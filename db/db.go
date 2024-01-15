@@ -644,6 +644,7 @@ func (db database) GetAllBounties(r *http.Request) []Bounty {
 	open := keys.Get("Open")
 	assingned := keys.Get("Assigned")
 	paid := keys.Get("Paid")
+	orgUuid := keys.Get("org_uuid")
 
 	ms := []Bounty{}
 
@@ -653,11 +654,12 @@ func (db database) GetAllBounties(r *http.Request) []Bounty {
 	openQuery := ""
 	assignedQuery := ""
 	paidQuery := ""
+	orgQuery := ""
 
 	if sortBy != "" && direction != "" {
 		orderQuery = "ORDER BY " + sortBy + " " + direction
 	} else {
-		orderQuery = " ORDER BY " + sortBy + "" + "DESC"
+		orderQuery = "ORDER BY " + sortBy + "" + "DESC"
 	}
 	if limit != 0 {
 		limitQuery = fmt.Sprintf("LIMIT %d  OFFSET %d", limit, offset)
@@ -685,9 +687,12 @@ func (db database) GetAllBounties(r *http.Request) []Bounty {
 			paidQuery = "AND paid = true"
 		}
 	}
+	if orgUuid != "" {
+		orgQuery = "AND org_uuid = '" + orgUuid + "'"
+	}
 	query := "SELECT * FROM public.bounty WHERE show != false"
 
-	allQuery := query + " " + openQuery + " " + assignedQuery + " " + paidQuery + " " + searchQuery + " " + orderQuery + " " + limitQuery
+	allQuery := query + " " + openQuery + " " + assignedQuery + " " + paidQuery + " " + searchQuery + " " + orgQuery + " " + orderQuery + " " + limitQuery
 
 	theQuery := db.db.Raw(allQuery)
 

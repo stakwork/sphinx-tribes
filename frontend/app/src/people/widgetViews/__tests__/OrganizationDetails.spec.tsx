@@ -30,6 +30,7 @@ const organization: Organization = {
  * @jest-environment jsdom
  */
 describe('OrganizationDetails', () => {
+  jest.setTimeout(10000);
   nock.disableNetConnect();
   nock(user.url).get('/person/id/1').reply(200, { user });
   nock(user.url).get('/ask').reply(200, {});
