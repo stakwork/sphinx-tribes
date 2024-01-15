@@ -9,7 +9,8 @@ import { useParams } from 'react-router-dom';
 import { colors } from '../../../config/colors';
 import { useIsMobile } from '../../../hooks';
 import { useStores } from '../../../store';
-import { Body, Backdrop } from '../style';
+import { OrgBody, Body, Backdrop } from '../style';
+import { OrgHeader } from './orgHeader';
 
 function OrgBodyComponent() {
   const { main, ui } = useStores();
@@ -141,7 +142,7 @@ function OrgBodyComponent() {
 
   return (
     !loading && (
-      <Body
+      <OrgBody
         onScroll={(e: any) => {
           setScrollValue(e?.currentTarget?.scrollTop >= 20);
         }}
@@ -150,21 +151,7 @@ function OrgBodyComponent() {
           height: 'calc(100% - 65px)'
         }}
       >
-        <div
-          style={{
-            minHeight: '32px'
-          }}
-        />
-
-        <BountyHeader
-          selectedWidget={selectedWidget}
-          scrollValue={scrollValue}
-          onChangeStatus={onChangeStatus}
-          onChangeLanguage={onChangeLanguage}
-          checkboxIdToSelectedMap={checkboxIdToSelectedMap}
-          checkboxIdToSelectedMapLanguage={checkboxIdToSelectedMapLanguage}
-        />
-
+        <OrgHeader />
         <>
           <div
             style={{
@@ -198,7 +185,7 @@ function OrgBodyComponent() {
           </div>
         </>
         {toastsEl}
-      </Body>
+      </OrgBody>
     )
   );
 }
