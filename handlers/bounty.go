@@ -30,9 +30,9 @@ func NewBountyHandler(httpClient HttpClient, db db.Database) *bountyHandler {
 	}
 }
 
-func GetAllBounties(w http.ResponseWriter, r *http.Request) {
-	bounties := db.DB.GetAllBounties(r)
-	var bountyResponse []db.BountyResponse = generateBountyResponse(bounties)
+func (h *bountyHandler) GetAllBounties(w http.ResponseWriter, r *http.Request) {
+	bounties := h.db.GetAllBounties(r)
+	var bountyResponse []db.BountyResponse = GenerateBountyResponse(bounties)
 
 	w.WriteHeader(http.StatusOK)
 	json.NewEncoder(w).Encode(bountyResponse)
@@ -48,7 +48,7 @@ func GetBountyById(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusBadRequest)
 		fmt.Println("Error", err)
 	} else {
-		var bountyResponse []db.BountyResponse = generateBountyResponse(bounties)
+		var bountyResponse []db.BountyResponse = GenerateBountyResponse(bounties)
 		w.WriteHeader(http.StatusOK)
 		json.NewEncoder(w).Encode(bountyResponse)
 	}
@@ -74,7 +74,7 @@ func GetBountyByCreated(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusBadRequest)
 		fmt.Println("Error", err)
 	} else {
-		var bountyResponse []db.BountyResponse = generateBountyResponse(bounties)
+		var bountyResponse []db.BountyResponse = GenerateBountyResponse(bounties)
 		w.WriteHeader(http.StatusOK)
 		json.NewEncoder(w).Encode(bountyResponse)
 	}
@@ -105,7 +105,7 @@ func GetPersonCreatedBounties(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusBadRequest)
 		fmt.Println("Error", err)
 	} else {
-		var bountyResponse []db.BountyResponse = generateBountyResponse(bounties)
+		var bountyResponse []db.BountyResponse = GenerateBountyResponse(bounties)
 		w.WriteHeader(http.StatusOK)
 		json.NewEncoder(w).Encode(bountyResponse)
 	}
@@ -117,7 +117,7 @@ func GetPersonAssignedBounties(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusBadRequest)
 		fmt.Println("Error", err)
 	} else {
-		var bountyResponse []db.BountyResponse = generateBountyResponse(bounties)
+		var bountyResponse []db.BountyResponse = GenerateBountyResponse(bounties)
 		w.WriteHeader(http.StatusOK)
 		json.NewEncoder(w).Encode(bountyResponse)
 	}
@@ -273,7 +273,7 @@ func UpdatePaymentStatus(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(bounty)
 }
 
-func generateBountyResponse(bounties []db.Bounty) []db.BountyResponse {
+func GenerateBountyResponse(bounties []db.Bounty) []db.BountyResponse {
 	var bountyResponse []db.BountyResponse
 
 	for i := 0; i < len(bounties); i++ {
