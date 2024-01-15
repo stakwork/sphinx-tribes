@@ -427,6 +427,12 @@ type BountyResponse struct {
 	Organization OrganizationShort `json:"organization"`
 }
 
+type BountyCountResponse struct {
+	OpenCount     int64 `json:"open_count"`
+	AssignedCount int64 `json:"assigned_count"`
+	PaidCount     int64 `json:"paid_count"`
+}
+
 type Organization struct {
 	ID          uint       `json:"id"`
 	Uuid        string     `json:"uuid"`
@@ -439,6 +445,9 @@ type Organization struct {
 	Deleted     bool       `gorm:"default:false" json:"deleted"`
 	BountyCount int64      `json:"bounty_count,omitempty"`
 	Budget      uint       `json:"budget,omitempty"`
+	Website     string     `json:"website"`
+	Github      string     `json:"github"`
+	Description string     `json:"description"`
 }
 
 type OrganizationShort struct {
