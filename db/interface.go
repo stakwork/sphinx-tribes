@@ -79,6 +79,7 @@ type Database interface {
 	GetBountiesLeaderboard() []LeaderData
 	GetOrganizations(r *http.Request) []Organization
 	GetOrganizationsCount() int64
+	GetOrganizationByUuid(uuid string) Organization
 	GetOrganizationByName(name string) Organization
 	CreateOrEditOrganization(m Organization) (Organization, error)
 	GetOrganizationUsers(uuid string) ([]OrganizationUsersData, error)
@@ -112,4 +113,14 @@ type Database interface {
 	ChangeOrganizationDeleteStatus(org_uuid string, status bool) Organization
 	GetFilterStatusCount() FilterStattuCount
 	UserHasManageBountyRoles(pubKeyFromAuth string, uuid string) bool
+	BountiesPaidPercentage(r PaymentDateRange) uint
+	TotalSatsPosted(r PaymentDateRange) uint
+	TotalSatsPaid(r PaymentDateRange) uint
+	SatsPaidPercentage(r PaymentDateRange) uint
+	AveragePaidTime(r PaymentDateRange) uint
+	AverageCompletedTime(r PaymentDateRange) uint
+	TotalBountiesPosted(r PaymentDateRange) int64
+	TotalPaidBounties(r PaymentDateRange) int64
+	NewHuntersPaid(r PaymentDateRange) int64
+	TotalHuntersPaid(r PaymentDateRange) int64
 }

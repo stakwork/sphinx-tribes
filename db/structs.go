@@ -556,9 +556,7 @@ type PaymentData struct {
 }
 
 type BountyPayRequest struct {
-	ReceiverPubKey  string `json:"receiver_pubkey"`
 	Websocket_token string `json:"websocket_token,omitempty"`
-	RouteHint       string `json:"route_hint,omitempty"`
 }
 
 type InvoiceType string
@@ -654,6 +652,21 @@ type BountyMetrics struct {
 	SatsPaidPercentage     uint  `json:"sats_paid_percentage"`
 	AveragePaid            uint  `json:"average_paid"`
 	AverageCompleted       uint  `json:"average_completed"`
+	UniqueHuntersPaid      int64 `json:"unique_hunters_paid"`
+	NewHuntersPaid         int64 `json:"new_hunters_paid"`
+}
+
+type MetricsBountyCsv struct {
+	DatePosted   *time.Time `json:"date_posted"`
+	Organization string     `json:"organization"`
+	BountyAmount uint       `json:"bounty_amount"`
+	Provider     string     `json:"provider"`
+	Hunter       string     `json:"hunter"`
+	BountyTitle  string     `json:"bounty_title"`
+	BountyLink   string     `json:"bounty_link"`
+	BountyStatus string     `json:"bounty_status"`
+	DatePaid     *time.Time `json:"date_paid"`
+	DateAssigned *time.Time `json:"date_assigned"`
 }
 
 type FilterStattuCount struct {

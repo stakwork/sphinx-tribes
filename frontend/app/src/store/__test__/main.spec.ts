@@ -7,6 +7,7 @@ import { MainStore } from '../main';
 import { localStorageMock } from '../../__test__/__mockData__/localStorage';
 import { TribesURL, getHost } from '../../config';
 import mockBounties, { expectedBountyResponses } from '../../bounties/__mock__/mockBounties.data';
+import moment from 'moment';
 
 let fetchStub: sinon.SinonStub;
 let mockApiResponseData: any[];
@@ -891,5 +892,45 @@ describe('Main store', () => {
     expect(store.peopleBounties.length).toEqual(2);
     expect(store.peopleBounties[1]).toEqual(expectedResponse);
     expect(bounties).toEqual([expectedResponse]);
+  });
+
+  it('should make a succcessful bounty payment', async () => {
+    const store = new MainStore();
+    uiStore.setMeInfo(emptyMeInfo);
+    const bounty = expectedBountyResponses[0];
+
+    store.makeBountyPayment = jest
+      .fn()
+      .mockReturnValueOnce(Promise.resolve({ status: 200, message: 'success' }));
+
+    const body = {
+      id: bounty.body.id,
+      websocket_token: 'test_websocket_token'
+    };
+
+    store.makeBountyPayment(body);
+    expect(store.makeBountyPayment).toBeCalledWith(body);
+  });
+
+  it('it should get a s3 URL afer a successful metrics url call', async () => {
+    const store = new MainStore();
+    uiStore.setMeInfo(emptyMeInfo);
+
+    store.exportMetricsBountiesCsv = jest
+      .fn()
+      .mockReturnValueOnce(
+        Promise.resolve({ status: 200, body: 'https://test-s3url.com/metrics.csv' })
+      );
+
+    const start_date = moment().subtract(30, 'days').unix().toString();
+    const end_date = moment().unix().toString();
+
+    const body = {
+      start_date,
+      end_date
+    };
+
+    store.exportMetricsBountiesCsv(body);
+    expect(store.exportMetricsBountiesCsv).toBeCalledWith(body);
   });
 });

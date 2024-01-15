@@ -311,6 +311,144 @@ func (_c *Database_AddUserInvoiceData_Call) RunAndReturn(run func(db.UserInvoice
 	return _c
 }
 
+// AverageCompletedTime provides a mock function with given fields: r
+func (_m *Database) AverageCompletedTime(r db.PaymentDateRange) uint {
+	ret := _m.Called(r)
+
+	if len(ret) == 0 {
+		panic("no return value specified for AverageCompletedTime")
+	}
+
+	var r0 uint
+	if rf, ok := ret.Get(0).(func(db.PaymentDateRange) uint); ok {
+		r0 = rf(r)
+	} else {
+		r0 = ret.Get(0).(uint)
+	}
+
+	return r0
+}
+
+// Database_AverageCompletedTime_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'AverageCompletedTime'
+type Database_AverageCompletedTime_Call struct {
+	*mock.Call
+}
+
+// AverageCompletedTime is a helper method to define mock.On call
+//   - r db.PaymentDateRange
+func (_e *Database_Expecter) AverageCompletedTime(r interface{}) *Database_AverageCompletedTime_Call {
+	return &Database_AverageCompletedTime_Call{Call: _e.mock.On("AverageCompletedTime", r)}
+}
+
+func (_c *Database_AverageCompletedTime_Call) Run(run func(r db.PaymentDateRange)) *Database_AverageCompletedTime_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(db.PaymentDateRange))
+	})
+	return _c
+}
+
+func (_c *Database_AverageCompletedTime_Call) Return(_a0 uint) *Database_AverageCompletedTime_Call {
+	_c.Call.Return(_a0)
+	return _c
+}
+
+func (_c *Database_AverageCompletedTime_Call) RunAndReturn(run func(db.PaymentDateRange) uint) *Database_AverageCompletedTime_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
+// AveragePaidTime provides a mock function with given fields: r
+func (_m *Database) AveragePaidTime(r db.PaymentDateRange) uint {
+	ret := _m.Called(r)
+
+	if len(ret) == 0 {
+		panic("no return value specified for AveragePaidTime")
+	}
+
+	var r0 uint
+	if rf, ok := ret.Get(0).(func(db.PaymentDateRange) uint); ok {
+		r0 = rf(r)
+	} else {
+		r0 = ret.Get(0).(uint)
+	}
+
+	return r0
+}
+
+// Database_AveragePaidTime_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'AveragePaidTime'
+type Database_AveragePaidTime_Call struct {
+	*mock.Call
+}
+
+// AveragePaidTime is a helper method to define mock.On call
+//   - r db.PaymentDateRange
+func (_e *Database_Expecter) AveragePaidTime(r interface{}) *Database_AveragePaidTime_Call {
+	return &Database_AveragePaidTime_Call{Call: _e.mock.On("AveragePaidTime", r)}
+}
+
+func (_c *Database_AveragePaidTime_Call) Run(run func(r db.PaymentDateRange)) *Database_AveragePaidTime_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(db.PaymentDateRange))
+	})
+	return _c
+}
+
+func (_c *Database_AveragePaidTime_Call) Return(_a0 uint) *Database_AveragePaidTime_Call {
+	_c.Call.Return(_a0)
+	return _c
+}
+
+func (_c *Database_AveragePaidTime_Call) RunAndReturn(run func(db.PaymentDateRange) uint) *Database_AveragePaidTime_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
+// BountiesPaidPercentage provides a mock function with given fields: r
+func (_m *Database) BountiesPaidPercentage(r db.PaymentDateRange) uint {
+	ret := _m.Called(r)
+
+	if len(ret) == 0 {
+		panic("no return value specified for BountiesPaidPercentage")
+	}
+
+	var r0 uint
+	if rf, ok := ret.Get(0).(func(db.PaymentDateRange) uint); ok {
+		r0 = rf(r)
+	} else {
+		r0 = ret.Get(0).(uint)
+	}
+
+	return r0
+}
+
+// Database_BountiesPaidPercentage_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'BountiesPaidPercentage'
+type Database_BountiesPaidPercentage_Call struct {
+	*mock.Call
+}
+
+// BountiesPaidPercentage is a helper method to define mock.On call
+//   - r db.PaymentDateRange
+func (_e *Database_Expecter) BountiesPaidPercentage(r interface{}) *Database_BountiesPaidPercentage_Call {
+	return &Database_BountiesPaidPercentage_Call{Call: _e.mock.On("BountiesPaidPercentage", r)}
+}
+
+func (_c *Database_BountiesPaidPercentage_Call) Run(run func(r db.PaymentDateRange)) *Database_BountiesPaidPercentage_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(db.PaymentDateRange))
+	})
+	return _c
+}
+
+func (_c *Database_BountiesPaidPercentage_Call) Return(_a0 uint) *Database_BountiesPaidPercentage_Call {
+	_c.Call.Return(_a0)
+	return _c
+}
+
+func (_c *Database_BountiesPaidPercentage_Call) RunAndReturn(run func(db.PaymentDateRange) uint) *Database_BountiesPaidPercentage_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
 // ChangeOrganizationDeleteStatus provides a mock function with given fields: org_uuid, status
 func (_m *Database) ChangeOrganizationDeleteStatus(org_uuid string, status bool) db.Organization {
 	ret := _m.Called(org_uuid, status)
@@ -3018,6 +3156,52 @@ func (_c *Database_GetOrganizationByName_Call) RunAndReturn(run func(string) db.
 	return _c
 }
 
+// GetOrganizationByUuid provides a mock function with given fields: uuid
+func (_m *Database) GetOrganizationByUuid(uuid string) db.Organization {
+	ret := _m.Called(uuid)
+
+	if len(ret) == 0 {
+		panic("no return value specified for GetOrganizationByUuid")
+	}
+
+	var r0 db.Organization
+	if rf, ok := ret.Get(0).(func(string) db.Organization); ok {
+		r0 = rf(uuid)
+	} else {
+		r0 = ret.Get(0).(db.Organization)
+	}
+
+	return r0
+}
+
+// Database_GetOrganizationByUuid_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'GetOrganizationByUuid'
+type Database_GetOrganizationByUuid_Call struct {
+	*mock.Call
+}
+
+// GetOrganizationByUuid is a helper method to define mock.On call
+//   - uuid string
+func (_e *Database_Expecter) GetOrganizationByUuid(uuid interface{}) *Database_GetOrganizationByUuid_Call {
+	return &Database_GetOrganizationByUuid_Call{Call: _e.mock.On("GetOrganizationByUuid", uuid)}
+}
+
+func (_c *Database_GetOrganizationByUuid_Call) Run(run func(uuid string)) *Database_GetOrganizationByUuid_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(string))
+	})
+	return _c
+}
+
+func (_c *Database_GetOrganizationByUuid_Call) Return(_a0 db.Organization) *Database_GetOrganizationByUuid_Call {
+	_c.Call.Return(_a0)
+	return _c
+}
+
+func (_c *Database_GetOrganizationByUuid_Call) RunAndReturn(run func(string) db.Organization) *Database_GetOrganizationByUuid_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
 // GetOrganizationInvoices provides a mock function with given fields: org_uuid
 func (_m *Database) GetOrganizationInvoices(org_uuid string) []db.InvoiceList {
 	ret := _m.Called(org_uuid)
@@ -4295,6 +4479,98 @@ func (_c *Database_GetUserInvoiceData_Call) RunAndReturn(run func(string) db.Use
 	return _c
 }
 
+// NewHuntersPaid provides a mock function with given fields: r
+func (_m *Database) NewHuntersPaid(r db.PaymentDateRange) int64 {
+	ret := _m.Called(r)
+
+	if len(ret) == 0 {
+		panic("no return value specified for NewHuntersPaid")
+	}
+
+	var r0 int64
+	if rf, ok := ret.Get(0).(func(db.PaymentDateRange) int64); ok {
+		r0 = rf(r)
+	} else {
+		r0 = ret.Get(0).(int64)
+	}
+
+	return r0
+}
+
+// Database_NewHuntersPaid_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'NewHuntersPaid'
+type Database_NewHuntersPaid_Call struct {
+	*mock.Call
+}
+
+// NewHuntersPaid is a helper method to define mock.On call
+//   - r db.PaymentDateRange
+func (_e *Database_Expecter) NewHuntersPaid(r interface{}) *Database_NewHuntersPaid_Call {
+	return &Database_NewHuntersPaid_Call{Call: _e.mock.On("NewHuntersPaid", r)}
+}
+
+func (_c *Database_NewHuntersPaid_Call) Run(run func(r db.PaymentDateRange)) *Database_NewHuntersPaid_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(db.PaymentDateRange))
+	})
+	return _c
+}
+
+func (_c *Database_NewHuntersPaid_Call) Return(_a0 int64) *Database_NewHuntersPaid_Call {
+	_c.Call.Return(_a0)
+	return _c
+}
+
+func (_c *Database_NewHuntersPaid_Call) RunAndReturn(run func(db.PaymentDateRange) int64) *Database_NewHuntersPaid_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
+// SatsPaidPercentage provides a mock function with given fields: r
+func (_m *Database) SatsPaidPercentage(r db.PaymentDateRange) uint {
+	ret := _m.Called(r)
+
+	if len(ret) == 0 {
+		panic("no return value specified for SatsPaidPercentage")
+	}
+
+	var r0 uint
+	if rf, ok := ret.Get(0).(func(db.PaymentDateRange) uint); ok {
+		r0 = rf(r)
+	} else {
+		r0 = ret.Get(0).(uint)
+	}
+
+	return r0
+}
+
+// Database_SatsPaidPercentage_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'SatsPaidPercentage'
+type Database_SatsPaidPercentage_Call struct {
+	*mock.Call
+}
+
+// SatsPaidPercentage is a helper method to define mock.On call
+//   - r db.PaymentDateRange
+func (_e *Database_Expecter) SatsPaidPercentage(r interface{}) *Database_SatsPaidPercentage_Call {
+	return &Database_SatsPaidPercentage_Call{Call: _e.mock.On("SatsPaidPercentage", r)}
+}
+
+func (_c *Database_SatsPaidPercentage_Call) Run(run func(r db.PaymentDateRange)) *Database_SatsPaidPercentage_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(db.PaymentDateRange))
+	})
+	return _c
+}
+
+func (_c *Database_SatsPaidPercentage_Call) Return(_a0 uint) *Database_SatsPaidPercentage_Call {
+	_c.Call.Return(_a0)
+	return _c
+}
+
+func (_c *Database_SatsPaidPercentage_Call) RunAndReturn(run func(db.PaymentDateRange) uint) *Database_SatsPaidPercentage_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
 // SearchBots provides a mock function with given fields: s, limit, offset
 func (_m *Database) SearchBots(s string, limit int, offset int) []db.BotRes {
 	ret := _m.Called(s, limit, offset)
@@ -4439,6 +4715,236 @@ func (_c *Database_SearchTribes_Call) Return(_a0 []db.Tribe) *Database_SearchTri
 }
 
 func (_c *Database_SearchTribes_Call) RunAndReturn(run func(string) []db.Tribe) *Database_SearchTribes_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
+// TotalBountiesPosted provides a mock function with given fields: r
+func (_m *Database) TotalBountiesPosted(r db.PaymentDateRange) int64 {
+	ret := _m.Called(r)
+
+	if len(ret) == 0 {
+		panic("no return value specified for TotalBountiesPosted")
+	}
+
+	var r0 int64
+	if rf, ok := ret.Get(0).(func(db.PaymentDateRange) int64); ok {
+		r0 = rf(r)
+	} else {
+		r0 = ret.Get(0).(int64)
+	}
+
+	return r0
+}
+
+// Database_TotalBountiesPosted_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'TotalBountiesPosted'
+type Database_TotalBountiesPosted_Call struct {
+	*mock.Call
+}
+
+// TotalBountiesPosted is a helper method to define mock.On call
+//   - r db.PaymentDateRange
+func (_e *Database_Expecter) TotalBountiesPosted(r interface{}) *Database_TotalBountiesPosted_Call {
+	return &Database_TotalBountiesPosted_Call{Call: _e.mock.On("TotalBountiesPosted", r)}
+}
+
+func (_c *Database_TotalBountiesPosted_Call) Run(run func(r db.PaymentDateRange)) *Database_TotalBountiesPosted_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(db.PaymentDateRange))
+	})
+	return _c
+}
+
+func (_c *Database_TotalBountiesPosted_Call) Return(_a0 int64) *Database_TotalBountiesPosted_Call {
+	_c.Call.Return(_a0)
+	return _c
+}
+
+func (_c *Database_TotalBountiesPosted_Call) RunAndReturn(run func(db.PaymentDateRange) int64) *Database_TotalBountiesPosted_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
+// TotalHuntersPaid provides a mock function with given fields: r
+func (_m *Database) TotalHuntersPaid(r db.PaymentDateRange) int64 {
+	ret := _m.Called(r)
+
+	if len(ret) == 0 {
+		panic("no return value specified for TotalHuntersPaid")
+	}
+
+	var r0 int64
+	if rf, ok := ret.Get(0).(func(db.PaymentDateRange) int64); ok {
+		r0 = rf(r)
+	} else {
+		r0 = ret.Get(0).(int64)
+	}
+
+	return r0
+}
+
+// Database_TotalHuntersPaid_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'TotalHuntersPaid'
+type Database_TotalHuntersPaid_Call struct {
+	*mock.Call
+}
+
+// TotalHuntersPaid is a helper method to define mock.On call
+//   - r db.PaymentDateRange
+func (_e *Database_Expecter) TotalHuntersPaid(r interface{}) *Database_TotalHuntersPaid_Call {
+	return &Database_TotalHuntersPaid_Call{Call: _e.mock.On("TotalHuntersPaid", r)}
+}
+
+func (_c *Database_TotalHuntersPaid_Call) Run(run func(r db.PaymentDateRange)) *Database_TotalHuntersPaid_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(db.PaymentDateRange))
+	})
+	return _c
+}
+
+func (_c *Database_TotalHuntersPaid_Call) Return(_a0 int64) *Database_TotalHuntersPaid_Call {
+	_c.Call.Return(_a0)
+	return _c
+}
+
+func (_c *Database_TotalHuntersPaid_Call) RunAndReturn(run func(db.PaymentDateRange) int64) *Database_TotalHuntersPaid_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
+// TotalPaidBounties provides a mock function with given fields: r
+func (_m *Database) TotalPaidBounties(r db.PaymentDateRange) int64 {
+	ret := _m.Called(r)
+
+	if len(ret) == 0 {
+		panic("no return value specified for TotalPaidBounties")
+	}
+
+	var r0 int64
+	if rf, ok := ret.Get(0).(func(db.PaymentDateRange) int64); ok {
+		r0 = rf(r)
+	} else {
+		r0 = ret.Get(0).(int64)
+	}
+
+	return r0
+}
+
+// Database_TotalPaidBounties_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'TotalPaidBounties'
+type Database_TotalPaidBounties_Call struct {
+	*mock.Call
+}
+
+// TotalPaidBounties is a helper method to define mock.On call
+//   - r db.PaymentDateRange
+func (_e *Database_Expecter) TotalPaidBounties(r interface{}) *Database_TotalPaidBounties_Call {
+	return &Database_TotalPaidBounties_Call{Call: _e.mock.On("TotalPaidBounties", r)}
+}
+
+func (_c *Database_TotalPaidBounties_Call) Run(run func(r db.PaymentDateRange)) *Database_TotalPaidBounties_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(db.PaymentDateRange))
+	})
+	return _c
+}
+
+func (_c *Database_TotalPaidBounties_Call) Return(_a0 int64) *Database_TotalPaidBounties_Call {
+	_c.Call.Return(_a0)
+	return _c
+}
+
+func (_c *Database_TotalPaidBounties_Call) RunAndReturn(run func(db.PaymentDateRange) int64) *Database_TotalPaidBounties_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
+// TotalSatsPaid provides a mock function with given fields: r
+func (_m *Database) TotalSatsPaid(r db.PaymentDateRange) uint {
+	ret := _m.Called(r)
+
+	if len(ret) == 0 {
+		panic("no return value specified for TotalSatsPaid")
+	}
+
+	var r0 uint
+	if rf, ok := ret.Get(0).(func(db.PaymentDateRange) uint); ok {
+		r0 = rf(r)
+	} else {
+		r0 = ret.Get(0).(uint)
+	}
+
+	return r0
+}
+
+// Database_TotalSatsPaid_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'TotalSatsPaid'
+type Database_TotalSatsPaid_Call struct {
+	*mock.Call
+}
+
+// TotalSatsPaid is a helper method to define mock.On call
+//   - r db.PaymentDateRange
+func (_e *Database_Expecter) TotalSatsPaid(r interface{}) *Database_TotalSatsPaid_Call {
+	return &Database_TotalSatsPaid_Call{Call: _e.mock.On("TotalSatsPaid", r)}
+}
+
+func (_c *Database_TotalSatsPaid_Call) Run(run func(r db.PaymentDateRange)) *Database_TotalSatsPaid_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(db.PaymentDateRange))
+	})
+	return _c
+}
+
+func (_c *Database_TotalSatsPaid_Call) Return(_a0 uint) *Database_TotalSatsPaid_Call {
+	_c.Call.Return(_a0)
+	return _c
+}
+
+func (_c *Database_TotalSatsPaid_Call) RunAndReturn(run func(db.PaymentDateRange) uint) *Database_TotalSatsPaid_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
+// TotalSatsPosted provides a mock function with given fields: r
+func (_m *Database) TotalSatsPosted(r db.PaymentDateRange) uint {
+	ret := _m.Called(r)
+
+	if len(ret) == 0 {
+		panic("no return value specified for TotalSatsPosted")
+	}
+
+	var r0 uint
+	if rf, ok := ret.Get(0).(func(db.PaymentDateRange) uint); ok {
+		r0 = rf(r)
+	} else {
+		r0 = ret.Get(0).(uint)
+	}
+
+	return r0
+}
+
+// Database_TotalSatsPosted_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'TotalSatsPosted'
+type Database_TotalSatsPosted_Call struct {
+	*mock.Call
+}
+
+// TotalSatsPosted is a helper method to define mock.On call
+//   - r db.PaymentDateRange
+func (_e *Database_Expecter) TotalSatsPosted(r interface{}) *Database_TotalSatsPosted_Call {
+	return &Database_TotalSatsPosted_Call{Call: _e.mock.On("TotalSatsPosted", r)}
+}
+
+func (_c *Database_TotalSatsPosted_Call) Run(run func(r db.PaymentDateRange)) *Database_TotalSatsPosted_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(db.PaymentDateRange))
+	})
+	return _c
+}
+
+func (_c *Database_TotalSatsPosted_Call) Return(_a0 uint) *Database_TotalSatsPosted_Call {
+	_c.Call.Return(_a0)
+	return _c
+}
+
+func (_c *Database_TotalSatsPosted_Call) RunAndReturn(run func(db.PaymentDateRange) uint) *Database_TotalSatsPosted_Call {
 	_c.Call.Return(run)
 	return _c
 }
