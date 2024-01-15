@@ -21,6 +21,14 @@ import (
 	"github.com/tuan78/jsonconv"
 )
 
+type metricHandler struct {
+	db db.Database
+}
+
+func NewMetricHandler(db db.Database) *metricHandler {
+	return &metricHandler{db: db}
+}
+
 func PaymentMetrics(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 	pubKeyFromAuth, _ := ctx.Value(auth.ContextKey).(string)
@@ -102,7 +110,7 @@ func PeopleMetrics(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(sumAmount)
 }
 
-func BountyMetrics(w http.ResponseWriter, r *http.Request) {
+func (mh *metricHandler) BountyMetrics(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 	pubKeyFromAuth, _ := ctx.Value(auth.ContextKey).(string)
 
@@ -137,14 +145,16 @@ func BountyMetrics(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
-	totalBountiesPosted := db.DB.TotalBountiesPosted(request)
-	totalBountiesPaid := db.DB.TotalPaidBounties(request)
-	bountiesPaidPercentage := db.DB.BountiesPaidPercentage(request)
-	totalSatsPosted := db.DB.TotalSatsPosted(request)
-	totalSatsPaid := db.DB.TotalSatsPaid(request)
-	satsPaidPercentage := db.DB.SatsPaidPercentage(request)
-	avgPaidDays := db.DB.AveragePaidTime(request)
-	avgCompletedDays := db.DB.AverageCompletedTime(request)
+	totalBountiesPosted := mh.db.TotalBountiesPosted(request)
+	totalBountiesPaid := mh.db.TotalPaidBounties(request)
+	bountiesPaidPercentage := mh.db.BountiesPaidPercentage(request)
+	totalSatsPosted := mh.db.TotalSatsPosted(request)
+	totalSatsPaid := mh.db.TotalSatsPaid(request)
+	satsPaidPercentage := mh.db.SatsPaidPercentage(request)
+	avgPaidDays := mh.db.AveragePaidTime(request)
+	avgCompletedDays := mh.db.AverageCompletedTime(request)
+	uniqueHuntersPaid := mh.db.TotalHuntersPaid(request)
+	newHuntersPaid := mh.db.NewHuntersPaid(request)
 
 	bountyMetrics := db.BountyMetrics{
 		BountiesPosted:         totalBountiesPosted,
@@ -155,6 +165,8 @@ func BountyMetrics(w http.ResponseWriter, r *http.Request) {
 		SatsPaidPercentage:     satsPaidPercentage,
 		AveragePaid:            avgPaidDays,
 		AverageCompleted:       avgCompletedDays,
+		UniqueHuntersPaid:      uniqueHuntersPaid,
+		NewHuntersPaid:         newHuntersPaid,
 	}
 
 	if db.RedisError == nil {
