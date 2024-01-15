@@ -35,7 +35,7 @@ interface StatisticsProps {
   mockHunter?: MockHunterMetrics;
 }
 
-export const Statistics = ({ freezeHeaderRef, metrics, mockHunter }: StatisticsProps) => (
+export const Statistics = ({ freezeHeaderRef, metrics }: StatisticsProps) => (
   <>
     <Wrapper ref={freezeHeaderRef}>
       <Card>
@@ -143,14 +143,14 @@ export const Statistics = ({ freezeHeaderRef, metrics, mockHunter }: StatisticsP
         <BelowCardWrapper>
           <DivWrapper>
             <div>
-              <Title>{mockHunter?.hunters_total_paid}</Title>
+              <Title>{metrics?.unique_hunters_paid}</Title>
               <Subheading width="80px">Total Paid</Subheading>
             </div>
             <VerticaGrayLine />
           </DivWrapper>
           <DivWrapper>
             <div>
-              <Title>{mockHunter?.hunters_first_bounty_paid}</Title>
+              <Title>{metrics?.new_hunters_paid}</Title>
               <Subheading width="120px">First Bounty Paid</Subheading>
             </div>
           </DivWrapper>

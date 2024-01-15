@@ -263,6 +263,8 @@ export interface BountyMetrics {
   sats_paid_percentage: number;
   average_paid: number;
   average_completed: number;
+  unique_hunters_paid: number;
+  new_hunters_paid: number;
 }
 
 export interface BountyStatus {
