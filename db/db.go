@@ -645,6 +645,9 @@ func (db database) GetAllBounties(r *http.Request) []Bounty {
 	assingned := keys.Get("Assigned")
 	paid := keys.Get("Paid")
 	orgUuid := keys.Get("org_uuid")
+	languages := keys.Get("languages")
+	languageArray := strings.Split(languages, ",")
+	languageLength := len(languageArray)
 
 	ms := []Bounty{}
 
@@ -655,6 +658,7 @@ func (db database) GetAllBounties(r *http.Request) []Bounty {
 	assignedQuery := ""
 	paidQuery := ""
 	orgQuery := ""
+	languageQuery := ""
 
 	if sortBy != "" && direction != "" {
 		orderQuery = "ORDER BY " + sortBy + " " + direction
@@ -690,9 +694,22 @@ func (db database) GetAllBounties(r *http.Request) []Bounty {
 	if orgUuid != "" {
 		orgQuery = "AND org_uuid = '" + orgUuid + "'"
 	}
+	if languageLength > 0 {
+		for i, val := range languageArray {
+			if val != "" {
+				if i == 0 {
+					languageQuery = "AND coding_languages && ARRAY['" + val + "']"
+				} else {
+					query := "OR coding_languages && ARRAY['" + val + "']"
+					languageQuery = languageQuery + " " + query
+				}
+			}
+		}
+	}
+
 	query := "SELECT * FROM public.bounty WHERE show != false"
 
-	allQuery := query + " " + openQuery + " " + assignedQuery + " " + paidQuery + " " + searchQuery + " " + orgQuery + " " + orderQuery + " " + limitQuery
+	allQuery := query + " " + openQuery + " " + assignedQuery + " " + paidQuery + " " + searchQuery + " " + orgQuery + " " + languageQuery + " " + orderQuery + " " + limitQuery
 
 	theQuery := db.db.Raw(allQuery)
 
