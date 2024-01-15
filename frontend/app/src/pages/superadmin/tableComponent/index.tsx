@@ -41,7 +41,7 @@ import {
   BoxImage
 } from './TableStyle';
 
-import './styles.css';
+// import './styles.css';
 
 import { FilterContainer, FlexDivStatus, StatusCheckboxItem } from './StatusStyle';
 
@@ -332,7 +332,6 @@ export const MyTable = ({
               </StyledSelect>
             </FlexDiv>
             <FlexDiv>
-              <Label>Status:</Label>
               <EuiPopover
                 button={
                   <FilterContainer onClick={onButtonClick}>                                       
