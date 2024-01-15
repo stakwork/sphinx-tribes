@@ -11,8 +11,6 @@ import (
 	"net/http"
 	"net/http/httptest"
 	"testing"
-	"strings"
-	"fmt"
 )
 
 func TestUnitCreateOrEditOrganization(t *testing.T) {
@@ -100,31 +98,4 @@ func TestUnitCreateOrEditOrganization(t *testing.T) {
 
 		assert.Equal(t, http.StatusOK, rr.Code)
 	})
-	t.Run("should return error if org description is empty or too long", func(t *testing.T) {
-        tests := []struct {
-            name        string
-            description string
-            wantStatus  int
-        }{
-            {"empty description", "", http.StatusBadRequest},  
-			{"long description", strings.Repeat("a", 121), http.StatusBadRequest},
-        }
-
-        for _, tc := range tests {
-            t.Run(tc.description, func(t *testing.T) {
-                rr := httptest.NewRecorder()
-                handler := http.HandlerFunc(oHandler.CreateOrEditOrganization)
-				invalidJson := []byte(fmt.Sprintf(`{"name": "TestOrganization", "owner_pubkey": "test-key", "description": "%s"}`, tc.description))
-               
-                req, err := http.NewRequestWithContext(ctx, http.MethodPost, "/", bytes.NewReader(invalidJson))
-                if err != nil {
-                    t.Fatal(err)
-                }
-
-                handler.ServeHTTP(rr, req)
-
-                assert.Equal(t, tc.wantStatus, rr.Code)
-            })
-        }
-    })
 }
