@@ -309,15 +309,31 @@ func GetMetricsBountiesData(metricBounties []db.Bounty) []db.BountyData {
 func getMetricsBountyCsv(metricBounties []db.Bounty) []db.MetricsBountyCsv {
 	var metricBountiesCsv []db.MetricsBountyCsv
 	for _, bounty := range metricBounties {
+		bountyOwner := db.DB.GetPersonByPubkey(bounty.OwnerID)
+		bountyAssignee := db.DB.GetPersonByPubkey(bounty.Assignee)
+		organization := db.DB.GetOrganizationByUuid(bounty.OrgUuid)
+
+		bountyLink := fmt.Sprintf("https://community.sphinx.chat/bounty/%d", bounty.ID)
+		bountyStatus := "Open"
+
+		if bounty.Assignee != "" && !bounty.Paid {
+			bountyStatus = "Assigned"
+		} else {
+			bountyStatus = "Paid"
+		}
+
 		tm := time.Unix(bounty.Created, 0)
 		bountyCsv := db.MetricsBountyCsv{
 			DatePosted:   &tm,
+			Organization: organization.Name,
 			BountyAmount: bounty.Price,
+			Provider:     bountyOwner.OwnerAlias,
+			Hunter:       bountyAssignee.OwnerAlias,
+			BountyTitle:  bounty.Title,
+			BountyLink:   bountyLink,
+			BountyStatus: bountyStatus,
 			DateAssigned: bounty.AssignedDate,
 			DatePaid:     bounty.PaidDate,
-			BountyTitle:  bounty.Title,
-			Hunter:       bounty.Assignee,
-			Provider:     bounty.OwnerID,
 		}
 		metricBountiesCsv = append(metricBountiesCsv, bountyCsv)
 	}
@@ -326,13 +342,7 @@ func getMetricsBountyCsv(metricBounties []db.Bounty) []db.MetricsBountyCsv {
 }
 
 func ConvertMetricsToCSV(metricBountiesData []db.MetricsBountyCsv) [][]string {
-	var metricsData []map[string]interface{}
-	data, err := json.Marshal(metricBountiesData)
-	if err != nil {
-		fmt.Println("Could not convert metrics structs Array to JSON")
-		return [][]string{}
-	}
-	err = json.Unmarshal(data, &metricsData)
+	metricsData := db.DB.ConvertMetricsBountiesToMap(metricBountiesData)
 	result := jsonconv.ToCsv(metricsData, nil)
 	return result
 }
