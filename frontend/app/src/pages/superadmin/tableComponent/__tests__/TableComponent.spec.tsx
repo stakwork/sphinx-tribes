@@ -66,6 +66,23 @@ const mockBounties = [
     organizationImage: 'org-image-3.jpg',
     status: 'paid',
     paid: true
+  },
+  {
+    id: 4,
+    bounty_id: 4,
+    title: 'Bounty 4',
+    date: '2023-01-04',
+    bounty_created: '1672812000',
+    paid_date: '2023-01-04',
+    dtgp: 400,
+    assignee: 'Assignee 4',
+    assigneeImage: 'assignee-image-4.jpg',
+    provider: 'Provider 4',
+    providerImage: 'provider-image-4.jpg',
+    organization: 'Org 4',
+    organizationImage: 'org-image-4.jpg',
+    status: 'open',
+    paid: false
   }
 ];
 
