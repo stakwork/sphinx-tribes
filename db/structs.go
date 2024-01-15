@@ -658,12 +658,15 @@ type BountyMetrics struct {
 
 type MetricsBountyCsv struct {
 	DatePosted   *time.Time `json:"date_posted"`
-	DatePaid     *time.Time `json:"date_paid"`
-	DateAssigned *time.Time `json:"date_assigned"`
-	BountyTitle  string     `json:"bounty_title"`
+	Organization string     `json:"organization"`
+	BountyAmount uint       `json:"bounty_amount"`
 	Provider     string     `json:"provider"`
 	Hunter       string     `json:"hunter"`
-	BountyAmount uint       `json:"bounty_amount"`
+	BountyTitle  string     `json:"bounty_title"`
+	BountyLink   string     `json:"bounty_link"`
+	BountyStatus string     `json:"bounty_status"`
+	DatePaid     *time.Time `json:"date_paid"`
+	DateAssigned *time.Time `json:"date_assigned"`
 }
 
 type FilterStattuCount struct {
