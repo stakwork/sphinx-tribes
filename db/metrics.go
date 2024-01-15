@@ -2,10 +2,9 @@ package db
 
 import (
 	"fmt"
+	"github.com/stakwork/sphinx-tribes/utils"
 	"math"
 	"net/http"
-
-	"github.com/stakwork/sphinx-tribes/utils"
 )
 
 var SecondsToDateConversion = 60 * 60 * 24
@@ -54,6 +53,26 @@ func (db database) SatsPaidPercentage(r PaymentDateRange) uint {
 func (db database) TotalPaidBounties(r PaymentDateRange) int64 {
 	var count int64
 	db.db.Model(&Bounty{}).Where("paid = ?", true).Where("created >= ?", r.StartDate).Where("created <= ?", r.EndDate).Count(&count)
+	return count
+}
+
+func (db database) TotalHuntersPaid(r PaymentDateRange) int64 {
+	var count int64
+	db.db.Model(&Bounty{}).Select("DISTINCT assignee").Where("created >= ?", r.StartDate).Where("created <= ?", r.EndDate).Count(&count)
+	return count
+}
+
+func (db database) NewHuntersPaid(r PaymentDateRange) int64 {
+	var count int64
+	db.db.Model(&Bounty{}).
+		Select("DISTINCT assignee").
+		Where("paid = true").
+		Where("created >= ?", r.StartDate).Where("created <= ?", r.EndDate).
+		Not("assignee IN (?)", db.db.Model(&Bounty{}).
+			Select("assignee").
+			Where("paid = true").
+			Where("created < ?", r.StartDate),
+		).Count(&count)
 	return count
 }
 
