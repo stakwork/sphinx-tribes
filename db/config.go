@@ -198,6 +198,28 @@ func GetUserRolesMap(userRoles []UserRoles) map[string]string {
 	return roles
 }
 
+func (db database) ConvertMetricsBountiesToMap(metricsCsv []MetricsBountyCsv) []map[string]interface{} {
+	var metricsMap []map[string]interface{}
+	for _, m := range metricsCsv {
+		metricMap := make(map[string]interface{})
+
+		metricMap["DatePosted"] = m.DatePosted
+		metricMap["Organization"] = m.Organization
+		metricMap["BountyAmount"] = m.BountyAmount
+		metricMap["Provider"] = m.Provider
+		metricMap["Hunter"] = m.Hunter
+		metricMap["BountyTitle"] = m.BountyTitle
+		metricMap["BountyLink"] = m.BountyLink
+		metricMap["BountyStatus"] = m.BountyStatus
+		metricMap["DateAssigned"] = m.DateAssigned
+		metricMap["DatePaid"] = m.DatePaid
+
+		metricsMap = append(metricsMap, metricMap)
+	}
+
+	return metricsMap
+}
+
 func RolesCheck(userRoles []UserRoles, check string) bool {
 	rolesMap := GetRolesMap()
 	userRolesMap := GetUserRolesMap(userRoles)
