@@ -484,9 +484,9 @@ func (db database) GetFilterStatusCount() FilterStattuCount {
 	var assignedCount int64
 	var paidCount int64
 
-	db.db.Raw("SELECT COUNT(*) FROM bounty WHERE show != false AND assignee = '' AND paid != true").Scan(&openCount)
-	db.db.Raw("SELECT COUNT(*) FROM bounty WHERE show != false AND assignee != ''").Scan(&assignedCount)
-	db.db.Raw("SELECT COUNT(*) FROM bounty WHERE show != false AND paid = true").Scan(&paidCount)
+	db.db.Model(&Bounty{}).Where("show != false").Where("assignee = ''").Where("paid != true").Count(&openCount)
+	db.db.Model(&Bounty{}).Where("show != false").Where("assignee != ''").Where("paid != true").Count(&assignedCount)
+	db.db.Model(&Bounty{}).Where("show != false").Where("assignee != ''").Where("paid = true").Count(&paidCount)
 
 	ms := FilterStattuCount{
 		Open:     openCount,
