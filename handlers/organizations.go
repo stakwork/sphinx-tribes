@@ -500,7 +500,7 @@ func GetOrganizationBounties(w http.ResponseWriter, r *http.Request) {
 	// get the organization bounties
 	organizationBounties := db.DB.GetOrganizationBounties(r, uuid)
 
-	var bountyResponse []db.BountyResponse = generateBountyResponse(organizationBounties)
+	var bountyResponse []db.BountyResponse = GenerateBountyResponse(organizationBounties)
 	w.WriteHeader(http.StatusOK)
 	json.NewEncoder(w).Encode(bountyResponse)
 }
