@@ -1,8 +1,8 @@
-import styled, { css } from 'styled-components';
+import styled from 'styled-components';
 
-type FreezeProps = {
-  freeze: boolean;
-};
+// type FreezeProps = {
+//   freeze: boolean;
+// };
 
 // const applyFreezeHeaderStyles = ({ freeze = false }: FreezeProps) =>
 //   freeze &&
