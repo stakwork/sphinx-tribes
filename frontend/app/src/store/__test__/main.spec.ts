@@ -7,6 +7,7 @@ import { MainStore } from '../main';
 import { localStorageMock } from '../../__test__/__mockData__/localStorage';
 import { TribesURL, getHost } from '../../config';
 import mockBounties, { expectedBountyResponses } from '../../bounties/__mock__/mockBounties.data';
+import moment from 'moment';
 
 let fetchStub: sinon.SinonStub;
 let mockApiResponseData: any[];
@@ -475,8 +476,8 @@ describe('Main store', () => {
     await store.deleteBounty(1111, 'pub_key');
 
     expect(fetchStub.withArgs(url, expectedRequestOptions).calledOnce).toEqual(true);
-    expect(store.peopleBounties.length).toEqual(1);
-    expect(store.peopleBounties).toEqual([expectedBountyResponses[0]]);
+    expect(store.peopleBounties.length).toEqual(0);
+    expect(store.peopleBounties).toEqual([]);
   });
 
   it('should not panic if failed to delete bounty', async () => {
@@ -656,7 +657,7 @@ describe('Main store', () => {
     expect(res).toEqual(0);
   });
 
-  it('should set all query params, page, limit, search when fetching bounties, user logged out', async () => {
+  it('should set all query params, page, limit, search, and languages when fetching bounties, user logged out', async () => {
     uiStore.setMeInfo(emptyMeInfo);
     const allBountiesUrl = `http://${getHost()}/gobounties/all?limit=10&sortBy=updatedat&search=random&page=1&resetPage=true`;
     fetchStub.withArgs(allBountiesUrl, sinon.match.any).returns(
@@ -909,5 +910,27 @@ describe('Main store', () => {
 
     store.makeBountyPayment(body);
     expect(store.makeBountyPayment).toBeCalledWith(body);
+  });
+
+  it('it should get a s3 URL afer a successful metrics url call', async () => {
+    const store = new MainStore();
+    uiStore.setMeInfo(emptyMeInfo);
+
+    store.exportMetricsBountiesCsv = jest
+      .fn()
+      .mockReturnValueOnce(
+        Promise.resolve({ status: 200, body: 'https://test-s3url.com/metrics.csv' })
+      );
+
+    const start_date = moment().subtract(30, 'days').unix().toString();
+    const end_date = moment().unix().toString();
+
+    const body = {
+      start_date,
+      end_date
+    };
+
+    store.exportMetricsBountiesCsv(body);
+    expect(store.exportMetricsBountiesCsv).toBeCalledWith(body);
   });
 });

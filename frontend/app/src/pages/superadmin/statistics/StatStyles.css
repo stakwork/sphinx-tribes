@@ -1,6 +1,11 @@
 .BountiesSvg {
-  margin-top: 3px;
-  margin-right: 4px;
+  margin-top: 4px;
+  margin-right: 10px;
+}
+
+.HunterSvg {
+  margin-top: 4px;
+  margin-right: 10px;
 }
 
 .logoAlign {
@@ -18,8 +23,8 @@
 }
 
 .SatoshieSvg {
-  margin-top: 3px;
-  margin-right: 5px;
+  margin-top: 4px;
+  margin-right: 10px;
 }
 
 .ClocklogoAlign {

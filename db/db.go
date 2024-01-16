@@ -484,9 +484,9 @@ func (db database) GetFilterStatusCount() FilterStattuCount {
 	var assignedCount int64
 	var paidCount int64
 
-	db.db.Raw("SELECT COUNT(*) FROM bounty WHERE show != false AND assignee = '' AND paid != true").Scan(&openCount)
-	db.db.Raw("SELECT COUNT(*) FROM bounty WHERE show != false AND assignee != ''").Scan(&assignedCount)
-	db.db.Raw("SELECT COUNT(*) FROM bounty WHERE show != false AND paid = true").Scan(&paidCount)
+	db.db.Model(&Bounty{}).Where("show != false").Where("assignee = ''").Where("paid != true").Count(&openCount)
+	db.db.Model(&Bounty{}).Where("show != false").Where("assignee != ''").Where("paid != true").Count(&assignedCount)
+	db.db.Model(&Bounty{}).Where("show != false").Where("assignee != ''").Where("paid = true").Count(&paidCount)
 
 	ms := FilterStattuCount{
 		Open:     openCount,
@@ -644,6 +644,10 @@ func (db database) GetAllBounties(r *http.Request) []Bounty {
 	open := keys.Get("Open")
 	assingned := keys.Get("Assigned")
 	paid := keys.Get("Paid")
+	orgUuid := keys.Get("org_uuid")
+	languages := keys.Get("languages")
+	languageArray := strings.Split(languages, ",")
+	languageLength := len(languageArray)
 
 	ms := []Bounty{}
 
@@ -653,11 +657,13 @@ func (db database) GetAllBounties(r *http.Request) []Bounty {
 	openQuery := ""
 	assignedQuery := ""
 	paidQuery := ""
+	orgQuery := ""
+	languageQuery := ""
 
 	if sortBy != "" && direction != "" {
 		orderQuery = "ORDER BY " + sortBy + " " + direction
 	} else {
-		orderQuery = " ORDER BY " + sortBy + "" + "DESC"
+		orderQuery = "ORDER BY " + sortBy + "" + "DESC"
 	}
 	if limit != 0 {
 		limitQuery = fmt.Sprintf("LIMIT %d  OFFSET %d", limit, offset)
@@ -685,9 +691,25 @@ func (db database) GetAllBounties(r *http.Request) []Bounty {
 			paidQuery = "AND paid = true"
 		}
 	}
+	if orgUuid != "" {
+		orgQuery = "AND org_uuid = '" + orgUuid + "'"
+	}
+	if languageLength > 0 {
+		for i, val := range languageArray {
+			if val != "" {
+				if i == 0 {
+					languageQuery = "AND coding_languages && ARRAY['" + val + "']"
+				} else {
+					query := "OR coding_languages && ARRAY['" + val + "']"
+					languageQuery = languageQuery + " " + query
+				}
+			}
+		}
+	}
+
 	query := "SELECT * FROM public.bounty WHERE show != false"
 
-	allQuery := query + " " + openQuery + " " + assignedQuery + " " + paidQuery + " " + searchQuery + " " + orderQuery + " " + limitQuery
+	allQuery := query + " " + openQuery + " " + assignedQuery + " " + paidQuery + " " + searchQuery + " " + orgQuery + " " + languageQuery + " " + orderQuery + " " + limitQuery
 
 	theQuery := db.db.Raw(allQuery)
 

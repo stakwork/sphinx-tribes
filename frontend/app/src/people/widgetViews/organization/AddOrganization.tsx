@@ -11,11 +11,13 @@ import {
   ImgText,
   ImgTextContainer,
   InputFile,
-  OrgInput,
+  TextInput,
   OrgInputContainer,
   OrgLabel,
   SelectedImg,
-  UploadImageContainer
+  UploadImageContainer,
+  TextAreaInput,
+  SecondaryText
 } from './style';
 
 const AddOrgWrapper = styled.div`
@@ -52,6 +54,17 @@ const OrgDetailsContainer = styled.div`
     gap: 0.5rem;
   }
 `;
+const FooterContainer = styled.div`
+  display: flex;
+  gap: 3.56rem;
+  align-items: end;
+  justify-content: space-between;
+
+  @media only screen and (max-width: 500px) {
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+`;
 
 const OrgImgOutterContainer = styled.div`
   display: flex;
@@ -70,7 +83,7 @@ const ImgContainer = styled.div`
 `;
 
 const OrgButton = styled.button`
-  width: 100%;
+  width: 16rem;
   height: 3rem;
   padding: 0.5rem 1rem;
   border-radius: 0.375rem;
@@ -94,12 +107,21 @@ const OrgButton = styled.button`
   }
 `;
 
+const LabelRowContainer = styled.div`
+  display: flex;
+  align-items: end;
+  justify-content: space-between;
+`;
+
 const AddOrganization = (props: {
   closeHandler: () => void;
   getUserOrganizations: () => void;
   owner_pubkey: string | undefined;
 }) => {
   const [orgName, setOrgName] = useState('');
+  const [websiteName, setWebsiteName] = useState('');
+  const [githubRepo, setGithubRepo] = useState('');
+  const [description, setDescription] = useState('');
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const { main } = useStores();
@@ -107,6 +129,17 @@ const AddOrganization = (props: {
 
   const handleOrgNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setOrgName(e.target.value);
+  };
+
+  const handleWebsiteNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setWebsiteName(e.target.value);
+  };
+
+  const handleGithubRepoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setGithubRepo(e.target.value);
+  };
+  const handleDescriptionChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    setDescription(e.target.value);
   };
 
   const handleDrop = (event: DragEvent<HTMLDivElement>) => {
@@ -225,17 +258,47 @@ const AddOrganization = (props: {
           </ImgTextContainer>
         </OrgImgOutterContainer>
         <OrgInputContainer>
-          <OrgLabel>Organization Name</OrgLabel>
-          <OrgInput
+          <LabelRowContainer>
+            <OrgLabel>Organization Name *</OrgLabel>
+            <SecondaryText>{orgName.length}/20</SecondaryText>
+          </LabelRowContainer>
+          <TextInput
             placeholder="My Organization..."
             value={orgName}
             onChange={handleOrgNameChange}
           />
-          <OrgButton disabled={!orgName} onClick={addOrganization}>
-            {isLoading ? <EuiLoadingSpinner size="m" /> : 'Add Organization'}
-          </OrgButton>
+          <OrgLabel>Website</OrgLabel>
+          <TextInput
+            placeholder="Website URL..."
+            value={websiteName}
+            onChange={handleWebsiteNameChange}
+          />
+          <OrgLabel>Github Repo</OrgLabel>
+          <TextInput
+            placeholder="Github link..."
+            value={githubRepo}
+            onChange={handleGithubRepoChange}
+          />
+        </OrgInputContainer>
+        <OrgInputContainer>
+          <LabelRowContainer>
+            <OrgLabel>Description</OrgLabel>
+            <SecondaryText>{description.length}/120</SecondaryText>
+          </LabelRowContainer>
+          <TextAreaInput
+            placeholder="Description Text..."
+            rows={7}
+            value={description}
+            onChange={handleDescriptionChange}
+          />
         </OrgInputContainer>
       </OrgDetailsContainer>
+      <FooterContainer>
+        <SecondaryText>* Required fields</SecondaryText>
+        <OrgButton disabled={!orgName} onClick={addOrganization}>
+          {isLoading ? <EuiLoadingSpinner size="m" /> : 'Add Organization'}
+        </OrgButton>
+      </FooterContainer>
       <EuiGlobalToastList toasts={toasts} dismissToast={removeToast} toastLifeTimeMs={3000} />
     </AddOrgWrapper>
   );
