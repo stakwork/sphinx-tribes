@@ -934,20 +934,20 @@ describe('Main store', () => {
     expect(store.exportMetricsBountiesCsv).toBeCalledWith(body);
   });
 
-  it("I should be able to test that the signed-in user details are persisted in the local storage", async () => {
+  it('I should be able to test that the signed-in user details are persisted in the local storage', async () => {
     uiStore.setShowSignIn(true);
 
     localStorageMock.setItem('ui', JSON.stringify(uiStore));
 
     expect(uiStore.showSignIn).toBeTruthy();
     expect(localStorageMock.getItem('ui')).toEqual(JSON.stringify(uiStore));
-  })
+  });
 
-  it("I should be able to test that when signed out the user data is deleted", async () => {
-    // Shows first if signed in 
+  it('I should be able to test that when signed out the user data is deleted', async () => {
+    // Shows first if signed in
     uiStore.setShowSignIn(true);
     localStorageMock.setItem('ui', JSON.stringify(uiStore));
-    
+
     expect(uiStore.showSignIn).toBeTruthy();
     expect(localStorageMock.getItem('ui')).toEqual(JSON.stringify(uiStore));
     //Shows when signed out
@@ -955,16 +955,16 @@ describe('Main store', () => {
     localStorageMock.setItem('ui', JSON.stringify(uiStore));
 
     expect(localStorageMock.getItem('ui')).toEqual(JSON.stringify(uiStore));
-  })
+  });
 
-  it("I should be able to test that signed-in user details can be displayed such as the name and pubkey", async () => {
+  it('I should be able to test that signed-in user details can be displayed such as the name and pubkey', async () => {
     uiStore.setShowSignIn(true);
 
     expect(uiStore.meInfo?.owner_alias).toEqual(user.alias);
     expect(uiStore.meInfo?.owner_pubkey).toEqual(user.pubkey);
-  })
+  });
 
-  it("I should be able to test that a signed-in user can update their details", async () => {
+  it('I should be able to test that a signed-in user can update their details', async () => {
     uiStore.setShowSignIn(true);
     expect(uiStore.meInfo?.alias).toEqual('Vladimir');
 
@@ -972,9 +972,9 @@ describe('Main store', () => {
     uiStore.setMeInfo(user);
 
     expect(uiStore.meInfo?.alias).toEqual('John');
-  })
+  });
 
-  it("I should be able to test that a signed-in user can make an API request without getting a 401 (unauthorized error)", async () => {
+  it('I should be able to test that a signed-in user can make an API request without getting a 401 (unauthorized error)', async () => {
     uiStore.setShowSignIn(true);
     const loggedUrl = `http://${getHost()}/admin/auth`;
     const res = await fetchStub.withArgs(loggedUrl, sinon.match.any).returns(
@@ -984,10 +984,10 @@ describe('Main store', () => {
       }) as any
     );
     expect(res).toBeTruthy();
-  })
+  });
 
-  it("I should be able to test that when a user is signed out, a user will get a 401 error if they make an API call", async () => {
-    uiStore.setMeInfo(emptyMeInfo);  
+  it('I should be able to test that when a user is signed out, a user will get a 401 error if they make an API call', async () => {
+    uiStore.setMeInfo(emptyMeInfo);
     const urlNoLogged = `http://${getHost()}/admin/auth`;
 
     const res = await fetchStub.withArgs(urlNoLogged, sinon.match.any).returns(
@@ -997,7 +997,5 @@ describe('Main store', () => {
       }) as any
     );
     expect(res).toBeTruthy();
-  })
+  });
 });
-
-
