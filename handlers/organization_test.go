@@ -3,14 +3,15 @@ package handlers
 import (
 	"bytes"
 	"context"
+	"net/http"
+	"net/http/httptest"
+	"testing"
+
 	"github.com/stakwork/sphinx-tribes/auth"
 	"github.com/stakwork/sphinx-tribes/db"
 	mocks "github.com/stakwork/sphinx-tribes/mocks"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
-	"net/http"
-	"net/http/httptest"
-	"testing"
 )
 
 func TestUnitCreateOrEditOrganization(t *testing.T) {
@@ -37,7 +38,7 @@ func TestUnitCreateOrEditOrganization(t *testing.T) {
 		rr := httptest.NewRecorder()
 		handler := http.HandlerFunc(oHandler.CreateOrEditOrganization)
 
-		invalidJson := []byte(`{"key": "value"}`)
+		invalidJson := []byte(`{"name": "value"}`)
 		req, err := http.NewRequestWithContext(context.Background(), http.MethodPost, "/", bytes.NewReader(invalidJson))
 		if err != nil {
 			t.Fatal(err)
@@ -88,8 +89,8 @@ func TestUnitCreateOrEditOrganization(t *testing.T) {
 			return org.Name == "TestOrganization" && org.Uuid != "" && org.Updated != nil && org.Created != nil
 		})).Return(db.Organization{}, nil).Once()
 
-		invalidJson := []byte(`{"name": "TestOrganization", "owner_pubkey": "test-key"}`)
-		req, err := http.NewRequestWithContext(ctx, http.MethodPost, "/", bytes.NewReader(invalidJson))
+		validJson := []byte(`{"name": "TestOrganization", "owner_pubkey": "test-key"}`)
+		req, err := http.NewRequestWithContext(ctx, http.MethodPost, "/", bytes.NewReader(validJson))
 		if err != nil {
 			t.Fatal(err)
 		}
