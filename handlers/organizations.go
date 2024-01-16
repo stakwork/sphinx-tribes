@@ -642,7 +642,7 @@ func GetInvoicesCount(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(invoiceCount)
 }
 
-func DeleteOrganization(w http.ResponseWriter, r *http.Request) {
+func (oh *organizationHandler) DeleteOrganization(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 	pubKeyFromAuth, _ := ctx.Value(auth.ContextKey).(string)
 	uuid := chi.URLParam(r, "uuid")
