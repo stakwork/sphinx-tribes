@@ -30,7 +30,7 @@ function App() {
     if (uiStore.meInfo?.id) {
       await mainStore.getUserDropdownOrganizations(uiStore.meInfo?.id);
     }
-  }, []);
+  }, [uiStore.selectedPerson]);
 
   useEffect(() => {
     getUserOrganizations();
@@ -43,7 +43,7 @@ function App() {
 
   useEffect(() => {
     getBountyRoles();
-  }, [getBountyRoles]);
+  }, []);
 
   useEffect(() => {
     // get usd/sat exchange rate every 100 second;
