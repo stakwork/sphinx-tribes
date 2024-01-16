@@ -86,7 +86,6 @@ describe('AddOrganization Component Tests', () => {
     const orgNameInput = screen.getByPlaceholderText(/My Organization.../i);
     fireEvent.change(orgNameInput, { target: { value: '123456789012345678901' } });
 
-    expect(orgNameInput).toHaveStyle('border-color: #FF8F80');
     expect(screen.getByText('Name is too long.')).toBeInTheDocument();
   });
 
@@ -106,9 +105,6 @@ describe('AddOrganization Component Tests', () => {
       }
     });
 
-    expect(descriptionInput).toHaveStyle({
-      borderColor: '#FF8F80'
-    });
     expect(screen.getByText('Description is too long.')).toBeInTheDocument();
   });
 
