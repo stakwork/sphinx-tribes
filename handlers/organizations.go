@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"io"
 	"net/http"
+	"strings"
 	"time"
 
 	"github.com/go-chi/chi"
@@ -35,6 +36,22 @@ func (oh *organizationHandler) CreateOrEditOrganization(w http.ResponseWriter, r
 	if err != nil {
 		fmt.Println(err)
 		w.WriteHeader(http.StatusNotAcceptable)
+		return
+	}
+
+	// Validate struct data
+	err = db.Validate.Struct(org)
+	if err != nil {
+		w.WriteHeader(http.StatusBadRequest)
+		msg := fmt.Sprintf("Error: did not pass validation test : %s", err)
+		json.NewEncoder(w).Encode(msg)
+		return
+	}
+
+	if org.Github != "" && !strings.Contains(org.Github, "github.com/") {
+		w.WriteHeader(http.StatusBadRequest)
+		msg := "Error: not a valid github"
+		json.NewEncoder(w).Encode(msg)
 		return
 	}
 
