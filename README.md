@@ -180,3 +180,33 @@ If you would like to enable Stakwork jobs for Youtube videos download add the St
 ```
     STAKWORK_KEY=
 ```
+
+### Backend API Data Validations
+
+We are currently using `gopkg.in/go-playground/validator.v9` for validation, to validate a struct add the `validate` property to it
+
+e.g 
+
+```
+type Organization struct {
+	Name        string     `gorm:"unique;not null" json:"name" validate:"required"`
+	Website     string     `json:"website" validate:"omitempty,uri"`
+	Github      string     `json:"github" validate:"omitempty,uri"`
+	Description string     `json:"description" validate:"omitempty,lte=200"`
+}
+```
+
+Then handle the validation errors in the request handler 
+
+```
+err = db.Validate.Struct(org)
+if err != nil {
+	w.WriteHeader(http.StatusBadRequest)
+	msg := fmt.Sprintf("Error: did not pass validation test : %s", err)
+	json.NewEncoder(w).Encode(msg)
+	return
+}
+
+```
+
+

@@ -15,6 +15,7 @@ import (
 	"github.com/stakwork/sphinx-tribes/handlers"
 	"github.com/stakwork/sphinx-tribes/routes"
 	"github.com/stakwork/sphinx-tribes/websocket"
+	"gopkg.in/go-playground/validator.v9"
 )
 
 func main() {
@@ -33,6 +34,8 @@ func main() {
 	config.InitConfig()
 	auth.InitJwt()
 
+	// validate
+	db.Validate = validator.New()
 	// Start websocket pool
 	go websocket.WebsocketPool.Start()
 
