@@ -4,8 +4,7 @@ import history from 'config/history';
 import AccessDeniedImage from '../../../public/static/access_denied.png';
 import { AccessImg, Container, DeniedSmall, DeniedText, Wrap } from './style';
 
-const AdminAccessDenied = () => {
-  return (
+const AdminAccessDenied = () => (
     <Container>
       <Wrap>
         <AccessImg src={AccessDeniedImage} />
@@ -21,6 +20,5 @@ const AdminAccessDenied = () => {
       </Wrap>
     </Container>
   );
-};
 
 export default AdminAccessDenied;

@@ -81,7 +81,7 @@ const MonthsDropdown = ({ value, onMonthChange }: MonthsDropdownProps) => {
         <option value="" disabled hidden>
           Month
         </option>
-        {months.map((month: String, index: number) => (
+        {months.map((month: string, index: number) => (
           <option key={index} value={(index + 1).toString()}>
             {month}
           </option>

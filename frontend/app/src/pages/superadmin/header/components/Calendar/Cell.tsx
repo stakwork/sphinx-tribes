@@ -39,12 +39,10 @@ const CellWrapper = styled.div<Props>`
       background-color: #618aff;
     `}
 `;
-const Cell = ({ onClick, children, isActive = false, isEmpty }: Props) => {
-  return (
+const Cell = ({ onClick, children, isActive = false, isEmpty }: Props) => (
     <CellWrapper onClick={!isActive ? onClick : undefined} isActive={isActive} isEmpty={isEmpty}>
       {children}
     </CellWrapper>
   );
-};
 
 export default Cell;
