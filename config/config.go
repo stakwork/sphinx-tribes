@@ -10,6 +10,11 @@ import (
 	"os"
 	"strings"
 	"time"
+
+	"github.com/aws/aws-sdk-go/aws"
+	"github.com/aws/aws-sdk-go/aws/credentials"
+	"github.com/aws/aws-sdk-go/aws/session"
+	"github.com/aws/aws-sdk-go/service/s3"
 )
 
 var Host string
@@ -23,6 +28,11 @@ var SuperAdmins []string = []string{""}
 // these are constants for the store
 var InvoiceList = "INVOICELIST"
 var BudgetInvoiceList = "BUDGETINVOICELIST"
+var S3BucketName string
+var S3FolderName string
+var S3Url string
+
+var S3Client *s3.S3
 
 func InitConfig() {
 	Host = os.Getenv("LN_SERVER_BASE_URL")
@@ -31,8 +41,30 @@ func InitConfig() {
 	MemeUrl = os.Getenv("MEME_URL")
 	RelayAuthKey = os.Getenv("RELAY_AUTH_KEY")
 	AdminStrings := os.Getenv("ADMINS")
+	AwsSecret := os.Getenv("AWS_SECRET_ACCESS")
+	AwsAccess := os.Getenv("AWS_ACCESS_KEY_ID")
+	AwsRegion := os.Getenv("AWS_REGION")
+	S3BucketName = os.Getenv("S3_BUCKET_NAME")
+	S3FolderName = os.Getenv("S3_FOLDER_NAME")
+	S3Url = os.Getenv("S3_URL")
 	// Add to super admins
 	SuperAdmins = StripSuperAdmins(AdminStrings)
+
+	awsConfig := aws.Config{
+		Credentials: credentials.NewStaticCredentials(AwsAccess, AwsSecret, ""),
+		Region:      aws.String(AwsRegion),
+	}
+
+	awsSession, err := session.NewSessionWithOptions(session.Options{
+		Config: awsConfig,
+	})
+
+	if err != nil {
+		fmt.Println("Could not setup AWS session", err)
+	}
+
+	// create a s3 client session
+	S3Client = s3.New(awsSession)
 
 	// only make this call if there is a Relay auth key
 	if RelayAuthKey != "" {
@@ -49,6 +81,18 @@ func InitConfig() {
 
 	if JwtKey == "" {
 		JwtKey = GenerateRandomString()
+	}
+
+	if S3BucketName == "" {
+		S3BucketName = "sphinx-tribes"
+	}
+
+	if S3FolderName == "" {
+		S3FolderName = "metrics"
+	}
+
+	if S3Url == "" {
+		S3Url = "https://sphinx-tribes.s3.amazonaws.com"
 	}
 }
 
