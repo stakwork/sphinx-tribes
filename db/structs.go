@@ -9,6 +9,7 @@ import (
 
 	"github.com/gorilla/websocket"
 	"github.com/lib/pq"
+	"gopkg.in/go-playground/validator.v9"
 	"gorm.io/gorm"
 	"gorm.io/gorm/schema"
 )
@@ -445,9 +446,9 @@ type Organization struct {
 	Deleted     bool       `gorm:"default:false" json:"deleted"`
 	BountyCount int64      `json:"bounty_count,omitempty"`
 	Budget      uint       `json:"budget,omitempty"`
-	Website     string     `json:"website"`
-	Github      string     `json:"github"`
-	Description string     `json:"description"`
+	Website     string     `json:"website" validate:"omitempty,uri"`
+	Github      string     `json:"github" validate:"omitempty,uri"`
+	Description string     `json:"description" validate:"omitempty,lte=200"`
 }
 
 type OrganizationShort struct {
@@ -748,3 +749,5 @@ func (a *JSONB) Scan(value interface{}) error {
 	}
 	return json.Unmarshal(b, &a)
 }
+
+var Validate *validator.Validate
