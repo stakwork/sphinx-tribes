@@ -131,7 +131,7 @@ function FocusedView(props: FocusViewProps) {
           if (props?.deleteExtraFunction) props?.deleteExtraFunction();
         }
       } catch (e) {
-        console.log('e', e);
+        console.error('Error during bounty deletion:', e);
       }
       setDeleting(false);
       if (!isNotHttps(ui?.meInfo?.url) && props.ReCallBounties) props.ReCallBounties();
@@ -210,7 +210,7 @@ function FocusedView(props: FocusViewProps) {
     try {
       newBody = await preSubmitFunctions(newBody);
     } catch (e) {
-      console.log('e', e);
+      console.error('Error during preSubmitFunctions:', e);
       alert(e);
       return;
     }
@@ -221,7 +221,7 @@ function FocusedView(props: FocusViewProps) {
     }
 
     const info = ui.meInfo as any;
-    if (!info) return console.log('no meInfo');
+    if (!info) return console.error('No meInfo');
     setLoading(true);
 
     try {
@@ -249,12 +249,12 @@ function FocusedView(props: FocusViewProps) {
 
       await main.saveBounty(newBody);
 
-      // Refresh the tickets page if a user eidts from the tickets tab
+      // Refresh the tickets page if a user edits from the tickets tab
       if (window.location.href.includes('wanted')) {
         await main.getPersonCreatedBounties({}, info.pubkey);
       }
     } catch (e) {
-      console.log('e', e);
+      console.error('Error during bounty submission:', e);
     }
 
     if (props?.onSuccess) props.onSuccess();
@@ -271,47 +271,50 @@ function FocusedView(props: FocusViewProps) {
   const personInfo = canEdit ? ui.meInfo : person;
 
   // set initials here
-  if (personInfo) {
-    // if there is a selected index, fill in values
-    if (bounty && bounty.length && selectedIndex >= 0) {
-      const selectedBounty = bounty[0];
-      const wanted = selectedBounty.body;
+  if (personInfo && bounty && bounty.length && selectedIndex >= 0) {
+    const selectedBounty = bounty[0];
+    const wanted = selectedBounty?.body;
+
+    if (wanted) {
       initialValues.estimated_completion_date = wanted?.estimated_completion_date
-        ? moment(wanted?.estimated_completion_date)
+        ? moment(wanted.estimated_completion_date)
         : '';
 
       if (wanted.type) {
         const thisDynamicSchema = dynamicSchemasByType[wanted.type];
-        const newValues = thisDynamicSchema.map((s: any) => {
-          if (s.name === 'estimated_completion_date') {
-            return {
-              [s.name]: wanted['estimated_completion_date'] || new Date()
-            };
-          } else if (s.name === 'one_sentence_summary') {
-            return {
-              [s.name]: wanted['one_sentence_summary'] || wanted['title']
-            };
-          } else if (s.name === 'coding_languages') {
-            const coding_languages =
-              wanted['coding_languages'] && wanted['coding_languages'].length
-                ? wanted['coding_languages'].map((lang: any) => ({ value: lang, label: lang }))
-                : [];
-            return {
-              [s.name]: coding_languages
-            };
-          }
-          return {
-            [s.name]: wanted[s.name]
-          };
-        });
 
-        const valueMap = Object.assign({}, ...newValues);
-        initialValues = { ...initialValues, ...valueMap };
-      } else {
-        const dynamicSchema = config?.schema?.find((f: any) => f.defaultSchema);
-        dynamicSchema?.defaultSchema?.forEach((s: any) => {
-          initialValues[s.name] = wanted[s.name];
-        });
+        if (Array.isArray(thisDynamicSchema)) {
+          const newValues = thisDynamicSchema.map((s: any) => {
+            if (s.name === 'estimated_completion_date') {
+              return {
+                [s.name]: wanted.estimated_completion_date || new Date()
+              };
+            } else if (s.name === 'one_sentence_summary') {
+              return {
+                [s.name]: wanted.one_sentence_summary || wanted.title
+              };
+            } else if (s.name === 'coding_languages') {
+              const coding_languages =
+                wanted.coding_languages && wanted.coding_languages.length
+                  ? wanted.coding_languages.map((lang: any) => ({ value: lang, label: lang }))
+                  : [];
+              return {
+                [s.name]: coding_languages
+              };
+            }
+            return {
+              [s.name]: wanted[s.name]
+            };
+          });
+
+          const valueMap = Object.assign({}, ...newValues);
+          initialValues = { ...initialValues, ...valueMap };
+        } else {
+          const dynamicSchema = config?.schema?.find((f: any) => f.defaultSchema);
+          dynamicSchema?.defaultSchema?.forEach((s: any) => {
+            initialValues[s.name] = wanted[s.name];
+          });
+        }
       }
     }
   }
