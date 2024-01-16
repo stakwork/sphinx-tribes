@@ -39,7 +39,7 @@ const CellWrapper = styled.div<Props>`
     `}
 `;
 const Cell = ({ onClick, children, isActive = false, isEmpty }: Props) => (
-  <CellWrapper onClick={!isActive ? onClick : undefined} isActive={isActive} isEmpty={isEmpty}>
+  <CellWrapper onClick={onClick} isActive={isActive} isEmpty={isEmpty}>
     {children}
   </CellWrapper>
 );
