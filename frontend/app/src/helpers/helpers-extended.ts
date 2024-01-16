@@ -1,9 +1,13 @@
 /* eslint-disable @typescript-eslint/typedef */
 import LighningDecoder from 'light-bolt11-decoder';
+import { MainStore } from 'store/main';
 import { getHost } from '../config/host';
 
 export const filterCount = (filterValues: any) => {
   let count = 0;
+  if (!filterValues || typeof filterValues !== 'object') {
+    return count;
+  }
   for (const [, value] of Object.entries(filterValues)) {
     if (value) {
       count += 1;
@@ -317,4 +321,23 @@ export function handleDisplayRole(displayedRoles: RolesCategory[]) {
   });
 
   return { newDisplayedRoles, tempDataRole };
+}
+
+export async function userCanManageBounty(
+  org_uuid: string | undefined,
+  userPubkey: string | undefined,
+  main: MainStore
+): Promise<boolean> {
+  if (org_uuid && userPubkey) {
+    const userRoles = await main.getUserRoles(org_uuid, userPubkey);
+    const org = await main.getUserOrganizationByUuid(org_uuid);
+    if (org) {
+      const isOrganizationAdmin = org.owner_pubkey === userPubkey;
+      const userAccess =
+        userHasManageBountyRoles(main.bountyRoles, userRoles) &&
+        userHasRole(main.bountyRoles, userRoles, 'VIEW REPORT');
+      return isOrganizationAdmin || userAccess;
+    }
+  }
+  return false;
 }

@@ -2438,7 +2438,7 @@
 
 "@types/date-fns@^2.6.0":
   version "2.6.0"
-  resolved "https://registry.yarnpkg.com/@types/date-fns/-/date-fns-2.6.0.tgz#b062ca46562002909be0c63a6467ed173136acc1"
+  resolved "https://registry.npmjs.org/@types/date-fns/-/date-fns-2.6.0.tgz"
   integrity sha512-9DSw2ZRzV0Tmpa6PHHJbMcZn79HHus+BBBohcOaDzkK/G3zMjDUDYjJIWBFLbkh+1+/IOS0A59BpQfdr37hASg==
   dependencies:
     date-fns "*"
@@ -4479,7 +4479,7 @@ data-urls@^2.0.0:
 
 date-fns@*, date-fns@^3.2.0:
   version "3.2.0"
-  resolved "https://registry.yarnpkg.com/date-fns/-/date-fns-3.2.0.tgz#c97cf685b62c829aa4ecba554e4a51768cf0bffc"
+  resolved "https://registry.npmjs.org/date-fns/-/date-fns-3.2.0.tgz"
   integrity sha512-E4KWKavANzeuusPi0jUjpuI22SURAznGkx7eZV+4i6x2A+IZxAMcajgkvuDAU1bg40+xuhW1zRdVIIM/4khuIg==
 
 dateformat@^3.0.3:
