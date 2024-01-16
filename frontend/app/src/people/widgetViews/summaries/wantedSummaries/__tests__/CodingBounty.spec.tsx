@@ -137,7 +137,7 @@ describe('MobileView component', () => {
     const nameTagProps = {
       owner_alias: 'Test Owner',
       img: 'test-image.jpg',
-      created: 1610000000, 
+      created: 1610000000,
       id: 180,
       owner: 'Test-Owner',
       owner_pubkey: 'abc100',
