@@ -1,5 +1,6 @@
 import React from 'react';
 import { BountyMetrics } from 'store/main';
+import { convertToLocaleString } from 'helpers/helpers-extended';
 import copy from '../header/icons/copy.svg';
 import hunter from '../header/icons/hunter.svg';
 import coin from '../header/icons/coin.svg';
@@ -61,7 +62,7 @@ export const Statistics = ({ freezeHeaderRef, metrics }: StatisticsProps) => (
         <BelowCardWrapper>
           <DivWrapper>
             <div>
-              <Title>{metrics?.bounties_posted}</Title>
+              <Title>{convertToLocaleString(metrics?.bounties_posted || 0)}</Title>
               <Subheading width="80px" data-testid="total_bounties_posted">
                 Total Posted
               </Subheading>
@@ -77,7 +78,7 @@ export const Statistics = ({ freezeHeaderRef, metrics }: StatisticsProps) => (
           </DivWrapper>
           <DivWrapper>
             <div>
-              <Title>{metrics?.bounties_paid}</Title>
+              <Title>{convertToLocaleString(metrics?.bounties_paid || 0)}</Title>
               <Subheading data-testid="total_bounties_paid">Paid</Subheading>
             </div>
           </DivWrapper>
@@ -106,14 +107,14 @@ export const Statistics = ({ freezeHeaderRef, metrics }: StatisticsProps) => (
         <BelowCardWrapper>
           <DivWrapper>
             <div>
-              <Title>{metrics?.sats_posted}</Title>
+              <Title>{convertToLocaleString(metrics?.sats_posted || 0)}</Title>
               <Subheading data-testid="total_satoshis_posted">Total Posted</Subheading>
             </div>
             <VerticaGrayLine />
           </DivWrapper>
           <DivWrapper>
             <div>
-              <Title>{metrics?.sats_paid}</Title>
+              <Title>{convertToLocaleString(metrics?.sats_paid || 0)}</Title>
               <Subheading>Paid</Subheading>
             </div>
             <VerticaGrayLineSecondary />
@@ -143,14 +144,14 @@ export const Statistics = ({ freezeHeaderRef, metrics }: StatisticsProps) => (
         <BelowCardWrapper>
           <DivWrapper>
             <div>
-              <Title>{metrics?.unique_hunters_paid}</Title>
+              <Title>{convertToLocaleString(metrics?.unique_hunters_paid || 0)}</Title>
               <Subheading width="80px">Total Paid</Subheading>
             </div>
             <VerticaGrayLine />
           </DivWrapper>
           <DivWrapper>
             <div>
-              <Title>{metrics?.new_hunters_paid}</Title>
+              <Title>{convertToLocaleString(metrics?.new_hunters_paid || 0)}</Title>
               <Subheading width="120px">First Bounty Paid</Subheading>
             </div>
           </DivWrapper>

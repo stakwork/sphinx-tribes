@@ -1,6 +1,8 @@
 import styled from 'styled-components';
 
-export const Container = styled.div``;
+export const Container = styled.div`
+  display: relative;
+`;
 
 export const NavWrapper = styled.div`
   display: flex;
@@ -145,7 +147,7 @@ export const Select = styled.select`
 export const Option = styled.div`
   position: absolute;
   z-index: 1;
-  top: 130px;
+  top: 65px;
   right: 48px;
   width: 169px;
   height: 157px;

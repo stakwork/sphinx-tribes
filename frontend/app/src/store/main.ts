@@ -807,7 +807,7 @@ export class MainStore {
   }
 
   @persist('object')
-  bountyLanguages: string = '';
+  bountyLanguages = '';
 
   @action setBountyLanguages(languages: string) {
     this.bountyLanguages = languages;
