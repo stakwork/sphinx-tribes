@@ -158,7 +158,7 @@ it('renders each element in the table in the document', () => {
   mockBounties.forEach((bounty: Bounty, index: number) => {
     expect(getByText(bounty.title)).toBeInTheDocument();
     expect(getByText(dates[index])).toBeInTheDocument();
-    expect(getByText(bounty.assignee_alias)).toBeInTheDocument();
+    expect(getAllByText(bounty.assignee_alias)).toBeInTheDocument();
     expect(getByText(bounty.organization)).toBeInTheDocument();
   });
 });
@@ -175,7 +175,7 @@ it('renders each element in the table in the document', () => {
     expect(getByText(bounty.title)).toBeInTheDocument();
     expect(getByText(dates[index])).toBeInTheDocument();
     // expect(getByText(String(bounty.dtgp))).toBeInTheDocument();
-    expect(getByText(bounty.assignee_alias)).toBeInTheDocument();
+    expect(getAllByText(bounty.assignee_alias)).toBeInTheDocument();
     // expect(getByText(bounty.provider)).toBeInTheDocument();
     expect(getByText(bounty.organization)).toBeInTheDocument();
   });
