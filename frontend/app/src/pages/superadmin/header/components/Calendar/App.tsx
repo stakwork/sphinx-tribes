@@ -1,18 +1,23 @@
-import React, { useState } from "react";
-import styled from "styled-components";
-import moment from "moment";
-import Calendar from "./Calender";
+import React, { useState } from 'react';
+import styled from 'styled-components';
+import moment from 'moment';
+import { set } from 'date-fns';
+import Calendar from './Calender';
 
 interface Props {
   filterStartDate: (newDate: number) => void;
   filterEndDate: (newDate: number) => void;
+  setShowCalendar: (show: boolean) => void;
 }
 
-const App = ({filterStartDate,filterEndDate}:Props) => {
+const App = ({ filterStartDate, filterEndDate, setShowCalendar }: Props) => {
   const [from, setFrom] = useState(false);
   const [to, setTo] = useState(false);
   const [startDate, setStartDate] = useState<Date>();
   const [endDate, setEndDate] = useState<Date>();
+  const [input1, setinput1] = useState();
+  const [formInputFocused, setFormInputFocused] = useState(false);
+  const [formInput2Focused, setFormInput2Focused] = useState(false);
 
   const Section = styled.div`
     display: flex;
@@ -22,13 +27,14 @@ const App = ({filterStartDate,filterEndDate}:Props) => {
     align-self: stretch;
     margin-right: 35px;
     z-index: 999;
+    margin-bottom: 8px;
   `;
 
   const MainContainer = styled.div`
     position: absolute;
     z-index: 999;
-    right: 0;
-    top: 70px;
+    right: -51px;
+    top: 40px;
     display: flex;
     width: 375px;
     flex-direction: column;
@@ -44,9 +50,10 @@ const App = ({filterStartDate,filterEndDate}:Props) => {
     display: flex;
     flex-direction: column;
     align-items: flex-start;
-    gap: 20px;
     align-self: stretch;
-    height: ${from || to ? "580px" : "180px"};
+    // height: ${from || to ? '580px' : '180px'};
+    gap: 16px;
+    width: 375px;
   `;
 
   const FormDiv = styled.div`
@@ -56,8 +63,10 @@ const App = ({filterStartDate,filterEndDate}:Props) => {
     align-items: center;
     gap: 25px;
   `;
-
-  const FormInput = styled.input`
+  type FormProps = {
+    focused: boolean;
+  };
+  const FormInput = styled.input<FormProps>`
     display: flex;
     width: 113px;
     height: 40px;
@@ -67,7 +76,6 @@ const App = ({filterStartDate,filterEndDate}:Props) => {
     gap: 6px;
     border-radius: 6px;
     outline: none;
-    border: 1px solid var(--Input-Outline-1, #d0d5d8);
     background: var(--White, #fff);
     color: var(--Placeholder-Text, var(--Disabled-Icon-color, #b0b7bc));
     text-align: center;
@@ -75,22 +83,24 @@ const App = ({filterStartDate,filterEndDate}:Props) => {
     font-style: normal;
     font-weight: 500;
     line-height: 0px;
-    &:focus {
-      color: var(--Placeholder-Text, var(--Disabled-Icon-color, #5078f2));
-      border: 1px solid var(--Input-Outline-1, #5078f2);
+    color: ${(props: any) =>
+      props.focused
+        ? 'var(--Placeholder-Text, var(--Disabled-Icon-color, #5078f2))'
+        : 'var(--Placeholder-Text, var(--Disabled-Icon-color, #b0b7bc))'};
 
-      &::placeholder {
-        color: var(--Placeholder-Text, var(--Disabled-Icon-color, #5078f2));
-      }
+    border: ${(props: any) => (props.focused ? '1px solid #5078f2' : '1px solid #b0b7bc')};
+    &::placeholder {
+      color: ${(props: any) =>
+        props.focused
+          ? 'var(--Placeholder-Text, var(--Disabled-Icon-color, #5078f2))'
+          : 'var(--Placeholder-Text, var(--Disabled-Icon-color, #b0b7bc))'};
     }
   `;
 
   const Button = styled.button`
     background-color: transparent;
-
     width: 54px;
     height: 40px;
-    padding: 1px;
     color: ${(props: any) => props.color};
     text-align: center;
     font-size: 14px;
@@ -100,6 +110,7 @@ const App = ({filterStartDate,filterEndDate}:Props) => {
     letter-spacing: 0.1px;
     outline: none;
     border: none;
+    font-family: Barlow;
   `;
 
   const Para = styled.p`
@@ -122,60 +133,92 @@ const App = ({filterStartDate,filterEndDate}:Props) => {
   `;
 
   const handleInputFocus = (parameter: string) => {
-    if (parameter === "From") {
+    if (parameter === 'From') {
       setTo(false);
-      setFrom(!from);
+      setFrom(true);
     }
-    if (parameter === "To") {
+    if (parameter === 'To') {
       setFrom(false);
       setTo(!to);
     }
   };
 
   const handleClick = () => {
-    console.log("called");
     if (startDate && endDate) {
-      console.log(endDate)
-      const start = moment(startDate);
+      let startDt = startDate;
+      let endDt = endDate;
+      startDt = set(startDate, { hours: 0, minutes: 0, seconds: 0 });
+      if (startDt > endDt) {
+        const temp = startDt;
+        startDt = endDt;
+        endDt = temp;
+      }
+      const start = moment(startDt);
       const unixStart = start.unix();
-
-      console.log("Unix Timestamp:", unixStart);
-   
-
-      const end = moment(endDate);
+      const end = moment(endDt);
       const unixEnd = end.unix();
-      console.log("Unix end:", unixEnd);
-      
-      
       filterStartDate(unixStart);
-      filterEndDate(unixEnd)
+      filterEndDate(unixEnd);
+      setShowCalendar(false);
     }
-
   };
-  
 
   return (
     <>
       <MainContainer>
         <HeaderDiv>
           <FlexDiv>
-            <h1 style={{ color: "#3C3F41", fontSize: "18px", fontWeight: "500", paddingBottom: "15px" }}>Enter Dates</h1>
+            <h1
+              style={{
+                color: '#3C3F41',
+                fontSize: '18px',
+                fontWeight: '500',
+                paddingBottom: '15px'
+              }}
+            >
+              Enter Dates
+            </h1>
             <FormDiv>
               <Formator>
                 <Para>From</Para>
-                <FormInput value={startDate ? moment(startDate).format("DD/MM/YY") : ""} placeholder="dd/mm/yy" type="text" readOnly onFocus={() => handleInputFocus("From")} />
+                <FormInput
+                  value={startDate ? moment(startDate).format('MM/DD/YY') : ''}
+                  placeholder="MM/DD/YY"
+                  type="text"
+                  onFocus={() => {
+                    handleInputFocus('From');
+                    setFormInputFocused(true);
+                    setFormInput2Focused(false);
+                  }}
+                  focused={formInputFocused}
+                />
               </Formator>
               <Formator>
                 <Para>To</Para>
-                <FormInput value={endDate ? moment(endDate).format("DD/MM/YY") : ""} placeholder="dd/mm/yy" type="text" readOnly onFocus={() => handleInputFocus("To")} />
+                <FormInput
+                  value={endDate ? moment(endDate).format('MM/DD/YY') : ''}
+                  placeholder="MM/DD/YY"
+                  type="text"
+                  onFocus={() => {
+                    handleInputFocus('To');
+                    setFormInput2Focused(true);
+                    setFormInputFocused(false);
+                  }}
+                  onChange={(e: any) => setEndDate(e.target.value)}
+                  focused={formInput2Focused}
+                />
               </Formator>
             </FormDiv>
           </FlexDiv>
           {from && <Calendar value={startDate} onChange={setStartDate} />}
           {to && <Calendar value={endDate} onChange={setEndDate} />}
           <Section>
-            <Button onClick={()=>handleClick()} color="#618AFF">Save</Button>
-            <Button color="#8E969C">Cancel</Button>
+            <Button onClick={() => handleClick()} color="#618AFF">
+              Save
+            </Button>
+            <Button color="#8E969C" onClick={() => setShowCalendar(false)}>
+              Cancel
+            </Button>
           </Section>
         </HeaderDiv>
       </MainContainer>
