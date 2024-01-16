@@ -30,12 +30,21 @@ const LoaderContainer = styled.div`
   align-items: center;
 `;
 
+export interface MockHunterMetrics {
+  hunters_total_paid: number;
+  hunters_first_bounty_paid: number;
+}
+
 export const SuperAdmin = () => {
   //Todo: Remove all comments when metrcis development is done
   const { main } = useStores();
   const [isSuperAdmin] = useState(true);
   const [bounties, setBounties] = useState<any[]>([]);
   const [bountyMetrics, setBountyMetrics] = useState<BountyMetrics | undefined>(undefined);
+  const mockHunterMetrics: MockHunterMetrics = {
+    hunters_total_paid: 145,
+    hunters_first_bounty_paid: 12
+  };
   const [bountyStatus, setBountyStatus] = useState<BountyStatus>({
     Open: false,
     Assigned: false,
@@ -104,7 +113,9 @@ export const SuperAdmin = () => {
     sats_paid: data.sats_paid || data.SatsPaid,
     sats_paid_percentage: data.sats_paid_percentage || data.SatsPaidPercentage,
     average_paid: data.average_paid || data.AveragePaid,
-    average_completed: data.average_completed || data.AverageCompleted
+    average_completed: data.average_completed || data.AverageCompleted,
+    unique_hunters_paid: data.unique_hunters_paid || data.uniqueHuntersPaid,
+    new_hunters_paid: data.new_hunters_paid || data.newHuntersPaid
   });
 
   const getMetrics = useCallback(async () => {
@@ -135,7 +146,11 @@ export const SuperAdmin = () => {
             setStartDate={setStartDate}
             setEndDate={setEndDate}
           />
-          <Statistics freezeHeaderRef={ref} metrics={bountyMetrics} />
+          <Statistics
+            freezeHeaderRef={ref}
+            metrics={bountyMetrics}
+            mockHunter={mockHunterMetrics}
+          />
           {loading ? (
             <LoaderContainer>
               <EuiLoadingSpinner size="l" />

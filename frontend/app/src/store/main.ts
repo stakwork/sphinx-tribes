@@ -183,6 +183,7 @@ export interface QueryParams {
   direction?: string;
   search?: string;
   resetPage?: boolean;
+  languages?: string;
 }
 
 export interface ClaimOnLiquid {
@@ -263,6 +264,8 @@ export interface BountyMetrics {
   sats_paid_percentage: number;
   average_paid: number;
   average_completed: number;
+  unique_hunters_paid: number;
+  new_hunters_paid: number;
 }
 
 export interface BountyStatus {
@@ -654,7 +657,8 @@ export class MainStore {
       ...queryParams,
       limit: String(limit),
       ...(queryParams?.resetPage ? { resetPage: String(queryParams.resetPage) } : {}),
-      ...(queryParams?.page ? { page: String(queryParams.page) } : {})
+      ...(queryParams?.page ? { page: String(queryParams.page) } : {}),
+      ...(queryParams?.languages ? { langauges: queryParams.languages } : {})
     } as Record<string, string>;
 
     const searchParams = new URLSearchParams(adaptedParams);
@@ -800,6 +804,13 @@ export class MainStore {
 
   @action setBountiesStatus(status: BountyStatus) {
     this.bountiesStatus = status;
+  }
+
+  @persist('object')
+  bountyLanguages: string = '';
+
+  @action setBountyLanguages(languages: string) {
+    this.bountyLanguages = languages;
   }
 
   getWantedsPrevParams?: QueryParams = {};
@@ -1462,7 +1473,11 @@ export class MainStore {
       });
 
       if (response.status) {
-        this.getPeopleBounties({ resetPage: true, ...this.bountiesStatus });
+        this.getPeopleBounties({
+          resetPage: true,
+          ...this.bountiesStatus,
+          languages: this.bountyLanguages
+        });
       }
       return;
     } catch (e) {
@@ -1489,7 +1504,11 @@ export class MainStore {
         }
       });
       if (response.status) {
-        await this.getPeopleBounties({ resetPage: true, ...this.bountiesStatus });
+        await this.getPeopleBounties({
+          resetPage: true,
+          ...this.bountiesStatus,
+          languages: this.bountyLanguages
+        });
       }
       return;
     } catch (e) {

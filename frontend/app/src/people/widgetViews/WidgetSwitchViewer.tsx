@@ -6,7 +6,6 @@ import { queryLimit } from 'store/main';
 import { Spacer } from '../main/Body';
 import NoResults from '../utils/NoResults';
 import { uiStore } from '../../store/ui';
-import { bountyHeaderLanguageFilter } from '../utils/filterValidation';
 import { colors } from '../../config/colors';
 import { useStores } from '../../store';
 import { widgetConfigs } from '../utils/Constants';
@@ -111,10 +110,7 @@ function WidgetSwitchViewer(props: any) {
 
   const activeList = [...listSource[selectedWidget]].filter(({ body }: any) => {
     const value = { ...body };
-    return bountyHeaderLanguageFilter(
-      value?.coding_languages,
-      props?.checkboxIdToSelectedMapLanguage
-    );
+    return value;
   });
 
   const foundDynamicSchema = widgetConfigs[selectedWidget]?.schema?.find(
