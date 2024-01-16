@@ -134,17 +134,14 @@ describe('MobileView component', () => {
   });
 
   it('should render the NameTag with correct props', () => {
-    // Define props for the NameTag
     const nameTagProps = {
       owner_alias: 'Test Owner',
       img: 'test-image.jpg',
-      created: 1610000000, // UNIX timestamp
+      created: 1610000000, 
       id: 180,
       owner: 'Test-Owner',
       owner_pubkey: 'abc100',
       widget: 'wanted'
-
-      // ... other props ...
     };
     render(<MobileView {...defaultProps} nametag={<NameTag {...nameTagProps} />} />);
 
