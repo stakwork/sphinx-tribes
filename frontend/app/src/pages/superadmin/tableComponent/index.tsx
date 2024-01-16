@@ -2,7 +2,7 @@ import React, { useCallback, useEffect, useState } from 'react';
 //import styled from 'styled-components';
 import { colors } from 'config';
 import { EuiPopover, EuiText, EuiCheckboxGroup } from '@elastic/eui';
-import { BountyStatus } from 'store/main';
+import { BountyStatus, defaultBountyStatus } from 'store/main';
 import moment from 'moment';
 import { useStores } from 'store';
 import expand_more from '../header/icons/expand_more.svg';
@@ -125,15 +125,10 @@ export const MyTable = ({
   bounties,
   startDate,
   endDate,
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   headerIsFrozen = false,
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   bountyStatus,
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   setBountyStatus,
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   dropdownValue,
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   setDropdownValue
 }: TableProps) => {
   const [currentPage, setCurrentPage] = useState(1);
@@ -211,45 +206,45 @@ export const MyTable = ({
   //   }
   // };
 
-  // const updateBountyStatus = (e: any) => {
-  //   const { value } = e.target;
-  //   if (bountyStatus && setBountyStatus && setDropdownValue) {
-  //     switch (value) {
-  //       case 'open': {
-  //         const newStatus = { ...defaultBountyStatus, Open: true };
-  //         setBountyStatus(newStatus);
-  //         break;
-  //       }
-  //       case 'in-progress': {
-  //         const newStatus = {
-  //           ...defaultBountyStatus,
-  //           Open: false,
-  //           Assigned: true
-  //         };
-  //         setBountyStatus(newStatus);
-  //         break;
-  //       }
-  //       case 'completed': {
-  //         const newStatus = {
-  //           ...defaultBountyStatus,
-  //           Open: false,
-  //           Paid: true
-  //         };
-  //         setBountyStatus(newStatus);
-  //         break;
-  //       }
-  //       default: {
-  //         const newStatus = {
-  //           ...defaultBountyStatus,
-  //           Open: false
-  //         };
-  //         setBountyStatus(newStatus);
-  //         break;
-  //       }
-  //     }
-  //     setDropdownValue(value);
-  //   }
-  // };
+  const updateBountyStatus = (e: any) => {
+    const { value } = e.target;
+    if (bountyStatus && setBountyStatus && setDropdownValue) {
+      switch (value) {
+        case 'open': {
+          const newStatus = { ...defaultBountyStatus, Open: true };
+          setBountyStatus(newStatus);
+          break;
+        }
+        case 'in-progress': {
+          const newStatus = {
+            ...defaultBountyStatus,
+            Open: false,
+            Assigned: true
+          };
+          setBountyStatus(newStatus);
+          break;
+        }
+        case 'completed': {
+          const newStatus = {
+            ...defaultBountyStatus,
+            Open: false,
+            Paid: true
+          };
+          setBountyStatus(newStatus);
+          break;
+        }
+        default: {
+          const newStatus = {
+            ...defaultBountyStatus,
+            Open: false
+          };
+          setBountyStatus(newStatus);
+          break;
+        }
+      }
+      setDropdownValue(value);
+    }
+  };
 
   const paginateNext = () => {
     const activeTab = paginationLimit > visibleTabs;

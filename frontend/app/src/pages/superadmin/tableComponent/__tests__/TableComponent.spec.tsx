@@ -7,7 +7,7 @@ import { Router } from 'react-router-dom';
 import '@testing-library/jest-dom';
 import { MyTable } from '../index.tsx';
 import { Bounty } from '../interfaces.ts';
-//import { mockBounties } from '../mockAdminData.ts';
+import { bounties } from '../mockBountyData.ts';
 
 jest.mock('../index.tsx', () => ({
   ...jest.requireActual('../index.tsx'),
@@ -159,6 +159,11 @@ it('renders "Organization" in the document', () => {
 it('renders each element in the table in the document', () => {
   const { getByText } = render(<MyTable bounties={mockBounties} headerIsFrozen={false} />);
   expect(getByText(mockBounties[0].title)).toBeInTheDocument();
+});
+
+it('renders elements from TableProps in the document', () => {
+  const { getByText } = render(<MyTable bounties={bounties} startDate={moment().subtract(30, 'days').unix()} endDate={moment().unix()} headerIsFrozen={false} />);
+  expect(getByText( 'Bounty 1')).toBeInTheDocument();
 });
 
 it('renders each element in the table in the document', () => {

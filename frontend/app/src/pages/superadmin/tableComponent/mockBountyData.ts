@@ -3,7 +3,7 @@ export const bounties = [
     id: 1,
     bounty_id: 1,
     title:
-      'Return user to the same page they were on before they edited a bounty user to the same page they were on before.',
+      'Bounty 1',
     date: '2021.01.01',
     bounty_created: '2021.01.01',
     paid_date: '',
