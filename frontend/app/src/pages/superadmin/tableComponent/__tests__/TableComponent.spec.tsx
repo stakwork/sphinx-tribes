@@ -143,8 +143,24 @@ it('renders "Organization" in the document', () => {
 });
 
 it('renders each element in the table in the document', () => {
-  const { getByText } = render(<MyTable bounties={mockBounties} headerIsFrozen={false} />);
-  expect(getByText(mockBounties[0].title)).toBeInTheDocument();
+  const { getByText, getAllByText } = render(
+    <MyTable bounties={mockBounties} headerIsFrozen={false} />
+  );
+
+  const dates = ['2023-01-01', '2023-01-02', '2023-01-03'];
+  const assignedText = getAllByText('assigned');
+  expect(assignedText.length).toBe(2);
+  expect(getByText('paid')).toBeInTheDocument();
+
+  const ednumElements = getAllByText('ednum');
+  expect(ednumElements).toHaveLength(mockBounties.length);
+
+  mockBounties.forEach((bounty: Bounty, index: number) => {
+    expect(getByText(bounty.title)).toBeInTheDocument();
+    expect(getByText(dates[index])).toBeInTheDocument();
+    expect(getByText(bounty.assignee_alias)).toBeInTheDocument();
+    expect(getByText(bounty.organization)).toBeInTheDocument();
+  });
 });
 
 it('renders each element in the table in the document', () => {
