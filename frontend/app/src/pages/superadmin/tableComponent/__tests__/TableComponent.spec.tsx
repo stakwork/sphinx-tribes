@@ -31,7 +31,8 @@ const mockBounties = [
     organization: 'Org 1',
     organizationImage: 'org-image-1.jpg',
     status: 'open',
-    paid: false
+    paid: false,
+    assignee_alias:"gourav"
   },
   {
     id: 2,
@@ -48,7 +49,8 @@ const mockBounties = [
     organization: 'Org 2',
     organizationImage: 'org-image-2.jpg',
     status: 'assigned',
-    paid: false
+    paid: false,
+    assignee_alias:"gourav"
   },
   {
     id: 3,
@@ -65,7 +67,8 @@ const mockBounties = [
     organization: 'Org 3',
     organizationImage: 'org-image-3.jpg',
     status: 'paid',
-    paid: true
+    paid: true,
+    assignee_alias:"gourav"
   }
 ];
 
@@ -156,7 +159,7 @@ it('renders each element in the table in the document', () => {
     expect(getByText(bounty.title)).toBeInTheDocument();
     expect(getByText(dates[index])).toBeInTheDocument();
     // expect(getByText(String(bounty.dtgp))).toBeInTheDocument();
-    expect(getByText(bounty.assignee)).toBeInTheDocument();
+    expect(getByText(bounty.assignee_alias)).toBeInTheDocument();
     // expect(getByText(bounty.provider)).toBeInTheDocument();
     expect(getByText(bounty.organization)).toBeInTheDocument();
   });
@@ -230,7 +233,8 @@ it('renders pagination section when number of bounties is greater than page size
     organization: 'OrganizationName',
     organizationImage:
       'https://avatars.githubusercontent.com/u/10001?s=460&u=8c61f1cda5e9e2c2d1d5b8d2a5a8a5b8d2a5a8a5&v=4',
-    status: 'open'
+    status: 'open',
+    assignee_alias:"gourav"
   }));
   const mockSetBountyStatus = jest.fn();
   const mockSetDropdownValue = jest.fn();
@@ -282,7 +286,8 @@ const mockProps = {
     organization: 'OrganizationName',
     organizationImage:
       'https://avatars.githubusercontent.com/u/10001?s=460&u=8c61f1cda5e9e2c2d1d5b8d2a5a8a5b8d2a5a8a5&v=4',
-    status: 'open'
+    status: 'open',
+    assignee_alias:"gourav"
   })),
   startDate: moment().subtract(7, 'days').startOf('day').unix(),
   endDate: moment().startOf('day').unix(),
