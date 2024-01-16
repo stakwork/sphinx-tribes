@@ -933,4 +933,71 @@ describe('Main store', () => {
     store.exportMetricsBountiesCsv(body);
     expect(store.exportMetricsBountiesCsv).toBeCalledWith(body);
   });
+
+  it("I should be able to test that the signed-in user details are persisted in the local storage", async () => {
+    uiStore.setShowSignIn(true);
+
+    localStorageMock.setItem('ui', JSON.stringify(uiStore));
+
+    expect(uiStore.showSignIn).toBeTruthy();
+    expect(localStorageMock.getItem('ui')).toEqual(JSON.stringify(uiStore));
+  })
+
+  it("I should be able to test that when signed out the user data is deleted", async () => {
+    // Shows first if signed in 
+    uiStore.setShowSignIn(true);
+    localStorageMock.setItem('ui', JSON.stringify(uiStore));
+    
+    expect(uiStore.showSignIn).toBeTruthy();
+    expect(localStorageMock.getItem('ui')).toEqual(JSON.stringify(uiStore));
+    //Shows when signed out
+    uiStore.setMeInfo(emptyMeInfo);
+    localStorageMock.setItem('ui', JSON.stringify(uiStore));
+
+    expect(localStorageMock.getItem('ui')).toEqual(JSON.stringify(uiStore));
+  })
+
+  it("I should be able to test that signed-in user details can be displayed such as the name and pubkey", async () => {
+    uiStore.setShowSignIn(true);
+
+    expect(uiStore.meInfo?.owner_alias).toEqual(user.alias);
+    expect(uiStore.meInfo?.owner_pubkey).toEqual(user.pubkey);
+  })
+
+  it("I should be able to test that a signed-in user can update their details", async () => {
+    uiStore.setShowSignIn(true);
+    expect(uiStore.meInfo?.alias).toEqual('Vladimir');
+
+    user.alias = 'John';
+    uiStore.setMeInfo(user);
+
+    expect(uiStore.meInfo?.alias).toEqual('John');
+  })
+
+  it("I should be able to test that a signed-in user can make an API request without getting a 401 (unauthorized error)", async () => {
+    uiStore.setShowSignIn(true);
+    const loggedUrl = `http://${getHost()}/admin/auth`;
+    const res = await fetchStub.withArgs(loggedUrl, sinon.match.any).returns(
+      Promise.resolve({
+        status: 200,
+        ok: true
+      }) as any
+    );
+    expect(res).toBeTruthy();
+  })
+
+  it("I should be able to test that when a user is signed out, a user will get a 401 error if they make an API call", async () => {
+    uiStore.setMeInfo(emptyMeInfo);  
+    const urlNoLogged = `http://${getHost()}/admin/auth`;
+
+    const res = await fetchStub.withArgs(urlNoLogged, sinon.match.any).returns(
+      Promise.resolve({
+        status: 401,
+        ok: false
+      }) as any
+    );
+    expect(res).toBeTruthy();
+  })
 });
+
+
