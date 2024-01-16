@@ -5,6 +5,7 @@ import (
 	"context"
 	"encoding/json"
 	"errors"
+	"github.com/go-chi/chi"
 	"github.com/stakwork/sphinx-tribes/auth"
 	"github.com/stakwork/sphinx-tribes/db"
 	mocks "github.com/stakwork/sphinx-tribes/mocks"
@@ -108,10 +109,13 @@ func TestDeleteOrganization(t *testing.T) {
 	oHandler := NewOrganizationHandler(mockDb)
 
 	t.Run("should return error if not authorized", func(t *testing.T) {
+		orgUUID := "org-uuid"
 		rr := httptest.NewRecorder()
 		handler := http.HandlerFunc(oHandler.DeleteOrganization)
 
-		req, err := http.NewRequestWithContext(context.Background(), http.MethodDelete, "/organization/uuid", nil)
+		rctx := chi.NewRouteContext()
+		rctx.URLParams.Add("uuid", orgUUID)
+		req, err := http.NewRequestWithContext(context.WithValue(context.Background(), chi.RouteCtxKey, rctx), http.MethodDelete, "/delete/"+orgUUID, nil)
 		if err != nil {
 			t.Fatal(err)
 		}
@@ -133,7 +137,9 @@ func TestDeleteOrganization(t *testing.T) {
 		rr := httptest.NewRecorder()
 		handler := http.HandlerFunc(oHandler.DeleteOrganization)
 
-		req, err := http.NewRequestWithContext(ctx, http.MethodDelete, "/organization/"+orgUUID, nil)
+		rctx := chi.NewRouteContext()
+		rctx.URLParams.Add("uuid", orgUUID)
+		req, err := http.NewRequestWithContext(context.WithValue(ctx, chi.RouteCtxKey, rctx), http.MethodDelete, "/delete/"+orgUUID, nil)
 		if err != nil {
 			t.Fatal(err)
 		}
@@ -154,7 +160,9 @@ func TestDeleteOrganization(t *testing.T) {
 		rr := httptest.NewRecorder()
 		handler := http.HandlerFunc(oHandler.DeleteOrganization)
 
-		req, err := http.NewRequestWithContext(ctx, http.MethodDelete, "/organization/"+orgUUID, nil)
+		rctx := chi.NewRouteContext()
+		rctx.URLParams.Add("uuid", orgUUID)
+		req, err := http.NewRequestWithContext(context.WithValue(ctx, chi.RouteCtxKey, rctx), http.MethodDelete, "/delete/"+orgUUID, nil)
 		if err != nil {
 			t.Fatal(err)
 		}
@@ -177,7 +185,9 @@ func TestDeleteOrganization(t *testing.T) {
 		rr := httptest.NewRecorder()
 		handler := http.HandlerFunc(oHandler.DeleteOrganization)
 
-		req, err := http.NewRequestWithContext(ctx, http.MethodDelete, "/organization/"+orgUUID, nil)
+		rctx := chi.NewRouteContext()
+		rctx.URLParams.Add("uuid", orgUUID)
+		req, err := http.NewRequestWithContext(context.WithValue(ctx, chi.RouteCtxKey, rctx), http.MethodDelete, "/delete/"+orgUUID, nil)
 		if err != nil {
 			t.Fatal(err)
 		}
@@ -210,14 +220,16 @@ func TestDeleteOrganization(t *testing.T) {
 		}
 
 		mockDb.On("GetOrganizationByUuid", orgUUID).Return(db.Organization{OwnerPubKey: "test-key"}).Once()
-		mockDb.On("UpdateOrganizationForDeletion", orgUUID).Return(updatedOrg).Once()
+		mockDb.On("UpdateOrganizationForDeletion", orgUUID).Return(nil).Once()
 		mockDb.On("DeleteAllUsersFromOrganization", orgUUID).Return(nil).Once()
 		mockDb.On("ChangeOrganizationDeleteStatus", orgUUID, true).Return(updatedOrg).Once()
 
 		rr := httptest.NewRecorder()
 		handler := http.HandlerFunc(oHandler.DeleteOrganization)
 
-		req, err := http.NewRequestWithContext(ctx, http.MethodDelete, "/organization/"+orgUUID, nil)
+		rctx := chi.NewRouteContext()
+		rctx.URLParams.Add("uuid", orgUUID)
+		req, err := http.NewRequestWithContext(context.WithValue(ctx, chi.RouteCtxKey, rctx), http.MethodDelete, "/delete/"+orgUUID, nil)
 		if err != nil {
 			t.Fatal(err)
 		}
@@ -249,7 +261,9 @@ func TestDeleteOrganization(t *testing.T) {
 		rr := httptest.NewRecorder()
 		handler := http.HandlerFunc(oHandler.DeleteOrganization)
 
-		req, err := http.NewRequestWithContext(ctx, http.MethodDelete, "/organization/"+orgUUID, nil)
+		rctx := chi.NewRouteContext()
+		rctx.URLParams.Add("uuid", orgUUID)
+		req, err := http.NewRequestWithContext(context.WithValue(ctx, chi.RouteCtxKey, rctx), http.MethodDelete, "/delete/"+orgUUID, nil)
 		if err != nil {
 			t.Fatal(err)
 		}
