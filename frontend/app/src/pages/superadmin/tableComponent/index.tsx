@@ -324,13 +324,13 @@ export const MyTable = ({
                   <TableDataCenter>{time_to_pay}</TableDataCenter>
                   <TableDataAlternative>
                     <ImageWithText
-                      text={bounty?.assignee}
+                      text={bounty?.assignee_alias}
                       image={bounty?.assignee_img || defaultPic}
                     />
                   </TableDataAlternative>
                   <TableDataAlternative className="address">
                     <ImageWithText
-                      text={bounty?.owner_pubkey}
+                      text={bounty?.unique_name}
                       image={bounty?.providerImage || defaultPic}
                     />
                   </TableDataAlternative>
