@@ -428,6 +428,12 @@ type BountyResponse struct {
 	Organization OrganizationShort `json:"organization"`
 }
 
+type BountyCountResponse struct {
+	OpenCount     int64 `json:"open_count"`
+	AssignedCount int64 `json:"assigned_count"`
+	PaidCount     int64 `json:"paid_count"`
+}
+
 type Organization struct {
 	ID          uint       `json:"id"`
 	Uuid        string     `json:"uuid"`
@@ -440,6 +446,8 @@ type Organization struct {
 	Deleted     bool       `gorm:"default:false" json:"deleted"`
 	BountyCount int64      `json:"bounty_count,omitempty"`
 	Budget      uint       `json:"budget,omitempty"`
+	Website     string     `json:"website"`
+	Github      string     `json:"github"`
 	Description string     `json:"description"`
 }
 
@@ -654,6 +662,21 @@ type BountyMetrics struct {
 	SatsPaidPercentage     uint  `json:"sats_paid_percentage"`
 	AveragePaid            uint  `json:"average_paid"`
 	AverageCompleted       uint  `json:"average_completed"`
+	UniqueHuntersPaid      int64 `json:"unique_hunters_paid"`
+	NewHuntersPaid         int64 `json:"new_hunters_paid"`
+}
+
+type MetricsBountyCsv struct {
+	DatePosted   *time.Time `json:"date_posted"`
+	Organization string     `json:"organization"`
+	BountyAmount uint       `json:"bounty_amount"`
+	Provider     string     `json:"provider"`
+	Hunter       string     `json:"hunter"`
+	BountyTitle  string     `json:"bounty_title"`
+	BountyLink   string     `json:"bounty_link"`
+	BountyStatus string     `json:"bounty_status"`
+	DatePaid     *time.Time `json:"date_paid"`
+	DateAssigned *time.Time `json:"date_assigned"`
 }
 
 type FilterStattuCount struct {
