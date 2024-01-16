@@ -28,7 +28,8 @@ export const Header = ({ startDate, setStartDate, endDate, setEndDate }: HeaderP
   const [showSelector, setShowSelector] = useState(false);
   const [dateDiff, setDateDiff] = useState(7);
   const [exportLoading, setExportLoading] = useState(false);
-  const formatUnixDate = (unixDate: number, includeYear: boolean = true) => {
+  // eslint-disable-next-line @typescript-eslint/typedef
+  const formatUnixDate = (unixDate: number, includeYear = true) => {
     const formatString = includeYear ? 'DD-MMM-YYYY' : 'DD-MMM';
     return moment.unix(unixDate).format(formatString);
   };
