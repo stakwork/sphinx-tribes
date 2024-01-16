@@ -141,15 +141,28 @@ describe('MobileView component', () => {
     expect(iCanHelp).toBeInTheDocument();
   });
   it('displays "Mark as paid" when bounty is unpaid', async () => {
-    render(<MobileView {...defaultProps} />);
-    let mark;
+    const modifiedProps = {
+      ...defaultProps,
+      person: {
+        ...defaultProps.person,
+        owner_alias: 'TestOwnerAlias'
+      },
+      paidStatus: false
+    };
 
-    // Wait for asynchronous operations if necessary
-    await waitFor(() => {
-      mark = screen.queryByText('Mark as Paid');
-    });
+    jest.mock('store', () => ({
+      useStores: () => ({
+        main: {
+          getOrganizationUser: jest.fn().mockResolvedValue({ owner_pubkey: 'UserPubKey' })
+        },
+        ui: {
+          meInfo: { owner_pubkey: 'UserPubKey', owner_alias: 'TestOwnerAlias' }
+        }
+      })
+    }));
+    render(<MobileView {...modifiedProps} />);
 
-    // Assert that the button is in the document
-    expect(mark).not.toBeNull();
+    const markPaidButton = await screen.findByText('Mark as Paid');
+    expect(markPaidButton).toBeInTheDocument();
   });
 });
