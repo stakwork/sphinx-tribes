@@ -21,6 +21,14 @@ import (
 	"github.com/tuan78/jsonconv"
 )
 
+type metricHandler struct {
+	db db.Database
+}
+
+func NewMetricHandler(db db.Database) *metricHandler {
+	return &metricHandler{db: db}
+}
+
 func PaymentMetrics(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 	pubKeyFromAuth, _ := ctx.Value(auth.ContextKey).(string)
@@ -102,7 +110,7 @@ func PeopleMetrics(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(sumAmount)
 }
 
-func BountyMetrics(w http.ResponseWriter, r *http.Request) {
+func (mh *metricHandler) BountyMetrics(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 	pubKeyFromAuth, _ := ctx.Value(auth.ContextKey).(string)
 
@@ -137,14 +145,16 @@ func BountyMetrics(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
-	totalBountiesPosted := db.DB.TotalBountiesPosted(request)
-	totalBountiesPaid := db.DB.TotalPaidBounties(request)
-	bountiesPaidPercentage := db.DB.BountiesPaidPercentage(request)
-	totalSatsPosted := db.DB.TotalSatsPosted(request)
-	totalSatsPaid := db.DB.TotalSatsPaid(request)
-	satsPaidPercentage := db.DB.SatsPaidPercentage(request)
-	avgPaidDays := db.DB.AveragePaidTime(request)
-	avgCompletedDays := db.DB.AverageCompletedTime(request)
+	totalBountiesPosted := mh.db.TotalBountiesPosted(request)
+	totalBountiesPaid := mh.db.TotalPaidBounties(request)
+	bountiesPaidPercentage := mh.db.BountiesPaidPercentage(request)
+	totalSatsPosted := mh.db.TotalSatsPosted(request)
+	totalSatsPaid := mh.db.TotalSatsPaid(request)
+	satsPaidPercentage := mh.db.SatsPaidPercentage(request)
+	avgPaidDays := mh.db.AveragePaidTime(request)
+	avgCompletedDays := mh.db.AverageCompletedTime(request)
+	uniqueHuntersPaid := mh.db.TotalHuntersPaid(request)
+	newHuntersPaid := mh.db.NewHuntersPaid(request)
 
 	bountyMetrics := db.BountyMetrics{
 		BountiesPosted:         totalBountiesPosted,
@@ -155,6 +165,8 @@ func BountyMetrics(w http.ResponseWriter, r *http.Request) {
 		SatsPaidPercentage:     satsPaidPercentage,
 		AveragePaid:            avgPaidDays,
 		AverageCompleted:       avgCompletedDays,
+		UniqueHuntersPaid:      uniqueHuntersPaid,
+		NewHuntersPaid:         newHuntersPaid,
 	}
 
 	if db.RedisError == nil {
@@ -297,15 +309,31 @@ func GetMetricsBountiesData(metricBounties []db.Bounty) []db.BountyData {
 func getMetricsBountyCsv(metricBounties []db.Bounty) []db.MetricsBountyCsv {
 	var metricBountiesCsv []db.MetricsBountyCsv
 	for _, bounty := range metricBounties {
+		bountyOwner := db.DB.GetPersonByPubkey(bounty.OwnerID)
+		bountyAssignee := db.DB.GetPersonByPubkey(bounty.Assignee)
+		organization := db.DB.GetOrganizationByUuid(bounty.OrgUuid)
+
+		bountyLink := fmt.Sprintf("https://community.sphinx.chat/bounty/%d", bounty.ID)
+		bountyStatus := "Open"
+
+		if bounty.Assignee != "" && !bounty.Paid {
+			bountyStatus = "Assigned"
+		} else {
+			bountyStatus = "Paid"
+		}
+
 		tm := time.Unix(bounty.Created, 0)
 		bountyCsv := db.MetricsBountyCsv{
 			DatePosted:   &tm,
+			Organization: organization.Name,
 			BountyAmount: bounty.Price,
+			Provider:     bountyOwner.OwnerAlias,
+			Hunter:       bountyAssignee.OwnerAlias,
+			BountyTitle:  bounty.Title,
+			BountyLink:   bountyLink,
+			BountyStatus: bountyStatus,
 			DateAssigned: bounty.AssignedDate,
 			DatePaid:     bounty.PaidDate,
-			BountyTitle:  bounty.Title,
-			Hunter:       bounty.Assignee,
-			Provider:     bounty.OwnerID,
 		}
 		metricBountiesCsv = append(metricBountiesCsv, bountyCsv)
 	}
@@ -314,13 +342,7 @@ func getMetricsBountyCsv(metricBounties []db.Bounty) []db.MetricsBountyCsv {
 }
 
 func ConvertMetricsToCSV(metricBountiesData []db.MetricsBountyCsv) [][]string {
-	var metricsData []map[string]interface{}
-	data, err := json.Marshal(metricBountiesData)
-	if err != nil {
-		fmt.Println("Could not convert metrics structs Array to JSON")
-		return [][]string{}
-	}
-	err = json.Unmarshal(data, &metricsData)
+	metricsData := db.DB.ConvertMetricsBountiesToMap(metricBountiesData)
 	result := jsonconv.ToCsv(metricsData, nil)
 	return result
 }
