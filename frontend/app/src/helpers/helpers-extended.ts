@@ -333,8 +333,7 @@ export async function userCanManageBounty(
       const userAccess =
         userHasManageBountyRoles(main.bountyRoles, userRoles) &&
         userHasRole(main.bountyRoles, userRoles, 'VIEW REPORT');
-      const canAssignHunter = isOrganizationAdmin || userAccess;
-      return canAssignHunter;
+      return isOrganizationAdmin || userAccess;
     }
   }
   return false;
