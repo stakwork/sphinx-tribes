@@ -361,8 +361,8 @@ function MobileView(props: CodingBountiesProps) {
   }, [setLocalPaid, ui]);
 
   const checkUserBountyRole = useCallback(async () => {
-      const canPayBounty = await userCanManageBounty(org_uuid, userPubkey, main);
-      setUserBountyRole(canPayBounty);
+    const canPayBounty = await userCanManageBounty(org_uuid, userPubkey, main);
+    setUserBountyRole(canPayBounty);
   }, [main, org_uuid, userPubkey]);
 
   useEffect(() => {

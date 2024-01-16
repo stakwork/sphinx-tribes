@@ -140,10 +140,9 @@ const Bounties = (props: BountiesProps) => {
   const closeConnectModal = () => setConnectModal(false);
   const showConnectModal = () => setConnectModal(true);
   const [canAssignHunter, setCanAssignHunter] = useState(false);
-  
+
   const { ui, main } = useStores();
   const userPubkey = ui.meInfo?.owner_pubkey;
-
 
   const checkUserRoles = useCallback(async () => {
     const canAssignHunter = await userCanManageBounty(org_uuid, userPubkey, main);
@@ -238,7 +237,9 @@ const Bounties = (props: BountiesProps) => {
                 <img src="/static/unassigned_profile.svg" alt="" height={'100%'} width={'100%'} />
               </div>
               <div className="UnassignedPersonalDetailContainer">
-                {!canAssignHunter && <EuiText className="ProfileText">Do your skills match?</EuiText>}
+                {!canAssignHunter && (
+                  <EuiText className="ProfileText">Do your skills match?</EuiText>
+                )}
                 <IconButton
                   text={canAssignHunter ? 'Assign Hunter' : 'I can help'}
                   onClick={(e: any) => {

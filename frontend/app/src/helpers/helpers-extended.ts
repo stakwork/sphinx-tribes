@@ -320,13 +320,18 @@ export function handleDisplayRole(displayedRoles: RolesCategory[]) {
   return { newDisplayedRoles, tempDataRole };
 }
 
-export async function userCanManageBounty(org_uuid: string | undefined, userPubkey: string | undefined, main: MainStore): Promise<boolean> {
+export async function userCanManageBounty(
+  org_uuid: string | undefined,
+  userPubkey: string | undefined,
+  main: MainStore
+): Promise<boolean> {
   if (org_uuid && userPubkey) {
     const userRoles = await main.getUserRoles(org_uuid, userPubkey);
     const org = await main.getUserOrganizationByUuid(org_uuid);
     if (org) {
       const isOrganizationAdmin = org.owner_pubkey === userPubkey;
-      const userAccess = userHasManageBountyRoles(main.bountyRoles, userRoles) &&
+      const userAccess =
+        userHasManageBountyRoles(main.bountyRoles, userRoles) &&
         userHasRole(main.bountyRoles, userRoles, 'VIEW REPORT');
       const canAssignHunter = isOrganizationAdmin || userAccess;
       return canAssignHunter;

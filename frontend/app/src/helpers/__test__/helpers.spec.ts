@@ -281,63 +281,75 @@ describe('testing helpers', () => {
 
   describe('userCanManageBounty', () => {
     test('should return false if org id not present', async () => {
-      const canManage = await userCanManageBounty("", user.owner_pubkey, mainStore);
+      const canManage = await userCanManageBounty('', user.owner_pubkey, mainStore);
       expect(canManage).toBeFalsy();
     });
 
     test('should return false if user not present', async () => {
-      const canManage = await userCanManageBounty("org_id", "", mainStore);
+      const canManage = await userCanManageBounty('org_id', '', mainStore);
       expect(canManage).toBeFalsy();
     });
 
     test('should return false if org not present', async () => {
-      jest.spyOn(mainStore, "getUserRoles").mockReturnValueOnce(Promise.resolve([]));
-      jest.spyOn(mainStore, "getUserOrganizationByUuid").mockReturnValueOnce(Promise.resolve(undefined));
-      const canManage = await userCanManageBounty("org_id", user.owner_pubkey, mainStore);
+      jest.spyOn(mainStore, 'getUserRoles').mockReturnValueOnce(Promise.resolve([]));
+      jest
+        .spyOn(mainStore, 'getUserOrganizationByUuid')
+        .mockReturnValueOnce(Promise.resolve(undefined));
+      const canManage = await userCanManageBounty('org_id', user.owner_pubkey, mainStore);
       expect(canManage).toBeFalsy();
     });
 
     test('should return true if user is owner of the org', async () => {
-      jest.spyOn(mainStore, "getUserRoles").mockReturnValueOnce(Promise.resolve([]));
-      jest.spyOn(mainStore, "getUserOrganizationByUuid").mockReturnValueOnce(Promise.resolve({ owner_pubkey: user.owner_pubkey } as any));
-      const canManage = await userCanManageBounty("org_id", user.owner_pubkey, mainStore);
+      jest.spyOn(mainStore, 'getUserRoles').mockReturnValueOnce(Promise.resolve([]));
+      jest
+        .spyOn(mainStore, 'getUserOrganizationByUuid')
+        .mockReturnValueOnce(Promise.resolve({ owner_pubkey: user.owner_pubkey } as any));
+      const canManage = await userCanManageBounty('org_id', user.owner_pubkey, mainStore);
       expect(canManage).toBeTruthy();
     });
 
     test('should return true is has manage bounty roles for that organization', async () => {
-      jest.spyOn(mainStore, "getUserRoles").mockReturnValueOnce(Promise.resolve([
-        { name: 'ADD BOUNTY' },
-        { name: 'UPDATE BOUNTY' },
-        { name: 'DELETE BOUNTY' },
-        { name: 'PAY BOUNTY' },
-        { name: 'VIEW REPORT' }
-      ]));
-      jest.spyOn(mainStore, "getUserOrganizationByUuid").mockReturnValueOnce(Promise.resolve({ owner_pubkey: "other_owner" } as any));
+      jest
+        .spyOn(mainStore, 'getUserRoles')
+        .mockReturnValueOnce(
+          Promise.resolve([
+            { name: 'ADD BOUNTY' },
+            { name: 'UPDATE BOUNTY' },
+            { name: 'DELETE BOUNTY' },
+            { name: 'PAY BOUNTY' },
+            { name: 'VIEW REPORT' }
+          ])
+        );
+      jest
+        .spyOn(mainStore, 'getUserOrganizationByUuid')
+        .mockReturnValueOnce(Promise.resolve({ owner_pubkey: 'other_owner' } as any));
       mainStore.setBountyRoles([
         { name: 'ADD BOUNTY' },
         { name: 'UPDATE BOUNTY' },
         { name: 'DELETE BOUNTY' },
         { name: 'PAY BOUNTY' },
         { name: 'VIEW REPORT' }
-      ])
-      const canManage = await userCanManageBounty("org_id", user.owner_pubkey, mainStore);
+      ]);
+      const canManage = await userCanManageBounty('org_id', user.owner_pubkey, mainStore);
       expect(canManage).toBeFalsy();
     });
 
     test('should return false if user does not have manage bounty roles for that organization', async () => {
-      jest.spyOn(mainStore, "getUserRoles").mockReturnValueOnce(Promise.resolve([
-        { name: 'VIEW REPORT' }
-      ]));
-      jest.spyOn(mainStore, "getUserOrganizationByUuid").mockReturnValueOnce(Promise.resolve({ owner_pubkey: "other_owner" } as any));
+      jest
+        .spyOn(mainStore, 'getUserRoles')
+        .mockReturnValueOnce(Promise.resolve([{ name: 'VIEW REPORT' }]));
+      jest
+        .spyOn(mainStore, 'getUserOrganizationByUuid')
+        .mockReturnValueOnce(Promise.resolve({ owner_pubkey: 'other_owner' } as any));
       mainStore.setBountyRoles([
         { name: 'ADD BOUNTY' },
         { name: 'UPDATE BOUNTY' },
         { name: 'DELETE BOUNTY' },
         { name: 'PAY BOUNTY' },
         { name: 'VIEW REPORT' }
-      ])
-      const canManage = await userCanManageBounty("org_id", user.owner_pubkey, mainStore);
+      ]);
+      const canManage = await userCanManageBounty('org_id', user.owner_pubkey, mainStore);
       expect(canManage).toBeFalsy();
     });
-  })
+  });
 });
