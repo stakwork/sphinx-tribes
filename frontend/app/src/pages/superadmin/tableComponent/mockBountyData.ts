@@ -2,8 +2,7 @@ export const bounties = [
   {
     id: 1,
     bounty_id: 1,
-    title:
-      'Bounty 1',
+    title: 'Bounty 1',
     date: '2021.01.01',
     bounty_created: '2021.01.01',
     paid_date: '',

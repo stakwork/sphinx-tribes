@@ -125,9 +125,11 @@ export const MyTable = ({
   bounties,
   startDate,
   endDate,
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   headerIsFrozen = false,
   bountyStatus,
   setBountyStatus,
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   dropdownValue,
   setDropdownValue
 }: TableProps) => {

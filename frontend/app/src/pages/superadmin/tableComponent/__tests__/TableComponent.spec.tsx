@@ -162,8 +162,15 @@ it('renders each element in the table in the document', () => {
 });
 
 it('renders elements from TableProps in the document', () => {
-  const { getByText } = render(<MyTable bounties={bounties} startDate={moment().subtract(30, 'days').unix()} endDate={moment().unix()} headerIsFrozen={false} />);
-  expect(getByText( 'Bounty 1')).toBeInTheDocument();
+  const { getByText } = render(
+    <MyTable
+      bounties={bounties}
+      startDate={moment().subtract(30, 'days').unix()}
+      endDate={moment().unix()}
+      headerIsFrozen={false}
+    />
+  );
+  expect(getByText('Bounty 1')).toBeInTheDocument();
 });
 
 it('renders each element in the table in the document', () => {
@@ -222,7 +229,7 @@ it('it renders with filter status states', async () => {
       />
     );
   };
-  const { getByText, getByLabelText } = render(<Wrapper />);
+  const { getByText } = render(<Wrapper />);
 
   const dropdown = getByText('All');
   fireEvent.select(dropdown);
