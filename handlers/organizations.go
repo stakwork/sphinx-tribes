@@ -653,7 +653,7 @@ func (oh *organizationHandler) DeleteOrganization(w http.ResponseWriter, r *http
 		return
 	}
 
-	organization := db.DB.GetOrganizationByUuid(uuid)
+	organization := oh.db.GetOrganizationByUuid(uuid)
 
 	if pubKeyFromAuth != organization.OwnerPubKey {
 		msg := "only org admin can delete an organization"
@@ -664,21 +664,21 @@ func (oh *organizationHandler) DeleteOrganization(w http.ResponseWriter, r *http
 	}
 
 	// Update organization to hide and clear certain fields
-	if err := db.DB.UpdateOrganizationForDeletion(uuid); err != nil {
+	if err := oh.db.UpdateOrganizationForDeletion(uuid); err != nil {
 		fmt.Println("Error updating organization:", err)
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
 
 	// Delete all users from the organization
-	if err := db.DB.DeleteAllUsersFromOrganization(uuid); err != nil {
+	if err := oh.db.DeleteAllUsersFromOrganization(uuid); err != nil {
 		fmt.Println("Error removing users from organization:", err)
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
 
 	// soft delete organization
-	org := db.DB.ChangeOrganizationDeleteStatus(uuid, true)
+	org := oh.db.ChangeOrganizationDeleteStatus(uuid, true)
 	w.WriteHeader(http.StatusOK)
 	json.NewEncoder(w).Encode(org)
 }
