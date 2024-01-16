@@ -1,9 +1,10 @@
-import React, { useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import styled from 'styled-components';
 import { observer } from 'mobx-react-lite';
 import { BountiesProps } from 'people/interfaces';
 import { Link } from 'react-router-dom';
 import { EuiText } from '@elastic/eui';
+import { userCanManageBounty } from 'helpers';
 import { colors } from '../../config/colors';
 import { useStores } from '../../store';
 import BountyDescription from '../../bounties/BountyDescription';
@@ -127,7 +128,8 @@ const Bounties = (props: BountiesProps) => {
     person,
     onPanelClick,
     widget,
-    created
+    created,
+    org_uuid
   } = props;
 
   const color = colors['light'];
@@ -137,10 +139,19 @@ const Bounties = (props: BountiesProps) => {
   const [openConnectModal, setConnectModal] = useState<boolean>(false);
   const closeConnectModal = () => setConnectModal(false);
   const showConnectModal = () => setConnectModal(true);
+  const [canAssignHunter, setCanAssignHunter] = useState(false);
 
-  const { ui } = useStores();
+  const { ui, main } = useStores();
+  const userPubkey = ui.meInfo?.owner_pubkey;
 
-  const isUser = ui.meInfo?.owner_pubkey === person.owner_pubkey;
+  const checkUserRoles = useCallback(async () => {
+    const canAssignHunter = await userCanManageBounty(org_uuid, userPubkey, main);
+    setCanAssignHunter(canAssignHunter);
+  }, [main, org_uuid, userPubkey]);
+
+  useEffect(() => {
+    checkUserRoles();
+  }, [checkUserRoles]);
 
   return (
     <>
@@ -226,12 +237,14 @@ const Bounties = (props: BountiesProps) => {
                 <img src="/static/unassigned_profile.svg" alt="" height={'100%'} width={'100%'} />
               </div>
               <div className="UnassignedPersonalDetailContainer">
-                {!isUser && <EuiText className="ProfileText">Do your skills match?</EuiText>}
+                {!canAssignHunter && (
+                  <EuiText className="ProfileText">Do your skills match?</EuiText>
+                )}
                 <IconButton
-                  text={isUser ? 'Assign Hunter' : 'I can help'}
+                  text={canAssignHunter ? 'Assign Hunter' : 'I can help'}
                   onClick={(e: any) => {
                     if (ui.meInfo) {
-                      isUser ? onPanelClick() : showConnectModal();
+                      canAssignHunter ? onPanelClick() : showConnectModal();
                       e.stopPropagation();
                     } else {
                       e.stopPropagation();
