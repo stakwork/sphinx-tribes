@@ -1235,6 +1235,52 @@ func (_c *Database_CreateUserRoles_Call) RunAndReturn(run func([]db.UserRoles, s
 	return _c
 }
 
+// DeleteAllUsersFromOrganization provides a mock function with given fields: uuid
+func (_m *Database) DeleteAllUsersFromOrganization(uuid string) error {
+	ret := _m.Called(uuid)
+
+	if len(ret) == 0 {
+		panic("no return value specified for DeleteAllUsersFromOrganization")
+	}
+
+	var r0 error
+	if rf, ok := ret.Get(0).(func(string) error); ok {
+		r0 = rf(uuid)
+	} else {
+		r0 = ret.Error(0)
+	}
+
+	return r0
+}
+
+// Database_DeleteAllUsersFromOrganization_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'DeleteAllUsersFromOrganization'
+type Database_DeleteAllUsersFromOrganization_Call struct {
+	*mock.Call
+}
+
+// DeleteAllUsersFromOrganization is a helper method to define mock.On call
+//   - uuid string
+func (_e *Database_Expecter) DeleteAllUsersFromOrganization(uuid interface{}) *Database_DeleteAllUsersFromOrganization_Call {
+	return &Database_DeleteAllUsersFromOrganization_Call{Call: _e.mock.On("DeleteAllUsersFromOrganization", uuid)}
+}
+
+func (_c *Database_DeleteAllUsersFromOrganization_Call) Run(run func(uuid string)) *Database_DeleteAllUsersFromOrganization_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(string))
+	})
+	return _c
+}
+
+func (_c *Database_DeleteAllUsersFromOrganization_Call) Return(_a0 error) *Database_DeleteAllUsersFromOrganization_Call {
+	_c.Call.Return(_a0)
+	return _c
+}
+
+func (_c *Database_DeleteAllUsersFromOrganization_Call) RunAndReturn(run func(string) error) *Database_DeleteAllUsersFromOrganization_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
 // DeleteBounty provides a mock function with given fields: pubkey, created
 func (_m *Database) DeleteBounty(pubkey string, created string) (db.Bounty, error) {
 	ret := _m.Called(pubkey, created)
@@ -5453,6 +5499,52 @@ func (_c *Database_UpdateOrganizationBudget_Call) Return(_a0 db.BountyBudget) *D
 }
 
 func (_c *Database_UpdateOrganizationBudget_Call) RunAndReturn(run func(db.BountyBudget) db.BountyBudget) *Database_UpdateOrganizationBudget_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
+// UpdateOrganizationForDeletion provides a mock function with given fields: uuid
+func (_m *Database) UpdateOrganizationForDeletion(uuid string) error {
+	ret := _m.Called(uuid)
+
+	if len(ret) == 0 {
+		panic("no return value specified for UpdateOrganizationForDeletion")
+	}
+
+	var r0 error
+	if rf, ok := ret.Get(0).(func(string) error); ok {
+		r0 = rf(uuid)
+	} else {
+		r0 = ret.Error(0)
+	}
+
+	return r0
+}
+
+// Database_UpdateOrganizationForDeletion_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'UpdateOrganizationForDeletion'
+type Database_UpdateOrganizationForDeletion_Call struct {
+	*mock.Call
+}
+
+// UpdateOrganizationForDeletion is a helper method to define mock.On call
+//   - uuid string
+func (_e *Database_Expecter) UpdateOrganizationForDeletion(uuid interface{}) *Database_UpdateOrganizationForDeletion_Call {
+	return &Database_UpdateOrganizationForDeletion_Call{Call: _e.mock.On("UpdateOrganizationForDeletion", uuid)}
+}
+
+func (_c *Database_UpdateOrganizationForDeletion_Call) Run(run func(uuid string)) *Database_UpdateOrganizationForDeletion_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(string))
+	})
+	return _c
+}
+
+func (_c *Database_UpdateOrganizationForDeletion_Call) Return(_a0 error) *Database_UpdateOrganizationForDeletion_Call {
+	_c.Call.Return(_a0)
+	return _c
+}
+
+func (_c *Database_UpdateOrganizationForDeletion_Call) RunAndReturn(run func(string) error) *Database_UpdateOrganizationForDeletion_Call {
 	_c.Call.Return(run)
 	return _c
 }
