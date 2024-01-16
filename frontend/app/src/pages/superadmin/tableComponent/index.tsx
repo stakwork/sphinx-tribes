@@ -249,6 +249,10 @@ export const MyTable = ({
     getActiveTabs();
   }, [getActiveTabs]);
 
+  function capFirstLetter(string: string): string {
+    if (!string) return '';
+    return string.charAt(0).toUpperCase() + string.slice(1);
+  }
   return (
     <>
       <HeaderContainer freeze={!headerIsFrozen}>
@@ -330,7 +334,7 @@ export const MyTable = ({
                   </TableDataAlternative>
                   <TableDataAlternative className="address">
                     <ImageWithText
-                      text={bounty?.unique_name}
+                      text={capFirstLetter(bounty?.unique_name)}
                       image={bounty?.providerImage || defaultPic}
                     />
                   </TableDataAlternative>
