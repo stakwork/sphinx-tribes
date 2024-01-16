@@ -9,7 +9,6 @@ import (
 
 	"github.com/gorilla/websocket"
 	"github.com/lib/pq"
-	"gopkg.in/go-playground/validator.v9"
 	"gorm.io/gorm"
 	"gorm.io/gorm/schema"
 )
@@ -749,5 +748,3 @@ func (a *JSONB) Scan(value interface{}) error {
 	}
 	return json.Unmarshal(b, &a)
 }
-
-var Validate *validator.Validate

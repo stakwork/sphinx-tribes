@@ -39,28 +39,6 @@ func (oh *organizationHandler) CreateOrEditOrganization(w http.ResponseWriter, r
 		return
 	}
 
-	// Validate struct data
-	err = db.Validate.Struct(org)
-	if err != nil {
-		w.WriteHeader(http.StatusBadRequest)
-		msg := fmt.Sprintf("Error: did not pass validation test : %s", err)
-		json.NewEncoder(w).Encode(msg)
-		return
-	}
-
-	if org.Github != "" && !strings.Contains(org.Github, "github.com/") {
-		w.WriteHeader(http.StatusBadRequest)
-		msg := "Error: not a valid github"
-		json.NewEncoder(w).Encode(msg)
-		return
-	}
-
-	if pubKeyFromAuth == "" {
-		fmt.Println("no pubkey from auth")
-		w.WriteHeader(http.StatusUnauthorized)
-		return
-	}
-
 	if len(org.Name) == 0 || len(org.Name) > 20 {
 		fmt.Printf("invalid organization name %s\n", org.Name)
 		w.WriteHeader(http.StatusBadRequest)
@@ -78,6 +56,28 @@ func (oh *organizationHandler) CreateOrEditOrganization(w http.ResponseWriter, r
 			json.NewEncoder(w).Encode("Don't have access to Edit Org")
 			return
 		}
+	}
+
+	if pubKeyFromAuth == "" {
+		fmt.Println("no pubkey from auth")
+		w.WriteHeader(http.StatusUnauthorized)
+		return
+	}
+
+	// Validate struct data
+	err = db.Validate.Struct(org)
+	if err != nil {
+		w.WriteHeader(http.StatusBadRequest)
+		msg := fmt.Sprintf("Error: did not pass validation test : %s", err)
+		json.NewEncoder(w).Encode(msg)
+		return
+	}
+
+	if org.Github != "" && !strings.Contains(org.Github, "github.com/") {
+		w.WriteHeader(http.StatusBadRequest)
+		msg := "Error: not a valid github"
+		json.NewEncoder(w).Encode(msg)
+		return
 	}
 
 	existing := oh.db.GetOrganizationByUuid(org.Uuid)
