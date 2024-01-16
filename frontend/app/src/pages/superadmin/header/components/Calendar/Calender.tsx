@@ -181,7 +181,9 @@ const Calendar = ({ value = new Date(), onChange }: Props) => {
             </Cell>
           ))}
 
-          {Array.from({ length: prefixDays }).map((_: any, index: number) => <Cell key={index} isEmpty={true} />)}
+          {Array.from({ length: prefixDays }).map((_: any, index: number) => (
+            <Cell key={index} isEmpty={true} />
+          ))}
           {Array.from({ length: numDays }).map((_: any, index: number) => {
             const date = index + 1;
             const isCurrentDate = date === value.getDate();
@@ -198,7 +200,9 @@ const Calendar = ({ value = new Date(), onChange }: Props) => {
             );
           })}
 
-          {Array.from({ length: suffixDays }).map((_: any, index: number) => <Cell key={index} isEmpty={true} />)}
+          {Array.from({ length: suffixDays }).map((_: any, index: number) => (
+            <Cell key={index} isEmpty={true} />
+          ))}
         </Grid>
       </CalendarWrapper>
     </MainContainer>

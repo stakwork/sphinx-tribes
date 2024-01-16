@@ -31,10 +31,10 @@ export const Header = ({ startDate, setStartDate, endDate, setEndDate }: HeaderP
   const [exportLoading, setExportLoading] = useState(false);
   const [showCalendar, setShowCalendar] = useState(false);
 
-  const formatUnixDate = (unixDate: number, includeYear:boolean=true): string => {
+  function formatUnixDate(unixDate: number, includeYear: boolean = true): string {
     const formatString = includeYear ? 'DD-MMM-YYYY' : 'DD-MMM';
     return moment.unix(unixDate).format(formatString);
-  };
+  }
 
   const handleBackClick = () => {
     if (startDate !== undefined && endDate !== undefined) {
