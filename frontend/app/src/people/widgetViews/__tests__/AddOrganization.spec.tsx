@@ -106,7 +106,9 @@ describe('AddOrganization Component Tests', () => {
       }
     });
 
-    expect(descriptionInput).toHaveStyle('border-color: #FF8F80');
+    expect(descriptionInput).toHaveStyle({
+      borderColor: '#FF8F80'
+    });
     expect(screen.getByText('Description is too long.')).toBeInTheDocument();
   });
 
