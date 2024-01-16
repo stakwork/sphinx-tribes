@@ -15,7 +15,6 @@ const App = ({ filterStartDate, filterEndDate, setShowCalendar }: Props) => {
   const [to, setTo] = useState(false);
   const [startDate, setStartDate] = useState<Date>();
   const [endDate, setEndDate] = useState<Date>();
-  const [input1, setinput1] = useState();
   const [formInputFocused, setFormInputFocused] = useState(false);
   const [formInput2Focused, setFormInput2Focused] = useState(false);
 
@@ -96,8 +95,10 @@ const App = ({ filterStartDate, filterEndDate, setShowCalendar }: Props) => {
           : 'var(--Placeholder-Text, var(--Disabled-Icon-color, #b0b7bc))'};
     }
   `;
-
-  const Button = styled.button`
+  type BtnProps = {
+    color: string;
+  };
+  const Button = styled.button<BtnProps>`
     background-color: transparent;
     width: 54px;
     height: 40px;
