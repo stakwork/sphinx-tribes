@@ -3,6 +3,8 @@ package handlers
 import (
 	"bytes"
 	"context"
+	"encoding/json"
+	"errors"
 	"github.com/stakwork/sphinx-tribes/auth"
 	"github.com/stakwork/sphinx-tribes/db"
 	mocks "github.com/stakwork/sphinx-tribes/mocks"
@@ -97,5 +99,165 @@ func TestUnitCreateOrEditOrganization(t *testing.T) {
 		handler.ServeHTTP(rr, req)
 
 		assert.Equal(t, http.StatusOK, rr.Code)
+	})
+}
+
+func TestDeleteOrganization(t *testing.T) {
+	ctx := context.WithValue(context.Background(), auth.ContextKey, "test-key")
+	mockDb := mocks.NewDatabase(t)
+	oHandler := NewOrganizationHandler(mockDb)
+
+	t.Run("should return error if not authorized", func(t *testing.T) {
+		rr := httptest.NewRecorder()
+		handler := http.HandlerFunc(oHandler.DeleteOrganization)
+
+		req, err := http.NewRequestWithContext(context.Background(), http.MethodDelete, "/organization/uuid", nil)
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		handler.ServeHTTP(rr, req)
+
+		assert.Equal(t, http.StatusUnauthorized, rr.Code)
+	})
+
+	t.Run("should set organization fields to null and delete users on successful delete", func(t *testing.T) {
+		orgUUID := "org-uuid"
+
+		// Mock expected database interactions
+		mockDb.On("GetOrganizationByUuid", orgUUID).Return(db.Organization{OwnerPubKey: "test-key"}).Once()
+		mockDb.On("UpdateOrganizationForDeletion", orgUUID).Return(nil).Once()
+		mockDb.On("DeleteAllUsersFromOrganization", orgUUID).Return(nil).Once()
+		mockDb.On("ChangeOrganizationDeleteStatus", orgUUID, true).Return(db.Organization{Uuid: orgUUID, Deleted: true}).Once()
+
+		rr := httptest.NewRecorder()
+		handler := http.HandlerFunc(oHandler.DeleteOrganization)
+
+		req, err := http.NewRequestWithContext(ctx, http.MethodDelete, "/organization/"+orgUUID, nil)
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		handler.ServeHTTP(rr, req)
+
+		assert.Equal(t, http.StatusOK, rr.Code)
+		mockDb.AssertExpectations(t)
+	})
+
+	t.Run("should handle failures in database updates", func(t *testing.T) {
+		orgUUID := "org-uuid"
+
+		// Mock database interactions with error
+		mockDb.On("GetOrganizationByUuid", orgUUID).Return(db.Organization{OwnerPubKey: "test-key"}).Once()
+		mockDb.On("UpdateOrganizationForDeletion", orgUUID).Return(errors.New("update error")).Once()
+
+		rr := httptest.NewRecorder()
+		handler := http.HandlerFunc(oHandler.DeleteOrganization)
+
+		req, err := http.NewRequestWithContext(ctx, http.MethodDelete, "/organization/"+orgUUID, nil)
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		handler.ServeHTTP(rr, req)
+
+		assert.Equal(t, http.StatusInternalServerError, rr.Code)
+		mockDb.AssertExpectations(t)
+	})
+
+	t.Run("should set organization's deleted column to true", func(t *testing.T) {
+		orgUUID := "org-uuid"
+
+		// Mock the database interactions
+		mockDb.On("GetOrganizationByUuid", orgUUID).Return(db.Organization{OwnerPubKey: "test-key"}).Once()
+		mockDb.On("UpdateOrganizationForDeletion", orgUUID).Return(nil).Once()
+		mockDb.On("DeleteAllUsersFromOrganization", orgUUID).Return(nil).Once()
+		mockDb.On("ChangeOrganizationDeleteStatus", orgUUID, true).Return(db.Organization{Uuid: orgUUID, Deleted: true}).Once()
+
+		rr := httptest.NewRecorder()
+		handler := http.HandlerFunc(oHandler.DeleteOrganization)
+
+		req, err := http.NewRequestWithContext(ctx, http.MethodDelete, "/organization/"+orgUUID, nil)
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		handler.ServeHTTP(rr, req)
+
+		// Asserting that the response status code is OK
+		assert.Equal(t, http.StatusOK, rr.Code)
+
+		// Decoding the response to check if Deleted field is true
+		var updatedOrg db.Organization
+		err = json.Unmarshal(rr.Body.Bytes(), &updatedOrg)
+		if err != nil {
+			t.Fatal(err)
+		}
+		assert.True(t, updatedOrg.Deleted)
+
+		mockDb.AssertExpectations(t)
+	})
+
+	t.Run("should set Website, Github, and Description to null", func(t *testing.T) {
+		orgUUID := "org-uuid"
+
+		updatedOrg := db.Organization{
+			Uuid:        orgUUID,
+			OwnerPubKey: "test-key",
+			Website:     nil,
+			Github:      nil,
+			Description: nil,
+		}
+
+		mockDb.On("GetOrganizationByUuid", orgUUID).Return(db.Organization{OwnerPubKey: "test-key"}).Once()
+		mockDb.On("UpdateOrganizationForDeletion", orgUUID).Return(updatedOrg).Once()
+		mockDb.On("DeleteAllUsersFromOrganization", orgUUID).Return(nil).Once()
+		mockDb.On("ChangeOrganizationDeleteStatus", orgUUID, true).Return(updatedOrg).Once()
+
+		rr := httptest.NewRecorder()
+		handler := http.HandlerFunc(oHandler.DeleteOrganization)
+
+		req, err := http.NewRequestWithContext(ctx, http.MethodDelete, "/organization/"+orgUUID, nil)
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		handler.ServeHTTP(rr, req)
+
+		assert.Equal(t, http.StatusOK, rr.Code)
+		var returnedOrg db.Organization
+		err = json.Unmarshal(rr.Body.Bytes(), &returnedOrg)
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		assert.Nil(t, returnedOrg.Website)
+		assert.Nil(t, returnedOrg.Github)
+		assert.Nil(t, returnedOrg.Description)
+		mockDb.AssertExpectations(t)
+	})
+
+	t.Run("should delete all users from the organization", func(t *testing.T) {
+		orgUUID := "org-uuid"
+
+		// Setting up the expected behavior of the mock database
+		mockDb.On("GetOrganizationByUuid", orgUUID).Return(db.Organization{OwnerPubKey: "test-key"}).Once()
+		mockDb.On("UpdateOrganizationForDeletion", orgUUID).Return(nil).Once()
+		mockDb.On("DeleteAllUsersFromOrganization", orgUUID).Return(nil).Run(func(args mock.Arguments) {}).Once()
+		mockDb.On("ChangeOrganizationDeleteStatus", orgUUID, true).Return(db.Organization{Uuid: orgUUID, Deleted: true}).Once()
+
+		rr := httptest.NewRecorder()
+		handler := http.HandlerFunc(oHandler.DeleteOrganization)
+
+		req, err := http.NewRequestWithContext(ctx, http.MethodDelete, "/organization/"+orgUUID, nil)
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		handler.ServeHTTP(rr, req)
+
+		// Asserting that the response status code is as expected
+		assert.Equal(t, http.StatusOK, rr.Code)
+		mockDb.AssertExpectations(t)
 	})
 }

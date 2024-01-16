@@ -1466,3 +1466,39 @@ func (db database) ChangeOrganizationDeleteStatus(org_uuid string, status bool) 
 	})
 	return ms
 }
+
+func (db database) UpdateOrganizationForDeletion(uuid string) error {
+	updates := map[string]interface{}{
+		"website":     nil,
+		"github":      nil,
+		"description": nil,
+		"show":        false,
+	}
+
+	result := db.db.Model(&Organization{}).Where("uuid = ?", uuid).Updates(updates)
+	if result.Error != nil {
+		return result.Error
+	}
+
+	return nil
+}
+
+func (db database) DeleteAllUsersFromOrganization(org string) error {
+	if org == "" {
+		return errors.New("no org uuid provided")
+	}
+
+	// Delete all users associated with the organization
+	result := db.db.Where("org_uuid = ?", org).Delete(&OrganizationUsers{})
+	if result.Error != nil {
+		return result.Error
+	}
+
+	// Delete all user roles associated with the organization
+	result = db.db.Where("org_uuid = ?", org).Delete(&UserRoles{})
+	if result.Error != nil {
+		return result.Error
+	}
+
+	return nil
+}
