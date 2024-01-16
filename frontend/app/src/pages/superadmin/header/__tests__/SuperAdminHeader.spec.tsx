@@ -48,7 +48,7 @@ describe('Header Component', () => {
 
     expect(monthElement).toBeInTheDocument();
     expect(monthElement).toHaveTextContent(
-      `${expectedStartDate.format('DD-MMM')} - ${expectedEndDate.format('DD-MMM-YYYY')}`
+      `${expectedStartDate.format('DD MMM')} - ${expectedEndDate.format('DD MMM YYYY')}`
     );
 
     expect(screen.getByText(exportCSVText)).toBeInTheDocument();
@@ -66,7 +66,7 @@ describe('Header Component', () => {
 
     const StartDate30 = today.clone().subtract(30, 'days');
     expect(monthElement).toHaveTextContent(
-      `${StartDate30.format('DD-MMM')} - ${expectedEndDate.format('DD-MMM-YYYY')}`
+      `${StartDate30.format('DD MMM YYYY')} - ${expectedEndDate.format('DD MMM YYYY')}`
     );
 
     act(() => {
@@ -82,7 +82,7 @@ describe('Header Component', () => {
 
     const StartDate90 = today.clone().subtract(90, 'days');
     expect(monthElement).toHaveTextContent(
-      `${StartDate90.format('DD-MMM')} - ${expectedEndDate.format('DD-MMM-YYYY')}`
+      `${StartDate90.format('DD MMM YYYY')} - ${expectedEndDate.format('DD MMM YYYY')}`
     );
   });
   test('displays same year for startDate and endDate', () => {
