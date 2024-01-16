@@ -140,9 +140,14 @@ describe('MobileView component', () => {
     const iCanHelp = screen.getByText('Share to Twitter');
     expect(iCanHelp).toBeInTheDocument();
   });
-  it('displays "Mark as paid" when bounty is unpaid', () => {
+ it('displays "Mark as paid" when bounty is unpaid', async () => {
     render(<MobileView {...defaultProps} />);
-    const mark = screen.getByText('Mark as Paid');
-    expect(mark).toBeInTheDocument();
+    let mark;
+  
+    await waitFor(() => {
+      mark = screen.queryByText('Mark as Paid');
+    });
+  
+    expect(mark).not.toBeNull();
   });
 });
