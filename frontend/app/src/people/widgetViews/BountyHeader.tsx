@@ -363,7 +363,6 @@ const BountyHeader = ({
     async function fetchCounts() {
       try {
         const response = await api.get('gobounties/filter/count');
-        console.log('Response:', response);
         setCounts({
           open: response.open || 0,
           assigned: response.assigned || 0,
