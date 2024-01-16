@@ -1,5 +1,5 @@
 import '@testing-library/jest-dom';
-import { render, screen } from '@testing-library/react';
+import { render, screen, waitFor } from '@testing-library/react';
 import { CodingBountiesProps, LocalPaymeentState } from 'people/interfaces';
 import React from 'react';
 import MobileView from '../CodingBounty';
@@ -17,12 +17,12 @@ describe('MobileView component', () => {
   jest.mock('store', () => ({
     useStores: () => ({
       main: {
-        getOrganizationUser: jest.fn().mockResolvedValue({ owner_pubkey: 'UserPubKey' }),
+        getOrganizationUser: jest.fn().mockResolvedValue({ owner_pubkey: 'UserPubKey' })
       },
       ui: {
-        meInfo: { owner_pubkey: 'UserPubKey' },
-      },
-    }),
+        meInfo: { owner_pubkey: 'UserPubKey' }
+      }
+    })
   }));
   const defaultProps: CodingBountiesProps = {
     deliverables: 'Default Deliverables',
@@ -64,7 +64,7 @@ describe('MobileView component', () => {
     setExtrasPropertyAndSaveMultiple: jest.fn(),
     handleAssigneeDetails: jest.fn(),
     peopleList: [],
-    owner_id:'035f22835fbf55cf4e6823447c63df74012d1d587ed60ef7cbfa3e430278c44cce',
+    owner_id: '035f22835fbf55cf4e6823447c63df74012d1d587ed60ef7cbfa3e430278c44cce',
     setIsPaidStatusBadgeInfo: jest.fn(),
     bountyPrice: 100,
     price: 100,
@@ -140,14 +140,16 @@ describe('MobileView component', () => {
     const iCanHelp = screen.getByText('Share to Twitter');
     expect(iCanHelp).toBeInTheDocument();
   });
- it('displays "Mark as paid" when bounty is unpaid', async () => {
+  it('displays "Mark as paid" when bounty is unpaid', async () => {
     render(<MobileView {...defaultProps} />);
     let mark;
-  
+
+    // Wait for asynchronous operations if necessary
     await waitFor(() => {
       mark = screen.queryByText('Mark as Paid');
     });
-  
+
+    // Assert that the button is in the document
     expect(mark).not.toBeNull();
   });
 });
