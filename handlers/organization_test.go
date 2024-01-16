@@ -6,14 +6,14 @@ import (
 	"encoding/json"
 	"errors"
 	"github.com/go-chi/chi"
-	"net/http"
-	"net/http/httptest"
-	"testing"
 	"github.com/stakwork/sphinx-tribes/auth"
 	"github.com/stakwork/sphinx-tribes/db"
 	mocks "github.com/stakwork/sphinx-tribes/mocks"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
+	"net/http"
+	"net/http/httptest"
+	"testing"
 )
 
 func TestUnitCreateOrEditOrganization(t *testing.T) {

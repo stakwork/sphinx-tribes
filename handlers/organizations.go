@@ -73,7 +73,7 @@ func (oh *organizationHandler) CreateOrEditOrganization(w http.ResponseWriter, r
 		return
 	}
 
-	if org.Github != "" && !strings.Contains(org.Github, "github.com/") {
+	if org.Github != nil && *org.Github != "" && !strings.Contains(*org.Github, "github.com/") {
 		w.WriteHeader(http.StatusBadRequest)
 		msg := "Error: not a valid github"
 		json.NewEncoder(w).Encode(msg)
