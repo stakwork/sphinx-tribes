@@ -28,9 +28,17 @@ export const Header = ({ startDate, setStartDate, endDate, setEndDate }: HeaderP
   const [showSelector, setShowSelector] = useState(false);
   const [dateDiff, setDateDiff] = useState(7);
   const [exportLoading, setExportLoading] = useState(false);
-  const formatUnixDate = (unixDate: number, includeYear: boolean = true) => {
-    const formatString = includeYear ? 'DD-MMM-YYYY' : 'DD-MMM';
-    return moment.unix(unixDate).format(formatString);
+  const formatUnixDate = (unixDate: number) => {
+    const formatString = 'DD MMM YYYY';
+    if (startDate !== undefined && endDate !== undefined) {
+      const startYear = moment.unix(startDate).format('YYYY');
+      const endYear = moment.unix(endDate).format('YYYY');
+
+      return moment
+        .unix(unixDate)
+        .format(startYear !== endYear || unixDate === endDate ? formatString : 'DD MMM');
+    }
+    return '';
   };
 
   const handleBackClick = () => {
@@ -130,7 +138,7 @@ export const Header = ({ startDate, setStartDate, endDate, setEndDate }: HeaderP
                 </ArrowButton>
               </ButtonWrapper>
               <Month data-testid="month">
-                {formatUnixDate(startDate, false)} - {formatUnixDate(endDate)}
+                {formatUnixDate(startDate)} - {formatUnixDate(endDate)}
               </Month>
             </>
           ) : null}
