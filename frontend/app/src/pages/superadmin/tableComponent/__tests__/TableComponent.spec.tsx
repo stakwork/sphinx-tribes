@@ -32,7 +32,7 @@ const mockBounties = [
     organizationImage: 'org-image-1.jpg',
     status: 'open',
     paid: false,
-    assignee_alias:"ednum"
+    assignee_alias: 'ednum'
   },
   {
     id: 2,
@@ -50,7 +50,7 @@ const mockBounties = [
     organizationImage: 'org-image-2.jpg',
     status: 'assigned',
     paid: false,
-    assignee_alias:"ednum"
+    assignee_alias: 'ednum'
   },
   {
     id: 3,
@@ -68,7 +68,7 @@ const mockBounties = [
     organizationImage: 'org-image-3.jpg',
     status: 'paid',
     paid: true,
-    assignee_alias:"ednum"
+    assignee_alias: 'ednum'
   }
 ];
 
@@ -158,7 +158,10 @@ it('renders each element in the table in the document', () => {
   mockBounties.forEach((bounty: Bounty, index: number) => {
     expect(getByText(bounty.title)).toBeInTheDocument();
     expect(getByText(dates[index])).toBeInTheDocument();
-    expect(getAllByText(bounty.assignee_alias)).toBeInTheDocument();
+    const assigneeAliasElements = getAllByText(bounty.assignee_alias);
+    assigneeAliasElements.forEach((element: HTMLElement) => {
+      expect(element).toBeInTheDocument();
+    });
     expect(getByText(bounty.organization)).toBeInTheDocument();
   });
 });
@@ -167,15 +170,20 @@ it('renders each element in the table in the document', () => {
   const { getByText, getAllByText } = render(
     <MyTable bounties={mockBounties} headerIsFrozen={false} />
   );
+
   const dates = ['2023-01-01', '2023-01-02', '2023-01-03'];
   const assignedText = getAllByText('assigned');
   expect(assignedText.length).toBe(2);
   expect(getByText('paid')).toBeInTheDocument();
+
   mockBounties.forEach((bounty: Bounty, index: number) => {
     expect(getByText(bounty.title)).toBeInTheDocument();
     expect(getByText(dates[index])).toBeInTheDocument();
     // expect(getByText(String(bounty.dtgp))).toBeInTheDocument();
-    expect(getAllByText(bounty.assignee_alias)).toBeInTheDocument();
+    const assigneeAliasElements = getAllByText(bounty.assignee_alias);
+    assigneeAliasElements.forEach((element: HTMLElement) => {
+      expect(element).toBeInTheDocument();
+    });
     // expect(getByText(bounty.provider)).toBeInTheDocument();
     expect(getByText(bounty.organization)).toBeInTheDocument();
   });
@@ -250,7 +258,7 @@ it('renders pagination section when number of bounties is greater than page size
     organizationImage:
       'https://avatars.githubusercontent.com/u/10001?s=460&u=8c61f1cda5e9e2c2d1d5b8d2a5a8a5b8d2a5a8a5&v=4',
     status: 'open',
-    assignee_alias:"ednum"
+    assignee_alias: 'ednum'
   }));
   const mockSetBountyStatus = jest.fn();
   const mockSetDropdownValue = jest.fn();
@@ -303,7 +311,7 @@ const mockProps = {
     organizationImage:
       'https://avatars.githubusercontent.com/u/10001?s=460&u=8c61f1cda5e9e2c2d1d5b8d2a5a8a5b8d2a5a8a5&v=4',
     status: 'open',
-    assignee_alias:"ednum"
+    assignee_alias: 'ednum'
   })),
   startDate: moment().subtract(7, 'days').startOf('day').unix(),
   endDate: moment().startOf('day').unix(),
