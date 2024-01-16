@@ -14,7 +14,16 @@ describe('MobileView component', () => {
     });
     window.IntersectionObserver = mockIntersectionObserver;
   });
-
+  jest.mock('store', () => ({
+    useStores: () => ({
+      main: {
+        getOrganizationUser: jest.fn().mockResolvedValue({ owner_pubkey: 'UserPubKey' }),
+      },
+      ui: {
+        meInfo: { owner_pubkey: 'UserPubKey' },
+      },
+    }),
+  }));
   const defaultProps: CodingBountiesProps = {
     deliverables: 'Default Deliverables',
     description: 'Default Description',
@@ -22,7 +31,7 @@ describe('MobileView component', () => {
     nametag: <></>,
     labels: [],
     person: {
-      owner_pubkey: 'DefaultOwnerPubKey',
+      owner_pubkey: 'UserPubKey',
       owner_route_hint: 'DefaultRouteHint',
       owner_alias: 'DefaultOwnerAlias'
     } as any,
