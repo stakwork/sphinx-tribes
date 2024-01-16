@@ -30,7 +30,8 @@ export const Header = ({ startDate, setStartDate, endDate, setEndDate }: HeaderP
   const [dateDiff, setDateDiff] = useState(7);
   const [exportLoading, setExportLoading] = useState(false);
   const [showCalendar, setShowCalendar] = useState(false);
-  const formatUnixDate = (unixDate: number, includeYear = true) => {
+
+  const formatUnixDate = (unixDate: number, includeYear:boolean=true): string => {
     const formatString = includeYear ? 'DD-MMM-YYYY' : 'DD-MMM';
     return moment.unix(unixDate).format(formatString);
   };
