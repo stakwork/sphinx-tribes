@@ -1,6 +1,6 @@
 import '@testing-library/jest-dom';
-import { render, screen } from '@testing-library/react';
-import { CodingBountiesProps } from 'people/interfaces';
+import { render, screen, waitFor } from '@testing-library/react';
+import { CodingBountiesProps, LocalPaymeentState } from 'people/interfaces';
 import React from 'react';
 import MobileView from '../CodingBounty';
 
@@ -14,7 +14,16 @@ describe('MobileView component', () => {
     });
     window.IntersectionObserver = mockIntersectionObserver;
   });
-
+  jest.mock('store', () => ({
+    useStores: () => ({
+      main: {
+        getOrganizationUser: jest.fn().mockResolvedValue({ owner_pubkey: 'UserPubKey' })
+      },
+      ui: {
+        meInfo: { owner_pubkey: 'UserPubKey' }
+      }
+    })
+  }));
   const defaultProps: CodingBountiesProps = {
     deliverables: 'Default Deliverables',
     description: 'Default Description',
@@ -22,9 +31,9 @@ describe('MobileView component', () => {
     nametag: <></>,
     labels: [],
     person: {
-      owner_pubkey: '035f22835fbf55cf4e6823447c63df74012d1d587ed60ef7cbfa3e430278c44cce',
-      owner_route_hint: '03a6ea2d9ead2120b12bd66292bb4a302c756983dc45dcb2b364b461c66fd53bcb',
-      owner_alias: 'Gourav'
+      owner_pubkey: 'UserPubKey',
+      owner_route_hint: 'DefaultRouteHint',
+      owner_alias: 'DefaultOwnerAlias'
     } as any,
     setIsPaidStatusPopOver: jest.fn(),
     creatorStep: 1,
@@ -55,6 +64,7 @@ describe('MobileView component', () => {
     setExtrasPropertyAndSaveMultiple: jest.fn(),
     handleAssigneeDetails: jest.fn(),
     peopleList: [],
+    owner_id: '035f22835fbf55cf4e6823447c63df74012d1d587ed60ef7cbfa3e430278c44cce',
     setIsPaidStatusBadgeInfo: jest.fn(),
     bountyPrice: 100,
     price: 100,
@@ -92,7 +102,6 @@ describe('MobileView component', () => {
     assignee: undefined as any,
     title: ''
   };
-
   it('should render titleString on the screen', () => {
     render(<MobileView {...defaultProps} titleString="Test Title" />);
     const titleElement = screen.getByText('Test Title');
@@ -131,10 +140,29 @@ describe('MobileView component', () => {
     const iCanHelp = screen.getByText('Share to Twitter');
     expect(iCanHelp).toBeInTheDocument();
   });
-  it('displays "Mark as paid" when bounty is unpaid', () => {
-    render(<MobileView {...defaultProps} />);
+  it('displays "Mark as paid" when bounty is unpaid', async () => {
+    const modifiedProps = {
+      ...defaultProps,
+      person: {
+        ...defaultProps.person,
+        owner_alias: 'TestOwnerAlias'
+      },
+      paidStatus: false
+    };
 
-    const mark = screen.getByText('Mark as Paid');
-    expect(mark).toBeInTheDocument();
+    jest.mock('store', () => ({
+      useStores: () => ({
+        main: {
+          getOrganizationUser: jest.fn().mockResolvedValue({ owner_pubkey: 'UserPubKey' })
+        },
+        ui: {
+          meInfo: { owner_pubkey: 'UserPubKey', owner_alias: 'TestOwnerAlias' }
+        }
+      })
+    }));
+    render(<MobileView {...modifiedProps} />);
+
+    const markPaidButton = await screen.findByText('Mark as Paid');
+    expect(markPaidButton).toBeInTheDocument();
   });
 });
