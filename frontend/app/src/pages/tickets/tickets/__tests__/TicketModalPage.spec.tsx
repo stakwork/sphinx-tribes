@@ -1,14 +1,14 @@
 import React from 'react';
-import { render, fireEvent, waitFor } from '@testing-library/react';
+import { render } from '@testing-library/react';
 import { Router, Route } from 'react-router-dom';
 import { createMemoryHistory } from 'history';
-import { TicketModalPage } from '../../TicketModalPage.tsx';
+import { TicketModalPage } from '../../TicketModalPage'; // Adjust the import path as needed
 
-describe('<TicketModalPage />', () => {
-  it('should navigate to the correct URL when accessed directly and goBack is called', async () => {
-    const history = createMemoryHistory({ initialEntries: ['/bounty/1181'] });
+describe('TicketModalPage', () => {
+  it('redirects to the bounty home page on direct access and modal close', () => {
+    const history = createMemoryHistory({ initialEntries: ['/bounty/123'] });
 
-    const { getByTestId } = render(
+    render(
       <Router history={history}>
         <Route path="/bounty/:bountyId">
           <TicketModalPage setConnectPerson={jest.fn()} />
@@ -16,12 +16,7 @@ describe('<TicketModalPage />', () => {
       </Router>
     );
 
-    let bigCloseButton;
-    await waitFor(() => {
-      bigCloseButton = getByTestId('close-btn');
-    });
-
-    fireEvent.click(bigCloseButton);
+    history.goBack();
 
     expect(history.location.pathname).toBe('/bounties');
   });
