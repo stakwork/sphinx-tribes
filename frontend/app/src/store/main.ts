@@ -209,6 +209,9 @@ export interface Organization {
   id: string;
   uuid: string;
   name: string;
+  description?: string;
+  github?: string;
+  website?: string;
   owner_pubkey: string;
   img: string;
   created: string;
@@ -217,6 +220,14 @@ export interface Organization {
   bounty_count?: number;
   budget?: number;
   deleted?: boolean;
+}
+
+export interface CreateOrganizationInput {
+  img: string;
+  name: string;
+  description?: string;
+  github?: string;
+  website?: string;
 }
 
 export interface BountyRoles {
@@ -1928,7 +1939,7 @@ export class MainStore {
     }
   }
 
-  @action async addOrganization(body: { name: string; img: string }): Promise<any> {
+  @action async addOrganization(body: CreateOrganizationInput): Promise<any> {
     try {
       if (!uiStore.meInfo) return null;
       const info = uiStore.meInfo;

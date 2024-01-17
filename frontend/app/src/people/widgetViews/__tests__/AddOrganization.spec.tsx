@@ -144,4 +144,51 @@ describe('AddOrganization Component Tests', () => {
       expect(mockGetUserOrganizations).toHaveBeenCalled();
     });
   });
+
+  test('all fields are passed while adding organization', async () => {
+    const mockGetUserOrganizations = jest.fn();
+    const mockOwnerPubKey = 'somePublicKey';
+    const mockOrgSpy = jest.spyOn(mainStore, 'addOrganization').mockReturnValueOnce(
+      Promise.resolve({
+        status: 200,
+        json: () => Promise.resolve({})
+      })
+    );
+
+    render(
+      <AddOrganization
+        closeHandler={mockCloseHandler}
+        getUserOrganizations={mockGetUserOrganizations}
+        owner_pubkey={mockOwnerPubKey}
+      />
+    );
+
+    const addButton = screen.getByText('Add Organization');
+    expect(addButton).toBeInTheDocument();
+    const orgNameInput = screen.getByPlaceholderText(/My Organization.../i);
+    fireEvent.change(orgNameInput, { target: { value: 'My Org' } });
+
+    const orgWebsiteInput = screen.getByPlaceholderText('Website URL...');
+    fireEvent.change(orgWebsiteInput, { target: { value: 'https://john.doe' } });
+
+    const orgGithubLink = screen.getByPlaceholderText('Github link...');
+    fireEvent.change(orgGithubLink, { target: { value: 'https://github.com/john-doe' } });
+
+    const orgDescription = screen.getByPlaceholderText('Description Text...');
+    fireEvent.change(orgDescription, { target: { value: 'My org description' } });
+
+    fireEvent.click(addButton);
+
+    await waitFor(() => {
+      expect(mockOrgSpy).toHaveBeenCalledWith({
+        owner_pubkey: mockOwnerPubKey,
+        name: 'My Org',
+        description: 'My org description',
+        img: '',
+        github: 'https://github.com/john-doe',
+        website: 'https://john.doe'
+      });
+      expect(mockGetUserOrganizations).toHaveBeenCalled();
+    });
+  });
 });

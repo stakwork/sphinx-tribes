@@ -97,6 +97,9 @@ const EditOrgModal = (props: EditOrgModalProps) => {
   const initValues = {
     name: org?.name,
     image: org?.img,
+    description: org?.description,
+    github: org?.github,
+    website: org?.website,
     show: org?.show
   };
 
@@ -127,6 +130,9 @@ const EditOrgModal = (props: EditOrgModalProps) => {
         name: body.name || org.name,
         owner_pubkey: org.owner_pubkey,
         img: img || org.img,
+        description: body.description || org?.description,
+        github: body.github || org?.github,
+        website: body.website || org?.website,
         created: org.created,
         updated: org.updated,
         show: body?.show !== undefined ? body.show : org.show,
