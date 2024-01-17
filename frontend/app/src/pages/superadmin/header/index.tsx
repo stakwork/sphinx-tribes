@@ -1,5 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import moment from 'moment';
+import { mainStore } from 'store/main';
 import {
   AlternateWrapper,
   ButtonWrapper,
@@ -17,7 +18,7 @@ import {
 import arrowback from './icons/arrowback.svg';
 import arrowforward from './icons/arrowforward.svg';
 import expand_more from './icons/expand_more.svg';
-//import './Header.css';
+import App from './components/Calendar/App';
 interface HeaderProps {
   startDate?: number;
   endDate?: number;
@@ -27,10 +28,13 @@ interface HeaderProps {
 export const Header = ({ startDate, setStartDate, endDate, setEndDate }: HeaderProps) => {
   const [showSelector, setShowSelector] = useState(false);
   const [dateDiff, setDateDiff] = useState(7);
-  const formatUnixDate = (unixDate: number, includeYear: boolean = true) => {
+  const [exportLoading, setExportLoading] = useState(false);
+  const [showCalendar, setShowCalendar] = useState(false);
+
+  function formatUnixDate(unixDate: number, includeYear: boolean = true): string {
     const formatString = includeYear ? 'DD-MMM-YYYY' : 'DD-MMM';
     return moment.unix(unixDate).format(formatString);
-  };
+  }
 
   const handleBackClick = () => {
     if (startDate !== undefined && endDate !== undefined) {
@@ -52,6 +56,19 @@ export const Header = ({ startDate, setStartDate, endDate, setEndDate }: HeaderP
       setStartDate(newStartDate);
       setEndDate(cappedEndDate);
     }
+  };
+
+  const exportCsv = async () => {
+    setExportLoading(true);
+    const csvUrl = await mainStore.exportMetricsBountiesCsv({
+      start_date: String(startDate),
+      end_date: String(endDate)
+    });
+
+    if (csvUrl) {
+      window.open(csvUrl);
+    }
+    setExportLoading(false);
   };
 
   const handleDropDownChange = (option: number) => {
@@ -122,8 +139,8 @@ export const Header = ({ startDate, setStartDate, endDate, setEndDate }: HeaderP
           ) : null}
         </LeftWrapper>
         <RightWrapper>
-          <ExportButton>
-            <ExportText>Export CSV</ExportText>
+          <ExportButton disabled={exportLoading} onClick={() => exportCsv()}>
+            <ExportText>{exportLoading ? 'Exporting ...' : 'Export CSV'}</ExportText>
           </ExportButton>
           <DropDown
             data-testid="DropDown"
@@ -142,7 +159,9 @@ export const Header = ({ startDate, setStartDate, endDate, setEndDate }: HeaderP
                   <li onClick={() => handleDropDownChange(30)}>30 Days</li>
                   <li onClick={() => handleDropDownChange(90)}>90 Days</li>
                   <li>
-                    <CustomButton>Custom</CustomButton>
+                    <CustomButton onClick={() => setShowCalendar(!showCalendar)}>
+                      Custom
+                    </CustomButton>
                   </li>
                 </ul>
               </Option>
@@ -150,6 +169,13 @@ export const Header = ({ startDate, setStartDate, endDate, setEndDate }: HeaderP
           </DropDown>
         </RightWrapper>
       </AlternateWrapper>
+      {showCalendar && (
+        <App
+          filterStartDate={setStartDate}
+          filterEndDate={setEndDate}
+          setShowCalendar={setShowCalendar}
+        />
+      )}
     </Container>
   );
 };

@@ -8,5 +8,7 @@ export const normalizeMetrics = (data: any): BountyMetrics => ({
   sats_paid: data.sats_paid || data.SatsPaid,
   sats_paid_percentage: data.sats_paid_percentage || data.SatsPaidPercentage,
   average_paid: data.average_paid || data.AveragePaid,
-  average_completed: data.average_completed || data.AverageCompleted
+  average_completed: data.average_completed || data.AverageCompleted,
+  unique_hunters_paid: data.unique_hunters_paid || data.uniqueHuntersPaid,
+  new_hunters_paid: data.new_hunters_paid || data.newHuntersPaid
 });

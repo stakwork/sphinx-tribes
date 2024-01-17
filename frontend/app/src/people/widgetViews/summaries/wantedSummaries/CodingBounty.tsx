@@ -3,7 +3,7 @@ import React, { useCallback, useEffect, useState } from 'react';
 import { EuiText, EuiFieldText, EuiGlobalToastList } from '@elastic/eui';
 import { observer } from 'mobx-react-lite';
 import moment from 'moment';
-import { isInvoiceExpired, userHasManageBountyRoles, userHasRole } from 'helpers';
+import { isInvoiceExpired, userCanManageBounty } from 'helpers';
 import { SOCKET_MSG, createSocketInstance } from 'config/socket';
 import { Button, Divider, Modal } from '../../../../components/common';
 import { colors } from '../../../../config/colors';
@@ -256,9 +256,7 @@ function MobileView(props: CodingBountiesProps) {
           // make keysend payment
           const body = {
             id: id || 0,
-            websocket_token: ui.meInfo?.websocketToken || '',
-            receiver_pubkey: assignee.owner_pubkey,
-            route_hint: assignee.owner_route_hint ?? ''
+            websocket_token: ui.meInfo?.websocketToken || ''
           };
 
           await main.makeBountyPayment(body);
@@ -362,25 +360,14 @@ function MobileView(props: CodingBountiesProps) {
     };
   }, [setLocalPaid, ui]);
 
-  const getOrganization = useCallback(async () => {
-    if (org_uuid && userPubkey) {
-      const userRoles = await main.getUserRoles(org_uuid, userPubkey);
-
-      const organization = await main.getUserOrganizationByUuid(org_uuid);
-      if (organization) {
-        const isOrganizationAdmin = organization.owner_pubkey === userPubkey;
-        const userAccess =
-          userHasManageBountyRoles(main.bountyRoles, userRoles) &&
-          userHasRole(main.bountyRoles, userRoles, 'VIEW REPORT');
-        const canPayBounty = isOrganizationAdmin || userAccess;
-        setUserBountyRole(canPayBounty);
-      }
-    }
+  const checkUserBountyRole = useCallback(async () => {
+    const canPayBounty = await userCanManageBounty(org_uuid, userPubkey, main);
+    setUserBountyRole(canPayBounty);
   }, [main, org_uuid, userPubkey]);
 
   useEffect(() => {
-    getOrganization();
-  }, [getOrganization]);
+    checkUserBountyRole();
+  }, [checkUserBountyRole]);
 
   const isOwner =
     { ...person }?.owner_alias &&
