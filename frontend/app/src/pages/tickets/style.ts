@@ -9,6 +9,15 @@ export const Body = styled.div`
   flex-direction: column;
 `;
 
+export const OrgBody = styled.div`
+  display: flex;
+  flex-direction: column;
+  background: var(--Search-bar-background, #f2f3f5);
+  height: 100vh;
+  overflow-y: auto;
+  overflow-x: hidden;
+`;
+
 export const Backdrop = styled.div`
   position: fixed;
   z-index: 1;

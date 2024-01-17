@@ -56,8 +56,8 @@ describe('Statistics Component', () => {
     expect(getByTestId('total_satoshis_posted')).toHaveTextContent('Total Posted');
     expect(getByTestId('total_satoshis_paid')).toHaveTextContent('Paid');
     expect(getByText('Avg Time to Paid')).toBeInTheDocument();
-    expect(getByText('5000')).toBeInTheDocument();
-    expect(getByText('2500')).toBeInTheDocument();
+    expect(getByText('5,000')).toBeInTheDocument();
+    expect(getByText('2,500')).toBeInTheDocument();
   });
 
   it('renders hunters metrics correctly', () => {

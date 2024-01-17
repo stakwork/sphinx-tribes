@@ -2,6 +2,7 @@ import '@testing-library/jest-dom';
 import { render, screen, waitFor } from '@testing-library/react';
 import { CodingBountiesProps, LocalPaymeentState } from 'people/interfaces';
 import React from 'react';
+import NameTag from 'people/utils/NameTag';
 import MobileView from '../CodingBounty';
 
 describe('MobileView component', () => {
@@ -161,5 +162,20 @@ describe('MobileView component', () => {
       const markPaidButton = screen.getByText('Mark as Paid');
       expect(markPaidButton).toBeInTheDocument();
     });
+
+  it('should render the NameTag with correct props', () => {
+    const nameTagProps = {
+      owner_alias: 'Test Owner',
+      img: 'test-image.jpg',
+      created: 1610000000,
+      id: 180,
+      owner: 'Test-Owner',
+      owner_pubkey: 'abc100',
+      widget: 'wanted'
+    };
+    render(<MobileView {...defaultProps} nametag={<NameTag {...nameTagProps} />} />);
+
+    expect(screen.getByText(nameTagProps.owner_alias)).toBeInTheDocument();
+
   });
 });

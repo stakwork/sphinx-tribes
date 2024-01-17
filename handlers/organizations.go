@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"io"
 	"net/http"
+	"strings"
 	"time"
 
 	"github.com/go-chi/chi"
@@ -25,6 +26,11 @@ func NewOrganizationHandler(db db.Database) *organizationHandler {
 func (oh *organizationHandler) CreateOrEditOrganization(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 	pubKeyFromAuth, _ := ctx.Value(auth.ContextKey).(string)
+	if pubKeyFromAuth == "" {
+		fmt.Println("no pubkey from auth")
+		w.WriteHeader(http.StatusUnauthorized)
+		return
+	}
 	now := time.Now()
 
 	org := db.Organization{}
@@ -38,16 +44,17 @@ func (oh *organizationHandler) CreateOrEditOrganization(w http.ResponseWriter, r
 		return
 	}
 
-	if pubKeyFromAuth == "" {
-		fmt.Println("no pubkey from auth")
-		w.WriteHeader(http.StatusUnauthorized)
-		return
-	}
-
 	if len(org.Name) == 0 || len(org.Name) > 20 {
 		fmt.Printf("invalid organization name %s\n", org.Name)
 		w.WriteHeader(http.StatusBadRequest)
 		json.NewEncoder(w).Encode("Error: organization name must be present and should not exceed 20 character")
+		return
+	}
+
+	if len(org.Description) == 0 || len(org.Description) > 120 {
+		fmt.Printf("invalid organization name %s\n", org.Description)
+		w.WriteHeader(http.StatusBadRequest)
+		json.NewEncoder(w).Encode("Error: organization description must be present and should not exceed 120 character")
 		return
 	}
 
@@ -61,6 +68,22 @@ func (oh *organizationHandler) CreateOrEditOrganization(w http.ResponseWriter, r
 			json.NewEncoder(w).Encode("Don't have access to Edit Org")
 			return
 		}
+	}
+
+	// Validate struct data
+	err = db.Validate.Struct(org)
+	if err != nil {
+		w.WriteHeader(http.StatusBadRequest)
+		msg := fmt.Sprintf("Error: did not pass validation test : %s", err)
+		json.NewEncoder(w).Encode(msg)
+		return
+	}
+
+	if org.Github != "" && !strings.Contains(org.Github, "github.com/") {
+		w.WriteHeader(http.StatusBadRequest)
+		msg := "Error: not a valid github"
+		json.NewEncoder(w).Encode(msg)
+		return
 	}
 
 	existing := oh.db.GetOrganizationByUuid(org.Uuid)
@@ -500,7 +523,7 @@ func GetOrganizationBounties(w http.ResponseWriter, r *http.Request) {
 	// get the organization bounties
 	organizationBounties := db.DB.GetOrganizationBounties(r, uuid)
 
-	var bountyResponse []db.BountyResponse = generateBountyResponse(organizationBounties)
+	var bountyResponse []db.BountyResponse = GenerateBountyResponse(organizationBounties)
 	w.WriteHeader(http.StatusOK)
 	json.NewEncoder(w).Encode(bountyResponse)
 }

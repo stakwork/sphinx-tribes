@@ -20,6 +20,7 @@ function BodyComponent() {
   const [scrollValue, setScrollValue] = useState<boolean>(false);
   const [checkboxIdToSelectedMap, setCheckboxIdToSelectedMap] = useState(defaultBountyStatus);
   const [checkboxIdToSelectedMapLanguage, setCheckboxIdToSelectedMapLanguage] = useState({});
+  const [languageString, setLanguageString] = useState('');
   const [page, setPage] = useState<number>(1);
   const [currentItems, setCurrentItems] = useState<number>(queryLimit);
   const [totalBounties, setTotalBounties] = useState(0);
@@ -34,10 +35,15 @@ function BodyComponent() {
       await main.getOpenGithubIssues();
       await main.getBadgeList();
       await main.getPeople();
-      await main.getPeopleBounties({ page: 1, resetPage: true, ...checkboxIdToSelectedMap });
+      await main.getPeopleBounties({
+        page: 1,
+        resetPage: true,
+        ...checkboxIdToSelectedMap,
+        languages: languageString
+      });
       setLoading(false);
     })();
-  }, [main, checkboxIdToSelectedMap]);
+  }, [main, checkboxIdToSelectedMap, languageString]);
 
   useEffect(() => {
     setCheckboxIdToSelectedMap({
@@ -85,14 +91,19 @@ function BodyComponent() {
     setPage(1);
   };
 
-  const onChangeLanguage = (optionId: any) => {
+  const onChangeLanguage = (optionId: number) => {
     const newCheckboxIdToSelectedMapLanguage = {
       ...checkboxIdToSelectedMapLanguage,
-      ...{
-        [optionId]: !checkboxIdToSelectedMapLanguage[optionId]
-      }
+      [optionId]: !checkboxIdToSelectedMapLanguage[optionId]
     };
     setCheckboxIdToSelectedMapLanguage(newCheckboxIdToSelectedMapLanguage);
+
+    const languageString = Object.keys(newCheckboxIdToSelectedMapLanguage)
+      .filter((key: string) => newCheckboxIdToSelectedMapLanguage[key])
+      .join(',');
+
+    setLanguageString(languageString);
+    main.setBountyLanguages(languageString);
   };
 
   const onPanelClick = (person: any, item: any) => {
