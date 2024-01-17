@@ -10,6 +10,8 @@ import React, { useEffect, useState } from 'react';
 import { Route, Switch, useHistory, useRouteMatch, useParams } from 'react-router-dom';
 import { useStores } from 'store';
 import styled from 'styled-components';
+import { LoadMoreContainer } from '../../../people/widgetViews/WidgetSwitchViewer';
+import { colors } from '../../../config/colors';
 const config = widgetConfigs.wanted;
 
 const Container = styled.div`
@@ -46,10 +48,16 @@ export const Wanted = observer(() => {
   const history = useHistory();
   const { personPubkey } = useParams<{ personPubkey: string }>();
   const [loading, setIsLoading] = useState<boolean>(false);
+  const [currentItems] = useState<number>(20);
+  const [visibleItems, setVisibleItems] = useState<number>(currentItems);
+  const loadMore = () => {
+    setVisibleItems((prevVisibleItems: number) => prevVisibleItems + currentItems);
+  };
 
   async function getUserTickets() {
     setIsLoading(true);
-    await main.getPersonCreatedBounties({}, personPubkey);
+    const tickets = await main.getPersonCreatedBounties({}, personPubkey);
+    main.setCreatedBounties(tickets);
     await main.getPersonAssignedBounties({ sortBy: 'paid' }, personPubkey);
     setIsLoading(false);
   }
@@ -106,7 +114,7 @@ export const Wanted = observer(() => {
       >
         {canEdit && <PostBounty widget="wanted" />}
       </div>
-      {main.createdBounties.map((w: any, i: any) => {
+      {main.createdBounties.slice(0, visibleItems).map((w: any, i: any) => {
         if (w.body.owner_id === person?.owner_pubkey) {
           return (
             <Panel
@@ -125,7 +133,24 @@ export const Wanted = observer(() => {
             </Panel>
           );
         }
+        return null;
       })}
+      {main.createdBounties.length > visibleItems && (
+        <LoadMoreContainer
+          color={colors['light']}
+          style={{
+            width: '100%',
+            display: 'flex',
+            justifyContent: 'center',
+            alignItems: 'center',
+            margin: '20px 0'
+          }}
+        >
+          <div className="LoadMoreButton" onClick={loadMore}>
+            Load More
+          </div>
+        </LoadMoreContainer>
+      )}
     </Container>
   );
 });
