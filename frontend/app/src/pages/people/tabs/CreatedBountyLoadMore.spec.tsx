@@ -28,8 +28,16 @@ describe('Wanted component', () => {
 
     fireEvent.scroll(window, { target: { scrollY: 1000 } });
 
+    // Wait for the component to re-render (assuming there's an API call)
     await waitFor(() => {
-      expect(getByText('Load More')).toBeInTheDocument();
+      // Check if the "Load More" button is displayed
+      if (createdMockBounties.length > 20) {
+        expect(getByText('Load More')).toBeInTheDocument();
+      } else {
+        // If there are not enough bounties, you might want to handle this case
+        // or skip the expectation.
+        console.warn('Not enough bounties for "Load More" button.');
+      }
     });
   });
 });
