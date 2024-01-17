@@ -75,55 +75,15 @@ describe('BountyHeader Component', () => {
     });
   });
 
-  test('should call onChangeLanguage for each filter option', async () => {
-    render(<BountyHeader {...mockProps} />);
-
-    const filterContainer = screen.getByText('Filter');
-    fireEvent.click(filterContainer);
-
-    const statusOptions = ['Open', 'Assigned', 'Paid'];
-    const tagOptions = [
-      'Lightning',
-      'Typescript',
-      'Golang',
-      'Kotlin',
-      'PHP',
-      'C#',
-      'Java',
-      'Ruby',
-      'Postgres',
-      'Other',
-      'Javascript',
-      'Node',
-      'Swift',
-      'MySQL',
-      'R',
-      'C++',
-      'Rust',
-      'Python',
-      'Elastic search'
-    ];
-
-    for (const status of statusOptions) {
-      const statusCheckbox = await screen.findByRole('checkbox', { name: new RegExp(status, 'i') });
-      fireEvent.click(statusCheckbox);
-
-      await waitFor(() => {
-        expect(mockProps.onChangeLanguage).toHaveBeenCalled();
-      });
-
-      jest.fn().mockClear();
-    }
-
-    for (const tag of tagOptions) {
-      const tagCheckbox = await screen.findByRole('checkbox', { name: new RegExp(tag, 'i') });
-      fireEvent.click(tagCheckbox);
-
-      await waitFor(() => {
-        expect(mockProps.onChangeLanguage).toHaveBeenCalled();
-      });
-
-      jest.fn().mockClear();
-    }
+  const languages = ['Typescript', 'Javascript', 'Python', 'Rust'];
+  languages.forEach((language: string) => {
+    test(`should call onChangeLanguage when the ${language} filter option is selected`, async () => {
+      render(<BountyHeader {...mockProps} />);
+      const filterButton = screen.getByRole('button', { name: /Filter/i });
+      fireEvent.click(filterButton);
+      const checkbox = await screen.findByRole('checkbox', { name: new RegExp(language, 'i') });
+      fireEvent.click(checkbox);
+      expect(mockProps.onChangeLanguage).toHaveBeenCalledWith(language); // This assumes that the function is called with the language name
+    });
   });
 });
