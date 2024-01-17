@@ -229,6 +229,11 @@ export const MyTable = ({
 
   const color = colors['light'];
 
+  function capFirstLetter(string: string): string {
+    if (!string) return '';
+    return string.charAt(0).toUpperCase() + string.slice(1);
+  }
+        
   return (
     <>
       <HeaderContainer freeze={!headerIsFrozen}>
@@ -347,13 +352,13 @@ export const MyTable = ({
                   <TableDataCenter>{time_to_pay}</TableDataCenter>
                   <TableDataAlternative>
                     <ImageWithText
-                      text={bounty?.assignee}
+                      text={capFirstLetter(bounty?.assignee_alias)}
                       image={bounty?.assignee_img || defaultPic}
                     />
                   </TableDataAlternative>
                   <TableDataAlternative className="address">
                     <ImageWithText
-                      text={bounty?.owner_pubkey}
+                      text={capFirstLetter(bounty?.unique_name)}
                       image={bounty?.providerImage || defaultPic}
                     />
                   </TableDataAlternative>

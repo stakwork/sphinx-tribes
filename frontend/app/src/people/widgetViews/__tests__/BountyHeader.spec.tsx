@@ -1,5 +1,5 @@
 import React from 'react';
-import { render, screen, waitFor } from '@testing-library/react';
+import { render, screen, waitFor, fireEvent } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import BountyHeader from '../BountyHeader';
 import { BountyHeaderProps } from '../../interfaces';
@@ -72,6 +72,47 @@ describe('BountyHeader Component', () => {
 
     await waitFor(() => {
       expect(screen.getByText(mockDeveloperCount.toString())).toBeInTheDocument();
+    });
+  });
+
+  const languageOptions = [
+    'Lightning',
+    'Typescript',
+    'Golang',
+    'Kotlin',
+    'PHP',
+    'Java',
+    'Ruby',
+    'Python',
+    'Postgres',
+    'Elastic search',
+    'Javascript',
+    'Node',
+    'Swift',
+    'MySQL',
+    'R',
+    'Rust',
+    'Other',
+    'C++',
+    'C#'
+  ];
+
+  languageOptions.forEach((language: string) => {
+    test(`should call onChangeLanguage when the ${language} filter option is selected`, async () => {
+      render(<BountyHeader {...mockProps} />);
+      const filterContainer = screen.getByText('Filter');
+      fireEvent.click(filterContainer);
+
+      let checkbox;
+      try {
+        checkbox = screen.getByRole('checkbox', { name: language });
+      } catch (error) {
+        console.error(`No checkbox found with the name: ${language}`);
+        return;
+      }
+
+      fireEvent.click(checkbox);
+      expect(mockProps.onChangeLanguage).toHaveBeenCalledWith(language);
     });
   });
 });

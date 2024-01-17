@@ -91,17 +91,17 @@ function BodyComponent() {
     setPage(1);
   };
 
-  const onChangeLanguage = (optionId: any) => {
+  const onChangeLanguage = (optionId: number) => {
     const newCheckboxIdToSelectedMapLanguage = {
       ...checkboxIdToSelectedMapLanguage,
-      ...{
-        [optionId]: !checkboxIdToSelectedMapLanguage[optionId]
-      }
+      [optionId]: !checkboxIdToSelectedMapLanguage[optionId]
     };
-
     setCheckboxIdToSelectedMapLanguage(newCheckboxIdToSelectedMapLanguage);
 
-    const languageString = Object.keys(newCheckboxIdToSelectedMapLanguage).join(',');
+    const languageString = Object.keys(newCheckboxIdToSelectedMapLanguage)
+      .filter((key: string) => newCheckboxIdToSelectedMapLanguage[key])
+      .join(',');
+
     setLanguageString(languageString);
     main.setBountyLanguages(languageString);
   };
