@@ -52,8 +52,8 @@ describe('TicketModalPage', () => {
     fireEvent.click(goBackButton);
 
     // Assert: Expect to be redirected to the home page
-    expect(mockedHistoryPush).toHaveBeenCalledWith('/bounties');
+    await waitFor(() => {
+      expect(mockedHistoryPush).toHaveBeenCalledWith('/bounties');
+    });
   });
-
-  // Other tests for different scenarios...
 });
