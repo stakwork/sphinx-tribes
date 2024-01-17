@@ -1,9 +1,9 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import { useStores } from 'store';
-import { BountyStatus } from 'store/main';
 import moment from 'moment';
 import { EuiPopover, EuiText } from '@elastic/eui';
 import MaterialIcon from '@material/react-material-icon';
+import { BountyStatus } from '../../../store/main';
 import paginationarrow1 from '../header/icons/paginationarrow1.svg';
 import paginationarrow2 from '../header/icons/paginationarrow2.svg';
 import defaultPic from '../../../public/static/profile_avatar.svg';

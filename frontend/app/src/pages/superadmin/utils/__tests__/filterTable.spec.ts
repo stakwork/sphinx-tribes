@@ -1,4 +1,4 @@
-import { getBountyStatus } from '..';
+import { getBountyStatus } from '../filterTable';
 
 describe('getBountyStatus', () => {
   test('should return Open status', () => {

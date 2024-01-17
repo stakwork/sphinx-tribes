@@ -1,5 +1,5 @@
 import { useState, useCallback, useEffect } from 'react';
-import { useStores } from 'store';
+import { useStores } from '../store';
 
 export const useIsSuperAdmin = () => {
   const { main, ui } = useStores();

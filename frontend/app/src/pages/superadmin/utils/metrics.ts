@@ -1,4 +1,4 @@
-import { BountyMetrics } from 'store/main';
+import { BountyMetrics } from '../../../store/main';
 
 export const normalizeMetrics = (data: any): BountyMetrics => ({
   bounties_posted: data.BountiesPosted || data.bounties_posted,

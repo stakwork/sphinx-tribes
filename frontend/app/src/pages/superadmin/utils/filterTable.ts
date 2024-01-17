@@ -1,4 +1,4 @@
-import { BountyStatus, defaultBountyStatus } from 'store/main';
+import { BountyStatus, defaultBountyStatus } from '../../../store/main';
 
 type SortCriterion = 'open' | 'in-progress' | 'completed' | 'assignee';
 
