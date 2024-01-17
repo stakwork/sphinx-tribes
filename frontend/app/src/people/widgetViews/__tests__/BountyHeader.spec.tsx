@@ -101,13 +101,22 @@ describe('BountyHeader Component', () => {
     test(`should call onChangeLanguage when the ${language} filter option is selected`, async () => {
       const safeLanguageName = language.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 
+      const languageRegExp = new RegExp(`\\b${safeLanguageName}\\b`, 'i');
+
       render(<BountyHeader {...mockProps} />);
       const filterContainer = screen.getByText('Filter');
       fireEvent.click(filterContainer);
 
-      const checkbox = await screen.findByRole('checkbox', {
-        name: new RegExp(safeLanguageName, 'i')
+      // Use `findAllByRole` instead of `findByRole` to handle multiple matches
+      const checkboxes = await screen.findAllByRole('checkbox', {
+        name: languageRegExp
       });
+
+      const checkbox = checkboxes.find((chk: any) => chk.id === language || chk.value === language);
+      if (!checkbox) {
+        throw new Error(`Checkbox with language ${language} not found.`);
+      }
+
       fireEvent.click(checkbox);
       expect(mockProps.onChangeLanguage).toHaveBeenCalledWith(language);
     });
