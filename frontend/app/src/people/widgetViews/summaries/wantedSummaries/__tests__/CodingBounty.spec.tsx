@@ -104,6 +104,7 @@ describe('MobileView component', () => {
     assignee: undefined as any,
     title: ''
   };
+  
   it('should render titleString on the screen', () => {
     render(<MobileView {...defaultProps} titleString="Test Title" />);
     const titleElement = screen.getByText('Test Title');
@@ -144,12 +145,14 @@ describe('MobileView component', () => {
   });
   describe('MobileView Component Payment Status', () => {
     it('renders unpaidString when paidStatus is false', () => {
-      render(<MobileView {...defaultProps} paid={false} />);
+      const testProps = {...defaultProps, org: { owner_pubkey: 'UserPubKey' }, paid: false};
+      render(<MobileView {...testProps} />);
       expect(screen.getByText(unpaidString)).toBeInTheDocument();
     });
   
     it('renders paidString when paidStatus is true', () => {
-      render(<MobileView {...defaultProps} paid={true} />);
+      const testProps = {...defaultProps, org: { owner_pubkey: 'UserPubKey' }, paid: true};
+      render(<MobileView {...testProps} />);
       expect(screen.getByText(paidString)).toBeInTheDocument();
     });
   });
