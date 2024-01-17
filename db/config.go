@@ -5,6 +5,7 @@ import (
 	"os"
 
 	"github.com/rs/xid"
+	"gopkg.in/go-playground/validator.v9"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 )
@@ -152,6 +153,9 @@ var Peopleupdatables = []string{
 	"price_to_meet", "updated",
 	"extras",
 }
+
+var Validate *validator.Validate = validator.New()
+
 var Channelupdatables = []string{
 	"name", "deleted"}
 
