@@ -83,7 +83,7 @@ describe('BountyHeader Component', () => {
       fireEvent.click(filterButton);
       const checkbox = await screen.findByRole('checkbox', { name: new RegExp(language, 'i') });
       fireEvent.click(checkbox);
-      expect(mockProps.onChangeLanguage).toHaveBeenCalledWith(language); // This assumes that the function is called with the language name
+      expect(mockProps.onChangeLanguage).toHaveBeenCalledWith(language);
     });
   });
 });
