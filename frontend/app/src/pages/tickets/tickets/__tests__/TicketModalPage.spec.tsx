@@ -1,5 +1,5 @@
 import React from 'react';
-import { render, fireEvent } from '@testing-library/react';
+import { render, screen } from '@testing-library/react';
 import { TicketModalPage } from '../../TicketModalPage';
 import { BrowserRouter as Router } from 'react-router-dom';
 
@@ -18,14 +18,14 @@ describe('TicketModalPage Navigation Test', () => {
     }));
 
     // Render the component
-    const { getByTestId } = render(
+    render(
       <Router>
         <TicketModalPage setConnectPerson={jest.fn()} />
       </Router>
     );
 
-    // Simulate the user closing the modal
-    fireEvent.click(getByTestId('close-btn'));
+    screen.debug();
+    expect(screen.getByTestId('close-btn')).toBeInTheDocument();
 
     // Check if the correct navigation function was called
     expect(mockPush).toHaveBeenCalledWith('/bounties');
