@@ -144,10 +144,6 @@ describe('Header Component', () => {
 
     expect(monthElement).toBeInTheDocument();
 
-    // Log the formatted dates for debugging
-    //console.log('Formatted Start Date:', formatUnixDate(expectedStartDate.unix()));
-    //console.log('Formatted End Date:', formatUnixDate(expectedEndDate.unix()));
-
     const formattedStartDate = moment.unix(expectedStartDate.unix()).format('DD MMM YYYY');
     const formattedEndDate = moment.unix(expectedEndDate.unix()).format('DD MMM YYYY');
 

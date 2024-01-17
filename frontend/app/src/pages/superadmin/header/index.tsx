@@ -29,6 +29,7 @@ export const Header = ({ startDate, setStartDate, endDate, setEndDate }: HeaderP
   const [showSelector, setShowSelector] = useState(false);
   const [dateDiff, setDateDiff] = useState(7);
   const [exportLoading, setExportLoading] = useState(false);
+  const [showCalendar, setShowCalendar] = useState(false);
   const formatUnixDate = (unixDate: number) => {
     const formatString = 'DD MMM YYYY';
     if (startDate !== undefined && endDate !== undefined) {
