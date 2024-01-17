@@ -107,13 +107,23 @@ describe('BountyHeader Component', () => {
     for (const status of statusOptions) {
       const statusCheckbox = await screen.findByRole('checkbox', { name: new RegExp(status, 'i') });
       fireEvent.click(statusCheckbox);
-      expect(mockProps.onChangeLanguage).toHaveBeenCalled();
+
+      await waitFor(() => {
+        expect(mockProps.onChangeLanguage).toHaveBeenCalled();
+      });
+
+      jest.fn().mockClear();
     }
 
     for (const tag of tagOptions) {
       const tagCheckbox = await screen.findByRole('checkbox', { name: new RegExp(tag, 'i') });
       fireEvent.click(tagCheckbox);
-      expect(mockProps.onChangeLanguage).toHaveBeenCalled();
+
+      await waitFor(() => {
+        expect(mockProps.onChangeLanguage).toHaveBeenCalled();
+      });
+
+      jest.fn().mockClear();
     }
   });
 });
