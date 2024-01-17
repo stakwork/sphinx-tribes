@@ -13,7 +13,7 @@ const InputOuterBox = styled.div<styledProps>`
   margin-bottom: 32px;
   .inputText {
     height: 40px;
-    width: 292px;
+    width: 100%;
     font-size: 14px;
     color: ${(p: any) => p.color && p.color.pureBlack};
     border: 1px solid ${(p: any) => p.borderColor && p.borderColor};
@@ -38,7 +38,8 @@ export default function TextInputNew({
   handleChange,
   handleBlur,
   handleFocus,
-  isFocused
+  isFocused,
+  labelStyle
 }: Props) {
   let labeltext = label;
   if (error) labeltext = `${labeltext}*`;
@@ -78,13 +79,14 @@ export default function TextInputNew({
         style={{
           position: 'absolute',
           left: 16,
-          top: !isFocused[label] ? (textValue === undefined ? 10 : -9) : -9,
-          fontSize: !isFocused[label] ? (textValue === undefined ? 14 : 12) : 12,
+          top: isFocused && !isFocused[label] ? (textValue === undefined ? 10 : -9) : -9,
+          fontSize: isFocused && !isFocused[label] ? (textValue === undefined ? 14 : 12) : 12,
           color: color.grayish.G300,
           background: color.pureWhite,
           fontFamily: 'Barlow',
           fontWeight: '500',
-          transition: 'all 0.5s'
+          transition: 'all 0.5s',
+          ...labelStyle
         }}
       >
         {labeltext}

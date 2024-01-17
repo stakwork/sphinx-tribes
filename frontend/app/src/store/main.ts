@@ -209,6 +209,9 @@ export interface Organization {
   uuid: string;
   name: string;
   owner_pubkey: string;
+  description?: string;
+  github?: string;
+  website?: string;
   img: string;
   created: string;
   updated: string;

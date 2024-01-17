@@ -3,6 +3,7 @@ import React from 'react';
 export interface Props {
   value: any;
   label: string;
+  labelStyle?: any;
   type?: string;
   handleChange: any;
   placeholder?: string;

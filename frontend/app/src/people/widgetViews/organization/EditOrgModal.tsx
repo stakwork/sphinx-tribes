@@ -15,11 +15,9 @@ import {
   ImgDetailInfo,
   ImgInstructionSpan,
   ImgInstructionText,
-  ImgText,
   ImgTextContainer,
   InputFile,
   ModalTitle,
-  OrgInputContainer,
   SelectedImg,
   UploadImageContainer
 } from './style';
@@ -29,34 +27,78 @@ import DeleteOrgWindow from './DeleteOrgWindow';
 const color = colors['light'];
 
 const EditOrgWrapper = styled.div`
-  padding: 3rem 3rem 1.5rem 3rem;
+  padding: 2.375rem 3rem 3rem 3rem;
   display: flex;
+  gap: 38px;
   flex-direction: column;
   position: relative;
+  width: 100%;
 
   @media only screen and (max-width: 500px) {
-    padding: 1.2rem;
-    width: 100%;
+    padding: 1rem 1.2rem 1.2rem 1.2rem;
+    justify-content: center;
+    gap: 0;
   }
 `;
 
-const EditOrgColumns = styled.div`
-  margin-top: 2rem;
-  display: flex;
-  gap: 3.56rem;
-  align-items: center;
-  justify-content: center;
+const InputWrapper = styled.div`
+  display: grid;
+  grid-template-columns: 242px 256px;
+  grid-template-rows: repeat(3, 61px);
+  grid-column-gap: 32px;
+  grid-row-gap: 20px;
+
   @media only screen and (max-width: 500px) {
+    display: flex;
     flex-direction: column;
-    gap: 0.5rem;
     width: 100%;
+    gap: 0;
   }
+`;
+
+const LabelWrapper = styled.div`
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+`;
+
+const Label = styled.span`
+  font-family: Barlow;
+  font-size: 13px;
+  font-weight: 500;
+  line-height: 35px;
+  letter-spacing: 0px;
+  text-align: left;
+  color: #5f6368;
+`;
+
+const SecondaryText = styled.span`
+  color: #b0b7bc;
+  font-family: Roboto;
+  font-size: 13px;
+  font-weight: 400;
+  line-height: 35px;
+  letter-spacing: 0px;
+  text-align: left;
+  vertical-align: center;
+`;
+
+const EditOrgRow = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  height: max-content;
 `;
 
 const OrgEditImageWrapper = styled.div`
   display: flex;
   flex-direction: column;
   align-items: center;
+
+  @media only screen and (max-width: 500px) {
+    margin: auto;
+  }
 `;
 
 const EditOrgTitle = styled(ModalTitle)`
@@ -74,14 +116,6 @@ const EditOrgTitle = styled(ModalTitle)`
   }
 `;
 
-const HLine = styled.div`
-  background-color: #ebedef;
-  height: 1px;
-  width: 100%;
-  margin-top: 2rem;
-  margin-bottom: 1.5rem;
-`;
-
 const EditOrgModal = (props: EditOrgModalProps) => {
   const { ui } = useStores();
 
@@ -90,6 +124,7 @@ const EditOrgModal = (props: EditOrgModalProps) => {
   const [showDeleteModal, setShowDeleteModal] = useState<boolean>(false);
   const { main } = useStores();
   const [loading, setLoading] = useState(false);
+  const [characterCount] = useState(0);
 
   const config = widgetConfigs.organizations;
   const schema = [...config.schema];
@@ -97,6 +132,9 @@ const EditOrgModal = (props: EditOrgModalProps) => {
   const initValues = {
     name: org?.name,
     image: org?.img,
+    description: org?.description,
+    github: org?.github,
+    website: org?.website,
     show: org?.show
   };
 
@@ -127,6 +165,9 @@ const EditOrgModal = (props: EditOrgModalProps) => {
         name: body.name || org.name,
         owner_pubkey: org.owner_pubkey,
         img: img || org.img,
+        description: body.description || org?.description,
+        github: body.github || org?.github,
+        website: body.website || org?.website,
         created: org.created,
         updated: org.updated,
         show: body?.show !== undefined ? body.show : org.show,
@@ -198,8 +239,8 @@ const EditOrgModal = (props: EditOrgModalProps) => {
           ...(config?.modalStyle ?? {}),
           maxHeight: '100%',
           borderRadius: '10px',
-          minWidth: isMobile ? '100%' : '34.4375rem',
-          minHeight: isMobile ? '100%' : '22.1875rem'
+          minWidth: isMobile ? '100%' : '51.9375rem',
+          minHeight: isMobile ? '100vh' : '29rem'
         }}
         overlayClick={close}
         bigCloseImage={close}
@@ -211,19 +252,48 @@ const EditOrgModal = (props: EditOrgModalProps) => {
         }}
       >
         <EditOrgWrapper>
-          <EditOrgTitle>Edit Organization</EditOrgTitle>
-          <EditOrgColumns>
+          <EditOrgRow>
+            <EditOrgTitle>Edit Organization</EditOrgTitle>
+            <Button
+              disabled={!isOrganizationAdmin}
+              onClick={() => {
+                setShowDeleteModal(true);
+              }}
+              loading={false}
+              style={{
+                width: isMobile ? '100%' : '170px',
+                height: '40px',
+                borderRadius: '6px',
+                padding: '8px, 16px, 8px, 16px',
+                borderStyle: 'solid',
+                alignSelf: 'flex-end',
+                borderWidth: '1px',
+                backgroundColor: 'white',
+                borderColor: '#ED7474',
+                color: '#ED7474',
+                position: !isMobile ? 'initial' : 'absolute',
+                bottom: '3px',
+                maxWidth: 'calc(100% - 2.4rem)'
+              }}
+              color={'#ED7474'}
+              text={'Delete Organization'}
+            />
+          </EditOrgRow>
+          <EditOrgRow>
             <OrgEditImageWrapper>
               <ImgDashContainer onDragOver={handleDragOver} onDrop={handleDrop}>
                 <UploadImageContainer onClick={openFileDialog}>
                   <img src="/static/badges/ResetOrgProfile.svg" alt="upload" />
                 </UploadImageContainer>
                 <ImgContainer>
-                  {selectedImage ? (
-                    <SelectedImg src={selectedImage} alt="selected file" />
-                  ) : (
-                    <ImgText>LOGO</ImgText>
-                  )}
+                  <SelectedImg
+                    src={
+                      selectedImage === ''
+                        ? '/static/badges/editOrganisationImage.svg'
+                        : selectedImage
+                    }
+                    alt="selected file"
+                  />
                 </ImgContainer>
               </ImgDashContainer>
               <ImgTextContainer>
@@ -256,9 +326,17 @@ const EditOrgModal = (props: EditOrgModalProps) => {
                 errors,
                 initialValues
               }: any) => (
-                <OrgInputContainer>
-                  <div className="SchemaInnerContainer">
-                    {schema.map((item: FormField) => (
+                <InputWrapper>
+                  {schema.map((item: FormField) => (
+                    <div key={item.name} style={item.style}>
+                      <LabelWrapper>
+                        <Label>{item.label}</Label>
+                        {item.maxCharacterLimit ? (
+                          <SecondaryText>
+                            {characterCount}/{item.maxCharacterLimit}
+                          </SecondaryText>
+                        ) : null}
+                      </LabelWrapper>
                       <Input
                         {...item}
                         key={item.name}
@@ -281,48 +359,39 @@ const EditOrgModal = (props: EditOrgModalProps) => {
                         handleFocus={() => setFieldTouched(item.name, true)}
                         borderType={'bottom'}
                         imageIcon={true}
-                        style={{ width: '100%' }}
+                        style={{
+                          width: '100%',
+                          ...item.style,
+                          maxHeight: isMobile ? '145px' : 'auto'
+                        }}
+                        newDesign
                       />
-                    ))}
-                  </div>
+                    </div>
+                  ))}
                   <Button
                     disabled={false}
                     onClick={() => handleSubmit()}
                     loading={loading}
                     style={{
                       width: '100%',
+                      maxWidth: isMobile ? '100%' : '256px',
                       height: '50px',
                       borderRadius: '5px',
-                      alignSelf: 'center'
+                      alignSelf: 'center',
+                      position: isMobile ? 'initial' : 'absolute',
+                      top: '368px',
+                      left: '527px'
                     }}
                     color={'primary'}
                     text={'Save changes'}
                   />
-                </OrgInputContainer>
+                </InputWrapper>
               )}
             </Formik>
-          </EditOrgColumns>
-          <HLine />
-          <Button
-            disabled={!isOrganizationAdmin}
-            onClick={() => {
-              setShowDeleteModal(true);
-            }}
-            loading={false}
-            style={{
-              width: isMobile ? '100%' : 'calc(60% - 18px)',
-              height: '50px',
-              borderRadius: '5px',
-              borderStyle: 'solid',
-              alignSelf: 'flex-end',
-              borderWidth: '1px',
-              backgroundColor: 'white',
-              borderColor: '#ED7474',
-              color: '#ED7474'
-            }}
-            color={'#ED7474'}
-            text={'Delete organization'}
-          />
+          </EditOrgRow>
+          <EditOrgRow>
+            <SecondaryText>* Required fields</SecondaryText>
+          </EditOrgRow>
           {showDeleteModal ? (
             <DeleteOrgWindow onDeleteOrg={onDelete} close={() => setShowDeleteModal(false)} />
           ) : (

@@ -802,14 +802,58 @@ export const dynamicSchemaAutofillFieldsByType = {
 export const organizationSchema: FormField[] = [
   {
     name: 'name',
-    label: 'Organization name',
+    label: 'Organization Name',
     type: 'text',
-    validator: strValidator
+    required: true,
+    validator: strValidator,
+    style: {
+      gridArea: '1 / 1 / 2 / 2',
+      height: '85px'
+    },
+    labelStyle: {
+      display: 'none'
+    },
+    maxCharacterLimit: 20
   },
   {
-    name: 'show',
-    label: 'Show to public',
-    type: 'switch'
+    name: 'website',
+    label: 'Website',
+    type: 'text',
+    validator: strValidator,
+    style: {
+      gridArea: '2 / 1 / 3 / 2',
+      height: '85px'
+    },
+    labelStyle: {
+      display: 'none'
+    }
+  },
+  {
+    name: 'github',
+    label: 'Github Repo',
+    type: 'text',
+    prepend: 'https://github.com/',
+    validator: strValidator,
+    style: {
+      gridArea: '3 / 1 / 4 / 2',
+      height: '85px'
+    },
+    labelStyle: {
+      display: 'none'
+    }
+  },
+  {
+    name: 'description',
+    label: 'Descripton',
+    type: 'textarea',
+    style: {
+      height: '202px',
+      gridArea: '1 / 2 / 4 / 3'
+    },
+    labelStyle: {
+      display: 'none'
+    },
+    maxCharacterLimit: 120
   }
 ];
 

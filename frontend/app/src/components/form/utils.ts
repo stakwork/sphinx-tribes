@@ -28,12 +28,14 @@ export interface FormField {
   type: FormFieldType;
   class?: FormFieldClass;
   label: string;
+  labelStyle?: React.CSSProperties;
+  maxCharacterLimit?: number;
   itemLabel?: string;
   single?: boolean;
   readOnly?: boolean;
   required?: boolean;
   validator?: any;
-  style?: any;
+  style?: React.CSSProperties;
   prepend?: string;
   widget?: boolean;
   page?: number;

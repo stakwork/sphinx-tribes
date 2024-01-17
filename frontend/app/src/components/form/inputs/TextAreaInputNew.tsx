@@ -12,7 +12,7 @@ const InputOuterBox = styled.div<styledProps>`
   position: relative;
   margin-bottom: 0px;
   .inputText {
-    width: 292px;
+    width: 100%;
     font-size: 14px;
     color: ${(p: any) => p.color && p.color.pureBlack};
     border: 1px solid ${(p: any) => p.borderColor && p.borderColor};
@@ -47,7 +47,9 @@ export default function TextAreaInputNew({
   handleBlur,
   handleFocus,
   isFocused,
-  placeholder
+  placeholder,
+  style,
+  labelStyle
 }: Props) {
   let labeltext = label;
   if (error) labeltext = `${labeltext}*`;
@@ -90,7 +92,8 @@ export default function TextAreaInputNew({
           setTextValue(e.target.value);
         }}
         style={{
-          height: label === 'Deliverables' ? '137px' : '175px'
+          height: label === 'Deliverables' ? '137px' : '175px',
+          ...style
         }}
       />
       <label
@@ -100,13 +103,19 @@ export default function TextAreaInputNew({
         style={{
           position: 'absolute',
           left: 16,
-          top: !isFocused[label] ? (textValue === undefined || textValue === '' ? 10 : -9) : -9,
-          fontSize: !isFocused[label] ? (textValue === undefined ? 14 : 12) : 12,
+          top:
+            isFocused && !isFocused[label]
+              ? textValue === undefined || textValue === ''
+                ? 10
+                : -9
+              : -9,
+          fontSize: isFocused && !isFocused[label] ? (textValue === undefined ? 14 : 12) : 12,
           color: color.grayish.G300,
           background: color.pureWhite,
           fontFamily: 'Barlow',
           fontWeight: '500',
-          transition: 'all 0.5s'
+          transition: 'all 0.5s',
+          ...labelStyle
         }}
       >
         {labeltext}
