@@ -504,6 +504,10 @@ func (db database) GetOrganizationBounties(r *http.Request, org_uuid string) []B
 	open := keys.Get("Open")
 	assingned := keys.Get("Assigned")
 	paid := keys.Get("Paid")
+	languages := keys.Get("languages")
+	languageArray := strings.Split(languages, ",")
+	languageLength := len(languageArray)
+
 	ms := []Bounty{}
 
 	orderQuery := ""
@@ -512,14 +516,31 @@ func (db database) GetOrganizationBounties(r *http.Request, org_uuid string) []B
 	openQuery := ""
 	assignedQuery := ""
 	paidQuery := ""
+	languageQuery := ""
+
+	if languageLength > 0 {
+		for i, val := range languageArray {
+			if val != "" {
+				if i == 0 {
+					languageQuery = "AND coding_languages && ARRAY['" + val + "']"
+				} else {
+					query := "OR coding_languages && ARRAY['" + val + "']"
+					languageQuery = languageQuery + " " + query
+				}
+			}
+		}
+	}
 
 	if sortBy != "" && direction != "" {
 		orderQuery = "ORDER BY " + sortBy + " " + direction
 	} else {
 		orderQuery = " ORDER BY " + sortBy + "" + "DESC"
 	}
-	if offset != 0 && limit != 0 {
-		limitQuery = fmt.Sprintf("LIMIT %d  OFFSET %d", limit, offset)
+	if limit > 0 {
+		limitQuery = fmt.Sprintf("LIMIT %d", limit)
+	}
+	if offset > 0 {
+		limitQuery += fmt.Sprintf(" OFFSET %d", offset)
 	}
 	if search != "" {
 		searchQuery = fmt.Sprintf("WHERE LOWER(title) LIKE %s", "'%"+search+"%'")
@@ -546,7 +567,7 @@ func (db database) GetOrganizationBounties(r *http.Request, org_uuid string) []B
 	}
 
 	query := `SELECT * FROM bounty WHERE org_uuid = '` + org_uuid + `'`
-	allQuery := query + " " + openQuery + " " + assignedQuery + " " + paidQuery + " " + searchQuery + " " + orderQuery + " " + limitQuery
+	allQuery := query + " " + openQuery + " " + assignedQuery + " " + paidQuery + " " + searchQuery + " " + languageQuery + " " + orderQuery + " " + limitQuery
 	theQuery := db.db.Raw(allQuery)
 
 	if tags != "" {
