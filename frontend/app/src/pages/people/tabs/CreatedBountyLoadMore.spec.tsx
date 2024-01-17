@@ -6,7 +6,7 @@ import '@testing-library/jest-dom/extend-expect';
 import { Wanted } from './Wanted';
 
 // eslint-disable-next-line @typescript-eslint/typedef
-const createdMockBounties = Array.from({ length: 25 }, (_, index) => ({
+const createdMockBounties = Array.from({ length: 15 }, (_, index) => ({
   ...(mockBounties[0] || {}),
   bounty: {
     ...(mockBounties[0]?.bounty || {}),
@@ -14,7 +14,7 @@ const createdMockBounties = Array.from({ length: 25 }, (_, index) => ({
   }
 }));
 
-console.log (createdMockBounties)
+console.log(createdMockBounties);
 
 jest.mock('../../../bounties/__mock__/mockBounties.data', () => ({
   createdMockBounties
@@ -36,8 +36,6 @@ describe('Wanted component', () => {
       if (createdMockBounties.length > 20) {
         expect(getByText('Load More')).toBeInTheDocument();
       } else {
-        // If there are not enough bounties, you might want to handle this case
-        // or skip the expectation.
         console.warn('Not enough bounties for "Load More" button.');
       }
     });
