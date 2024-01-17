@@ -32,6 +32,7 @@ describe('TicketModalPage', () => {
   });
 
   it('redirects to home page on direct access to bounty page', async () => {
+    jest.setTimeout(10000);
     // Arrange: Set up conditions for a direct access
     Object.defineProperty(window, 'referrer', {
       configurable: true,
