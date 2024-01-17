@@ -142,12 +142,7 @@ describe('MobileView component', () => {
     expect(iCanHelp).toBeInTheDocument();
   });
   it('displays "Mark as Paid" when bounty is unpaid', async () => {
-    const modifiedProps = {
-      ...defaultProps,
-      paid: false, 
-    };
-
-    jest.mock('store', () => ({
+      jest.mock('store', () => ({
       useStores: () => ({
         main: {
         },
@@ -156,11 +151,13 @@ describe('MobileView component', () => {
         }
       })
     }));
-    render(<MobileView {...modifiedProps} />);
+    render(<MobileView {...defaultProps} />);
 
     await waitFor(() => {
       const markPaidButton = screen.getByText('Mark as Paid');
+      const markUnPaidButton = screen.getByText('Mark as Unpaid');
       expect(markPaidButton).toBeInTheDocument();
+      expect(markUnPaidButton).toBeInTheDocument();
     });  });
 
   it('should render the NameTag with correct props', () => {
