@@ -107,11 +107,22 @@ const OrgButton = styled.button`
   }
 `;
 
+const errcolor = '#FF8F80';
+
+const InputError = styled.div`
+  color: #ff8f80;
+  font-size: 11px;
+  font-weight: 500;
+`;
+
 const LabelRowContainer = styled.div`
   display: flex;
   align-items: end;
   justify-content: space-between;
 `;
+
+const MAX_ORG_NAME_LENGTH = 20;
+const MAX_DESCRIPTION_LENGTH = 120;
 
 const AddOrganization = (props: {
   closeHandler: () => void;
@@ -126,9 +137,17 @@ const AddOrganization = (props: {
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const { main } = useStores();
   const [toasts, setToasts] = useState<Toast[]>([]);
+  const [orgNameError, setOrgNameError] = useState<boolean>(false);
+  const [descriptionError, setDescriptionError] = useState<boolean>(false);
 
   const handleOrgNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setOrgName(e.target.value);
+    const newValue = e.target.value;
+    if (newValue.length <= MAX_ORG_NAME_LENGTH) {
+      setOrgName(newValue);
+      setOrgNameError(false);
+    } else {
+      setOrgNameError(true);
+    }
   };
 
   const handleWebsiteNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -138,8 +157,15 @@ const AddOrganization = (props: {
   const handleGithubRepoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setGithubRepo(e.target.value);
   };
+
   const handleDescriptionChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
-    setDescription(e.target.value);
+    const newValue = e.target.value;
+    if (newValue.length <= MAX_DESCRIPTION_LENGTH) {
+      setDescription(newValue);
+      setDescriptionError(false);
+    } else {
+      setDescriptionError(true);
+    }
   };
 
   const handleDrop = (event: DragEvent<HTMLDivElement>) => {
@@ -257,16 +283,20 @@ const AddOrganization = (props: {
             <ImgDetailInfo>PNG, JPG or GIF, Min. 300 x 300 px</ImgDetailInfo>
           </ImgTextContainer>
         </OrgImgOutterContainer>
-        <OrgInputContainer>
+        <OrgInputContainer style={{ color: orgNameError ? errcolor : '' }}>
           <LabelRowContainer>
-            <OrgLabel>Organization Name *</OrgLabel>
-            <SecondaryText>{orgName.length}/20</SecondaryText>
+            <OrgLabel style={{ color: orgNameError ? errcolor : '' }}>Organization Name *</OrgLabel>
+            <SecondaryText style={{ color: orgNameError ? errcolor : '' }}>
+              {orgName.length}/{MAX_ORG_NAME_LENGTH}
+            </SecondaryText>
           </LabelRowContainer>
           <TextInput
             placeholder="My Organization..."
             value={orgName}
             onChange={handleOrgNameChange}
+            style={{ borderColor: orgNameError ? errcolor : '' }}
           />
+          {orgNameError && <InputError>Name is too long.</InputError>}
           <OrgLabel>Website</OrgLabel>
           <TextInput
             placeholder="Website URL..."
@@ -282,20 +312,27 @@ const AddOrganization = (props: {
         </OrgInputContainer>
         <OrgInputContainer>
           <LabelRowContainer>
-            <OrgLabel>Description</OrgLabel>
-            <SecondaryText>{description.length}/120</SecondaryText>
+            <OrgLabel style={{ color: descriptionError ? errcolor : '' }}>Description</OrgLabel>
+            <SecondaryText style={{ color: descriptionError ? errcolor : '' }}>
+              {description.length}/{MAX_DESCRIPTION_LENGTH}
+            </SecondaryText>
           </LabelRowContainer>
           <TextAreaInput
             placeholder="Description Text..."
             rows={7}
             value={description}
             onChange={handleDescriptionChange}
+            style={{ borderColor: descriptionError ? errcolor : '' }}
           />
+          {descriptionError && <InputError>Description is too long.</InputError>}
         </OrgInputContainer>
       </OrgDetailsContainer>
       <FooterContainer>
         <SecondaryText>* Required fields</SecondaryText>
-        <OrgButton disabled={!orgName} onClick={addOrganization}>
+        <OrgButton
+          disabled={orgNameError || descriptionError || !orgName}
+          onClick={addOrganization}
+        >
           {isLoading ? <EuiLoadingSpinner size="m" /> : 'Add Organization'}
         </OrgButton>
       </FooterContainer>
