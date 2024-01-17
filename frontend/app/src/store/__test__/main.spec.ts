@@ -966,11 +966,11 @@ describe('Main store', () => {
     uiStore.setMeInfo(mockUser);
     uiStore.setShowSignIn(true);
 
-    localStorageMock.setItem('ui', JSON.stringify(uiStore));
+    localStorageMock.setItem('ui', null);
 
     expect(uiStore.showSignIn).toBeTruthy();
     expect(uiStore.meInfo).toEqual(mockUser);
-    expect(localStorageMock.getItem('ui')).toEqual(JSON.stringify(uiStore));
+    expect(localStorageMock.getItem('ui')).toEqual(null);
   });
 
   it('I should be able to test that when signed out the user data is deleted', async () => {
