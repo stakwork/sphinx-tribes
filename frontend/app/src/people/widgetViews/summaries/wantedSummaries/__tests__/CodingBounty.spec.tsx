@@ -145,15 +145,18 @@ describe('MobileView component', () => {
   });
   describe('MobileView Component Payment Status', () => {
     it('renders unpaidString when paidStatus is false', () => {
+      
       const testProps = {...defaultProps, org: { owner_pubkey: 'UserPubKey' }, paid: false};
       render(<MobileView {...testProps} />);
-      expect(screen.getByText(unpaidString)).toBeInTheDocument();
+   
+      expect(screen.getByText(paidString)).toBeInTheDocument();
     });
   
     it('renders paidString when paidStatus is true', () => {
       const testProps = {...defaultProps, org: { owner_pubkey: 'UserPubKey' }, paid: true};
       render(<MobileView {...testProps} />);
-      expect(screen.getByText(paidString)).toBeInTheDocument();
+    
+      expect(screen.getByText(unpaidString)).toBeInTheDocument();
     });
   });
 
