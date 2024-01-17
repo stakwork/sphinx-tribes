@@ -81,7 +81,6 @@ describe('BountyHeader Component', () => {
     'Golang',
     'Kotlin',
     'PHP',
-    'C#',
     'Java',
     'Ruby',
     'Python',
@@ -92,7 +91,6 @@ describe('BountyHeader Component', () => {
     'Swift',
     'MySQL',
     'R',
-    'C++',
     'Rust',
     'Other'
   ];
