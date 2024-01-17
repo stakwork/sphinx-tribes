@@ -77,10 +77,35 @@ describe('BountyHeader Component', () => {
 
   test('should call onChangeLanguage when a language filter option is selected', async () => {
     render(<BountyHeader {...mockProps} />);
-    const filterButton = screen.getByRole('button', { name: /Filter/i });
-    fireEvent.click(filterButton);
-    const checkbox = await screen.findByRole('checkbox', { name: /Typescript/i });
-    fireEvent.click(checkbox);
-    expect(mockProps.onChangeLanguage).toHaveBeenCalled();
+    const filterContainer = screen.getByText('Filter');
+    fireEvent.click(filterContainer);
+
+    const languageOptions = [
+      'Lightning',
+      'Typescript',
+      'Golang',
+      'Kotlin',
+      'PHP',
+      'C#',
+      'Java',
+      'Ruby',
+      'Python',
+      'Postgres',
+      'Elastic search',
+      'Javascript',
+      'Node',
+      'Swift',
+      'MySQL',
+      'R',
+      'C++',
+      'Rust',
+      'Other'
+    ];
+
+    languageOptions.forEach(async (language: string) => {
+      const checkbox = await screen.findByRole('checkbox', { name: new RegExp(language, 'i') });
+      fireEvent.click(checkbox);
+      expect(mockProps.onChangeLanguage).toHaveBeenCalled();
+    });
   });
 });
