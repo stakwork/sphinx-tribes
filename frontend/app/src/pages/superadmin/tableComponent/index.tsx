@@ -328,7 +328,7 @@ export const MyTable = ({
                   <TableDataCenter>{time_to_pay}</TableDataCenter>
                   <TableDataAlternative>
                     <ImageWithText
-                      text={bounty?.assignee_alias}
+                      text={capFirstLetter(bounty?.assignee_alias)}
                       image={bounty?.assignee_img || defaultPic}
                     />
                   </TableDataAlternative>
