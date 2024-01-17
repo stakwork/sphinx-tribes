@@ -99,11 +99,15 @@ describe('BountyHeader Component', () => {
 
   languageOptions.forEach((language: string) => {
     test(`should call onChangeLanguage when the ${language} filter option is selected`, async () => {
-      render(<BountyHeader {...mockProps} />);
-      const filterContainer = screen.getByText('Filter');
-      fireEvent.click(filterContainer);
+      const safeLanguageName = language.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 
-      const checkbox = await screen.findByRole('checkbox', { name: new RegExp(language, 'i') });
+      render(<BountyHeader {...mockProps} />);
+      const filterButton = screen.getByRole('button', { name: /Filter/i });
+      fireEvent.click(filterButton);
+
+      const checkbox = await screen.findByRole('checkbox', {
+        name: new RegExp(safeLanguageName, 'i')
+      });
       fireEvent.click(checkbox);
       expect(mockProps.onChangeLanguage).toHaveBeenCalledWith(language);
     });
