@@ -140,20 +140,15 @@ describe('MobileView component', () => {
     const iCanHelp = screen.getByText('Share to Twitter');
     expect(iCanHelp).toBeInTheDocument();
   });
-  it('displays "Mark as paid" when bounty is unpaid', async () => {
+  it('displays "Mark as Paid" when bounty is unpaid', async () => {
     const modifiedProps = {
       ...defaultProps,
-      person: {
-        ...defaultProps.person,
-        owner_alias: 'TestOwnerAlias'
-      },
-      paidStatus: false
+      paid: false, 
     };
 
     jest.mock('store', () => ({
       useStores: () => ({
         main: {
-          getOrganizationUser: jest.fn().mockResolvedValue({ owner_pubkey: 'UserPubKey' })
         },
         ui: {
           meInfo: { owner_pubkey: 'UserPubKey', owner_alias: 'TestOwnerAlias' }
@@ -162,7 +157,9 @@ describe('MobileView component', () => {
     }));
     render(<MobileView {...modifiedProps} />);
 
-    const markPaidButton = await screen.findByText('Mark as Paid');
-    expect(markPaidButton).toBeInTheDocument();
+    await waitFor(() => {
+      const markPaidButton = screen.getByText('Mark as Paid');
+      expect(markPaidButton).toBeInTheDocument();
+    });
   });
 });
