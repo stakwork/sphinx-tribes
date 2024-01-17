@@ -6,8 +6,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"strings"
-  "github.com/go-chi/chi"
+	"github.com/go-chi/chi"
 	"github.com/stakwork/sphinx-tribes/auth"
 	"github.com/stakwork/sphinx-tribes/db"
 	mocks "github.com/stakwork/sphinx-tribes/mocks"
@@ -15,6 +14,7 @@ import (
 	"github.com/stretchr/testify/mock"
 	"net/http"
 	"net/http/httptest"
+	"strings"
 	"testing"
 )
 
@@ -26,12 +26,12 @@ func TestUnitCreateOrEditOrganization(t *testing.T) {
 	t.Run("should return error if body is not a valid json", func(t *testing.T) {
 		rr := httptest.NewRecorder()
 		handler := http.HandlerFunc(oHandler.CreateOrEditOrganization)
-	
+
 		invalidJson := []byte(`{"key": "value"`)
-		
+
 		// Include a dummy public key in the context
 		ctx := context.WithValue(context.Background(), auth.ContextKey, "dummy-pub-key")
-		
+
 		req, err := http.NewRequestWithContext(ctx, http.MethodPost, "/", bytes.NewReader(invalidJson))
 		if err != nil {
 			t.Fatal(err)
@@ -40,7 +40,7 @@ func TestUnitCreateOrEditOrganization(t *testing.T) {
 		assert.Equal(t, http.StatusNotAcceptable, rr.Code)
 	})
 
-	t.Run("should return error if public key not present", func(t *testing.T) { //passed 
+	t.Run("should return error if public key not present", func(t *testing.T) { //passed
 		rr := httptest.NewRecorder()
 		handler := http.HandlerFunc(oHandler.CreateOrEditOrganization)
 
