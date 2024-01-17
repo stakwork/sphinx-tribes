@@ -36,7 +36,7 @@ describe('<TicketModalPage />', () => {
       </Router>
     );
 
-    expect(mockHistoryPush).toHaveBeenCalledWith('/bounties');
+    expect(mockHistoryPush).toHaveBeenCalledWith('https://community.sphinx.chat/bounties');
     expect(mockHistoryGoBack).toHaveBeenCalled();
   });
 });
