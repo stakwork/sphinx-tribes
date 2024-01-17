@@ -161,7 +161,7 @@ describe('MobileView component', () => {
     await waitFor(() => {
       const markPaidButton = screen.getByText('Mark as Paid');
       expect(markPaidButton).toBeInTheDocument();
-    });
+    });  });
 
   it('should render the NameTag with correct props', () => {
     const nameTagProps = {
