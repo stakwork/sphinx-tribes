@@ -966,11 +966,11 @@ describe('Main store', () => {
     uiStore.setMeInfo(mockUser);
     uiStore.setShowSignIn(true);
 
-    localStorageMock.setItem('ui', null);
+    localStorageMock.setItem('ui', JSON.stringify(uiStore));
 
     expect(uiStore.showSignIn).toBeTruthy();
     expect(uiStore.meInfo).toEqual(mockUser);
-    expect(localStorageMock.getItem('ui')).toEqual(null);
+    expect(localStorageMock.getItem('ui')).toEqual(JSON.stringify(uiStore));
   });
 
   it('I should be able to test that when signed out the user data is deleted', async () => {
@@ -982,9 +982,9 @@ describe('Main store', () => {
     expect(localStorageMock.getItem('ui')).toEqual(JSON.stringify(uiStore));
     //Shows when signed out
     uiStore.setMeInfo(null);
-    localStorageMock.setItem('ui', JSON.stringify(uiStore));
+    localStorageMock.setItem('ui', null);
 
-    expect(localStorageMock.getItem('ui')).toEqual(JSON.stringify(uiStore));
+    expect(localStorageMock.getItem('ui')).toEqual(null);
   });
 
   it('I should be able to test that signed-in user details can be displayed such as the name and pubkey', async () => {
