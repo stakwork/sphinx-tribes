@@ -102,8 +102,8 @@ describe('BountyHeader Component', () => {
       const safeLanguageName = language.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 
       render(<BountyHeader {...mockProps} />);
-      const filterButton = screen.getByRole('button', { name: /Filter/i });
-      fireEvent.click(filterButton);
+      const filterContainer = screen.getByText('Filter');
+      fireEvent.click(filterContainer);
 
       const checkbox = await screen.findByRole('checkbox', {
         name: new RegExp(safeLanguageName, 'i')
