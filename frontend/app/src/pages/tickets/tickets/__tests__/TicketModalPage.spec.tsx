@@ -1,22 +1,34 @@
 import React from 'react';
-import { render } from '@testing-library/react';
-import { Router, Route } from 'react-router-dom';
-import { createMemoryHistory } from 'history';
+import { render, fireEvent } from '@testing-library/react';
 import { TicketModalPage } from '../../TicketModalPage';
+import { BrowserRouter as Router } from 'react-router-dom';
 
-describe('TicketModalPage', () => {
-  it('redirects to the bounty home page on direct access', () => {
-    const history = createMemoryHistory({ initialEntries: ['/bounty/1186'] });
-    jest.spyOn(history, 'push');
+describe('TicketModalPage Navigation Test', () => {
+  it('should redirect to bounties home when accessed directly and closed', () => {
+    // Mock `history.push` and `history.goBack`
+    const mockPush = jest.fn();
+    const mockGoBack = jest.fn();
 
-    render(
-      <Router history={history}>
-        <Route path="/bounty/:bountyId">
-          <TicketModalPage setConnectPerson={jest.fn()} />
-        </Route>
+    jest.mock('react-router-dom', () => ({
+      ...jest.requireActual('react-router-dom'),
+      useHistory: () => ({
+        push: mockPush,
+        goBack: mockGoBack
+      })
+    }));
+
+    // Render the component
+    const { getByTestId } = render(
+      <Router>
+        <TicketModalPage setConnectPerson={jest.fn()} />
       </Router>
     );
 
-    expect(history.push).toHaveBeenCalledWith('/bounties');
+    // Simulate the user closing the modal
+    fireEvent.click(getByTestId('close-btn'));
+
+    // Check if the correct navigation function was called
+    expect(mockPush).toHaveBeenCalledWith('/bounties');
+    expect(mockGoBack).not.toHaveBeenCalled();
   });
 });
