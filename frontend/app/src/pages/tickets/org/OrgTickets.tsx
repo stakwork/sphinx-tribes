@@ -73,7 +73,7 @@ function OrgBodyComponent() {
   };
 
   const onPanelClick = (person: any, item: any) => {
-    history.push(`/bounty/${item.id}`);
+    history.push(`/bounty/${item.id}`, { uuid });
   };
 
   if (loading) {

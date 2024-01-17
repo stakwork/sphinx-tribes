@@ -32,6 +32,27 @@ export const TicketModalPage = observer(({ setConnectPerson }: Props) => {
   const [activeBounty, setActiveBounty] = useState<PersonBounty[]>([]);
   const [visible, setVisible] = useState(false);
   const [isDeleted, setisDeleted] = useState(false);
+  const [isOrgBounties, setIsOrgBounties] = useState(false);
+  const [orgBounties, setOrgBounties] = useState<any>({});
+
+  const { state } = location;
+
+  type OrgTicketModalState = {
+    uuid?: string;
+  };
+
+  const uuid = (state as OrgTicketModalState)?.uuid || '';
+
+  useEffect(() => {
+    (async () => {
+      if (uuid) {
+        const res = await main.getOrganizationBounties(uuid, { page: 1, resetPage: true });
+        setOrgBounties(res);
+        setIsOrgBounties(true);
+      }
+      console.log(orgBounties, 'as');
+    })();
+  }, [main, uuid]);
 
   const isMobile = useIsMobile();
 
@@ -89,22 +110,39 @@ export const TicketModalPage = observer(({ setConnectPerson }: Props) => {
 
   const getBountyIndex = () => {
     const id = parseInt(bountyId, 10);
-    const index = main.peopleBounties.findIndex((bounty: any) => id === bounty.body.id);
+    let index;
+    if (isOrgBounties) {
+      index = orgBounties.findIndex((bounty: any) => id === bounty.body.id);
+    } else {
+      index = main.peopleBounties.findIndex((bounty: any) => id === bounty.body.id);
+    }
     return index;
   };
 
   const prevArrHandler = () => {
     const index = getBountyIndex();
-    if (index <= 0 || index >= main.peopleBounties.length) return;
-    const { person, body } = main.peopleBounties[index - 1];
-    directionHandler(person, body);
+    if (isOrgBounties) {
+      if (index <= 0 || index >= orgBounties.length) return;
+      const { person, body } = orgBounties[index - 1];
+      directionHandler(person, body);
+    } else {
+      if (index <= 0 || index >= main.peopleBounties.length) return;
+      const { person, body } = main.peopleBounties[index - 1];
+      directionHandler(person, body);
+    }
   };
 
   const nextArrHandler = () => {
     const index = getBountyIndex();
-    if (index + 1 >= main.peopleBounties?.length) return;
-    const { person, body } = main.peopleBounties[index + 1];
-    directionHandler(person, body);
+    if (isOrgBounties) {
+      if (index + 1 >= orgBounties?.length) return;
+      const { person, body } = orgBounties[index + 1];
+      directionHandler(person, body);
+    } else {
+      if (index + 1 >= main.peopleBounties?.length) return;
+      const { person, body } = main.peopleBounties[index + 1];
+      directionHandler(person, body);
+    }
   };
 
   if (isMobile) {
