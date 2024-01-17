@@ -1,6 +1,6 @@
 import React from 'react';
 import { render, fireEvent } from '@testing-library/react';
-import { MemoryRouter, Route } from 'react-router-dom';
+import { Router, Route } from 'react-router-dom';
 import { createMemoryHistory } from 'history';
 import { TicketModalPage } from '../../TicketModalPage'; // Adjust the import path as needed
 
@@ -14,11 +14,11 @@ describe('TicketModalPage', () => {
     }));
 
     const { getByTestId } = render(
-      <MemoryRouter history={history}>
+      <Router history={history}>
         <Route path="/bounty/:bountyId">
-          <TicketModalPage />
+          <TicketModalPage setConnectPerson={jest.fn()} />
         </Route>
-      </MemoryRouter>
+      </Router>
     );
 
     // Simulate clicking the big close button in the modal
