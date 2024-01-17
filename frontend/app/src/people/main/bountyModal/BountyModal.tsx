@@ -22,6 +22,7 @@ export const BountyModal = ({ basePath, fromPage, bountyOwner }: BountyModalProp
   const [bounty, setBounty] = useState<PersonBounty[]>([]);
   const [afterEdit, setAfterEdit] = useState(false);
   const [loading, setLoading] = useState(true);
+  const [ToDisplay, setToDisplay] = useState<any>();
 
   const personToDisplay = fromPage === 'usertickets' ? bountyOwner : person;
 
@@ -44,7 +45,13 @@ export const BountyModal = ({ basePath, fromPage, bountyOwner }: BountyModalProp
       if ((wantedId && !bounty.length) || afterEdit) {
         try {
           const bountyData = await main.getBountyById(Number(wantedId));
+          console.log(bountyData, 'bd');
           setBounty(bountyData);
+          if (personToDisplay === undefined) {
+            setToDisplay(bountyData[0].person);
+          } else {
+            setToDisplay(personToDisplay);
+          }
         } catch (error) {
           console.error('Error fetching bounty:', error);
         } finally {
@@ -52,7 +59,7 @@ export const BountyModal = ({ basePath, fromPage, bountyOwner }: BountyModalProp
         }
       }
     },
-    [bounty, main, wantedId]
+    [bounty, main, wantedId, personToDisplay]
   );
 
   useEffect(() => {
@@ -115,7 +122,7 @@ export const BountyModal = ({ basePath, fromPage, bountyOwner }: BountyModalProp
       }}
     >
       <FocusedView
-        person={personToDisplay}
+        person={ToDisplay}
         personBody={person}
         canEdit={false}
         selectedIndex={Number(wantedIndex)}

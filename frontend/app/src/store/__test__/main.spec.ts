@@ -476,8 +476,8 @@ describe('Main store', () => {
     await store.deleteBounty(1111, 'pub_key');
 
     expect(fetchStub.withArgs(url, expectedRequestOptions).calledOnce).toEqual(true);
-    expect(store.peopleBounties.length).toEqual(1);
-    expect(store.peopleBounties).toEqual([expectedBountyResponses[0]]);
+    expect(store.peopleBounties.length).toEqual(0);
+    expect(store.peopleBounties).toEqual([]);
   });
 
   it('should not panic if failed to delete bounty', async () => {
@@ -657,7 +657,7 @@ describe('Main store', () => {
     expect(res).toEqual(0);
   });
 
-  it('should set all query params, page, limit, search when fetching bounties, user logged out', async () => {
+  it('should set all query params, page, limit, search, and languages when fetching bounties, user logged out', async () => {
     uiStore.setMeInfo(emptyMeInfo);
     const allBountiesUrl = `http://${getHost()}/gobounties/all?limit=10&sortBy=updatedat&search=random&page=1&resetPage=true`;
     fetchStub.withArgs(allBountiesUrl, sinon.match.any).returns(

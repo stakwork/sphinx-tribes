@@ -18,6 +18,7 @@ import {
 import arrowback from './icons/arrowback.svg';
 import arrowforward from './icons/arrowforward.svg';
 import expand_more from './icons/expand_more.svg';
+import App from './components/Calendar/App';
 interface HeaderProps {
   startDate?: number;
   endDate?: number;
@@ -40,7 +41,6 @@ export const Header = ({ startDate, setStartDate, endDate, setEndDate }: HeaderP
     }
     return '';
   };
-
   const handleBackClick = () => {
     if (startDate !== undefined && endDate !== undefined) {
       const newStartDate = moment.unix(startDate).subtract(dateDiff, 'days').unix();
@@ -164,7 +164,9 @@ export const Header = ({ startDate, setStartDate, endDate, setEndDate }: HeaderP
                   <li onClick={() => handleDropDownChange(30)}>30 Days</li>
                   <li onClick={() => handleDropDownChange(90)}>90 Days</li>
                   <li>
-                    <CustomButton>Custom</CustomButton>
+                    <CustomButton onClick={() => setShowCalendar(!showCalendar)}>
+                      Custom
+                    </CustomButton>
                   </li>
                 </ul>
               </Option>
@@ -172,6 +174,13 @@ export const Header = ({ startDate, setStartDate, endDate, setEndDate }: HeaderP
           </DropDown>
         </RightWrapper>
       </AlternateWrapper>
+      {showCalendar && (
+        <App
+          filterStartDate={setStartDate}
+          filterEndDate={setEndDate}
+          setShowCalendar={setShowCalendar}
+        />
+      )}
     </Container>
   );
 };
