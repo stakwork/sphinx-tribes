@@ -73,10 +73,17 @@ export const TicketModalPage = observer(({ setConnectPerson }: Props) => {
     getBounty();
   }, [getBounty, removeNextAndPrev]);
 
-  const goBack = async () => {
-    setVisible(false);
-    setisDeleted(false);
-    history.goBack();
+  const goBack = () => {
+    // If there's no referrer, it's likely opened in a new tab
+    if (!document.referrer || document.referrer.indexOf(window.location.hostname) === -1) {
+      // Choose the return path based on the URL pattern
+      const returnPath = location.pathname.includes('/org/') ? '/org/bounties/:uuid' : '/bounties';
+      history.push(returnPath);
+    } else {
+      // Go back to the previous page stored in the context or global state
+      // history.push(previousPath);
+      history.goBack(); // Fallback if previous path is not set
+    }
   };
 
   const directionHandler = (person: any, body: any) => {
