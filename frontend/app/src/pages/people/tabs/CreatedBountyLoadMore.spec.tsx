@@ -6,10 +6,10 @@ import { Wanted } from './Wanted';
 
 // eslint-disable-next-line @typescript-eslint/typedef
 const createdMockBounties = Array.from({ length: 25 }, (_, index) => ({
-  ...mockBounties[0],
+  ...(mockBounties[0] || {}), 
   bounty: {
-    ...mockBounties[0].bounty,
-    id: mockBounties[0].bounty.id + index + 1
+    ...(mockBounties[0]?.bounty || {}), 
+    id: mockBounties[0]?.bounty?.id + index + 1
   }
 }));
 
