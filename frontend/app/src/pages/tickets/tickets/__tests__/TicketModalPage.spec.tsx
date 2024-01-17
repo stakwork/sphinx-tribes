@@ -1,31 +1,17 @@
 import React from 'react';
-import { render, act } from '@testing-library/react';
-import '@testing-library/jest-dom';
+import { render, fireEvent, waitFor, screen } from '@testing-library/react';
 import { Router, Route } from 'react-router-dom';
 import { createMemoryHistory } from 'history';
-import { TicketModalPage } from '../../TicketModalPage';
-
-jest.mock('react-router-dom', () => {
-  const originalModule = jest.requireActual('react-router-dom');
-  return {
-    ...originalModule,
-    useHistory: () => ({
-      push: jest.fn(),
-      goBack: jest.fn()
-    })
-  };
-});
+import { TicketModalPage } from '../../TicketModalPage.tsx';
 
 describe('<TicketModalPage />', () => {
   it('should navigate to the correct URL when accessed directly and goBack is called', async () => {
     const history = createMemoryHistory({ initialEntries: ['/bounty/1181'] });
-    const pushSpy = jest.spyOn(history, 'push');
-    const goBackSpy = jest.spyOn(history, 'goBack');
 
-    // Set up an empty referrer to simulate direct access
+    // Mock referrer if necessary
     Object.defineProperty(document, 'referrer', {
       value: '',
-      configurable: true
+      writable: true
     });
 
     render(
@@ -36,9 +22,11 @@ describe('<TicketModalPage />', () => {
       </Router>
     );
 
-    await act(async () => {
-      expect(pushSpy).toHaveBeenCalledWith('/bounties');
-      expect(goBackSpy).toHaveBeenCalled();
-    });
+    // Wait for the modal to be in the document
+    const goBackButton = await waitFor(() => screen.findByTestId('close-btn'));
+
+    fireEvent.click(goBackButton);
+
+    expect(history.location.pathname).toBe('/bounties');
   });
 });
