@@ -75,12 +75,15 @@ describe('BountyHeader Component', () => {
     });
   });
 
-  test('should call onChangeLanguage every time a language filter is clicked', async () => {
+  test('should call onChangeLanguage when a language filter option is selected', async () => {
     render(<BountyHeader {...mockProps} />);
-    const filterElement = screen.getByText('Filter');
-    fireEvent.click(filterElement);
-    await waitFor(() => {
-      expect(mockProps.onChangeLanguage).toHaveBeenCalled();
-    });
+
+    const filterContainer = screen.getByText('Filter');
+    fireEvent.click(filterContainer);
+
+    const checkbox = await screen.findByRole('checkbox', { name: /Javascript/i });
+    fireEvent.click(checkbox);
+
+    expect(mockProps.onChangeLanguage).toHaveBeenCalled();
   });
 });
