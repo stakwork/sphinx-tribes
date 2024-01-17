@@ -96,7 +96,7 @@ func TestUnitCreateOrEditOrganization(t *testing.T) {
 		invalidJson := []byte(`{"name": "TestOrganization", "owner_pubkey": "test-key" ,"description": "Test"}`)
 		req, err := http.NewRequestWithContext(ctx, http.MethodPost, "/", bytes.NewReader(invalidJson))
 
-		validJson := []byte(`{"name": "TestOrganization", "owner_pubkey": "test-key"}`)
+		validJson := []byte(`{"name": "TestOrganization", "owner_pubkey": "test-key"}` ,"description": "Test"}`)
 		req, err := http.NewRequestWithContext(ctx, http.MethodPost, "/", bytes.NewReader(validJson))
 
 		if err != nil {
