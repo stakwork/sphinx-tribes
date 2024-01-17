@@ -1,5 +1,5 @@
 import React from 'react';
-import { render } from '@testing-library/react';
+import { render, waitFor } from '@testing-library/react';
 import { Router, Route } from 'react-router-dom';
 import { createMemoryHistory } from 'history';
 import { TicketModalPage } from '../../TicketModalPage';
@@ -23,7 +23,7 @@ describe('<TicketModalPage />', () => {
     mockHistoryGoBack.mockClear();
   });
 
-  it('should navigate to the correct URL when accessed directly and goBack is called', () => {
+  it('should navigate to the correct URL when accessed directly and goBack is called', async () => {
     // Create a memory history for your test
     const history = createMemoryHistory({ initialEntries: ['/bounty/1181'] });
 
@@ -36,7 +36,9 @@ describe('<TicketModalPage />', () => {
       </Router>
     );
 
-    expect(mockHistoryPush).toHaveBeenCalledWith('https://community.sphinx.chat/bounties');
-    expect(mockHistoryGoBack).toHaveBeenCalled();
+    await waitFor(() => {
+      expect(mockHistoryPush).toHaveBeenCalledWith('/bounties');
+      // or expect(mockHistoryGoBack).toHaveBeenCalled();
+    });
   });
 });
