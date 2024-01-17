@@ -107,7 +107,6 @@ describe('BountyHeader Component', () => {
       const filterContainer = screen.getByText('Filter');
       fireEvent.click(filterContainer);
 
-      // Use `findAllByRole` instead of `findByRole` to handle multiple matches
       const checkboxes = await screen.findAllByRole('checkbox', {
         name: languageRegExp
       });
