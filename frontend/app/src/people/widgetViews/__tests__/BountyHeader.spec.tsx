@@ -75,15 +75,45 @@ describe('BountyHeader Component', () => {
     });
   });
 
-  test('should call onChangeLanguage when a language filter option is selected', async () => {
+  test('should call onChangeLanguage for each filter option', async () => {
     render(<BountyHeader {...mockProps} />);
 
     const filterContainer = screen.getByText('Filter');
     fireEvent.click(filterContainer);
 
-    const checkbox = await screen.findByRole('checkbox', { name: /Javascript/i });
-    fireEvent.click(checkbox);
+    const statusOptions = ['Open', 'Assigned', 'Paid'];
+    const tagOptions = [
+      'Lightning',
+      'Typescript',
+      'Golang',
+      'Kotlin',
+      'PHP',
+      'C#',
+      'Java',
+      'Ruby',
+      'Postgres',
+      'Other',
+      'Javascript',
+      'Node',
+      'Swift',
+      'MySQL',
+      'R',
+      'C++',
+      'Rust',
+      'Python',
+      'Elastic search'
+    ];
 
-    expect(mockProps.onChangeLanguage).toHaveBeenCalled();
+    for (const status of statusOptions) {
+      const statusCheckbox = await screen.findByRole('checkbox', { name: new RegExp(status, 'i') });
+      fireEvent.click(statusCheckbox);
+      expect(mockProps.onChangeLanguage).toHaveBeenCalled();
+    }
+
+    for (const tag of tagOptions) {
+      const tagCheckbox = await screen.findByRole('checkbox', { name: new RegExp(tag, 'i') });
+      fireEvent.click(tagCheckbox);
+      expect(mockProps.onChangeLanguage).toHaveBeenCalled();
+    }
   });
 });
