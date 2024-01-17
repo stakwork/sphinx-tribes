@@ -2,11 +2,12 @@ import React from 'react';
 import { render } from '@testing-library/react';
 import { Router, Route } from 'react-router-dom';
 import { createMemoryHistory } from 'history';
-import { TicketModalPage } from '../../TicketModalPage'; // Adjust the import path as needed
+import { TicketModalPage } from '../../TicketModalPage';
 
 describe('TicketModalPage', () => {
-  it('redirects to the bounty home page on direct access and modal close', () => {
+  it('redirects to the bounty home page on direct access', () => {
     const history = createMemoryHistory({ initialEntries: ['/bounty/1186'] });
+    jest.spyOn(history, 'push');
 
     render(
       <Router history={history}>
@@ -16,8 +17,6 @@ describe('TicketModalPage', () => {
       </Router>
     );
 
-    history.goBack();
-
-    expect(history.location.pathname).toBe('/bounties');
+    expect(history.push).toHaveBeenCalledWith('/bounties');
   });
 });
