@@ -26,6 +26,11 @@ func NewOrganizationHandler(db db.Database) *organizationHandler {
 func (oh *organizationHandler) CreateOrEditOrganization(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 	pubKeyFromAuth, _ := ctx.Value(auth.ContextKey).(string)
+	if pubKeyFromAuth == "" {
+		fmt.Println("no pubkey from auth")
+		w.WriteHeader(http.StatusUnauthorized)
+		return
+	}
 	now := time.Now()
 
 	org := db.Organization{}
@@ -63,12 +68,6 @@ func (oh *organizationHandler) CreateOrEditOrganization(w http.ResponseWriter, r
 			json.NewEncoder(w).Encode("Don't have access to Edit Org")
 			return
 		}
-	}
-
-	if pubKeyFromAuth == "" {
-		fmt.Println("no pubkey from auth")
-		w.WriteHeader(http.StatusUnauthorized)
-		return
 	}
 
 	// Validate struct data
