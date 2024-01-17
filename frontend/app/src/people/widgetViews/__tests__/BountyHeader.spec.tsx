@@ -1,5 +1,5 @@
 import React from 'react';
-import { render, screen, waitFor } from '@testing-library/react';
+import { render, screen, waitFor, fireEvent } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import BountyHeader from '../BountyHeader';
 import { BountyHeaderProps } from '../../interfaces';
@@ -73,5 +73,12 @@ describe('BountyHeader Component', () => {
     await waitFor(() => {
       expect(screen.getByText(mockDeveloperCount.toString())).toBeInTheDocument();
     });
+  });
+
+  test('should call onChangeLanguage every time a language filter is clicked', () => {
+    render(<BountyHeader {...mockProps} />);
+    const filterElement = screen.getByText('FilterElement');
+    fireEvent.click(filterElement);
+    expect(mockProps.onChangeLanguage).toHaveBeenCalled();
   });
 });
