@@ -77,7 +77,7 @@ describe('BountyHeader Component', () => {
 
   test('should call onChangeLanguage every time a language filter is clicked', () => {
     render(<BountyHeader {...mockProps} />);
-    const filterElement = screen.getByText('FilterElement');
+    const filterElement = screen.getByText('Filter');
     fireEvent.click(filterElement);
     expect(mockProps.onChangeLanguage).toHaveBeenCalled();
   });
