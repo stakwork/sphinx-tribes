@@ -14,6 +14,8 @@ const createdMockBounties = Array.from({ length: 25 }, (_, index) => ({
   }
 }));
 
+console.log (createdMockBounties)
+
 jest.mock('../../../bounties/__mock__/mockBounties.data', () => ({
   createdMockBounties
 }));
