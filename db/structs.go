@@ -439,6 +439,7 @@ type Organization struct {
 	Deleted     bool       `gorm:"default:false" json:"deleted"`
 	BountyCount int64      `json:"bounty_count,omitempty"`
 	Budget      uint       `json:"budget,omitempty"`
+	Description string     `json:"description"`
 }
 
 type OrganizationShort struct {
