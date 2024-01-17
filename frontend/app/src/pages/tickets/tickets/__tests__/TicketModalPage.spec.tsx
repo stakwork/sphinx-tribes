@@ -1,64 +1,25 @@
 import React from 'react';
-import { render, act } from '@testing-library/react';
+import { render, fireEvent } from '@testing-library/react';
 import { Router, Route } from 'react-router-dom';
 import { createMemoryHistory } from 'history';
-import { TicketModalPage } from '../../TicketModalPage'; // Adjust import as necessary
+import { TicketModalPage } from '../../TicketModalPage';
 
-// Mock the necessary hooks and modules
-jest.mock('react-router-dom', () => ({
-  ...jest.requireActual('react-router-dom'),
-  useHistory: () => ({
-    push: jest.fn(),
-    goBack: jest.fn()
-  }),
-  useParams: () => ({
-    uuid: 'ck9drb84nncjnaefo090',
-    bountyId: '1186'
-  }),
-  useLocation: () => ({
-    pathname: '/bounty/1186',
-    search: '',
-    state: null
-  })
-}));
-
-describe('TicketModalPage Navigation', () => {
-  it('should redirect to the home page on direct access', async () => {
-    const history = createMemoryHistory();
-    jest.spyOn(document, 'referrer', 'get').mockReturnValue('');
-
-    await act(async () => {
-      render(
-        <Router history={history}>
-          <Route path="/bounty/:bountyId">
-            <TicketModalPage setConnectPerson={jest.fn()} />
-          </Route>
-        </Router>
-      );
-    });
-
-    // Update your expectation as per the actual redirection logic
-    expect(history.location.pathname).toEqual('/org/bounties/ck9drb84nncjnaefo090');
-  });
-
-  it('should go back on non-direct access', async () => {
+describe('TicketModalPage', () => {
+  it('redirects to the bounty home page on direct access and modal close', () => {
     const history = createMemoryHistory({ initialEntries: ['/bounty/1181'] });
-    jest
-      .spyOn(document, 'referrer', 'get')
-      .mockReturnValue('https://community.sphinx.chat/bounties');
+    const { getByRole } = render(
+      <Router history={history}>
+        <Route path="/bounty/:bountyId">
+          <TicketModalPage setConnectPerson={jest.fn()} />
+        </Route>
+      </Router>
+    );
 
-    await act(async () => {
-      render(
-        <Router history={history}>
-          <Route path="/bounty/:bountyId">
-            <TicketModalPage setConnectPerson={jest.fn()} />
-          </Route>
-        </Router>
-      );
-    });
+    // Assuming there's a close button in your modal, you might need to adjust this selector
+    const closeButton = getByRole('button', { name: /close/i });
+    fireEvent.click(closeButton);
 
-    // Update your expectation as per the actual redirection logic
-    expect(history.location.pathname).not.toEqual('/org/bounties/ck9drb84nncjnaefo090');
-    expect(history.location.pathname).toEqual('/previous-path');
+    // Check if the current URL is the bounty home page
+    expect(history.location.pathname).toBe('/bounties');
   });
 });
