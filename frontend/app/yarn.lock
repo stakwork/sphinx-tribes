@@ -2436,6 +2436,13 @@
   dependencies:
     "@types/node" "*"
 
+"@types/date-fns@^2.6.0":
+  version "2.6.0"
+  resolved "https://registry.npmjs.org/@types/date-fns/-/date-fns-2.6.0.tgz"
+  integrity sha512-9DSw2ZRzV0Tmpa6PHHJbMcZn79HHus+BBBohcOaDzkK/G3zMjDUDYjJIWBFLbkh+1+/IOS0A59BpQfdr37hASg==
+  dependencies:
+    date-fns "*"
+
 "@types/dateformat@^3.0.1":
   version "3.0.1"
   resolved "https://registry.npmjs.org/@types/dateformat/-/dateformat-3.0.1.tgz"
@@ -4528,6 +4535,11 @@ data-urls@^2.0.0:
     abab "^2.0.3"
     whatwg-mimetype "^2.3.0"
     whatwg-url "^8.0.0"
+
+date-fns@*, date-fns@^3.2.0:
+  version "3.2.0"
+  resolved "https://registry.npmjs.org/date-fns/-/date-fns-3.2.0.tgz"
+  integrity sha512-E4KWKavANzeuusPi0jUjpuI22SURAznGkx7eZV+4i6x2A+IZxAMcajgkvuDAU1bg40+xuhW1zRdVIIM/4khuIg==
 
 dateformat@^3.0.3:
   version "3.0.3"

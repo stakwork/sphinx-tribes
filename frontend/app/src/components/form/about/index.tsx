@@ -3,7 +3,6 @@ import { observer } from 'mobx-react-lite';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import history from 'config/history';
 import { colors } from '../../../config/colors';
-import { BountyDetailsCreationData } from '../../../people/utils/BountyCreationConstant';
 import { useStores } from '../../../store';
 import { Button, IconButton, Modal } from '../../common';
 import Input from '../inputs';
@@ -26,8 +25,6 @@ function Form(props: FormProps) {
   const { main, ui } = useStores();
   const color = colors['light'];
   const [isFocused, setIsFocused] = useState({});
-
-  const [schemaData] = useState(BountyDetailsCreationData.step_1);
 
   const scrollDiv = scrollRef ?? refBody;
 
@@ -99,7 +96,6 @@ function Form(props: FormProps) {
   const buttonAlignment = buttonsOnBottom
     ? { zIndex: 20, bottom: 0, height: 108, justifyContent: 'center' }
     : { top: 0 };
-  const formPad = buttonsOnBottom ? { paddingTop: 30 } : {};
 
   const buttonStyle = buttonsOnBottom ? { width: '80%', height: 48 } : {};
 

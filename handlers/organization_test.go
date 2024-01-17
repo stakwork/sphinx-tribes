@@ -7,6 +7,7 @@ import (
 	"net/http"
 	"net/http/httptest"
 	"strings"
+
 	"testing"
 
 	"github.com/stakwork/sphinx-tribes/auth"
@@ -40,7 +41,7 @@ func TestUnitCreateOrEditOrganization(t *testing.T) {
 		rr := httptest.NewRecorder()
 		handler := http.HandlerFunc(oHandler.CreateOrEditOrganization)
 
-		invalidJson := []byte(`{"key": "value"}`)
+		invalidJson := []byte(`{"name": "value"}`)
 		req, err := http.NewRequestWithContext(context.Background(), http.MethodPost, "/", bytes.NewReader(invalidJson))
 		if err != nil {
 			t.Fatal(err)
@@ -91,8 +92,13 @@ func TestUnitCreateOrEditOrganization(t *testing.T) {
 			return org.Name == "TestOrganization" && org.Uuid != "" && org.Updated != nil && org.Created != nil
 		})).Return(db.Organization{}, nil).Once()
 
+
 		invalidJson := []byte(`{"name": "TestOrganization", "owner_pubkey": "test-key" ,"description": "Test"}`)
 		req, err := http.NewRequestWithContext(ctx, http.MethodPost, "/", bytes.NewReader(invalidJson))
+
+		validJson := []byte(`{"name": "TestOrganization", "owner_pubkey": "test-key"}`)
+		req, err := http.NewRequestWithContext(ctx, http.MethodPost, "/", bytes.NewReader(validJson))
+
 		if err != nil {
 			t.Fatal(err)
 		}
