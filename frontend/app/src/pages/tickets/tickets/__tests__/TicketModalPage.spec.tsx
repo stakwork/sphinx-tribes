@@ -4,11 +4,6 @@ import { Router, Route } from 'react-router-dom';
 import { createMemoryHistory } from 'history';
 import { TicketModalPage } from '../../TicketModalPage.tsx';
 
-jest.mock('hooks', () => ({
-  useIsMobile: () => false
-}));
-jest.mock('store', () => ({}));
-
 describe('<TicketModalPage />', () => {
   it('should navigate to the correct URL when accessed directly and goBack is called', () => {
     const history = createMemoryHistory({ initialEntries: ['/bounty/1181'] });
