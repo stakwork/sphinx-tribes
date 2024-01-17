@@ -6,7 +6,7 @@ import { TicketModalPage } from '../../TicketModalPage'; // Adjust the import pa
 
 describe('TicketModalPage', () => {
   it('redirects to the bounty home page on direct access and modal close', () => {
-    const history = createMemoryHistory({ initialEntries: ['/bounty/123'] });
+    const history = createMemoryHistory({ initialEntries: ['/bounty/1186'] });
 
     render(
       <Router history={history}>
