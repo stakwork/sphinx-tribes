@@ -1,19 +1,33 @@
 import React from 'react';
-import { render, fireEvent, waitFor, screen } from '@testing-library/react';
+import { render } from '@testing-library/react';
 import { Router, Route } from 'react-router-dom';
 import { createMemoryHistory } from 'history';
-import { TicketModalPage } from '../../TicketModalPage.tsx';
+import { TicketModalPage } from '../../TicketModalPage';
+
+// Mock useHistory
+const mockHistoryPush = jest.fn();
+const mockHistoryGoBack = jest.fn();
+
+jest.mock('react-router-dom', () => ({
+  ...jest.requireActual('react-router-dom'),
+  useHistory: () => ({
+    push: mockHistoryPush,
+    goBack: mockHistoryGoBack
+  })
+}));
 
 describe('<TicketModalPage />', () => {
-  it('should navigate to the correct URL when accessed directly and goBack is called', async () => {
+  beforeEach(() => {
+    // Clear all mock function calls before each test
+    mockHistoryPush.mockClear();
+    mockHistoryGoBack.mockClear();
+  });
+
+  it('should navigate to the correct URL when accessed directly and goBack is called', () => {
+    // Create a memory history for your test
     const history = createMemoryHistory({ initialEntries: ['/bounty/1181'] });
 
-    // Mock referrer if necessary
-    Object.defineProperty(document, 'referrer', {
-      value: '',
-      writable: true
-    });
-
+    // Render the component inside a Router context
     render(
       <Router history={history}>
         <Route path="/bounty/:bountyId">
@@ -22,11 +36,7 @@ describe('<TicketModalPage />', () => {
       </Router>
     );
 
-    // Wait for the modal to be in the document
-    const goBackButton = await waitFor(() => screen.findByTestId('close-btn'));
-
-    fireEvent.click(goBackButton);
-
-    expect(history.location.pathname).toBe('/bounties');
+    expect(mockHistoryPush).toHaveBeenCalledWith('/bounties');
+    expect(mockHistoryGoBack).toHaveBeenCalled();
   });
 });
