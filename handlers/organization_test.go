@@ -23,19 +23,21 @@ func TestUnitCreateOrEditOrganization(t *testing.T) {
 	t.Run("should return error if body is not a valid json", func(t *testing.T) {
 		rr := httptest.NewRecorder()
 		handler := http.HandlerFunc(oHandler.CreateOrEditOrganization)
-
+	
 		invalidJson := []byte(`{"key": "value"`)
-		req, err := http.NewRequestWithContext(context.Background(), http.MethodPost, "/", bytes.NewReader(invalidJson))
+		
+		// Include a dummy public key in the context
+		ctx := context.WithValue(context.Background(), auth.ContextKey, "dummy-pub-key")
+		
+		req, err := http.NewRequestWithContext(ctx, http.MethodPost, "/", bytes.NewReader(invalidJson))
 		if err != nil {
 			t.Fatal(err)
 		}
-
 		handler.ServeHTTP(rr, req)
-
 		assert.Equal(t, http.StatusNotAcceptable, rr.Code)
 	})
 
-	t.Run("should return error if public key not present", func(t *testing.T) {
+	t.Run("should return error if public key not present", func(t *testing.T) { //passed 
 		rr := httptest.NewRecorder()
 		handler := http.HandlerFunc(oHandler.CreateOrEditOrganization)
 
