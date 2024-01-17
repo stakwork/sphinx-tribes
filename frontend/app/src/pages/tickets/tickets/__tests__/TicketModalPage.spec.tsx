@@ -21,7 +21,7 @@ describe('<TicketModalPage />', () => {
       </Router>
     );
 
-    const goBackButton = getByTestId('go-back-button');
+    const goBackButton = getByTestId('close');
     fireEvent.click(goBackButton);
 
     expect(history.location.pathname).toBe('/bounties');
