@@ -4,6 +4,7 @@ import { CodingBountiesProps, LocalPaymeentState } from 'people/interfaces';
 import React from 'react';
 import NameTag from 'people/utils/NameTag';
 import MobileView from '../CodingBounty';
+import { paidString, unpaidString } from '../../constants';
 
 describe('MobileView component', () => {
   beforeEach(() => {
@@ -141,24 +142,17 @@ describe('MobileView component', () => {
     const iCanHelp = screen.getByText('Share to Twitter');
     expect(iCanHelp).toBeInTheDocument();
   });
-  it('displays "Mark as Paid" when bounty is unpaid', async () => {
-      jest.mock('store', () => ({
-      useStores: () => ({
-        main: {
-        },
-        ui: {
-          meInfo: { owner_pubkey: 'UserPubKey', owner_alias: 'TestOwnerAlias' }
-        }
-      })
-    }));
-    render(<MobileView {...defaultProps} />);
-
-    await waitFor(() => {
-      const markPaidButton = screen.getByText('Mark as Paid');
-      const markUnPaidButton = screen.getByText('Mark as Unpaid');
-      expect(markPaidButton).toBeInTheDocument();
-      expect(markUnPaidButton).toBeInTheDocument();
-    });  });
+  describe('MobileView Component Payment Status', () => {
+    it('renders unpaidString when paidStatus is false', () => {
+      render(<MobileView {...defaultProps} paid={false} />);
+      expect(screen.getByText(unpaidString)).toBeInTheDocument();
+    });
+  
+    it('renders paidString when paidStatus is true', () => {
+      render(<MobileView {...defaultProps} paid={true} />);
+      expect(screen.getByText(paidString)).toBeInTheDocument();
+    });
+  });
 
   it('should render the NameTag with correct props', () => {
     const nameTagProps = {
