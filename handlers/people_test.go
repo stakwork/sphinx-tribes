@@ -2,6 +2,7 @@ package handlers
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
 	"net/http"
 	"net/http/httptest"
@@ -56,13 +57,11 @@ func TestGetPersonById(t *testing.T) {
 			t.Fatal(err)
 		}
 
-		mockDb.On("GetPerson", nonExistentID).Return(db.Person{})
+		mockError := errors.New("person not found")
+		mockDb.On("GetPerson", nonExistentID).Return(db.Person{}, mockError).Once()
 		handler.ServeHTTP(rr, req)
 
-		if rr.Code != http.StatusNotFound {
-			t.Errorf("Expected status code %d, but got %d", http.StatusNotFound, rr.Code)
-		}
-
+		assert.Equal(t, http.StatusNotFound, rr.Code)
 		mockDb.AssertExpectations(t)
 	})
 }
