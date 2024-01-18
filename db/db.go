@@ -518,19 +518,6 @@ func (db database) GetOrganizationBounties(r *http.Request, org_uuid string) []B
 	paidQuery := ""
 	languageQuery := ""
 
-	if languageLength > 0 {
-		for i, val := range languageArray {
-			if val != "" {
-				if i == 0 {
-					languageQuery = "AND coding_languages && ARRAY['" + val + "']"
-				} else {
-					query := "OR coding_languages && ARRAY['" + val + "']"
-					languageQuery = languageQuery + " " + query
-				}
-			}
-		}
-	}
-
 	if sortBy != "" && direction != "" {
 		orderQuery = "ORDER BY " + sortBy + " " + direction
 	} else {
@@ -563,6 +550,19 @@ func (db database) GetOrganizationBounties(r *http.Request, org_uuid string) []B
 			assignedQuery = ""
 		} else {
 			paidQuery = "AND paid = true"
+		}
+	}
+	if languageLength > 0 {
+		langs := ""
+		for i, val := range languageArray {
+			if val != "" {
+				if i == 0 {
+					langs = "'" + val + "'"
+				} else {
+					langs = langs + ", '" + val + "'"
+				}
+				languageQuery = "AND coding_languages && ARRAY[" + langs + "]"
+			}
 		}
 	}
 
@@ -613,8 +613,6 @@ func (db database) GetCreatedBounties(r *http.Request) ([]Bounty, error) {
 
 	orderQuery := ""
 	limitQuery := ""
-
-	fmt.Println("Sort BY", sortBy, limit)
 
 	if sortBy != "" && direction != "" {
 		orderQuery = "ORDER BY " + sortBy + " " + "ASC"
@@ -716,14 +714,15 @@ func (db database) GetAllBounties(r *http.Request) []Bounty {
 		orgQuery = "AND org_uuid = '" + orgUuid + "'"
 	}
 	if languageLength > 0 {
+		langs := ""
 		for i, val := range languageArray {
 			if val != "" {
 				if i == 0 {
-					languageQuery = "AND coding_languages && ARRAY['" + val + "']"
+					langs = "'" + val + "'"
 				} else {
-					query := "OR coding_languages && ARRAY['" + val + "']"
-					languageQuery = languageQuery + " " + query
+					langs = langs + ", '" + val + "'"
 				}
+				languageQuery = "AND coding_languages && ARRAY[" + langs + "]"
 			}
 		}
 	}
