@@ -22,6 +22,18 @@ import (
 
 const liquidTestModeUrl = "TEST_ASSET_URL"
 
+type personHandler struct {
+	httpClient HttpClient
+	db         db.Database
+}
+
+func NewPersonyHandler(httpClient HttpClient, db db.Database) *personHandler {
+	return &personHandler{
+		httpClient: httpClient,
+		db:         db,
+	}
+}
+
 func CreateOrEditPerson(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 	pubKeyFromAuth, _ := ctx.Value(auth.ContextKey).(string)
@@ -330,7 +342,7 @@ func GetPersonByPubkey(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(person)
 }
 
-func GetPersonById(w http.ResponseWriter, r *http.Request) {
+func (h *personHandler) GetPersonById(w http.ResponseWriter, r *http.Request) {
 	idParam := chi.URLParam(r, "id")
 	id, _ := strconv.ParseUint(idParam, 10, 32)
 
