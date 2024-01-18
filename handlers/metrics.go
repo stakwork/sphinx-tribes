@@ -178,7 +178,7 @@ func (mh *metricHandler) BountyMetrics(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(bountyMetrics)
 }
 
-func MetricsBounties(w http.ResponseWriter, r *http.Request) {
+func (mh *metricHandler) MetricsBounties(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 	pubKeyFromAuth, _ := ctx.Value(auth.ContextKey).(string)
 
@@ -199,14 +199,14 @@ func MetricsBounties(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	metricBounties := db.DB.GetBountiesByDateRange(request, r)
-	metricBountiesData := GetMetricsBountiesData(metricBounties)
+	metricBounties := mh.db.GetBountiesByDateRange(request, r)
+	metricBountiesData := mh.GetMetricsBountiesData(metricBounties)
 
 	w.WriteHeader(http.StatusOK)
 	json.NewEncoder(w).Encode(metricBountiesData)
 }
 
-func MetricsBountiesCount(w http.ResponseWriter, r *http.Request) {
+func (mh *metricHandler) MetricsBountiesCount(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 	pubKeyFromAuth, _ := ctx.Value(auth.ContextKey).(string)
 
@@ -227,7 +227,7 @@ func MetricsBountiesCount(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	MetricsBountiesCount := db.DB.GetBountiesByDateRangeCount(request, r)
+	MetricsBountiesCount := mh.db.GetBountiesByDateRangeCount(request, r)
 	w.WriteHeader(http.StatusOK)
 	json.NewEncoder(w).Encode(MetricsBountiesCount)
 }
@@ -273,34 +273,34 @@ func MetricsCsv(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func GetMetricsBountiesData(metricBounties []db.Bounty) []db.BountyData {
+func (mh *metricHandler) GetMetricsBountiesData(metricBounties []db.Bounty) []db.BountyData {
 	var metricBountiesData []db.BountyData
 	for _, bounty := range metricBounties {
-		bountyOwner := db.DB.GetPersonByPubkey(bounty.OwnerID)
-		bountyAssignee := db.DB.GetPersonByPubkey(bounty.Assignee)
-		organization := db.DB.GetOrganizationByUuid(bounty.OrgUuid)
+		bountyOwner := mh.db.GetPersonByPubkey(bounty.OwnerID)
+		bountyAssignee := mh.db.GetPersonByPubkey(bounty.Assignee)
+		organization := mh.db.GetOrganizationByUuid(bounty.OrgUuid)
 
 		bountyData := db.BountyData{
-			Bounty:              bounty,
-			BountyId:            bounty.ID,
-			Person:              bountyOwner,
-			BountyCreated:       bounty.Created,
-			BountyDescription:   bounty.Description,
-			BountyUpdated:       bounty.Updated,
-			AssigneeId:          bountyAssignee.ID,
-			AssigneeImg:         bountyAssignee.Img,
-			AssigneeAlias:       bountyAssignee.OwnerAlias,
-			AssigneeDescription: bountyAssignee.Description,
-			AssigneeRouteHint:   bountyAssignee.OwnerRouteHint,
-			BountyOwnerId:       bountyOwner.ID,
-			OwnerUuid:           bountyOwner.Uuid,
-			OwnerDescription:    bountyOwner.Description,
-			OwnerUniqueName:     bountyOwner.UniqueName,
-			OwnerImg:            bountyOwner.Img,
-			OrganizationName:    organization.Name,
-			OrganizationImg:     organization.Img,
-			OrganizationUuid:    organization.Uuid,
-			OrganizationDescription:  organization.Description,
+			Bounty:                  bounty,
+			BountyId:                bounty.ID,
+			Person:                  bountyOwner,
+			BountyCreated:           bounty.Created,
+			BountyDescription:       bounty.Description,
+			BountyUpdated:           bounty.Updated,
+			AssigneeId:              bountyAssignee.ID,
+			AssigneeImg:             bountyAssignee.Img,
+			AssigneeAlias:           bountyAssignee.OwnerAlias,
+			AssigneeDescription:     bountyAssignee.Description,
+			AssigneeRouteHint:       bountyAssignee.OwnerRouteHint,
+			BountyOwnerId:           bountyOwner.ID,
+			OwnerUuid:               bountyOwner.Uuid,
+			OwnerDescription:        bountyOwner.Description,
+			OwnerUniqueName:         bountyOwner.UniqueName,
+			OwnerImg:                bountyOwner.Img,
+			OrganizationName:        organization.Name,
+			OrganizationImg:         organization.Img,
+			OrganizationUuid:        organization.Uuid,
+			OrganizationDescription: organization.Description,
 		}
 		metricBountiesData = append(metricBountiesData, bountyData)
 	}
