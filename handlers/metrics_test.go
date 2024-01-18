@@ -127,8 +127,8 @@ func TestBountyMetrics(t *testing.T) {
 		handler := http.HandlerFunc(mh.BountyMetrics)
 
 		dateRange := db.PaymentDateRange{
-			StartDate: "2023-01-01",
-			EndDate:   "2023-01-31",
+			StartDate: "1111",
+			EndDate:   "1212",
 		}
 		body, _ := json.Marshal(dateRange)
 		req, err := http.NewRequestWithContext(ctx, http.MethodPost, "/bounty_stats", bytes.NewReader(body))
@@ -148,8 +148,8 @@ func TestBountyMetrics(t *testing.T) {
 		handler := http.HandlerFunc(mh.BountyMetrics)
 
 		dateRange := db.PaymentDateRange{
-			StartDate: "2023-01-01",
-			EndDate:   "2023-01-31",
+			StartDate: "0112",
+			EndDate:   "0212",
 		}
 		body, _ := json.Marshal(dateRange)
 		req, err := http.NewRequestWithContext(ctx, http.MethodPost, "/bounty_count", bytes.NewReader(body))
