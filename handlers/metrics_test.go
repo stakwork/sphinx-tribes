@@ -92,4 +92,80 @@ func TestBountyMetrics(t *testing.T) {
 		assert.EqualValues(t, expectedMetricRes, res)
 		assert.Equal(t, http.StatusOK, rr.Code)
 	})
+
+	t.Run("should return 401 if pubkeyFromAuth is not decoded from auth token", func(t *testing.T) {
+		rr := httptest.NewRecorder()
+		handler := http.HandlerFunc(mh.BountyMetrics)
+
+		req, err := http.NewRequestWithContext(context.Background(), http.MethodPost, "/bounty_stats", nil)
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		handler.ServeHTTP(rr, req)
+
+		assert.Equal(t, http.StatusUnauthorized, rr.Code)
+	})
+
+	t.Run("should return 406 if a bad request is sent", func(t *testing.T) {
+		rr := httptest.NewRecorder()
+		handler := http.HandlerFunc(mh.BountyMetrics)
+
+		invalidJson := []byte(`{"key": "value"`)
+		req, err := http.NewRequestWithContext(ctx, http.MethodPost, "/bounty_stats", bytes.NewReader(invalidJson))
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		handler.ServeHTTP(rr, req)
+
+		assert.Equal(t, http.StatusNotAcceptable, rr.Code)
+	})
+
+	t.Run("should fetch bounties within a specific date range", func(t *testing.T) {
+		rr := httptest.NewRecorder()
+		handler := http.HandlerFunc(mh.BountyMetrics)
+
+		dateRange := db.PaymentDateRange{
+			StartDate: "2023-01-01",
+			EndDate:   "2023-01-31",
+		}
+		body, _ := json.Marshal(dateRange)
+		req, err := http.NewRequestWithContext(ctx, http.MethodPost, "/bounty_stats", bytes.NewReader(body))
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		mockDb.On("GetBountiesByDateRange", dateRange, req).Return([]db.Bounty{}, nil).Once()
+
+		handler.ServeHTTP(rr, req)
+
+		assert.Equal(t, http.StatusOK, rr.Code)
+	})
+
+	t.Run("should get the total count of bounties within a specific date range", func(t *testing.T) {
+		rr := httptest.NewRecorder()
+		handler := http.HandlerFunc(mh.MetricsBountiesCount)
+
+		dateRange := db.PaymentDateRange{
+			StartDate: "2023-01-01",
+			EndDate:   "2023-01-31",
+		}
+		body, _ := json.Marshal(dateRange)
+		req, err := http.NewRequestWithContext(ctx, http.MethodPost, "/bounty_count", bytes.NewReader(body))
+		if err != nil {
+			t.Fatal(err)
+		}
+		totalCount := int64(10)
+		mockDb.On("GetBountiesByDateRangeCount", dateRange, req).Return(int64(10), nil).Once()
+
+		handler.ServeHTTP(rr, req)
+		assert.Equal(t, http.StatusOK, rr.Code)
+		var countRes int64
+        err = json.Unmarshal(rr.Body.Bytes(), &countRes)
+        if err != nil {
+            t.Fatalf("failed to unmarshal response body: %v", err)
+        }
+		assert.Equal(t, totalCount, countRes)
+	})
 }
