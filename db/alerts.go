@@ -20,7 +20,7 @@ type Action struct {
 	BotId    string `json:"bot_id"`
 }
 
-func ProcessAlerts(p Person) {
+func (db database) ProcessAlerts(p Person) {
 	// get the existing person's github_issues
 	// compare to see if there are new ones
 	// check the new ones for coding languages like "#Javascript"
@@ -86,7 +86,7 @@ func ProcessAlerts(p Person) {
 	}
 
 	var err error
-	people, err := DB.GetPeopleForNewTicket(languages)
+	people, err := db.GetPeopleForNewTicket(languages)
 	if err != nil {
 		fmt.Println("Ticket alerts: DB query to get interested people failed", err)
 		return
