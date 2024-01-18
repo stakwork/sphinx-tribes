@@ -22,7 +22,7 @@ describe('MobileView component', () => {
         getOrganizationUser: jest.fn().mockResolvedValue({ owner_pubkey: 'UserPubKey' })
       },
       ui: {
-        meInfo: { owner_pubkey: 'UserPubKey' }
+        meInfo: { owner_pubkey: 'UserPubKey',owner_alias: 'DefaultOwnerAlias' }
       }
     })
   }));
@@ -146,14 +146,14 @@ describe('MobileView component', () => {
   describe('MobileView Component Payment Status', () => {
     it('renders unpaidString when paidStatus is false', () => {
       
-      const testProps = {...defaultProps, org: { owner_pubkey: 'UserPubKey' }, paid: false};
+      const testProps = {...defaultProps, org: { owner_pubkey: 'UserPubKey' ,owner_alias: 'DefaultOwnerAlias'}, paid: false};
       render(<MobileView {...testProps} />);
    
       expect(screen.getByText(paidString)).toBeInTheDocument();
     });
   
     it('renders paidString when paidStatus is true', () => {
-      const testProps = {...defaultProps, org: { owner_pubkey: 'UserPubKey' }, paid: true};
+      const testProps = {...defaultProps, org: { owner_pubkey: 'UserPubKey',owner_alias: 'DefaultOwnerAlias' }, paid: true};
       render(<MobileView {...testProps} />);
     
       expect(screen.getByText(unpaidString)).toBeInTheDocument();
