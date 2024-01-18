@@ -145,7 +145,7 @@ func TestBountyMetrics(t *testing.T) {
 
 	t.Run("should get the total count of bounties within a specific date range", func(t *testing.T) {
 		rr := httptest.NewRecorder()
-		handler := http.HandlerFunc(mh.MetricsBountiesCount)
+		handler := http.HandlerFunc(mh.BountyMetrics)
 
 		dateRange := db.PaymentDateRange{
 			StartDate: "2023-01-01",
