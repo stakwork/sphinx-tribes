@@ -21,7 +21,7 @@ func TestGetPersonById(t *testing.T) {
 		rr := httptest.NewRecorder()
 		handler := http.HandlerFunc(pHandler.GetPersonById)
 
-		personID := uint(1)
+		personID := uint(0)
 		person := db.Person{
 			ID:          personID,
 			Uuid:        uuid.New().String(),
@@ -50,7 +50,7 @@ func TestGetPersonById(t *testing.T) {
 		rr := httptest.NewRecorder()
 		handler := http.HandlerFunc(pHandler.GetPersonById)
 
-		nonExistentID := uint(2)
+		nonExistentID := uint(1)
 
 		req, err := http.NewRequest(http.MethodGet, fmt.Sprintf("/person/%d", nonExistentID), nil)
 		if err != nil {
