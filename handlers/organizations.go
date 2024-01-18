@@ -51,8 +51,8 @@ func (oh *organizationHandler) CreateOrEditOrganization(w http.ResponseWriter, r
 		return
 	}
 
-	if org.Description != nil && (len(*org.Description) == 0 || len(*org.Description) > 120) {
-		fmt.Printf("invalid organization name %s\n", *org.Description)
+	if len(org.Description) == 0 || len(org.Description) > 120 {
+		fmt.Printf("invalid organization name %s\n", org.Description)
 		w.WriteHeader(http.StatusBadRequest)
 		json.NewEncoder(w).Encode("Error: organization description must be present and should not exceed 120 character")
 		return
@@ -79,7 +79,7 @@ func (oh *organizationHandler) CreateOrEditOrganization(w http.ResponseWriter, r
 		return
 	}
 
-	if org.Github != nil && *org.Github != "" && !strings.Contains(*org.Github, "github.com/") {
+	if org.Github != "" && !strings.Contains(org.Github, "github.com/") {
 		w.WriteHeader(http.StatusBadRequest)
 		msg := "Error: not a valid github"
 		json.NewEncoder(w).Encode(msg)
