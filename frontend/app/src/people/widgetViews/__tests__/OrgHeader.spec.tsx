@@ -52,8 +52,6 @@ describe('OrgHeader Component', () => {
     // Simulate pressing Enter key
     fireEvent.keyUp(searchInput, { key: 'Enter', code: 'Enter' });
 
-    console.log('getOrgBounties mock call: ' ,mainStore.getOrgBounties.mock.calls);
-
     // Expected org_uuid extracted from the mocked URL
     const expectedOrgUuid = 'cd9dm5ua5fdtsj2c2n9g';
 
