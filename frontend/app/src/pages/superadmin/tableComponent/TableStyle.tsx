@@ -4,6 +4,10 @@ type FreezeProps = {
   freeze: boolean;
 };
 
+type styledProps = {
+  color?: any;
+};
+
 const applyFreezeHeaderStyles = ({ freeze = false }: FreezeProps) =>
   freeze &&
   css`
@@ -216,6 +220,7 @@ export const BountyHeader = styled.div`
 `;
 
 export const Options = styled.div`
+  height: 20px;
   font-size: 15px;
   cursor: pointer;
   outline: none;
@@ -226,18 +231,75 @@ export const Options = styled.div`
   padding-right: 2px;
 `;
 
-export const StyledSelect = styled.select`
-  color: var(--Text-2, var(--Hover-Icon-Color, #3c3f41));
-  font-family: Barlow;
-  font-size: 15px;
-  font-style: normal;
-  font-weight: 500;
-  line-height: normal;
-  border-radius: 4px;
-  cursor: pointer;
-  outline: none;
-  width: 60px;
-  border: none;
+export const DateFilterWrapper = styled.div<styledProps>`
+  width: 130px;
+  height: 20px;
+  display: flex;
+  gap: 5px;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center !important;
+  margin-left: 19px;
+  user-select: none;
+  .image {
+    display: flex;
+    justify-content: space-between;
+    gap: 5px;
+    align-items: center;
+    width: 36px;
+    .materialIconImage {
+      color: ${(p: any) => p.color && p.color.grayish.G200};
+      cursor: pointer;
+      font-size: 18px;
+      margin-top: 4px;
+    }
+  }
+  .filterText {
+    color: var(--Main-bottom-icons, var(--Hover-Icon-Color, #5f6368));
+    font-family: Barlow;
+    font-size: 15px;
+    font-style: normal;
+    font-weight: 500;
+    line-height: normal;
+    margin-left: 15px;
+  }
+  &:hover {
+    .image {
+      .materialIconImage {
+        color: ${(p: any) => p.color && p.color.grayish.G50} !important;
+        cursor: pointer;
+        font-size: 18px;
+        margin-top: 4px;
+      }
+    }
+    .filterText {
+      color: ${(p: any) => p.color && p.color.grayish.G50};
+    }
+  }
+  &:active {
+    .image {
+      .materialIconImage {
+        color: ${(p: any) => p.color && p.color.grayish.G10} !important;
+        cursor: pointer;
+        font-size: 18px;
+        margin-top: 4px;
+      }
+    }
+    .filterText {
+      color: ${(p: any) => p.color && p.color.grayish.G10};
+    }
+  }
+`;
+
+export const DateFilterContent = styled.div<styledProps>`
+  width: 100%;
+  height: 100%;
+  padding: 15px 18px;
+  user-select: none;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 5px;
 `;
 
 export const StyledSelect2 = styled.select`

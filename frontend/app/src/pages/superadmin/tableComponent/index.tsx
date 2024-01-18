@@ -1,11 +1,15 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import { useStores } from 'store';
-import { BountyStatus, defaultBountyStatus } from 'store/main';
 import moment from 'moment';
+import { EuiPopover, EuiText } from '@elastic/eui';
+import MaterialIcon from '@material/react-material-icon';
+import { BountyStatus } from '../../../store/main';
 import paginationarrow1 from '../header/icons/paginationarrow1.svg';
 import paginationarrow2 from '../header/icons/paginationarrow2.svg';
 import defaultPic from '../../../public/static/profile_avatar.svg';
 import copygray from '../header/icons/copygray.svg';
+import { dateFilterOptions, getBountyStatus } from '../utils';
+import { colors } from './../../../config/colors';
 import { Bounty } from './interfaces.ts';
 
 import {
@@ -23,7 +27,6 @@ import {
   TableHeaderDataRight,
   BountyHeader,
   Options,
-  StyledSelect,
   LeadingTitle,
   AlternativeTitle,
   Label,
@@ -36,10 +39,10 @@ import {
   TableDataAlternative,
   BountyData,
   Paragraph,
-  BoxImage
+  BoxImage,
+  DateFilterWrapper,
+  DateFilterContent
 } from './TableStyle';
-
-//import './styles.css';
 
 interface TableProps {
   bounties: Bounty[];
@@ -49,7 +52,9 @@ interface TableProps {
   bountyStatus?: BountyStatus;
   setBountyStatus?: React.Dispatch<React.SetStateAction<BountyStatus>>;
   dropdownValue?: string;
+  sortOrder?: string;
   setDropdownValue?: React.Dispatch<React.SetStateAction<string>>;
+  onChangeFilterByDate?: (option: string) => void;
   paginatePrev?: () => void;
   paginateNext?: () => void;
 }
@@ -126,11 +131,16 @@ export const MyTable = ({
   setBountyStatus,
   dropdownValue,
   headerIsFrozen,
-  setDropdownValue
+  sortOrder,
+  setDropdownValue,
+  onChangeFilterByDate
 }: TableProps) => {
   const [currentPage, setCurrentPage] = useState(1);
   const [totalBounties, setTotalBounties] = useState(0);
   const [activeTabs, setActiveTabs] = useState<number[]>([]);
+  const [isPopoverOpen, setIsPopoverOpen] = useState<boolean>(false);
+  const onButtonClick = () => setIsPopoverOpen((isPopoverOpen: any) => !isPopoverOpen);
+  const closePopover = () => setIsPopoverOpen(false);
   const pageSize = 20;
   const visibleTabs = 7;
 
@@ -148,42 +158,9 @@ export const MyTable = ({
   };
 
   const updateBountyStatus = (e: any) => {
-    const { value } = e.target;
     if (bountyStatus && setBountyStatus && setDropdownValue) {
-      switch (value) {
-        case 'open': {
-          const newStatus = { ...defaultBountyStatus, Open: true };
-          setBountyStatus(newStatus);
-          break;
-        }
-        case 'in-progress': {
-          const newStatus = {
-            ...defaultBountyStatus,
-            Open: false,
-            Assigned: true
-          };
-          setBountyStatus(newStatus);
-          break;
-        }
-        case 'completed': {
-          const newStatus = {
-            ...defaultBountyStatus,
-            Open: false,
-            Paid: true
-          };
-          setBountyStatus(newStatus);
-          break;
-        }
-        default: {
-          const newStatus = {
-            ...defaultBountyStatus,
-            Open: false
-          };
-          setBountyStatus(newStatus);
-          break;
-        }
-      }
-      setDropdownValue(value);
+      getBountyStatus(e.target.value);
+      setDropdownValue(e.target.value);
     }
   };
 
@@ -206,6 +183,7 @@ export const MyTable = ({
       dataNumber.shift();
     }
   };
+
   const paginatePrev = () => {
     const firtsTab = activeTabs[0];
     const lastTab = activeTabs[6];
@@ -249,10 +227,8 @@ export const MyTable = ({
     getActiveTabs();
   }, [getActiveTabs]);
 
-  function capFirstLetter(string: string): string {
-    if (!string) return '';
-    return string.charAt(0).toUpperCase() + string.slice(1);
-  }
+  const color = colors['light'];
+
   return (
     <>
       <HeaderContainer freeze={!headerIsFrozen}>
@@ -268,12 +244,56 @@ export const MyTable = ({
           </BountyHeader>
           <Options>
             <FlexDiv>
-              <Label>Sort By:</Label>
-              <StyledSelect id="sortBy">
-                <option value="date">Date</option>
-                <option value="assignee">Assignee</option>
-                <option value="status">Status</option>
-              </StyledSelect>
+              <EuiPopover
+                button={
+                  <DateFilterWrapper onClick={onButtonClick} color={color}>
+                    <EuiText
+                      className="filterText"
+                      style={{
+                        color: isPopoverOpen ? color.grayish.G10 : ''
+                      }}
+                    >
+                      Sort By:
+                    </EuiText>
+                    <div className="image">
+                      {sortOrder === 'desc' ? 'Newest' : 'Oldest'}
+                      <MaterialIcon
+                        className="materialIconImage"
+                        icon="expand_more"
+                        style={{
+                          color: isPopoverOpen ? color.grayish.G10 : ''
+                        }}
+                      />
+                    </div>
+                  </DateFilterWrapper>
+                }
+                panelStyle={{
+                  marginTop: '3px',
+                  border: 'none',
+                  left: '700px',
+                  maxWidth: '106px',
+                  boxShadow: `0px 1px 20px ${color.black90}`,
+                  background: `${color.pureWhite}`,
+                  borderRadius: '6px'
+                }}
+                isOpen={isPopoverOpen}
+                closePopover={closePopover}
+                panelPaddingSize="none"
+                anchorPosition="downRight"
+              >
+                <DateFilterContent className="CheckboxOuter" color={color}>
+                  {dateFilterOptions.map((val: { [key: string]: string }) => (
+                    <Options
+                      onClick={() => {
+                        onChangeFilterByDate?.(val.value);
+                      }}
+                      key={val.id}
+                    >
+                      {val.label}
+                    </Options>
+                  ))}
+                </DateFilterContent>
+              </EuiPopover>
             </FlexDiv>
             <FlexDiv>
               <Label>Status:</Label>
@@ -328,13 +348,13 @@ export const MyTable = ({
                   <TableDataCenter>{time_to_pay}</TableDataCenter>
                   <TableDataAlternative>
                     <ImageWithText
-                      text={capFirstLetter(bounty?.assignee_alias)}
+                      text={bounty?.assignee}
                       image={bounty?.assignee_img || defaultPic}
                     />
                   </TableDataAlternative>
                   <TableDataAlternative className="address">
                     <ImageWithText
-                      text={capFirstLetter(bounty?.unique_name)}
+                      text={bounty?.owner_pubkey}
                       image={bounty?.providerImage || defaultPic}
                     />
                   </TableDataAlternative>
