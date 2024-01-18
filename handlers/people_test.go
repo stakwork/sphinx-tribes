@@ -11,7 +11,6 @@ import (
 	"github.com/stakwork/sphinx-tribes/db"
 	mocks "github.com/stakwork/sphinx-tribes/mocks"
 	"github.com/stretchr/testify/assert"
-	"github.com/stretchr/testify/mock"
 )
 
 func TestGetPersonById(t *testing.T) {
@@ -56,10 +55,14 @@ func TestGetPersonById(t *testing.T) {
 		if err != nil {
 			t.Fatal(err)
 		}
-		expectedPerson := db.Person{}
-		mockDb.On("GetPerson", mock.Anything).Return(expectedPerson).Once()
+
+		mockDb.On("GetPerson", nonExistentID).Return(db.Person{})
 		handler.ServeHTTP(rr, req)
-		assert.Equal(t, http.StatusNotFound, rr.Code)
+
+		if rr.Code != http.StatusNotFound {
+			t.Errorf("Expected status code %d, but got %d", http.StatusNotFound, rr.Code)
+		}
+
 		mockDb.AssertExpectations(t)
 	})
 }
