@@ -1469,9 +1469,9 @@ func (db database) ChangeOrganizationDeleteStatus(org_uuid string, status bool) 
 
 func (db database) UpdateOrganizationForDeletion(uuid string) error {
 	updates := map[string]interface{}{
-		"website":     nil,
-		"github":      nil,
-		"description": nil,
+		"website":     "",
+		"github":      "",
+		"description": "",
 		"show":        false,
 	}
 
