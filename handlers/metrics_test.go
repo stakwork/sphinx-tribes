@@ -123,34 +123,37 @@ func TestBountyMetrics(t *testing.T) {
 	})
 
 	t.Run("should fetch bounties within a specific date range", func(t *testing.T) {
-		rr := httptest.NewRecorder()
-		handler := http.HandlerFunc(mh.BountyMetrics)
+        rr := httptest.NewRecorder()
+        handler := http.HandlerFunc(mh.BountyMetrics)
 
-		dateRange := db.PaymentDateRange{
-			StartDate: "1111",
-			EndDate:   "2222",
-		}
-		body, _ := json.Marshal(dateRange)
-		req, err := http.NewRequestWithContext(ctx, http.MethodPost, "/bounty_stats", bytes.NewReader(body))
-		if err != nil {
-			t.Fatal(err)
-		}
+        dateRange := db.PaymentDateRange{
+            StartDate: "1111",
+            EndDate:   "2222",
+            PaymentType: db.PaymentType{ },
+        }
+        body, _ := json.Marshal(dateRange)
+        req, err := http.NewRequestWithContext(ctx, http.MethodPost, "/bounty_stats", bytes.NewReader(body))
+        if err != nil {
+            t.Fatal(err)
+        }
 
-		mockDb.On("GetBountiesByDateRange", dateRange, req).Return([]db.Bounty{}, nil).Once()
+        mockDb.On("GetBountiesByDateRange", dateRange, req).Return([]db.Bounty{}, nil).Once()
 
-		handler.ServeHTTP(rr, req)
+        handler.ServeHTTP(rr, req)
 
-		assert.Equal(t, http.StatusOK, rr.Code)
-	})
+        assert.Equal(t, http.StatusOK, rr.Code)
+
+    })
 
 	t.Run("should get the total count of bounties within a specific date range", func(t *testing.T) {
 		rr := httptest.NewRecorder()
 		handler := http.HandlerFunc(mh.BountyMetrics)
 
 		dateRange := db.PaymentDateRange{
-			StartDate: "1111",
-			EndDate:   "2222",
-		}
+            StartDate: "1111",
+            EndDate:   "2222",
+            PaymentType: db.PaymentType{ },
+        }
 		body, _ := json.Marshal(dateRange)
 		req, err := http.NewRequestWithContext(ctx, http.MethodPost, "/bounty_count", bytes.NewReader(body))
 		if err != nil {
