@@ -57,7 +57,7 @@ func TestGetPersonById(t *testing.T) {
 			t.Fatal(err)
 		}
 
-		mockDb.On("GetPerson", mock.Anything).Return(db.Person{})
+		mockDb.On("GetPerson", mock.Anything).Return(db.Person{}).Once()
 		handler.ServeHTTP(rr, req)
 
 		if rr.Code != http.StatusNotFound {
