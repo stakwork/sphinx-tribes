@@ -28,7 +28,7 @@ export const TicketModalPage = observer(({ setConnectPerson }: Props) => {
   const [activeListIndex, setActiveListIndex] = useState<number>(0);
   const [publicFocusIndex, setPublicFocusIndex] = useState(0);
   const [removeNextAndPrev, setRemoveNextAndPrev] = useState(false);
-  const { bountyId } = useParams<{ uuid: string; bountyId: string }>();
+  const { uuid, bountyId } = useParams<{ uuid: string; bountyId: string }>();
   const [activeBounty, setActiveBounty] = useState<PersonBounty[]>([]);
   const [visible, setVisible] = useState(false);
   const [isDeleted, setisDeleted] = useState(false);
@@ -73,16 +73,20 @@ export const TicketModalPage = observer(({ setConnectPerson }: Props) => {
     getBounty();
   }, [getBounty, removeNextAndPrev]);
 
+  const isDirectAccess = useCallback(
+    () => !document.referrer && location.pathname.includes('/bounty/'),
+    [location.pathname]
+  );
+
   const goBack = () => {
-    // If there's no referrer, it's likely opened in a new tab
-    if (!document.referrer || document.referrer.indexOf(window.location.hostname) === -1) {
-      // Choose the return path based on the URL pattern
-      const returnPath = location.pathname.includes('/org/') ? '/org/bounties/:uuid' : '/bounties';
-      history.push(returnPath);
+    setVisible(false);
+    setisDeleted(false);
+
+    if (isDirectAccess()) {
+      const homePageUrl = uuid ? `/org/bounties/${uuid}` : '/bounties';
+      history.push(homePageUrl);
     } else {
-      // Go back to the previous page stored in the context or global state
-      // history.push(previousPath);
-      history.goBack(); // Fallback if previous path is not set
+      history.goBack();
     }
   };
 
