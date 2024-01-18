@@ -177,38 +177,38 @@ export const OrgHeader = () => {
               <Skill id="statusSelect" />
             </SkillContainer>
             <SearchBar
-                name="search"
-                type="search"
-                placeholder="Search"
-                value={ui.searchText}
-                style={{
-                  width: '384px',
-                  height: '40px',
-                  background: color.grayish.G950,
-                  fontFamily: 'Barlow',
-                  color: color.text2,
-                  gap: '10px',
-                  flex: '1 0 0',
-                  display: 'flex',
-                  position: 'relative',
-                  marginLeft: '20px',
-                  alignItems: 'center',
-                  borderRadius: '6px',
-                  border: 'none',
-                  outline: 'none',
-                }}
-                onChange={(e: any) => {
-                  ui.setSearchText(e);
-                }}
-                onKeyUp={(e: any) => {
-                  if (e.key === 'Enter' || e.keyCode === 13) {
-                    main.getOrgBounties({ page: 1, resetPage: true });
-                  }
-                }}
-                TextColor={color.grayish.G100}
-                TextColorHover={color.grayish.G50}
-                iconColor={color.grayish.G300}
-                iconColorHover={color.grayish.G50}
+              name="search"
+              type="search"
+              placeholder="Search"
+              value={ui.searchText}
+              style={{
+                width: '384px',
+                height: '40px',
+                background: color.grayish.G950,
+                fontFamily: 'Barlow',
+                color: color.text2,
+                gap: '10px',
+                flex: '1 0 0',
+                display: 'flex',
+                position: 'relative',
+                marginLeft: '20px',
+                alignItems: 'center',
+                borderRadius: '6px',
+                border: 'none',
+                outline: 'none'
+              }}
+              onChange={(e: any) => {
+                ui.setSearchText(e);
+              }}
+              onKeyUp={(e: any) => {
+                if (e.key === 'Enter' || e.keyCode === 13) {
+                  main.getOrgBounties({ page: 1, resetPage: true });
+                }
+              }}
+              TextColor={color.grayish.G100}
+              TextColorHover={color.grayish.G50}
+              iconColor={color.grayish.G300}
+              iconColorHover={color.grayish.G50}
             />
           </FiltersRight>
           <SoryByContainer>

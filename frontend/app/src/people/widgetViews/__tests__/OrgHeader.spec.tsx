@@ -8,8 +8,8 @@ import { mainStore } from 'store/main';
 jest.mock('react-router-dom', () => ({
   ...jest.requireActual('react-router-dom'),
   useLocation: () => ({
-    pathname: '/some-path/org-uuid-123', // Mocked path containing org_uuid
-  }),
+    pathname: '/org/bounties/cd9dm5ua5fdtsj2c2n9g' // Mocked path containing org_uuid
+  })
 }));
 
 describe('OrgHeader Component', () => {
@@ -53,14 +53,14 @@ describe('OrgHeader Component', () => {
     fireEvent.keyUp(searchInput, { key: 'Enter', code: 'Enter' });
 
     // Expected org_uuid extracted from the mocked URL
-    const expectedOrgUuid = 'org-uuid-123';
+    const expectedOrgUuid = 'cd9dm5ua5fdtsj2c2n9g';
 
     // Check if getOrgBounties is called with correct parameters
     expect(mainStore.getOrgBounties).toHaveBeenCalledWith({
       page: 1,
       resetPage: true,
       search: searchText,
-      org_uuid: expectedOrgUuid,
+      org_uuid: expectedOrgUuid
     });
   });
 });
