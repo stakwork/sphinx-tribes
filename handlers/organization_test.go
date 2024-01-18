@@ -239,15 +239,16 @@ func TestDeleteOrganization(t *testing.T) {
 		mockDb.AssertExpectations(t)
 	})
 
-	t.Run("should set Website, Github, and Description to null", func(t *testing.T) {
+	t.Run("should set Website, Github, and Description to empty strings", func(t *testing.T) {
 		orgUUID := "org-uuid"
 
+		emptyString := ""
 		updatedOrg := db.Organization{
 			Uuid:        orgUUID,
 			OwnerPubKey: "test-key",
-			Website:     nil,
-			Github:      nil,
-			Description: nil,
+			Website:     &emptyString,
+			Github:      &emptyString,
+			Description: &emptyString,
 		}
 
 		mockDb.On("GetOrganizationByUuid", orgUUID).Return(db.Organization{OwnerPubKey: "test-key"}).Once()
@@ -274,9 +275,9 @@ func TestDeleteOrganization(t *testing.T) {
 			t.Fatal(err)
 		}
 
-		assert.Nil(t, returnedOrg.Website)
-		assert.Nil(t, returnedOrg.Github)
-		assert.Nil(t, returnedOrg.Description)
+		assert.Equal(t, "", *returnedOrg.Website)
+		assert.Equal(t, "", *returnedOrg.Github)
+		assert.Equal(t, "", *returnedOrg.Description)
 		mockDb.AssertExpectations(t)
 	})
 
