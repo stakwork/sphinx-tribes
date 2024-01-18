@@ -2,50 +2,65 @@ package handlers
 
 import (
 	"encoding/json"
+	"fmt"
 	"net/http"
 	"net/http/httptest"
 	"testing"
 
-	"github.com/stakwork/sphinx-tribes/handlers/mocks"
-	dbMocks "github.com/stakwork/sphinx-tribes/mocks"
+	"github.com/google/uuid"
+	"github.com/stakwork/sphinx-tribes/db"
+	mocks "github.com/stakwork/sphinx-tribes/mocks"
 	"github.com/stretchr/testify/assert"
-	"github.com/stretchr/testify/mock"
 )
 
-type Person struct {
-	ID   string
-	Name string
-}
-
-type MockDB struct {
-	mock.Mock
-}
-
-func (m *MockDB) GetPerson(id uint) (*Person, error) {
-	args := m.Called(id)
-	return args.Get(0).(*Person), args.Error(1)
-}
-
 func TestGetPersonById(t *testing.T) {
-	// ctx := context.WithValue(context.Background(), auth.ContextKey, "test-key")
-	mockDb := dbMocks.NewDatabase(t)
-	mockClient := mocks.NewHttpClient(t)
-	personHandler := NewPersonyHandler(mockClient, mockDb)
-	handler := http.HandlerFunc(personHandler.GetPersonById)
+	mockDb := mocks.NewDatabase(t)
+	pHandler := NewPeopleHandler(mockDb)
 
-	t.Run("successful retrieval of a person by ID", func(t *testing.T) {
-		person := &Person{ID: "123", Name: "John Doe"}
-		mockDb.On("GetPerson", uint(123)).Return(person, nil)
-
-		request, _ := http.NewRequest("GET", "/person/123", nil)
+	t.Run("should return person by ID if present in db", func(t *testing.T) {
 		rr := httptest.NewRecorder()
+		handler := http.HandlerFunc(pHandler.GetPersonById)
 
-		handler.ServeHTTP(rr, request)
+		personID := uint(1)
+		person := db.Person{
+			ID:          personID,
+			Uuid:        uuid.New().String(),
+			OwnerPubKey: "person-pub-key",
+			OwnerAlias:  "owner",
+			UniqueName:  "test_user",
+			Description: "test user",
+		}
 
+		req, err := http.NewRequest(http.MethodGet, fmt.Sprintf("/person/%d", personID), nil)
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		mockDb.On("GetPerson", personID).Return(person).Once()
+		handler.ServeHTTP(rr, req)
+
+		var returnedPerson db.Person
+		_ = json.Unmarshal(rr.Body.Bytes(), &returnedPerson)
 		assert.Equal(t, http.StatusOK, rr.Code)
+		assert.EqualValues(t, person, returnedPerson)
+		mockDb.AssertExpectations(t)
+	})
 
-		var responsePerson Person
-		json.NewDecoder(rr.Body).Decode(&responsePerson)
-		assert.Equal(t, person, &responsePerson)
+	t.Run("should return error if person not found by ID", func(t *testing.T) {
+		rr := httptest.NewRecorder()
+		handler := http.HandlerFunc(pHandler.GetPersonById)
+
+		nonExistentID := uint(2)
+
+		req, err := http.NewRequest(http.MethodGet, fmt.Sprintf("/person/%d", nonExistentID), nil)
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		mockDb.On("GetPerson", nonExistentID).Return(db.Person{}).Once()
+		handler.ServeHTTP(rr, req)
+
+		assert.Equal(t, http.StatusNotFound, rr.Code)
+		mockDb.AssertExpectations(t)
 	})
 }

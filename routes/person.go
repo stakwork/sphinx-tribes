@@ -1,8 +1,6 @@
 package routes
 
 import (
-	"net/http"
-
 	"github.com/go-chi/chi"
 	"github.com/stakwork/sphinx-tribes/auth"
 	"github.com/stakwork/sphinx-tribes/db"
@@ -11,10 +9,10 @@ import (
 
 func PersonRoutes() chi.Router {
 	r := chi.NewRouter()
-	personHandler := handlers.NewPersonyHandler(http.DefaultClient, db.DB)
+	peopleHandler := handlers.NewPeopleHandler(db.DB)
 	r.Group(func(r chi.Router) {
 		r.Get("/{pubkey}", handlers.GetPersonByPubkey)
-		r.Get("/id/{id}", personHandler.GetPersonById)
+		r.Get("/id/{id}", peopleHandler.GetPersonById)
 		r.Get("/uuid/{uuid}", handlers.GetPersonByUuid)
 		r.Get("/uuid/{uuid}/assets", handlers.GetPersonAssetsByUuid)
 		r.Get("/githubname/{github}", handlers.GetPersonByGithubName)
