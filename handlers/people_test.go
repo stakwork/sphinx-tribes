@@ -9,11 +9,21 @@ import (
 	"github.com/stakwork/sphinx-tribes/handlers/mocks"
 	dbMocks "github.com/stakwork/sphinx-tribes/mocks"
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/mock"
 )
 
 type Person struct {
 	ID   string
 	Name string
+}
+
+type MockDB struct {
+	mock.Mock
+}
+
+func (m *MockDB) GetPerson(id uint) (*Person, error) {
+	args := m.Called(id)
+	return args.Get(0).(*Person), args.Error(1)
 }
 
 func TestGetPersonById(t *testing.T) {
@@ -25,7 +35,7 @@ func TestGetPersonById(t *testing.T) {
 
 	t.Run("successful retrieval of a person by ID", func(t *testing.T) {
 		person := &Person{ID: "123", Name: "John Doe"}
-		mockDb.On("GetPersonByID", "123").Return(person, nil)
+		mockDb.On("GetPerson", uint(123)).Return(person, nil)
 
 		request, _ := http.NewRequest("GET", "/person/123", nil)
 		rr := httptest.NewRecorder()
