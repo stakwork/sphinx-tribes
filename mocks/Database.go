@@ -3824,6 +3824,52 @@ func (_c *Database_GetPersonByGithubName_Call) RunAndReturn(run func(string) db.
 	return _c
 }
 
+// GetPersonByPubkey provides a mock function with given fields: pubkey
+func (_m *Database) GetPersonByPubkey(pubkey string) db.Person {
+	ret := _m.Called(pubkey)
+
+	if len(ret) == 0 {
+		panic("no return value specified for GetPersonByPubkey")
+	}
+
+	var r0 db.Person
+	if rf, ok := ret.Get(0).(func(string) db.Person); ok {
+		r0 = rf(pubkey)
+	} else {
+		r0 = ret.Get(0).(db.Person)
+	}
+
+	return r0
+}
+
+// Database_GetPersonByPubkey_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'GetPersonByPubkey'
+type Database_GetPersonByPubkey_Call struct {
+	*mock.Call
+}
+
+// GetPersonByPubkey is a helper method to define mock.On call
+//   - pubkey string
+func (_e *Database_Expecter) GetPersonByPubkey(pubkey interface{}) *Database_GetPersonByPubkey_Call {
+	return &Database_GetPersonByPubkey_Call{Call: _e.mock.On("GetPersonByPubkey", pubkey)}
+}
+
+func (_c *Database_GetPersonByPubkey_Call) Run(run func(pubkey string)) *Database_GetPersonByPubkey_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(string))
+	})
+	return _c
+}
+
+func (_c *Database_GetPersonByPubkey_Call) Return(_a0 db.Person) *Database_GetPersonByPubkey_Call {
+	_c.Call.Return(_a0)
+	return _c
+}
+
+func (_c *Database_GetPersonByPubkey_Call) RunAndReturn(run func(string) db.Person) *Database_GetPersonByPubkey_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
 // GetPersonByUniqueName provides a mock function with given fields: un
 func (_m *Database) GetPersonByUniqueName(un string) db.Person {
 	ret := _m.Called(un)
@@ -4521,6 +4567,95 @@ func (_c *Database_NewHuntersPaid_Call) Return(_a0 int64) *Database_NewHuntersPa
 }
 
 func (_c *Database_NewHuntersPaid_Call) RunAndReturn(run func(db.PaymentDateRange) int64) *Database_NewHuntersPaid_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
+// PersonUniqueNameFromName provides a mock function with given fields: name
+func (_m *Database) PersonUniqueNameFromName(name string) (string, error) {
+	ret := _m.Called(name)
+
+	if len(ret) == 0 {
+		panic("no return value specified for PersonUniqueNameFromName")
+	}
+
+	var r0 string
+	var r1 error
+	if rf, ok := ret.Get(0).(func(string) (string, error)); ok {
+		return rf(name)
+	}
+	if rf, ok := ret.Get(0).(func(string) string); ok {
+		r0 = rf(name)
+	} else {
+		r0 = ret.Get(0).(string)
+	}
+
+	if rf, ok := ret.Get(1).(func(string) error); ok {
+		r1 = rf(name)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
+// Database_PersonUniqueNameFromName_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'PersonUniqueNameFromName'
+type Database_PersonUniqueNameFromName_Call struct {
+	*mock.Call
+}
+
+// PersonUniqueNameFromName is a helper method to define mock.On call
+//   - name string
+func (_e *Database_Expecter) PersonUniqueNameFromName(name interface{}) *Database_PersonUniqueNameFromName_Call {
+	return &Database_PersonUniqueNameFromName_Call{Call: _e.mock.On("PersonUniqueNameFromName", name)}
+}
+
+func (_c *Database_PersonUniqueNameFromName_Call) Run(run func(name string)) *Database_PersonUniqueNameFromName_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(string))
+	})
+	return _c
+}
+
+func (_c *Database_PersonUniqueNameFromName_Call) Return(_a0 string, _a1 error) *Database_PersonUniqueNameFromName_Call {
+	_c.Call.Return(_a0, _a1)
+	return _c
+}
+
+func (_c *Database_PersonUniqueNameFromName_Call) RunAndReturn(run func(string) (string, error)) *Database_PersonUniqueNameFromName_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
+// ProcessAlerts provides a mock function with given fields: p
+func (_m *Database) ProcessAlerts(p db.Person) {
+	_m.Called(p)
+}
+
+// Database_ProcessAlerts_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'ProcessAlerts'
+type Database_ProcessAlerts_Call struct {
+	*mock.Call
+}
+
+// ProcessAlerts is a helper method to define mock.On call
+//   - p db.Person
+func (_e *Database_Expecter) ProcessAlerts(p interface{}) *Database_ProcessAlerts_Call {
+	return &Database_ProcessAlerts_Call{Call: _e.mock.On("ProcessAlerts", p)}
+}
+
+func (_c *Database_ProcessAlerts_Call) Run(run func(p db.Person)) *Database_ProcessAlerts_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(db.Person))
+	})
+	return _c
+}
+
+func (_c *Database_ProcessAlerts_Call) Return() *Database_ProcessAlerts_Call {
+	_c.Call.Return()
+	return _c
+}
+
+func (_c *Database_ProcessAlerts_Call) RunAndReturn(run func(db.Person)) *Database_ProcessAlerts_Call {
 	_c.Call.Return(run)
 	return _c
 }
