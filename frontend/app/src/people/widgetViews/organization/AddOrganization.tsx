@@ -231,7 +231,14 @@ const AddOrganization = (props: {
           img_url = await file.json();
         }
       }
-      const body = { owner_pubkey: props.owner_pubkey || '', name: orgName, img: img_url };
+      const body = {
+        owner_pubkey: props.owner_pubkey || '',
+        name: orgName,
+        description: description,
+        img: img_url,
+        github: githubRepo,
+        website: websiteName
+      };
 
       const res = await main.addOrganization(body);
       if (res.status === 200) {

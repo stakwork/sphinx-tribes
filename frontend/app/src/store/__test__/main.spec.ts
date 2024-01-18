@@ -1,5 +1,6 @@
 import { toJS } from 'mobx';
 import sinon from 'sinon';
+import moment from 'moment';
 import { people } from '../../__test__/__mockData__/persons';
 import { user } from '../../__test__/__mockData__/user';
 import { MeInfo, emptyMeInfo, uiStore } from '../ui';
@@ -7,7 +8,6 @@ import { MainStore } from '../main';
 import { localStorageMock } from '../../__test__/__mockData__/localStorage';
 import { TribesURL, getHost } from '../../config';
 import mockBounties, { expectedBountyResponses } from '../../bounties/__mock__/mockBounties.data';
-import moment from 'moment';
 
 let fetchStub: sinon.SinonStub;
 let mockApiResponseData: any[];
@@ -72,6 +72,41 @@ describe('Main store', () => {
     );
   });
 
+  it('should call endpoint on addOrganization with description, github and website url', async () => {
+    const mainStore = new MainStore();
+
+    const mockApiResponse = { status: 200, message: 'success' };
+
+    fetchStub.resolves(Promise.resolve(mockApiResponse));
+
+    const addOrganization = {
+      img: '',
+      name: 'New Orgination test',
+      owner_pubkey: '035f22835fbf55cf4e6823447c63df74012d1d587ed60ef7cbfa3e430278c44cce',
+      description: 'My test Organization',
+      github: 'https://github.com/john-doe',
+      website: 'https://john.doe'
+    };
+
+    const expectedHeaders = {
+      'Content-Type': 'application/json',
+      'x-jwt': 'test_jwt'
+    };
+
+    await mainStore.addOrganization(addOrganization);
+
+    sinon.assert.calledWith(
+      fetchStub,
+      `${TribesURL}/organizations`,
+      sinon.match({
+        method: 'POST',
+        headers: expectedHeaders,
+        body: JSON.stringify(addOrganization),
+        mode: 'cors'
+      })
+    );
+  });
+
   it('should call endpoint on UpdateOrganization Name', async () => {
     const mainStore = new MainStore();
 
@@ -90,6 +125,48 @@ describe('Main store', () => {
       show: false,
       deleted: false,
       bounty_count: 1
+    };
+
+    const expectedHeaders = {
+      'Content-Type': 'application/json',
+      'x-jwt': 'test_jwt'
+    };
+
+    await mainStore.updateOrganization(updateOrganization);
+
+    sinon.assert.calledWith(
+      fetchStub,
+      `${TribesURL}/organizations`,
+      sinon.match({
+        method: 'POST',
+        headers: expectedHeaders,
+        body: JSON.stringify(updateOrganization),
+        mode: 'cors'
+      })
+    );
+  });
+
+  it('should call endpoint on UpdateOrganization description, github url and website url, non mandatory fields', async () => {
+    const mainStore = new MainStore();
+
+    const mockApiResponse = { status: 200, message: 'success' };
+
+    fetchStub.resolves(Promise.resolve(mockApiResponse));
+
+    const updateOrganization = {
+      id: '42',
+      uuid: 'clic8k04nncuuf32kgr0',
+      name: 'TEST1',
+      owner_pubkey: '035f22835fbf55cf4e6823447c63df74012d1d587ed60ef7cbfa3e430278c44cce',
+      img: 'https://memes.sphinx.chat/public/NVhwFqDqHKAC-_Sy9pR4RNy8_cgYuOVWgohgceAs-aM=',
+      created: '2023-11-27T16:31:12.699355Z',
+      updated: '2023-11-27T16:31:12.699355Z',
+      show: false,
+      deleted: false,
+      bounty_count: 1,
+      description: 'Update description',
+      website: 'https://john.doe',
+      github: 'https://github.com/john-doe'
     };
 
     const expectedHeaders = {
