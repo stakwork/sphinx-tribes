@@ -5,6 +5,8 @@ import React from 'react';
 import NameTag from 'people/utils/NameTag';
 import MobileView from '../CodingBounty';
 import { paidString, unpaidString } from '../../constants';
+import { setupStore } from '__test__/__mockData__/setupStore';
+import { person } from '__test__/__mockData__/persons';
 
 describe('MobileView component', () => {
   beforeEach(() => {
@@ -16,16 +18,6 @@ describe('MobileView component', () => {
     });
     window.IntersectionObserver = mockIntersectionObserver;
   });
-  jest.mock('store', () => ({
-    useStores: () => ({
-      main: {
-        getOrganizationUser: jest.fn().mockResolvedValue({ owner_pubkey: 'UserPubKey' })
-      },
-      ui: {
-        meInfo: { owner_pubkey: 'UserPubKey',owner_alias: 'DefaultOwnerAlias' }
-      }
-    })
-  }));
   const defaultProps: CodingBountiesProps = {
     deliverables: 'Default Deliverables',
     description: 'Default Description',
@@ -101,7 +93,7 @@ describe('MobileView component', () => {
     show: false,
     formSubmit: jest.fn(),
     ticket_url: '',
-    assignee: undefined as any,
+    assignee: { img: '' } as any,
     title: ''
   };
   
@@ -144,16 +136,18 @@ describe('MobileView component', () => {
     expect(iCanHelp).toBeInTheDocument();
   });
   describe('MobileView Component Payment Status', () => {
+    beforeAll(() => {
+      setupStore();
+    });
     it('renders unpaidString when paidStatus is false', () => {
-      
-      const testProps = {...defaultProps, org: { owner_pubkey: 'UserPubKey' ,owner_alias: 'DefaultOwnerAlias'}, paid: false};
+      const testProps = {...defaultProps, person: { ...person }, org: { owner_pubkey: 'UserPubKey' ,owner_alias: 'DefaultOwnerAlias'}, paid: false};
       render(<MobileView {...testProps} />);
    
       expect(screen.getByText(paidString)).toBeInTheDocument();
     });
   
     it('renders paidString when paidStatus is true', () => {
-      const testProps = {...defaultProps, org: { owner_pubkey: 'UserPubKey',owner_alias: 'DefaultOwnerAlias' }, paid: true};
+      const testProps = {...defaultProps, person: { ...person }, org: { owner_pubkey: 'UserPubKey',owner_alias: 'DefaultOwnerAlias' }, paid: true};
       render(<MobileView {...testProps} />);
     
       expect(screen.getByText(unpaidString)).toBeInTheDocument();
