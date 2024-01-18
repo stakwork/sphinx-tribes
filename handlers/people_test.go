@@ -27,7 +27,7 @@ func TestGetPersonById(t *testing.T) {
 		person := &Person{ID: "123", Name: "John Doe"}
 		mockDb.On("GetPersonByID", "123").Return(person, nil)
 
-		request, _ := http.NewRequest("GET", "/person?id=123", nil)
+		request, _ := http.NewRequest("GET", "/person/123", nil)
 		rr := httptest.NewRecorder()
 
 		handler.ServeHTTP(rr, request)
