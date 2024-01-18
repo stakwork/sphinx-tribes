@@ -129,7 +129,7 @@ func TestBountyMetrics(t *testing.T) {
         dateRange := db.PaymentDateRange{
             StartDate: "1111",
             EndDate:   "2222",
-            PaymentType: db.PaymentType{ "test" },
+            PaymentType: "test",
         }
         body, _ := json.Marshal(dateRange)
         req, err := http.NewRequestWithContext(ctx, http.MethodPost, "/bounty_stats", bytes.NewReader(body))
@@ -152,7 +152,7 @@ func TestBountyMetrics(t *testing.T) {
 		dateRange := db.PaymentDateRange{
             StartDate: "1111",
             EndDate:   "2222",
-            PaymentType: db.PaymentType{ "test" },
+            PaymentType: "test",
         }
 		body, _ := json.Marshal(dateRange)
 		req, err := http.NewRequestWithContext(ctx, http.MethodPost, "/bounty_count", bytes.NewReader(body))
