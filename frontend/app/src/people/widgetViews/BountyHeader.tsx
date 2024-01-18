@@ -382,6 +382,18 @@ const BountyHeader = ({
     );
   }, [checkboxIdToSelectedMapLanguage, checkboxIdToSelectedMap]);
 
+  let timeoutId;
+  const onChangeSearch = (e: any) => {
+    ui.setSearchText(e);
+    clearTimeout(timeoutId);
+    // Set a new timeout to wait for user to pause typing
+    timeoutId = setTimeout(() => {
+      if (ui.searchText === '') {
+        main.getPeopleBounties({ page: 1, resetPage: true, ...checkboxIdToSelectedMap });
+      }
+    }, 1000);
+  };
+
   return (
     <>
       {!isMobile ? (
@@ -417,6 +429,7 @@ const BountyHeader = ({
                 }}
               />
               <SearchBar
+                data-testid="search-bar"
                 name="search"
                 type="search"
                 placeholder={`Search across ${activeBounty} Bounties`}
@@ -429,9 +442,7 @@ const BountyHeader = ({
                   fontFamily: 'Barlow',
                   color: color.text2
                 }}
-                onChange={(e: any) => {
-                  ui.setSearchText(e);
-                }}
+                onChange={onChangeSearch}
                 onKeyUp={(e: any) => {
                   if (e.key === 'Enter' || e.keyCode === 13) {
                     main.getPeopleBounties({ page: 1, resetPage: true });
