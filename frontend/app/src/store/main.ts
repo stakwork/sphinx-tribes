@@ -894,8 +894,11 @@ export class MainStore {
 
   async getOrgBounties(params?: QueryParams2): Promise<PersonBounty[]> {
     const currentPath = window.location.pathname;
+    console.log('currentPath: ', currentPath)
     const pathSegments = currentPath.split('/');
+    console.log('pathSegments: ', pathSegments)
     const paramValue = pathSegments[pathSegments.length - 1];
+    console.log('paramValue: ', paramValue)
 
     const queryParams: QueryParams2 = {
       limit: queryLimit,
@@ -906,6 +909,8 @@ export class MainStore {
       org_uuid: paramValue,
       ...params
     };
+
+    console.log('queryParams: ', queryParams)
 
     if (params) {
       // save previous params
