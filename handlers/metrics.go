@@ -12,9 +12,9 @@ import (
 	"path"
 	"time"
 
-	"github.com/ambelovsky/go-structs"
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/service/s3"
+	"github.com/fatih/structs"
 	"github.com/stakwork/sphinx-tribes/auth"
 	"github.com/stakwork/sphinx-tribes/config"
 	"github.com/stakwork/sphinx-tribes/db"
