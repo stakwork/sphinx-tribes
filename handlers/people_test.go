@@ -187,7 +187,7 @@ func TestGetPersonById(t *testing.T) {
 		rr := httptest.NewRecorder()
 		handler := http.HandlerFunc(pHandler.GetPersonById)
 		person := db.Person{
-			ID:          1,
+			ID:          0,
 			Uuid:        uuid.New().String(),
 			OwnerPubKey: "person-pub-key",
 			OwnerAlias:  "owner",
@@ -195,12 +195,12 @@ func TestGetPersonById(t *testing.T) {
 			Description: "test user",
 		}
 		rctx := chi.NewRouteContext()
-		rctx.URLParams.Add("id", "1")
+		rctx.URLParams.Add("id", "0")
 		req, err := http.NewRequestWithContext(context.WithValue(context.Background(), chi.RouteCtxKey, rctx), http.MethodGet, "/person/1", nil)
 		if err != nil {
 			t.Fatal(err)
 		}
-		mockDb.On("GetPerson", uint(1)).Return(person).Once()
+		mockDb.On("GetPerson", uint(0)).Return(person).Once()
 		handler.ServeHTTP(rr, req)
 
 		var returnedPerson db.Person
@@ -278,7 +278,7 @@ func TestDeletePerson(t *testing.T) {
 
 	t.Run("should delete user successfully", func(t *testing.T) {
 		rr := httptest.NewRecorder()
-		handler := http.HandlerFunc(pHandler.CreateOrEditPerson)
+		handler := http.HandlerFunc(pHandler.DeletePerson)
 		rctx := chi.NewRouteContext()
 		rctx.URLParams.Add("id", "1")
 		req, err := http.NewRequestWithContext(ctx, http.MethodDelete, "/person/1", nil)
