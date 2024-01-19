@@ -344,7 +344,10 @@ func getMetricsBountyCsv(metricBounties []db.Bounty) []db.MetricsBountyCsv {
 
 func ConvertMetricsToCSV(metricBountiesData []db.MetricsBountyCsv) [][]string {
 	metricsData := db.DB.ConvertMetricsBountiesToMap(metricBountiesData)
-	result := jsonconv.ToCsv(metricsData, nil)
+	opts := &jsonconv.ToCsvOption{
+		BaseHeaders: []string{"DatePosted", "Organization", "BountyAmount", "Provider", "Hunter", "BountyTitle", "BountyLink", "BountyStatus", "DateAssigned", "DatePaid"},
+	}
+	result := jsonconv.ToCsv(metricsData, opts)
 	return result
 }
 
