@@ -10,6 +10,7 @@ import { setupStore } from '../../../__test__/__mockData__/setupStore';
 import { user } from '../../../__test__/__mockData__/user';
 import { mockUsehistory } from '../../../__test__/__mockFn__/useHistory';
 import Header from '../Header';
+import { uiStore } from 'store/ui';
 
 beforeAll(() => {
   nock.disableNetConnect();
@@ -56,6 +57,76 @@ describe('AboutView Component', () => {
       fireEvent.click(me);
       expect(history.location.pathname).toEqual(`/p/${user.owner_pubkey}/organizations`);
       expect(history.length).toEqual(2);
+    });
+  });
+
+  it('should render get sphinx button', async () => {
+    jest.spyOn(mainStore, 'getIsAdmin').mockReturnValue(Promise.resolve(false));
+    jest.spyOn(mainStore, 'getPersonById').mockReturnValue(Promise.resolve(person));
+    jest.spyOn(mainStore, 'getSelf').mockReturnValue(Promise.resolve());
+    const history = createMemoryHistory();
+    await act(async () => {
+      const { getByText } = render(
+        <Router history={history}>
+          <Header />
+        </Router>
+      );
+      const getSphinxButton = getByText('Get Sphinx');
+      expect(getSphinxButton).toBeInTheDocument();
+    });
+  });
+
+  it('should render get sphinx button', async () => {
+    jest.spyOn(mainStore, 'getIsAdmin').mockReturnValue(Promise.resolve(false));
+    jest.spyOn(mainStore, 'getPersonById').mockReturnValue(Promise.resolve(person));
+    jest.spyOn(mainStore, 'getSelf').mockReturnValue(Promise.resolve());
+
+    uiStore.setMeInfo(null);
+    const history = createMemoryHistory();
+    await act(async () => {
+      const { getByText } = render(
+        <Router history={history}>
+          <Header />
+        </Router>
+      );
+      const signInBtn = getByText('Sign in');
+      expect(signInBtn).toBeInTheDocument();
+    });
+  });
+
+  it('should render user image if signed in', async () => {
+    jest.spyOn(mainStore, 'getIsAdmin').mockReturnValue(Promise.resolve(false));
+    jest.spyOn(mainStore, 'getPersonById').mockReturnValue(Promise.resolve(person));
+    jest.spyOn(mainStore, 'getSelf').mockReturnValue(Promise.resolve());
+
+    uiStore.setMeInfo(user);
+    const history = createMemoryHistory();
+    await act(async () => {
+      const { getByTestId } = render(
+        <Router history={history}>
+          <Header />
+        </Router>
+      );
+      const userImg = getByTestId('userImg');
+      expect(userImg).toHaveAttribute('src', user.img);
+    });
+  });
+
+  it('should not render sign in button for signed in user', async () => {
+    jest.spyOn(mainStore, 'getIsAdmin').mockReturnValue(Promise.resolve(false));
+    jest.spyOn(mainStore, 'getPersonById').mockReturnValue(Promise.resolve(person));
+    jest.spyOn(mainStore, 'getSelf').mockReturnValue(Promise.resolve());
+
+    uiStore.setMeInfo(user);
+    const history = createMemoryHistory();
+    await act(async () => {
+      const { queryByText } = render(
+        <Router history={history}>
+          <Header />
+        </Router>
+      );
+      const signInBtn = queryByText('Sign in');
+      expect(signInBtn).not.toBeInTheDocument();
     });
   });
 });
