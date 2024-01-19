@@ -251,7 +251,7 @@ func TestDeletePerson(t *testing.T) {
 		assert.NoError(t, err)
 
 		mockDb.On("GetPerson", person.ID).Return(person).Once()
-		mockDb.On("UpdatePerson", person.ID, mock.Anything).Return().Once()
+		mockDb.On("UpdatePerson", person.ID, mock.Anything).Return(true).Once()
 		handler.ServeHTTP(rr, req)
 
 		assert.Equal(t, http.StatusOK, rr.Code)
