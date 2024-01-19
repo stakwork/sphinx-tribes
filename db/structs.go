@@ -393,31 +393,32 @@ type BountyData struct {
 	BountyUpdated     *time.Time `json:"bounty_updated"`
 	BountyDescription string     `json:"bounty_description"`
 	Person
-	AssigneeAlias         string         `json:"assignee_alias"`
-	AssigneeId            uint           `json:"assignee_id"`
-	AssigneeImg           string         `json:"assignee_img"`
-	AssigneeCreated       *time.Time     `json:"assignee_created"`
-	AssigneeUpdated       *time.Time     `json:"assignee_updated"`
-	AssigneeDescription   string         `json:"assignee_description"`
-	AssigneeRouteHint     string         `json:"assignee_route_hint"`
-	BountyOwnerId         uint           `json:"bounty_owner_id"`
-	OwnerUuid             string         `json:"owner_uuid"`
-	OwnerKey              string         `json:"owner_key"`
-	OwnerAlias            string         `json:"owner_alias"`
-	OwnerUniqueName       string         `json:"owner_unique_name"`
-	OwnerDescription      string         `json:"owner_description"`
-	OwnerTags             pq.StringArray `gorm:"type:text[]" json:"owner_tags" null`
-	OwnerImg              string         `json:"owner_img"`
-	OwnerCreated          *time.Time     `json:"owner_created"`
-	OwnerUpdated          *time.Time     `json:"owner_updated"`
-	OwnerLastLogin        int64          `json:"owner_last_login"`
-	OwnerRouteHint        string         `json:"owner_route_hint"`
-	OwnerContactKey       string         `json:"owner_contact_key"`
-	OwnerPriceToMeet      int64          `json:"owner_price_to_meet"`
-	OwnerTwitterConfirmed bool           `json:"owner_twitter_confirmed"`
-	OrganizationName      string         `json:"organization_name"`
-	OrganizationImg       string         `json:"organization_img"`
-	OrganizationUuid      string         `json:"organization_uuid"`
+	AssigneeAlias           string         `json:"assignee_alias"`
+	AssigneeId              uint           `json:"assignee_id"`
+	AssigneeImg             string         `json:"assignee_img"`
+	AssigneeCreated         *time.Time     `json:"assignee_created"`
+	AssigneeUpdated         *time.Time     `json:"assignee_updated"`
+	AssigneeDescription     string         `json:"assignee_description"`
+	AssigneeRouteHint       string         `json:"assignee_route_hint"`
+	BountyOwnerId           uint           `json:"bounty_owner_id"`
+	OwnerUuid               string         `json:"owner_uuid"`
+	OwnerKey                string         `json:"owner_key"`
+	OwnerAlias              string         `json:"owner_alias"`
+	OwnerUniqueName         string         `json:"owner_unique_name"`
+	OwnerDescription        string         `json:"owner_description"`
+	OwnerTags               pq.StringArray `gorm:"type:text[]" json:"owner_tags" null`
+	OwnerImg                string         `json:"owner_img"`
+	OwnerCreated            *time.Time     `json:"owner_created"`
+	OwnerUpdated            *time.Time     `json:"owner_updated"`
+	OwnerLastLogin          int64          `json:"owner_last_login"`
+	OwnerRouteHint          string         `json:"owner_route_hint"`
+	OwnerContactKey         string         `json:"owner_contact_key"`
+	OwnerPriceToMeet        int64          `json:"owner_price_to_meet"`
+	OwnerTwitterConfirmed   bool           `json:"owner_twitter_confirmed"`
+	OrganizationName        string         `json:"organization_name"`
+	OrganizationImg         string         `json:"organization_img"`
+	OrganizationUuid        string         `json:"organization_uuid"`
+	OrganizationDescription string         `json:"description"`
 }
 
 type BountyResponse struct {
@@ -425,6 +426,12 @@ type BountyResponse struct {
 	Assignee     Person            `json:"assignee"`
 	Owner        Person            `json:"owner"`
 	Organization OrganizationShort `json:"organization"`
+}
+
+type BountyCountResponse struct {
+	OpenCount     int64 `json:"open_count"`
+	AssignedCount int64 `json:"assigned_count"`
+	PaidCount     int64 `json:"paid_count"`
 }
 
 type Organization struct {
@@ -439,6 +446,9 @@ type Organization struct {
 	Deleted     bool       `gorm:"default:false" json:"deleted"`
 	BountyCount int64      `json:"bounty_count,omitempty"`
 	Budget      uint       `json:"budget,omitempty"`
+	Website     string     `json:"website" validate:"omitempty,uri"`
+	Github      string     `json:"github" validate:"omitempty,uri"`
+	Description string     `json:"description" validate:"omitempty,lte=200"`
 }
 
 type OrganizationShort struct {
@@ -658,12 +668,15 @@ type BountyMetrics struct {
 
 type MetricsBountyCsv struct {
 	DatePosted   *time.Time `json:"date_posted"`
-	DatePaid     *time.Time `json:"date_paid"`
-	DateAssigned *time.Time `json:"date_assigned"`
-	BountyTitle  string     `json:"bounty_title"`
+	Organization string     `json:"organization"`
+	BountyAmount uint       `json:"bounty_amount"`
 	Provider     string     `json:"provider"`
 	Hunter       string     `json:"hunter"`
-	BountyAmount uint       `json:"bounty_amount"`
+	BountyTitle  string     `json:"bounty_title"`
+	BountyLink   string     `json:"bounty_link"`
+	BountyStatus string     `json:"bounty_status"`
+	DatePaid     *time.Time `json:"date_paid"`
+	DateAssigned *time.Time `json:"date_assigned"`
 }
 
 type FilterStattuCount struct {
