@@ -14,9 +14,6 @@ import (
 	"github.com/stakwork/sphinx-tribes/db"
 	mocks "github.com/stakwork/sphinx-tribes/mocks"
 	"github.com/stretchr/testify/assert"
-	"net/http"
-	"net/http/httptest"
-	"testing"
 	"time"
 )
 
