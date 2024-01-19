@@ -1,5 +1,5 @@
 import React from 'react';
-import { render, screen, waitFor, fireEvent } from '@testing-library/react';
+import { render, screen, waitFor, fireEvent, act } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import BountyHeader from '../BountyHeader';
 import { BountyHeaderProps } from '../../interfaces';
@@ -114,5 +114,36 @@ describe('BountyHeader Component', () => {
       fireEvent.click(checkbox);
       expect(mockProps.onChangeLanguage).toHaveBeenCalledWith(language);
     });
+  });
+
+  jest.useFakeTimers();
+
+  it('should call main.getPeopleBounty when search text is empty', async () => {
+    const { getByTestId } = render(<BountyHeader {...mockProps} />);
+
+    // Simulate typing in the search bar
+    fireEvent.change(getByTestId('search-bar'), { target: { value: 'Test' } });
+
+    // Check if the search text is updated
+    expect(getByTestId('search-bar')).toHaveValue('Test');
+
+    // const getPeopleBountiesMock = jest.fn();
+
+    // Simulate clicking on the close icon
+    fireEvent.change(getByTestId('search-bar'), { target: { value: '' } });
+
+    expect(getByTestId('search-bar')).toHaveValue('');
+
+    const getPeopleBountiesSpy = jest.spyOn(mainStore, 'getPeopleBounties');
+
+    act(() => {
+      jest.advanceTimersByTime(2001);
+    });
+    // Expect that getPeopleBounties has been called
+    expect(await getPeopleBountiesSpy).toHaveBeenCalled();
+  });
+
+  afterAll(() => {
+    jest.useRealTimers(); // Restore real timers after all tests are done
   });
 });
