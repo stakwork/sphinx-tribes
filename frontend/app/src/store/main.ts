@@ -901,8 +901,6 @@ export class MainStore {
       ...params
     };
 
-    console.log('queryParams: ', queryParams)
-
     if (params) {
       // save previous params
       this.getWantedsOrgBountiesPrevParams = queryParams;
