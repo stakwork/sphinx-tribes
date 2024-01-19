@@ -421,7 +421,7 @@ func (ph *peopleHandler) DeletePerson(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	existing := db.DB.GetPerson(uint(id))
+	existing := ph.db.GetPerson(uint(id))
 	if existing.ID == 0 {
 		fmt.Println("existing id is 0")
 		w.WriteHeader(http.StatusUnauthorized)
