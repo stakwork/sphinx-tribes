@@ -184,9 +184,6 @@ export interface QueryParams {
   search?: string;
   resetPage?: boolean;
   languages?: string;
-}
-
-export interface QueryParams2 extends QueryParams {
   org_uuid?: string;
 }
 
@@ -886,39 +883,6 @@ export class MainStore {
       return ps3;
     } catch (e) {
       console.log('fetch failed getPeopleBounties: ', e);
-      return [];
-    }
-  }
-
-  getWantedsOrgBountiesPrevParams?: QueryParams = {};
-
-  async getOrgBounties(params?: QueryParams2): Promise<PersonBounty[]> {
-    const queryParams: QueryParams2 = {
-      limit: queryLimit,
-      sortBy: 'created',
-      page: 1,
-      resetPage: false,
-      ...params
-    };
-
-    if (params) {
-      // save previous params
-      this.getWantedsOrgBountiesPrevParams = queryParams;
-    }
-
-    // if we don't pass the params, we should use previous params for invalidate query
-    const query2 = this.appendQueryParams(
-      'gobounties/all',
-      queryLimit,
-      params ? queryParams : this.getWantedsOrgBountiesPrevParams
-    );
-
-    try {
-      const ps2 = await api.get(query2);
-
-      return ps2;
-    } catch (e) {
-      console.log('fetch failed getOrgBounties: ', e);
       return [];
     }
   }

@@ -6,7 +6,7 @@ import { mainStore } from 'store/main';
 
 describe('OrgHeader Component', () => {
   beforeEach(() => {
-    jest.spyOn(mainStore, 'getOrgBounties').mockReset();
+    jest.spyOn(mainStore, 'getPeopleBounties').mockReset();
   });
 
   afterEach(() => {
@@ -33,7 +33,7 @@ describe('OrgHeader Component', () => {
     expect(screen.getByText('Bounties')).toBeInTheDocument();
   });
 
-  it('should calls getOrgBounties with correct parameters', () => {
+  it('should calls getPeopleBounties with correct parameters', () => {
     const orgUuid = 'cmkln4tm098m49vhlt80';
     Object.defineProperty(window, 'location', {
       value: {
@@ -52,8 +52,8 @@ describe('OrgHeader Component', () => {
     // Simulate pressing Enter key
     fireEvent.keyUp(searchInput, { key: 'Enter', code: 'Enter' });
 
-    // Check if getOrgBounties is called with correct parameters
-    expect(mainStore.getOrgBounties).toHaveBeenCalledWith({
+    // Check if getPeopleBounties is called with correct parameters
+    expect(mainStore.getPeopleBounties).toHaveBeenCalledWith({
       page: 1,
       resetPage: true,
       search: searchText,
