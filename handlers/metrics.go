@@ -12,9 +12,9 @@ import (
 	"path"
 	"time"
 
-	"github.com/ambelovsky/go-structs"
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/service/s3"
+	"github.com/fatih/structs"
 	"github.com/stakwork/sphinx-tribes/auth"
 	"github.com/stakwork/sphinx-tribes/config"
 	"github.com/stakwork/sphinx-tribes/db"
@@ -281,26 +281,26 @@ func GetMetricsBountiesData(metricBounties []db.Bounty) []db.BountyData {
 		organization := db.DB.GetOrganizationByUuid(bounty.OrgUuid)
 
 		bountyData := db.BountyData{
-			Bounty:              bounty,
-			BountyId:            bounty.ID,
-			Person:              bountyOwner,
-			BountyCreated:       bounty.Created,
-			BountyDescription:   bounty.Description,
-			BountyUpdated:       bounty.Updated,
-			AssigneeId:          bountyAssignee.ID,
-			AssigneeImg:         bountyAssignee.Img,
-			AssigneeAlias:       bountyAssignee.OwnerAlias,
-			AssigneeDescription: bountyAssignee.Description,
-			AssigneeRouteHint:   bountyAssignee.OwnerRouteHint,
-			BountyOwnerId:       bountyOwner.ID,
-			OwnerUuid:           bountyOwner.Uuid,
-			OwnerDescription:    bountyOwner.Description,
-			OwnerUniqueName:     bountyOwner.UniqueName,
-			OwnerImg:            bountyOwner.Img,
-			OrganizationName:    organization.Name,
-			OrganizationImg:     organization.Img,
-			OrganizationUuid:    organization.Uuid,
-			OrganizationDescription:  organization.Description,
+			Bounty:                  bounty,
+			BountyId:                bounty.ID,
+			Person:                  bountyOwner,
+			BountyCreated:           bounty.Created,
+			BountyDescription:       bounty.Description,
+			BountyUpdated:           bounty.Updated,
+			AssigneeId:              bountyAssignee.ID,
+			AssigneeImg:             bountyAssignee.Img,
+			AssigneeAlias:           bountyAssignee.OwnerAlias,
+			AssigneeDescription:     bountyAssignee.Description,
+			AssigneeRouteHint:       bountyAssignee.OwnerRouteHint,
+			BountyOwnerId:           bountyOwner.ID,
+			OwnerUuid:               bountyOwner.Uuid,
+			OwnerDescription:        bountyOwner.Description,
+			OwnerUniqueName:         bountyOwner.UniqueName,
+			OwnerImg:                bountyOwner.Img,
+			OrganizationName:        organization.Name,
+			OrganizationImg:         organization.Img,
+			OrganizationUuid:        organization.Uuid,
+			OrganizationDescription: organization.Description,
 		}
 		metricBountiesData = append(metricBountiesData, bountyData)
 	}
