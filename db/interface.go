@@ -126,4 +126,5 @@ type Database interface {
 	GetPersonByPubkey(pubkey string) Person
 	PersonUniqueNameFromName(name string) (string, error)
 	ProcessAlerts(p Person)
+	UpdatePerson(id uint, updates map[string]interface{}) error
 }

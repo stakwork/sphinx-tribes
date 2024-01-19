@@ -433,7 +433,7 @@ func (ph *peopleHandler) DeletePerson(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	db.DB.UpdatePerson(uint(id), map[string]interface{}{
+	ph.db.UpdatePerson(uint(id), map[string]interface{}{
 		"deleted": true,
 	})
 
