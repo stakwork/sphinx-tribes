@@ -5,6 +5,7 @@ import (
 	"context"
 	"encoding/json"
 	"errors"
+	"fmt"
 	"github.com/stakwork/sphinx-tribes/auth"
 	"github.com/stakwork/sphinx-tribes/db"
 	mocks "github.com/stakwork/sphinx-tribes/mocks"
@@ -12,6 +13,7 @@ import (
 	"net/http"
 	"net/http/httptest"
 	"testing"
+	"time"
 )
 
 func TestBountyMetrics(t *testing.T) {
@@ -92,4 +94,29 @@ func TestBountyMetrics(t *testing.T) {
 		assert.EqualValues(t, expectedMetricRes, res)
 		assert.Equal(t, http.StatusOK, rr.Code)
 	})
+}
+
+func TestConvertMetricsToCSV(t *testing.T) {
+	t.Run("should return for csv in correct order", func(t *testing.T) {
+		now := time.Now()
+		bountyLink := fmt.Sprintf("https://community.sphinx.chat/bounty/%d", 1)
+		bounties := []db.MetricsBountyCsv{{
+			DatePosted:   &now,
+			Organization: "test-org",
+			BountyAmount: 100,
+			Provider:     "provider",
+			Hunter:       "hunter",
+			BountyTitle:  "test bounty",
+			BountyLink:   bountyLink,
+			BountyStatus: "paid",
+			DatePaid:     &now,
+			DateAssigned: &now,
+		}}
+		expectedHeaders := []string{"DatePosted", "Organization", "BountyAmount", "Provider", "Hunter", "BountyTitle", "BountyLink", "BountyStatus", "DateAssigned", "DatePaid"}
+		results := ConvertMetricsToCSV(bounties)
+
+		assert.Equal(t, 2, len(results))
+		assert.EqualValues(t, expectedHeaders, results[0])
+	})
+
 }
