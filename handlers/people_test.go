@@ -221,11 +221,9 @@ func TestGetPersonById(t *testing.T) {
 			t.Fatal(err)
 		}
 
-		// Attempt to parse the ID from the route
 		idStr := rctx.URLParam("id")
 		_, parseErr := strconv.Atoi(idStr)
 		if parseErr != nil {
-			// Return an error if the ID is not a valid integer
 			rr.WriteHeader(http.StatusUnauthorized)
 			return
 		}
@@ -235,4 +233,3 @@ func TestGetPersonById(t *testing.T) {
 		assert.Equal(t, http.StatusUnauthorized, rr.Code)
 	})
 }
-
