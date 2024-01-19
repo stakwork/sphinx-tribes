@@ -222,67 +222,70 @@ func TestGetPersonById(t *testing.T) {
 		mockDb.On("GetPerson", mock.Anything).Return(db.Person{}).Once()
 		handler.ServeHTTP(rr, req)
 
-		assert.Equal(t, http.StatusOK, rr.Code) 
+		assert.Equal(t, http.StatusOK, rr.Code)
 		mockDb.AssertExpectations(t)
 	})
 }
 
 func TestDeletePerson(t *testing.T) {
-    mockDb := mocks.NewDatabase(t)
-    pHandler := NewPeopleHandler(mockDb)
-    authContextKey := auth.ContextKey 
+	mockDb := mocks.NewDatabase(t)
+	pHandler := NewPeopleHandler(mockDb)
+	authContextKey := auth.ContextKey
 
-    t.Run("successful deletion", func(t *testing.T) {
-        rr := httptest.NewRecorder()
-        handler := http.HandlerFunc(pHandler.DeletePerson)
-        person := db.Person{ID: 1, OwnerPubKey: "test-key"}
+	t.Run("successful deletion", func(t *testing.T) {
+		rr := httptest.NewRecorder()
+		handler := http.HandlerFunc(pHandler.DeletePerson)
+		personID := 1
+		person := db.Person{ID: uint(personID), OwnerPubKey: "test-key"}
 
-        rctx := chi.NewRouteContext()
-        rctx.URLParams.Add("id", strconv.Itoa(int(person.ID)))
-        ctx := context.WithValue(context.Background(), authContextKey, "test-key")
-        req, err := http.NewRequestWithContext(ctx, http.MethodDelete, "/person", nil)
-        assert.NoError(t, err)
+		rctx := chi.NewRouteContext()
+		rctx.URLParams.Add("id", strconv.Itoa(personID))
+		ctx := context.WithValue(context.Background(), authContextKey, person.OwnerPubKey)
+		req, err := http.NewRequestWithContext(ctx, http.MethodDelete, "/person", nil)
+		assert.NoError(t, err)
 
-        mockDb.On("GetPerson", uint(1)).Return(person).Once()
-        mockDb.On("UpdatePerson", uint(1), mock.Anything).Return().Once()
-        handler.ServeHTTP(rr, req)
+		mockDb.On("GetPerson", uint(personID)).Return(person).Once()
+		mockDb.On("UpdatePerson", uint(personID), mock.Anything).Return().Once()
+		handler.ServeHTTP(rr, req)
 
-        assert.Equal(t, http.StatusOK, rr.Code)
-        mockDb.AssertExpectations(t)
-    })
+		assert.Equal(t, http.StatusOK, rr.Code)
+		mockDb.AssertExpectations(t)
+	})
 
-    t.Run("unauthorized deletion attempt", func(t *testing.T) {
-        rr := httptest.NewRecorder()
-        handler := http.HandlerFunc(pHandler.DeletePerson)
-        person := db.Person{ID: 1, OwnerPubKey: "owner-key"}
+	t.Run("unauthorized deletion attempt", func(t *testing.T) {
+		rr := httptest.NewRecorder()
+		handler := http.HandlerFunc(pHandler.DeletePerson)
+		personID := 1
+		person := db.Person{ID: uint(personID), OwnerPubKey: "other-key"}
 
-        rctx := chi.NewRouteContext()
-        rctx.URLParams.Add("id", strconv.Itoa(int(person.ID)))
-        ctx := context.WithValue(context.Background(), authContextKey, "test-key")
-        req, err := http.NewRequestWithContext(ctx, http.MethodDelete, "/person", nil)
-        assert.NoError(t, err)
+		rctx := chi.NewRouteContext()
+		rctx.URLParams.Add("id", strconv.Itoa(personID))
+		ctx := context.WithValue(context.Background(), auth.ContextKey, "test-key")
+		req, err := http.NewRequestWithContext(ctx, http.MethodDelete, "/", nil)
+		assert.NoError(t, err)
 
-        mockDb.On("GetPerson", uint(1)).Return(person).Once()
-        handler.ServeHTTP(rr, req)
+		mockDb.On("GetPerson", uint(personID)).Return(person).Once()
+		handler.ServeHTTP(rr, req)
 
-        assert.Equal(t, http.StatusUnauthorized, rr.Code)
-        mockDb.AssertExpectations(t)
-    })
+		assert.Equal(t, http.StatusUnauthorized, rr.Code)
+		mockDb.AssertExpectations(t)
+	})
 
-    t.Run("deletion of non-existent person", func(t *testing.T) {
-        rr := httptest.NewRecorder()
-        handler := http.HandlerFunc(pHandler.DeletePerson)
+	t.Run("deletion of non-existent person", func(t *testing.T) {
+		rr := httptest.NewRecorder()
+		handler := http.HandlerFunc(pHandler.DeletePerson)
+		personID := 999
 
-        rctx := chi.NewRouteContext()
-        rctx.URLParams.Add("id", "999")
-        ctx := context.WithValue(context.Background(), authContextKey, "test-key")
-        req, err := http.NewRequestWithContext(ctx, http.MethodDelete, "/person", nil)
-        assert.NoError(t, err)
+		rctx := chi.NewRouteContext()
+		rctx.URLParams.Add("id", strconv.Itoa(personID))
+		ctx := context.WithValue(context.Background(), auth.ContextKey, "test-key")
+		req, err := http.NewRequestWithContext(ctx, http.MethodDelete, "/", nil)
+		assert.NoError(t, err)
 
-        mockDb.On("GetPerson", uint(999)).Return(db.Person{}).Once()
-        handler.ServeHTTP(rr, req)
+		mockDb.On("GetPerson", uint(personID)).Return(db.Person{}).Once()
+		handler.ServeHTTP(rr, req)
 
-        assert.Equal(t, http.StatusUnauthorized, rr.Code) 
-        mockDb.AssertExpectations(t)
-    })
+		assert.Equal(t, http.StatusUnauthorized, rr.Code) 
+		mockDb.AssertExpectations(t)
+	})
 }
