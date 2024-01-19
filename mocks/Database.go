@@ -5684,6 +5684,53 @@ func (_c *Database_UpdateOrganizationForDeletion_Call) RunAndReturn(run func(str
 	return _c
 }
 
+// UpdatePerson provides a mock function with given fields: id, u
+func (_m *Database) UpdatePerson(id uint, u map[string]interface{}) bool {
+	ret := _m.Called(id, u)
+
+	if len(ret) == 0 {
+		panic("no return value specified for UpdatePerson")
+	}
+
+	var r0 bool
+	if rf, ok := ret.Get(0).(func(uint, map[string]interface{}) bool); ok {
+		r0 = rf(id, u)
+	} else {
+		r0 = ret.Get(0).(bool)
+	}
+
+	return r0
+}
+
+// Database_UpdatePerson_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'UpdatePerson'
+type Database_UpdatePerson_Call struct {
+	*mock.Call
+}
+
+// UpdatePerson is a helper method to define mock.On call
+//   - id uint
+//   - u map[string]interface{}
+func (_e *Database_Expecter) UpdatePerson(id interface{}, u interface{}) *Database_UpdatePerson_Call {
+	return &Database_UpdatePerson_Call{Call: _e.mock.On("UpdatePerson", id, u)}
+}
+
+func (_c *Database_UpdatePerson_Call) Run(run func(id uint, u map[string]interface{})) *Database_UpdatePerson_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(uint), args[1].(map[string]interface{}))
+	})
+	return _c
+}
+
+func (_c *Database_UpdatePerson_Call) Return(_a0 bool) *Database_UpdatePerson_Call {
+	_c.Call.Return(_a0)
+	return _c
+}
+
+func (_c *Database_UpdatePerson_Call) RunAndReturn(run func(uint, map[string]interface{}) bool) *Database_UpdatePerson_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
 // UpdateTribe provides a mock function with given fields: uuid, u
 func (_m *Database) UpdateTribe(uuid string, u map[string]interface{}) bool {
 	ret := _m.Called(uuid, u)

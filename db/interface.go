@@ -54,6 +54,7 @@ type Database interface {
 	GetTribeByIdAndPubkey(uuid string, pubkey string) Tribe
 	GetTribe(uuid string) Tribe
 	GetPerson(id uint) Person
+	UpdatePerson(id uint, u map[string]interface{}) bool
 	GetPersonByUuid(uuid string) Person
 	GetPersonByGithubName(github_name string) Person
 	GetFirstTribeByFeedURL(feedURL string) Tribe
