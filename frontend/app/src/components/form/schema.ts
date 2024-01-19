@@ -830,7 +830,7 @@ export const organizationSchema: FormField[] = [
   },
   {
     name: 'github',
-    label: 'Github Repo',
+    label: 'Github repo',
     type: 'text',
     prepend: 'https://github.com/',
     validator: strValidator,
@@ -844,7 +844,7 @@ export const organizationSchema: FormField[] = [
   },
   {
     name: 'description',
-    label: 'Descripton',
+    label: 'Description',
     type: 'textarea',
     style: {
       height: '202px',

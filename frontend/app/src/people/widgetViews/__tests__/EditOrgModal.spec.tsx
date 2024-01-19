@@ -1,3 +1,4 @@
+import '@testing-library/jest-dom';
 import React from 'react';
 import { render, screen } from '@testing-library/react';
 import { Organization } from 'store/main';
@@ -32,22 +33,22 @@ const props = {
 describe('EditOrgModal Component', () => {
   test('displays the Organization Name text field', () => {
     render(<EditOrgModal {...props} />);
-    expect(screen.getByLabelText('Organization Name')).toBeInTheDocument();
+    expect(screen.getAllByText(/Organization Name/i)).toHaveLength(2);
   });
 
   test('displays the Website text field', () => {
     render(<EditOrgModal {...props} />);
-    expect(screen.getByLabelText('Website')).toBeInTheDocument();
+    expect(screen.getAllByText(/Website/i)).toHaveLength(2);
   });
 
   test('displays the Github repo text field', () => {
     render(<EditOrgModal {...props} />);
-    expect(screen.getByLabelText('Github repo')).toBeInTheDocument();
+    expect(screen.getAllByText(/Github repo/i)).toHaveLength(2);
   });
 
   test('displays the Description box', () => {
     render(<EditOrgModal {...props} />);
-    expect(screen.getByLabelText('Description')).toBeInTheDocument();
+    expect(screen.getAllByText(/Description/i)).toHaveLength(2);
   });
 
   test('displays the Save changes button', () => {

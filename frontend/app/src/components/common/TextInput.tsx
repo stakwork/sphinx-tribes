@@ -4,7 +4,7 @@ import { TextInputProps } from 'components/interfaces';
 import { colors } from '../../config/colors';
 import { FieldEnv, FieldText } from '../form/inputs/index';
 
-const F = styled(FieldEnv)`
+const F = styled((props: any) => <FieldEnv {...props} />)`
   .euiFormLabel[for] {
     cursor: default;
   }
