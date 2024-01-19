@@ -24,4 +24,4 @@ jobs:
       - name: Install cover
         run: go get golang.org/x/tools/cmd/cover
       - name: Tests 
-        run: go test ./... -race -v -coverprofile=coverage.out && ./cover-check.sh coverage.out 7.2
+        run: go test ./... -race -v -coverprofile=coverage.out && ./cover-check.sh coverage.out 8.4

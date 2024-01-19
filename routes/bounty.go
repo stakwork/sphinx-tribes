@@ -13,7 +13,7 @@ func BountyRoutes() chi.Router {
 	r := chi.NewRouter()
 	bountyHandler := handlers.NewBountyHandler(http.DefaultClient, db.DB)
 	r.Group(func(r chi.Router) {
-		r.Get("/all", handlers.GetAllBounties)
+		r.Get("/all", bountyHandler.GetAllBounties)
 		r.Get("/id/{bountyId}", handlers.GetBountyById)
 		r.Get("/index/{bountyId}", handlers.GetBountyIndexById)
 		r.Get("/created/{created}", handlers.GetBountyByCreated)
