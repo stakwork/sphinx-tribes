@@ -13,7 +13,11 @@ const Wrap = styled.div`
   align-items: center;
   justify-content: center;
   width: 100%;
-  overflow: hidden;
+  overflow: hidden;transition: background 0.3s;
+
+    &:hover {
+        background: #f2f3f5;
+    }
 `;
 
 interface DWarpProps {
@@ -31,7 +35,11 @@ const DWrap = styled.div<DWarpProps>`
   margin-right: 20px;
   box-shadow: 0px 1px 2px rgba(0, 0, 0, 0.15);
   border-radius: 4px;
-  overflow: hidden;
+  overflow: hidden;transition: background 0.3s;
+
+    &:hover {
+        background: #f2f3f5;
+    }
 `;
 
 const R = styled.div`
@@ -128,13 +136,19 @@ export default function Person(props: PersonProps) {
   const addedStyles = hideActions ? { width: 56, height: 56 } : {};
   const qrString = makeQR(owner_pubkey);
   const [showQR, setShowQR] = useState(false);
-
+  const [showHighlight, setShowHighlight] = useState(false);
   function renderPersonCard() {
     if (small) {
       return (
+        <a
+          href={`/p/${owner_pubkey}`}
+          style={{ textDecoration: 'none', color: 'inherit', cursor: 'pointer' }}
+        >
         <div
           style={{ background: selected ? '#F2F3F5' : '#fff', cursor: 'pointer' }}
           onClick={() => select(id, unique_name, owner_pubkey)}
+          onMouseEnter={() => setShowHighlight(true)}
+          onMouseLeave={() => setShowHighlight(false)}
         >
           <Wrap style={{ padding: hideActions ? 10 : 25 }}>
             <div>
@@ -179,47 +193,59 @@ export default function Person(props: PersonProps) {
           </Wrap>
           <Divider />
         </div>
+        </a>
       );
-    }
-    // desktop mode
-    return (
-      <DWrap squeeze={squeeze} onClick={() => select(id, unique_name, owner_pubkey)}>
-        <div>
-          <div style={{ height: 210 }}>
-            <Img style={{ height: '100%', width: '100%', borderRadius: 0 }} src={img} />
+    } else {
+      // desktop mode
+      return (
+        <a
+          href={`/p/${owner_pubkey}`}
+          style={{ textDecoration: 'none', color: 'inherit', cursor: 'pointer' }}
+        >
+        <DWrap
+          squeeze={squeeze}
+          onClick={() => select(id, unique_name, owner_pubkey)}
+        >
+          <div>
+            <div onMouseEnter={() => setShowHighlight(true)} onMouseLeave={() => setShowHighlight(false)}>
+              <div style={{ height: 210 }}>
+                <Img style={{ height: '100%', width: '100%', borderRadius: 0 }} src={img} />
+              </div>
+              <div style={{ padding: 16 }}>
+                <DTitle>{owner_alias}</DTitle>
+                {description && description !== 'description' && (
+                  <DDescription>{description}</DDescription>
+                )}
+              </div>
+            </div>
+            <div>
+              <Divider />
+              <Row style={{ justifyContent: 'space-between', alignItems: 'center', height: 50 }}>
+                {owner_pubkey ? (
+                  <>
+                    <Button
+                      text="Connect"
+                      color="clear"
+                      iconStyle={{ color: '#B0B7BC' }}
+                      endingIcon={'open_in_new'}
+                      style={{ fontSize: 13, fontWeight: 500 }}
+                      iconSize={16}
+                      onClick={(e: any) => {
+                        setShowQR(true);
+                        e.stopPropagation();
+                      }}
+                    />
+                  </>
+                ) : (
+                  <div />
+                )}
+              </Row>
+            </div>
           </div>
-          <div style={{ padding: 16 }}>
-            <DTitle>{owner_alias}</DTitle>
-            {description && description !== 'description' && (
-              <DDescription>{description}</DDescription>
-            )}
-          </div>
-        </div>
-        <div>
-          <Divider />
-          <Row style={{ justifyContent: 'space-between', alignItems: 'center', height: 50 }}>
-            {owner_pubkey ? (
-              <>
-                <Button
-                  text="Connect"
-                  color="clear"
-                  iconStyle={{ color: '#B0B7BC' }}
-                  endingIcon={'open_in_new'}
-                  style={{ fontSize: 13, fontWeight: 500 }}
-                  iconSize={16}
-                  onClick={(e: any) => {
-                    setShowQR(true);
-                    e.stopPropagation();
-                  }}
-                />
-              </>
-            ) : (
-              <div />
-            )}
-          </Row>
-        </div>
-      </DWrap>
+        </DWrap>
+        </a>
     );
+    }
   }
 
   return (
