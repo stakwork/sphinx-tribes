@@ -230,7 +230,6 @@ func TestGetPersonById(t *testing.T) {
 func TestDeletePerson(t *testing.T) {
 	mockDb := mocks.NewDatabase(t)
 	pHandler := NewPeopleHandler(mockDb)
-	authContextKey := auth.ContextKey
 
 	t.Run("successful deletion", func(t *testing.T) {
 		rr := httptest.NewRecorder()
@@ -243,9 +242,9 @@ func TestDeletePerson(t *testing.T) {
 		}
 
 		rctx := chi.NewRouteContext()
-		rctx.URLParams.Add("id", strconv.Itoa(int(person.ID)))
-		ctx := context.WithValue(context.Background(), authContextKey, person.OwnerPubKey)
-		req, err := http.NewRequestWithContext(ctx, http.MethodDelete, "/person", nil)
+		rctx.URLParams.Add("id", "1")
+
+		req, err := http.NewRequestWithContext(context.WithValue(context.Background(), chi.RouteCtxKey, rctx), http.MethodGet, "/person", nil)
 		assert.NoError(t, err)
 
 		mockDb.On("GetPerson", person.ID).Return(person).Once()
@@ -267,7 +266,7 @@ func TestDeletePerson(t *testing.T) {
 		}
 
 		rctx := chi.NewRouteContext()
-		rctx.URLParams.Add("id", strconv.Itoa(int(person.ID)))
+		rctx.URLParams.Add("id", "1")
 		ctx := context.WithValue(context.Background(), auth.ContextKey, "test-key")
 		req, err := http.NewRequestWithContext(ctx, http.MethodDelete, "/", nil)
 		assert.NoError(t, err)
@@ -290,7 +289,7 @@ func TestDeletePerson(t *testing.T) {
 		}
 
 		rctx := chi.NewRouteContext()
-		rctx.URLParams.Add("id", strconv.Itoa(int(person.ID)))
+		rctx.URLParams.Add("id", "999")
 		ctx := context.WithValue(context.Background(), auth.ContextKey, "test-key")
 		req, err := http.NewRequestWithContext(ctx, http.MethodDelete, "/", nil)
 		assert.NoError(t, err)
