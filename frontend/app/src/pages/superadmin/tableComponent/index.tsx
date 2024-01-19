@@ -256,12 +256,15 @@ export const MyTable = ({
                       Sort By:
                     </EuiText>
                     <div className="image">
-                      {sortOrder === 'desc' ? 'Newest' : 'Oldest'}
+                      <EuiText className="filterText">
+                        {sortOrder === 'desc' ? 'Newest' : 'Oldest'}
+                      </EuiText>
                       <MaterialIcon
                         className="materialIconImage"
                         icon="expand_more"
                         style={{
-                          color: isPopoverOpen ? color.grayish.G10 : ''
+                          color: isPopoverOpen ? color.grayish.G10 : '',
+                          fontWeight: 'bold'
                         }}
                       />
                     </div>

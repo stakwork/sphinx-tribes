@@ -261,7 +261,7 @@ export const DateFilterWrapper = styled.div<styledProps>`
     font-style: normal;
     font-weight: 500;
     line-height: normal;
-    margin-left: 15px;
+    margin-left: 2px;
   }
   &:hover {
     .image {
@@ -314,6 +314,7 @@ export const StyledSelect2 = styled.select`
   outline: none;
   width: 45px;
   border: none;
+  height: 20px;
 `;
 
 export const LeadingTitle = styled.h2`
