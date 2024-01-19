@@ -240,30 +240,36 @@ func TestDeletePerson(t *testing.T) {
     mockDb := mocks.NewDatabase(t)
     pHandler := NewPeopleHandler(mockDb)
 
-    t.Run("should return error if person does not exist", func(t *testing.T) {
-        rr := httptest.NewRecorder()
-        handler := http.HandlerFunc(pHandler.DeletePerson)
-
-        id := "1"
-        rctx := chi.NewRouteContext()
-        rctx.URLParams.Add("id", id)
-        req, err := http.NewRequestWithContext(context.WithValue(context.Background(), chi.RouteCtxKey, rctx), http.MethodDelete, "/person/"+id, nil)
-        if err != nil {
-            t.Fatal(err)
-        }
-
-        mockDb.On("GetPerson", uint(1)).Return(db.Person{}).Once()
-        handler.ServeHTTP(rr, req)
-
-        assert.Equal(t, http.StatusUnauthorized, rr.Code)
-        mockDb.AssertExpectations(t)
-    })
+    t.Run("should delete person successfully", func(t *testing.T) {
+		rr := httptest.NewRecorder()
+		handler := http.HandlerFunc(pHandler.DeletePerson)
+	
+		pubKey := "test-key"
+	
+		ctx := context.WithValue(context.Background(), auth.ContextKey, pubKey)
+	
+		id := "1"
+		rctx := chi.NewRouteContext()
+		rctx.URLParams.Add("id", id)
+		req, err := http.NewRequestWithContext(ctx, http.MethodDelete, "/person/"+id, nil)
+		if err != nil {
+			t.Fatal(err)
+		}
+	
+		mockDb.On("GetPerson", uint(1)).Return(db.Person{ID: 1, OwnerPubKey: pubKey}).Once()
+		mockDb.On("UpdatePerson", uint(1), mock.AnythingOfType("map[string]interface {}")).Return(nil).Once()
+	
+		handler.ServeHTTP(rr, req)
+	
+		assert.Equal(t, http.StatusOK, rr.Code)
+		mockDb.AssertExpectations(t)
+	})
 
     t.Run("should delete person successfully", func(t *testing.T) {
         rr := httptest.NewRecorder()
         handler := http.HandlerFunc(pHandler.DeletePerson)
 
-        id := "1"
+        id := "0"
         rctx := chi.NewRouteContext()
         rctx.URLParams.Add("id", id)
         req, err := http.NewRequestWithContext(context.WithValue(context.Background(), chi.RouteCtxKey, rctx), http.MethodDelete, "/person/"+id, nil)
@@ -271,8 +277,8 @@ func TestDeletePerson(t *testing.T) {
             t.Fatal(err)
         }
 
-        mockDb.On("GetPerson", uint(1)).Return(db.Person{ID: 1, OwnerPubKey: "test-key"}).Once()
-        mockDb.On("UpdatePerson", uint(1), mock.AnythingOfType("map[string]interface {}")).Return(nil).Once()
+        mockDb.On("GetPerson", uint(0)).Return(db.Person{ID: 1, OwnerPubKey: "test-key"}).Once()
+        mockDb.On("UpdatePerson", uint(0), mock.AnythingOfType("map[string]interface {}")).Return(nil).Once()
 
         handler.ServeHTTP(rr, req)
 
