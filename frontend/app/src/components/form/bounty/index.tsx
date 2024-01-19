@@ -443,8 +443,9 @@ function Form(props: FormProps) {
                           .map((item: FormField) => (
                             <Input
                               {...item}
+                              type={item.type}
                               key={item.name}
-                              newDesign={true}
+                              newDesign={item.name === 'description' ? false : true}
                               values={values}
                               setAssigneefunction={item.name === 'assignee' && setAssigneeName}
                               peopleList={peopleList}
