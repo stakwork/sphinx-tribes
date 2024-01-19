@@ -111,8 +111,12 @@ const errcolor = '#FF8F80';
 
 const InputError = styled.div`
   color: #ff8f80;
-  font-size: 11px;
-  font-weight: 500;
+  text-edge: cap;
+    margin-bottom: 9px;
+font-family: Barlow;
+font-size: 11px;
+font-style: normal;
+font-weight: 500;
 `;
 
 const LabelRowContainer = styled.div`
