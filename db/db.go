@@ -591,7 +591,7 @@ func (db database) GetAssignedBounties(r *http.Request) ([]Bounty, error) {
 	limitQuery := ""
 
 	if sortBy != "" && direction != "" {
-		orderQuery = "ORDER BY " + sortBy + " " + "DESC"
+		orderQuery = "ORDER BY " + sortBy + " " + "ASC"
 	} else {
 		orderQuery = " ORDER BY paid DESC"
 	}
