@@ -665,7 +665,7 @@ func GetInvoicesCount(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(invoiceCount)
 }
 
-func DeleteOrganization(w http.ResponseWriter, r *http.Request) {
+func (oh *organizationHandler) DeleteOrganization(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 	pubKeyFromAuth, _ := ctx.Value(auth.ContextKey).(string)
 	uuid := chi.URLParam(r, "uuid")
@@ -676,7 +676,7 @@ func DeleteOrganization(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	organization := db.DB.GetOrganizationByUuid(uuid)
+	organization := oh.db.GetOrganizationByUuid(uuid)
 
 	if pubKeyFromAuth != organization.OwnerPubKey {
 		msg := "only org admin can delete an organization"
@@ -686,8 +686,22 @@ func DeleteOrganization(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	// Update organization to hide and clear certain fields
+	if err := oh.db.UpdateOrganizationForDeletion(uuid); err != nil {
+		fmt.Println("Error updating organization:", err)
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+
+	// Delete all users from the organization
+	if err := oh.db.DeleteAllUsersFromOrganization(uuid); err != nil {
+		fmt.Println("Error removing users from organization:", err)
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+
 	// soft delete organization
-	org := db.DB.ChangeOrganizationDeleteStatus(uuid, true)
+	org := oh.db.ChangeOrganizationDeleteStatus(uuid, true)
 	w.WriteHeader(http.StatusOK)
 	json.NewEncoder(w).Encode(org)
 }

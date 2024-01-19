@@ -111,6 +111,8 @@ type Database interface {
 	GetUserInvoiceData(payment_request string) UserInvoiceData
 	DeleteUserInvoiceData(payment_request string) UserInvoiceData
 	ChangeOrganizationDeleteStatus(org_uuid string, status bool) Organization
+	UpdateOrganizationForDeletion(uuid string) error
+	DeleteAllUsersFromOrganization(uuid string) error
 	GetFilterStatusCount() FilterStattuCount
 	UserHasManageBountyRoles(pubKeyFromAuth string, uuid string) bool
 	BountiesPaidPercentage(r PaymentDateRange) uint
