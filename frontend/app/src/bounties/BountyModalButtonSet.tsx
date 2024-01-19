@@ -14,7 +14,6 @@ const ButtonSetContainer = styled.div`
 
 const ButtonSet = ({ showGithubBtn, ...props }: any) => {
   const color = colors['light'];
-  const tribeString = typeof props.tribe === 'string' ? props.tribe : 'Default Value';
   return (
     <ButtonSetContainer
       style={{
@@ -78,7 +77,7 @@ const ButtonSet = ({ showGithubBtn, ...props }: any) => {
           </div>
         </ButtonContainer>
       )}
-      {props.tribe !== 'None' ? (
+      {typeof props.tribe === 'string' && props.tribe !== 'None' ? (
         <ButtonContainer
           topMargin={'16px'}
           onClick={() => {
@@ -101,7 +100,7 @@ const ButtonSet = ({ showGithubBtn, ...props }: any) => {
             />
           </div>
           <EuiText className="ButtonText">
-            {tribeString.slice(0, 14)} {props.tribe.length > 14 && '...'}
+            {props.tribe.slice(0, 14)} {props.tribe.length > 14 && '...'}
           </EuiText>
           <div className="ImageContainer">
             <img
@@ -135,7 +134,7 @@ const ButtonSet = ({ showGithubBtn, ...props }: any) => {
           </div>
           <EuiText className="ButtonText">
             {props.tribe
-              ? tribeString.slice(0, 14) + (props.tribe.length > 14 ? '...' : '')
+              ? props.tribe.slice(0, 14) + (props.tribe.length > 14 ? '...' : '')
               : 'No Tribe'}
           </EuiText>
           <div className="ImageContainer">
