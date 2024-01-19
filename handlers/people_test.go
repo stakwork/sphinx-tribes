@@ -274,7 +274,7 @@ func TestDeletePerson(t *testing.T) {
 		req, err := http.NewRequestWithContext(ctx, http.MethodDelete, "/", nil)
 		assert.NoError(t, err)
 
-		mockDb.On("GetPerson", person.ID).Return(person).Once()
+		mockDb.On("GetPerson", uint(1)).Return(person).Once()
 		handler.ServeHTTP(rr, req)
 
 		assert.Equal(t, http.StatusUnauthorized, rr.Code)
