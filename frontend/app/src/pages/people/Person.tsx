@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import styled from 'styled-components';
-import { getHost } from '../../config/host';
+import { getHost } from '../../config';
 import { Button, Divider, LazyImgBg } from '../../components/common';
 import ConnectCard from '../../people/utils/ConnectCard';
 import { PersonProps } from '../../people/interfaces';
@@ -24,18 +24,19 @@ interface DWarpProps {
   squeeze: boolean;
 }
 const DWrap = styled.div<DWarpProps>`
-  cursor: pointer;
-  height: 350px;
-  width: ${(p: any) => (p.squeeze ? '200px' : '210px')};
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-  background: #fff;
-  margin-bottom: 20px;
-  margin-right: 20px;
-  box-shadow: 0px 1px 2px rgba(0, 0, 0, 0.15);
-  border-radius: 4px;
-  overflow: hidden;transition: background 0.3s;
+    cursor: pointer;
+    height: 350px;
+    width: ${(p: any) => (p.squeeze ? '200px' : '210px')};
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    background: #fff;
+    margin-bottom: 20px;
+    margin-right: 20px;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.15);
+    border-radius: 4px;
+    overflow: hidden;
+    transition: background 0.3s;
 
     &:hover {
         background: #f2f3f5;
@@ -136,7 +137,7 @@ export default function Person(props: PersonProps) {
   const addedStyles = hideActions ? { width: 56, height: 56 } : {};
   const qrString = makeQR(owner_pubkey);
   const [showQR, setShowQR] = useState(false);
-  const [showHighlight, setShowHighlight] = useState(false);
+  const [showHighlight, setShowHighlight] = useState(false); //intentionally unused
   function renderPersonCard() {
     if (small) {
       return (
