@@ -321,7 +321,7 @@ const AddOrganization = (props: {
           />
           <LabelRowContainer>
             {descriptionError && <InputError>Description is too long.</InputError>}
-            <SecondaryText style={{ color: descriptionError ? errcolor : '' , marginLeft: 'auto'}}>
+            <SecondaryText style={{ color: descriptionError ? errcolor : '', marginLeft: 'auto' }}>
               {description.length}/{MAX_DESCRIPTION_LENGTH}
             </SecondaryText>
           </LabelRowContainer>
