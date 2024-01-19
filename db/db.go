@@ -484,9 +484,9 @@ func (db database) GetFilterStatusCount() FilterStattuCount {
 	var assignedCount int64
 	var paidCount int64
 
-	db.db.Raw("SELECT COUNT(*) FROM bounty WHERE show != false AND assignee = '' AND paid != true").Scan(&openCount)
-	db.db.Raw("SELECT COUNT(*) FROM bounty WHERE show != false AND assignee != ''").Scan(&assignedCount)
-	db.db.Raw("SELECT COUNT(*) FROM bounty WHERE show != false AND paid = true").Scan(&paidCount)
+	db.db.Model(&Bounty{}).Where("show != false").Where("assignee = ''").Where("paid != true").Count(&openCount)
+	db.db.Model(&Bounty{}).Where("show != false").Where("assignee != ''").Where("paid != true").Count(&assignedCount)
+	db.db.Model(&Bounty{}).Where("show != false").Where("assignee != ''").Where("paid = true").Count(&paidCount)
 
 	ms := FilterStattuCount{
 		Open:     openCount,
@@ -504,6 +504,10 @@ func (db database) GetOrganizationBounties(r *http.Request, org_uuid string) []B
 	open := keys.Get("Open")
 	assingned := keys.Get("Assigned")
 	paid := keys.Get("Paid")
+	languages := keys.Get("languages")
+	languageArray := strings.Split(languages, ",")
+	languageLength := len(languageArray)
+
 	ms := []Bounty{}
 
 	orderQuery := ""
@@ -512,14 +516,18 @@ func (db database) GetOrganizationBounties(r *http.Request, org_uuid string) []B
 	openQuery := ""
 	assignedQuery := ""
 	paidQuery := ""
+	languageQuery := ""
 
 	if sortBy != "" && direction != "" {
 		orderQuery = "ORDER BY " + sortBy + " " + direction
 	} else {
 		orderQuery = " ORDER BY " + sortBy + "" + "DESC"
 	}
-	if offset != 0 && limit != 0 {
-		limitQuery = fmt.Sprintf("LIMIT %d  OFFSET %d", limit, offset)
+	if limit > 0 {
+		limitQuery = fmt.Sprintf("LIMIT %d", limit)
+	}
+	if offset > 0 {
+		limitQuery += fmt.Sprintf(" OFFSET %d", offset)
 	}
 	if search != "" {
 		searchQuery = fmt.Sprintf("WHERE LOWER(title) LIKE %s", "'%"+search+"%'")
@@ -544,9 +552,22 @@ func (db database) GetOrganizationBounties(r *http.Request, org_uuid string) []B
 			paidQuery = "AND paid = true"
 		}
 	}
+	if languageLength > 0 {
+		langs := ""
+		for i, val := range languageArray {
+			if val != "" {
+				if i == 0 {
+					langs = "'" + val + "'"
+				} else {
+					langs = langs + ", '" + val + "'"
+				}
+				languageQuery = "AND coding_languages && ARRAY[" + langs + "]"
+			}
+		}
+	}
 
 	query := `SELECT * FROM bounty WHERE org_uuid = '` + org_uuid + `'`
-	allQuery := query + " " + openQuery + " " + assignedQuery + " " + paidQuery + " " + searchQuery + " " + orderQuery + " " + limitQuery
+	allQuery := query + " " + openQuery + " " + assignedQuery + " " + paidQuery + " " + searchQuery + " " + languageQuery + " " + orderQuery + " " + limitQuery
 	theQuery := db.db.Raw(allQuery)
 
 	if tags != "" {
@@ -592,8 +613,6 @@ func (db database) GetCreatedBounties(r *http.Request) ([]Bounty, error) {
 
 	orderQuery := ""
 	limitQuery := ""
-
-	fmt.Println("Sort BY", sortBy, limit)
 
 	if sortBy != "" && direction != "" {
 		orderQuery = "ORDER BY " + sortBy + " " + "ASC"
@@ -645,6 +664,9 @@ func (db database) GetAllBounties(r *http.Request) []Bounty {
 	assingned := keys.Get("Assigned")
 	paid := keys.Get("Paid")
 	orgUuid := keys.Get("org_uuid")
+	languages := keys.Get("languages")
+	languageArray := strings.Split(languages, ",")
+	languageLength := len(languageArray)
 
 	ms := []Bounty{}
 
@@ -655,6 +677,7 @@ func (db database) GetAllBounties(r *http.Request) []Bounty {
 	assignedQuery := ""
 	paidQuery := ""
 	orgQuery := ""
+	languageQuery := ""
 
 	if sortBy != "" && direction != "" {
 		orderQuery = "ORDER BY " + sortBy + " " + direction
@@ -690,9 +713,23 @@ func (db database) GetAllBounties(r *http.Request) []Bounty {
 	if orgUuid != "" {
 		orgQuery = "AND org_uuid = '" + orgUuid + "'"
 	}
+	if languageLength > 0 {
+		langs := ""
+		for i, val := range languageArray {
+			if val != "" {
+				if i == 0 {
+					langs = "'" + val + "'"
+				} else {
+					langs = langs + ", '" + val + "'"
+				}
+				languageQuery = "AND coding_languages && ARRAY[" + langs + "]"
+			}
+		}
+	}
+
 	query := "SELECT * FROM public.bounty WHERE show != false"
 
-	allQuery := query + " " + openQuery + " " + assignedQuery + " " + paidQuery + " " + searchQuery + " " + orgQuery + " " + orderQuery + " " + limitQuery
+	allQuery := query + " " + openQuery + " " + assignedQuery + " " + paidQuery + " " + searchQuery + " " + orgQuery + " " + languageQuery + " " + orderQuery + " " + limitQuery
 
 	theQuery := db.db.Raw(allQuery)
 
@@ -1058,7 +1095,7 @@ func (db database) CreateLnUser(lnKey string) (Person, error) {
 	if db.GetLnUser(lnKey) == 0 {
 		p.OwnerPubKey = lnKey
 		p.OwnerAlias = lnKey
-		p.UniqueName, _ = PersonUniqueNameFromName(p.OwnerAlias)
+		p.UniqueName, _ = db.PersonUniqueNameFromName(p.OwnerAlias)
 		p.Created = &now
 		p.Tags = pq.StringArray{}
 		p.Uuid = xid.New().String()
@@ -1070,7 +1107,7 @@ func (db database) CreateLnUser(lnKey string) (Person, error) {
 	return p, nil
 }
 
-func PersonUniqueNameFromName(name string) (string, error) {
+func (db database) PersonUniqueNameFromName(name string) (string, error) {
 	pathOne := strings.ToLower(strings.Join(strings.Fields(name), ""))
 	reg, err := regexp.Compile("[^a-zA-Z0-9]+")
 	if err != nil {
@@ -1083,7 +1120,7 @@ func PersonUniqueNameFromName(name string) (string, error) {
 		if n > 0 {
 			uniquepath = path + strconv.Itoa(n)
 		}
-		existing := DB.GetPersonByUniqueName(uniquepath)
+		existing := db.GetPersonByUniqueName(uniquepath)
 		if existing.ID != 0 {
 			n = n + 1
 		} else {
@@ -1448,4 +1485,40 @@ func (db database) ChangeOrganizationDeleteStatus(org_uuid string, status bool) 
 		"deleted": status,
 	})
 	return ms
+}
+
+func (db database) UpdateOrganizationForDeletion(uuid string) error {
+	updates := map[string]interface{}{
+		"website":     "",
+		"github":      "",
+		"description": "",
+		"show":        false,
+	}
+
+	result := db.db.Model(&Organization{}).Where("uuid = ?", uuid).Updates(updates)
+	if result.Error != nil {
+		return result.Error
+	}
+
+	return nil
+}
+
+func (db database) DeleteAllUsersFromOrganization(org string) error {
+	if org == "" {
+		return errors.New("no org uuid provided")
+	}
+
+	// Delete all users associated with the organization
+	result := db.db.Where("org_uuid = ?", org).Delete(&OrganizationUsers{})
+	if result.Error != nil {
+		return result.Error
+	}
+
+	// Delete all user roles associated with the organization
+	result = db.db.Where("org_uuid = ?", org).Delete(&UserRoles{})
+	if result.Error != nil {
+		return result.Error
+	}
+
+	return nil
 }
