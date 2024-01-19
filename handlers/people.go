@@ -22,7 +22,15 @@ import (
 
 const liquidTestModeUrl = "TEST_ASSET_URL"
 
-func CreateOrEditPerson(w http.ResponseWriter, r *http.Request) {
+type peopleHandler struct {
+	db db.Database
+}
+
+func NewPeopleHandler(db db.Database) *peopleHandler {
+	return &peopleHandler{db: db}
+}
+
+func (ph *peopleHandler) CreateOrEditPerson(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 	pubKeyFromAuth, _ := ctx.Value(auth.ContextKey).(string)
 
@@ -51,14 +59,14 @@ func CreateOrEditPerson(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	existing := db.DB.GetPersonByPubkey(pubKeyFromAuth)
+	existing := ph.db.GetPersonByPubkey(pubKeyFromAuth)
 	if existing.ID == 0 { // new!
 		if person.ID != 0 { // cant try to "edit" if not exists already
 			fmt.Println("cant edit non existing")
 			w.WriteHeader(http.StatusUnauthorized)
 			return
 		}
-		person.UniqueName, _ = db.PersonUniqueNameFromName(person.OwnerAlias)
+		person.UniqueName, _ = ph.db.PersonUniqueNameFromName(person.OwnerAlias)
 		person.Created = &now
 		person.Uuid = xid.New().String()
 	} else { // editing! needs ID
@@ -78,7 +86,7 @@ func CreateOrEditPerson(w http.ResponseWriter, r *http.Request) {
 	person.Updated = &now
 
 	if person.NewTicketTime != 0 {
-		go db.ProcessAlerts(person)
+		go ph.db.ProcessAlerts(person)
 	}
 
 	b := new(bytes.Buffer)
@@ -88,7 +96,7 @@ func CreateOrEditPerson(w http.ResponseWriter, r *http.Request) {
 		log.Printf("Could not encode extras json data")
 	}
 
-	p, err := db.DB.CreateOrEditPerson(person)
+	p, err := ph.db.CreateOrEditPerson(person)
 	if err != nil {
 		w.WriteHeader(http.StatusBadRequest)
 		return
@@ -322,10 +330,10 @@ func processGithubConfirmationsLoop() {
 	processGithubConfirmationsLoop()
 }
 
-func GetPersonByPubkey(w http.ResponseWriter, r *http.Request) {
+func (ph *peopleHandler) GetPersonByPubkey(w http.ResponseWriter, r *http.Request) {
 	pubkey := chi.URLParam(r, "pubkey")
 
-	person := db.DB.GetPersonByPubkey(pubkey)
+	person := ph.db.GetPersonByPubkey(pubkey)
 	w.WriteHeader(http.StatusOK)
 	json.NewEncoder(w).Encode(person)
 }
