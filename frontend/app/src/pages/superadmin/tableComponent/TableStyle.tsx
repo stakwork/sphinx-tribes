@@ -355,6 +355,10 @@ export const FlexDiv = styled.div`
   justify-content: center;
   align-items: center;
   gap: 4px;
+
+  .euiPopover__anchor {
+    margin-top: 6px !important;
+  }
 `;
 
 interface PaginationButtonsProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
