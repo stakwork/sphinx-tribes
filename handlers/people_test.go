@@ -235,17 +235,21 @@ func TestDeletePerson(t *testing.T) {
 	t.Run("successful deletion", func(t *testing.T) {
 		rr := httptest.NewRecorder()
 		handler := http.HandlerFunc(pHandler.DeletePerson)
-		personID := 1
-		person := db.Person{ID: uint(personID), OwnerPubKey: "test-key"}
+		person := db.Person{
+			ID:          1,
+			Uuid:        "test-uuid",
+			OwnerPubKey: "owner-pub-key",
+			OwnerAlias:  "owner",
+		}
 
 		rctx := chi.NewRouteContext()
-		rctx.URLParams.Add("id", strconv.Itoa(personID))
+		rctx.URLParams.Add("id", strconv.Itoa(int(person.ID)))
 		ctx := context.WithValue(context.Background(), authContextKey, person.OwnerPubKey)
 		req, err := http.NewRequestWithContext(ctx, http.MethodDelete, "/person", nil)
 		assert.NoError(t, err)
 
-		mockDb.On("GetPerson", uint(personID)).Return(person).Once()
-		mockDb.On("UpdatePerson", uint(personID), mock.Anything).Return().Once()
+		mockDb.On("GetPerson", person.ID).Return(person).Once()
+		mockDb.On("UpdatePerson", person.ID, mock.Anything).Return().Once()
 		handler.ServeHTTP(rr, req)
 
 		assert.Equal(t, http.StatusOK, rr.Code)
@@ -255,16 +259,20 @@ func TestDeletePerson(t *testing.T) {
 	t.Run("unauthorized deletion attempt", func(t *testing.T) {
 		rr := httptest.NewRecorder()
 		handler := http.HandlerFunc(pHandler.DeletePerson)
-		personID := 1
-		person := db.Person{ID: uint(personID), OwnerPubKey: "other-key"}
+		person := db.Person{
+			ID:          1,
+			Uuid:        "test-uuid",
+			OwnerPubKey: "owner-pub-key",
+			OwnerAlias:  "owner",
+		}
 
 		rctx := chi.NewRouteContext()
-		rctx.URLParams.Add("id", strconv.Itoa(personID))
+		rctx.URLParams.Add("id", strconv.Itoa(int(person.ID)))
 		ctx := context.WithValue(context.Background(), auth.ContextKey, "test-key")
 		req, err := http.NewRequestWithContext(ctx, http.MethodDelete, "/", nil)
 		assert.NoError(t, err)
 
-		mockDb.On("GetPerson", uint(personID)).Return(person).Once()
+		mockDb.On("GetPerson", person.ID).Return(person).Once()
 		handler.ServeHTTP(rr, req)
 
 		assert.Equal(t, http.StatusUnauthorized, rr.Code)
@@ -274,18 +282,23 @@ func TestDeletePerson(t *testing.T) {
 	t.Run("deletion of non-existent person", func(t *testing.T) {
 		rr := httptest.NewRecorder()
 		handler := http.HandlerFunc(pHandler.DeletePerson)
-		personID := 999
+		person := db.Person{
+			ID:          999,
+			Uuid:        "test-uuid",
+			OwnerPubKey: "owner-pub-key",
+			OwnerAlias:  "owner",
+		}
 
 		rctx := chi.NewRouteContext()
-		rctx.URLParams.Add("id", strconv.Itoa(personID))
+		rctx.URLParams.Add("id", strconv.Itoa(int(person.ID)))
 		ctx := context.WithValue(context.Background(), auth.ContextKey, "test-key")
 		req, err := http.NewRequestWithContext(ctx, http.MethodDelete, "/", nil)
 		assert.NoError(t, err)
 
-		mockDb.On("GetPerson", uint(personID)).Return(db.Person{}).Once()
+		mockDb.On("GetPerson", person.ID).Return(db.Person{}).Once()
 		handler.ServeHTTP(rr, req)
 
-		assert.Equal(t, http.StatusUnauthorized, rr.Code) 
+		assert.Equal(t, http.StatusUnauthorized, rr.Code)
 		mockDb.AssertExpectations(t)
 	})
 }
