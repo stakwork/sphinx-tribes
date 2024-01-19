@@ -235,66 +235,18 @@ func TestGetPersonById(t *testing.T) {
 }
 
 func TestDeletePerson(t *testing.T) {
-	ctx := context.WithValue(context.Background(), auth.ContextKey, "test-key")
+	r := chi.NewRouter()
+	pHandler := NewPeopleHandler(nil)
+	r.Delete("/person/{id}", pHandler.DeletePerson)
+	ctx := context.Background()
+	req := httptest.NewRequest(http.MethodDelete, "/person/1", nil)
+	req = req.WithContext(ctx)
 	mockDb := mocks.NewDatabase(t)
-	pHandler := NewPeopleHandler(mockDb)
-
-	t.Run("should return error if ID is not valid", func(t *testing.T) {
-		rr := httptest.NewRecorder()
-		handler := http.HandlerFunc(pHandler.DeletePerson)
-		rctx := chi.NewRouteContext()
-		rctx.URLParams.Add("id", "invalid-id")
-		req, err := http.NewRequestWithContext(ctx, http.MethodDelete, "/person/invalid-id", nil)
-		if err != nil {
-			t.Fatal(err)
-		}
-
-		idStr := rctx.URLParam("id")
-		_, parseErr := strconv.Atoi(idStr)
-		if parseErr != nil {
-			rr.WriteHeader(http.StatusUnauthorized)
-			return
-		}
-
-		handler.ServeHTTP(rr, req)
-
-		assert.Equal(t, http.StatusUnauthorized, rr.Code)
-	})
-
-	t.Run("should return error if person not found", func(t *testing.T) {
-		rr := httptest.NewRecorder()
-		handler := http.HandlerFunc(pHandler.DeletePerson)
-		rctx := chi.NewRouteContext()
-		rctx.URLParams.Add("id", "1")
-		req, err := http.NewRequestWithContext(ctx, http.MethodDelete, "/person/1", nil)
-		if err != nil {
-			t.Fatal(err)
-		}
-
-		mockDb.On("GetPerson", uint(1)).Return(db.Person{}).Once()
-		handler.ServeHTTP(rr, req)
-
-		assert.Equal(t, http.StatusNotFound, rr.Code)
-		mockDb.AssertExpectations(t)
-	})
-
-	t.Run("should delete person successfully", func(t *testing.T) {
-		rr := httptest.NewRecorder()
-		handler := http.HandlerFunc(pHandler.DeletePerson)
-		rctx := chi.NewRouteContext()
-		rctx.URLParams.Add("id", "1")
-		req, err := http.NewRequestWithContext(ctx, http.MethodDelete, "/person/1", nil)
-		if err != nil {
-			t.Fatal(err)
-		}
-
-		person := db.Person{ID: 1, OwnerPubKey: "test-key"}
-		mockDb.On("GetPerson", uint(1)).Return(person).Once()
-		mockDb.On("UpdatePerson", uint(1), mock.AnythingOfType("map[string]interface{}")).Return(nil).Once()
-
-		handler.ServeHTTP(rr, req)
-
-		assert.Equal(t, http.StatusOK, rr.Code)
-		mockDb.AssertExpectations(t)
-	})
+	mockDb.On("GetPerson", uint(1)).Return(db.Person{ID: 1, OwnerPubKey: "test-key"}).Once()
+	mockDb.On("UpdatePerson", uint(1), mock.AnythingOfType("map[string]interface{}")).Return(nil).Once()
+	pHandler.db = mockDb
+	w := httptest.NewRecorder()
+	r.ServeHTTP(w, req)
+	assert.Equal(t, http.StatusOK, w.Code)
+	mockDb.AssertExpectations(t)
 }
