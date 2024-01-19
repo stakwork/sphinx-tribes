@@ -518,19 +518,6 @@ func (db database) GetOrganizationBounties(r *http.Request, org_uuid string) []B
 	paidQuery := ""
 	languageQuery := ""
 
-	if languageLength > 0 {
-		for i, val := range languageArray {
-			if val != "" {
-				if i == 0 {
-					languageQuery = "AND coding_languages && ARRAY['" + val + "']"
-				} else {
-					query := "OR coding_languages && ARRAY['" + val + "']"
-					languageQuery = languageQuery + " " + query
-				}
-			}
-		}
-	}
-
 	if sortBy != "" && direction != "" {
 		orderQuery = "ORDER BY " + sortBy + " " + direction
 	} else {
@@ -563,6 +550,19 @@ func (db database) GetOrganizationBounties(r *http.Request, org_uuid string) []B
 			assignedQuery = ""
 		} else {
 			paidQuery = "AND paid = true"
+		}
+	}
+	if languageLength > 0 {
+		langs := ""
+		for i, val := range languageArray {
+			if val != "" {
+				if i == 0 {
+					langs = "'" + val + "'"
+				} else {
+					langs = langs + ", '" + val + "'"
+				}
+				languageQuery = "AND coding_languages && ARRAY[" + langs + "]"
+			}
 		}
 	}
 
@@ -613,8 +613,6 @@ func (db database) GetCreatedBounties(r *http.Request) ([]Bounty, error) {
 
 	orderQuery := ""
 	limitQuery := ""
-
-	fmt.Println("Sort BY", sortBy, limit)
 
 	if sortBy != "" && direction != "" {
 		orderQuery = "ORDER BY " + sortBy + " " + "ASC"
@@ -716,14 +714,15 @@ func (db database) GetAllBounties(r *http.Request) []Bounty {
 		orgQuery = "AND org_uuid = '" + orgUuid + "'"
 	}
 	if languageLength > 0 {
+		langs := ""
 		for i, val := range languageArray {
 			if val != "" {
 				if i == 0 {
-					languageQuery = "AND coding_languages && ARRAY['" + val + "']"
+					langs = "'" + val + "'"
 				} else {
-					query := "OR coding_languages && ARRAY['" + val + "']"
-					languageQuery = languageQuery + " " + query
+					langs = langs + ", '" + val + "'"
 				}
+				languageQuery = "AND coding_languages && ARRAY[" + langs + "]"
 			}
 		}
 	}
@@ -1096,7 +1095,7 @@ func (db database) CreateLnUser(lnKey string) (Person, error) {
 	if db.GetLnUser(lnKey) == 0 {
 		p.OwnerPubKey = lnKey
 		p.OwnerAlias = lnKey
-		p.UniqueName, _ = PersonUniqueNameFromName(p.OwnerAlias)
+		p.UniqueName, _ = db.PersonUniqueNameFromName(p.OwnerAlias)
 		p.Created = &now
 		p.Tags = pq.StringArray{}
 		p.Uuid = xid.New().String()
@@ -1108,7 +1107,7 @@ func (db database) CreateLnUser(lnKey string) (Person, error) {
 	return p, nil
 }
 
-func PersonUniqueNameFromName(name string) (string, error) {
+func (db database) PersonUniqueNameFromName(name string) (string, error) {
 	pathOne := strings.ToLower(strings.Join(strings.Fields(name), ""))
 	reg, err := regexp.Compile("[^a-zA-Z0-9]+")
 	if err != nil {
@@ -1121,7 +1120,7 @@ func PersonUniqueNameFromName(name string) (string, error) {
 		if n > 0 {
 			uniquepath = path + strconv.Itoa(n)
 		}
-		existing := DB.GetPersonByUniqueName(uniquepath)
+		existing := db.GetPersonByUniqueName(uniquepath)
 		if existing.ID != 0 {
 			n = n + 1
 		} else {
