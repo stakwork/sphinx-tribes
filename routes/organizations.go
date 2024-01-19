@@ -36,7 +36,7 @@ func OrganizationRoutes() chi.Router {
 		r.Get("/payments/{uuid}", handlers.GetPaymentHistory)
 		r.Get("/poll/invoices/{uuid}", handlers.PollBudgetInvoices)
 		r.Get("/invoices/count/{uuid}", handlers.GetInvoicesCount)
-		r.Delete("/delete/{uuid}", handlers.DeleteOrganization)
+		r.Delete("/delete/{uuid}", organizationHandlers.DeleteOrganization)
 	})
 	return r
 }

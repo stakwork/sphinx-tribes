@@ -11,11 +11,13 @@ import {
   ImgText,
   ImgTextContainer,
   InputFile,
-  OrgInput,
+  TextInput,
   OrgInputContainer,
   OrgLabel,
   SelectedImg,
-  UploadImageContainer
+  UploadImageContainer,
+  TextAreaInput,
+  SecondaryText
 } from './style';
 
 const AddOrgWrapper = styled.div`
@@ -52,6 +54,17 @@ const OrgDetailsContainer = styled.div`
     gap: 0.5rem;
   }
 `;
+const FooterContainer = styled.div`
+  display: flex;
+  gap: 3.56rem;
+  align-items: end;
+  justify-content: space-between;
+
+  @media only screen and (max-width: 500px) {
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+`;
 
 const OrgImgOutterContainer = styled.div`
   display: flex;
@@ -70,7 +83,7 @@ const ImgContainer = styled.div`
 `;
 
 const OrgButton = styled.button`
-  width: 100%;
+  width: 16rem;
   height: 3rem;
   padding: 0.5rem 1rem;
   border-radius: 0.375rem;
@@ -94,19 +107,65 @@ const OrgButton = styled.button`
   }
 `;
 
+const errcolor = '#FF8F80';
+
+const InputError = styled.div`
+  color: #ff8f80;
+  font-size: 11px;
+  font-weight: 500;
+`;
+
+const LabelRowContainer = styled.div`
+  display: flex;
+  align-items: end;
+  justify-content: space-between;
+`;
+
+const MAX_ORG_NAME_LENGTH = 20;
+const MAX_DESCRIPTION_LENGTH = 120;
+
 const AddOrganization = (props: {
   closeHandler: () => void;
   getUserOrganizations: () => void;
   owner_pubkey: string | undefined;
 }) => {
   const [orgName, setOrgName] = useState('');
+  const [websiteName, setWebsiteName] = useState('');
+  const [githubRepo, setGithubRepo] = useState('');
+  const [description, setDescription] = useState('');
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const { main } = useStores();
   const [toasts, setToasts] = useState<Toast[]>([]);
+  const [orgNameError, setOrgNameError] = useState<boolean>(false);
+  const [descriptionError, setDescriptionError] = useState<boolean>(false);
 
   const handleOrgNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setOrgName(e.target.value);
+    const newValue = e.target.value;
+    if (newValue.length <= MAX_ORG_NAME_LENGTH) {
+      setOrgName(newValue);
+      setOrgNameError(false);
+    } else {
+      setOrgNameError(true);
+    }
+  };
+
+  const handleWebsiteNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setWebsiteName(e.target.value);
+  };
+
+  const handleGithubRepoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setGithubRepo(e.target.value);
+  };
+
+  const handleDescriptionChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    const newValue = e.target.value;
+    if (newValue.length <= MAX_DESCRIPTION_LENGTH) {
+      setDescription(newValue);
+      setDescriptionError(false);
+    } else {
+      setDescriptionError(true);
+    }
   };
 
   const handleDrop = (event: DragEvent<HTMLDivElement>) => {
@@ -172,7 +231,14 @@ const AddOrganization = (props: {
           img_url = await file.json();
         }
       }
-      const body = { owner_pubkey: props.owner_pubkey || '', name: orgName, img: img_url };
+      const body = {
+        owner_pubkey: props.owner_pubkey || '',
+        name: orgName,
+        description: description,
+        img: img_url,
+        github: githubRepo,
+        website: websiteName
+      };
 
       const res = await main.addOrganization(body);
       if (res.status === 200) {
@@ -224,18 +290,59 @@ const AddOrganization = (props: {
             <ImgDetailInfo>PNG, JPG or GIF, Min. 300 x 300 px</ImgDetailInfo>
           </ImgTextContainer>
         </OrgImgOutterContainer>
-        <OrgInputContainer>
-          <OrgLabel>Organization Name</OrgLabel>
-          <OrgInput
+        <OrgInputContainer style={{ color: orgNameError ? errcolor : '' }}>
+          <LabelRowContainer>
+            <OrgLabel style={{ color: orgNameError ? errcolor : '' }}>Organization Name *</OrgLabel>
+            <SecondaryText style={{ color: orgNameError ? errcolor : '' }}>
+              {orgName.length}/{MAX_ORG_NAME_LENGTH}
+            </SecondaryText>
+          </LabelRowContainer>
+          <TextInput
             placeholder="My Organization..."
             value={orgName}
             onChange={handleOrgNameChange}
+            style={{ borderColor: orgNameError ? errcolor : '' }}
           />
-          <OrgButton disabled={!orgName} onClick={addOrganization}>
-            {isLoading ? <EuiLoadingSpinner size="m" /> : 'Add Organization'}
-          </OrgButton>
+          {orgNameError && <InputError>Name is too long.</InputError>}
+          <OrgLabel>Website</OrgLabel>
+          <TextInput
+            placeholder="Website URL..."
+            value={websiteName}
+            onChange={handleWebsiteNameChange}
+          />
+          <OrgLabel>Github Repo</OrgLabel>
+          <TextInput
+            placeholder="Github link..."
+            value={githubRepo}
+            onChange={handleGithubRepoChange}
+          />
+        </OrgInputContainer>
+        <OrgInputContainer>
+          <LabelRowContainer>
+            <OrgLabel style={{ color: descriptionError ? errcolor : '' }}>Description</OrgLabel>
+            <SecondaryText style={{ color: descriptionError ? errcolor : '' }}>
+              {description.length}/{MAX_DESCRIPTION_LENGTH}
+            </SecondaryText>
+          </LabelRowContainer>
+          <TextAreaInput
+            placeholder="Description Text..."
+            rows={7}
+            value={description}
+            onChange={handleDescriptionChange}
+            style={{ borderColor: descriptionError ? errcolor : '' }}
+          />
+          {descriptionError && <InputError>Description is too long.</InputError>}
         </OrgInputContainer>
       </OrgDetailsContainer>
+      <FooterContainer>
+        <SecondaryText>* Required fields</SecondaryText>
+        <OrgButton
+          disabled={orgNameError || descriptionError || !orgName}
+          onClick={addOrganization}
+        >
+          {isLoading ? <EuiLoadingSpinner size="m" /> : 'Add Organization'}
+        </OrgButton>
+      </FooterContainer>
       <EuiGlobalToastList toasts={toasts} dismissToast={removeToast} toastLifeTimeMs={3000} />
     </AddOrgWrapper>
   );

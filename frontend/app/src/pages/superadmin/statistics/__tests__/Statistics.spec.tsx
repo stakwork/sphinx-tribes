@@ -25,12 +25,9 @@ const mockMetrics = {
   bounties_paid_average: 78,
   sats_paid_percentage: 50,
   average_paid: 10,
-  average_completed: 1
-};
-
-const mockHunter = {
-  hunters_total_paid: 125,
-  hunters_first_bounty_paid: 16
+  average_completed: 1,
+  unique_hunters_paid: 7,
+  new_hunters_paid: 2
 };
 
 describe('Statistics Component', () => {
@@ -59,16 +56,16 @@ describe('Statistics Component', () => {
     expect(getByTestId('total_satoshis_posted')).toHaveTextContent('Total Posted');
     expect(getByTestId('total_satoshis_paid')).toHaveTextContent('Paid');
     expect(getByText('Avg Time to Paid')).toBeInTheDocument();
-    expect(getByText('5000')).toBeInTheDocument();
-    expect(getByText('2500')).toBeInTheDocument();
+    expect(getByText('5,000')).toBeInTheDocument();
+    expect(getByText('2,500')).toBeInTheDocument();
   });
 
   it('renders hunters metrics correctly', () => {
-    const { getByText } = render(<Statistics metrics={mockMetrics} mockHunter={mockHunter} />);
+    const { getByText } = render(<Statistics metrics={mockMetrics} />);
     expect(getByText('Hunters')).toBeInTheDocument();
     expect(getByText('Total Paid')).toBeInTheDocument();
     expect(getByText('First Bounty Paid')).toBeInTheDocument();
-    expect(getByText('125')).toBeInTheDocument();
-    expect(getByText('16')).toBeInTheDocument();
+    expect(getByText('7')).toBeInTheDocument();
+    expect(getByText('2')).toBeInTheDocument();
   });
 });

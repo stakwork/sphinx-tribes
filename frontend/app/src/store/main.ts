@@ -183,6 +183,7 @@ export interface QueryParams {
   direction?: string;
   search?: string;
   resetPage?: boolean;
+  languages?: string;
 }
 
 export interface ClaimOnLiquid {
@@ -208,6 +209,9 @@ export interface Organization {
   id: string;
   uuid: string;
   name: string;
+  description?: string;
+  github?: string;
+  website?: string;
   owner_pubkey: string;
   description?: string;
   github?: string;
@@ -219,6 +223,14 @@ export interface Organization {
   bounty_count?: number;
   budget?: number;
   deleted?: boolean;
+}
+
+export interface CreateOrganizationInput {
+  img: string;
+  name: string;
+  description?: string;
+  github?: string;
+  website?: string;
 }
 
 export interface BountyRoles {
@@ -266,6 +278,8 @@ export interface BountyMetrics {
   sats_paid_percentage: number;
   average_paid: number;
   average_completed: number;
+  unique_hunters_paid: number;
+  new_hunters_paid: number;
 }
 
 export interface BountyStatus {
@@ -657,7 +671,8 @@ export class MainStore {
       ...queryParams,
       limit: String(limit),
       ...(queryParams?.resetPage ? { resetPage: String(queryParams.resetPage) } : {}),
-      ...(queryParams?.page ? { page: String(queryParams.page) } : {})
+      ...(queryParams?.page ? { page: String(queryParams.page) } : {}),
+      ...(queryParams?.languages ? { langauges: queryParams.languages } : {})
     } as Record<string, string>;
 
     const searchParams = new URLSearchParams(adaptedParams);
@@ -803,6 +818,13 @@ export class MainStore {
 
   @action setBountiesStatus(status: BountyStatus) {
     this.bountiesStatus = status;
+  }
+
+  @persist('object')
+  bountyLanguages = '';
+
+  @action setBountyLanguages(languages: string) {
+    this.bountyLanguages = languages;
   }
 
   getWantedsPrevParams?: QueryParams = {};
@@ -1465,7 +1487,11 @@ export class MainStore {
       });
 
       if (response.status) {
-        this.getPeopleBounties({ resetPage: true, ...this.bountiesStatus });
+        this.getPeopleBounties({
+          resetPage: true,
+          ...this.bountiesStatus,
+          languages: this.bountyLanguages
+        });
       }
       return;
     } catch (e) {
@@ -1492,7 +1518,11 @@ export class MainStore {
         }
       });
       if (response.status) {
-        await this.getPeopleBounties({ resetPage: true, ...this.bountiesStatus });
+        await this.getPeopleBounties({
+          resetPage: true,
+          ...this.bountiesStatus,
+          languages: this.bountyLanguages
+        });
       }
       return;
     } catch (e) {
@@ -1912,7 +1942,7 @@ export class MainStore {
     }
   }
 
-  @action async addOrganization(body: { name: string; img: string }): Promise<any> {
+  @action async addOrganization(body: CreateOrganizationInput): Promise<any> {
     try {
       if (!uiStore.meInfo) return null;
       const info = uiStore.meInfo;

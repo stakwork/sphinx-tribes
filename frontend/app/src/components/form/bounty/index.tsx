@@ -2,7 +2,6 @@ import { EuiText } from '@elastic/eui';
 import { Formik } from 'formik';
 import { observer } from 'mobx-react-lite';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
-import history from 'config/history';
 import { useIsMobile } from 'hooks';
 import api from '../../../api';
 import { colors } from '../../../config/colors';
@@ -265,7 +264,7 @@ function Form(props: FormProps) {
                   />
                 ))}
             </div>
-            {schemaData.step != 5 && (
+            {schemaData.step !== 5 && (
               <div className="RightSchema" style={style}>
                 {schema
                   .filter((item: any) => schemaData.schema2.includes(item.name))
@@ -444,8 +443,9 @@ function Form(props: FormProps) {
                           .map((item: FormField) => (
                             <Input
                               {...item}
+                              type={item.type}
                               key={item.name}
-                              newDesign={true}
+                              newDesign={item.name === 'description' ? false : true}
                               values={values}
                               setAssigneefunction={item.name === 'assignee' && setAssigneeName}
                               peopleList={peopleList}

@@ -7,6 +7,7 @@ import { observer } from 'mobx-react-lite';
 import IconButton from 'components/common/IconButton2';
 import { useHistory } from 'react-router-dom';
 import { BountyHeaderProps } from 'people/interfaces';
+import api from 'api';
 import { colors } from '../../config/colors';
 import { useIsMobile } from '../../hooks';
 import { SearchBar } from '../../components/common/index';
@@ -351,11 +352,47 @@ const BountyHeader = ({
     getPeopleList();
   }, [main, selectedWidget]);
 
+  const [counts, setCounts] = useState({
+    open: 0,
+    assigned: 0,
+    paid: 0
+  });
+
+  useEffect(() => {
+    // Fetch counts from the API
+    async function fetchCounts() {
+      try {
+        const response = await api.get('gobounties/filter/count');
+        setCounts({
+          open: response.open || 0,
+          assigned: response.assigned || 0,
+          paid: response.paid || 0
+        });
+      } catch (error) {
+        console.error('Error fetching filter counts:', error);
+      }
+    }
+
+    fetchCounts();
+  }, []);
+
   useEffect(() => {
     setFilterCountNumber(
       filterCount(checkboxIdToSelectedMapLanguage) + filterCount(checkboxIdToSelectedMap)
     );
   }, [checkboxIdToSelectedMapLanguage, checkboxIdToSelectedMap]);
+
+  let timeoutId;
+  const onChangeSearch = (e: any) => {
+    ui.setSearchText(e);
+    clearTimeout(timeoutId);
+    // Set a new timeout to wait for user to pause typing
+    timeoutId = setTimeout(() => {
+      if (ui.searchText === '') {
+        main.getPeopleBounties({ page: 1, resetPage: true, ...checkboxIdToSelectedMap });
+      }
+    }, 1000);
+  };
 
   return (
     <>
@@ -392,6 +429,7 @@ const BountyHeader = ({
                 }}
               />
               <SearchBar
+                data-testid="search-bar"
                 name="search"
                 type="search"
                 placeholder={`Search across ${activeBounty} Bounties`}
@@ -404,9 +442,7 @@ const BountyHeader = ({
                   fontFamily: 'Barlow',
                   color: color.text2
                 }}
-                onChange={(e: any) => {
-                  ui.setSearchText(e);
-                }}
+                onChange={onChangeSearch}
                 onKeyUp={(e: any) => {
                   if (e.key === 'Enter' || e.keyCode === 13) {
                     main.getPeopleBounties({ page: 1, resetPage: true });
@@ -471,7 +507,10 @@ const BountyHeader = ({
                   <EuiPopOverCheckboxLeft className="CheckboxOuter" color={color}>
                     <EuiText className="leftBoxHeading">STATUS</EuiText>
                     <EuiCheckboxGroup
-                      options={Status}
+                      options={status.map((status: any) => ({
+                        label: `${status} [${counts[status.toLowerCase()]}]`, // Use counts to display the corresponding count
+                        id: status
+                      }))}
                       idToSelectedMap={checkboxIdToSelectedMap}
                       onChange={(id: any) => {
                         onChangeStatus(id);

@@ -12,9 +12,9 @@ import (
 	"path"
 	"time"
 
-	"github.com/ambelovsky/go-structs"
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/service/s3"
+	"github.com/fatih/structs"
 	"github.com/stakwork/sphinx-tribes/auth"
 	"github.com/stakwork/sphinx-tribes/config"
 	"github.com/stakwork/sphinx-tribes/db"
@@ -281,25 +281,26 @@ func GetMetricsBountiesData(metricBounties []db.Bounty) []db.BountyData {
 		organization := db.DB.GetOrganizationByUuid(bounty.OrgUuid)
 
 		bountyData := db.BountyData{
-			Bounty:              bounty,
-			BountyId:            bounty.ID,
-			Person:              bountyOwner,
-			BountyCreated:       bounty.Created,
-			BountyDescription:   bounty.Description,
-			BountyUpdated:       bounty.Updated,
-			AssigneeId:          bountyAssignee.ID,
-			AssigneeImg:         bountyAssignee.Img,
-			AssigneeAlias:       bountyAssignee.OwnerAlias,
-			AssigneeDescription: bountyAssignee.Description,
-			AssigneeRouteHint:   bountyAssignee.OwnerRouteHint,
-			BountyOwnerId:       bountyOwner.ID,
-			OwnerUuid:           bountyOwner.Uuid,
-			OwnerDescription:    bountyOwner.Description,
-			OwnerUniqueName:     bountyOwner.UniqueName,
-			OwnerImg:            bountyOwner.Img,
-			OrganizationName:    organization.Name,
-			OrganizationImg:     organization.Img,
-			OrganizationUuid:    organization.Uuid,
+			Bounty:                  bounty,
+			BountyId:                bounty.ID,
+			Person:                  bountyOwner,
+			BountyCreated:           bounty.Created,
+			BountyDescription:       bounty.Description,
+			BountyUpdated:           bounty.Updated,
+			AssigneeId:              bountyAssignee.ID,
+			AssigneeImg:             bountyAssignee.Img,
+			AssigneeAlias:           bountyAssignee.OwnerAlias,
+			AssigneeDescription:     bountyAssignee.Description,
+			AssigneeRouteHint:       bountyAssignee.OwnerRouteHint,
+			BountyOwnerId:           bountyOwner.ID,
+			OwnerUuid:               bountyOwner.Uuid,
+			OwnerDescription:        bountyOwner.Description,
+			OwnerUniqueName:         bountyOwner.UniqueName,
+			OwnerImg:                bountyOwner.Img,
+			OrganizationName:        organization.Name,
+			OrganizationImg:         organization.Img,
+			OrganizationUuid:        organization.Uuid,
+			OrganizationDescription: organization.Description,
 		}
 		metricBountiesData = append(metricBountiesData, bountyData)
 	}
@@ -309,15 +310,31 @@ func GetMetricsBountiesData(metricBounties []db.Bounty) []db.BountyData {
 func getMetricsBountyCsv(metricBounties []db.Bounty) []db.MetricsBountyCsv {
 	var metricBountiesCsv []db.MetricsBountyCsv
 	for _, bounty := range metricBounties {
+		bountyOwner := db.DB.GetPersonByPubkey(bounty.OwnerID)
+		bountyAssignee := db.DB.GetPersonByPubkey(bounty.Assignee)
+		organization := db.DB.GetOrganizationByUuid(bounty.OrgUuid)
+
+		bountyLink := fmt.Sprintf("https://community.sphinx.chat/bounty/%d", bounty.ID)
+		bountyStatus := "Open"
+
+		if bounty.Assignee != "" && !bounty.Paid {
+			bountyStatus = "Assigned"
+		} else {
+			bountyStatus = "Paid"
+		}
+
 		tm := time.Unix(bounty.Created, 0)
 		bountyCsv := db.MetricsBountyCsv{
 			DatePosted:   &tm,
+			Organization: organization.Name,
 			BountyAmount: bounty.Price,
+			Provider:     bountyOwner.OwnerAlias,
+			Hunter:       bountyAssignee.OwnerAlias,
+			BountyTitle:  bounty.Title,
+			BountyLink:   bountyLink,
+			BountyStatus: bountyStatus,
 			DateAssigned: bounty.AssignedDate,
 			DatePaid:     bounty.PaidDate,
-			BountyTitle:  bounty.Title,
-			Hunter:       bounty.Assignee,
-			Provider:     bounty.OwnerID,
 		}
 		metricBountiesCsv = append(metricBountiesCsv, bountyCsv)
 	}
@@ -326,13 +343,7 @@ func getMetricsBountyCsv(metricBounties []db.Bounty) []db.MetricsBountyCsv {
 }
 
 func ConvertMetricsToCSV(metricBountiesData []db.MetricsBountyCsv) [][]string {
-	var metricsData []map[string]interface{}
-	data, err := json.Marshal(metricBountiesData)
-	if err != nil {
-		fmt.Println("Could not convert metrics structs Array to JSON")
-		return [][]string{}
-	}
-	err = json.Unmarshal(data, &metricsData)
+	metricsData := db.DB.ConvertMetricsBountiesToMap(metricBountiesData)
 	result := jsonconv.ToCsv(metricsData, nil)
 	return result
 }

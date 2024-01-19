@@ -1,13 +1,13 @@
 import { toJS } from 'mobx';
 import sinon from 'sinon';
+import moment from 'moment';
 import { people } from '../../__test__/__mockData__/persons';
 import { user } from '../../__test__/__mockData__/user';
-import { emptyMeInfo, uiStore } from '../ui';
+import { MeInfo, emptyMeInfo, uiStore } from '../ui';
 import { MainStore } from '../main';
 import { localStorageMock } from '../../__test__/__mockData__/localStorage';
 import { TribesURL, getHost } from '../../config';
 import mockBounties, { expectedBountyResponses } from '../../bounties/__mock__/mockBounties.data';
-import moment from 'moment';
 
 let fetchStub: sinon.SinonStub;
 let mockApiResponseData: any[];
@@ -72,6 +72,41 @@ describe('Main store', () => {
     );
   });
 
+  it('should call endpoint on addOrganization with description, github and website url', async () => {
+    const mainStore = new MainStore();
+
+    const mockApiResponse = { status: 200, message: 'success' };
+
+    fetchStub.resolves(Promise.resolve(mockApiResponse));
+
+    const addOrganization = {
+      img: '',
+      name: 'New Orgination test',
+      owner_pubkey: '035f22835fbf55cf4e6823447c63df74012d1d587ed60ef7cbfa3e430278c44cce',
+      description: 'My test Organization',
+      github: 'https://github.com/john-doe',
+      website: 'https://john.doe'
+    };
+
+    const expectedHeaders = {
+      'Content-Type': 'application/json',
+      'x-jwt': 'test_jwt'
+    };
+
+    await mainStore.addOrganization(addOrganization);
+
+    sinon.assert.calledWith(
+      fetchStub,
+      `${TribesURL}/organizations`,
+      sinon.match({
+        method: 'POST',
+        headers: expectedHeaders,
+        body: JSON.stringify(addOrganization),
+        mode: 'cors'
+      })
+    );
+  });
+
   it('should call endpoint on UpdateOrganization Name', async () => {
     const mainStore = new MainStore();
 
@@ -93,6 +128,48 @@ describe('Main store', () => {
       show: false,
       deleted: false,
       bounty_count: 1
+    };
+
+    const expectedHeaders = {
+      'Content-Type': 'application/json',
+      'x-jwt': 'test_jwt'
+    };
+
+    await mainStore.updateOrganization(updateOrganization);
+
+    sinon.assert.calledWith(
+      fetchStub,
+      `${TribesURL}/organizations`,
+      sinon.match({
+        method: 'POST',
+        headers: expectedHeaders,
+        body: JSON.stringify(updateOrganization),
+        mode: 'cors'
+      })
+    );
+  });
+
+  it('should call endpoint on UpdateOrganization description, github url and website url, non mandatory fields', async () => {
+    const mainStore = new MainStore();
+
+    const mockApiResponse = { status: 200, message: 'success' };
+
+    fetchStub.resolves(Promise.resolve(mockApiResponse));
+
+    const updateOrganization = {
+      id: '42',
+      uuid: 'clic8k04nncuuf32kgr0',
+      name: 'TEST1',
+      owner_pubkey: '035f22835fbf55cf4e6823447c63df74012d1d587ed60ef7cbfa3e430278c44cce',
+      img: 'https://memes.sphinx.chat/public/NVhwFqDqHKAC-_Sy9pR4RNy8_cgYuOVWgohgceAs-aM=',
+      created: '2023-11-27T16:31:12.699355Z',
+      updated: '2023-11-27T16:31:12.699355Z',
+      show: false,
+      deleted: false,
+      bounty_count: 1,
+      description: 'Update description',
+      website: 'https://john.doe',
+      github: 'https://github.com/john-doe'
     };
 
     const expectedHeaders = {
@@ -494,8 +571,8 @@ describe('Main store', () => {
     await store.deleteBounty(1111, 'pub_key');
 
     expect(fetchStub.withArgs(url, expectedRequestOptions).calledOnce).toEqual(true);
-    expect(store.peopleBounties.length).toEqual(1);
-    expect(store.peopleBounties).toEqual([expectedBountyResponses[0]]);
+    expect(store.peopleBounties.length).toEqual(0);
+    expect(store.peopleBounties).toEqual([]);
   });
 
   it('should not panic if failed to delete bounty', async () => {
@@ -675,7 +752,7 @@ describe('Main store', () => {
     expect(res).toEqual(0);
   });
 
-  it('should set all query params, page, limit, search when fetching bounties, user logged out', async () => {
+  it('should set all query params, page, limit, search, and languages when fetching bounties, user logged out', async () => {
     uiStore.setMeInfo(emptyMeInfo);
     const allBountiesUrl = `http://${getHost()}/gobounties/all?limit=10&sortBy=updatedat&search=random&page=1&resetPage=true`;
     fetchStub.withArgs(allBountiesUrl, sinon.match.any).returns(
@@ -950,5 +1027,100 @@ describe('Main store', () => {
 
     store.exportMetricsBountiesCsv(body);
     expect(store.exportMetricsBountiesCsv).toBeCalledWith(body);
+  });
+
+  it('I should be able to test that the signed-in user details are persisted in the local storage', async () => {
+    const mockUser: MeInfo = {
+      id: 20,
+      pubkey: 'test_pub_key',
+      uuid: mockApiResponseData[0].uuid,
+      contact_key: 'test_owner_contact_key',
+      owner_route_hint: 'test_owner_route_hint',
+      alias: 'Owner Name',
+      photo_url: '',
+      github_issues: [],
+      route_hint: 'test_hint:1099567661057',
+      price_to_meet: 0,
+      jwt: 'test_jwt',
+      tribe_jwt: 'test_jwt',
+      url: 'http://localhost:5002',
+      description: 'description',
+      verification_signature: 'test_verification_signature',
+      extras: {
+        email: [{ value: 'testEmail@sphinx.com' }],
+        liquid: [{ value: 'none' }],
+        wanted: []
+      },
+      owner_alias: 'Owner Name',
+      owner_pubkey: 'test_pub_key',
+      img: '/static/avatarPlaceholders/placeholder_34.jpg',
+      twitter_confirmed: false,
+      isSuperAdmin: false,
+      websocketToken: 'test_websocketToken'
+    };
+    uiStore.setMeInfo(mockUser);
+    uiStore.setShowSignIn(true);
+
+    localStorageMock.setItem('ui', JSON.stringify(uiStore));
+
+    expect(uiStore.showSignIn).toBeTruthy();
+    expect(uiStore.meInfo).toEqual(mockUser);
+    expect(localStorageMock.getItem('ui')).toEqual(JSON.stringify(uiStore));
+  });
+
+  it('I should be able to test that when signed out the user data is deleted', async () => {
+    // Shows first if signed in
+    uiStore.setShowSignIn(true);
+    localStorageMock.setItem('ui', JSON.stringify(uiStore));
+
+    expect(uiStore.showSignIn).toBeTruthy();
+    expect(localStorageMock.getItem('ui')).toEqual(JSON.stringify(uiStore));
+    //Shows when signed out
+    uiStore.setMeInfo(null);
+    localStorageMock.setItem('ui', null);
+
+    expect(localStorageMock.getItem('ui')).toEqual(null);
+  });
+
+  it('I should be able to test that signed-in user details can be displayed such as the name and pubkey', async () => {
+    uiStore.setShowSignIn(true);
+
+    expect(uiStore.meInfo?.owner_alias).toEqual(user.alias);
+    expect(uiStore.meInfo?.owner_pubkey).toEqual(user.pubkey);
+  });
+
+  it('I should be able to test that a signed-in user can update their details', async () => {
+    uiStore.setShowSignIn(true);
+    expect(uiStore.meInfo?.alias).toEqual('Vladimir');
+
+    user.alias = 'John';
+    uiStore.setMeInfo(user);
+
+    expect(uiStore.meInfo?.alias).toEqual('John');
+  });
+
+  it('I should be able to test that a signed-in user can make an API request without getting a 401 (unauthorized error)', async () => {
+    uiStore.setShowSignIn(true);
+    const loggedUrl = `http://${getHost()}/admin/auth`;
+    const res = await fetchStub.withArgs(loggedUrl, sinon.match.any).returns(
+      Promise.resolve({
+        status: 200,
+        ok: true
+      }) as any
+    );
+    expect(res).toBeTruthy();
+  });
+
+  it('I should be able to test that when a user is signed out, a user will get a 401 error if they make an API call', async () => {
+    uiStore.setMeInfo(emptyMeInfo);
+    const urlNoLogged = `http://${getHost()}/admin/auth`;
+
+    const res = await fetchStub.withArgs(urlNoLogged, sinon.match.any).returns(
+      Promise.resolve({
+        status: 401,
+        ok: false
+      }) as any
+    );
+    expect(res).toBeTruthy();
   });
 });

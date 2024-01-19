@@ -5,6 +5,7 @@ import (
 	"os"
 
 	"github.com/rs/xid"
+	"gopkg.in/go-playground/validator.v9"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 )
@@ -152,6 +153,9 @@ var Peopleupdatables = []string{
 	"price_to_meet", "updated",
 	"extras",
 }
+
+var Validate *validator.Validate = validator.New()
+
 var Channelupdatables = []string{
 	"name", "deleted"}
 
@@ -196,6 +200,28 @@ func GetUserRolesMap(userRoles []UserRoles) map[string]string {
 		roles[v.Role] = v.Role
 	}
 	return roles
+}
+
+func (db database) ConvertMetricsBountiesToMap(metricsCsv []MetricsBountyCsv) []map[string]interface{} {
+	var metricsMap []map[string]interface{}
+	for _, m := range metricsCsv {
+		metricMap := make(map[string]interface{})
+
+		metricMap["DatePosted"] = m.DatePosted
+		metricMap["Organization"] = m.Organization
+		metricMap["BountyAmount"] = m.BountyAmount
+		metricMap["Provider"] = m.Provider
+		metricMap["Hunter"] = m.Hunter
+		metricMap["BountyTitle"] = m.BountyTitle
+		metricMap["BountyLink"] = m.BountyLink
+		metricMap["BountyStatus"] = m.BountyStatus
+		metricMap["DateAssigned"] = m.DateAssigned
+		metricMap["DatePaid"] = m.DatePaid
+
+		metricsMap = append(metricsMap, metricMap)
+	}
+
+	return metricsMap
 }
 
 func RolesCheck(userRoles []UserRoles, check string) bool {
