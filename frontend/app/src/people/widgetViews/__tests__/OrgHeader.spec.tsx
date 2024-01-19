@@ -4,14 +4,6 @@ import '@testing-library/jest-dom';
 import { OrgHeader } from 'pages/tickets/org/orgHeader';
 import { mainStore } from 'store/main';
 
-// Mock the necessary module to provide org_uuid
-jest.mock('react-router-dom', () => ({
-  ...jest.requireActual('react-router-dom'),
-  useLocation: () => ({
-    pathname: '/org/bounties/cd9dm5ua5fdtsj2c2n9g' // Mocked path containing org_uuid
-  })
-}));
-
 describe('OrgHeader Component', () => {
   beforeEach(() => {
     jest.spyOn(mainStore, 'getOrgBounties').mockReset();
@@ -41,26 +33,31 @@ describe('OrgHeader Component', () => {
     expect(screen.getByText('Bounties')).toBeInTheDocument();
   });
 
-  it('calls getOrgBounties with correct parameters including org_uuid on search', () => {
+  it('should calls getOrgBounties with correct parameters', () => {
+    const orgUuid = 'cmkln4tm098m49vhlt80';
+    Object.defineProperty(window, 'location', {
+      value: {
+        pathname: `/org/bounties/${orgUuid}`
+      },
+      writable: true
+    });
+
     render(<OrgHeader />);
 
     // Simulate entering search text
     const searchText = 'sample search';
-    const searchInput = screen.getByPlaceholderText('Search');
+    const searchInput = screen.getByPlaceholderText('Search') as HTMLInputElement;
     fireEvent.change(searchInput, { target: { value: searchText } });
 
     // Simulate pressing Enter key
     fireEvent.keyUp(searchInput, { key: 'Enter', code: 'Enter' });
-
-    // Expected org_uuid extracted from the mocked URL
-    const expectedOrgUuid = 'cd9dm5ua5fdtsj2c2n9g';
 
     // Check if getOrgBounties is called with correct parameters
     expect(mainStore.getOrgBounties).toHaveBeenCalledWith({
       page: 1,
       resetPage: true,
       search: searchText,
-      org_uuid: expectedOrgUuid
+      org_uuid: orgUuid
     });
   });
 });

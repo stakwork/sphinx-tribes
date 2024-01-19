@@ -893,20 +893,11 @@ export class MainStore {
   getWantedsOrgBountiesPrevParams?: QueryParams = {};
 
   async getOrgBounties(params?: QueryParams2): Promise<PersonBounty[]> {
-    const currentPath = window.location.pathname;
-    console.log('currentPath: ', currentPath)
-    const pathSegments = currentPath.split('/');
-    console.log('pathSegments: ', pathSegments)
-    const paramValue = pathSegments[pathSegments.length - 1];
-    console.log('paramValue: ', paramValue)
-
     const queryParams: QueryParams2 = {
       limit: queryLimit,
       sortBy: 'created',
-      search: uiStore.searchText ?? '',
       page: 1,
       resetPage: false,
-      org_uuid: paramValue,
       ...params
     };
 

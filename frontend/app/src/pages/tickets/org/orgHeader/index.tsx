@@ -202,7 +202,10 @@ export const OrgHeader = () => {
               }}
               onKeyUp={(e: any) => {
                 if (e.key === 'Enter' || e.keyCode === 13) {
-                  main.getOrgBounties({ page: 1, resetPage: true });
+                  const currentPath = window.location.pathname;
+                  const pathSegments = currentPath.split('/');
+                  const paramValue = pathSegments[pathSegments.length - 1];
+                  main.getOrgBounties({ page: 1, resetPage: true, search: e.target.value, org_uuid: paramValue });
                 }
               }}
               TextColor={color.grayish.G100}
