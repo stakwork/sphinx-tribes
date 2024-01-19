@@ -512,7 +512,7 @@ export const TextInput = styled.input`
   font-weight: 500;
   line-height: 20px;
   width: 16rem;
-  margin-bottom: 1.25rem;
+  margin-bottom: 1px;
   height: 2.4rem;
 
   ::placeholder {
