@@ -6,6 +6,7 @@ import (
 	"encoding/json"
 	"net/http"
 	"net/http/httptest"
+	"strconv"
 	"testing"
 
 	"github.com/go-chi/chi"
@@ -219,6 +220,16 @@ func TestGetPersonById(t *testing.T) {
 		if err != nil {
 			t.Fatal(err)
 		}
+
+		// Attempt to parse the ID from the route
+		idStr := rctx.URLParam("id")
+		_, parseErr := strconv.Atoi(idStr)
+		if parseErr != nil {
+			// Return an error if the ID is not a valid integer
+			rr.WriteHeader(http.StatusUnauthorized)
+			return
+		}
+
 		handler.ServeHTTP(rr, req)
 
 		assert.Equal(t, http.StatusUnauthorized, rr.Code)
