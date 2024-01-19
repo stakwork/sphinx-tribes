@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import styled from 'styled-components';
 import { EuiHeader, EuiHeaderSection } from '@elastic/eui';
-import { useHistory, useLocation } from 'react-router-dom';
+import { Link, useHistory, useLocation } from 'react-router-dom';
 import MaterialIcon from '@material/react-material-icon';
 import { observer } from 'mobx-react-lite';
 import { useStores } from '../../store';
@@ -95,7 +95,7 @@ const MTabs = styled.div`
 interface TagProps {
   selected: boolean;
 }
-const Tab = styled.div<TagProps>`
+const Tab = styled(Link)<TagProps>`
   display: flex;
   margin-right: 50px;
   padding: 0 8px;
@@ -107,6 +107,7 @@ const Tab = styled.div<TagProps>`
   height: 100%;
   align-items: center;
   border-bottom: ${(p: any) => (p.selected ? '6px solid #618AFF' : '6px solid transparent')};
+  text-decoration: none !important;
 
   &:hover {
     color: #909baa;
@@ -118,7 +119,7 @@ const Tab = styled.div<TagProps>`
   }
 `;
 
-const MTab = styled.div<TagProps>`
+const MTab = styled(Link)<TagProps>`
   display: flex;
   margin: 25px 5px 0;
   color: ${(p: any) => (p.selected ? '#fff' : '#ffffff99')};
@@ -130,6 +131,7 @@ const MTab = styled.div<TagProps>`
   line-height: 19px;
   justify-content: center;
   border-bottom: ${(p: any) => (p.selected ? '3px solid #618AFF' : 'none')};
+  text-decoration: none !important;
 `;
 
 const LoggedInBtn = styled.div`
@@ -409,6 +411,7 @@ function Header() {
                   return (
                     <MTab
                       key={i}
+                      to={t.path}
                       selected={selected}
                       onClick={() => {
                         history.push(t.path);
@@ -464,6 +467,7 @@ function Header() {
                   return (
                     <Tab
                       key={i}
+                      to={t.path}
                       selected={selected}
                       onClick={() => {
                         history.push(t.path);
