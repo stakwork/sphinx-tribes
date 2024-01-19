@@ -338,7 +338,7 @@ func (ph *peopleHandler) GetPersonByPubkey(w http.ResponseWriter, r *http.Reques
 	json.NewEncoder(w).Encode(person)
 }
 
-func GetPersonById(w http.ResponseWriter, r *http.Request) {
+func (ph *peopleHandler) GetPersonById(w http.ResponseWriter, r *http.Request) {
 	idParam := chi.URLParam(r, "id")
 	id, _ := strconv.ParseUint(idParam, 10, 32)
 
@@ -403,7 +403,7 @@ func GetPersonByGithubName(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(person)
 }
 
-func DeletePerson(w http.ResponseWriter, r *http.Request) {
+func (ph *peopleHandler) DeletePerson(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 	pubKeyFromAuth, _ := ctx.Value(auth.ContextKey).(string)
 
