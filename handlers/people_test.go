@@ -268,13 +268,12 @@ func TestDeletePerson(t *testing.T) {
 			OwnerAlias:  "owner",
 		}
 
-		rctx := chi.NewRouteContext()
-		rctx.URLParams.Add("id", "1")
 		ctx := context.WithValue(context.Background(), auth.ContextKey, "test-key")
+
 		req, err := http.NewRequestWithContext(ctx, http.MethodDelete, "/", nil)
 		assert.NoError(t, err)
 
-		mockDb.On("GetPerson", uint(1)).Return(person).Once()
+		mockDb.On("GetPerson", person.ID).Return(person).Once()
 		handler.ServeHTTP(rr, req)
 
 		assert.Equal(t, http.StatusUnauthorized, rr.Code)
