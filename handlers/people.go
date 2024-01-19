@@ -342,7 +342,7 @@ func (ph *peopleHandler) GetPersonById(w http.ResponseWriter, r *http.Request) {
 	idParam := chi.URLParam(r, "id")
 	id, _ := strconv.ParseUint(idParam, 10, 32)
 
-	person := db.DB.GetPerson(uint(id))
+	person := ph.db.GetPerson(uint(id))
 	w.WriteHeader(http.StatusOK)
 	json.NewEncoder(w).Encode(person)
 }
