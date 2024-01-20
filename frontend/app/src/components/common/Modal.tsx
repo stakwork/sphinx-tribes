@@ -1,6 +1,7 @@
-import React from 'react';
+import React, { useCallback } from 'react';
 import styled from 'styled-components';
 import { ModalProps } from 'components/interfaces';
+import { useLocation, useHistory } from 'react-router-dom';
 import FadeLeft from '../animated/FadeLeft';
 import { colors } from '../../config/colors';
 import { IconButton } from '.';
@@ -112,7 +113,6 @@ export default function Modal(props: ModalProps) {
   const {
     visible,
     fill,
-    overlayClick,
     dismountCallback,
     children,
     close,
@@ -128,6 +128,9 @@ export default function Modal(props: ModalProps) {
     bigCloseImageStyle
   } = props;
 
+  const location = useLocation();
+  const history = useHistory();
+
   const color = colors['light'];
   const fillStyle = fill
     ? {
@@ -138,6 +141,19 @@ export default function Modal(props: ModalProps) {
       }
     : {};
 
+  const isDirectAccess = useCallback(
+    () => !document.referrer && location.pathname.includes('/bounty/'),
+    [location.pathname]
+  );
+
+  const handleClose = useCallback(() => {
+    if (isDirectAccess()) {
+      history.push('/bounties');
+    } else {
+      history.goBack();
+    }
+  }, [isDirectAccess, history]);
+
   return (
     <Portal>
       <FadeLeft
@@ -145,7 +161,7 @@ export default function Modal(props: ModalProps) {
         drift={100}
         direction="up"
         close={close || bigClose}
-        overlayClick={overlayClick}
+        overlayClick={handleClose}
         dismountCallback={dismountCallback}
         isMounted={visible ? true : false}
         style={{
@@ -195,7 +211,7 @@ export default function Modal(props: ModalProps) {
                 zIndex: 10,
                 ...bigCloseImageStyle
               }}
-              onClick={bigCloseImage}
+              onClick={handleClose}
             >
               <img src="/static/Close.svg" alt="close_svg" height={'100%'} width={'100%'} />
             </div>
