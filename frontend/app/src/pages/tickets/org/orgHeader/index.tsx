@@ -1,9 +1,23 @@
 import React, { useState } from 'react';
 import styled from 'styled-components';
 import { PostModal } from 'people/widgetViews/postBounty/PostModal';
+import { EuiCheckboxGroup } from '@elastic/eui';
+import {GetValue, coding_languages, status } from 'people/utils/languageLabelStyle';
+import { BountyHeaderProps } from 'people/interfaces';
+import { colors } from 'config';
 import addBounty from './Icons/addBounty.svg';
 import searchIcon from './Icons/searchIcon.svg';
 import file from './Icons/file.svg';
+
+
+const Status = GetValue(status);
+const Coding_Languages = GetValue(coding_languages);
+
+interface styledProps {
+  color?: any;
+}
+
+const color = colors['light'];
 
 const Header = styled.div`
   width: 1366px;
@@ -50,16 +64,19 @@ const StatusContainer = styled.span`
   align-items: center;
   gap: 4px;
 `;
-const Status = styled.select`
+const StatusSelector = styled.select`
   background-color: transparent;
   border: none;
+  z-index:10;
 `;
 const SkillContainer = styled.span`
   padding: 10px 0px;
   align-items: center;
   gap: 4px;
+  display:flex;
+  position:relative;
 `;
-const Skill = styled.select`
+const Skill = styled.button`
   border: none;
   background-color: transparent;
 `;
@@ -170,8 +187,85 @@ const Img = styled.img`
   padding-bottom: 10px;
 `;
 
-export const OrgHeader = () => {
+const SkillFilter = styled.div`
+  width:448px;
+  height:228px;
+  background-color:white;
+  position:absolute;
+  top:50px;
+  z-index:999;
+  /* border-top: 3px solid var(--Primary-blue, #618AFF);
+  border-top-height: 20px; */
+
+  ::after {
+    content: '';
+    position: absolute;
+    left:0;
+    right: 380px;
+    top: 0;
+    height: 3px; 
+    background:var(--Primary-blue, #618AFF); 
+}
+`
+const InternalContainer = styled.div`
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: flex-start;
+  gap: 30px;
+  padding:24px 28px 28px 32px;
+`
+
+const EuiPopOverCheckboxRight = styled.div<styledProps>`
+
+  height: auto;
+  user-select: none;
+  &.CheckboxOuter > div {
+    height: 100%;
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr; 
+    column-gap:56px;
+    justify-content: center;
+    .euiCheckboxGroup__item {
+      .euiCheckbox__square {
+        top: 5px;
+        border: 1px solid ${(p: any) => p?.color && p?.color?.grayish.G500};
+        border-radius: 2px;
+      }
+      .euiCheckbox__input + .euiCheckbox__square {
+        background: ${(p: any) => p?.color && p?.color?.pureWhite} no-repeat center;
+      }
+      .euiCheckbox__input:checked + .euiCheckbox__square {
+        border: 1px solid ${(p: any) => p?.color && p?.color?.blue1};
+        background: ${(p: any) => p?.color && p?.color?.blue1} no-repeat center;
+        background-image: url('static/checkboxImage.svg');
+      }
+      .euiCheckbox__label {
+        font-family: 'Barlow';
+        font-style: normal;
+        font-weight: 500;
+        font-size: 13px;
+        line-height: 16px;
+        color: ${(p: any) => p?.color && p?.color?.grayish.G50};
+        &:hover {
+          color: ${(p: any) => p?.color && p?.color?.grayish.G05};
+        }
+      }
+      input.euiCheckbox__input:checked ~ label {
+        color: ${(p: any) => p?.color && p?.color?.blue1};
+      }
+    }
+  }
+`;
+
+
+export const OrgHeader = ({
+  onChangeLanguage,
+  checkboxIdToSelectedMapLanguage
+}: BountyHeaderProps) => {
+
   const [isPostBountyModalOpen, setIsPostBountyModalOpen] = useState(false);
+  const [filterClick,setFilterClick] = useState(false);
   const selectedWidget = 'wanted';
   const handlePostBountyClick = () => {
     setIsPostBountyModalOpen(true);
@@ -180,6 +274,10 @@ export const OrgHeader = () => {
     setIsPostBountyModalOpen(false);
   };
 
+  const handleClick =()=>{
+    console.log("callsd");
+    setFilterClick(!filterClick)
+  }
   return (
     <>
       <FillContainer>
@@ -195,11 +293,26 @@ export const OrgHeader = () => {
           <FiltersRight>
             <StatusContainer>
               <Label htmlFor="statusSelect">Status</Label>
-              <Status id="statusSelect" />
+              <StatusSelector id="statusSelect" />
             </StatusContainer>
             <SkillContainer>
-              <Label htmlFor="statusSelect">Skill</Label>
-              <Skill id="statusSelect" />
+              <Label htmlFor="skillSelect">Skill</Label>
+              <Skill id="skillSelect"/>
+               <button onClick={handleClick}> a</button>
+               {filterClick ? 
+               <SkillFilter>
+                <InternalContainer>
+                <EuiPopOverCheckboxRight className="CheckboxOuter" color={color}>
+                      <EuiCheckboxGroup
+                        options={Coding_Languages}
+                        idToSelectedMap={checkboxIdToSelectedMapLanguage}
+                        onChange={(id: any) => {
+                          onChangeLanguage(id);
+                        }}
+                      />
+                </EuiPopOverCheckboxRight>
+                </InternalContainer>
+               </SkillFilter> : null}
             </SkillContainer>
             <SearchWrapper>
               <SearchBar placeholder="Search" disabled />

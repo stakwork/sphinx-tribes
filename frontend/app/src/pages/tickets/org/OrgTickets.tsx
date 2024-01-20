@@ -151,7 +151,13 @@ function OrgBodyComponent() {
           height: 'calc(100% - 65px)'
         }}
       >
-        <OrgHeader />
+        <OrgHeader selectedWidget={selectedWidget}
+            scrollValue={scrollValue}
+            onChangeStatus={onChangeStatus}
+            onChangeLanguage={onChangeLanguage}
+            checkboxIdToSelectedMap={checkboxIdToSelectedMap}
+            checkboxIdToSelectedMapLanguage={checkboxIdToSelectedMapLanguage} 
+        />
         <>
           <div
             style={{
