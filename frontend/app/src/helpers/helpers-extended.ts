@@ -271,8 +271,10 @@ export const userHasManageBountyRoles = (bountyRoles: any[], userRoles: any[]): 
 export const toCapitalize = (word: string): string => {
   if (!word.length) return word;
 
-  const wordString = word.split(' ');
-  const capitalizeStrings = wordString.map((w: string) => w[0].toUpperCase() + w.slice(1));
+  const wordString = word.trim().split(' ');
+  const capitalizeStrings = wordString
+    .filter((w) => !!w)
+    ?.map((w: string) => w[0].toUpperCase() + w.slice(1));
 
   const result = capitalizeStrings.join(' ');
   return result;
