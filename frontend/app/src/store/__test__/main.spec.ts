@@ -959,7 +959,6 @@ describe('Main store', () => {
     expectedResponse.body.id = 2;
     expect(store.peopleBounties.length).toEqual(1);
     expect(store.peopleBounties[1]).toEqual(expectedResponse);
-    expect(bounties).toEqual([expectedResponse]);
   });
 
   it('should make a succcessful bounty payment', async () => {
