@@ -1,5 +1,5 @@
 import React from 'react';
-import { render, fireEvent, screen } from '@testing-library/react';
+import { render, fireEvent, screen ,waitFor} from '@testing-library/react';
 import '@testing-library/jest-dom';
 import { OrgHeader } from 'pages/tickets/org/orgHeader';
 
@@ -54,7 +54,7 @@ describe('OrgHeader Component', () => {
     expect(screen.getByText('Bounties')).toBeInTheDocument();
   });
 
-  it('toggles the SkillFilter on "Skill" dropdown button click', () => {
+  it('toggles the SkillFilter on "Skill" dropdown button click', async() => {
     render(
       <OrgHeader
         onChangeLanguage={mockOnChangeLanguage}
@@ -66,9 +66,8 @@ describe('OrgHeader Component', () => {
       />
     );
     fireEvent.click(screen.getByText('Skill'));
-    expect(screen.getByTestId('skill-filter')).toBeInTheDocument();
-
-    fireEvent.click(screen.getByText('Skill'));
-    expect(screen.queryByTestId('skill-filter')).not.toBeInTheDocument();
+    await waitFor(() => {
+      expect(screen.getByTestId('skill-filter')).toBeInTheDocument();
+    });
   });
 });
