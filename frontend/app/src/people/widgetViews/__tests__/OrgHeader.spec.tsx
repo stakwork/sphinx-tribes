@@ -14,6 +14,7 @@ describe('OrgHeader Component', () => {
         selectedWidget={selectedWidget}
         onChangeStatus={jest.fn()}
         checkboxIdToSelectedMap={{}}
+        scrollValue={true}
       />
     );
     expect(screen.getByText('Post a Bounty')).toBeInTheDocument();
@@ -31,6 +32,7 @@ describe('OrgHeader Component', () => {
         selectedWidget={selectedWidget}
         onChangeStatus={jest.fn()}
         checkboxIdToSelectedMap={{}}
+        scrollValue={true}
       />
     );
     fireEvent.click(screen.getByText('Post a Bounty'));
@@ -44,6 +46,7 @@ describe('OrgHeader Component', () => {
         checkboxIdToSelectedMapLanguage={{}}
         selectedWidget={selectedWidget}
         onChangeStatus={jest.fn()}
+        scrollValue={true}
         checkboxIdToSelectedMap={{}}
       />
     );
@@ -59,6 +62,7 @@ describe('OrgHeader Component', () => {
         selectedWidget={selectedWidget}
         onChangeStatus={jest.fn()}
         checkboxIdToSelectedMap={{}}
+        scrollValue={true}
       />
     );
     fireEvent.click(screen.getByLabelText('Skill'));
