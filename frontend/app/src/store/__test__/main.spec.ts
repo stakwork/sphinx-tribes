@@ -958,7 +958,6 @@ describe('Main store', () => {
     const expectedResponse = { ...expectedBountyResponses[0] };
     expectedResponse.body.id = 2;
     expect(store.peopleBounties.length).toEqual(1);
-    
   });
 
   it('should make a succcessful bounty payment', async () => {
