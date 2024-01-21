@@ -184,6 +184,7 @@ export interface QueryParams {
   search?: string;
   resetPage?: boolean;
   languages?: string;
+  org_uuid?: string;
 }
 
 export interface ClaimOnLiquid {
@@ -291,6 +292,19 @@ export const defaultBountyStatus: BountyStatus = {
   Paid: false
 };
 
+export interface OrgBountyStatus {
+  Opened: boolean;
+  Assigned: boolean;
+  Paid: boolean;
+  Completed: boolean;
+}
+
+export const defaultOrgBountyStatus: OrgBountyStatus = {
+  Opened: false,
+  Assigned: false,
+  Paid: false,
+  Completed: false
+};
 export class MainStore {
   [x: string]: any;
   tribes: Tribe[] = [];
