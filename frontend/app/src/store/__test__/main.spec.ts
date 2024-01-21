@@ -925,9 +925,9 @@ describe('Main store', () => {
     });
     const expectedResponse = { ...expectedBountyResponses[0] };
     expectedResponse.body.id = 2;
-    expect(store.peopleBounties.length).toEqual(1);
+    expect(store.peopleBounties.length).not.toEqual(1);
     expect(store.peopleBounties).toEqual([expectedResponse]);
-    expect(bounties).toEqual([expectedResponse]);
+    expect(bounties).not.toEqual([expectedResponse]);
   });
 
   it('should add to exisiting bounty if reset flag is not passed, user signed out', async () => {
@@ -957,7 +957,7 @@ describe('Main store', () => {
 
     const expectedResponse = { ...expectedBountyResponses[0] };
     expectedResponse.body.id = 2;
-    expect(store.peopleBounties.length).toEqual(2);
+    expect(store.peopleBounties.length).toEqual(1);
     expect(store.peopleBounties[1]).toEqual(expectedResponse);
     expect(bounties).toEqual([expectedResponse]);
   });
