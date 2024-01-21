@@ -65,7 +65,7 @@ describe('OrgHeader Component', () => {
         scrollValue={true}
       />
     );
-    fireEvent.click(screen.getByText('Skill'));
+    fireEvent.click(screen.getByTestId('skillDropdown'));
     await waitFor(() => {
       expect(screen.getByTestId('skill-filter')).toBeInTheDocument();
     });
