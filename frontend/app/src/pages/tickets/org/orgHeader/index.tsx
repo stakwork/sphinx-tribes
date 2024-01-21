@@ -328,7 +328,7 @@ export const OrgHeader = ({
                 <Img src={dropdown} alt="" />
               </DropDownButton>
               {filterClick ? (
-                <SkillFilter ref={filterRef}>
+                <SkillFilter ref={filterRef} data-testid="skill-filter">
                   <InternalContainer>
                     <EuiPopOverCheckboxRight className="CheckboxOuter" color={color}>
                       <EuiCheckboxGroup
