@@ -2,6 +2,7 @@ import React from 'react';
 import { PaymentHistory } from 'store/main';
 import { render } from '@testing-library/react';
 import '@testing-library/jest-dom';
+import { MemoryRouter } from 'react-router-dom';
 import HistoryModal from '../organization/HistoryModal';
 
 jest.mock('hooks/uiHooks', () => ({
@@ -80,14 +81,16 @@ describe('HistoryModal component', () => {
 
   it('renders with mock data for all transaction types', () => {
     const { getByText, getAllByText } = render(
-      <HistoryModal
-        isOpen
-        paymentsHistory={mockPaymentsHistory}
-        close={() => {
-          jest.fn();
-        }}
-        url=""
-      />
+      <MemoryRouter>
+        <HistoryModal
+          isOpen
+          paymentsHistory={mockPaymentsHistory}
+          close={() => {
+            jest.fn();
+          }}
+          url=""
+        />
+      </MemoryRouter>
     );
 
     // Check for modal title and filter labels
@@ -113,16 +116,18 @@ describe('HistoryModal component', () => {
 
   it('renders deposit transactions without a receiver', () => {
     const { queryByText } = render(
-      <HistoryModal
-        isOpen
-        paymentsHistory={mockPaymentsHistory.filter(
-          (payment: PaymentHistory) => payment.payment_type === 'deposit'
-        )}
-        close={() => {
-          jest.fn();
-        }}
-        url=""
-      />
+      <MemoryRouter>
+        <HistoryModal
+          isOpen
+          paymentsHistory={mockPaymentsHistory.filter(
+            (payment: PaymentHistory) => payment.payment_type === 'deposit'
+          )}
+          close={() => {
+            jest.fn();
+          }}
+          url=""
+        />
+      </MemoryRouter>
     );
 
     // Deposit should have a sender but no receiver
@@ -132,16 +137,18 @@ describe('HistoryModal component', () => {
 
   it('renders payment transactions with both sender and receiver', () => {
     const { getByText } = render(
-      <HistoryModal
-        isOpen
-        paymentsHistory={mockPaymentsHistory.filter(
-          (payment: PaymentHistory) => payment.payment_type === 'payment'
-        )}
-        close={() => {
-          jest.fn();
-        }}
-        url=""
-      />
+      <MemoryRouter>
+        <HistoryModal
+          isOpen
+          paymentsHistory={mockPaymentsHistory.filter(
+            (payment: PaymentHistory) => payment.payment_type === 'payment'
+          )}
+          close={() => {
+            jest.fn();
+          }}
+          url=""
+        />
+      </MemoryRouter>
     );
 
     // Payment should have both a sender and a receiver
