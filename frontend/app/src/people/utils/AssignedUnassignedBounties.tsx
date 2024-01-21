@@ -156,7 +156,7 @@ const Bounties = (props: BountiesProps) => {
   return (
     <>
       {!!assignee?.owner_pubkey && !!assignee?.owner_alias ? (
-        <BountyLink to={`/bounty/${props.id}`}>
+        <BountyLink to={`/bounty/${props.id}/${org_uuid}`}>
           <BountyContainer
             assignedBackgroundImage={'url("/static/assigned_bounty_bg.svg")'}
             color={color}

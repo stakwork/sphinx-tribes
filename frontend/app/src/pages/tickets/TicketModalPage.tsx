@@ -24,11 +24,9 @@ export const TicketModalPage = observer(({ setConnectPerson }: Props) => {
 
   const history = useHistory();
   const [connectPersonBody, setConnectPersonBody] = useState<any>();
-  // eslint-disable-next-line no-unused-vars
-  const [activeListIndex, setActiveListIndex] = useState<number>(0);
   const [publicFocusIndex, setPublicFocusIndex] = useState(0);
   const [removeNextAndPrev, setRemoveNextAndPrev] = useState(false);
-  const { bountyId } = useParams<{ uuid: string; bountyId: string }>();
+  const { bountyId } = useParams<{ bountyId: string }>();
   const [activeBounty, setActiveBounty] = useState<PersonBounty[]>([]);
   const [visible, setVisible] = useState(false);
   const [isDeleted, setisDeleted] = useState(false);
@@ -58,7 +56,7 @@ export const TicketModalPage = observer(({ setConnectPerson }: Props) => {
     const connectPerson = bounty && bounty.length ? bounty[0].person : [];
 
     setPublicFocusIndex(bountyIndex);
-    setActiveListIndex(bountyIndex);
+    // setActiveListIndex(bountyIndex);
     setConnectPersonBody(connectPerson);
 
     const visible = bounty && bounty.length > 0;
@@ -79,32 +77,68 @@ export const TicketModalPage = observer(({ setConnectPerson }: Props) => {
     history.goBack();
   };
 
+  const getUuidFromUrl = () => {
+    const { href } = window.location;
+    const parts = href.split('/');
+    return parts[parts.length - 1];
+  };
+
+  const uuid = getUuidFromUrl();
+  console.log(uuid, 'Gofestr');
+
   const directionHandler = (person: any, body: any) => {
     if (person && body) {
       if (bountyId) {
-        history.replace(`/bounty/${body.id}`);
+        history.replace(`/bounty/${body.id}/${uuid}`);
       }
     }
   };
 
+  const [response, setResponse] = useState<any>([]);
+  const getOrgBounties = async () => {
+    const response = await main.getOrganizationBounties(uuid);
+    setResponse(response);
+  };
+  useEffect(() => {
+    getOrgBounties();
+  });
+
   const getBountyIndex = () => {
-    const id = parseInt(bountyId, 10);
-    const index = main.peopleBounties.findIndex((bounty: any) => id === bounty.body.id);
-    return index;
+    if (!uuid) {
+      const id = parseInt(bountyId, 10);
+      const index = main.peopleBounties.findIndex((bounty: any) => id === bounty.body.id);
+      return index;
+    } else if (uuid) {
+      const id = parseInt(bountyId, 10);
+      const index = response.findIndex((bounty: any) => id === bounty.body.id);
+      return index;
+    }
   };
 
   const prevArrHandler = () => {
     const index = getBountyIndex();
-    if (index <= 0 || index >= main.peopleBounties.length) return;
-    const { person, body } = main.peopleBounties[index - 1];
-    directionHandler(person, body);
+    if (uuid) {
+      if (index <= 0 || index >= response.length) return;
+      const { person, body } = response[index - 1];
+      directionHandler(person, body);
+    } else {
+      if (index <= 0 || index >= main.peopleBounties.length) return;
+      const { person, body } = main.peopleBounties[index - 1];
+      directionHandler(person, body);
+    }
   };
 
   const nextArrHandler = () => {
     const index = getBountyIndex();
-    if (index + 1 >= main.peopleBounties?.length) return;
-    const { person, body } = main.peopleBounties[index + 1];
-    directionHandler(person, body);
+    if (uuid) {
+      if (index + 1 >= response.length) return;
+      const { person, body } = response[index + 1];
+      directionHandler(person, body);
+    } else {
+      if (index + 1 >= main.peopleBounties?.length) return;
+      const { person, body } = main.peopleBounties[index + 1];
+      directionHandler(person, body);
+    }
   };
 
   if (isMobile) {
