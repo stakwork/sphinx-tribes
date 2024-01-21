@@ -323,7 +323,7 @@ export const OrgHeader = ({
             </StatusContainer>
             <SkillContainer>
               <Label>Skill</Label>
-              <DropDownButton onClick={handleClick}>
+              <DropDownButton onClick={handleClick} data-testid="skillDropdown">
                 {' '}
                 <Img src={dropdown} alt="" />
               </DropDownButton>

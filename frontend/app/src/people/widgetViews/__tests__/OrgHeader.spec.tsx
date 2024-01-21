@@ -1,5 +1,5 @@
 import React from 'react';
-import { render, fireEvent, screen ,waitFor} from '@testing-library/react';
+import { render, fireEvent, screen, waitFor } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import { OrgHeader } from 'pages/tickets/org/orgHeader';
 
@@ -54,7 +54,7 @@ describe('OrgHeader Component', () => {
     expect(screen.getByText('Bounties')).toBeInTheDocument();
   });
 
-  it('toggles the SkillFilter on "Skill" dropdown button click', async() => {
+  it('toggles the SkillFilter on "Skill" dropdown button click', async () => {
     render(
       <OrgHeader
         onChangeLanguage={mockOnChangeLanguage}
