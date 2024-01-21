@@ -18,8 +18,8 @@ describe('OrgHeader Component', () => {
       />
     );
     expect(screen.getByText('Post a Bounty')).toBeInTheDocument();
-    expect(screen.getByLabelText('Status')).toBeInTheDocument();
-    expect(screen.getByLabelText('Skill')).toBeInTheDocument();
+    expect(screen.getByText('Status')).toBeInTheDocument();
+    expect(screen.getByText('Skill')).toBeInTheDocument();
     expect(screen.getByPlaceholderText('Search')).toBeInTheDocument();
     expect(screen.getByText(/Bounties/i)).toBeInTheDocument();
   });
@@ -65,10 +65,10 @@ describe('OrgHeader Component', () => {
         scrollValue={true}
       />
     );
-    fireEvent.click(screen.getByLabelText('Skill'));
+    fireEvent.click(screen.getByText('Skill'));
     expect(screen.getByTestId('skill-filter')).toBeInTheDocument();
 
-    fireEvent.click(screen.getByLabelText('Skill'));
+    fireEvent.click(screen.getByText('Skill'));
     expect(screen.queryByTestId('skill-filter')).not.toBeInTheDocument();
   });
 });

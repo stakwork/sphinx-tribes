@@ -95,7 +95,7 @@ const Button = styled.button`
   letter-spacing: 0.14px;
 `;
 
-const Label = styled.label`
+const Label = styled.p`
   color: var(--Main-bottom-icons, #5f6368);
   font-family: Barlow;
   font-size: 15px;
@@ -315,14 +315,14 @@ export const OrgHeader = ({
         <Filters>
           <FiltersRight>
             <StatusContainer>
-              <Label htmlFor="statusSelect">Status</Label>
+              <Label>Status</Label>
               <DropDownButton>
                 {' '}
                 <Img src={dropdown} alt="" />
               </DropDownButton>
             </StatusContainer>
             <SkillContainer>
-              <Label htmlFor="skillSelect">Skill</Label>
+              <Label>Skill</Label>
               <DropDownButton onClick={handleClick}>
                 {' '}
                 <Img src={dropdown} alt="" />
@@ -350,7 +350,7 @@ export const OrgHeader = ({
           </FiltersRight>
           <FiltersLeft>
             <SoryByContainer>
-              <Label htmlFor="statusSelect">Sort by:Newest First</Label>
+              <Label>Sort by:Newest First</Label>
               <DropDownButton>
                 {' '}
                 <Img src={dropdown} alt="" />
