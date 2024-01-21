@@ -893,15 +893,12 @@ describe('Main store', () => {
 
     const store = new MainStore();
     const bounties = await store.getOrganizationBounties('1111', {
+      page: 1,
       resetPage: true,
-      search: 'random',
-      limit: 11,
-      page: 2,
-      sortBy: 'updatedat'
     });
 
-    expect(store.getOrganizationBounties.length).toEqual(1);
-    expect(store.getOrganizationBounties).toEqual([expectedBountyResponses[0]]);
+    expect(store.peopleBounties.length).toEqual(1);
+    expect(store.peopleBounties).toEqual([expectedBountyResponses[0]]);
     expect(bounties).toEqual([expectedBountyResponses[0]]);
   });
 
@@ -923,11 +920,8 @@ describe('Main store', () => {
     expect(store.peopleBounties.length).toEqual(1);
 
     const bounties = await store.getOrganizationBounties('1111', {
+      page: 1,
       resetPage: true,
-      search: 'random',
-      limit: 11,
-      page: 2,
-      sortBy: 'updatedat'
     });
     const expectedResponse = { ...expectedBountyResponses[0] };
     expectedResponse.body.id = 2;
@@ -957,11 +951,8 @@ describe('Main store', () => {
     expect(store.peopleBounties[0].body.id).not.toEqual(2);
 
     const bounties = await store.getOrganizationBounties('1111', {
+      page: 1,
       resetPage: false,
-      search: 'random',
-      limit: 11,
-      page: 2,
-      sortBy: 'updatedat'
     });
 
     const expectedResponse = { ...expectedBountyResponses[0] };
