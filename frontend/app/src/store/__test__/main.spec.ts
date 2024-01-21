@@ -894,7 +894,7 @@ describe('Main store', () => {
     const store = new MainStore();
     const bounties = await store.getOrganizationBounties('1111', {
       page: 1,
-      resetPage: true,
+      resetPage: true
     });
 
     expect(store.peopleBounties.length).toEqual(1);
@@ -921,7 +921,7 @@ describe('Main store', () => {
 
     const bounties = await store.getOrganizationBounties('1111', {
       page: 1,
-      resetPage: true,
+      resetPage: true
     });
     const expectedResponse = { ...expectedBountyResponses[0] };
     expectedResponse.body.id = 2;
@@ -952,7 +952,7 @@ describe('Main store', () => {
 
     const bounties = await store.getOrganizationBounties('1111', {
       page: 1,
-      resetPage: false,
+      resetPage: false
     });
 
     const expectedResponse = { ...expectedBountyResponses[0] };
