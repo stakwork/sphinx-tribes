@@ -1,16 +1,15 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import styled from 'styled-components';
 import { PostModal } from 'people/widgetViews/postBounty/PostModal';
 import { EuiCheckboxGroup } from '@elastic/eui';
-import {GetValue, coding_languages, status } from 'people/utils/languageLabelStyle';
+import { GetValue, coding_languages } from 'people/utils/languageLabelStyle';
 import { BountyHeaderProps } from 'people/interfaces';
 import { colors } from 'config';
 import addBounty from './Icons/addBounty.svg';
 import searchIcon from './Icons/searchIcon.svg';
 import file from './Icons/file.svg';
+import dropdown from './Icons/dropwDownIcon.svg';
 
-
-const Status = GetValue(status);
 const Coding_Languages = GetValue(coding_languages);
 
 interface styledProps {
@@ -59,26 +58,19 @@ const FiltersRight = styled.span`
   flex: 1 0 0;
   width: 1366px;
 `;
+
 const StatusContainer = styled.span`
-  padding: 10px 0px;
+  padding: 7px 0px;
   align-items: center;
-  gap: 4px;
+  display: flex;
+  position: relative;
 `;
-const StatusSelector = styled.select`
-  background-color: transparent;
-  border: none;
-  z-index:10;
-`;
+
 const SkillContainer = styled.span`
-  padding: 10px 0px;
+  padding: 7px 0px;
   align-items: center;
-  gap: 4px;
-  display:flex;
-  position:relative;
-`;
-const Skill = styled.button`
-  border: none;
-  background-color: transparent;
+  display: flex;
+  position: relative;
 `;
 
 const Button = styled.button`
@@ -143,14 +135,12 @@ const SearchBar = styled.input`
 `;
 
 const SoryByContainer = styled.span`
+  padding: 7px 0px;
+  display: flex;
   justify-content: center;
   align-items: center;
-  gap: 4px;
 `;
-const SortBy = styled.select`
-  background-color: transparent;
-  border: none;
-`;
+
 const NumberOfBounties = styled.div`
   height: 23px;
   padding: 1.5px 983.492px 1.5px 10px;
@@ -188,43 +178,49 @@ const Img = styled.img`
 `;
 
 const SkillFilter = styled.div`
-  width:448px;
-  height:228px;
-  background-color:white;
-  position:absolute;
-  top:50px;
-  z-index:999;
+  width: 480px;
+  height: 280px;
+  background-color: white;
+  position: absolute;
+  top: 50px;
+  z-index: 999;
+  border-radius: 0px 0px 6px 6px;
+  border-right: 1px solid rgba(0, 0, 0, 0.1);
+  border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+  border-left: 1px solid rgba(0, 0, 0, 0.1);
+  background: #fff;
+  box-shadow: 0px 2px 8px 0px rgba(0, 0, 0, 0.12);
+
   /* border-top: 3px solid var(--Primary-blue, #618AFF);
   border-top-height: 20px; */
 
   ::after {
     content: '';
     position: absolute;
-    left:0;
+    left: 0;
     right: 380px;
     top: 0;
-    height: 3px; 
-    background:var(--Primary-blue, #618AFF); 
-}
-`
+    height: 3px;
+    background: var(--Primary-blue, #618aff);
+  }
+`;
 const InternalContainer = styled.div`
   display: flex;
   flex-direction: column;
   justify-content: center;
   align-items: flex-start;
   gap: 30px;
-  padding:24px 28px 28px 32px;
-`
+  padding: 24px 20px 28px 20px;
+`;
 
 const EuiPopOverCheckboxRight = styled.div<styledProps>`
-
   height: auto;
   user-select: none;
   &.CheckboxOuter > div {
     height: 100%;
     display: grid;
-    grid-template-columns: 1fr 1fr 1fr; 
-    column-gap:56px;
+    grid-template-columns: 1fr 1fr 1fr;
+    column-gap: 56px;
     justify-content: center;
     .euiCheckboxGroup__item {
       .euiCheckbox__square {
@@ -245,7 +241,7 @@ const EuiPopOverCheckboxRight = styled.div<styledProps>`
         font-style: normal;
         font-weight: 500;
         font-size: 13px;
-        line-height: 16px;
+        line-height: 18px;
         color: ${(p: any) => p?.color && p?.color?.grayish.G50};
         &:hover {
           color: ${(p: any) => p?.color && p?.color?.grayish.G05};
@@ -258,15 +254,26 @@ const EuiPopOverCheckboxRight = styled.div<styledProps>`
   }
 `;
 
+const DropDownButton = styled.button`
+  border: none;
+  background-color: transparent;
+  padding-top: 5px;
+`;
+
+const FiltersLeft = styled.span`
+  display: flex;
+  height: 40px;
+  align-items: flex-start;
+`;
 
 export const OrgHeader = ({
   onChangeLanguage,
   checkboxIdToSelectedMapLanguage
 }: BountyHeaderProps) => {
-
   const [isPostBountyModalOpen, setIsPostBountyModalOpen] = useState(false);
-  const [filterClick,setFilterClick] = useState(false);
+  const [filterClick, setFilterClick] = useState(false);
   const selectedWidget = 'wanted';
+  const filterRef = useRef<HTMLDivElement | null>(null);
   const handlePostBountyClick = () => {
     setIsPostBountyModalOpen(true);
   };
@@ -274,10 +281,26 @@ export const OrgHeader = ({
     setIsPostBountyModalOpen(false);
   };
 
-  const handleClick =()=>{
-    console.log("callsd");
-    setFilterClick(!filterClick)
-  }
+  const handleClick = () => {
+    setFilterClick(!filterClick);
+  };
+
+  useEffect(() => {
+    const handleWindowClick = (event: MouseEvent) => {
+      if (filterRef.current && !filterRef.current.contains(event.target as Node)) {
+        setFilterClick(false);
+      }
+    };
+    if (filterClick) {
+      window.addEventListener('click', handleWindowClick);
+    } else {
+      window.removeEventListener('click', handleWindowClick);
+    }
+    return () => {
+      window.removeEventListener('click', handleWindowClick);
+    };
+  }, [filterClick]);
+
   return (
     <>
       <FillContainer>
@@ -293,16 +316,21 @@ export const OrgHeader = ({
           <FiltersRight>
             <StatusContainer>
               <Label htmlFor="statusSelect">Status</Label>
-              <StatusSelector id="statusSelect" />
+              <DropDownButton>
+                {' '}
+                <Img src={dropdown} alt="" />
+              </DropDownButton>
             </StatusContainer>
             <SkillContainer>
               <Label htmlFor="skillSelect">Skill</Label>
-              <Skill id="skillSelect"/>
-               <button onClick={handleClick}> a</button>
-               {filterClick ? 
-               <SkillFilter>
-                <InternalContainer>
-                <EuiPopOverCheckboxRight className="CheckboxOuter" color={color}>
+              <DropDownButton onClick={handleClick}>
+                {' '}
+                <Img src={dropdown} alt="" />
+              </DropDownButton>
+              {filterClick ? (
+                <SkillFilter ref={filterRef}>
+                  <InternalContainer>
+                    <EuiPopOverCheckboxRight className="CheckboxOuter" color={color}>
                       <EuiCheckboxGroup
                         options={Coding_Languages}
                         idToSelectedMap={checkboxIdToSelectedMapLanguage}
@@ -310,19 +338,25 @@ export const OrgHeader = ({
                           onChangeLanguage(id);
                         }}
                       />
-                </EuiPopOverCheckboxRight>
-                </InternalContainer>
-               </SkillFilter> : null}
+                    </EuiPopOverCheckboxRight>
+                  </InternalContainer>
+                </SkillFilter>
+              ) : null}
             </SkillContainer>
             <SearchWrapper>
               <SearchBar placeholder="Search" disabled />
               <Icon src={searchIcon} alt="Search" />
             </SearchWrapper>
           </FiltersRight>
-          <SoryByContainer>
-            <Label htmlFor="statusSelect">Sort by:Newest First</Label>
-            <SortBy id="statusSelect" />
-          </SoryByContainer>
+          <FiltersLeft>
+            <SoryByContainer>
+              <Label htmlFor="statusSelect">Sort by:Newest First</Label>
+              <DropDownButton>
+                {' '}
+                <Img src={dropdown} alt="" />
+              </DropDownButton>
+            </SoryByContainer>
+          </FiltersLeft>
         </Filters>
       </FillContainer>
       <NumberOfBounties>

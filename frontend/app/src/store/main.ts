@@ -1074,10 +1074,28 @@ export class MainStore {
     }
   }
 
-  async getOrganizationBounties(uuid: string, queryParams?: any): Promise<PersonBounty[]> {
-    queryParams = { ...queryParams, search: uiStore.searchText };
+  async getOrganizationBounties(uuid: string, params?: QueryParams): Promise<PersonBounty[]> {
+    const queryParams: QueryParams = {
+      limit: 20,
+      sortBy: 'created',
+      search: uiStore.searchText ?? '',
+      page: 1,
+      resetPage: false,
+      ...params
+    };
+    if (queryParams) {
+      this.getWantedsPrevParams = queryParams;
+    }
+
+    // if we don't pass the params, we should use previous params for invalidate query
+    const query2 = this.appendQueryParams(
+      `organizations/bounties/${uuid}`,
+      20,
+      params ? queryParams : this.getWantedsPrevParams
+    );
+
     try {
-      const ps2 = await api.get(`organizations/bounties/${uuid}`);
+      const ps2 = await api.get(query2);
       const ps3: any[] = [];
 
       if (ps2 && ps2.length) {
