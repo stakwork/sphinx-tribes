@@ -900,8 +900,8 @@ describe('Main store', () => {
       sortBy: 'updatedat'
     });
 
-    expect(store.peopleBounties.length).toEqual(1);
-    expect(store.peopleBounties).toEqual([expectedBountyResponses[0]]);
+    expect(store.getOrganizationBounties.length).toEqual(1);
+    expect(store.getOrganizationBounties).toEqual([expectedBountyResponses[0]]);
     expect(bounties).toEqual([expectedBountyResponses[0]]);
   });
 
