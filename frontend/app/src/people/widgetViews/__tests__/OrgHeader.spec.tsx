@@ -3,9 +3,19 @@ import { render, fireEvent, screen } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import { OrgHeader } from 'pages/tickets/org/orgHeader';
 
+const mockOnChangeLanguage = jest.fn();
+const selectedWidget = 'wanted';
 describe('OrgHeader Component', () => {
   it('renders the component correctly', () => {
-    render(<OrgHeader />);
+    render(
+      <OrgHeader
+        onChangeLanguage={mockOnChangeLanguage}
+        checkboxIdToSelectedMapLanguage={{}}
+        selectedWidget={selectedWidget}
+        onChangeStatus={jest.fn()}
+        checkboxIdToSelectedMap={{}}
+      />
+    );
     expect(screen.getByText('Post a Bounty')).toBeInTheDocument();
     expect(screen.getByLabelText('Status')).toBeInTheDocument();
     expect(screen.getByLabelText('Skill')).toBeInTheDocument();
@@ -14,13 +24,47 @@ describe('OrgHeader Component', () => {
   });
 
   it('opens the PostModal on "Post a Bounty" button click', async () => {
-    render(<OrgHeader />);
+    render(
+      <OrgHeader
+        onChangeLanguage={mockOnChangeLanguage}
+        checkboxIdToSelectedMapLanguage={{}}
+        selectedWidget={selectedWidget}
+        onChangeStatus={jest.fn()}
+        checkboxIdToSelectedMap={{}}
+      />
+    );
     fireEvent.click(screen.getByText('Post a Bounty'));
+    // You can add further assertions here to check the modal is open
   });
 
   it('displays the correct number of bounties', () => {
-    render(<OrgHeader />);
+    render(
+      <OrgHeader
+        onChangeLanguage={mockOnChangeLanguage}
+        checkboxIdToSelectedMapLanguage={{}}
+        selectedWidget={selectedWidget}
+        onChangeStatus={jest.fn()}
+        checkboxIdToSelectedMap={{}}
+      />
+    );
     expect(screen.getByText('284')).toBeInTheDocument();
     expect(screen.getByText('Bounties')).toBeInTheDocument();
+  });
+
+  it('toggles the SkillFilter on "Skill" dropdown button click', () => {
+    render(
+      <OrgHeader
+        onChangeLanguage={mockOnChangeLanguage}
+        checkboxIdToSelectedMapLanguage={{}}
+        selectedWidget={selectedWidget}
+        onChangeStatus={jest.fn()}
+        checkboxIdToSelectedMap={{}}
+      />
+    );
+    fireEvent.click(screen.getByLabelText('Skill'));
+    expect(screen.getByTestId('skill-filter')).toBeInTheDocument();
+
+    fireEvent.click(screen.getByLabelText('Skill'));
+    expect(screen.queryByTestId('skill-filter')).not.toBeInTheDocument();
   });
 });
