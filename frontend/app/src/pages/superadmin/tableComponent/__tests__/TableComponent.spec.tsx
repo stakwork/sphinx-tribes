@@ -7,13 +7,14 @@ import { Router } from 'react-router-dom';
 import '@testing-library/jest-dom';
 import { MyTable } from '../index.tsx';
 import { Bounty } from '../interfaces.ts';
-//import { mockBounties } from '../mockAdminData.ts';
 
 jest.mock('../index.tsx', () => ({
   ...jest.requireActual('../index.tsx'),
   paginatePrev: jest.fn(),
   paginateNext: jest.fn()
 }));
+
+const defaultPage = 1;
 
 const mockBounties: Bounty[] = [
   {
@@ -73,83 +74,83 @@ const mockBounties: Bounty[] = [
 ];
 
 it('renders elements from TableProps in the document', () => {
-  const { getByText } = render(<MyTable bounties={mockBounties} headerIsFrozen={false} />);
+  const { getByText } = render(<MyTable bounties={mockBounties} headerIsFrozen={false} currentPage={defaultPage} />);
   expect(getByText(mockBounties[0].title)).toBeInTheDocument();
 });
 
 it('renders "Sort By:" in the document', () => {
-  const { getByText } = render(<MyTable bounties={mockBounties} headerIsFrozen={false} />);
+  const { getByText } = render(<MyTable bounties={mockBounties} headerIsFrozen={false} currentPage={defaultPage} />);
   expect(getByText('Sort By:')).toBeInTheDocument();
 });
 
 it('renders "Date" in the document', () => {
-  const { getByText } = render(<MyTable bounties={mockBounties} headerIsFrozen={false} />);
+  const { getByText } = render(<MyTable bounties={mockBounties} headerIsFrozen={false} currentPage={defaultPage} />);
   expect(getByText('Date')).toBeInTheDocument();
 });
 
 it('renders "Assignee" in the document', () => {
-  const { getByText } = render(<MyTable bounties={mockBounties} headerIsFrozen={false} />);
+  const { getByText } = render(<MyTable bounties={mockBounties} headerIsFrozen={false} currentPage={defaultPage} />);
   expect(getByText('Assignee')).toBeInTheDocument();
 });
 
 it('renders "Status" twice in the document', () => {
-  const { getAllByText } = render(<MyTable bounties={mockBounties} headerIsFrozen={false} />);
+  const { getAllByText } = render(<MyTable bounties={mockBounties} headerIsFrozen={false} currentPage={defaultPage} />);
   expect(getAllByText(/Status/i)).toHaveLength(2);
 });
 
 it('renders "Status:" in the document', () => {
-  const { getByText } = render(<MyTable bounties={mockBounties} headerIsFrozen={false} />);
+  const { getByText } = render(<MyTable bounties={mockBounties} headerIsFrozen={false} currentPage={defaultPage} />);
   expect(getByText('Status:')).toBeInTheDocument();
 });
 
 it('renders "All" in the document', () => {
-  const { getByText } = render(<MyTable bounties={mockBounties} headerIsFrozen={false} />);
+  const { getByText } = render(<MyTable bounties={mockBounties} headerIsFrozen={false} currentPage={defaultPage} />);
   expect(getByText('All')).toBeInTheDocument();
 });
 
 it('renders "Open" in the document', () => {
-  const { getByText } = render(<MyTable bounties={mockBounties} headerIsFrozen={false} />);
+  const { getByText } = render(<MyTable bounties={mockBounties} headerIsFrozen={false} currentPage={defaultPage} />);
   expect(getByText('Open')).toBeInTheDocument();
 });
 
 it('renders "In Progress" in the document', () => {
-  const { getByText } = render(<MyTable bounties={mockBounties} headerIsFrozen={false} />);
+  const { getByText } = render(<MyTable bounties={mockBounties} headerIsFrozen={false} currentPage={defaultPage} />);
   expect(getByText('In Progress')).toBeInTheDocument();
 });
 
 it('renders "Completed" in the document', () => {
-  const { getByText } = render(<MyTable bounties={mockBounties} headerIsFrozen={false} />);
+  const { getByText } = render(<MyTable bounties={mockBounties} headerIsFrozen={false} currentPage={defaultPage} />);
   expect(getByText('Completed')).toBeInTheDocument();
 });
 
 it('renders "Bounty" in the document', () => {
-  const { getByText } = render(<MyTable bounties={mockBounties} headerIsFrozen={false} />);
+  const { getByText } = render(<MyTable bounties={mockBounties} headerIsFrozen={false} currentPage={defaultPage} />);
   expect(getByText('Bounty')).toBeInTheDocument();
 });
 
 it('renders "#DTGP" in the document', () => {
-  const { getByText } = render(<MyTable bounties={mockBounties} headerIsFrozen={false} />);
+  const { getByText } = render(<MyTable bounties={mockBounties} headerIsFrozen={false} currentPage={defaultPage} />);
   expect(getByText('#DTGP')).toBeInTheDocument();
 });
 
 it('renders "Provider" in the document', () => {
-  const { getByText } = render(<MyTable bounties={mockBounties} headerIsFrozen={false} />);
+  const { getByText } = render(<MyTable bounties={mockBounties} headerIsFrozen={false} currentPage={defaultPage} />);
   expect(getByText('Provider')).toBeInTheDocument();
 });
 
 it('renders "Organization" in the document', () => {
-  const { getByText } = render(<MyTable bounties={mockBounties} headerIsFrozen={false} />);
+  const { getByText } = render(<MyTable bounties={mockBounties} headerIsFrozen={false} currentPage={defaultPage} />);
   expect(getByText('Organization')).toBeInTheDocument();
 });
 
 it('renders each element in the table in the document', () => {
-  const { getByText } = render(<MyTable bounties={mockBounties} headerIsFrozen={false} />);
+  const { getByText } = render(<MyTable bounties={mockBounties} headerIsFrozen={false} currentPage={defaultPage} />);
   expect(getByText(mockBounties[0].title)).toBeInTheDocument();
 });
 
 it('renders each element in the table in the document', () => {
   const { getByText, getAllByText } = render(
-    <MyTable bounties={mockBounties} headerIsFrozen={false} />
+    <MyTable bounties={mockBounties} headerIsFrozen={false} currentPage={defaultPage} />
   );
   const dates = ['2023-01-01', '2023-01-02', '2023-01-03'];
   const assignedText = getAllByText('assigned');
@@ -169,7 +170,7 @@ it('should navigate to the correct URL when a bounty is clicked', () => {
   const history = createMemoryHistory();
   const { getByText } = render(
     <Router history={history}>
-      <MyTable bounties={mockBounties} />
+      <MyTable bounties={mockBounties} currentPage={defaultPage} />
     </Router>
   );
   const bountyTitle = getByText('Bounty 1');
@@ -178,7 +179,7 @@ it('should navigate to the correct URL when a bounty is clicked', () => {
 });
 
 it('renders correct color box for different bounty statuses', () => {
-  const { getAllByTestId } = render(<MyTable bounties={mockBounties} />);
+  const { getAllByTestId } = render(<MyTable bounties={mockBounties} currentPage={defaultPage} />);
   const statusElements = getAllByTestId('bounty-status');
   expect(statusElements[0]).toHaveStyle('background-color: #49C998');
   expect(statusElements[1]).toHaveStyle('background-color: #49C998');
@@ -200,6 +201,7 @@ it('it renders with filter status states', async () => {
         setDropdownValue={setDropdownValue}
         bountyStatus={bountyStatus}
         setBountyStatus={setBountyStatus}
+        currentPage={defaultPage}
       />
     );
   };
@@ -250,6 +252,7 @@ it('renders pagination section when number of bounties is greater than page size
       setBountyStatus={mockSetBountyStatus}
       dropdownValue="all"
       setDropdownValue={mockSetDropdownValue}
+      currentPage={defaultPage}
     />
   );
 
@@ -302,7 +305,7 @@ const mockProps = {
   paginateNext: jest.fn()
 };
 it('renders pagination arrows when bounties length is greater than pageSize and status filter is set to "open"', async () => {
-  render(<MyTable {...mockProps} />);
+  render(<MyTable {...mockProps} currentPage={defaultPage} />);
 
   (async () => {
     await waitFor(() => {
@@ -320,7 +323,7 @@ it('calls paginateNext when next pagination arrow is clicked with status filter 
     ...mockProps,
     bountyStatus: { Open: false, Assigned: true, Paid: false }
   };
-  render(<MyTable {...inProgressProps} />);
+  render(<MyTable {...inProgressProps} currentPage={defaultPage} />);
 
   (async () => {
     await waitFor(() => {

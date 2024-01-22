@@ -374,6 +374,7 @@ export const PaginationButtons = styled.button<PaginationButtonsProps>`
   border: none;
   text-align: center;
   margin: 10px;
+  cursor: pointer;
   background: ${(props: any) => (props.active ? 'var(--Active-blue, #618AFF)' : 'white')};
   color: ${(props: any) => (props.active ? 'white' : 'black')};
 `;
@@ -397,4 +398,8 @@ export const Paragraph = styled.div`
   white-space: nowrap;
   text-overflow: ellipsis;
   max-width: 200px;
+`;
+
+export const PaginationImg = styled.img`
+  cursor: pointer;
 `;

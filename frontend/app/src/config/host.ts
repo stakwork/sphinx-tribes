@@ -19,5 +19,5 @@ export function getHostIncludingDockerHosts() {
 export const TribesURL = getHost().startsWith('localhost')
   ? `http://${getHost()}`
   : getHost().startsWith('http')
-  ? getHost()
-  : `https://${getHost()}`;
+    ? getHost()
+    : `https://${getHost()}`;

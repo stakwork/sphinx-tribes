@@ -3,7 +3,7 @@ import { useStores } from 'store';
 import moment from 'moment';
 import { EuiPopover, EuiText } from '@elastic/eui';
 import MaterialIcon from '@material/react-material-icon';
-import { BountyStatus } from '../../../store/main';
+import { BountyStatus, defaultBountyStatus } from '../../../store/main';
 import paginationarrow1 from '../header/icons/paginationarrow1.svg';
 import paginationarrow2 from '../header/icons/paginationarrow2.svg';
 import defaultPic from '../../../public/static/profile_avatar.svg';
@@ -41,7 +41,8 @@ import {
   Paragraph,
   BoxImage,
   DateFilterWrapper,
-  DateFilterContent
+  DateFilterContent,
+  PaginationImg
 } from './TableStyle';
 
 interface TableProps {
@@ -57,6 +58,8 @@ interface TableProps {
   onChangeFilterByDate?: (option: string) => void;
   paginatePrev?: () => void;
   paginateNext?: () => void;
+  currentPage: number;
+  setCurrentPage?: React.Dispatch<React.SetStateAction<number>>;
 }
 
 interface ImageWithTextProps {
@@ -107,12 +110,12 @@ export const TextInColorBox = ({ status }: TextInColorBoxProps) => (
             status === 'open'
               ? '#618AFF'
               : status === 'paid'
-              ? '#5F6368'
-              : status === 'assigned'
-              ? '#49C998'
-              : status === 'completed'
-              ? '#9157F6'
-              : 'transparent',
+                ? '#5F6368'
+                : status === 'assigned'
+                  ? '#49C998'
+                  : status === 'completed'
+                    ? '#9157F6'
+                    : 'transparent',
           borderRadius: '2px',
           marginBottom: '0'
         }}
@@ -133,11 +136,11 @@ export const MyTable = ({
   headerIsFrozen,
   sortOrder,
   setDropdownValue,
-  onChangeFilterByDate
+  onChangeFilterByDate,
+  currentPage,
+  setCurrentPage
 }: TableProps) => {
-  const [currentPage, setCurrentPage] = useState(1);
   const [totalBounties, setTotalBounties] = useState(0);
-  const [activeTabs, setActiveTabs] = useState<number[]>([]);
   const [isPopoverOpen, setIsPopoverOpen] = useState<boolean>(false);
   const onButtonClick = () => setIsPopoverOpen((isPopoverOpen: any) => !isPopoverOpen);
   const closePopover = () => setIsPopoverOpen(false);
@@ -147,20 +150,13 @@ export const MyTable = ({
   const { main } = useStores();
 
   const paginationLimit = Math.floor(totalBounties / pageSize) + 1;
-
-  const currentPageData = () => {
-    const indexOfLastPost = currentPage * pageSize;
-    const indexOfFirstPost = indexOfLastPost - pageSize;
-    if (bounties) {
-      const currentPosts = bounties.slice(indexOfFirstPost, indexOfLastPost);
-      return currentPosts;
-    }
-  };
+  const [activeTabs, setActiveTabs] = useState<number[]>([]);
 
   const updateBountyStatus = (e: any) => {
     if (bountyStatus && setBountyStatus && setDropdownValue) {
-      getBountyStatus(e.target.value);
-      setDropdownValue(e.target.value);
+      const { value } = e.target;
+      getBountyStatus(value);
+      setDropdownValue(value);
     }
   };
 
@@ -173,14 +169,16 @@ export const MyTable = ({
       let nextPage: number;
       if (currentPage < visibleTabs) {
         nextPage = visibleTabs + 1;
-        setCurrentPage(nextPage);
+        if (setCurrentPage) setCurrentPage(nextPage);
       } else {
         nextPage = currentPage + 1;
-        setCurrentPage(nextPage);
+        if (setCurrentPage) setCurrentPage(nextPage);
       }
 
       dataNumber.push(nextPage);
       dataNumber.shift();
+      setActiveTabs(dataNumber);
+      console.log("Active Tabs ===", activeTabs, dataNumber)
     }
   };
 
@@ -196,7 +194,7 @@ export const MyTable = ({
         nextPage = currentPage - 1;
       }
 
-      setCurrentPage(currentPage - 1);
+      if (setCurrentPage) setCurrentPage(currentPage - 1);
       dataNumber.pop();
       const newActivetabs = [nextPage, ...dataNumber];
       setActiveTabs(newActivetabs);
@@ -216,8 +214,15 @@ export const MyTable = ({
       if (i > visibleTabs) break;
       dataNumber.push(i);
     }
+
     setActiveTabs(dataNumber);
   }, [paginationLimit]);
+
+  const paginate = (page: number) => {
+    if (setCurrentPage) {
+      setCurrentPage(page);
+    }
+  }
 
   useEffect(() => {
     getTotalBounties();
@@ -236,7 +241,7 @@ export const MyTable = ({
           <BountyHeader>
             <img src={copygray} alt="" width="16.508px" height="20px" />
             <LeadingTitle>
-              {bounties.length}
+              {totalBounties}
               <div>
                 <AlternativeTitle>{bounties.length === 1 ? 'Bounty' : 'Bounties'}</AlternativeTitle>
               </div>
@@ -301,10 +306,10 @@ export const MyTable = ({
             <FlexDiv>
               <Label>Status:</Label>
               <StyledSelect2 id="statusFilter" value={dropdownValue} onChange={updateBountyStatus}>
-                <option value="all">All</option>
-                <option value="open">Open</option>
-                <option value="in-progress">In Progress</option>
-                <option value="completed">Completed</option>
+                <option value="All">All</option>
+                <option value="Open">Open</option>
+                <option value="Assigned">In Progress</option>
+                <option value="Paid">Completed</option>
               </StyledSelect2>
             </FlexDiv>
           </Options>
@@ -322,13 +327,13 @@ export const MyTable = ({
             <TableHeaderDataRight>Status</TableHeaderDataRight>
           </TableRow>
           <tbody>
-            {currentPageData()?.map((bounty: any) => {
+            {bounties.map((bounty: any) => {
               const bounty_status =
                 bounty?.paid && bounty.assignee
                   ? 'paid'
                   : bounty.assignee && !bounty.paid
-                  ? 'assigned'
-                  : 'open';
+                    ? 'assigned'
+                    : 'open';
 
               const created = moment.unix(bounty.bounty_created).format('YYYY-MM-DD');
               const time_to_pay = bounty.paid_date
@@ -380,17 +385,25 @@ export const MyTable = ({
         <FlexDiv>
           {totalBounties > pageSize ? (
             <PageContainer role="pagination">
-              <img src={paginationarrow1} alt="pagination arrow 1" onClick={() => paginatePrev()} />
+              <PaginationImg
+                src={paginationarrow1}
+                alt="pagination arrow 1"
+                onClick={() => paginatePrev()}
+              />
               {activeTabs.map((page: number) => (
                 <PaginationButtons
                   key={page}
-                  onClick={() => setCurrentPage(page)}
+                  onClick={() => paginate(page)}
                   active={page === currentPage}
                 >
                   {page}
                 </PaginationButtons>
               ))}
-              <img src={paginationarrow2} alt="pagination arrow 2" onClick={() => paginateNext()} />
+              <PaginationImg
+                src={paginationarrow2}
+                alt="pagination arrow 2"
+                onClick={() => paginateNext()}
+              />
             </PageContainer>
           ) : null}
         </FlexDiv>

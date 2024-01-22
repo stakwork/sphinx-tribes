@@ -40,18 +40,15 @@ export const SuperAdmin = () => {
   //Todo: Remove all comments when metrcis development is done
   const { main } = useStores();
   const [isSuperAdmin] = useState(true);
+  const [currentPage, setCurrentPage] = useState(1);
   const [bounties, setBounties] = useState<any[]>([]);
   const [bountyMetrics, setBountyMetrics] = useState<BountyMetrics | undefined>(undefined);
-  const mockHunterMetrics: MockHunterMetrics = {
-    hunters_total_paid: 145,
-    hunters_first_bounty_paid: 12
-  };
   const [bountyStatus, setBountyStatus] = useState<BountyStatus>({
     ...defaultBountyStatus,
     Open: false
   });
   const [sortOrder, setSortOrder] = useState<string>('desc');
-  const [dropdownValue, setDropdownValue] = useState('all');
+  const [dropdownValue, setDropdownValue] = useState('All');
   const [loading, setLoading] = useState(false);
 
   /**
@@ -78,7 +75,7 @@ export const SuperAdmin = () => {
             end_date: String(endDate)
           },
           {
-            resetPage: true,
+            page: currentPage,
             ...bountyStatus,
             direction: sortOrder
           }
@@ -92,11 +89,11 @@ export const SuperAdmin = () => {
         setLoading(false);
       }
     }
-  }, [main, startDate, endDate, bountyStatus, sortOrder]);
+  }, [main, startDate, endDate, bountyStatus, sortOrder, currentPage]);
 
   useEffect(() => {
     getBounties();
-  }, [getBounties]);
+  }, [getBounties, currentPage]);
 
   const getMetrics = useCallback(async () => {
     if (startDate && endDate) {
@@ -129,7 +126,6 @@ export const SuperAdmin = () => {
           <Statistics
             freezeHeaderRef={ref}
             metrics={bountyMetrics}
-            mockHunter={mockHunterMetrics}
           />
           {loading ? (
             <LoaderContainer>
@@ -147,6 +143,8 @@ export const SuperAdmin = () => {
               sortOrder={sortOrder}
               dropdownValue={dropdownValue}
               setDropdownValue={setDropdownValue}
+              currentPage={currentPage}
+              setCurrentPage={setCurrentPage}
             />
           )}
         </Container>
