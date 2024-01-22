@@ -175,7 +175,6 @@ const Organizations = (props: { person: Person }) => {
     setIsLoading(true);
     if (ui.selectedPerson) {
       await main.getUserOrganizations(ui.selectedPerson);
-      await main.getUserDropdownOrganizations(ui.selectedPerson);
     }
     setIsLoading(false);
   }, [main, ui.selectedPerson]);

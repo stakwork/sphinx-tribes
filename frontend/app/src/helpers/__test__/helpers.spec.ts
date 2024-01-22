@@ -209,6 +209,16 @@ describe('testing helpers', () => {
       const capitalizeString = toCapitalize('hello test sphinx');
       expect(capitalizeString).toBe('Hello Test Sphinx');
     });
+
+    test('test to capitalize string with extra space at the end', () => {
+      const capitalizeString = toCapitalize('hello test sphinx    ');
+      expect(capitalizeString).toBe('Hello Test Sphinx');
+    });
+
+    test('test to capitalize string with extra space between', () => {
+      const capitalizeString = toCapitalize('hello test    sphinx');
+      expect(capitalizeString).toBe('Hello Test Sphinx');
+    });
   });
   describe('spliceOutPubkey', () => {
     test('test that it returns pubkey from a pubkey:route_hint string', () => {
