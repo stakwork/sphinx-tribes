@@ -20,7 +20,7 @@ describe('Modal Component Tests', () => {
     nextArrow: mockNextArrow,
     prevArrowNew: mockPrevArrowNew,
     nextArrowNew: mockNextArrowNew,
-    bigClose: mockBigClose,
+    bigClose: mockBigClose
   };
 
   it('renders without crashing', () => {
@@ -35,7 +35,6 @@ describe('Modal Component Tests', () => {
 
   it('is not visible when visible prop is false', () => {
     render(<Modal {...{ ...defaultProps, visible: false }} />);
-    // Depending on how visibility is handled, you may need to adjust this check
     expect(screen.queryByTestId('modal-fadeleft')).not.toBeInTheDocument();
   });
 
