@@ -162,30 +162,28 @@ export default function Modal(props: ModalProps) {
           overflowX: 'hidden',
           ...style
         }}
-        data-testid="modal-fadeleft"
       >
         <Env
-          data-testid="modal-env"
+  
           role="alertdialog"
           aria-modal={true}
           style={{ ...fillStyle, ...envStyle }}
           color={color}
         >
           {close && (
-            <X color={color} data-testid="modal-close-button">
+            <X color={color}>
               <IconButton onClick={close} size={20} icon="close" color="transparent" />
             </X>
           )}
 
           {bigClose && (
-            <BigX color={color} data-testid="modal-bigclose-button">
+            <BigX color={color}>
               <IconButton onClick={bigClose} size={36} icon="close" color="transparent" />
             </BigX>
           )}
 
           {bigCloseImage && (
             <div
-              data-testid="modal-bigclose-image"
               style={{
                 height: '40px',
                 width: '40px',
@@ -203,7 +201,7 @@ export default function Modal(props: ModalProps) {
           )}
 
           {prevArrow && (
-            <L color={color} data-testid="modal-prev-arrow">
+            <L color={color}>
               <Circ color={color}>
                 <IconButton
                   color="noColor"
@@ -218,7 +216,7 @@ export default function Modal(props: ModalProps) {
             </L>
           )}
           {nextArrow && (
-            <R color={color} data-testid="modal-next-arrow">
+            <R color={color}>
               <Circ color={color}>
                 <IconButton
                   color="noColor"
@@ -234,7 +232,7 @@ export default function Modal(props: ModalProps) {
           )}
 
           {prevArrowNew && (
-            <LNew color={color} data-testid="modal-prev-arrow-new">
+            <LNew color={color}>
               <CircL color={color}>
                 <IconButton
                   iconStyle={{ color: color.pureWhite }}
@@ -248,7 +246,7 @@ export default function Modal(props: ModalProps) {
             </LNew>
           )}
           {nextArrowNew && (
-            <RNew color={color} data-testid="modal-next-arrow-new">
+            <RNew color={color}>
               <CircR color={color}>
                 <IconButton
                   icon={'chevron_right'}
