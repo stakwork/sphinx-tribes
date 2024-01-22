@@ -512,7 +512,6 @@ export const TextInput = styled.input`
   font-weight: 500;
   line-height: 20px;
   width: 16rem;
-  margin-bottom: 1.25rem;
   height: 2.4rem;
 
   ::placeholder {
@@ -542,7 +541,6 @@ export const TextAreaInput = styled.textarea`
   font-weight: 500;
   line-height: 20px;
   width: 16rem;
-  margin-bottom: 12px;
   resize: none;
   height: 13.9375rem;
 
@@ -561,10 +559,10 @@ export const TextAreaInput = styled.textarea`
 export const SecondaryText = styled.p`
   color: #b0b7bc;
   font-family: 'Barlow';
-  font-size: 0.9375rem;
+  font-size: 0.813rem;
   font-style: normal;
   font-weight: 400;
-  margin-bottom: 0.75rem;
+  margin-bottom: 18px;
   height: 0.5625rem;
 `;
 export const RouteHintText = styled.p`

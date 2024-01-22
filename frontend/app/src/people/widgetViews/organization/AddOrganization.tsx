@@ -111,7 +111,11 @@ const errcolor = '#FF8F80';
 
 const InputError = styled.div`
   color: #ff8f80;
+  text-edge: cap;
+  margin-bottom: 9px;
+  font-family: Barlow;
   font-size: 11px;
+  font-style: normal;
   font-weight: 500;
 `;
 
@@ -291,19 +295,19 @@ const AddOrganization = (props: {
           </ImgTextContainer>
         </OrgImgOutterContainer>
         <OrgInputContainer style={{ color: orgNameError ? errcolor : '' }}>
-          <LabelRowContainer>
-            <OrgLabel style={{ color: orgNameError ? errcolor : '' }}>Organization Name *</OrgLabel>
-            <SecondaryText style={{ color: orgNameError ? errcolor : '' }}>
-              {orgName.length}/{MAX_ORG_NAME_LENGTH}
-            </SecondaryText>
-          </LabelRowContainer>
+          <OrgLabel style={{ color: orgNameError ? errcolor : '' }}>Organization Name *</OrgLabel>
           <TextInput
             placeholder="My Organization..."
             value={orgName}
             onChange={handleOrgNameChange}
             style={{ borderColor: orgNameError ? errcolor : '' }}
           />
-          {orgNameError && <InputError>Name is too long.</InputError>}
+          <LabelRowContainer>
+            {orgNameError && <InputError>Name is too long.</InputError>}
+            <SecondaryText style={{ color: orgNameError ? errcolor : '', marginLeft: 'auto' }}>
+              {orgName.length}/{MAX_ORG_NAME_LENGTH}
+            </SecondaryText>
+          </LabelRowContainer>
           <OrgLabel>Website</OrgLabel>
           <TextInput
             placeholder="Website URL..."
@@ -318,12 +322,7 @@ const AddOrganization = (props: {
           />
         </OrgInputContainer>
         <OrgInputContainer>
-          <LabelRowContainer>
-            <OrgLabel style={{ color: descriptionError ? errcolor : '' }}>Description</OrgLabel>
-            <SecondaryText style={{ color: descriptionError ? errcolor : '' }}>
-              {description.length}/{MAX_DESCRIPTION_LENGTH}
-            </SecondaryText>
-          </LabelRowContainer>
+          <OrgLabel style={{ color: descriptionError ? errcolor : '' }}>Description</OrgLabel>
           <TextAreaInput
             placeholder="Description Text..."
             rows={7}
@@ -331,7 +330,12 @@ const AddOrganization = (props: {
             onChange={handleDescriptionChange}
             style={{ borderColor: descriptionError ? errcolor : '' }}
           />
-          {descriptionError && <InputError>Description is too long.</InputError>}
+          <LabelRowContainer>
+            {descriptionError && <InputError>Description is too long.</InputError>}
+            <SecondaryText style={{ color: descriptionError ? errcolor : '', marginLeft: 'auto' }}>
+              {description.length}/{MAX_DESCRIPTION_LENGTH}
+            </SecondaryText>
+          </LabelRowContainer>
         </OrgInputContainer>
       </OrgDetailsContainer>
       <FooterContainer>

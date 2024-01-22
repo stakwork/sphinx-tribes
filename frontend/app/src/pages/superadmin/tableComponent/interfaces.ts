@@ -14,4 +14,5 @@ export type Bounty = {
   organizationImage: string;
   status: string;
   assignee_alias: string;
+  paid: boolean;
 };
