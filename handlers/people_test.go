@@ -4,6 +4,11 @@ import (
 	"bytes"
 	"context"
 	"encoding/json"
+	"net/http"
+	"net/http/httptest"
+	"strconv"
+	"testing"
+
 	"github.com/go-chi/chi"
 	"github.com/google/uuid"
 	"github.com/stakwork/sphinx-tribes/auth"
@@ -11,9 +16,6 @@ import (
 	mocks "github.com/stakwork/sphinx-tribes/mocks"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
-	"net/http"
-	"net/http/httptest"
-	"testing"
 )
 
 func TestGetPersonByPuKey(t *testing.T) {
@@ -174,6 +176,85 @@ func TestCreateOrEditPerson(t *testing.T) {
 		handler.ServeHTTP(rr, req)
 
 		assert.Equal(t, http.StatusOK, rr.Code, "invalid status received")
+		mockDb.AssertExpectations(t)
+	})
+}
+
+func TestGetPersonById(t *testing.T) {
+	mockDb := mocks.NewDatabase(t)
+	pHandler := NewPeopleHandler(mockDb)
+
+	t.Run("successful retrieval", func(t *testing.T) {
+		rr := httptest.NewRecorder()
+		handler := http.HandlerFunc(pHandler.GetPersonById)
+		person := db.Person{
+			ID:          1,
+			Uuid:        "test-uuid",
+			OwnerPubKey: "owner-pub-key",
+			OwnerAlias:  "owner",
+		}
+
+		rctx := chi.NewRouteContext()
+		rctx.URLParams.Add("id", strconv.Itoa(int(person.ID)))
+		req, err := http.NewRequestWithContext(context.WithValue(context.Background(), chi.RouteCtxKey, rctx), http.MethodGet, "/person", nil)
+		assert.NoError(t, err)
+
+		mockDb.On("GetPerson", mock.Anything).Return(person).Once()
+		handler.ServeHTTP(rr, req)
+
+		var returnedPerson db.Person
+		err = json.Unmarshal(rr.Body.Bytes(), &returnedPerson)
+		assert.NoError(t, err)
+		assert.Equal(t, http.StatusOK, rr.Code)
+		assert.EqualValues(t, person, returnedPerson)
+		mockDb.AssertExpectations(t)
+	})
+
+	t.Run("person not found", func(t *testing.T) {
+		rr := httptest.NewRecorder()
+		handler := http.HandlerFunc(pHandler.GetPersonById)
+
+		rctx := chi.NewRouteContext()
+		rctx.URLParams.Add("id", "999")
+		req, err := http.NewRequestWithContext(context.WithValue(context.Background(), chi.RouteCtxKey, rctx), http.MethodGet, "/person", nil)
+		assert.NoError(t, err)
+
+		mockDb.On("GetPerson", mock.Anything).Return(db.Person{}).Once()
+		handler.ServeHTTP(rr, req)
+
+		assert.Equal(t, http.StatusOK, rr.Code)
+		mockDb.AssertExpectations(t)
+	})
+}
+
+func TestDeletePerson(t *testing.T) {
+	mockDb := mocks.NewDatabase(t)
+	pHandler := NewPeopleHandler(mockDb)
+
+	t.Run("successful deletion", func(t *testing.T) {
+		rr := httptest.NewRecorder()
+		handler := http.HandlerFunc(pHandler.DeletePerson)
+		person := db.Person{
+			ID:          1,
+			Uuid:        "test-uuid",
+			OwnerPubKey: "owner-pub-key",
+			OwnerAlias:  "owner",
+		}
+
+		rctx := chi.NewRouteContext()
+		rctx.URLParams.Add("id", "1")
+
+		ctx := context.WithValue(context.Background(), chi.RouteCtxKey, rctx)
+		ctx = context.WithValue(ctx, auth.ContextKey, person.OwnerPubKey)
+
+		req, err := http.NewRequestWithContext(ctx, http.MethodDelete, "/person", nil)
+		assert.NoError(t, err)
+
+		mockDb.On("GetPerson", person.ID).Return(person).Once()
+		mockDb.On("UpdatePerson", person.ID, mock.Anything).Return(true).Once()
+		handler.ServeHTTP(rr, req)
+
+		assert.Equal(t, http.StatusOK, rr.Code)
 		mockDb.AssertExpectations(t)
 	})
 }
