@@ -7,7 +7,7 @@ export enum AppMode {
 }
 
 const hosts: { [k: string]: AppMode } = {
-  'localhost:3000': AppMode.COMMUNITY,
+  'localhost:3000': AppMode.TRIBES,
   'localhost:13000': AppMode.TRIBES,
   'localhost:23000': AppMode.TRIBES,
   'tribes.sphinx.chat': AppMode.TRIBES,
