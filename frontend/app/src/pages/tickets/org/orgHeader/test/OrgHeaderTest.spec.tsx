@@ -15,14 +15,17 @@ const updateIsPostBountyModalOpen = jest.fn();
 
 describe('OrgDescription Component', () => {
   it('renders the component with organization information', async () => {
-
     const url = 'http://localhost:5002';
 
     nock(url).get(`/organizations/${organization.uuid}`).reply(200, {});
 
-    render(<OrgDescription updateIsPostBountyModalOpen={updateIsPostBountyModalOpen} orgData={organization}/>);
+    render(
+      <OrgDescription
+        updateIsPostBountyModalOpen={updateIsPostBountyModalOpen}
+        orgData={organization}
+      />
+    );
 
-  
     await waitFor(async () => {
       expect(await screen.findByText(organization.name)).toBeInTheDocument();
       expect(screen.getByText('Post a Bounty')).toBeInTheDocument();
@@ -31,4 +34,3 @@ describe('OrgDescription Component', () => {
     });
   });
 });
-

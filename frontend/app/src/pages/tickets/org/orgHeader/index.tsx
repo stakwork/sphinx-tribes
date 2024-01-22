@@ -8,7 +8,6 @@ import searchIcon from './Icons/searchIcon.svg';
 import file from './Icons/file.svg';
 import OrgDescription from './OrgDescription';
 
-
 const FillContainer = styled.div`
   width: 100vw;
   align-self: stretch;
@@ -53,7 +52,7 @@ const SkillContainer = styled.span`
 const Skill = styled.select`
   border: none;
   background-color: transparent;
-`
+`;
 const Label = styled.label`
   color: var(--Main-bottom-icons, #5f6368);
   font-family: Barlow;
@@ -140,34 +139,34 @@ const Img = styled.img`
 
 export const OrgHeader = () => {
   const [isPostBountyModalOpen, setIsPostBountyModalOpen] = useState(false);
-  const [organization, setOrganization] = useState<Organization>()
+  const [organization, setOrganization] = useState<Organization>();
   const { uuid } = useParams<{ uuid: string; bountyId: string }>();
-  const { main} = useStores();
+  const { main } = useStores();
 
-useEffect(() => {
+  useEffect(() => {
     (async () => {
+      if (!uuid) return;
 
-      if (!uuid) return
+      const res = await main.getUserOrganizationByUuid(uuid);
 
-       const res = await main.getUserOrganizationByUuid(uuid)
-
-         if (!res) return
+      if (!res) return;
       setOrganization(res);
-
     })();
   }, [main, uuid]);
 
   const selectedWidget = 'wanted';
-  
+
   const handlePostBountyClose = () => {
     setIsPostBountyModalOpen(false);
   };
 
-
   return (
     <>
       <FillContainer>
-        <OrgDescription updateIsPostBountyModalOpen={setIsPostBountyModalOpen} orgData={organization}/>
+        <OrgDescription
+          updateIsPostBountyModalOpen={setIsPostBountyModalOpen}
+          orgData={organization}
+        />
       </FillContainer>
       <FillContainer>
         <Filters>
