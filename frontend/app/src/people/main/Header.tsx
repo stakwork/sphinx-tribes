@@ -514,7 +514,10 @@ function Header() {
                   goToEditSelf();
                 }}
               >
-                <Imgg src={ui.meInfo?.img || '/static/person_placeholder.png'} />
+                <Imgg
+                  data-testid="userImg"
+                  src={ui.meInfo?.img || '/static/person_placeholder.png'}
+                />
                 <Alias> {ui.meInfo?.owner_alias}</Alias>
               </LoggedInBtn>
             ) : (
