@@ -139,7 +139,7 @@ export const FieldTextArea = styled(EuiTextArea)<styledProps>`
   background-color: ${(p: any) => p?.color && p.color.pureWhite} !important;
   background: ${(p: any) => p?.color && p.color.pureWhite} !important;
   max-width: 900px;
-  width: 292px;
+  width: 100%;
   min-height: 167px;
   color: ${(p: any) => p?.color && p.color.pureBlack} !important;
   box-shadow: none !important;

@@ -16,6 +16,9 @@ const StyleOnText = {
   }
 };
 
+const defaultHeight = '135px';
+const defaultWidth = '100%';
+
 interface styledProps {
   color?: any;
 }
@@ -98,14 +101,14 @@ export default function TextAreaInput({
         className={active ? 'euiFormRow_active' : (value ?? '') === '' ? '' : 'euiFormRow_filed'}
         border={borderType}
         label={label}
-        height={StyleOnText[label].height}
-        width={StyleOnText[label].width}
+        height={StyleOnText[label]?.height ?? defaultHeight}
+        width={StyleOnText[label]?.width ?? defaultWidth}
       >
         <R>
           <FieldTextArea
             color={color}
-            height={StyleOnText[label].height}
-            width={StyleOnText[label].width}
+            height={StyleOnText[label]?.height ?? defaultHeight}
+            width={StyleOnText[label]?.width ?? defaultWidth}
             name="first"
             value={value || ''}
             readOnly={readOnly || false}
