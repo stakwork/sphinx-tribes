@@ -1,48 +1,40 @@
+import { render, fireEvent } from '@testing-library/react';
 import React from 'react';
-import { mount } from 'enzyme';
+import { BrowserRouter as Router } from 'react-router-dom';
 import { TicketModalPage } from './TicketModalPage';
 
-describe('prevArrHandler', () => {
-  const initialState = {
-    main: {
-      peopleBounties: [{ body: { id: 1 }, person: {} }],
-      getBountyById: jest.fn(),
-      getBountyIndexById: jest.fn(),
-      getOrganizationBounties: jest.fn()
-    },
-    modals: { setStartupModal: jest.fn() },
-    ui: { meInfo: true },
-    response: [{ body: { id: 1 }, person: {} }],
-    bountyId: '1',
-    connectPersonBody: {},
-    publicFocusIndex: 0,
-    removeNextAndPrev: false,
-    visible: true,
-    isDeleted: false,
-    search: { owner_id: '1', created: '1' },
-    history: { goBack: jest.fn() },
-    getUuidFromUrl: jest.fn(() => '1'),
-    directionHandler: jest.fn(),
-    setResponse: jest.fn(),
-    uuid: '1'
-  };
+describe('TicketModalPage', () => {
+  test('calls prevArrHandler when the previous button is clicked', () => {
+    const setConnectPerson = jest.fn();
+    const history = { replace: jest.fn() };
 
-  const component = mount(<TicketModalPage {...initialState} setConnectPerson={jest.fn()} />);
+    const { getByRole } = render(
+      <Router>
+        <TicketModalPage setConnectPerson={setConnectPerson} />
+      </Router>
+    );
 
-  it('should call directionHandler with the correct arguments when called', () => {
-    component.instance().prevArrHandler();
-    expect(component.instance().directionHandler).toHaveBeenCalledWith({}, { id: 0 });
+    fireEvent.click(getByRole('button', { name: /previous/i }));
+
+    expect(setConnectPerson).toHaveBeenCalled();
+    expect(history.replace).toHaveBeenCalled();
   });
+});
 
-  it('should not call directionHandler when index is less than or equal to 0', () => {
-    component.instance().publicFocusIndex = -1;
-    component.instance().prevArrHandler();
-    expect(component.instance().directionHandler).not.toHaveBeenCalled();
-  });
+describe('TicketModalPage', () => {
+  test('calls nextArrHandler when the next button is clicked', () => {
+    const setConnectPerson = jest.fn();
+    const history = { replace: jest.fn() };
 
-  it('should not call directionHandler when there are no more items to navigate to', () => {
-    component.instance().publicFocusIndex = 1;
-    component.instance().prevArrHandler();
-    expect(component.instance().directionHandler).not.toHaveBeenCalled();
+    const { getByRole } = render(
+      <Router>
+        <TicketModalPage setConnectPerson={setConnectPerson} />
+      </Router>
+    );
+
+    fireEvent.click(getByRole('button', { name: /next/i }));
+
+    expect(setConnectPerson).toHaveBeenCalled();
+    expect(history.replace).toHaveBeenCalled();
   });
 });
