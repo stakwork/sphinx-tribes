@@ -420,9 +420,9 @@ export interface BountyHeaderProps {
 
 export interface OrgBountyHeaderProps {
   onChangeStatus: (number) => void;
-  checkboxIdToSelectedMap: any;
-  languageString: string;
-  org_uuid: string;
+  checkboxIdToSelectedMap?: any;
+  languageString?: string;
+  org_uuid?: string;
 }
 export interface PeopleHeaderProps {
   onChangeLanguage: (number) => void;

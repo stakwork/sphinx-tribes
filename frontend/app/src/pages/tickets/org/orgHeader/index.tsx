@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import styled from 'styled-components';
 import { EuiCheckboxGroup, EuiPopover, EuiText } from '@elastic/eui';
 import MaterialIcon from '@material/react-material-icon';
@@ -290,28 +290,19 @@ const StatusContainer = styled.div<styledProps>`
   }
 `;
 
-const Status = ['Opened', 'Assigned', 'Completed', 'Paid'];
+const Status = ['Open', 'Assigned', 'Completed', 'Paid'];
 const color = colors['light'];
 export const OrgHeader = ({
   onChangeStatus,
   checkboxIdToSelectedMap,
-  languageString,
-  org_uuid
+  org_uuid,
+  languageString
 }: OrgBountyHeaderProps) => {
   const { main } = useStores();
   const [isPostBountyModalOpen, setIsPostBountyModalOpen] = useState(false);
   const [isStatusPopoverOpen, setIsStatusPopoverOpen] = useState<boolean>(false);
   const onButtonClick = async () => {
     setIsStatusPopoverOpen((isPopoverOpen: any) => !isPopoverOpen);
-    if (!isStatusPopoverOpen) {
-      await main.getPeopleBounties({
-        page: 1,
-        resetPage: true,
-        ...checkboxIdToSelectedMap,
-        languages: languageString,
-        org_uuid
-      });
-    }
   };
   const closeStatusPopover = () => setIsStatusPopoverOpen(false);
 
@@ -322,6 +313,17 @@ export const OrgHeader = ({
   const handlePostBountyClose = () => {
     setIsPostBountyModalOpen(false);
   };
+
+  useEffect(() => {
+    if (org_uuid) {
+      main.getOrganizationBounties(org_uuid, {
+        page: 1,
+        resetPage: true,
+        ...checkboxIdToSelectedMap,
+        languageString
+      });
+    }
+  }, [org_uuid, checkboxIdToSelectedMap]);
 
   return (
     <>
@@ -340,7 +342,6 @@ export const OrgHeader = ({
               button={
                 <StatusContainer onClick={onButtonClick} color={color}>
                   <EuiText
-                    data-testid="euiStatusText"
                     className="statusText"
                     style={{
                       color: isStatusPopoverOpen ? color.grayish.G10 : ''

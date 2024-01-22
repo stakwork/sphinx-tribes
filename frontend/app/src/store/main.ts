@@ -293,14 +293,14 @@ export const defaultBountyStatus: BountyStatus = {
 };
 
 export interface OrgBountyStatus {
-  Opened: boolean;
+  Open: boolean;
   Assigned: boolean;
   Paid: boolean;
   Completed: boolean;
 }
 
 export const defaultOrgBountyStatus: OrgBountyStatus = {
-  Opened: false,
+  Open: true,
   Assigned: false,
   Paid: false,
   Completed: false
@@ -1088,10 +1088,30 @@ export class MainStore {
     }
   }
 
-  async getOrganizationBounties(uuid: string, queryParams?: any): Promise<PersonBounty[]> {
-    queryParams = { ...queryParams, search: uiStore.searchText };
+  getWantedsOrgPrevParams?: QueryParams = {};
+  async getOrganizationBounties(uuid: string, params?: any): Promise<PersonBounty[]> {
+    const queryParams: QueryParams = {
+      limit: queryLimit,
+      sortBy: 'created',
+      search: uiStore.searchText ?? '',
+      page: 1,
+      resetPage: false,
+      ...params
+    };
+
+    if (params) {
+      // save previous params
+      this.getWantedsOrgPrevParams = queryParams;
+    }
+
+    // if we don't pass the params, we should use previous params for invalidate query
+    const query2 = this.appendQueryParams(
+      `organizations/bounties/${uuid}`,
+      queryLimit,
+      params ? queryParams : this.getWantedsOrgPrevParams
+    );
     try {
-      const ps2 = await api.get(`organizations/bounties/${uuid}`);
+      const ps2 = await api.get(query2);
       const ps3: any[] = [];
 
       if (ps2 && ps2.length) {
@@ -1109,11 +1129,13 @@ export class MainStore {
             organization = { ...ps2[i].organization };
           }
 
-          ps3.push({
-            body: { ...bounty, assignee: assignee || '' },
-            person: { ...owner, wanteds: [] } || { wanteds: [] },
-            organization: { ...organization }
-          });
+          if (bounty.org_uuid === uuid) {
+            ps3.push({
+              body: { ...bounty, assignee: assignee || '' },
+              person: { ...owner, wanteds: [] } || { wanteds: [] },
+              organization: { ...organization }
+            });
+          }
         }
       }
 

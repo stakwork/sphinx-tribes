@@ -43,7 +43,7 @@ function OrgBodyComponent() {
 
   useEffect(() => {
     setCheckboxIdToSelectedMap({
-      Opened: false,
+      Open: false,
       Assigned: false,
       Paid: false,
       Completed: false
@@ -157,8 +157,8 @@ function OrgBodyComponent() {
         <OrgHeader
           onChangeStatus={onChangeStatus}
           checkboxIdToSelectedMap={checkboxIdToSelectedMap}
-          languageString={languageString}
           org_uuid={uuid}
+          languageString={languageString}
         />
         <>
           <div

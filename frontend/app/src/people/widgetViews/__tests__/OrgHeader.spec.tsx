@@ -7,7 +7,7 @@ import { mainStore } from '../../../store/main.ts';
 
 const MockProps: OrgBountyHeaderProps = {
   checkboxIdToSelectedMap: {
-    Opened: false,
+    Open: false,
     Assigned: false,
     Paid: false,
     Completed: false
@@ -19,7 +19,7 @@ const MockProps: OrgBountyHeaderProps = {
 
 describe('OrgHeader Component', () => {
   beforeEach(() => {
-    jest.spyOn(mainStore, 'getPeopleBounties').mockReset();
+    jest.spyOn(mainStore, 'getOrganizationBounties').mockReset();
   });
 
   afterEach(() => {
@@ -47,20 +47,34 @@ describe('OrgHeader Component', () => {
   });
 
   it('should trigger API call in response to click on status from OrgHeader', async () => {
-    const { getByText } = render(<OrgHeader {...MockProps} />);
+    const { getByText, getByRole, rerender } = render(<OrgHeader {...MockProps} />);
 
     const statusFilter = getByText('Status');
     expect(statusFilter).toBeInTheDocument();
-
     fireEvent.click(statusFilter);
 
+    const statusOpenCheckbox = getByRole('checkbox', { name: /Open/i });
+    expect(statusOpenCheckbox).toBeInTheDocument();
+    fireEvent.click(statusOpenCheckbox);
+
     await waitFor(() => {
-      expect(mainStore.getPeopleBounties).toHaveBeenCalledWith({
+      expect(MockProps.onChangeStatus).toHaveBeenCalledWith('Open');
+
+      // Simulate a change in checkboxIdToSelectedMap
+      const updatedCheckboxIdToSelectedMap = {
+        ...MockProps.checkboxIdToSelectedMap,
+        Open: true
+      };
+
+      rerender(
+        <OrgHeader {...MockProps} checkboxIdToSelectedMap={updatedCheckboxIdToSelectedMap} />
+      );
+
+      expect(mainStore.getOrganizationBounties).toHaveBeenCalledWith(MockProps.org_uuid, {
         page: 1,
         resetPage: true,
-        ...MockProps.checkboxIdToSelectedMap,
-        languages: MockProps.languageString,
-        org_uuid: MockProps.org_uuid
+        ...updatedCheckboxIdToSelectedMap,
+        languageString: MockProps.languageString
       });
     });
   });
