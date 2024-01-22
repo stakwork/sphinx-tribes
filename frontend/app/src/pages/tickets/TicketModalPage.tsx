@@ -79,28 +79,35 @@ export const TicketModalPage = observer(({ setConnectPerson }: Props) => {
 
   const getUuidFromUrl = () => {
     const { href } = window.location;
-    const parts = href.split('/');
-    return parts[parts.length - 1];
+    const parts = href.split(`/bounty/${bountyId}/`);
+    if (parts.length > 1) {
+      return parts[parts.length - 1];
+    }
   };
 
   const uuid = getUuidFromUrl();
-  console.log(uuid, 'Gofestr');
 
   const directionHandler = (person: any, body: any) => {
     if (person && body) {
-      if (bountyId) {
+      if (uuid) {
         history.replace(`/bounty/${body.id}/${uuid}`);
+      }
+      if (!uuid) {
+        history.replace(`/bounty/${body.id}`);
       }
     }
   };
 
   const [response, setResponse] = useState<any>([]);
-  const getOrgBounties = async () => {
-    const response = await main.getOrganizationBounties(uuid);
-    setResponse(response);
-  };
+
   useEffect(() => {
-    getOrgBounties();
+    if (uuid !== null && uuid !== undefined) {
+      const getOrgBounties = async () => {
+        const response = await main.getOrganizationBounties(uuid);
+        setResponse(response);
+      };
+      getOrgBounties();
+    }
   });
 
   const getBountyIndex = () => {
@@ -121,7 +128,7 @@ export const TicketModalPage = observer(({ setConnectPerson }: Props) => {
       if (index <= 0 || index >= response.length) return;
       const { person, body } = response[index - 1];
       directionHandler(person, body);
-    } else {
+    } else if (!uuid) {
       if (index <= 0 || index >= main.peopleBounties.length) return;
       const { person, body } = main.peopleBounties[index - 1];
       directionHandler(person, body);
