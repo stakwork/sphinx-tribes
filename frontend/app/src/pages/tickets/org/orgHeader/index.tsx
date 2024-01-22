@@ -1,22 +1,13 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import styled from 'styled-components';
 import { PostModal } from 'people/widgetViews/postBounty/PostModal';
-import addBounty from './Icons/addBounty.svg';
+import { Organization } from 'store/main';
+import { useParams } from 'react-router-dom';
+import { useStores } from 'store';
 import searchIcon from './Icons/searchIcon.svg';
 import file from './Icons/file.svg';
+import OrgDescription from './OrgDescription';
 
-const Header = styled.div`
-  width: 1366px;
-  height: 130px;
-  padding: 45px 132px 45px 1089px;
-  justify-content: flex-end;
-  align-items: center;
-  align-self: stretch;
-  border-bottom: 1px solid var(--Input-BG-1, #f2f3f5);
-  background: #fff;
-  margin-left: auto;
-  margin-right: auto;
-`;
 
 const FillContainer = styled.div`
   width: 100vw;
@@ -62,30 +53,7 @@ const SkillContainer = styled.span`
 const Skill = styled.select`
   border: none;
   background-color: transparent;
-`;
-
-const Button = styled.button`
-  border-radius: 6px;
-  background: var(--Primary-Green, #49c998);
-  box-shadow: 0px 2px 10px 0px rgba(73, 201, 152, 0.5);
-  border: none;
-  display: flex;
-  width: 144px;
-  height: 40px;
-  padding: 8px 16px;
-  justify-content: flex-end;
-  align-items: center;
-  gap: 6px;
-  color: var(--White, #fff);
-  text-align: center;
-  font-family: Barlow;
-  font-size: 14px;
-  font-style: normal;
-  font-weight: 500;
-  line-height: 0px; /* 0% */
-  letter-spacing: 0.14px;
-`;
-
+`
 const Label = styled.label`
   color: var(--Main-bottom-icons, #5f6368);
   font-family: Barlow;
@@ -172,23 +140,34 @@ const Img = styled.img`
 
 export const OrgHeader = () => {
   const [isPostBountyModalOpen, setIsPostBountyModalOpen] = useState(false);
+  const [organization, setOrganization] = useState<Organization>()
+  const { uuid } = useParams<{ uuid: string; bountyId: string }>();
+  const { main} = useStores();
+
+useEffect(() => {
+    (async () => {
+
+      if (!uuid) return
+
+       const res = await main.getUserOrganizationByUuid(uuid)
+
+         if (!res) return
+      setOrganization(res);
+
+    })();
+  }, [main, uuid]);
+
   const selectedWidget = 'wanted';
-  const handlePostBountyClick = () => {
-    setIsPostBountyModalOpen(true);
-  };
+  
   const handlePostBountyClose = () => {
     setIsPostBountyModalOpen(false);
   };
 
+
   return (
     <>
       <FillContainer>
-        <Header>
-          <Button onClick={handlePostBountyClick}>
-            <img src={addBounty} alt="" />
-            Post a Bounty
-          </Button>
-        </Header>
+        <OrgDescription updateIsPostBountyModalOpen={setIsPostBountyModalOpen} orgData={organization}/>
       </FillContainer>
       <FillContainer>
         <Filters>
