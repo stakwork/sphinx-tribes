@@ -12,7 +12,7 @@ func PersonRoutes() chi.Router {
 	peopleHandler := handlers.NewPeopleHandler(db.DB)
 	r.Group(func(r chi.Router) {
 		r.Get("/{pubkey}", peopleHandler.GetPersonByPubkey)
-		r.Get("/id/{id}", handlers.GetPersonById)
+		r.Get("/id/{id}", peopleHandler.GetPersonById)
 		r.Get("/uuid/{uuid}", handlers.GetPersonByUuid)
 		r.Get("/uuid/{uuid}/assets", handlers.GetPersonAssetsByUuid)
 		r.Get("/githubname/{github}", handlers.GetPersonByGithubName)
@@ -21,7 +21,7 @@ func PersonRoutes() chi.Router {
 		r.Use(auth.PubKeyContext)
 
 		r.Post("/", peopleHandler.CreateOrEditPerson)
-		r.Delete("/{id}", handlers.DeletePerson)
+		r.Delete("/{id}", peopleHandler.DeletePerson)
 	})
 	return r
 }

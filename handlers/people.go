@@ -338,11 +338,11 @@ func (ph *peopleHandler) GetPersonByPubkey(w http.ResponseWriter, r *http.Reques
 	json.NewEncoder(w).Encode(person)
 }
 
-func GetPersonById(w http.ResponseWriter, r *http.Request) {
+func (ph *peopleHandler) GetPersonById(w http.ResponseWriter, r *http.Request) {
 	idParam := chi.URLParam(r, "id")
 	id, _ := strconv.ParseUint(idParam, 10, 32)
 
-	person := db.DB.GetPerson(uint(id))
+	person := ph.db.GetPerson(uint(id))
 	w.WriteHeader(http.StatusOK)
 	json.NewEncoder(w).Encode(person)
 }
@@ -403,7 +403,7 @@ func GetPersonByGithubName(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(person)
 }
 
-func DeletePerson(w http.ResponseWriter, r *http.Request) {
+func (ph *peopleHandler) DeletePerson(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 	pubKeyFromAuth, _ := ctx.Value(auth.ContextKey).(string)
 
@@ -421,7 +421,7 @@ func DeletePerson(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	existing := db.DB.GetPerson(uint(id))
+	existing := ph.db.GetPerson(uint(id))
 	if existing.ID == 0 {
 		fmt.Println("existing id is 0")
 		w.WriteHeader(http.StatusUnauthorized)
@@ -433,7 +433,7 @@ func DeletePerson(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	db.DB.UpdatePerson(uint(id), map[string]interface{}{
+	ph.db.UpdatePerson(uint(id), map[string]interface{}{
 		"deleted": true,
 	})
 
