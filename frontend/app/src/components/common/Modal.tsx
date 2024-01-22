@@ -10,26 +10,6 @@ interface styledProps {
   color?: any;
 }
 
-const R = styled.div<styledProps>`
-  position: absolute;
-  right: -75px;
-  top: 0px;
-  height: 100%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-`;
-
-const L = styled.div<styledProps>`
-  position: absolute;
-  left: -75px;
-  top: 0px;
-  height: 100%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-`;
-
 const RNew = styled.div<styledProps>`
   position: absolute;
   right: -63.9px;
@@ -72,17 +52,6 @@ const CircR = styled.div<styledProps>`
   cursor: pointer;
 `;
 
-const Circ = styled.div<styledProps>`
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 65px;
-  height: 65px;
-  background: ${(p: any) => p.color && p.color.grayish.G60};
-  border-radius: 50px;
-  cursor: pointer;
-`;
-
 const X = styled.div<styledProps>`
   position: absolute;
   top: 5px;
@@ -119,8 +88,6 @@ export default function Modal(props: ModalProps) {
     style,
     hideOverlay,
     envStyle,
-    nextArrow,
-    prevArrow,
     nextArrowNew,
     prevArrowNew,
     bigClose,
@@ -198,38 +165,6 @@ export default function Modal(props: ModalProps) {
               <img src="/static/Close.svg" alt="close_svg" height={'100%'} width={'100%'} />
             </div>
           )}
-
-          {prevArrow && (
-            <L color={color}>
-              <Circ color={color}>
-                <IconButton
-                  color="noColor"
-                  iconStyle={{ color: color.pureWhite }}
-                  icon={'chevron_left'}
-                  onClick={(e: any) => {
-                    e.stopPropagation();
-                    prevArrow();
-                  }}
-                />
-              </Circ>
-            </L>
-          )}
-          {nextArrow && (
-            <R color={color}>
-              <Circ color={color}>
-                <IconButton
-                  color="noColor"
-                  icon={'chevron_right'}
-                  iconStyle={{ color: color.pureWhite }}
-                  onClick={(e: any) => {
-                    e.stopPropagation();
-                    nextArrow();
-                  }}
-                />
-              </Circ>
-            </R>
-          )}
-
           {prevArrowNew && (
             <LNew color={color}>
               <CircL color={color}>
