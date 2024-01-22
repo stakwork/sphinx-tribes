@@ -80,3 +80,4 @@ describe('Modal Component Tests', () => {
     expect(mockNextArrowNew).toHaveBeenCalled();
   });
 });
+
