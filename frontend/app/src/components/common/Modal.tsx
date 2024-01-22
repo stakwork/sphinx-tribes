@@ -164,7 +164,6 @@ export default function Modal(props: ModalProps) {
         }}
       >
         <Env
-  
           role="alertdialog"
           aria-modal={true}
           style={{ ...fillStyle, ...envStyle }}
