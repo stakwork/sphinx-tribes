@@ -233,9 +233,10 @@ export default function Modal(props: ModalProps) {
           )}
 
           {prevArrowNew && (
-            <LNew color={color} data-testid="prev-arrow">
+            <LNew color={color}>
               <CircL color={color}>
                 <IconButton
+                  data-testid="prev-arrow"
                   iconStyle={{ color: color.pureWhite }}
                   icon={'chevron_left'}
                   onClick={(e: any) => {
@@ -247,9 +248,10 @@ export default function Modal(props: ModalProps) {
             </LNew>
           )}
           {nextArrowNew && (
-            <RNew color={color} data-testid="next-arrow">
+            <RNew color={color}>
               <CircR color={color}>
                 <IconButton
+                  data-testid="next-arrow"
                   icon={'chevron_right'}
                   iconStyle={{ color: color.pureWhite }}
                   onClick={(e: any) => {
