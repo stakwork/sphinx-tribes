@@ -15,6 +15,9 @@ jest.mock('react-router-dom', () => ({
 const organization: Organization = {
   id: 'clrqpq84nncuuf32kh2g',
   name: 'test organization',
+  description: 'test',
+  github: 'https://github.com/stakwork',
+  website: 'https://community.sphinx.chat',
   show: true,
   uuid: 'c360e930-f94d-4c07-9980-69fc428a994e',
   bounty_count: 1,
