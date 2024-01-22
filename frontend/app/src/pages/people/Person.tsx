@@ -14,11 +14,6 @@ const Wrap = styled.div`
   justify-content: center;
   width: 100%;
   overflow: hidden;
-  transition: background 0.3s;
-
-  &:hover {
-    background: #f2f3f5;
-  }
 `;
 
 interface DWarpProps {
@@ -37,11 +32,6 @@ const DWrap = styled.div<DWarpProps>`
   box-shadow: 0 1px 2px rgba(0, 0, 0, 0.15);
   border-radius: 4px;
   overflow: hidden;
-  transition: background 0.3s;
-
-  &:hover {
-    background: #f2f3f5;
-  }
 `;
 
 const R = styled.div`
@@ -138,7 +128,6 @@ export default function Person(props: PersonProps) {
   const addedStyles = hideActions ? { width: 56, height: 56 } : {};
   const qrString = makeQR(owner_pubkey);
   const [showQR, setShowQR] = useState(false);
-  const [showHighlight, setShowHighlight] = useState(false); //intentionally unused
   function renderPersonCard() {
     if (small) {
       return (
@@ -149,8 +138,6 @@ export default function Person(props: PersonProps) {
           <div
             style={{ background: selected ? '#F2F3F5' : '#fff', cursor: 'pointer' }}
             onClick={() => select(id, unique_name, owner_pubkey)}
-            onMouseEnter={() => setShowHighlight(true)}
-            onMouseLeave={() => setShowHighlight(false)}
           >
             <Wrap style={{ padding: hideActions ? 10 : 25 }}>
               <div>
@@ -206,19 +193,14 @@ export default function Person(props: PersonProps) {
         >
           <DWrap squeeze={squeeze} onClick={() => select(id, unique_name, owner_pubkey)}>
             <div>
-              <div
-                onMouseEnter={() => setShowHighlight(true)}
-                onMouseLeave={() => setShowHighlight(false)}
-              >
-                <div style={{ height: 210 }}>
-                  <Img style={{ height: '100%', width: '100%', borderRadius: 0 }} src={img} />
-                </div>
-                <div style={{ padding: 16 }}>
-                  <DTitle>{owner_alias}</DTitle>
-                  {description && description !== 'description' && (
-                    <DDescription>{description}</DDescription>
-                  )}
-                </div>
+              <div style={{ height: 210 }}>
+                <Img style={{ height: '100%', width: '100%', borderRadius: 0 }} src={img} />
+              </div>
+              <div style={{ padding: 16 }}>
+                <DTitle>{owner_alias}</DTitle>
+                {description && description !== 'description' && (
+                  <DDescription>{description}</DDescription>
+                )}
               </div>
               <div>
                 <Divider />
