@@ -225,7 +225,7 @@ function Form(props: FormProps) {
         );
         const onClickHandler = () => {
           if (!isOnline) {
-            alert('Bounty Failed, No internet connection. ');
+            alert('No internet connection. Please try again later.');
             return;
           }
 
