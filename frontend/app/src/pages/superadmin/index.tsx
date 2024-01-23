@@ -14,6 +14,7 @@ import { Header } from './header';
 import { Statistics } from './statistics';
 import AdminAccessDenied from './accessDenied';
 import { normalizeMetrics } from './utils/metrics';
+import { pageSize, visibleTabs } from './constants.ts';
 
 const Container = styled.body`
   height: 100vh; /* Set a fixed height for the container */
@@ -50,6 +51,8 @@ export const SuperAdmin = () => {
   const [sortOrder, setSortOrder] = useState<string>('desc');
   const [dropdownValue, setDropdownValue] = useState('All');
   const [loading, setLoading] = useState(false);
+  const [activeTabs, setActiveTabs] = useState<number[]>([]);
+  const [totalBounties, setTotalBounties] = useState(0);
 
   /**
    * Todo use the same date range,
@@ -64,6 +67,8 @@ export const SuperAdmin = () => {
   });
 
   const onDateFilterChange = useCallback((option: string) => setSortOrder(option), []);
+
+  const paginationLimit = Math.floor(totalBounties / pageSize) + 1;
 
   const getBounties = useCallback(async () => {
     setLoading(true);
@@ -111,6 +116,32 @@ export const SuperAdmin = () => {
     getMetrics();
   }, [getMetrics]);
 
+  const getTotalBounties = useCallback(async () => {
+    if (startDate && endDate) {
+      const totalBounties = await main.getBountiesCountByRange(String(startDate), String(endDate));
+      setTotalBounties(totalBounties);
+    }
+  }, [main, startDate, endDate]);
+
+  useEffect(() => {
+    getTotalBounties();
+  }, [getTotalBounties]);
+
+
+  const getActiveTabs = useCallback(() => {
+    const dataNumber: number[] = [];
+    for (let i = 1; i <= Math.ceil(paginationLimit); i++) {
+      if (i > visibleTabs) break;
+      dataNumber.push(i);
+    }
+
+    setActiveTabs(dataNumber);
+  }, [paginationLimit]);
+
+  useEffect(() => {
+    getActiveTabs();
+  }, [getActiveTabs]);
+
   return (
     <>
       {!isSuperAdmin ? (
@@ -145,6 +176,10 @@ export const SuperAdmin = () => {
               setDropdownValue={setDropdownValue}
               currentPage={currentPage}
               setCurrentPage={setCurrentPage}
+              activeTabs={activeTabs}
+              setActiveTabs={setActiveTabs}
+              totalBounties={totalBounties}
+              paginationLimit={paginationLimit}
             />
           )}
         </Container>

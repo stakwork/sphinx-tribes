@@ -954,7 +954,7 @@ export class MainStore {
   async getPersonCreatedBounties(queryParams?: any, pubkey?: string): Promise<PersonBounty[]> {
     queryParams = { ...queryParams, search: uiStore.searchText };
 
-    const query = this.appendQueryParams(`people/wanteds/created/${pubkey}`, 20, {
+    const query = this.appendQueryParams(`people/wanteds/created/${pubkey}`, 10, {
       ...queryParams,
       sortBy: 'paid'
     });
