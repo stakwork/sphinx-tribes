@@ -2,9 +2,10 @@ package db
 
 import (
 	"fmt"
-	"github.com/stakwork/sphinx-tribes/utils"
 	"math"
 	"net/http"
+
+	"github.com/stakwork/sphinx-tribes/utils"
 )
 
 var SecondsToDateConversion = 60 * 60 * 24
@@ -58,7 +59,7 @@ func (db database) TotalPaidBounties(r PaymentDateRange) int64 {
 
 func (db database) TotalHuntersPaid(r PaymentDateRange) int64 {
 	var count int64
-	db.db.Model(&Bounty{}).Select("DISTINCT assignee").Where("created >= ?", r.StartDate).Where("created <= ?", r.EndDate).Count(&count)
+	db.db.Model(&Bounty{}).Select("DISTINCT assignee").Where("assignee != ''").Where("paid = ?", true).Where("created >= ?", r.StartDate).Where("created <= ?", r.EndDate).Count(&count)
 	return count
 }
 
