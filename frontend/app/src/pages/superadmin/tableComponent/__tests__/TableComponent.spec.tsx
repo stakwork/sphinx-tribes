@@ -81,13 +81,15 @@ const mockBounties: Bounty[] = [
 it('renders elements from TableProps in the document', () => {
   const { getByText } = render(
     <MyTable
-      bounties={mockBounties} headerIsFrozen={false}
+      bounties={mockBounties}
+      headerIsFrozen={false}
       currentPage={defaultPage}
       totalBounties={totalBounties}
       paginationLimit={paginationLimit}
       activeTabs={activeTabs}
       setActiveTabs={setActiveTabs}
-    />);
+    />
+  );
   expect(getByText(mockBounties[0].title)).toBeInTheDocument();
 });
 
@@ -101,7 +103,8 @@ it('renders "Sort By:" in the document', () => {
       paginationLimit={paginationLimit}
       activeTabs={activeTabs}
       setActiveTabs={setActiveTabs}
-    />);
+    />
+  );
   expect(getByText('Sort By:')).toBeInTheDocument();
 });
 
@@ -115,7 +118,8 @@ it('renders "Date" in the document', () => {
       paginationLimit={paginationLimit}
       activeTabs={activeTabs}
       setActiveTabs={setActiveTabs}
-    />);
+    />
+  );
   expect(getByText('Date')).toBeInTheDocument();
 });
 
@@ -129,7 +133,8 @@ it('renders "Assignee" in the document', () => {
       paginationLimit={paginationLimit}
       activeTabs={activeTabs}
       setActiveTabs={setActiveTabs}
-    />);
+    />
+  );
   expect(getByText('Assignee')).toBeInTheDocument();
 });
 
@@ -143,7 +148,8 @@ it('renders "Status" twice in the document', () => {
       paginationLimit={paginationLimit}
       activeTabs={activeTabs}
       setActiveTabs={setActiveTabs}
-    />);
+    />
+  );
   expect(getAllByText(/Status/i)).toHaveLength(2);
 });
 
@@ -157,20 +163,23 @@ it('renders "Status:" in the document', () => {
       paginationLimit={paginationLimit}
       activeTabs={activeTabs}
       setActiveTabs={setActiveTabs}
-    />);
+    />
+  );
   expect(getByText('Status:')).toBeInTheDocument();
 });
 
 it('renders "All" in the document', () => {
   const { getByText } = render(
-    <MyTable bounties={mockBounties}
+    <MyTable
+      bounties={mockBounties}
       headerIsFrozen={false}
       currentPage={defaultPage}
       totalBounties={totalBounties}
       paginationLimit={paginationLimit}
       activeTabs={activeTabs}
       setActiveTabs={setActiveTabs}
-    />);
+    />
+  );
   expect(getByText('All')).toBeInTheDocument();
 });
 
@@ -184,7 +193,8 @@ it('renders "Open" in the document', () => {
       paginationLimit={paginationLimit}
       activeTabs={activeTabs}
       setActiveTabs={setActiveTabs}
-    />);
+    />
+  );
   expect(getByText('Open')).toBeInTheDocument();
 });
 
@@ -198,7 +208,8 @@ it('renders "In Progress" in the document', () => {
       paginationLimit={paginationLimit}
       activeTabs={activeTabs}
       setActiveTabs={setActiveTabs}
-    />);
+    />
+  );
   expect(getByText('In Progress')).toBeInTheDocument();
 });
 
@@ -212,7 +223,8 @@ it('renders "Completed" in the document', () => {
       paginationLimit={paginationLimit}
       activeTabs={activeTabs}
       setActiveTabs={setActiveTabs}
-    />);
+    />
+  );
   expect(getByText('Completed')).toBeInTheDocument();
 });
 
@@ -226,7 +238,8 @@ it('renders "Bounty" in the document', () => {
       paginationLimit={paginationLimit}
       activeTabs={activeTabs}
       setActiveTabs={setActiveTabs}
-    />);
+    />
+  );
   expect(getByText('Bounty')).toBeInTheDocument();
 });
 
@@ -240,7 +253,8 @@ it('renders "#DTGP" in the document', () => {
       paginationLimit={paginationLimit}
       activeTabs={activeTabs}
       setActiveTabs={setActiveTabs}
-    />);
+    />
+  );
   expect(getByText('#DTGP')).toBeInTheDocument();
 });
 
@@ -254,7 +268,8 @@ it('renders "Provider" in the document', () => {
       paginationLimit={paginationLimit}
       activeTabs={activeTabs}
       setActiveTabs={setActiveTabs}
-    />);
+    />
+  );
   expect(getByText('Provider')).toBeInTheDocument();
 });
 
@@ -268,7 +283,8 @@ it('renders "Organization" in the document', () => {
       paginationLimit={paginationLimit}
       activeTabs={activeTabs}
       setActiveTabs={setActiveTabs}
-    />);
+    />
+  );
   expect(getByText('Organization')).toBeInTheDocument();
 });
 
@@ -282,7 +298,8 @@ it('renders each element in the table in the document', () => {
       paginationLimit={paginationLimit}
       activeTabs={activeTabs}
       setActiveTabs={setActiveTabs}
-    />);
+    />
+  );
   expect(getByText(mockBounties[0].title)).toBeInTheDocument();
 });
 
@@ -340,7 +357,8 @@ it('renders correct color box for different bounty statuses', () => {
       paginationLimit={paginationLimit}
       activeTabs={activeTabs}
       setActiveTabs={setActiveTabs}
-    />);
+    />
+  );
   const statusElements = getAllByTestId('bounty-status');
   expect(statusElements[0]).toHaveStyle('background-color: #49C998');
   expect(statusElements[1]).toHaveStyle('background-color: #49C998');
@@ -482,7 +500,8 @@ it('renders pagination arrows when bounties length is greater than pageSize and 
       paginationLimit={paginationLimit}
       activeTabs={activeTabs}
       setActiveTabs={setActiveTabs}
-    />);
+    />
+  );
 
   (async () => {
     await waitFor(() => {
@@ -508,7 +527,8 @@ it('calls paginateNext when next pagination arrow is clicked with status filter 
       paginationLimit={paginationLimit}
       activeTabs={activeTabs}
       setActiveTabs={setActiveTabs}
-    />);
+    />
+  );
 
   (async () => {
     await waitFor(() => {

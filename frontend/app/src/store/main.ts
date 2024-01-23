@@ -12,6 +12,7 @@ import { getUserAvatarPlaceholder } from './lib';
 
 export const queryLimit = 10;
 export const peopleQueryLimit = 500;
+export const wantedTabLimit = 20;
 
 function makeTorSaveURL(host: string, key: string) {
   return `sphinx.chat://?action=save&host=${host}&key=${key}`;
@@ -906,7 +907,7 @@ export class MainStore {
   async getPersonAssignedBounties(queryParams?: any, pubkey?: string): Promise<PersonBounty[]> {
     queryParams = { ...queryParams, search: uiStore.searchText };
 
-    const query = this.appendQueryParams(`people/wanteds/assigned/${pubkey}`, 10, {
+    const query = this.appendQueryParams(`people/wanteds/assigned/${pubkey}`, wantedTabLimit, {
       sortBy: 'paid',
       page: 1,
       ...queryParams
@@ -954,7 +955,7 @@ export class MainStore {
   async getPersonCreatedBounties(queryParams?: any, pubkey?: string): Promise<PersonBounty[]> {
     queryParams = { ...queryParams, search: uiStore.searchText };
 
-    const query = this.appendQueryParams(`people/wanteds/created/${pubkey}`, 10, {
+    const query = this.appendQueryParams(`people/wanteds/created/${pubkey}`, wantedTabLimit, {
       ...queryParams,
       sortBy: 'paid'
     });

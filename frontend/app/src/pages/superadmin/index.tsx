@@ -127,7 +127,6 @@ export const SuperAdmin = () => {
     getTotalBounties();
   }, [getTotalBounties]);
 
-
   const getActiveTabs = useCallback(() => {
     const dataNumber: number[] = [];
     for (let i = 1; i <= Math.ceil(paginationLimit); i++) {
@@ -154,10 +153,7 @@ export const SuperAdmin = () => {
             setStartDate={setStartDate}
             setEndDate={setEndDate}
           />
-          <Statistics
-            freezeHeaderRef={ref}
-            metrics={bountyMetrics}
-          />
+          <Statistics freezeHeaderRef={ref} metrics={bountyMetrics} />
           {loading ? (
             <LoaderContainer>
               <EuiLoadingSpinner size="l" />

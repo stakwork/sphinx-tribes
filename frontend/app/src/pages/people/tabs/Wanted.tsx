@@ -49,8 +49,8 @@ export const Wanted = observer(() => {
 
   async function getUserTickets() {
     setIsLoading(true);
-    await main.getPersonCreatedBounties({ page: 1, limit: 2 }, personPubkey);
-    await main.getPersonAssignedBounties({ sortBy: 'paid' }, personPubkey);
+    await main.getPersonCreatedBounties({ page: 1 }, personPubkey);
+    await main.getPersonAssignedBounties({ page: 1 }, personPubkey);
     setIsLoading(false);
   }
 

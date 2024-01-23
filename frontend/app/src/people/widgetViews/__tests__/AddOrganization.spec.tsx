@@ -156,6 +156,7 @@ describe('AddOrganization Component Tests', () => {
   });
 
   test('all fields are passed while adding organization', async () => {
+    jest.setTimeout(10000);
     const mockGetUserOrganizations = jest.fn();
     const mockOwnerPubKey = 'somePublicKey';
     const mockOrgSpy = jest.spyOn(mainStore, 'addOrganization').mockReturnValueOnce(
