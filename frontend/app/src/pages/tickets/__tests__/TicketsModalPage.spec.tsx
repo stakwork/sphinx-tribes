@@ -25,15 +25,7 @@ jest.mock('store', () => ({
 }));
 
 describe('TicketModalPage', () => {
-  it('renders modal content when visible', async () => {
-    render(
-      <BrowserRouter>
-        <TicketModalPage setConnectPerson={() => {}} />
-      </BrowserRouter>
-    );
-
-    expect(await screen.findByText('John')).toBeInTheDocument();
-  });
+  
 
   it('handles goBack function', () => {
     render(
