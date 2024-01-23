@@ -49,7 +49,7 @@ function Form(props: FormProps) {
   const { main, ui } = useStores();
   const color = colors['light'];
   const [isFocused, setIsFocused] = useState({});
-
+  const [isOnline, setIsOnline] = useState(navigator.onLine);
   const [schemaData, setSchemaData] = useState(BountyDetailsCreationData.step_1);
   const [stepTracker, setStepTracker] = useState<number>(1);
 
@@ -97,6 +97,19 @@ function Form(props: FormProps) {
         console.log(error);
       }
     })();
+  }, []);
+
+  useEffect(() => {
+    const handleOnline = () => setIsOnline(true);
+    const handleOffline = () => setIsOnline(false);
+  
+    window.addEventListener('online', handleOnline);
+    window.addEventListener('offline', handleOffline);
+  
+    return () => {
+      window.removeEventListener('online', handleOnline);
+      window.removeEventListener('offline', handleOffline);
+    };
   }, []);
 
   useEffect(() => {
@@ -210,7 +223,28 @@ function Form(props: FormProps) {
         const valid = schemaData.required.every((key: string) =>
           key === '' ? true : values?.[key]
         );
-
+        const onClickHandler = () => {
+          if (!isOnline) {
+            alert("No internet connection. Please try again later.");
+            return;
+          }
+        
+          // Your existing logic for handling the button click
+          if (schemaData.step === 5 && valid) {
+            if (dynamicSchemaName) {
+              setFieldValue('type', dynamicSchemaName);
+            }
+            if (assigneeName !== '') {
+              handleSubmit();
+            } else {
+              setAssigneeName('a');
+            }
+          } else {
+            if (valid) {
+              NextStepHandler();
+            }
+          }
+        };
         const isBtnDisabled = (stepTracker === 3 && !isDescriptionValid) || !valid;
 
         // returns the body of a form page
@@ -565,22 +599,7 @@ function Form(props: FormProps) {
                         {!isBtnDisabled && (
                           <div
                             className="nextButton"
-                            onClick={() => {
-                              if (schemaData.step === 5 && valid) {
-                                if (dynamicSchemaName) {
-                                  setFieldValue('type', dynamicSchemaName);
-                                }
-                                if (assigneeName !== '') {
-                                  handleSubmit();
-                                } else {
-                                  setAssigneeName('a');
-                                }
-                              } else {
-                                if (valid) {
-                                  NextStepHandler();
-                                }
-                              }
-                            }}
+                            onClick={onClickHandler}
                             style={{
                               width:
                                 schemaData.step === 5
