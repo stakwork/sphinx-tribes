@@ -1,5 +1,5 @@
 import { Button, SearchTextInput } from 'components/common';
-import { usePageScroll } from 'hooks';
+import { usePageScroll, usePeopleSearchHandler } from 'hooks';
 import NoResults from 'people/utils/NoResults';
 import PageLoadSpinner from 'people/utils/PageLoadSpinner';
 import React from 'react';
@@ -68,6 +68,7 @@ export const PeopleList = observer(() => {
   const { peoplePageNumber } = ui || {};
   const history = useHistory();
   const personId = ui.selectedPerson;
+  const handleSearchChange = usePeopleSearchHandler();
 
   async function loadMorePeople(direction: number) {
     let newPage = peoplePageNumber + direction;
@@ -113,9 +114,7 @@ export const PeopleList = observer(() => {
             border: '1px solid #DDE1E5',
             background: '#fff'
           }}
-          onChange={(e: any) => {
-            ui.setSearchText(e);
-          }}
+          onChange={handleSearchChange}
         />
       </DBack>
 
