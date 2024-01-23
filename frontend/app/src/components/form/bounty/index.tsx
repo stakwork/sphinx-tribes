@@ -102,10 +102,10 @@ function Form(props: FormProps) {
   useEffect(() => {
     const handleOnline = () => setIsOnline(true);
     const handleOffline = () => setIsOnline(false);
-  
+
     window.addEventListener('online', handleOnline);
     window.addEventListener('offline', handleOffline);
-  
+
     return () => {
       window.removeEventListener('online', handleOnline);
       window.removeEventListener('offline', handleOffline);
@@ -225,10 +225,10 @@ function Form(props: FormProps) {
         );
         const onClickHandler = () => {
           if (!isOnline) {
-            alert("Bounty Failed, No internet connection. ");
+            alert('Bounty Failed, No internet connection. ');
             return;
           }
-        
+
           // Your existing logic for handling the button click
           if (schemaData.step === 5 && valid) {
             if (dynamicSchemaName) {
