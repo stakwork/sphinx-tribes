@@ -66,7 +66,23 @@ describe('BountyHeader Component', () => {
     const mockDeveloperCount = 100;
     jest
       .spyOn(mainStore, 'getBountyHeaderData')
-      .mockResolvedValue({ developer_count: mockDeveloperCount });
+      .mockResolvedValue(
+        {
+          developer_count: mockDeveloperCount,
+          people: [],
+          bounties_count: 0
+        }
+      );
+
+    jest
+      .spyOn(mainStore, 'getFilterStatusCount')
+      .mockResolvedValue(
+        {
+          open: 10,
+          assigned: 5,
+          paid: 5
+        }
+      );
 
     render(<BountyHeader {...mockProps} />);
 
