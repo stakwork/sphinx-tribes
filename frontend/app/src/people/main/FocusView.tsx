@@ -192,9 +192,6 @@ function FocusedView(props: FocusViewProps) {
 
         // body.description = description;
         newBody.title = newBody.one_sentence_summary;
-
-        // save repo to cookies for autofill in form
-        ui.setLastGithubRepo(newBody.ticket_url);
       }
     } catch (e) {
       throw githubError;
