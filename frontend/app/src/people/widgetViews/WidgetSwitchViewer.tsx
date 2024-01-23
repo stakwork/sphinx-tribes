@@ -96,7 +96,7 @@ function WidgetSwitchViewer(props: any) {
 
   const { peoplePosts, peopleBounties, peopleOffers } = main;
 
-  const { selectedWidget, onPanelClick } = props;
+  const { selectedWidget, onPanelClick, org_uuid } = props;
 
   if (!selectedWidget) {
     return <div style={{ height: 200 }} />;
@@ -110,6 +110,9 @@ function WidgetSwitchViewer(props: any) {
 
   const activeList = [...listSource[selectedWidget]].filter(({ body }: any) => {
     const value = { ...body };
+    if (org_uuid) {
+      return value.org_uuid === org_uuid;
+    }
     return value;
   });
 

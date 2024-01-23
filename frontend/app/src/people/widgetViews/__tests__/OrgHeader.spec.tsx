@@ -19,7 +19,7 @@ const MockProps: OrgBountyHeaderProps = {
 
 describe('OrgHeader Component', () => {
   beforeEach(() => {
-    jest.spyOn(mainStore, 'getOrganizationBounties').mockReset();
+    jest.spyOn(mainStore, 'getSpecificOrganizationBounties').mockReset();
   });
 
   afterEach(() => {
@@ -70,7 +70,7 @@ describe('OrgHeader Component', () => {
         <OrgHeader {...MockProps} checkboxIdToSelectedMap={updatedCheckboxIdToSelectedMap} />
       );
 
-      expect(mainStore.getOrganizationBounties).toHaveBeenCalledWith(MockProps.org_uuid, {
+      expect(mainStore.getSpecificOrganizationBounties).toHaveBeenCalledWith(MockProps.org_uuid, {
         page: 1,
         resetPage: true,
         ...updatedCheckboxIdToSelectedMap,

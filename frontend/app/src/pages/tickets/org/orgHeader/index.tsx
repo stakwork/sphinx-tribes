@@ -316,7 +316,7 @@ export const OrgHeader = ({
 
   useEffect(() => {
     if (org_uuid) {
-      main.getOrganizationBounties(org_uuid, {
+      main.getSpecificOrganizationBounties(org_uuid, {
         page: 1,
         resetPage: true,
         ...checkboxIdToSelectedMap,

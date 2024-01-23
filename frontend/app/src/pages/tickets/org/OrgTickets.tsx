@@ -35,7 +35,7 @@ function OrgBodyComponent() {
       await main.getBadgeList();
       await main.getPeople();
       if (uuid) {
-        await main.getOrganizationBounties(uuid, { page: 1, resetPage: true });
+        await main.getSpecificOrganizationBounties(uuid, { page: 1, resetPage: true });
       }
       setLoading(false);
     })();
@@ -188,6 +188,7 @@ function OrgBodyComponent() {
                 fromBountyPage={true}
                 selectedWidget={selectedWidget}
                 loading={loading}
+                org_uuid={uuid}
               />
             </div>
           </div>
