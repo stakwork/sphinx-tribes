@@ -362,7 +362,7 @@ const BountyHeader = ({
     // Fetch counts from the API
     async function fetchCounts() {
       try {
-        const response = await api.get('gobounties/filter/count');
+        const response = await main.getFilterStatusCount();
         setCounts({
           open: response.open || 0,
           assigned: response.assigned || 0,

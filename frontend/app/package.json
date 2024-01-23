@@ -18,7 +18,7 @@
     "prettier:check": "npx prettier --config .prettierrc.json --check ./src",
     "prepare": "cd ../.. && husky install frontend/app/.husky",
     "test": "yarn run test-jest",
-    "test-jest": "REACT_APP_IS_TEST=true NODE_ENV=test yarn jest --coverage --no-cache --transformIgnorePatterns \"./frontend/app/svg/\""
+    "test-jest": "REACT_APP_IS_TEST=true NODE_ENV=test yarn jest --coverage --maxWorkers 2 --no-cache --transformIgnorePatterns \"./frontend/app/svg/\""
   },
   "resolutions": {
     "react-error-overlay": "6.0.9",

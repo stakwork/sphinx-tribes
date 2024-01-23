@@ -595,7 +595,7 @@ func (db database) GetAssignedBounties(r *http.Request) ([]Bounty, error) {
 	} else {
 		orderQuery = " ORDER BY paid DESC"
 	}
-	if offset != 0 && limit != 0 {
+	if offset >= 0 && limit != 0 {
 		limitQuery = fmt.Sprintf("LIMIT %d  OFFSET %d", limit, offset)
 	}
 
@@ -615,12 +615,12 @@ func (db database) GetCreatedBounties(r *http.Request) ([]Bounty, error) {
 	limitQuery := ""
 
 	if sortBy != "" && direction != "" {
-		orderQuery = "ORDER BY " + sortBy + " " + "ASC"
+		orderQuery = "ORDER BY " + sortBy + " " + direction
 	} else {
-		orderQuery = "ORDER BY paid DESC"
+		orderQuery = "ORDER BY paid ASC"
 	}
 
-	if offset != 0 && limit != 0 {
+	if offset >= 0 && limit != 0 {
 		limitQuery = fmt.Sprintf("LIMIT %d  OFFSET %d", limit, offset)
 	}
 

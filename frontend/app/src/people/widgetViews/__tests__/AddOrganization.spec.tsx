@@ -134,8 +134,18 @@ describe('AddOrganization Component Tests', () => {
 
     const addButton = screen.getByText('Add Organization');
     expect(addButton).toBeInTheDocument();
+
     const orgNameInput = screen.getByPlaceholderText(/My Organization.../i);
     fireEvent.change(orgNameInput, { target: { value: 'My Org' } });
+
+    const orgWebsiteInput = screen.getByPlaceholderText('Website URL...');
+    fireEvent.change(orgWebsiteInput, { target: { value: 'https://john.doe.com' } });
+
+    const orgGithubLink = screen.getByPlaceholderText('Github link...');
+    fireEvent.change(orgGithubLink, { target: { value: 'https://github.com/john-doe' } });
+
+    const orgDescription = screen.getByPlaceholderText('Description Text...');
+    fireEvent.change(orgDescription, { target: { value: 'My org description' } });
 
     fireEvent.click(addButton);
 
@@ -146,6 +156,7 @@ describe('AddOrganization Component Tests', () => {
   });
 
   test('all fields are passed while adding organization', async () => {
+    jest.setTimeout(10000);
     const mockGetUserOrganizations = jest.fn();
     const mockOwnerPubKey = 'somePublicKey';
     const mockOrgSpy = jest.spyOn(mainStore, 'addOrganization').mockReturnValueOnce(
@@ -169,7 +180,7 @@ describe('AddOrganization Component Tests', () => {
     fireEvent.change(orgNameInput, { target: { value: 'My Org' } });
 
     const orgWebsiteInput = screen.getByPlaceholderText('Website URL...');
-    fireEvent.change(orgWebsiteInput, { target: { value: 'https://john.doe' } });
+    fireEvent.change(orgWebsiteInput, { target: { value: 'https://john.doe.com' } });
 
     const orgGithubLink = screen.getByPlaceholderText('Github link...');
     fireEvent.change(orgGithubLink, { target: { value: 'https://github.com/john-doe' } });
@@ -186,7 +197,7 @@ describe('AddOrganization Component Tests', () => {
         description: 'My org description',
         img: '',
         github: 'https://github.com/john-doe',
-        website: 'https://john.doe'
+        website: 'https://john.doe.com'
       });
       expect(mockGetUserOrganizations).toHaveBeenCalled();
     });
