@@ -4,6 +4,7 @@ import { cloneDeep } from 'lodash';
 import { observer } from 'mobx-react-lite';
 import { FocusViewProps } from 'people/interfaces';
 import { EuiGlobalToastList } from '@elastic/eui';
+import { Organization } from 'store/main';
 import { Box } from '@mui/system';
 import { useStores } from '../../store';
 import Form from '../../components/form/bounty';
@@ -16,7 +17,11 @@ import {
 import WantedSummary from '../widgetViews/summaries/WantedSummary';
 import { useIsMobile } from '../../hooks';
 import { dynamicSchemasByType } from '../../components/form/schema';
-import { convertLocaleToNumber, extractRepoAndIssueFromIssueUrl } from '../../helpers';
+import {
+  convertLocaleToNumber,
+  extractRepoAndIssueFromIssueUrl,
+  toCapitalize
+} from '../../helpers';
 import { B, BWrap } from './style';
 
 // selected bounty popup window
@@ -55,52 +60,12 @@ function FocusedView(props: FocusViewProps) {
 
   const isTorSave = canEdit && main.isTorSave();
 
-  //this code block can be used to get the real org values
-  // const [userOrganizations,setUserOrganizations] = useState<any>({});
-  // const getOrg =async()=>{
-  //   const response = await main.getOrganizations()
-  //   const mappedResponse = response.map((org: Organization) => ({
-  //           label: org.name,
-  //           value: org.uuid
-  //         }))
-  //   setUserOrganizations(mappedResponse)
-  // }
-  // getOrg()
-
-  const [orgName, setOrgName] = useState<any>([]);
-  const getOrganization = async () => {
-    const urlParts = window.location.href.split('/bounties/');
-    const uuid = urlParts.length > 1 ? urlParts[1] : null;
-
-    if (!uuid) {
-      console.error('No UUID found in the URL');
-      return;
-    }
-
-    try {
-      const response = await main.getUserOrganizationByUuid(uuid);
-      console.log(response, 'res');
-
-      if (response && response.uuid && response.name) {
-        // Creating an array with an object containing label and value
-        const orgDetails = [
-          {
-            label: response.name,
-            value: response.uuid
-          }
-        ];
-        setOrgName(orgDetails);
-      } else {
-        console.error('Response does not have the expected structure');
-      }
-    } catch (error) {
-      console.error('Error fetching organization:', error);
-    }
-  };
-
-  useEffect(() => {
-    getOrganization();
-  });
+  const userOrganizations = main.dropDownOrganizations.length
+    ? main.dropDownOrganizations.map((org: Organization) => ({
+        label: toCapitalize(org.name),
+        value: org.uuid
+      }))
+    : [];
 
   function isNotHttps(url: string | undefined) {
     if (main.isTorSave() || url?.startsWith('http://')) {
@@ -301,19 +266,7 @@ function FocusedView(props: FocusViewProps) {
       props?.ReCallBounties();
   }
 
-  // set user organizations
-  if (config?.schema?.[0]?.['defaultSchema']?.[0]?.['options']) {
-    config.schema[0]['defaultSchema'][0]['options'] = orgName;
-  }
-
   let initialValues: any = {};
-
-  let altInitialValue = {};
-  if (window.location.href.includes('/org')) {
-    altInitialValue = {
-      org_uuid: `"ck95pe04nncjnaefo08g"` || orgName[0]?.value
-    };
-  }
 
   const personInfo = canEdit ? ui.meInfo : person;
 
@@ -360,8 +313,6 @@ function FocusedView(props: FocusViewProps) {
           initialValues[s.name] = wanted[s.name];
         });
       }
-    } else {
-      initialValues = altInitialValue;
     }
   }
 
@@ -397,6 +348,11 @@ function FocusedView(props: FocusViewProps) {
       setEditMode(false);
       setRemoveNextAndPrev && setRemoveNextAndPrev(false);
     }
+  }
+
+  // set user organizations
+  if (config?.schema?.[0]?.['defaultSchema']?.[0]?.['options']) {
+    config.schema[0]['defaultSchema'][0]['options'] = userOrganizations;
   }
 
   return (
