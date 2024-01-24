@@ -30,4 +30,4 @@ A clear and concise description of what you expected to happen.
 
 ### Acceptance Criteria
 - [ ] I have tested on Chrome desktop
-- [ ] I have posted a screenshot or video if it is a change in the front end
+- [ ] I have posted a screenshot or video in my PR
