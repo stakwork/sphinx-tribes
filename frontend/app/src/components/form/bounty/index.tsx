@@ -225,10 +225,11 @@ function Form(props: FormProps) {
         );
         const onClickHandler = () => {
           if (!isOnline) {
-            toast.error("Bounty creation failed. Please try again.",{
-              closeOnClick: true,toastId:"xa12"
+            toast.error('Bounty creation failed. Please try again.', {
+              closeOnClick: true,
+              toastId: 'xa12'
             });
-            return;        
+            return;
           }
 
           // Your existing logic for handling the button click
@@ -616,7 +617,10 @@ function Form(props: FormProps) {
                                 {schemaData.step === 5 ? 'Decide Later' : 'Next'}
                               </EuiText>
                             ) : (
-                              <><EuiText className="nextText">Finish</EuiText><ToastContainer /></>
+                              <>
+                                <EuiText className="nextText">Finish</EuiText>
+                                <ToastContainer />
+                              </>
                             )}
                           </div>
                         )}
