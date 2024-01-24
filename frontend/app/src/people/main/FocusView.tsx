@@ -66,10 +66,12 @@ function FocusedView(props: FocusViewProps) {
   //   setUserOrganizations(mappedResponse)
   // }
   // getOrg()
-  const urlParts = window.location.href.split('/bounties/');
-  const uuid = urlParts.length > 1 ? urlParts[1] : null;
+
   const [orgName, setOrgName] = useState<any>([]);
   const getOrganization = async () => {
+    const urlParts = window.location.href.split('/bounties/');
+    const uuid = urlParts.length > 1 ? urlParts[1] : null;
+
     if (!uuid) {
       console.error('No UUID found in the URL');
       return;
@@ -309,7 +311,7 @@ function FocusedView(props: FocusViewProps) {
   let altInitialValue = {};
   if (window.location.href.includes('/org')) {
     altInitialValue = {
-      org_uuid:uuid
+      org_uuid: `"ck95pe04nncjnaefo08g"` || orgName[0]?.value
     };
   }
 
