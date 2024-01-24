@@ -15,6 +15,7 @@ const focusedDesktopModalStyles = widgetConfigs.wanted.modalStyle;
 
 type Props = {
   setConnectPerson: (p: any) => void;
+  visible?: boolean;
 };
 
 export const TicketModalPage = observer(({ setConnectPerson }: Props) => {
@@ -28,11 +29,10 @@ export const TicketModalPage = observer(({ setConnectPerson }: Props) => {
   const [activeListIndex, setActiveListIndex] = useState<number>(0);
   const [publicFocusIndex, setPublicFocusIndex] = useState(0);
   const [removeNextAndPrev, setRemoveNextAndPrev] = useState(false);
-  const { bountyId } = useParams<{ uuid: string; bountyId: string }>();
+  const { uuid, bountyId } = useParams<{ uuid: string; bountyId: string }>();
   const [activeBounty, setActiveBounty] = useState<PersonBounty[]>([]);
   const [visible, setVisible] = useState(false);
   const [isDeleted, setisDeleted] = useState(false);
-
   const isMobile = useIsMobile();
 
   const search = useMemo(() => {
@@ -73,10 +73,21 @@ export const TicketModalPage = observer(({ setConnectPerson }: Props) => {
     getBounty();
   }, [getBounty, removeNextAndPrev]);
 
-  const goBack = async () => {
+  const isDirectAccess = useCallback(
+    () => !document.referrer && location.pathname.includes('/bounty/'),
+    [location.pathname]
+  );
+
+  const goBack = () => {
     setVisible(false);
     setisDeleted(false);
-    history.goBack();
+
+    if (isDirectAccess()) {
+      const homePageUrl = uuid ? `/org/bounties/${uuid}` : '/bounties';
+      history.push(homePageUrl);
+    } else {
+      history.goBack();
+    }
   };
 
   const directionHandler = (person: any, body: any) => {
