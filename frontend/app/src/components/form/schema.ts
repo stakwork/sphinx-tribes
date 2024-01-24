@@ -4,7 +4,7 @@ import {
   estimation,
   estimated_budget_15_min,
   help_wanted_coding_task_schema,
-  help_wanted_other_schema,
+  help_wanted_other_schema
 } from '../../config/bounties';
 import { FormField } from './utils';
 
@@ -707,7 +707,7 @@ export const wantedCodingTaskSchema: FormField[] = [
   },
   {
     name: 'description',
-    label: 'Description',
+    label: 'Description *',
     type: 'textarea'
   },
   {
