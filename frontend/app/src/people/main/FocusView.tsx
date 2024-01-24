@@ -55,12 +55,51 @@ function FocusedView(props: FocusViewProps) {
 
   const isTorSave = canEdit && main.isTorSave();
 
-  // const userOrganizations = main.dropDownOrganizations.length
-  //   ? main.dropDownOrganizations.map((org: Organization) => ({
-  //       label: toCapitalize(org.name),
-  //       value: org.uuid
-  //     }))
-  //   : [];
+  //this code block can be used to get the real org values
+  // const [userOrganizations,setUserOrganizations] = useState<any>({});
+  // const getOrg =async()=>{
+  //   const response = await main.getOrganizations()
+  //   const mappedResponse = response.map((org: Organization) => ({
+  //           label: org.name,
+  //           value: org.uuid
+  //         }))
+  //   setUserOrganizations(mappedResponse)
+  // }
+  // getOrg()
+
+  const urlParts = window.location.href.split('/bounties/');
+  const uuid = urlParts.length > 1 ? urlParts[1] : null;
+  const [orgName, setOrgName] = useState<any>([]);
+  const getOrganization = async () => {
+    if (!uuid) {
+      console.error('No UUID found in the URL');
+      return;
+    }
+
+    try {
+      const response = await main.getUserOrganizationByUuid(uuid);
+      console.log(response, 'res');
+
+      if (response && response.uuid && response.name) {
+        // Creating an array with an object containing label and value
+        const orgDetails = [
+          {
+            label: response.name,
+            value: response.uuid
+          }
+        ];
+        setOrgName(orgDetails);
+      } else {
+        console.error('Response does not have the expected structure');
+      }
+    } catch (error) {
+      console.error('Error fetching organization:', error);
+    }
+  };
+
+  useEffect(() => {
+    getOrganization();
+  });
 
   function isNotHttps(url: string | undefined) {
     if (main.isTorSave() || url?.startsWith('http://')) {
@@ -261,36 +300,17 @@ function FocusedView(props: FocusViewProps) {
       props?.ReCallBounties();
   }
 
-  const [orgName, setOrgName] = useState<string | undefined>();
-  const getOrganization = async () => {
-    const urlParts = window.location.href.split('/bounties/');
-    const uuid = urlParts.length > 1 ? urlParts[1] : null;
-
-    if (!uuid) {
-      console.error('No UUID found in the URL');
-      return;
-    }
-    try {
-      const response = await main.getUserOrganizationByUuid(uuid);
-      if (response && typeof response.name === 'string') {
-        setOrgName(response.name);
-      }
-    } catch (error) {
-      console.error('Error fetching organization:', error);
-    }
-  };
-
-  useEffect(() => {
-    getOrganization();
-  });
+  // set user organizations
+  if (config?.schema?.[0]?.['defaultSchema']?.[0]?.['options']) {
+    config.schema[0]['defaultSchema'][0]['options'] = orgName;
+  }
 
   let initialValues: any = {};
 
   let altInitialValue = {};
-
   if (window.location.href.includes('/org')) {
     altInitialValue = {
-      org_uuid: orgName || 'Bounties Platform'
+      org_uuid: uuid
     };
   }
 
@@ -377,10 +397,6 @@ function FocusedView(props: FocusViewProps) {
       setRemoveNextAndPrev && setRemoveNextAndPrev(false);
     }
   }
-
-  // if (config?.schema?.[0]?.['defaultSchema']?.[0]?.['options']) {
-  //   config.schema[0]['defaultSchema'][0]['options'] = userOrganizations;
-  // }
 
   return (
     <div
