@@ -5,7 +5,6 @@ import {
   estimated_budget_15_min,
   help_wanted_coding_task_schema,
   help_wanted_other_schema,
-  organization
 } from '../../config/bounties';
 import { FormField } from './utils';
 
@@ -28,7 +27,6 @@ const estimated_time = GetValue(estimation);
 const helpType_wanted_coding_task_schema = GetValue(help_wanted_coding_task_schema);
 const helpType_wanted_other_schema = GetValue(help_wanted_other_schema);
 const estimated_budget_15_min_options = GetValue(estimated_budget_15_min);
-const organization_options = GetValue(organization);
 
 // this is source of truth for widget items!
 export const meSchema: FormField[] = [
@@ -676,7 +674,7 @@ export const wantedCodingTaskSchema: FormField[] = [
     name: 'org_uuid',
     label: 'Organization (optional)',
     type: 'select',
-    options: organization_options,
+    options: [],
     validator: strValidatorNotRequired
   },
   {
