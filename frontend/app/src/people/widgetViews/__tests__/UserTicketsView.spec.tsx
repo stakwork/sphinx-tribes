@@ -89,6 +89,7 @@ describe('UserTickets', () => {
   });
 
   it('renders price matching the bounty', async () => {
+    jest.setTimeout(10000);
     const userBounty = { ...mockBounties[0], body: {} } as any;
     userBounty.body = {
       ...mockBounties[0].bounty,

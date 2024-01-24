@@ -448,7 +448,7 @@ type Organization struct {
 	Budget      uint       `json:"budget,omitempty"`
 	Website     string     `json:"website" validate:"omitempty,uri"`
 	Github      string     `json:"github" validate:"omitempty,uri"`
-	Description string     `json:"description" validate:"omitempty,lte=200"`
+	Description string     `json:"description" validate:"omitempty,lte=120"`
 }
 
 type OrganizationShort struct {

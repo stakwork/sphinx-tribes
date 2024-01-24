@@ -437,7 +437,7 @@ function Form(props: FormProps) {
                 {schemaData.step !== 1 && (
                   <>
                     <SchemaTagsContainer>
-                      <div className="LeftSchema">
+                      <div className="LeftSchema" style={{ width: '292px' }}>
                         {schema
                           .filter((item: any) => schemaData.schema.includes(item.name))
                           .map((item: FormField) => (
@@ -497,7 +497,7 @@ function Form(props: FormProps) {
                             />
                           ))}
                       </div>
-                      <div className="RightSchema">
+                      <div className="RightSchema" style={{ width: '292px' }}>
                         {schema
                           .filter((item: any) => schemaData.schema2.includes(item.name))
                           .map((item: FormField) => (

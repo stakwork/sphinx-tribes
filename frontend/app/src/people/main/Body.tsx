@@ -162,7 +162,7 @@ function BodyComponent() {
         {(ui.searchText ? people : filterResult).map((t: any) => (
           <Person
             {...t}
-            key={t.owner_pubkey}
+            key={t.id}
             small={isMobile}
             squeeze={screenWidth < 1420}
             selected={ui.selectedPerson === t.id}
