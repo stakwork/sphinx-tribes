@@ -1,6 +1,8 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { Organization } from 'store/main';
 import styled from 'styled-components';
+import { useStores } from 'store';
+import { useParams } from 'react-router-dom';
 import addBounty from './Icons/addBounty.svg';
 import Globe from './Icons/Globe.svg';
 import GithubIcon from './Icons/GithubIcon.svg';
@@ -113,20 +115,32 @@ const Button = styled.button`
   font-size: 14px;
   font-style: normal;
   font-weight: 500;
-  line-height: 0px; /* 0% */
   letter-spacing: 0.14px;
 `;
 
 function OrgDescription({
-  updateIsPostBountyModalOpen,
-  orgData
+  updateIsPostBountyModalOpen
 }: {
   updateIsPostBountyModalOpen: (value: boolean) => void;
-  orgData: Organization | undefined;
 }) {
-  if (!orgData) return null;
+  const [organization, setOrganization] = useState<Organization>();
+  const { uuid } = useParams<{ uuid: string; bountyId: string }>();
+  const { main } = useStores();
 
-  const { name, img, website, github, description } = orgData as Organization;
+  useEffect(() => {
+    (async () => {
+      if (!uuid) return;
+
+      const res = await main.getUserOrganizationByUuid(uuid);
+
+      if (!res) return;
+      setOrganization(res);
+    })();
+  }, [main, uuid]);
+
+  if (!organization) return null;
+
+  const { name, img, website, github, description } = organization;
 
   const handlePostBountyClick = () => {
     updateIsPostBountyModalOpen(true);

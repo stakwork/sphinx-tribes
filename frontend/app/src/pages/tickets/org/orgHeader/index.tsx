@@ -1,9 +1,6 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import styled from 'styled-components';
 import { PostModal } from 'people/widgetViews/postBounty/PostModal';
-import { Organization } from 'store/main';
-import { useParams } from 'react-router-dom';
-import { useStores } from 'store';
 import searchIcon from './Icons/searchIcon.svg';
 import file from './Icons/file.svg';
 import OrgDescription from './OrgDescription';
@@ -139,20 +136,6 @@ const Img = styled.img`
 
 export const OrgHeader = () => {
   const [isPostBountyModalOpen, setIsPostBountyModalOpen] = useState(false);
-  const [organization, setOrganization] = useState<Organization>();
-  const { uuid } = useParams<{ uuid: string; bountyId: string }>();
-  const { main } = useStores();
-
-  useEffect(() => {
-    (async () => {
-      if (!uuid) return;
-
-      const res = await main.getUserOrganizationByUuid(uuid);
-
-      if (!res) return;
-      setOrganization(res);
-    })();
-  }, [main, uuid]);
 
   const selectedWidget = 'wanted';
 
@@ -163,10 +146,7 @@ export const OrgHeader = () => {
   return (
     <>
       <FillContainer>
-        <OrgDescription
-          updateIsPostBountyModalOpen={setIsPostBountyModalOpen}
-          orgData={organization}
-        />
+        {/* <OrgDescription updateIsPostBountyModalOpen={setIsPostBountyModalOpen} /> */}
       </FillContainer>
       <FillContainer>
         <Filters>
