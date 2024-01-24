@@ -3,6 +3,8 @@ import { Formik } from 'formik';
 import { observer } from 'mobx-react-lite';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { useIsMobile } from 'hooks';
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 import api from '../../../api';
 import { colors } from '../../../config/colors';
 import { BountyDetailsCreationData } from '../../../people/utils/BountyCreationConstant';
@@ -25,7 +27,6 @@ import {
 } from '../style';
 import { FormField, validator } from '../utils';
 import { FormProps } from '../interfaces';
-
 function Form(props: FormProps) {
   const {
     buttonsOnBottom,
@@ -207,7 +208,6 @@ function Form(props: FormProps) {
         });
       });
   }
-
   return (
     <Formik
       initialValues={initValues || {}}
@@ -225,8 +225,10 @@ function Form(props: FormProps) {
         );
         const onClickHandler = () => {
           if (!isOnline) {
-            alert('Bounty creation failed. Please try again.');
-            return;
+            toast.error("Bounty creation failed. Please try again.",{
+              closeOnClick: true,toastId:"xa12"
+            });
+            return;        
           }
 
           // Your existing logic for handling the button click
@@ -614,7 +616,7 @@ function Form(props: FormProps) {
                                 {schemaData.step === 5 ? 'Decide Later' : 'Next'}
                               </EuiText>
                             ) : (
-                              <EuiText className="nextText">Finish</EuiText>
+                              <><EuiText className="nextText">Finish</EuiText><ToastContainer /></>
                             )}
                           </div>
                         )}
