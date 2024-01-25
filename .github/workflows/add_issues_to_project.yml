@@ -1,0 +1,19 @@
+# Since we've separated the frontend from the backend, we must track 2 repos in our bounties platform project. The free version of github only allows the project to reference one repo for free. So we are implementing this workflow to have issues be auto-added to the project board from a second repo.
+
+name: Add issues labeled `bounties` to bounties platform project
+
+on:
+  issues:
+    types:
+      - opened
+
+jobs:
+  add-to-project:
+    name: Add issue to project
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/add-to-project@v0.5.0
+        with:
+          project-url: https://github.com/orgs/stakwork/projects/24
+          github-token: ${{ secrets.ADD_TO_PROJECT }}	
+          labeled: bounties
