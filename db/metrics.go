@@ -167,12 +167,23 @@ func (db database) GetBountiesByDateRange(r PaymentDateRange, re *http.Request) 
 
 	if open != "" && open == "true" {
 		openQuery = "AND assignee = '' AND paid != true"
+		assignedQuery = ""
 	}
 	if assingned != "" && assingned == "true" {
-		assignedQuery = "AND assignee != '' AND paid = false"
+		if open != "" && open == "true" {
+			assignedQuery = "OR assignee != '' AND paid != true"
+		} else {
+			assignedQuery = "AND assignee != '' AND paid != true"
+		}
 	}
 	if paid != "" && paid == "true" {
-		paidQuery = "AND paid = true"
+		if open != "" && open == "true" || assingned != "" && assingned == "true" {
+			paidQuery = "OR paid = true"
+		} else if open != "" && open == "true" && assingned == "" && assingned != "true" {
+			assignedQuery = ""
+		} else {
+			paidQuery = "AND paid = true"
+		}
 	}
 
 	if sortBy != "" && direction != "" {

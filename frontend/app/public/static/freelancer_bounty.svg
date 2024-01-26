@@ -1,0 +1,36 @@
+<svg width="171" height="149" viewBox="0 0 171 149" fill="none" xmlns="http://www.w3.org/2000/svg">
+<g filter="url(#filter0_d_6475_10966)">
+<rect x="20" y="19" width="130.097" height="109" rx="10" fill="white"/>
+</g>
+<path d="M43.9097 33.7678H55.1613" stroke="#EBEDEF" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M31 49H77" stroke="#EBEDEF" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M31.2516 56.5677L40.3935 56.5677" stroke="#FBE4FF" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M46.0194 56.5677L55.1613 56.5677" stroke="#DBF3FB" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M31.2516 69.6323L84.6967 69.6323" stroke="#EBEDEF" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M31.252 77L84.6971 77" stroke="#EBEDEF" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M31 84H69" stroke="#EBEDEF" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M124 41L134 41" stroke="#EBEDEF" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M105 63L124 63" stroke="#EBEDEF" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M105 76L124 76" stroke="#EBEDEF" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M105 84L124 84" stroke="#EBEDEF" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M105 92L124 92" stroke="#EBEDEF" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M124 34H130" stroke="#CEF4E6" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M105 56L134 56" stroke="#CEF4E6" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M38.2839 33.4161C38.2839 35.9406 36.2374 37.9871 33.7129 37.9871C31.1885 37.9871 29.142 35.9406 29.142 33.4161C29.142 30.8916 31.1885 28.8452 33.7129 28.8452C36.2374 28.8452 38.2839 30.8916 38.2839 33.4161Z" fill="#EBEDEF"/>
+<circle cx="109.661" cy="36.9323" r="7.38387" fill="#EBEDEF"/>
+<rect x="29" y="91" width="57" height="22" rx="4" fill="#EBEDEF"/>
+<path d="M115.833 138.454V112.563C115.833 112.01 116.281 111.562 116.833 111.562H128.687C129.239 111.562 129.687 112.01 129.687 112.562V138.454C129.687 139.179 128.939 139.663 128.277 139.366L123.17 137.069C122.909 136.951 122.611 136.951 122.35 137.069L117.243 139.366C116.582 139.663 115.833 139.179 115.833 138.454Z" fill="#2FB379"/>
+<circle cx="122.76" cy="111.76" r="12.7604" fill="#49C998"/>
+<defs>
+<filter id="filter0_d_6475_10966" x="0" y="0" width="170.097" height="149" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB">
+<feFlood flood-opacity="0" result="BackgroundImageFix"/>
+<feColorMatrix in="SourceAlpha" type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0" result="hardAlpha"/>
+<feOffset dy="1"/>
+<feGaussianBlur stdDeviation="10"/>
+<feComposite in2="hardAlpha" operator="out"/>
+<feColorMatrix type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0.15 0"/>
+<feBlend mode="normal" in2="BackgroundImageFix" result="effect1_dropShadow_6475_10966"/>
+<feBlend mode="normal" in="SourceGraphic" in2="effect1_dropShadow_6475_10966" result="shape"/>
+</filter>
+</defs>
+</svg>

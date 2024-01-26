@@ -1,0 +1,1101 @@
+@import url('https://fonts.googleapis.com/css?family=Roboto+Mono:100,100i,300,300i,400,400i,500,500i,700,700i,900,900i');
+@import url('https://fonts.googleapis.com/css2?family=Barlow:wght@100;200;300;400;500;600;700;800;900&display=swap');
+@import url('https://rsms.me/inter/inter-ui.css');
+
+html {
+  overflow: hidden;
+  height: 100%;
+  width: 100%;
+}
+
+body {
+  margin: 0;
+  height: 100%;
+  width: 100%;
+  font-family:
+    'Roboto',
+    'Barlow',
+    'Inter UI',
+    -apple-system,
+    BlinkMacSystemFont,
+    'Segoe UI',
+    'Oxygen',
+    'Ubuntu',
+    'Cantarell',
+    'Fira Sans',
+    'Droid Sans',
+    'Helvetica Neue',
+    sans-serif !important;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+* {
+  scrollbar-width: 8px;
+}
+
+/* Works on Chrome, Edge, and Safari */
+*::-webkit-scrollbar {
+  width: 8px;
+}
+
+*::-webkit-scrollbar-thumb {
+  background-clip: padding-box;
+  background-color: rgba(176, 183, 188, 0.45);
+  background: rgba(176, 183, 188, 0.45);
+  width: 8px;
+  border-radius: 8px;
+}
+
+code {
+  font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New', monospace;
+}
+
+button:focus {
+  outline: none !important;
+}
+
+.app {
+  position: fixed;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+}
+
+.euiCheckableCard__children {
+  width: 100%;
+  padding: 0 !important;
+}
+
+.euiCheckableCard__control {
+  display: none !important;
+}
+
+.euiCheckableCard__row:first-of-type {
+  display: none;
+}
+
+.container {
+  max-width: 760px !important;
+}
+
+.euiPopover {
+  margin-top: -5px;
+}
+
+#header {
+  padding-top: 12px;
+  padding-bottom: 16px;
+  display: block;
+  max-height: 105px;
+  height: auto;
+  min-height: auto;
+  background: #1e1f25;
+  border: 0;
+  padding-bottom: 10px;
+}
+
+#logo {
+  width: 200px;
+  height: 40px;
+}
+
+#search-input {
+  width: 260px;
+  height: 35px;
+  box-shadow: none;
+  border-radius: 5px;
+  color: #587393;
+  background: #101821;
+  margin-right: 10px;
+  background-image: url(./public/static/search-24px.svg) !important;
+  background-repeat: no-repeat;
+  background-position: 10px;
+  background-size: 20px 20px;
+}
+
+#header .euiIcon--medium {
+  width: 11px;
+}
+
+#header .euiFieldSearch::placeholder {
+  color: #3b4755;
+  font-size: 13px;
+}
+
+#header .euiFieldSearch:focus {
+  background-image: linear-gradient(
+    to top,
+    #5d8fdd,
+    #5d8fdd 2px,
+    transparent 2px,
+    transparent 100%
+  );
+}
+
+#header-right {
+  align-items: center;
+}
+
+.euiPanel.euiPanel {
+  background-color: #161e29;
+  border: 1px solid #161e29;
+}
+
+.euiPanel.euiPanel .euiSelectableListItem:not(:last-of-type) {
+  border-bottom: 1px solid transparent;
+}
+
+.euiFieldSearch.euiFieldSearch {
+  background-color: #101821;
+  font-size: 12px;
+}
+
+.euiFieldSearch.euiFieldSearch::placeholder {
+  color: #3b4755;
+}
+
+.euiFieldSearch.euiFieldSearch:focus {
+  background-color: #101821;
+}
+
+#header-right .euiFormControlLayoutIcons {
+  display: none;
+}
+
+.euiFormControlLayout {
+  max-width: none;
+  min-height: 40px;
+}
+
+.popover-tags .euiFieldSearch.euiFieldSearch {
+  background-image: url(./public/static/search-24px.svg) !important;
+  background-repeat: no-repeat;
+  background-position: 10px;
+  background-size: 20px 20px;
+}
+
+.popover-tags .euiFormControlLayoutIcons {
+  display: none;
+}
+
+/* main */
+.main-wrap.main-wrap {
+  max-width: none;
+}
+
+#main {
+  padding-top: 8px;
+}
+
+#main .euiSpacer--m {
+  height: 6px;
+}
+
+fieldset.container {
+  padding: 0;
+  padding-bottom: 60px;
+}
+
+#main .euiCheckableCard {
+  min-height: 137px;
+  padding: 20px;
+  border: 0;
+  position: relative;
+}
+
+#main .euiCheckableCard h5 {
+  font-size: 12px;
+  margin-bottom: 0;
+}
+
+.tribe-title.tribe-title {
+  margin-top: 10px;
+  margin-bottom: 3px;
+  font-size: 17px;
+}
+
+.euiCheckableCard-isChecked .tribe-title {
+  white-space: normal;
+}
+
+.placeholder-img-tribe {
+  left: 22px;
+  top: 22px;
+  width: 90px;
+  height: 90px;
+  border-radius: 5px;
+  background: url(./public/static/placeholder.svg);
+  background-repeat: no-repeat;
+  background-size: 40px 33px;
+  background-position: center center;
+  background-color: #161e29;
+}
+
+input.input {
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.qr-wrap {
+  width: 219px;
+  margin-bottom: 20px;
+}
+
+.qr-left {
+  color: #6b7a8d;
+  font-size: 12px;
+  position: relative;
+}
+
+.qr-left .lighter-color {
+  color: #fff;
+}
+
+.qr-left .disabled,
+.qr-left .disabled .lighter-color {
+  color: #3b4755;
+}
+
+.qr-left .info {
+  display: block;
+  padding-top: 15px;
+  padding-bottom: 15px;
+}
+
+.qr-left .section-separator {
+  margin-top: 0;
+  margin-bottom: 0;
+}
+
+.below-qr {
+  display: flex;
+}
+
+#main .item-cont {
+  align-items: inherit;
+  min-height: 100px;
+}
+
+.info-section {
+  color: #556171;
+  font-size: 9px;
+}
+
+.lighter-color {
+  color: #68798b;
+  font-size: 12px;
+}
+
+.section-separator {
+  border: 1px solid #151e27;
+  margin-top: 20px;
+  margin-bottom: 20px;
+}
+
+.uppercase {
+  text-transform: uppercase;
+}
+
+.colapse-button {
+  display: block;
+  width: 100px;
+  height: 40px;
+  margin: 0 auto;
+  background: #151e27;
+  margin-bottom: -24px;
+  margin-top: 20px;
+  border-top-left-radius: 10px;
+  border-top-right-radius: 10px;
+  position: relative;
+}
+
+.colapse-button img {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+
+.tags-wrapper.tags-wrapper {
+  display: initial;
+  height: 20px;
+  overflow: hidden;
+  position: relative;
+}
+
+.euiCheckableCard-isChecked .tags-wrapper.tags-wrapper {
+  overflow: visible;
+  height: auto;
+}
+
+.tag-wrapper.tag-wrapper {
+  display: inline-flex;
+}
+
+.more-tags-available {
+  position: absolute;
+  top: -4px;
+  right: 0px;
+  font-size: 10px;
+  color: #6b7a8d;
+  background: #1a2430;
+  padding: 10px;
+}
+
+.euiCheckableCard-isChecked .more-tags-available {
+  display: none;
+}
+
+.qr-string {
+  color: #7b7b7b;
+  width: 134px;
+  height: 15px;
+  font-size: 13px;
+}
+
+textarea.qr-string {
+  height: 20px;
+  background: transparent;
+  border: 0;
+  position: relative;
+  width: 160px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  resize: none;
+}
+
+.copy-btn {
+  background: #698cf7;
+  min-width: 62px;
+  height: 25px;
+  font-size: 10px;
+  border-radius: 5px;
+  color: #fff;
+  text-transform: uppercase;
+}
+
+.preview-btn {
+  background: #698cf7;
+  width: 62px;
+  height: 25px;
+  font-size: 10px;
+  border-radius: 5px;
+  color: #fff;
+  text-transform: uppercase;
+  align-items: center;
+  display: flex;
+  justify-content: center;
+}
+
+.preview-btn:hover {
+  text-decoration: none;
+  color: #fff;
+}
+
+.copy-btn {
+  margin-left: auto;
+}
+
+.join-btn {
+  background: #698cf7 !important;
+  width: 68px;
+  height: 25px;
+  font-size: 10px !important;
+  border-radius: 5px;
+  color: #fff !important;
+  text-transform: uppercase;
+  position: absolute;
+  right: 12px;
+  bottom: 0px;
+  padding: 4px 2px !important;
+}
+
+#logo {
+  width: 250px;
+  height: 60px;
+}
+
+#header .container {
+  padding: 0;
+}
+
+#main .euiSpacer--m {
+  display: none;
+}
+
+#main .euiCheckableCard {
+  max-width: 378px;
+}
+
+#main .euiCheckableCard-isChecked {
+  height: auto;
+}
+
+#header-right {
+  margin-top: 10px;
+  margin-bottom: 10px;
+}
+
+.euiModal__flex .euiModalBody .euiModalBody__overflow {
+  padding: 24px 0 !important;
+}
+
+.euiFormRow {
+  margin-bottom: 10px;
+}
+
+.euiFormRow__labelWrapper {
+  margin-bottom: 0px;
+}
+
+::placeholder {
+  /* Chrome, Firefox, Opera, Safari 10.1+ */
+  color: #556171;
+  opacity: 1;
+  /* Firefox */
+}
+
+:-ms-input-placeholder {
+  /* Internet Explorer 10-11 */
+  color: #556171;
+}
+
+::-ms-input-placeholder {
+  /* Microsoft Edge */
+  color: #556171;
+}
+
+.sphinxButton {
+  box-shadow: none;
+}
+
+#logo {
+  width: 200px;
+  height: 40px;
+}
+
+#search-input {
+  width: 260px;
+  height: 35px;
+  box-shadow: none;
+  border-radius: 5px;
+  color: #587393;
+  background: #101821;
+  margin-right: 10px;
+  background-image: url(./public/static/search-24px.svg) !important;
+  background-repeat: no-repeat;
+  background-position: 10px;
+  background-size: 20px 20px;
+}
+
+#header .euiButton {
+  min-width: 80px;
+  width: 95px;
+  height: 35px;
+  border: 1px solid #5d8fdd;
+  color: #5d8fdd;
+}
+
+#header .euiButton__text {
+  font-size: 10px;
+  text-transform: uppercase;
+}
+
+#header .euiIcon--medium {
+  width: 11px;
+}
+
+#header .euiFieldSearch::placeholder {
+  color: #3b4755;
+  font-size: 13px;
+}
+
+#header .euiFieldSearch:focus {
+  background-image: linear-gradient(
+    to top,
+    #5d8fdd,
+    #5d8fdd 2px,
+    transparent 2px,
+    transparent 100%
+  );
+}
+
+#header-right {
+  align-items: center;
+}
+
+.euiPanel.euiPanel {
+  background-color: #161e29;
+  border: 1px solid #161e29;
+}
+
+.euiPanel.euiPanel .euiSelectableListItem:not(:last-of-type) {
+  border-bottom: 1px solid transparent;
+}
+
+.euiFieldSearch.euiFieldSearch {
+  background-color: #101821;
+  font-size: 12px;
+}
+
+.euiFieldSearch.euiFieldSearch::placeholder {
+  color: #3b4755;
+}
+
+.euiFieldSearch.euiFieldSearch:focus {
+  background-color: #101821;
+}
+
+#header-right .euiFormControlLayoutIcons {
+  display: none;
+}
+
+#hide-icons .euiFormControlLayoutIcons {
+  display: none;
+}
+
+.popover-tags .euiFieldSearch.euiFieldSearch {
+  background-image: url(./public/static/search-24px.svg) !important;
+  background-repeat: no-repeat;
+  background-position: 10px;
+  background-size: 20px 20px;
+}
+
+.popover-tags .euiFormControlLayoutIcons {
+  display: none;
+}
+
+/* main */
+.main-wrap.main-wrap {
+  max-width: none;
+}
+
+#main {
+  background: #17212a;
+  padding-top: 8px;
+}
+
+#main .euiSpacer--m {
+  height: 6px;
+}
+
+fieldset.container {
+  padding: 0;
+  padding-bottom: 60px;
+}
+
+#main .euiCheckableCard {
+  min-height: 137px;
+  padding: 20px;
+  border: 0;
+  background: #1a2430;
+  position: relative;
+}
+
+#main .euiCheckableCard h5 {
+  color: #6b7a8d;
+  font-size: 12px;
+  margin-bottom: 0;
+}
+
+.tribe-title.tribe-title {
+  margin-top: 10px;
+  margin-bottom: 3px;
+  font-size: 17px;
+}
+
+.euiCheckableCard-isChecked .tribe-title {
+  white-space: normal;
+}
+
+.placeholder-img-tribe {
+  position: absolute;
+  left: 22px;
+  top: 22px;
+  width: 90px;
+  height: 90px;
+  border-radius: 5px;
+  background: url(./public/static/placeholder.svg);
+  background-repeat: no-repeat;
+  background-size: 40px 33px;
+  background-position: center center;
+  background-color: #161e29;
+}
+
+.qr-wrap {
+  width: 219px;
+  margin-bottom: 20px;
+}
+
+.qr-left {
+  color: #6b7a8d;
+  font-size: 12px;
+  position: relative;
+}
+
+.qr-left .lighter-color {
+  color: #fff;
+}
+
+.qr-left .disabled,
+.qr-left .disabled .lighter-color {
+  color: #3b4755;
+}
+
+.qr-left .info {
+  display: block;
+  padding-top: 15px;
+  padding-bottom: 15px;
+}
+
+.qr-left .section-separator {
+  margin-top: 0;
+  margin-bottom: 0;
+}
+
+.below-qr {
+  display: flex;
+}
+
+#main .item-cont {
+  align-items: inherit;
+  min-height: 100px;
+}
+
+.info-section {
+  color: #556171;
+  font-size: 9px;
+}
+
+.lighter-color {
+  color: #68798b;
+  font-size: 12px;
+}
+
+.section-separator {
+  border: 1px solid #151e27;
+  margin-top: 20px;
+  margin-bottom: 20px;
+}
+
+.uppercase {
+  text-transform: uppercase;
+}
+
+.colapse-button {
+  display: block;
+  width: 100px;
+  height: 40px;
+  margin: 0 auto;
+  background: #151e27;
+  margin-bottom: -24px;
+  margin-top: 20px;
+  border-top-left-radius: 10px;
+  border-top-right-radius: 10px;
+  position: relative;
+}
+
+.colapse-button img {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+
+.tags-wrapper.tags-wrapper {
+  display: initial;
+  height: 20px;
+  overflow: hidden;
+  position: relative;
+}
+
+.euiCheckableCard-isChecked .tags-wrapper.tags-wrapper {
+  overflow: visible;
+  height: auto;
+}
+
+.tag-wrapper.tag-wrapper {
+  display: inline-flex;
+}
+
+.more-tags-available {
+  position: absolute;
+  top: -4px;
+  right: 0px;
+  font-size: 10px;
+  color: #6b7a8d;
+  background: #1a2430;
+  padding: 10px;
+}
+
+.euiCheckableCard-isChecked .more-tags-available {
+  display: none;
+}
+
+.qr-string {
+  color: #7b7b7b;
+  width: 134px;
+  height: 15px;
+  font-size: 13px;
+}
+
+textarea.qr-string {
+  height: 20px;
+  background: transparent;
+  border: 0;
+  position: relative;
+  width: 160px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  resize: none;
+}
+
+.copy-btn {
+  background: #698cf7;
+  width: 62px;
+  height: 25px;
+  font-size: 10px;
+  border-radius: 5px;
+  color: #fff;
+  text-transform: uppercase;
+}
+
+.join-btn {
+  background: #698cf7 !important;
+  width: 68px;
+  height: 25px;
+  font-size: 10px !important;
+  border-radius: 5px;
+  color: #fff !important;
+  text-transform: uppercase;
+  position: absolute;
+  right: 12px;
+  bottom: 0px;
+  padding: 4px 2px !important;
+}
+
+@media (min-width: 768px) {
+  #logo {
+    width: 250px;
+    height: 60px;
+  }
+
+  #header .container {
+    padding: 0;
+  }
+
+  #main .euiSpacer--m {
+    display: none;
+  }
+
+  #main .euiCheckableCard {
+    max-width: 378px;
+    height: 100px;
+  }
+
+  #main .euiCheckableCard-isChecked {
+    height: auto;
+  }
+}
+
+.euiSuperSelect__listbox {
+  border: none;
+  outline: none;
+}
+
+.euiPanel.euiPanel--plain.euiPopover__panel {
+  border: 1px solid #dde1e5;
+  overflow: hidden;
+  padding: 0;
+}
+
+.euiSuperSelect__listbox button {
+  background-color: #ffffff !important;
+  border: none;
+  outline: none;
+  padding: 0px 8px;
+}
+
+.euiSuperSelect__listbox .euiContextMenu__icon {
+  color: #000;
+  position: relative;
+  top: 5px;
+}
+
+.euiDatePicker .euiFieldText {
+  background-color: #fff;
+  color: #000;
+}
+
+.euiDatePicker .euiFieldText:focus {
+  background-color: #fff;
+  color: #000;
+  outline: 1px solid #dde0e5;
+  text-decoration: none;
+}
+
+.react-datepicker {
+  background-color: #fff;
+}
+
+.react-datepicker__month-read-view,
+.react-datepicker__year-read-view {
+  background: #dde0e5 !important;
+  outline: 1px solid #dde0e5 !important;
+  color: #000 !important;
+}
+
+.react-datepicker__month-read-view span {
+  color: #000 !important;
+}
+
+.react-datepicker__navigation--previous {
+  border: none;
+  background-color: #dde0e5;
+}
+
+.react-datepicker__navigation--previous:hover {
+  border: none;
+  background-color: #dde0e5;
+}
+
+.react-datepicker__navigation--next {
+  border: none;
+  background-color: #dde0e5;
+}
+
+.react-datepicker__month-dropdown,
+.react-datepicker__year-dropdown {
+  background: #fff !important;
+  color: #000 !important;
+  border: none;
+}
+
+.react-datepicker__year-dropdown-container > div:not([class*='read-view']),
+.react-datepicker__month-dropdown {
+  background: #fff !important;
+  color: #000 !important;
+}
+
+.react-datepicker__day,
+.react-datepicker__day--weekend {
+  color: #000 !important;
+}
+
+.react-datepicker__day--outside-month {
+  color: #71797e !important;
+}
+
+.euiModal__closeIcon {
+  color: #b0b7bc !important;
+  background: #f2f3f5 !important;
+  padding: 20px;
+}
+
+.euiModal__closeIcon svg {
+  height: 24px;
+  width: 24px;
+}
+
+@media (max-width: 767px) {
+  #header-right {
+    margin-top: 10px;
+    margin-bottom: 10px;
+  }
+}
+
+.euiModal__flex .euiModalBody .euiModalBody__overflow {
+  padding: 24px 0 !important;
+}
+
+.euiFormRow {
+  margin-bottom: 10px;
+}
+
+.euiFormRow__labelWrapper {
+  margin-bottom: 0px;
+}
+
+.masonry-flex-container {
+  display: flex;
+  flex-flow: column wrap;
+  align-content: space-around;
+  /* Your container needs a fixed height, and it 
+   * needs to be taller than your tallest column. */
+  /* height: 600px;  */
+  width: 100%;
+  overflow-x: hidden;
+  overflow-y: auto;
+}
+
+.masonry-flex-item {
+  width: 32%;
+  margin-bottom: 2%;
+  /* Optional */
+}
+
+/* Re-order items into 3 rows */
+.masonry-flex-item:nth-child(3n + 1) {
+  order: 1;
+}
+
+.masonry-flex-item:nth-child(3n + 2) {
+  order: 2;
+}
+
+.masonry-flex-item:nth-child(3n) {
+  order: 3;
+}
+
+/* Force new columns */
+.masonry-flex-container::before,
+.masonry-flex-container::after {
+  content: '';
+  flex-basis: 100%;
+  width: 0;
+  order: 2;
+}
+
+.euiFormRow__fieldWrapper .euiFormControlLayout--group {
+  background-color: #ffffff00;
+  box-shadow: none;
+  transition: none;
+  display: flex;
+  padding: 1px;
+}
+
+.euiFormRow__fieldWrapper .euiFormControlLayout--group label {
+  color: #000000;
+  padding-right: 0px;
+  background-color: #ffffff00 !important;
+}
+
+.euiFormRow__fieldWrapper
+  .euiFormControlLayout--group
+  .euiFormLabel
+  .euiFormControlLayout__prepend {
+  background-color: #ffffff00 !important;
+}
+
+.euiFormControlLayout {
+  max-width: 900px !important;
+}
+
+.euiSuperSelectControl.euiSuperSelect--isOpen__button {
+  background: #ffffff !important;
+  background-color: #ffffff !important;
+}
+
+.euiSuperSelectControl.euiSuperSelect--isClosed__button {
+  background: #ffffff !important;
+  background-color: #ffffff !important;
+}
+
+.euiSuperSelectControl:focus {
+  background: #ffffff !important;
+  background-color: #ffffff !important;
+  box-shadow: none !important;
+}
+
+.euiFormControlLayout__prepend {
+  color: #b0b7bc !important;
+}
+
+.multi-select-input div {
+  border-width: 0px !important;
+  border: none !important;
+}
+
+/* the erase button for inputs */
+input::-webkit-search-cancel-button {
+  -webkit-appearance: none;
+}
+
+.btn-disabled {
+  pointer-events: none;
+  opacity: 0.65;
+}
+
+.euiPanel:focus-visible,
+.euiPanel > div:focus-visible,
+.euiPanel > div > div:focus-visible {
+  outline: none;
+  border: none;
+}
+
+.euiSwitch.euiSwitch--compressed .euiSwitch__thumb {
+  color: #fff;
+  background-color: #fff !important;
+  border: none !important;
+  height: 18px;
+  width: 18px;
+  margin-top: 2px;
+  margin-left: 4px;
+  margin-right: -2px;
+}
+
+.euiSwitch .euiSwitch__button[aria-checked='true'] .euiSwitch__body {
+  background-color: #49c998 !important;
+  height: 24px;
+  width: 40px;
+}
+
+.euiSwitch .euiSwitch__button[aria-checked='false'] .euiSwitch__body {
+  background-color: #d0d5d8 !important;
+  height: 24px;
+  width: 40px;
+}
+
+.euiPanel.euiPanel--plain.euiPopover__panel {
+  background-color: #fff !important;
+  border: 1px solid #82b4ff;
+  border-top: 1px solid #ebedef !important;
+  border-radius: 0px 0px 3px 3px;
+  overflow: hidden !important;
+  width: 292px !important;
+  margin-left: -1px;
+  box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1) !important;
+}
+
+.euiSuperSelect__listbox button:active {
+  text-decoration: none;
+  text-transform: none;
+}
+
+.euiSuperSelect__listbox button:focus {
+  text-decoration: none;
+  text-transform: none;
+}
+
+.euiSuperSelect__listbox button {
+  /* padding: 4px 8px; */
+  text-decoration: none;
+  text-transform: none;
+  font-size: 14px;
+}
+
+.euiSuperSelect__listbox button:hover {
+  background-color: rgba(130, 180, 255, 0.25) !important;
+  color: #3c3f41 !important;
+  text-decoration: none;
+  text-transform: none;
+}
+
+.ellipsis {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 100px;
+}
+
+table {
+  width: 100%;
+}
+
+td {
+  padding: 10px 0px;
+}
