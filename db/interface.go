@@ -35,6 +35,10 @@ type Database interface {
 	GetAssignedBounties(r *http.Request) ([]Bounty, error)
 	GetCreatedBounties(r *http.Request) ([]Bounty, error)
 	GetBountyById(id string) ([]Bounty, error)
+	GetNextBountyById(id string) ([]Bounty, error)
+	GetPreviousBountyById(id string) ([]Bounty, error)
+	GetNextOrganizationBountyById(uuid string, id string) ([]Bounty, error)
+	GetPreviousOrganizationBountyById(uuid string, id string) ([]Bounty, error)
 	GetBountyIndexById(id string) int64
 	GetBountyDataByCreated(created string) ([]Bounty, error)
 	AddBounty(b Bounty) (Bounty, error)
