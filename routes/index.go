@@ -21,7 +21,6 @@ import (
 func NewRouter() *http.Server {
 	r := initChi()
 
-	r.Mount("/", IndexRoutes())
 	r.Mount("/tribes", TribeRoutes())
 	r.Mount("/bots", BotsRoutes())
 	r.Mount("/bot", BotRoutes())
