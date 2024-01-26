@@ -530,20 +530,22 @@ func (db database) GetOrganizationBounties(r *http.Request, org_uuid string) []B
 		limitQuery += fmt.Sprintf(" OFFSET %d", offset)
 	}
 	if search != "" {
-		searchQuery = fmt.Sprintf("WHERE LOWER(title) LIKE %s", "'%"+search+"%'")
+		searchQuery = fmt.Sprintf("AND LOWER(title) LIKE %s", "'%"+search+"%'")
 	}
 	if open != "" && open == "true" {
 		openQuery = "AND assignee = '' AND paid != true"
 		assignedQuery = ""
 	}
 	if assingned != "" && assingned == "true" {
+		assignedQuery = "AND assignee != '' AND paid = false"
 		if open != "" && open == "true" {
-			assignedQuery = "OR assignee != '' AND paid = false"
+			assignedQuery = "OR assignee != '' AND paid != true"
 		} else {
-			assignedQuery = "AND assignee != '' AND paid = false"
+			assignedQuery = "AND assignee != '' AND paid != true"
 		}
 	}
 	if paid != "" && paid == "true" {
+		paidQuery = "AND paid = true"
 		if open != "" && open == "true" || assingned != "" && assingned == "true" {
 			paidQuery = "OR paid = true"
 		} else if open != "" && open == "true" && assingned == "" && assingned != "true" {
