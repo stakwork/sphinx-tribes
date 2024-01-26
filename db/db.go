@@ -639,6 +639,30 @@ func (db database) GetBountyById(id string) ([]Bounty, error) {
 	return ms, err
 }
 
+func (db database) GetNextBountyById(id string) ([]Bounty, error) {
+	ms := []Bounty{}
+	err := db.db.Raw(`SELECT * FROM public.bounty WHERE id > '` + id + `' ORDER BY id ASC LIMIT 1`).Find(&ms).Error
+	return ms, err
+}
+
+func (db database) GetPreviousBountyById(id string) ([]Bounty, error) {
+	ms := []Bounty{}
+	err := db.db.Raw(`SELECT * FROM public.bounty WHERE id < '` + id + `' ORDER BY id DESC LIMIT 1`).Find(&ms).Error
+	return ms, err
+}
+
+func (db database) GetNextOrganizationBountyById(uuid string, id string) ([]Bounty, error) {
+	ms := []Bounty{}
+	err := db.db.Raw(`SELECT * FROM public.bounty WHERE org_uuid = '` + uuid + `' AND id > '` + id + `' ORDER BY id ASC LIMIT 1`).Find(&ms).Error
+	return ms, err
+}
+
+func (db database) GetPreviousOrganizationBountyById(uuid string, id string) ([]Bounty, error) {
+	ms := []Bounty{}
+	err := db.db.Raw(`SELECT * FROM public.bounty WHERE org_uuid = '` + uuid + `' AND id < '` + id + `' ORDER BY id DESC LIMIT 1`).Find(&ms).Error
+	return ms, err
+}
+
 func (db database) GetBountyIndexById(id string) int64 {
 	var index int64
 	db.db.Raw(`SELECT position FROM(SELECT *, row_number() over( ORDER BY id DESC) as position FROM public.bounty) result WHERE id = '` + id + `' OR created = '` + id + `'`).Scan(&index)
