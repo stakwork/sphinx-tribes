@@ -54,6 +54,72 @@ func GetBountyById(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+func GetNextBountyById(w http.ResponseWriter, r *http.Request) {
+	bountyId := chi.URLParam(r, "bountyId")
+	if bountyId == "" {
+		w.WriteHeader(http.StatusNotFound)
+	}
+	bounties, err := db.DB.GetNextBountyById(bountyId)
+	if err != nil {
+		w.WriteHeader(http.StatusBadRequest)
+		fmt.Println("Error", err)
+	} else {
+		var bountyResponse []db.BountyResponse = GenerateBountyResponse(bounties)
+		w.WriteHeader(http.StatusOK)
+		json.NewEncoder(w).Encode(bountyResponse)
+	}
+}
+
+func GetPreviousBountyById(w http.ResponseWriter, r *http.Request) {
+	bountyId := chi.URLParam(r, "bountyId")
+	if bountyId == "" {
+		w.WriteHeader(http.StatusNotFound)
+	}
+	bounties, err := db.DB.GetPreviousBountyById(bountyId)
+	if err != nil {
+		w.WriteHeader(http.StatusBadRequest)
+		fmt.Println("Error", err)
+	} else {
+		var bountyResponse []db.BountyResponse = GenerateBountyResponse(bounties)
+		w.WriteHeader(http.StatusOK)
+		json.NewEncoder(w).Encode(bountyResponse)
+	}
+}
+
+func GetOrganizationNextBountyById(w http.ResponseWriter, r *http.Request) {
+	bountyId := chi.URLParam(r, "bountyId")
+	uuid := chi.URLParam(r, "uuid")
+	if bountyId == "" || uuid == "" {
+		w.WriteHeader(http.StatusNotFound)
+	}
+	bounties, err := db.DB.GetNextOrganizationBountyById(uuid, bountyId)
+	if err != nil {
+		w.WriteHeader(http.StatusBadRequest)
+		fmt.Println("Error", err)
+	} else {
+		var bountyResponse []db.BountyResponse = GenerateBountyResponse(bounties)
+		w.WriteHeader(http.StatusOK)
+		json.NewEncoder(w).Encode(bountyResponse)
+	}
+}
+
+func GetOrganizationPreviousBountyById(w http.ResponseWriter, r *http.Request) {
+	bountyId := chi.URLParam(r, "bountyId")
+	uuid := chi.URLParam(r, "uuid")
+	if bountyId == "" || uuid == "" {
+		w.WriteHeader(http.StatusNotFound)
+	}
+	bounties, err := db.DB.GetPreviousOrganizationBountyById(uuid, bountyId)
+	if err != nil {
+		w.WriteHeader(http.StatusBadRequest)
+		fmt.Println("Error", err)
+	} else {
+		var bountyResponse []db.BountyResponse = GenerateBountyResponse(bounties)
+		w.WriteHeader(http.StatusOK)
+		json.NewEncoder(w).Encode(bountyResponse)
+	}
+}
+
 func GetBountyIndexById(w http.ResponseWriter, r *http.Request) {
 	bountyId := chi.URLParam(r, "bountyId")
 	if bountyId == "" {
