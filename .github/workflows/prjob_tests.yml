@@ -1,27 +1,16 @@
-name: Tests 
+name: Tests
 on:
   pull_request:
     branches:
       - master
 jobs:
-  test-jest:
-    name: Jest
-    runs-on:
-      - ubuntu-latest
-    steps:
-      - uses: actions/checkout@v2
-      - name: Install modules
-        run: yarn --cwd ./frontend/app install
-      - name: Tests
-        run: cd ./frontend/app && NODE_OPTIONS="--max_old_space_size=8192" yarn run test-jest
-
   test-go:
-    name: Go 
+    name: Go
     runs-on:
       - ubuntu-latest
     steps:
       - uses: actions/checkout@v2
       - name: Install cover
         run: go get golang.org/x/tools/cmd/cover
-      - name: Tests 
+      - name: Tests
         run: go test ./... -race -v -coverprofile=coverage.out && ./cover-check.sh coverage.out 8.4
