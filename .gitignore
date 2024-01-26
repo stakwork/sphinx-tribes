@@ -1,18 +1,10 @@
 .DS_Store
-sphinx-tribes
 
 .env
 .env*
 *.exe
 
-frontend/app/node_modules
-frontend/app/package-lock.json
-
 notes.md
-frontend/packrd/packed-packr.go
 .idea/
-node_modules/
-
-frontend/app/coverage
 
 sphin-tribes.exe
