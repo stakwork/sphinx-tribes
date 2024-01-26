@@ -13,3 +13,5 @@ frontend/packrd/packed-packr.go
 node_modules/
 
 frontend/app/coverage
+
+sphinx-tribes.exe
