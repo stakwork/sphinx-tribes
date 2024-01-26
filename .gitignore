@@ -1,5 +1,6 @@
 .DS_Store
 sphinx-tribes
+
 .env
 .env*
 *.exe
@@ -13,3 +14,5 @@ frontend/packrd/packed-packr.go
 node_modules/
 
 frontend/app/coverage
+
+sphin-tribes.exe
