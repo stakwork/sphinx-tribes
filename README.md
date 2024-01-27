@@ -23,7 +23,7 @@ Sphinx-Tribes is a decentralized message broker for public groups within the Sph
 - [Testing and Mocking](#testing-and-mocking)
   - [Unit Testing](#unit-testing)
   - [Mocking Interfaces](#mocking-interfaces)
-- [API Data Validations](#api-data-validations)
+- [Backend API Data Validations](#backend-api-data-validations)
 - [Contributing](#contributing)
 - [License](#license)
 
@@ -101,17 +101,93 @@ Add `STAKWORK_KEY` for YouTube video downloads.
 Run unit tests with coverage:
 
 ```sh
-go test ./... -tags mock -race -v -coverprofile=coverage.out
-go tool cover -html="coverage.out"
+    // you may need to install cover with this command first
+    go get golang.org/x/tools/cmd/cover
+    // run test
+    go test ./... -tags mock -race -v -coverprofile=coverage.out && ./cover-check.sh coverage.out <min coverage amount> 
+    // To get code coverage in html format do the following after running the code above
+    go tool cover -html="coverage.out"
 ```
 
 ### Mocking Interfaces
 
 Use [mockery](https://vektra.github.io/mockery/latest/) for interface mocking.
 
-## API Data Validations
+#### Installing mockery
 
-Implement validations using `gopkg.in/go-playground/validator.v9`.
+There are multiple options to install mockery. Use any one of the following to download.
+
+##### Download the mockery binary
+
+Use the release page link [mockery releases](https://github.com/vektra/mockery/releases/tag/v2.39.1) to download the artifact for your respective device.
+
+##### Using go install
+
+If you have go already installed on your device you can use the go install command to download mockery.
+
+```sh
+go install github.com/vektra/mockery/v2@v2.39.1
+```
+
+##### Using homebrew
+
+If you are on mac you can use homebrew to download mockery
+
+```zsh
+brew install mockery
+brew upgrade mockery
+```
+
+#### When adding a new function to the interface which is already mocked follow the below steps
+
+1. Update the corresponding interface with the function signature, for example if you are adding new function to the ```database``` structure make sure the interface file ```db/interface.go``` is updated with the function signature.
+2. run the command ```mockery``` to update the mocks.
+
+#### To create mocks for a new interface make follow the steps below
+
+1. Add the new entry in the ```.mockery.yml``` file like this
+
+```yml
+
+with-expecter: true
+dir: "mocks"
+packages:
+    github.com/stakwork/sphinx-tribes/db:
+        interfaces:
+            Database:
+    github.com/stakwork/sphinx-tribes/*your-package-name*:
+        interfaces:
+            *your-interface-1*:
+            *your-interface-2*:
+```
+
+2. run the command ```mockery``` to update the mocks.
+
+### Backend API Data Validations
+
+We are currently using `gopkg.in/go-playground/validator.v9` for validation, to validate a struct add the `validate` property to it
+
+```golang
+type Organization struct {
+  Name        string     `gorm:"unique;not null" json:"name" validate:"required"`
+  Website     string     `json:"website" validate:"omitempty,uri"`
+  Github      string     `json:"github" validate:"omitempty,uri"`
+  Description string     `json:"description" validate:"omitempty,lte=200"`
+}
+```
+
+Then handle the validation errors in the request handler
+
+```golang
+err = db.Validate.Struct(org)
+if err != nil {
+  w.WriteHeader(http.StatusBadRequest)
+  msg := fmt.Sprintf("Error: did not pass validation test : %s", err)
+  json.NewEncoder(w).Encode(msg)
+  return
+}
+
+```
 
 ## Contributing
 
