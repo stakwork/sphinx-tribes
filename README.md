@@ -1,4 +1,3 @@
-
 # Sphinx-Tribes Backend
 
 ![Tribes](https://github.com/stakwork/sphinx-tribes/raw/master/img/sphinx-tribes.png)
@@ -77,6 +76,14 @@ go build .
 ### Redis for Caching
 
 Configure Redis by adding the `REDIS_URL` or other relevant variables to your `.env` file.
+
+```sh
+    RDS_HOSTNAME =
+    RDS_PORT =
+    RDS_DB_NAME =
+    RDS_USERNAME =
+    RDS_PASSWORD =
+```
 
 ### Relay Integration
 
