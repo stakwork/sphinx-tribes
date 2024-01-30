@@ -513,9 +513,6 @@ func (db database) GetOrganizationBounties(r *http.Request, org_uuid string) []B
 	orderQuery := ""
 	limitQuery := ""
 	searchQuery := ""
-	openQuery := ""
-	assignedQuery := ""
-	paidQuery := ""
 	languageQuery := ""
 
 	if sortBy != "" && direction != "" {
@@ -530,30 +527,28 @@ func (db database) GetOrganizationBounties(r *http.Request, org_uuid string) []B
 		limitQuery += fmt.Sprintf(" OFFSET %d", offset)
 	}
 	if search != "" {
-		searchQuery = fmt.Sprintf("AND LOWER(title) LIKE %s", "'%"+search+"%'")
+		searchQuery = fmt.Sprintf("AND LOWER(title) LIKE %s", "'%"+strings.ToLower(search)+"%'")
 	}
-	if open != "" && open == "true" {
-		openQuery = "AND assignee = '' AND paid != true"
-		assignedQuery = ""
+
+	var statusConditions []string
+
+	if open == "true" {
+		statusConditions = append(statusConditions, "assignee = '' AND paid != true")
 	}
-	if assingned != "" && assingned == "true" {
-		assignedQuery = "AND assignee != '' AND paid = false"
-		if open != "" && open == "true" {
-			assignedQuery = "OR assignee != '' AND paid != true"
-		} else {
-			assignedQuery = "AND assignee != '' AND paid != true"
-		}
+	if assingned == "true" {
+		statusConditions = append(statusConditions, "assignee != '' AND paid = false")
 	}
-	if paid != "" && paid == "true" {
-		paidQuery = "AND paid = true"
-		if open != "" && open == "true" || assingned != "" && assingned == "true" {
-			paidQuery = "OR paid = true"
-		} else if open != "" && open == "true" && assingned == "" && assingned != "true" {
-			assignedQuery = ""
-		} else {
-			paidQuery = "AND paid = true"
-		}
+	if paid == "true" {
+		statusConditions = append(statusConditions, "paid = true")
 	}
+
+	var statusQuery string
+	if len(statusConditions) > 0 {
+		statusQuery = " AND (" + strings.Join(statusConditions, " OR ") + ")"
+	} else {
+		statusQuery = ""
+	}
+
 	if languageLength > 0 {
 		langs := ""
 		for i, val := range languageArray {
@@ -569,7 +564,7 @@ func (db database) GetOrganizationBounties(r *http.Request, org_uuid string) []B
 	}
 
 	query := `SELECT * FROM bounty WHERE org_uuid = '` + org_uuid + `'`
-	allQuery := query + " " + openQuery + " " + assignedQuery + " " + paidQuery + " " + searchQuery + " " + languageQuery + " " + orderQuery + " " + limitQuery
+	allQuery := query + " " + statusQuery + " " + searchQuery + " " + languageQuery + " " + orderQuery + " " + limitQuery
 	theQuery := db.db.Raw(allQuery)
 
 	if tags != "" {
