@@ -643,25 +643,25 @@ func (db database) GetBountyById(id string) ([]Bounty, error) {
 
 func (db database) GetNextBountyById(id string) ([]Bounty, error) {
 	ms := []Bounty{}
-	err := db.db.Raw(`SELECT * FROM public.bounty WHERE id > '` + id + `' ORDER BY id ASC LIMIT 1`).Find(&ms).Error
+	err := db.db.Raw(`SELECT * FROM public.bounty WHERE id > '` + id + `' AND show = true ORDER BY id ASC LIMIT 1`).Find(&ms).Error
 	return ms, err
 }
 
 func (db database) GetPreviousBountyById(id string) ([]Bounty, error) {
 	ms := []Bounty{}
-	err := db.db.Raw(`SELECT * FROM public.bounty WHERE id < '` + id + `' ORDER BY id DESC LIMIT 1`).Find(&ms).Error
+	err := db.db.Raw(`SELECT * FROM public.bounty WHERE id < '` + id + `' AND show = true ORDER BY id DESC LIMIT 1`).Find(&ms).Error
 	return ms, err
 }
 
 func (db database) GetNextOrganizationBountyById(uuid string, id string) ([]Bounty, error) {
 	ms := []Bounty{}
-	err := db.db.Raw(`SELECT * FROM public.bounty WHERE org_uuid = '` + uuid + `' AND id > '` + id + `' ORDER BY id ASC LIMIT 1`).Find(&ms).Error
+	err := db.db.Raw(`SELECT * FROM public.bounty WHERE org_uuid = '` + uuid + `' AND id > '` + id + `' AND show = true ORDER BY id ASC LIMIT 1`).Find(&ms).Error
 	return ms, err
 }
 
 func (db database) GetPreviousOrganizationBountyById(uuid string, id string) ([]Bounty, error) {
 	ms := []Bounty{}
-	err := db.db.Raw(`SELECT * FROM public.bounty WHERE org_uuid = '` + uuid + `' AND id < '` + id + `' ORDER BY id DESC LIMIT 1`).Find(&ms).Error
+	err := db.db.Raw(`SELECT * FROM public.bounty WHERE org_uuid = '` + uuid + `' AND id < '` + id + `' AND show = true ORDER BY id DESC LIMIT 1`).Find(&ms).Error
 	return ms, err
 }
 
