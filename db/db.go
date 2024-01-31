@@ -7,6 +7,7 @@ import (
 	"errors"
 	"fmt"
 	"net/http"
+	"net/url"
 	"regexp"
 	"strconv"
 	"strings"
@@ -323,8 +324,82 @@ func (db database) GetListedPeople(r *http.Request) []Person {
 	ms := []Person{}
 	offset, limit, sortBy, direction, search := utils.GetPaginationParams(r)
 
-	// if search is empty, returns all
-	db.db.Offset(offset).Limit(limit).Order(sortBy+" "+direction+" NULLS LAST").Where("(unlisted = 'f' OR unlisted is null) AND (deleted = 'f' OR deleted is null)").Where("LOWER(owner_alias) LIKE ?", "%"+search+"%").Find(&ms)
+	// avoid dereference error, since r can be nil
+	var keys url.Values
+	if r != nil {
+		keys = r.URL.Query()
+	}
+
+	languages := keys.Get("languages")
+	languageArray := strings.Split(languages, ",")
+	languageLength := len(languageArray)
+
+	orderQuery := ""
+	limitQuery := ""
+	searchQuery := ""
+
+	languageQuery := ""
+
+	if sortBy != "" && direction != "" {
+		orderQuery = "ORDER BY " + sortBy + " " + direction
+	} else {
+		orderQuery = "ORDER BY " + sortBy + "" + "DESC"
+	}
+	if limit > -1 {
+		limitQuery = fmt.Sprintf("LIMIT %d  OFFSET %d", limit, offset)
+	}
+	if search != "" {
+		searchQuery = fmt.Sprintf("AND LOWER(title) LIKE %s", "'%"+search+"%'")
+	}
+
+	if languageLength > 0 {
+		for i, val := range languageArray {
+			if val != "" {
+				if i == 0 {
+
+					languageQuery = "AND extras->'coding_languages' @> '[{\"label\": \"" + val + "\"}]'"
+				} else {
+					languageQuery += " OR extras->'coding_languages' @> '[{\"label\": \"" + val + "\"}]'"
+				}
+			}
+		}
+	}
+
+	query := "SELECT * FROM people WHERE (unlisted = 'f' OR unlisted is null) AND (deleted = 'f' OR deleted is null)"
+
+	allQuery := query + " " + searchQuery + " " + languageQuery + " " + orderQuery + " " + limitQuery
+	db.db.Raw(allQuery).Find(&ms)
+	return ms
+}
+
+func (db database) ListAllPeople(r *http.Request) []Person {
+	keys := r.URL.Query()
+
+	languages := keys.Get("languages")
+	languageArray := strings.Split(languages, ",")
+	languageLength := len(languageArray)
+
+	languageQuery := ""
+
+	if languageLength > 0 {
+		langs := ""
+		for i, val := range languageArray {
+			if val != "" {
+				if i == 0 {
+					langs = "'" + val + "'"
+				} else {
+					langs = langs + ", '" + val + "'"
+				}
+				languageQuery = "AND coding_languages && ARRAY[" + langs + "]"
+			}
+		}
+	}
+
+	ms := []Person{}
+
+	query := "SELECT * from people WHERE (unlisted = 'f' OR unlisted is null AND (deleted = 'f' OR deleted is null)"
+	allQuery := query + languageQuery
+	db.db.Raw(allQuery).Find(&ms)
 	return ms
 }
 
