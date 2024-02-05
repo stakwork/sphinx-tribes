@@ -712,27 +712,249 @@ func (db database) GetBountyById(id string) ([]Bounty, error) {
 	return ms, err
 }
 
-func (db database) GetNextBountyById(id string) ([]Bounty, error) {
+func (db database) GetNextBountyById(r *http.Request) ([]Bounty, error) {
+	id := chi.URLParam(r, "bountyId")
+	keys := r.URL.Query()
+	_, _, _, _, search := utils.GetPaginationParams(r)
 	ms := []Bounty{}
-	err := db.db.Raw(`SELECT * FROM public.bounty WHERE id > '` + id + `' AND show = true ORDER BY id ASC LIMIT 1`).Find(&ms).Error
+
+	open := keys.Get("Open")
+	assingned := keys.Get("Assigned")
+	paid := keys.Get("Paid")
+	languages := keys.Get("languages")
+	languageArray := strings.Split(languages, ",")
+	languageLength := len(languageArray)
+
+	var languageQuery string
+	var statusQuery string
+	var searchQuery string
+	var statusConditions []string
+
+	if search != "" {
+		searchQuery = fmt.Sprintf("AND LOWER(title) LIKE %s", "'%"+strings.ToLower(search)+"%'")
+	}
+
+	if open == "true" {
+		statusConditions = append(statusConditions, "assignee = '' AND paid != true")
+	}
+	if assingned == "true" {
+		statusConditions = append(statusConditions, "assignee != '' AND paid = false")
+	}
+	if paid == "true" {
+		statusConditions = append(statusConditions, "paid = true")
+	}
+
+	if len(statusConditions) > 0 {
+		statusQuery = " AND (" + strings.Join(statusConditions, " OR ") + ")"
+	} else {
+		statusQuery = ""
+	}
+
+	if languageLength > 0 {
+		langs := ""
+		for i, val := range languageArray {
+			if val != "" {
+				if i == 0 {
+					langs = "'" + val + "'"
+				} else {
+					langs = langs + ", '" + val + "'"
+				}
+				languageQuery = "AND coding_languages && ARRAY[" + langs + "]"
+			}
+		}
+	}
+
+	query := `SELECT * FROM public.bounty WHERE id > '` + id + `' AND show = true`
+	orderQuery := "ORDER BY id ASC LIMIT 1"
+
+	allQuery := query + " " + searchQuery + " " + statusQuery + " " + languageQuery + " " + orderQuery
+
+	err := db.db.Raw(allQuery).Find(&ms).Error
 	return ms, err
 }
 
-func (db database) GetPreviousBountyById(id string) ([]Bounty, error) {
+func (db database) GetPreviousBountyById(r *http.Request) ([]Bounty, error) {
+	id := chi.URLParam(r, "bountyId")
+	keys := r.URL.Query()
+	_, _, _, _, search := utils.GetPaginationParams(r)
 	ms := []Bounty{}
-	err := db.db.Raw(`SELECT * FROM public.bounty WHERE id < '` + id + `' AND show = true ORDER BY id DESC LIMIT 1`).Find(&ms).Error
+
+	open := keys.Get("Open")
+	assingned := keys.Get("Assigned")
+	paid := keys.Get("Paid")
+	languages := keys.Get("languages")
+	languageArray := strings.Split(languages, ",")
+	languageLength := len(languageArray)
+
+	var languageQuery string
+	var statusQuery string
+	var searchQuery string
+	var statusConditions []string
+
+	if search != "" {
+		searchQuery = fmt.Sprintf("AND LOWER(title) LIKE %s", "'%"+strings.ToLower(search)+"%'")
+	}
+
+	if open == "true" {
+		statusConditions = append(statusConditions, "assignee = '' AND paid != true")
+	}
+	if assingned == "true" {
+		statusConditions = append(statusConditions, "assignee != '' AND paid = false")
+	}
+	if paid == "true" {
+		statusConditions = append(statusConditions, "paid = true")
+	}
+
+	if len(statusConditions) > 0 {
+		statusQuery = " AND (" + strings.Join(statusConditions, " OR ") + ")"
+	} else {
+		statusQuery = ""
+	}
+
+	if languageLength > 0 {
+		langs := ""
+		for i, val := range languageArray {
+			if val != "" {
+				if i == 0 {
+					langs = "'" + val + "'"
+				} else {
+					langs = langs + ", '" + val + "'"
+				}
+				languageQuery = "AND coding_languages && ARRAY[" + langs + "]"
+			}
+		}
+	}
+
+	query := `SELECT * FROM public.bounty WHERE id < '` + id + `' AND show = true`
+	orderQuery := "ORDER BY id DESC LIMIT 1"
+
+	allQuery := query + " " + searchQuery + " " + statusQuery + " " + languageQuery + " " + orderQuery
+
+	err := db.db.Raw(allQuery).Find(&ms).Error
 	return ms, err
 }
 
-func (db database) GetNextOrganizationBountyById(uuid string, id string) ([]Bounty, error) {
+func (db database) GetNextOrganizationBountyById(r *http.Request) ([]Bounty, error) {
+	id := chi.URLParam(r, "bountyId")
+	uuid := chi.URLParam(r, "uuid")
+	keys := r.URL.Query()
+	_, _, _, _, search := utils.GetPaginationParams(r)
 	ms := []Bounty{}
-	err := db.db.Raw(`SELECT * FROM public.bounty WHERE org_uuid = '` + uuid + `' AND id > '` + id + `' AND show = true ORDER BY id ASC LIMIT 1`).Find(&ms).Error
+
+	open := keys.Get("Open")
+	assingned := keys.Get("Assigned")
+	paid := keys.Get("Paid")
+	languages := keys.Get("languages")
+	languageArray := strings.Split(languages, ",")
+	languageLength := len(languageArray)
+
+	var languageQuery string
+	var statusQuery string
+	var searchQuery string
+	var statusConditions []string
+
+	if search != "" {
+		searchQuery = fmt.Sprintf("AND LOWER(title) LIKE %s", "'%"+strings.ToLower(search)+"%'")
+	}
+
+	if open == "true" {
+		statusConditions = append(statusConditions, "assignee = '' AND paid != true")
+	}
+	if assingned == "true" {
+		statusConditions = append(statusConditions, "assignee != '' AND paid = false")
+	}
+	if paid == "true" {
+		statusConditions = append(statusConditions, "paid = true")
+	}
+
+	if len(statusConditions) > 0 {
+		statusQuery = " AND (" + strings.Join(statusConditions, " OR ") + ")"
+	} else {
+		statusQuery = ""
+	}
+
+	if languageLength > 0 {
+		langs := ""
+		for i, val := range languageArray {
+			if val != "" {
+				if i == 0 {
+					langs = "'" + val + "'"
+				} else {
+					langs = langs + ", '" + val + "'"
+				}
+				languageQuery = "AND coding_languages && ARRAY[" + langs + "]"
+			}
+		}
+	}
+
+	query := `SELECT * FROM public.bounty WHERE org_uuid = '` + uuid + `' AND id > '` + id + `' AND show = true`
+	orderQuery := "ORDER BY id ASC LIMIT 1"
+
+	allQuery := query + " " + searchQuery + " " + statusQuery + " " + languageQuery + " " + orderQuery
+
+	err := db.db.Raw(allQuery).Find(&ms).Error
 	return ms, err
 }
 
-func (db database) GetPreviousOrganizationBountyById(uuid string, id string) ([]Bounty, error) {
+func (db database) GetPreviousOrganizationBountyById(r *http.Request) ([]Bounty, error) {
+	id := chi.URLParam(r, "bountyId")
+	uuid := chi.URLParam(r, "uuid")
+	keys := r.URL.Query()
+	_, _, _, _, search := utils.GetPaginationParams(r)
 	ms := []Bounty{}
-	err := db.db.Raw(`SELECT * FROM public.bounty WHERE org_uuid = '` + uuid + `' AND id < '` + id + `' AND show = true ORDER BY id DESC LIMIT 1`).Find(&ms).Error
+
+	open := keys.Get("Open")
+	assingned := keys.Get("Assigned")
+	paid := keys.Get("Paid")
+	languages := keys.Get("languages")
+	languageArray := strings.Split(languages, ",")
+	languageLength := len(languageArray)
+
+	var languageQuery string
+	var statusQuery string
+	var searchQuery string
+	var statusConditions []string
+
+	if search != "" {
+		searchQuery = fmt.Sprintf("AND LOWER(title) LIKE %s", "'%"+strings.ToLower(search)+"%'")
+	}
+
+	if open == "true" {
+		statusConditions = append(statusConditions, "assignee = '' AND paid != true")
+	}
+	if assingned == "true" {
+		statusConditions = append(statusConditions, "assignee != '' AND paid = false")
+	}
+	if paid == "true" {
+		statusConditions = append(statusConditions, "paid = true")
+	}
+
+	if len(statusConditions) > 0 {
+		statusQuery = " AND (" + strings.Join(statusConditions, " OR ") + ")"
+	} else {
+		statusQuery = ""
+	}
+
+	if languageLength > 0 {
+		langs := ""
+		for i, val := range languageArray {
+			if val != "" {
+				if i == 0 {
+					langs = "'" + val + "'"
+				} else {
+					langs = langs + ", '" + val + "'"
+				}
+				languageQuery = "AND coding_languages && ARRAY[" + langs + "]"
+			}
+		}
+	}
+
+	query := `SELECT * FROM public.bounty WHERE org_uuid = '` + uuid + `' AND id < '` + id + `' AND show = true`
+	orderQuery := "ORDER BY id DESC LIMIT 1"
+
+	allQuery := query + " " + searchQuery + " " + statusQuery + " " + languageQuery + " " + orderQuery
+
+	err := db.db.Raw(allQuery).Find(&ms).Error
 	return ms, err
 }
 
@@ -785,7 +1007,7 @@ func (db database) GetAllBounties(r *http.Request) []Bounty {
 		limitQuery = fmt.Sprintf("LIMIT %d  OFFSET %d", limit, offset)
 	}
 	if search != "" {
-		searchQuery = fmt.Sprintf("AND LOWER(title) LIKE %s", "'%"+search+"%'")
+		searchQuery = fmt.Sprintf("AND LOWER(title) LIKE %s", "'%"+strings.ToLower(search)+"%'")
 	}
 	if open != "" && open == "true" {
 		openQuery = "AND assignee = '' AND paid != true"
