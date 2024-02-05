@@ -118,7 +118,7 @@ type Person struct {
 	TwitterConfirmed bool           `json:"twitter_confirmed"`
 	Extras           PropertyMap    `json:"extras", type: jsonb not null default '{}'::jsonb`
 	GithubIssues     PropertyMap    `json:"github_issues", type: jsonb not null default '{}'::jsonb`
-	ReferredBy       string         `json:"referred_by"`
+	ReferredBy       uint           `json:"referred_by"`
 }
 
 type GormDataTypeInterface interface {
