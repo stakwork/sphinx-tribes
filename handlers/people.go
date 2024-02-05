@@ -33,6 +33,8 @@ func NewPeopleHandler(db db.Database) *peopleHandler {
 func (ph *peopleHandler) CreateOrEditPerson(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 	pubKeyFromAuth, _ := ctx.Value(auth.ContextKey).(string)
+	keys := r.URL.Query()
+	referred_by := keys.Get("referred_by")
 
 	person := db.Person{}
 	body, err := io.ReadAll(r.Body)
@@ -60,7 +62,7 @@ func (ph *peopleHandler) CreateOrEditPerson(w http.ResponseWriter, r *http.Reque
 	}
 
 	existing := ph.db.GetPersonByPubkey(pubKeyFromAuth)
-	if existing.ID == 0 { // new!
+	if existing.ID == 0 {
 		if person.ID != 0 { // cant try to "edit" if not exists already
 			fmt.Println("cant edit non existing")
 			w.WriteHeader(http.StatusUnauthorized)
@@ -69,6 +71,12 @@ func (ph *peopleHandler) CreateOrEditPerson(w http.ResponseWriter, r *http.Reque
 		person.UniqueName, _ = ph.db.PersonUniqueNameFromName(person.OwnerAlias)
 		person.Created = &now
 		person.Uuid = xid.New().String()
+
+		if referred_by != "" {
+			// get the referral nd populate the pubkey
+			referral := db.DB.GetPersonByUuid(referred_by)
+			person.ReferredBy = referral.OwnerPubKey
+		}
 	} else { // editing! needs ID
 		if person.ID == 0 { // can't create if already exists
 			fmt.Println("can't create, already existing")
