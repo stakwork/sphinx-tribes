@@ -3007,9 +3007,9 @@ func (_c *Database_GetLnUser_Call) RunAndReturn(run func(string) int64) *Databas
 	return _c
 }
 
-// GetNextBountyById provides a mock function with given fields: id
-func (_m *Database) GetNextBountyById(id string) ([]db.Bounty, error) {
-	ret := _m.Called(id)
+// GetNextBountyById provides a mock function with given fields: r
+func (_m *Database) GetNextBountyById(r *http.Request) ([]db.Bounty, error) {
+	ret := _m.Called(r)
 
 	if len(ret) == 0 {
 		panic("no return value specified for GetNextBountyById")
@@ -3017,19 +3017,19 @@ func (_m *Database) GetNextBountyById(id string) ([]db.Bounty, error) {
 
 	var r0 []db.Bounty
 	var r1 error
-	if rf, ok := ret.Get(0).(func(string) ([]db.Bounty, error)); ok {
-		return rf(id)
+	if rf, ok := ret.Get(0).(func(*http.Request) ([]db.Bounty, error)); ok {
+		return rf(r)
 	}
-	if rf, ok := ret.Get(0).(func(string) []db.Bounty); ok {
-		r0 = rf(id)
+	if rf, ok := ret.Get(0).(func(*http.Request) []db.Bounty); ok {
+		r0 = rf(r)
 	} else {
 		if ret.Get(0) != nil {
 			r0 = ret.Get(0).([]db.Bounty)
 		}
 	}
 
-	if rf, ok := ret.Get(1).(func(string) error); ok {
-		r1 = rf(id)
+	if rf, ok := ret.Get(1).(func(*http.Request) error); ok {
+		r1 = rf(r)
 	} else {
 		r1 = ret.Error(1)
 	}
@@ -3043,14 +3043,14 @@ type Database_GetNextBountyById_Call struct {
 }
 
 // GetNextBountyById is a helper method to define mock.On call
-//   - id string
-func (_e *Database_Expecter) GetNextBountyById(id interface{}) *Database_GetNextBountyById_Call {
-	return &Database_GetNextBountyById_Call{Call: _e.mock.On("GetNextBountyById", id)}
+//   - r *http.Request
+func (_e *Database_Expecter) GetNextBountyById(r interface{}) *Database_GetNextBountyById_Call {
+	return &Database_GetNextBountyById_Call{Call: _e.mock.On("GetNextBountyById", r)}
 }
 
-func (_c *Database_GetNextBountyById_Call) Run(run func(id string)) *Database_GetNextBountyById_Call {
+func (_c *Database_GetNextBountyById_Call) Run(run func(r *http.Request)) *Database_GetNextBountyById_Call {
 	_c.Call.Run(func(args mock.Arguments) {
-		run(args[0].(string))
+		run(args[0].(*http.Request))
 	})
 	return _c
 }
@@ -3060,14 +3060,14 @@ func (_c *Database_GetNextBountyById_Call) Return(_a0 []db.Bounty, _a1 error) *D
 	return _c
 }
 
-func (_c *Database_GetNextBountyById_Call) RunAndReturn(run func(string) ([]db.Bounty, error)) *Database_GetNextBountyById_Call {
+func (_c *Database_GetNextBountyById_Call) RunAndReturn(run func(*http.Request) ([]db.Bounty, error)) *Database_GetNextBountyById_Call {
 	_c.Call.Return(run)
 	return _c
 }
 
-// GetNextOrganizationBountyById provides a mock function with given fields: uuid, id
-func (_m *Database) GetNextOrganizationBountyById(uuid string, id string) ([]db.Bounty, error) {
-	ret := _m.Called(uuid, id)
+// GetNextOrganizationBountyById provides a mock function with given fields: r
+func (_m *Database) GetNextOrganizationBountyById(r *http.Request) ([]db.Bounty, error) {
+	ret := _m.Called(r)
 
 	if len(ret) == 0 {
 		panic("no return value specified for GetNextOrganizationBountyById")
@@ -3075,19 +3075,19 @@ func (_m *Database) GetNextOrganizationBountyById(uuid string, id string) ([]db.
 
 	var r0 []db.Bounty
 	var r1 error
-	if rf, ok := ret.Get(0).(func(string, string) ([]db.Bounty, error)); ok {
-		return rf(uuid, id)
+	if rf, ok := ret.Get(0).(func(*http.Request) ([]db.Bounty, error)); ok {
+		return rf(r)
 	}
-	if rf, ok := ret.Get(0).(func(string, string) []db.Bounty); ok {
-		r0 = rf(uuid, id)
+	if rf, ok := ret.Get(0).(func(*http.Request) []db.Bounty); ok {
+		r0 = rf(r)
 	} else {
 		if ret.Get(0) != nil {
 			r0 = ret.Get(0).([]db.Bounty)
 		}
 	}
 
-	if rf, ok := ret.Get(1).(func(string, string) error); ok {
-		r1 = rf(uuid, id)
+	if rf, ok := ret.Get(1).(func(*http.Request) error); ok {
+		r1 = rf(r)
 	} else {
 		r1 = ret.Error(1)
 	}
@@ -3101,15 +3101,14 @@ type Database_GetNextOrganizationBountyById_Call struct {
 }
 
 // GetNextOrganizationBountyById is a helper method to define mock.On call
-//   - uuid string
-//   - id string
-func (_e *Database_Expecter) GetNextOrganizationBountyById(uuid interface{}, id interface{}) *Database_GetNextOrganizationBountyById_Call {
-	return &Database_GetNextOrganizationBountyById_Call{Call: _e.mock.On("GetNextOrganizationBountyById", uuid, id)}
+//   - r *http.Request
+func (_e *Database_Expecter) GetNextOrganizationBountyById(r interface{}) *Database_GetNextOrganizationBountyById_Call {
+	return &Database_GetNextOrganizationBountyById_Call{Call: _e.mock.On("GetNextOrganizationBountyById", r)}
 }
 
-func (_c *Database_GetNextOrganizationBountyById_Call) Run(run func(uuid string, id string)) *Database_GetNextOrganizationBountyById_Call {
+func (_c *Database_GetNextOrganizationBountyById_Call) Run(run func(r *http.Request)) *Database_GetNextOrganizationBountyById_Call {
 	_c.Call.Run(func(args mock.Arguments) {
-		run(args[0].(string), args[1].(string))
+		run(args[0].(*http.Request))
 	})
 	return _c
 }
@@ -3119,7 +3118,7 @@ func (_c *Database_GetNextOrganizationBountyById_Call) Return(_a0 []db.Bounty, _
 	return _c
 }
 
-func (_c *Database_GetNextOrganizationBountyById_Call) RunAndReturn(run func(string, string) ([]db.Bounty, error)) *Database_GetNextOrganizationBountyById_Call {
+func (_c *Database_GetNextOrganizationBountyById_Call) RunAndReturn(run func(*http.Request) ([]db.Bounty, error)) *Database_GetNextOrganizationBountyById_Call {
 	_c.Call.Return(run)
 	return _c
 }
@@ -4221,9 +4220,9 @@ func (_c *Database_GetPersonByUuid_Call) RunAndReturn(run func(string) db.Person
 	return _c
 }
 
-// GetPreviousBountyById provides a mock function with given fields: id
-func (_m *Database) GetPreviousBountyById(id string) ([]db.Bounty, error) {
-	ret := _m.Called(id)
+// GetPreviousBountyById provides a mock function with given fields: r
+func (_m *Database) GetPreviousBountyById(r *http.Request) ([]db.Bounty, error) {
+	ret := _m.Called(r)
 
 	if len(ret) == 0 {
 		panic("no return value specified for GetPreviousBountyById")
@@ -4231,19 +4230,19 @@ func (_m *Database) GetPreviousBountyById(id string) ([]db.Bounty, error) {
 
 	var r0 []db.Bounty
 	var r1 error
-	if rf, ok := ret.Get(0).(func(string) ([]db.Bounty, error)); ok {
-		return rf(id)
+	if rf, ok := ret.Get(0).(func(*http.Request) ([]db.Bounty, error)); ok {
+		return rf(r)
 	}
-	if rf, ok := ret.Get(0).(func(string) []db.Bounty); ok {
-		r0 = rf(id)
+	if rf, ok := ret.Get(0).(func(*http.Request) []db.Bounty); ok {
+		r0 = rf(r)
 	} else {
 		if ret.Get(0) != nil {
 			r0 = ret.Get(0).([]db.Bounty)
 		}
 	}
 
-	if rf, ok := ret.Get(1).(func(string) error); ok {
-		r1 = rf(id)
+	if rf, ok := ret.Get(1).(func(*http.Request) error); ok {
+		r1 = rf(r)
 	} else {
 		r1 = ret.Error(1)
 	}
@@ -4257,14 +4256,14 @@ type Database_GetPreviousBountyById_Call struct {
 }
 
 // GetPreviousBountyById is a helper method to define mock.On call
-//   - id string
-func (_e *Database_Expecter) GetPreviousBountyById(id interface{}) *Database_GetPreviousBountyById_Call {
-	return &Database_GetPreviousBountyById_Call{Call: _e.mock.On("GetPreviousBountyById", id)}
+//   - r *http.Request
+func (_e *Database_Expecter) GetPreviousBountyById(r interface{}) *Database_GetPreviousBountyById_Call {
+	return &Database_GetPreviousBountyById_Call{Call: _e.mock.On("GetPreviousBountyById", r)}
 }
 
-func (_c *Database_GetPreviousBountyById_Call) Run(run func(id string)) *Database_GetPreviousBountyById_Call {
+func (_c *Database_GetPreviousBountyById_Call) Run(run func(r *http.Request)) *Database_GetPreviousBountyById_Call {
 	_c.Call.Run(func(args mock.Arguments) {
-		run(args[0].(string))
+		run(args[0].(*http.Request))
 	})
 	return _c
 }
@@ -4274,14 +4273,14 @@ func (_c *Database_GetPreviousBountyById_Call) Return(_a0 []db.Bounty, _a1 error
 	return _c
 }
 
-func (_c *Database_GetPreviousBountyById_Call) RunAndReturn(run func(string) ([]db.Bounty, error)) *Database_GetPreviousBountyById_Call {
+func (_c *Database_GetPreviousBountyById_Call) RunAndReturn(run func(*http.Request) ([]db.Bounty, error)) *Database_GetPreviousBountyById_Call {
 	_c.Call.Return(run)
 	return _c
 }
 
-// GetPreviousOrganizationBountyById provides a mock function with given fields: uuid, id
-func (_m *Database) GetPreviousOrganizationBountyById(uuid string, id string) ([]db.Bounty, error) {
-	ret := _m.Called(uuid, id)
+// GetPreviousOrganizationBountyById provides a mock function with given fields: r
+func (_m *Database) GetPreviousOrganizationBountyById(r *http.Request) ([]db.Bounty, error) {
+	ret := _m.Called(r)
 
 	if len(ret) == 0 {
 		panic("no return value specified for GetPreviousOrganizationBountyById")
@@ -4289,19 +4288,19 @@ func (_m *Database) GetPreviousOrganizationBountyById(uuid string, id string) ([
 
 	var r0 []db.Bounty
 	var r1 error
-	if rf, ok := ret.Get(0).(func(string, string) ([]db.Bounty, error)); ok {
-		return rf(uuid, id)
+	if rf, ok := ret.Get(0).(func(*http.Request) ([]db.Bounty, error)); ok {
+		return rf(r)
 	}
-	if rf, ok := ret.Get(0).(func(string, string) []db.Bounty); ok {
-		r0 = rf(uuid, id)
+	if rf, ok := ret.Get(0).(func(*http.Request) []db.Bounty); ok {
+		r0 = rf(r)
 	} else {
 		if ret.Get(0) != nil {
 			r0 = ret.Get(0).([]db.Bounty)
 		}
 	}
 
-	if rf, ok := ret.Get(1).(func(string, string) error); ok {
-		r1 = rf(uuid, id)
+	if rf, ok := ret.Get(1).(func(*http.Request) error); ok {
+		r1 = rf(r)
 	} else {
 		r1 = ret.Error(1)
 	}
@@ -4315,15 +4314,14 @@ type Database_GetPreviousOrganizationBountyById_Call struct {
 }
 
 // GetPreviousOrganizationBountyById is a helper method to define mock.On call
-//   - uuid string
-//   - id string
-func (_e *Database_Expecter) GetPreviousOrganizationBountyById(uuid interface{}, id interface{}) *Database_GetPreviousOrganizationBountyById_Call {
-	return &Database_GetPreviousOrganizationBountyById_Call{Call: _e.mock.On("GetPreviousOrganizationBountyById", uuid, id)}
+//   - r *http.Request
+func (_e *Database_Expecter) GetPreviousOrganizationBountyById(r interface{}) *Database_GetPreviousOrganizationBountyById_Call {
+	return &Database_GetPreviousOrganizationBountyById_Call{Call: _e.mock.On("GetPreviousOrganizationBountyById", r)}
 }
 
-func (_c *Database_GetPreviousOrganizationBountyById_Call) Run(run func(uuid string, id string)) *Database_GetPreviousOrganizationBountyById_Call {
+func (_c *Database_GetPreviousOrganizationBountyById_Call) Run(run func(r *http.Request)) *Database_GetPreviousOrganizationBountyById_Call {
 	_c.Call.Run(func(args mock.Arguments) {
-		run(args[0].(string), args[1].(string))
+		run(args[0].(*http.Request))
 	})
 	return _c
 }
@@ -4333,7 +4331,7 @@ func (_c *Database_GetPreviousOrganizationBountyById_Call) Return(_a0 []db.Bount
 	return _c
 }
 
-func (_c *Database_GetPreviousOrganizationBountyById_Call) RunAndReturn(run func(string, string) ([]db.Bounty, error)) *Database_GetPreviousOrganizationBountyById_Call {
+func (_c *Database_GetPreviousOrganizationBountyById_Call) RunAndReturn(run func(*http.Request) ([]db.Bounty, error)) *Database_GetPreviousOrganizationBountyById_Call {
 	_c.Call.Return(run)
 	return _c
 }
