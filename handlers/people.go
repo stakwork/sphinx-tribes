@@ -76,7 +76,10 @@ func (ph *peopleHandler) CreateOrEditPerson(w http.ResponseWriter, r *http.Reque
 		if referredBy != "" {
 			// get the referral and populate the pubkey
 			referral := db.DB.GetPersonByUuid(referredBy)
-			person.ReferredBy = referral.ID
+			// if referral exists
+			if referral.ID != 0 {
+				person.ReferredBy = referral.ID
+			}
 		}
 	} else { // editing! needs ID
 		if person.ID == 0 { // can't create if already exists
