@@ -55,11 +55,7 @@ func GetBountyById(w http.ResponseWriter, r *http.Request) {
 }
 
 func GetNextBountyById(w http.ResponseWriter, r *http.Request) {
-	bountyId := chi.URLParam(r, "bountyId")
-	if bountyId == "" {
-		w.WriteHeader(http.StatusNotFound)
-	}
-	bounties, err := db.DB.GetNextBountyById(bountyId)
+	bounties, err := db.DB.GetNextBountyById(r)
 	if err != nil {
 		w.WriteHeader(http.StatusBadRequest)
 		fmt.Println("Error", err)
@@ -71,11 +67,7 @@ func GetNextBountyById(w http.ResponseWriter, r *http.Request) {
 }
 
 func GetPreviousBountyById(w http.ResponseWriter, r *http.Request) {
-	bountyId := chi.URLParam(r, "bountyId")
-	if bountyId == "" {
-		w.WriteHeader(http.StatusNotFound)
-	}
-	bounties, err := db.DB.GetPreviousBountyById(bountyId)
+	bounties, err := db.DB.GetPreviousBountyById(r)
 	if err != nil {
 		w.WriteHeader(http.StatusBadRequest)
 		fmt.Println("Error", err)
@@ -87,12 +79,7 @@ func GetPreviousBountyById(w http.ResponseWriter, r *http.Request) {
 }
 
 func GetOrganizationNextBountyById(w http.ResponseWriter, r *http.Request) {
-	bountyId := chi.URLParam(r, "bountyId")
-	uuid := chi.URLParam(r, "uuid")
-	if bountyId == "" || uuid == "" {
-		w.WriteHeader(http.StatusNotFound)
-	}
-	bounties, err := db.DB.GetNextOrganizationBountyById(uuid, bountyId)
+	bounties, err := db.DB.GetNextOrganizationBountyById(r)
 	if err != nil {
 		w.WriteHeader(http.StatusBadRequest)
 		fmt.Println("Error", err)
@@ -104,12 +91,7 @@ func GetOrganizationNextBountyById(w http.ResponseWriter, r *http.Request) {
 }
 
 func GetOrganizationPreviousBountyById(w http.ResponseWriter, r *http.Request) {
-	bountyId := chi.URLParam(r, "bountyId")
-	uuid := chi.URLParam(r, "uuid")
-	if bountyId == "" || uuid == "" {
-		w.WriteHeader(http.StatusNotFound)
-	}
-	bounties, err := db.DB.GetPreviousOrganizationBountyById(uuid, bountyId)
+	bounties, err := db.DB.GetPreviousOrganizationBountyById(r)
 	if err != nil {
 		w.WriteHeader(http.StatusBadRequest)
 		fmt.Println("Error", err)
