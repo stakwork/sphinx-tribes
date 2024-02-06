@@ -54,8 +54,8 @@ func GetBountyById(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func GetNextBountyById(w http.ResponseWriter, r *http.Request) {
-	bounties, err := db.DB.GetNextBountyById(r)
+func GetNextBountyByCreated(w http.ResponseWriter, r *http.Request) {
+	bounties, err := db.DB.GetNextBountyByCreated(r)
 	if err != nil {
 		w.WriteHeader(http.StatusBadRequest)
 		fmt.Println("Error", err)
@@ -66,8 +66,8 @@ func GetNextBountyById(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func GetPreviousBountyById(w http.ResponseWriter, r *http.Request) {
-	bounties, err := db.DB.GetPreviousBountyById(r)
+func GetPreviousBountyByCreated(w http.ResponseWriter, r *http.Request) {
+	bounties, err := db.DB.GetPreviousBountyByCreated(r)
 	if err != nil {
 		w.WriteHeader(http.StatusBadRequest)
 		fmt.Println("Error", err)
@@ -78,8 +78,8 @@ func GetPreviousBountyById(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func GetOrganizationNextBountyById(w http.ResponseWriter, r *http.Request) {
-	bounties, err := db.DB.GetNextOrganizationBountyById(r)
+func GetOrganizationNextBountyByCreated(w http.ResponseWriter, r *http.Request) {
+	bounties, err := db.DB.GetNextOrganizationBountyByCreated(r)
 	if err != nil {
 		w.WriteHeader(http.StatusBadRequest)
 		fmt.Println("Error", err)
@@ -90,8 +90,8 @@ func GetOrganizationNextBountyById(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func GetOrganizationPreviousBountyById(w http.ResponseWriter, r *http.Request) {
-	bounties, err := db.DB.GetPreviousOrganizationBountyById(r)
+func GetOrganizationPreviousBountyByCreated(w http.ResponseWriter, r *http.Request) {
+	bounties, err := db.DB.GetPreviousOrganizationBountyByCreated(r)
 	if err != nil {
 		w.WriteHeader(http.StatusBadRequest)
 		fmt.Println("Error", err)
