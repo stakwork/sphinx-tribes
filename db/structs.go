@@ -116,9 +116,9 @@ type Person struct {
 	PriceToMeet      int64          `json:"price_to_meet"`
 	NewTicketTime    int64          `json:"new_ticket_time", gorm: "-:all"`
 	TwitterConfirmed bool           `json:"twitter_confirmed"`
+	ReferredBy       uint           `json:"referred_by"`
 	Extras           PropertyMap    `json:"extras", type: jsonb not null default '{}'::jsonb`
 	GithubIssues     PropertyMap    `json:"github_issues", type: jsonb not null default '{}'::jsonb`
-	ReferredBy       uint           `json:"referred_by"`
 }
 
 type GormDataTypeInterface interface {
