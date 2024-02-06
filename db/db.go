@@ -764,8 +764,8 @@ func (db database) GetNextBountyByCreated(r *http.Request) ([]Bounty, error) {
 		}
 	}
 
-	query := `SELECT * FROM public.bounty WHERE id > '` + created + `' AND show = true`
-	orderQuery := "ORDER BY id ASC LIMIT 1"
+	query := `SELECT * FROM public.bounty WHERE created > '` + created + `' AND show = true`
+	orderQuery := "ORDER BY created ASC LIMIT 1"
 
 	allQuery := query + " " + searchQuery + " " + statusQuery + " " + languageQuery + " " + orderQuery
 
@@ -825,8 +825,8 @@ func (db database) GetPreviousBountyByCreated(r *http.Request) ([]Bounty, error)
 		}
 	}
 
-	query := `SELECT * FROM public.bounty WHERE id < '` + created + `' AND show = true`
-	orderQuery := "ORDER BY id DESC LIMIT 1"
+	query := `SELECT * FROM public.bounty WHERE created < '` + created + `' AND show = true`
+	orderQuery := "ORDER BY created DESC LIMIT 1"
 
 	allQuery := query + " " + searchQuery + " " + statusQuery + " " + languageQuery + " " + orderQuery
 
@@ -887,9 +887,8 @@ func (db database) GetNextOrganizationBountyByCreated(r *http.Request) ([]Bounty
 		}
 	}
 
-	fmt.Println("Org UUID", uuid)
 	query := `SELECT * FROM public.bounty WHERE org_uuid = '` + uuid + `' AND created > '` + created + `' AND show = true`
-	orderQuery := "ORDER BY id ASC LIMIT 1"
+	orderQuery := "ORDER BY created ASC LIMIT 1"
 
 	allQuery := query + " " + searchQuery + " " + statusQuery + " " + languageQuery + " " + orderQuery
 
