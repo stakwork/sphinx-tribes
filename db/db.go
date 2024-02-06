@@ -712,11 +712,11 @@ func (db database) GetBountyById(id string) ([]Bounty, error) {
 	return ms, err
 }
 
-func (db database) GetNextBountyByCreated(r *http.Request) ([]Bounty, error) {
+func (db database) GetNextBountyByCreated(r *http.Request) (uint, error) {
 	created := chi.URLParam(r, "created")
 	keys := r.URL.Query()
 	_, _, _, _, search := utils.GetPaginationParams(r)
-	ms := []Bounty{}
+	var bountyId uint
 
 	open := keys.Get("Open")
 	assingned := keys.Get("Assigned")
@@ -764,20 +764,20 @@ func (db database) GetNextBountyByCreated(r *http.Request) ([]Bounty, error) {
 		}
 	}
 
-	query := `SELECT * FROM public.bounty WHERE created > '` + created + `' AND show = true`
+	query := `SELECT id FROM public.bounty WHERE created > '` + created + `' AND show = true`
 	orderQuery := "ORDER BY created ASC LIMIT 1"
 
 	allQuery := query + " " + searchQuery + " " + statusQuery + " " + languageQuery + " " + orderQuery
 
-	err := db.db.Raw(allQuery).Find(&ms).Error
-	return ms, err
+	err := db.db.Raw(allQuery).Find(&bountyId).Error
+	return bountyId, err
 }
 
-func (db database) GetPreviousBountyByCreated(r *http.Request) ([]Bounty, error) {
+func (db database) GetPreviousBountyByCreated(r *http.Request) (uint, error) {
 	created := chi.URLParam(r, "created")
 	keys := r.URL.Query()
+	var bountyId uint
 	_, _, _, _, search := utils.GetPaginationParams(r)
-	ms := []Bounty{}
 
 	open := keys.Get("Open")
 	assingned := keys.Get("Assigned")
@@ -825,21 +825,21 @@ func (db database) GetPreviousBountyByCreated(r *http.Request) ([]Bounty, error)
 		}
 	}
 
-	query := `SELECT * FROM public.bounty WHERE created < '` + created + `' AND show = true`
+	query := `SELECT id FROM public.bounty WHERE created < '` + created + `' AND show = true`
 	orderQuery := "ORDER BY created DESC LIMIT 1"
 
 	allQuery := query + " " + searchQuery + " " + statusQuery + " " + languageQuery + " " + orderQuery
 
-	err := db.db.Raw(allQuery).Find(&ms).Error
-	return ms, err
+	err := db.db.Raw(allQuery).Find(&bountyId).Error
+	return bountyId, err
 }
 
-func (db database) GetNextOrganizationBountyByCreated(r *http.Request) ([]Bounty, error) {
+func (db database) GetNextOrganizationBountyByCreated(r *http.Request) (uint, error) {
 	created := chi.URLParam(r, "created")
 	uuid := chi.URLParam(r, "uuid")
 	keys := r.URL.Query()
 	_, _, _, _, search := utils.GetPaginationParams(r)
-	ms := []Bounty{}
+	var bountyId uint
 
 	open := keys.Get("Open")
 	assingned := keys.Get("Assigned")
@@ -887,21 +887,21 @@ func (db database) GetNextOrganizationBountyByCreated(r *http.Request) ([]Bounty
 		}
 	}
 
-	query := `SELECT * FROM public.bounty WHERE org_uuid = '` + uuid + `' AND created > '` + created + `' AND show = true`
+	query := `SELECT id FROM public.bounty WHERE org_uuid = '` + uuid + `' AND created > '` + created + `' AND show = true`
 	orderQuery := "ORDER BY created ASC LIMIT 1"
 
 	allQuery := query + " " + searchQuery + " " + statusQuery + " " + languageQuery + " " + orderQuery
 
-	err := db.db.Raw(allQuery).Find(&ms).Error
-	return ms, err
+	err := db.db.Raw(allQuery).Find(&bountyId).Error
+	return bountyId, err
 }
 
-func (db database) GetPreviousOrganizationBountyByCreated(r *http.Request) ([]Bounty, error) {
+func (db database) GetPreviousOrganizationBountyByCreated(r *http.Request) (uint, error) {
 	created := chi.URLParam(r, "created")
 	uuid := chi.URLParam(r, "uuid")
 	keys := r.URL.Query()
 	_, _, _, _, search := utils.GetPaginationParams(r)
-	ms := []Bounty{}
+	var bountyId uint
 
 	open := keys.Get("Open")
 	assingned := keys.Get("Assigned")
@@ -949,13 +949,13 @@ func (db database) GetPreviousOrganizationBountyByCreated(r *http.Request) ([]Bo
 		}
 	}
 
-	query := `SELECT * FROM public.bounty WHERE org_uuid = '` + uuid + `' AND created < '` + created + `' AND show = true`
+	query := `SELECT id FROM public.bounty WHERE org_uuid = '` + uuid + `' AND created < '` + created + `' AND show = true`
 	orderQuery := "ORDER BY created DESC LIMIT 1"
 
 	allQuery := query + " " + searchQuery + " " + statusQuery + " " + languageQuery + " " + orderQuery
 
-	err := db.db.Raw(allQuery).Find(&ms).Error
-	return ms, err
+	err := db.db.Raw(allQuery).Find(&bountyId).Error
+	return bountyId, err
 }
 
 func (db database) GetBountyIndexById(id string) int64 {

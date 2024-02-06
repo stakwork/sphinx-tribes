@@ -3008,24 +3008,22 @@ func (_c *Database_GetLnUser_Call) RunAndReturn(run func(string) int64) *Databas
 }
 
 // GetNextBountyByCreated provides a mock function with given fields: r
-func (_m *Database) GetNextBountyByCreated(r *http.Request) ([]db.Bounty, error) {
+func (_m *Database) GetNextBountyByCreated(r *http.Request) (uint, error) {
 	ret := _m.Called(r)
 
 	if len(ret) == 0 {
 		panic("no return value specified for GetNextBountyByCreated")
 	}
 
-	var r0 []db.Bounty
+	var r0 uint
 	var r1 error
-	if rf, ok := ret.Get(0).(func(*http.Request) ([]db.Bounty, error)); ok {
+	if rf, ok := ret.Get(0).(func(*http.Request) (uint, error)); ok {
 		return rf(r)
 	}
-	if rf, ok := ret.Get(0).(func(*http.Request) []db.Bounty); ok {
+	if rf, ok := ret.Get(0).(func(*http.Request) uint); ok {
 		r0 = rf(r)
 	} else {
-		if ret.Get(0) != nil {
-			r0 = ret.Get(0).([]db.Bounty)
-		}
+		r0 = ret.Get(0).(uint)
 	}
 
 	if rf, ok := ret.Get(1).(func(*http.Request) error); ok {
@@ -3055,35 +3053,33 @@ func (_c *Database_GetNextBountyByCreated_Call) Run(run func(r *http.Request)) *
 	return _c
 }
 
-func (_c *Database_GetNextBountyByCreated_Call) Return(_a0 []db.Bounty, _a1 error) *Database_GetNextBountyByCreated_Call {
+func (_c *Database_GetNextBountyByCreated_Call) Return(_a0 uint, _a1 error) *Database_GetNextBountyByCreated_Call {
 	_c.Call.Return(_a0, _a1)
 	return _c
 }
 
-func (_c *Database_GetNextBountyByCreated_Call) RunAndReturn(run func(*http.Request) ([]db.Bounty, error)) *Database_GetNextBountyByCreated_Call {
+func (_c *Database_GetNextBountyByCreated_Call) RunAndReturn(run func(*http.Request) (uint, error)) *Database_GetNextBountyByCreated_Call {
 	_c.Call.Return(run)
 	return _c
 }
 
 // GetNextOrganizationBountyByCreated provides a mock function with given fields: r
-func (_m *Database) GetNextOrganizationBountyByCreated(r *http.Request) ([]db.Bounty, error) {
+func (_m *Database) GetNextOrganizationBountyByCreated(r *http.Request) (uint, error) {
 	ret := _m.Called(r)
 
 	if len(ret) == 0 {
 		panic("no return value specified for GetNextOrganizationBountyByCreated")
 	}
 
-	var r0 []db.Bounty
+	var r0 uint
 	var r1 error
-	if rf, ok := ret.Get(0).(func(*http.Request) ([]db.Bounty, error)); ok {
+	if rf, ok := ret.Get(0).(func(*http.Request) (uint, error)); ok {
 		return rf(r)
 	}
-	if rf, ok := ret.Get(0).(func(*http.Request) []db.Bounty); ok {
+	if rf, ok := ret.Get(0).(func(*http.Request) uint); ok {
 		r0 = rf(r)
 	} else {
-		if ret.Get(0) != nil {
-			r0 = ret.Get(0).([]db.Bounty)
-		}
+		r0 = ret.Get(0).(uint)
 	}
 
 	if rf, ok := ret.Get(1).(func(*http.Request) error); ok {
@@ -3113,12 +3109,12 @@ func (_c *Database_GetNextOrganizationBountyByCreated_Call) Run(run func(r *http
 	return _c
 }
 
-func (_c *Database_GetNextOrganizationBountyByCreated_Call) Return(_a0 []db.Bounty, _a1 error) *Database_GetNextOrganizationBountyByCreated_Call {
+func (_c *Database_GetNextOrganizationBountyByCreated_Call) Return(_a0 uint, _a1 error) *Database_GetNextOrganizationBountyByCreated_Call {
 	_c.Call.Return(_a0, _a1)
 	return _c
 }
 
-func (_c *Database_GetNextOrganizationBountyByCreated_Call) RunAndReturn(run func(*http.Request) ([]db.Bounty, error)) *Database_GetNextOrganizationBountyByCreated_Call {
+func (_c *Database_GetNextOrganizationBountyByCreated_Call) RunAndReturn(run func(*http.Request) (uint, error)) *Database_GetNextOrganizationBountyByCreated_Call {
 	_c.Call.Return(run)
 	return _c
 }
@@ -4221,24 +4217,22 @@ func (_c *Database_GetPersonByUuid_Call) RunAndReturn(run func(string) db.Person
 }
 
 // GetPreviousBountyByCreated provides a mock function with given fields: r
-func (_m *Database) GetPreviousBountyByCreated(r *http.Request) ([]db.Bounty, error) {
+func (_m *Database) GetPreviousBountyByCreated(r *http.Request) (uint, error) {
 	ret := _m.Called(r)
 
 	if len(ret) == 0 {
 		panic("no return value specified for GetPreviousBountyByCreated")
 	}
 
-	var r0 []db.Bounty
+	var r0 uint
 	var r1 error
-	if rf, ok := ret.Get(0).(func(*http.Request) ([]db.Bounty, error)); ok {
+	if rf, ok := ret.Get(0).(func(*http.Request) (uint, error)); ok {
 		return rf(r)
 	}
-	if rf, ok := ret.Get(0).(func(*http.Request) []db.Bounty); ok {
+	if rf, ok := ret.Get(0).(func(*http.Request) uint); ok {
 		r0 = rf(r)
 	} else {
-		if ret.Get(0) != nil {
-			r0 = ret.Get(0).([]db.Bounty)
-		}
+		r0 = ret.Get(0).(uint)
 	}
 
 	if rf, ok := ret.Get(1).(func(*http.Request) error); ok {
@@ -4268,35 +4262,33 @@ func (_c *Database_GetPreviousBountyByCreated_Call) Run(run func(r *http.Request
 	return _c
 }
 
-func (_c *Database_GetPreviousBountyByCreated_Call) Return(_a0 []db.Bounty, _a1 error) *Database_GetPreviousBountyByCreated_Call {
+func (_c *Database_GetPreviousBountyByCreated_Call) Return(_a0 uint, _a1 error) *Database_GetPreviousBountyByCreated_Call {
 	_c.Call.Return(_a0, _a1)
 	return _c
 }
 
-func (_c *Database_GetPreviousBountyByCreated_Call) RunAndReturn(run func(*http.Request) ([]db.Bounty, error)) *Database_GetPreviousBountyByCreated_Call {
+func (_c *Database_GetPreviousBountyByCreated_Call) RunAndReturn(run func(*http.Request) (uint, error)) *Database_GetPreviousBountyByCreated_Call {
 	_c.Call.Return(run)
 	return _c
 }
 
 // GetPreviousOrganizationBountyByCreated provides a mock function with given fields: r
-func (_m *Database) GetPreviousOrganizationBountyByCreated(r *http.Request) ([]db.Bounty, error) {
+func (_m *Database) GetPreviousOrganizationBountyByCreated(r *http.Request) (uint, error) {
 	ret := _m.Called(r)
 
 	if len(ret) == 0 {
 		panic("no return value specified for GetPreviousOrganizationBountyByCreated")
 	}
 
-	var r0 []db.Bounty
+	var r0 uint
 	var r1 error
-	if rf, ok := ret.Get(0).(func(*http.Request) ([]db.Bounty, error)); ok {
+	if rf, ok := ret.Get(0).(func(*http.Request) (uint, error)); ok {
 		return rf(r)
 	}
-	if rf, ok := ret.Get(0).(func(*http.Request) []db.Bounty); ok {
+	if rf, ok := ret.Get(0).(func(*http.Request) uint); ok {
 		r0 = rf(r)
 	} else {
-		if ret.Get(0) != nil {
-			r0 = ret.Get(0).([]db.Bounty)
-		}
+		r0 = ret.Get(0).(uint)
 	}
 
 	if rf, ok := ret.Get(1).(func(*http.Request) error); ok {
@@ -4326,12 +4318,12 @@ func (_c *Database_GetPreviousOrganizationBountyByCreated_Call) Run(run func(r *
 	return _c
 }
 
-func (_c *Database_GetPreviousOrganizationBountyByCreated_Call) Return(_a0 []db.Bounty, _a1 error) *Database_GetPreviousOrganizationBountyByCreated_Call {
+func (_c *Database_GetPreviousOrganizationBountyByCreated_Call) Return(_a0 uint, _a1 error) *Database_GetPreviousOrganizationBountyByCreated_Call {
 	_c.Call.Return(_a0, _a1)
 	return _c
 }
 
-func (_c *Database_GetPreviousOrganizationBountyByCreated_Call) RunAndReturn(run func(*http.Request) ([]db.Bounty, error)) *Database_GetPreviousOrganizationBountyByCreated_Call {
+func (_c *Database_GetPreviousOrganizationBountyByCreated_Call) RunAndReturn(run func(*http.Request) (uint, error)) *Database_GetPreviousOrganizationBountyByCreated_Call {
 	_c.Call.Return(run)
 	return _c
 }
