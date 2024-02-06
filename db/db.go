@@ -712,8 +712,8 @@ func (db database) GetBountyById(id string) ([]Bounty, error) {
 	return ms, err
 }
 
-func (db database) GetNextBountyById(r *http.Request) ([]Bounty, error) {
-	id := chi.URLParam(r, "bountyId")
+func (db database) GetNextBountyByCreated(r *http.Request) ([]Bounty, error) {
+	created := chi.URLParam(r, "created")
 	keys := r.URL.Query()
 	_, _, _, _, search := utils.GetPaginationParams(r)
 	ms := []Bounty{}
@@ -764,7 +764,7 @@ func (db database) GetNextBountyById(r *http.Request) ([]Bounty, error) {
 		}
 	}
 
-	query := `SELECT * FROM public.bounty WHERE id > '` + id + `' AND show = true`
+	query := `SELECT * FROM public.bounty WHERE id > '` + created + `' AND show = true`
 	orderQuery := "ORDER BY id ASC LIMIT 1"
 
 	allQuery := query + " " + searchQuery + " " + statusQuery + " " + languageQuery + " " + orderQuery
@@ -773,8 +773,8 @@ func (db database) GetNextBountyById(r *http.Request) ([]Bounty, error) {
 	return ms, err
 }
 
-func (db database) GetPreviousBountyById(r *http.Request) ([]Bounty, error) {
-	id := chi.URLParam(r, "bountyId")
+func (db database) GetPreviousBountyByCreated(r *http.Request) ([]Bounty, error) {
+	created := chi.URLParam(r, "created")
 	keys := r.URL.Query()
 	_, _, _, _, search := utils.GetPaginationParams(r)
 	ms := []Bounty{}
@@ -825,7 +825,7 @@ func (db database) GetPreviousBountyById(r *http.Request) ([]Bounty, error) {
 		}
 	}
 
-	query := `SELECT * FROM public.bounty WHERE id < '` + id + `' AND show = true`
+	query := `SELECT * FROM public.bounty WHERE id < '` + created + `' AND show = true`
 	orderQuery := "ORDER BY id DESC LIMIT 1"
 
 	allQuery := query + " " + searchQuery + " " + statusQuery + " " + languageQuery + " " + orderQuery
@@ -834,8 +834,8 @@ func (db database) GetPreviousBountyById(r *http.Request) ([]Bounty, error) {
 	return ms, err
 }
 
-func (db database) GetNextOrganizationBountyById(r *http.Request) ([]Bounty, error) {
-	id := chi.URLParam(r, "bountyId")
+func (db database) GetNextOrganizationBountyByCreated(r *http.Request) ([]Bounty, error) {
+	created := chi.URLParam(r, "created")
 	uuid := chi.URLParam(r, "uuid")
 	keys := r.URL.Query()
 	_, _, _, _, search := utils.GetPaginationParams(r)
@@ -887,7 +887,8 @@ func (db database) GetNextOrganizationBountyById(r *http.Request) ([]Bounty, err
 		}
 	}
 
-	query := `SELECT * FROM public.bounty WHERE org_uuid = '` + uuid + `' AND id > '` + id + `' AND show = true`
+	fmt.Println("Org UUID", uuid)
+	query := `SELECT * FROM public.bounty WHERE org_uuid = '` + uuid + `' AND created > '` + created + `' AND show = true`
 	orderQuery := "ORDER BY id ASC LIMIT 1"
 
 	allQuery := query + " " + searchQuery + " " + statusQuery + " " + languageQuery + " " + orderQuery
@@ -896,8 +897,8 @@ func (db database) GetNextOrganizationBountyById(r *http.Request) ([]Bounty, err
 	return ms, err
 }
 
-func (db database) GetPreviousOrganizationBountyById(r *http.Request) ([]Bounty, error) {
-	id := chi.URLParam(r, "bountyId")
+func (db database) GetPreviousOrganizationBountyByCreated(r *http.Request) ([]Bounty, error) {
+	created := chi.URLParam(r, "created")
 	uuid := chi.URLParam(r, "uuid")
 	keys := r.URL.Query()
 	_, _, _, _, search := utils.GetPaginationParams(r)
@@ -949,8 +950,8 @@ func (db database) GetPreviousOrganizationBountyById(r *http.Request) ([]Bounty,
 		}
 	}
 
-	query := `SELECT * FROM public.bounty WHERE org_uuid = '` + uuid + `' AND id < '` + id + `' AND show = true`
-	orderQuery := "ORDER BY id DESC LIMIT 1"
+	query := `SELECT * FROM public.bounty WHERE org_uuid = '` + uuid + `' AND created < '` + created + `' AND show = true`
+	orderQuery := "ORDER BY created DESC LIMIT 1"
 
 	allQuery := query + " " + searchQuery + " " + statusQuery + " " + languageQuery + " " + orderQuery
 

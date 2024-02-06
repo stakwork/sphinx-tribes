@@ -3007,12 +3007,12 @@ func (_c *Database_GetLnUser_Call) RunAndReturn(run func(string) int64) *Databas
 	return _c
 }
 
-// GetNextBountyById provides a mock function with given fields: r
-func (_m *Database) GetNextBountyById(r *http.Request) ([]db.Bounty, error) {
+// GetNextBountyByCreated provides a mock function with given fields: r
+func (_m *Database) GetNextBountyByCreated(r *http.Request) ([]db.Bounty, error) {
 	ret := _m.Called(r)
 
 	if len(ret) == 0 {
-		panic("no return value specified for GetNextBountyById")
+		panic("no return value specified for GetNextBountyByCreated")
 	}
 
 	var r0 []db.Bounty
@@ -3037,40 +3037,40 @@ func (_m *Database) GetNextBountyById(r *http.Request) ([]db.Bounty, error) {
 	return r0, r1
 }
 
-// Database_GetNextBountyById_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'GetNextBountyById'
-type Database_GetNextBountyById_Call struct {
+// Database_GetNextBountyByCreated_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'GetNextBountyByCreated'
+type Database_GetNextBountyByCreated_Call struct {
 	*mock.Call
 }
 
-// GetNextBountyById is a helper method to define mock.On call
+// GetNextBountyByCreated is a helper method to define mock.On call
 //   - r *http.Request
-func (_e *Database_Expecter) GetNextBountyById(r interface{}) *Database_GetNextBountyById_Call {
-	return &Database_GetNextBountyById_Call{Call: _e.mock.On("GetNextBountyById", r)}
+func (_e *Database_Expecter) GetNextBountyByCreated(r interface{}) *Database_GetNextBountyByCreated_Call {
+	return &Database_GetNextBountyByCreated_Call{Call: _e.mock.On("GetNextBountyByCreated", r)}
 }
 
-func (_c *Database_GetNextBountyById_Call) Run(run func(r *http.Request)) *Database_GetNextBountyById_Call {
+func (_c *Database_GetNextBountyByCreated_Call) Run(run func(r *http.Request)) *Database_GetNextBountyByCreated_Call {
 	_c.Call.Run(func(args mock.Arguments) {
 		run(args[0].(*http.Request))
 	})
 	return _c
 }
 
-func (_c *Database_GetNextBountyById_Call) Return(_a0 []db.Bounty, _a1 error) *Database_GetNextBountyById_Call {
+func (_c *Database_GetNextBountyByCreated_Call) Return(_a0 []db.Bounty, _a1 error) *Database_GetNextBountyByCreated_Call {
 	_c.Call.Return(_a0, _a1)
 	return _c
 }
 
-func (_c *Database_GetNextBountyById_Call) RunAndReturn(run func(*http.Request) ([]db.Bounty, error)) *Database_GetNextBountyById_Call {
+func (_c *Database_GetNextBountyByCreated_Call) RunAndReturn(run func(*http.Request) ([]db.Bounty, error)) *Database_GetNextBountyByCreated_Call {
 	_c.Call.Return(run)
 	return _c
 }
 
-// GetNextOrganizationBountyById provides a mock function with given fields: r
-func (_m *Database) GetNextOrganizationBountyById(r *http.Request) ([]db.Bounty, error) {
+// GetNextOrganizationBountyByCreated provides a mock function with given fields: r
+func (_m *Database) GetNextOrganizationBountyByCreated(r *http.Request) ([]db.Bounty, error) {
 	ret := _m.Called(r)
 
 	if len(ret) == 0 {
-		panic("no return value specified for GetNextOrganizationBountyById")
+		panic("no return value specified for GetNextOrganizationBountyByCreated")
 	}
 
 	var r0 []db.Bounty
@@ -3095,30 +3095,30 @@ func (_m *Database) GetNextOrganizationBountyById(r *http.Request) ([]db.Bounty,
 	return r0, r1
 }
 
-// Database_GetNextOrganizationBountyById_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'GetNextOrganizationBountyById'
-type Database_GetNextOrganizationBountyById_Call struct {
+// Database_GetNextOrganizationBountyByCreated_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'GetNextOrganizationBountyByCreated'
+type Database_GetNextOrganizationBountyByCreated_Call struct {
 	*mock.Call
 }
 
-// GetNextOrganizationBountyById is a helper method to define mock.On call
+// GetNextOrganizationBountyByCreated is a helper method to define mock.On call
 //   - r *http.Request
-func (_e *Database_Expecter) GetNextOrganizationBountyById(r interface{}) *Database_GetNextOrganizationBountyById_Call {
-	return &Database_GetNextOrganizationBountyById_Call{Call: _e.mock.On("GetNextOrganizationBountyById", r)}
+func (_e *Database_Expecter) GetNextOrganizationBountyByCreated(r interface{}) *Database_GetNextOrganizationBountyByCreated_Call {
+	return &Database_GetNextOrganizationBountyByCreated_Call{Call: _e.mock.On("GetNextOrganizationBountyByCreated", r)}
 }
 
-func (_c *Database_GetNextOrganizationBountyById_Call) Run(run func(r *http.Request)) *Database_GetNextOrganizationBountyById_Call {
+func (_c *Database_GetNextOrganizationBountyByCreated_Call) Run(run func(r *http.Request)) *Database_GetNextOrganizationBountyByCreated_Call {
 	_c.Call.Run(func(args mock.Arguments) {
 		run(args[0].(*http.Request))
 	})
 	return _c
 }
 
-func (_c *Database_GetNextOrganizationBountyById_Call) Return(_a0 []db.Bounty, _a1 error) *Database_GetNextOrganizationBountyById_Call {
+func (_c *Database_GetNextOrganizationBountyByCreated_Call) Return(_a0 []db.Bounty, _a1 error) *Database_GetNextOrganizationBountyByCreated_Call {
 	_c.Call.Return(_a0, _a1)
 	return _c
 }
 
-func (_c *Database_GetNextOrganizationBountyById_Call) RunAndReturn(run func(*http.Request) ([]db.Bounty, error)) *Database_GetNextOrganizationBountyById_Call {
+func (_c *Database_GetNextOrganizationBountyByCreated_Call) RunAndReturn(run func(*http.Request) ([]db.Bounty, error)) *Database_GetNextOrganizationBountyByCreated_Call {
 	_c.Call.Return(run)
 	return _c
 }
@@ -4220,12 +4220,12 @@ func (_c *Database_GetPersonByUuid_Call) RunAndReturn(run func(string) db.Person
 	return _c
 }
 
-// GetPreviousBountyById provides a mock function with given fields: r
-func (_m *Database) GetPreviousBountyById(r *http.Request) ([]db.Bounty, error) {
+// GetPreviousBountyByCreated provides a mock function with given fields: r
+func (_m *Database) GetPreviousBountyByCreated(r *http.Request) ([]db.Bounty, error) {
 	ret := _m.Called(r)
 
 	if len(ret) == 0 {
-		panic("no return value specified for GetPreviousBountyById")
+		panic("no return value specified for GetPreviousBountyByCreated")
 	}
 
 	var r0 []db.Bounty
@@ -4250,40 +4250,40 @@ func (_m *Database) GetPreviousBountyById(r *http.Request) ([]db.Bounty, error) 
 	return r0, r1
 }
 
-// Database_GetPreviousBountyById_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'GetPreviousBountyById'
-type Database_GetPreviousBountyById_Call struct {
+// Database_GetPreviousBountyByCreated_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'GetPreviousBountyByCreated'
+type Database_GetPreviousBountyByCreated_Call struct {
 	*mock.Call
 }
 
-// GetPreviousBountyById is a helper method to define mock.On call
+// GetPreviousBountyByCreated is a helper method to define mock.On call
 //   - r *http.Request
-func (_e *Database_Expecter) GetPreviousBountyById(r interface{}) *Database_GetPreviousBountyById_Call {
-	return &Database_GetPreviousBountyById_Call{Call: _e.mock.On("GetPreviousBountyById", r)}
+func (_e *Database_Expecter) GetPreviousBountyByCreated(r interface{}) *Database_GetPreviousBountyByCreated_Call {
+	return &Database_GetPreviousBountyByCreated_Call{Call: _e.mock.On("GetPreviousBountyByCreated", r)}
 }
 
-func (_c *Database_GetPreviousBountyById_Call) Run(run func(r *http.Request)) *Database_GetPreviousBountyById_Call {
+func (_c *Database_GetPreviousBountyByCreated_Call) Run(run func(r *http.Request)) *Database_GetPreviousBountyByCreated_Call {
 	_c.Call.Run(func(args mock.Arguments) {
 		run(args[0].(*http.Request))
 	})
 	return _c
 }
 
-func (_c *Database_GetPreviousBountyById_Call) Return(_a0 []db.Bounty, _a1 error) *Database_GetPreviousBountyById_Call {
+func (_c *Database_GetPreviousBountyByCreated_Call) Return(_a0 []db.Bounty, _a1 error) *Database_GetPreviousBountyByCreated_Call {
 	_c.Call.Return(_a0, _a1)
 	return _c
 }
 
-func (_c *Database_GetPreviousBountyById_Call) RunAndReturn(run func(*http.Request) ([]db.Bounty, error)) *Database_GetPreviousBountyById_Call {
+func (_c *Database_GetPreviousBountyByCreated_Call) RunAndReturn(run func(*http.Request) ([]db.Bounty, error)) *Database_GetPreviousBountyByCreated_Call {
 	_c.Call.Return(run)
 	return _c
 }
 
-// GetPreviousOrganizationBountyById provides a mock function with given fields: r
-func (_m *Database) GetPreviousOrganizationBountyById(r *http.Request) ([]db.Bounty, error) {
+// GetPreviousOrganizationBountyByCreated provides a mock function with given fields: r
+func (_m *Database) GetPreviousOrganizationBountyByCreated(r *http.Request) ([]db.Bounty, error) {
 	ret := _m.Called(r)
 
 	if len(ret) == 0 {
-		panic("no return value specified for GetPreviousOrganizationBountyById")
+		panic("no return value specified for GetPreviousOrganizationBountyByCreated")
 	}
 
 	var r0 []db.Bounty
@@ -4308,30 +4308,30 @@ func (_m *Database) GetPreviousOrganizationBountyById(r *http.Request) ([]db.Bou
 	return r0, r1
 }
 
-// Database_GetPreviousOrganizationBountyById_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'GetPreviousOrganizationBountyById'
-type Database_GetPreviousOrganizationBountyById_Call struct {
+// Database_GetPreviousOrganizationBountyByCreated_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'GetPreviousOrganizationBountyByCreated'
+type Database_GetPreviousOrganizationBountyByCreated_Call struct {
 	*mock.Call
 }
 
-// GetPreviousOrganizationBountyById is a helper method to define mock.On call
+// GetPreviousOrganizationBountyByCreated is a helper method to define mock.On call
 //   - r *http.Request
-func (_e *Database_Expecter) GetPreviousOrganizationBountyById(r interface{}) *Database_GetPreviousOrganizationBountyById_Call {
-	return &Database_GetPreviousOrganizationBountyById_Call{Call: _e.mock.On("GetPreviousOrganizationBountyById", r)}
+func (_e *Database_Expecter) GetPreviousOrganizationBountyByCreated(r interface{}) *Database_GetPreviousOrganizationBountyByCreated_Call {
+	return &Database_GetPreviousOrganizationBountyByCreated_Call{Call: _e.mock.On("GetPreviousOrganizationBountyByCreated", r)}
 }
 
-func (_c *Database_GetPreviousOrganizationBountyById_Call) Run(run func(r *http.Request)) *Database_GetPreviousOrganizationBountyById_Call {
+func (_c *Database_GetPreviousOrganizationBountyByCreated_Call) Run(run func(r *http.Request)) *Database_GetPreviousOrganizationBountyByCreated_Call {
 	_c.Call.Run(func(args mock.Arguments) {
 		run(args[0].(*http.Request))
 	})
 	return _c
 }
 
-func (_c *Database_GetPreviousOrganizationBountyById_Call) Return(_a0 []db.Bounty, _a1 error) *Database_GetPreviousOrganizationBountyById_Call {
+func (_c *Database_GetPreviousOrganizationBountyByCreated_Call) Return(_a0 []db.Bounty, _a1 error) *Database_GetPreviousOrganizationBountyByCreated_Call {
 	_c.Call.Return(_a0, _a1)
 	return _c
 }
 
-func (_c *Database_GetPreviousOrganizationBountyById_Call) RunAndReturn(run func(*http.Request) ([]db.Bounty, error)) *Database_GetPreviousOrganizationBountyById_Call {
+func (_c *Database_GetPreviousOrganizationBountyByCreated_Call) RunAndReturn(run func(*http.Request) ([]db.Bounty, error)) *Database_GetPreviousOrganizationBountyByCreated_Call {
 	_c.Call.Return(run)
 	return _c
 }
