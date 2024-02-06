@@ -36,8 +36,8 @@ func GetIsAdmin(w http.ResponseWriter, r *http.Request) {
 	pubKeyFromAuth, _ := ctx.Value(auth.ContextKey).(string)
 	isAdmin := auth.AdminCheck(pubKeyFromAuth)
 
-	if !isAdmin {
-		fmt.Println("Not a super admin")
+	if !auth.IsFreePass() && !isAdmin {
+		fmt.Println("Not a super admin: handler")
 		http.Error(w, http.StatusText(401), 401)
 		return
 	} else {
