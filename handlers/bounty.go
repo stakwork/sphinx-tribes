@@ -60,9 +60,8 @@ func GetNextBountyByCreated(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusBadRequest)
 		fmt.Println("Error", err)
 	} else {
-		var bountyResponse []db.BountyResponse = GenerateBountyResponse(bounties)
 		w.WriteHeader(http.StatusOK)
-		json.NewEncoder(w).Encode(bountyResponse)
+		json.NewEncoder(w).Encode(bounties)
 	}
 }
 
@@ -72,9 +71,8 @@ func GetPreviousBountyByCreated(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusBadRequest)
 		fmt.Println("Error", err)
 	} else {
-		var bountyResponse []db.BountyResponse = GenerateBountyResponse(bounties)
 		w.WriteHeader(http.StatusOK)
-		json.NewEncoder(w).Encode(bountyResponse)
+		json.NewEncoder(w).Encode(bounties)
 	}
 }
 
@@ -84,9 +82,8 @@ func GetOrganizationNextBountyByCreated(w http.ResponseWriter, r *http.Request) 
 		w.WriteHeader(http.StatusBadRequest)
 		fmt.Println("Error", err)
 	} else {
-		var bountyResponse []db.BountyResponse = GenerateBountyResponse(bounties)
 		w.WriteHeader(http.StatusOK)
-		json.NewEncoder(w).Encode(bountyResponse)
+		json.NewEncoder(w).Encode(bounties)
 	}
 }
 
@@ -96,9 +93,8 @@ func GetOrganizationPreviousBountyByCreated(w http.ResponseWriter, r *http.Reque
 		w.WriteHeader(http.StatusBadRequest)
 		fmt.Println("Error", err)
 	} else {
-		var bountyResponse []db.BountyResponse = GenerateBountyResponse(bounties)
 		w.WriteHeader(http.StatusOK)
-		json.NewEncoder(w).Encode(bountyResponse)
+		json.NewEncoder(w).Encode(bounties)
 	}
 }
 
