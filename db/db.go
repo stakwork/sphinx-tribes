@@ -349,20 +349,20 @@ func (db database) GetListedPeople(r *http.Request) []Person {
 		limitQuery = fmt.Sprintf("LIMIT %d  OFFSET %d", limit, offset)
 	}
 	if search != "" {
-		searchQuery = fmt.Sprintf("AND (LOWER(owner_alias) LIKE %[1]s OR LOWER(unique_name) LIKE %[1]s)", "'%"+strings.ToLower(search)+"%'")
+		searchQuery = fmt.Sprintf("AND LOWER(owner_alias) LIKE %[1]s OR LOWER(unique_name) LIKE %[1]s", "'%"+strings.ToLower(search)+"%'")
 	}
 
 	if languageLength > 0 {
 		for i, val := range languageArray {
 			if val != "" {
 				if i == 0 {
-
 					languageQuery = "AND extras->'coding_languages' @> '[{\"label\": \"" + val + "\"}]'"
 				} else {
 					languageQuery += " OR extras->'coding_languages' @> '[{\"label\": \"" + val + "\"}]'"
 				}
 			}
 		}
+
 	}
 
 	query := "SELECT * FROM people WHERE (unlisted = 'f' OR unlisted is null) AND (deleted = 'f' OR deleted is null)"
