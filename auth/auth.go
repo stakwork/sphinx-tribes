@@ -98,7 +98,6 @@ func PubKeyContextSuperAdmin(next http.Handler) http.Handler {
 		}
 
 		isJwt := strings.Contains(token, ".") && !strings.HasPrefix(token, ".")
-
 		if isJwt {
 			claims, err := DecodeJwt(token)
 
@@ -115,7 +114,7 @@ func PubKeyContextSuperAdmin(next http.Handler) http.Handler {
 			}
 
 			pubkey := fmt.Sprintf("%v", claims["pubkey"])
-			if !AdminCheck(pubkey) {
+			if !IsFreePass() && !AdminCheck(pubkey) {
 				fmt.Println("Not a super admin")
 				http.Error(w, http.StatusText(401), 401)
 				return
@@ -135,8 +134,8 @@ func PubKeyContextSuperAdmin(next http.Handler) http.Handler {
 				return
 			}
 
-			if !AdminCheck(pubkey) {
-				fmt.Println("Not a super admin")
+			if !IsFreePass() && !AdminCheck(pubkey) {
+				fmt.Println("Not a super admin : auth")
 				http.Error(w, http.StatusText(401), 401)
 				return
 			}
@@ -152,6 +151,13 @@ func AdminCheck(pubkey string) bool {
 		if val == pubkey {
 			return true
 		}
+	}
+	return false
+}
+
+func IsFreePass() bool {
+	if len(config.SuperAdmins) == 1 && config.SuperAdmins[0] == config.AdminDevFreePass {
+		return true
 	}
 	return false
 }

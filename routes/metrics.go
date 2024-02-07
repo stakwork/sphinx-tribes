@@ -12,7 +12,7 @@ func MetricsRoutes() chi.Router {
 	mh := handlers.NewMetricHandler(db.DB)
 	r.Group(func(r chi.Router) {
 		// Todo: change auth to superadmin context
-		r.Use(auth.PubKeyContext)
+		r.Use(auth.PubKeyContextSuperAdmin)
 
 		r.Post("/payment", handlers.PaymentMetrics)
 		r.Post("/people", handlers.PeopleMetrics)
