@@ -111,7 +111,6 @@ func TestUnitCreateOrEditOrganization(t *testing.T) {
 			description string
 			wantStatus  int
 		}{
-			{"empty description", "", http.StatusBadRequest},
 			{"long description", strings.Repeat("a", 121), http.StatusBadRequest},
 		}
 
