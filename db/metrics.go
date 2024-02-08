@@ -59,7 +59,9 @@ func (db database) TotalPaidBounties(r PaymentDateRange) int64 {
 
 func (db database) TotalHuntersPaid(r PaymentDateRange) int64 {
 	var count int64
-	db.db.Model(&Bounty{}).Select("DISTINCT assignee").Where("assignee != ''").Where("paid = ?", true).Where("created >= ?", r.StartDate).Where("created <= ?", r.EndDate).Count(&count)
+	query := fmt.Sprintf(`SELECT COUNT(DISTINCT assignee) FROM bounty WHERE assignee !='' AND paid=true AND created >= %s AND created <= %s`, r.StartDate, r.EndDate)
+
+	db.db.Raw(query).Count(&count)
 	return count
 }
 
