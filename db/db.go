@@ -507,9 +507,9 @@ func (db database) GetUserBountiesCount(personKey string, tabType string) int64 
 	var count int64
 
 	query := db.db.Model(&Bounty{})
-	if tabType == "wanted" {
+	if tabType == "bounties" {
 		query.Where("owner_id", personKey)
-	} else if tabType == "usertickets" {
+	} else if tabType == "assigned" {
 		query.Where("assignee", personKey)
 	}
 
