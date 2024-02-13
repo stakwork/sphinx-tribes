@@ -73,6 +73,8 @@ func InitConfig() {
 	// only make this call if there is a Relay auth key
 	if RelayAuthKey != "" {
 		RelayNodeKey = GetNodePubKey()
+	} else {
+		panic("No relay auth key set")
 	}
 
 	if Host == "" {
