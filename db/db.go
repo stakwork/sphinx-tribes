@@ -658,7 +658,9 @@ func (db database) GetOrganizationBounties(r *http.Request, org_uuid string) []B
 
 func (db database) GetAssignedBounties(r *http.Request) ([]Bounty, error) {
 	offset, limit, sortBy, direction, _ := utils.GetPaginationParams(r)
-	pubkey := chi.URLParam(r, "pubkey")
+	uuid := chi.URLParam(r, "uuid")
+	person := db.GetPersonByUuid(uuid)
+	pubkey := person.OwnerPubKey
 
 	orderQuery := ""
 	limitQuery := ""
@@ -682,7 +684,9 @@ func (db database) GetAssignedBounties(r *http.Request) ([]Bounty, error) {
 
 func (db database) GetCreatedBounties(r *http.Request) ([]Bounty, error) {
 	offset, limit, sortBy, direction, _ := utils.GetPaginationParams(r)
-	pubkey := chi.URLParam(r, "pubkey")
+	uuid := chi.URLParam(r, "uuid")
+	person := db.GetPersonByUuid(uuid)
+	pubkey := person.OwnerPubKey
 
 	orderQuery := ""
 	limitQuery := ""
