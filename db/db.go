@@ -507,9 +507,9 @@ func (db database) GetUserBountiesCount(personKey string, tabType string) int64 
 	var count int64
 
 	query := db.db.Model(&Bounty{})
-	if tabType == "wanted" {
+	if tabType == "bounties" {
 		query.Where("owner_id", personKey)
-	} else if tabType == "usertickets" {
+	} else if tabType == "assigned" {
 		query.Where("assignee", personKey)
 	}
 
@@ -658,7 +658,9 @@ func (db database) GetOrganizationBounties(r *http.Request, org_uuid string) []B
 
 func (db database) GetAssignedBounties(r *http.Request) ([]Bounty, error) {
 	offset, limit, sortBy, direction, _ := utils.GetPaginationParams(r)
-	pubkey := chi.URLParam(r, "pubkey")
+	uuid := chi.URLParam(r, "uuid")
+	person := db.GetPersonByUuid(uuid)
+	pubkey := person.OwnerPubKey
 
 	orderQuery := ""
 	limitQuery := ""
@@ -682,7 +684,9 @@ func (db database) GetAssignedBounties(r *http.Request) ([]Bounty, error) {
 
 func (db database) GetCreatedBounties(r *http.Request) ([]Bounty, error) {
 	offset, limit, sortBy, direction, _ := utils.GetPaginationParams(r)
-	pubkey := chi.URLParam(r, "pubkey")
+	uuid := chi.URLParam(r, "uuid")
+	person := db.GetPersonByUuid(uuid)
+	pubkey := person.OwnerPubKey
 
 	orderQuery := ""
 	limitQuery := ""
