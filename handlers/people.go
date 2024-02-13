@@ -367,6 +367,7 @@ func GetPersonByUuid(w http.ResponseWriter, r *http.Request) {
 	personResponse := make(map[string]interface{})
 	personResponse["id"] = person.ID
 	personResponse["uuid"] = person.Uuid
+	personResponse["owner_pubkey"] = person.OwnerPubKey
 	personResponse["owner_alias"] = person.OwnerAlias
 	personResponse["unique_name"] = person.UniqueName
 	personResponse["description"] = person.Description
