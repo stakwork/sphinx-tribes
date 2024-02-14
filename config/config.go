@@ -73,6 +73,8 @@ func InitConfig() {
 	// only make this call if there is a Relay auth key
 	if RelayAuthKey != "" {
 		RelayNodeKey = GetNodePubKey()
+	} else {
+		panic("No relay auth key set")
 	}
 
 	if Host == "" {
@@ -98,6 +100,10 @@ func InitConfig() {
 	if S3Url == "" {
 		S3Url = "https://sphinx-tribes.s3.amazonaws.com"
 	}
+}
+
+func CheckRelayAuthKey(authKey string) {
+
 }
 
 func StripSuperAdmins(adminStrings string) []string {
