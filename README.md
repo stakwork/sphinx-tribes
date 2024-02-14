@@ -111,7 +111,7 @@ Run unit tests with coverage:
     // you may need to install cover with this command first
     go get golang.org/x/tools/cmd/cover
     // run test
-    go test ./... -tags mock -race -v -coverprofile=coverage.out && ./cover-check.sh coverage.out <min coverage amount> 
+    RELAY_AUTH_KEY=TEST go test ./... -tags mock -race -v -coverprofile=coverage.out && ./cover-check.sh coverage.out <min coverage amount>
     // To get code coverage in html format do the following after running the code above
     go tool cover -html="coverage.out"
 ```
@@ -147,12 +147,12 @@ brew upgrade mockery
 
 #### When adding a new function to the interface which is already mocked follow the below steps
 
-1. Update the corresponding interface with the function signature, for example if you are adding new function to the ```database``` structure make sure the interface file ```db/interface.go``` is updated with the function signature.
-2. run the command ```mockery``` to update the mocks.
+1. Update the corresponding interface with the function signature, for example if you are adding new function to the `database` structure make sure the interface file `db/interface.go` is updated with the function signature.
+2. run the command `mockery` to update the mocks.
 
 #### To create mocks for a new interface make follow the steps below
 
-1. Add the new entry in the ```.mockery.yml``` file like this
+1. Add the new entry in the `.mockery.yml` file like this
 
 ```yml
 
@@ -168,7 +168,7 @@ packages:
             *your-interface-2*:
 ```
 
-2. run the command ```mockery``` to update the mocks.
+2. run the command `mockery` to update the mocks.
 
 ### Backend API Data Validations
 
