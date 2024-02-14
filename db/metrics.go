@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"math"
 	"net/http"
+	"strings"
 
 	"github.com/stakwork/sphinx-tribes/utils"
 )
@@ -161,31 +162,26 @@ func (db database) GetBountiesByDateRange(r PaymentDateRange, re *http.Request) 
 	assingned := keys.Get("Assigned")
 	paid := keys.Get("Paid")
 
-	openQuery := ""
-	assignedQuery := ""
-	paidQuery := ""
 	orderQuery := ""
 	limitQuery := ""
 
-	if open != "" && open == "true" {
-		openQuery = "AND assignee = '' AND paid != true"
-		assignedQuery = ""
+	var statusConditions []string
+
+	if open == "true" {
+		statusConditions = append(statusConditions, "assignee = '' AND paid != true")
 	}
-	if assingned != "" && assingned == "true" {
-		if open != "" && open == "true" {
-			assignedQuery = "OR assignee != '' AND paid != true"
-		} else {
-			assignedQuery = "AND assignee != '' AND paid != true"
-		}
+	if assingned == "true" {
+		statusConditions = append(statusConditions, "assignee != '' AND paid = false")
 	}
-	if paid != "" && paid == "true" {
-		if open != "" && open == "true" || assingned != "" && assingned == "true" {
-			paidQuery = "OR paid = true"
-		} else if open != "" && open == "true" && assingned == "" && assingned != "true" {
-			assignedQuery = ""
-		} else {
-			paidQuery = "AND paid = true"
-		}
+	if paid == "true" {
+		statusConditions = append(statusConditions, "paid = true")
+	}
+
+	var statusQuery string
+	if len(statusConditions) > 0 {
+		statusQuery = " AND (" + strings.Join(statusConditions, " OR ") + ")"
+	} else {
+		statusQuery = ""
 	}
 
 	if sortBy != "" && direction != "" {
@@ -198,7 +194,7 @@ func (db database) GetBountiesByDateRange(r PaymentDateRange, re *http.Request) 
 	}
 
 	query := `SELECT * FROM public.bounty WHERE created >= '` + r.StartDate + `'  AND created <= '` + r.EndDate + `'`
-	allQuery := query + " " + openQuery + " " + assignedQuery + " " + paidQuery + " " + orderQuery + " " + limitQuery
+	allQuery := query + " " + statusQuery + " " + orderQuery + " " + limitQuery
 
 	b := []Bounty{}
 	db.db.Raw(allQuery).Find(&b)
@@ -211,35 +207,29 @@ func (db database) GetBountiesByDateRangeCount(r PaymentDateRange, re *http.Requ
 	assingned := keys.Get("Assigned")
 	paid := keys.Get("Paid")
 
-	openQuery := ""
-	assignedQuery := ""
-	paidQuery := ""
+	var statusConditions []string
 
-	if open != "" && open == "true" {
-		openQuery = "AND assignee = '' AND paid != true"
-		assignedQuery = ""
+	if open == "true" {
+		statusConditions = append(statusConditions, "assignee = '' AND paid != true")
 	}
-	if assingned != "" && assingned == "true" {
-		if open != "" && open == "true" {
-			assignedQuery = "OR assignee != '' AND paid = false"
-		} else {
-			assignedQuery = "AND assignee != '' AND paid = false"
-		}
+	if assingned == "true" {
+		statusConditions = append(statusConditions, "assignee != '' AND paid = false")
 	}
-	if paid != "" && paid == "true" {
-		if open != "" && open == "true" || assingned != "" && assingned == "true" {
-			paidQuery = "OR paid = true"
-		} else if open != "" && open == "true" && assingned == "" && assingned != "true" {
-			assignedQuery = ""
-		} else {
-			paidQuery = "AND paid = true"
-		}
+	if paid == "true" {
+		statusConditions = append(statusConditions, "paid = true")
+	}
+
+	var statusQuery string
+	if len(statusConditions) > 0 {
+		statusQuery = " AND (" + strings.Join(statusConditions, " OR ") + ")"
+	} else {
+		statusQuery = ""
 	}
 
 	var count int64
 
 	query := `SELECT COUNT(*) FROM public.bounty WHERE created >= '` + r.StartDate + `'  AND created <= '` + r.EndDate + `'`
-	allQuery := query + " " + openQuery + " " + assignedQuery + " " + paidQuery
+	allQuery := query + " " + statusQuery
 	db.db.Raw(allQuery).Scan(&count)
 	return count
 }
