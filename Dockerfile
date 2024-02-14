@@ -20,6 +20,7 @@ FROM alpine:latest
 RUN apk add --no-cache ca-certificates openssl
 
 COPY --from=builder /app/sphinx-tribes /app/
+COPY --from=builder /app/.env /app/  
 
 RUN ls app
 
