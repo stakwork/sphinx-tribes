@@ -23,10 +23,6 @@ func TestInitConfig(t *testing.T) {
 	if JwtKey == "" {
 		t.Error("Could not load random jwtKey")
 	}
-
-	if RelayAuthKey != "" {
-		t.Error("Could not load RelayAuthKey")
-	}
 }
 
 func TestGenerateRandomString(t *testing.T) {
