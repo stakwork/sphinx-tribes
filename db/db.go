@@ -996,9 +996,6 @@ func (db database) GetAllBounties(r *http.Request) []Bounty {
 	orderQuery := ""
 	limitQuery := ""
 	searchQuery := ""
-	openQuery := ""
-	assignedQuery := ""
-	paidQuery := ""
 	orgQuery := ""
 	languageQuery := ""
 
@@ -1013,26 +1010,26 @@ func (db database) GetAllBounties(r *http.Request) []Bounty {
 	if search != "" {
 		searchQuery = fmt.Sprintf("AND LOWER(title) LIKE %s", "'%"+strings.ToLower(search)+"%'")
 	}
-	if open != "" && open == "true" {
-		openQuery = "AND assignee = '' AND paid != true"
-		assignedQuery = ""
+
+	var statusConditions []string
+
+	if open == "true" {
+		statusConditions = append(statusConditions, "assignee = '' AND paid != true")
 	}
-	if assingned != "" && assingned == "true" {
-		if open != "" && open == "true" {
-			assignedQuery = "OR assignee != '' AND paid != true"
-		} else {
-			assignedQuery = "AND assignee != '' AND paid != true"
-		}
+	if assingned == "true" {
+		statusConditions = append(statusConditions, "assignee != '' AND paid = false")
 	}
-	if paid != "" && paid == "true" {
-		if open != "" && open == "true" || assingned != "" && assingned == "true" {
-			paidQuery = "OR paid = true"
-		} else if open != "" && open == "true" && assingned == "" && assingned != "true" {
-			assignedQuery = ""
-		} else {
-			paidQuery = "AND paid = true"
-		}
+	if paid == "true" {
+		statusConditions = append(statusConditions, "paid = true")
 	}
+
+	var statusQuery string
+	if len(statusConditions) > 0 {
+		statusQuery = " AND (" + strings.Join(statusConditions, " OR ") + ")"
+	} else {
+		statusQuery = ""
+	}
+
 	if orgUuid != "" {
 		orgQuery = "AND org_uuid = '" + orgUuid + "'"
 	}
@@ -1052,8 +1049,8 @@ func (db database) GetAllBounties(r *http.Request) []Bounty {
 
 	query := "SELECT * FROM public.bounty WHERE show != false"
 
-	allQuery := query + " " + openQuery + " " + assignedQuery + " " + paidQuery + " " + searchQuery + " " + orgQuery + " " + languageQuery + " " + orderQuery + " " + limitQuery
-
+	allQuery := query + " " + statusQuery + " " + searchQuery + " " + orgQuery + " " + languageQuery + " " + orderQuery + " " + limitQuery
+	
 	theQuery := db.db.Raw(allQuery)
 
 	if tags != "" {
