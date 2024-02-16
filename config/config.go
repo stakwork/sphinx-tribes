@@ -102,10 +102,6 @@ func InitConfig() {
 	}
 }
 
-func CheckRelayAuthKey(authKey string) {
-
-}
-
 func StripSuperAdmins(adminStrings string) []string {
 	superAdmins := []string{}
 	if adminStrings != "" {
