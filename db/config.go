@@ -262,6 +262,17 @@ func UserHasAccess(pubKeyFromAuth string, uuid string, role string) bool {
 	return true
 }
 
+func (db database) UserHasAccess(pubKeyFromAuth string, uuid string, role string) bool {
+	org := DB.GetOrganizationByUuid(uuid)
+	var hasRole bool = false
+	if pubKeyFromAuth != org.OwnerPubKey {
+		userRoles := DB.GetUserRoles(uuid, pubKeyFromAuth)
+		hasRole = RolesCheck(userRoles, role)
+		return hasRole
+	}
+	return true
+}
+
 func (db database) UserHasManageBountyRoles(pubKeyFromAuth string, uuid string) bool {
 	var manageRolesCount = len(ManageBountiesGroup)
 	org := DB.GetOrganizationByUuid(uuid)

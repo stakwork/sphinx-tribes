@@ -16,11 +16,15 @@ import (
 )
 
 type organizationHandler struct {
-	db db.Database
+	db                    db.Database
+	generateBountyHandler func(bounties []db.Bounty) []db.BountyResponse
 }
 
 func NewOrganizationHandler(db db.Database) *organizationHandler {
-	return &organizationHandler{db: db}
+	return &organizationHandler{
+		db:                    db,
+		generateBountyHandler: GenerateBountyResponse,
+	}
 }
 
 func (oh *organizationHandler) CreateOrEditOrganization(w http.ResponseWriter, r *http.Request) {
@@ -517,18 +521,18 @@ func GetCreatedOrganizations(pubkey string) []db.Organization {
 	return organizations
 }
 
-func GetOrganizationBounties(w http.ResponseWriter, r *http.Request) {
+func (oh *organizationHandler) GetOrganizationBounties(w http.ResponseWriter, r *http.Request) {
 	uuid := chi.URLParam(r, "uuid")
 
 	// get the organization bounties
-	organizationBounties := db.DB.GetOrganizationBounties(r, uuid)
+	organizationBounties := oh.db.GetOrganizationBounties(r, uuid)
 
-	var bountyResponse []db.BountyResponse = GenerateBountyResponse(organizationBounties)
+	var bountyResponse []db.BountyResponse = oh.generateBountyHandler(organizationBounties)
 	w.WriteHeader(http.StatusOK)
 	json.NewEncoder(w).Encode(bountyResponse)
 }
 
-func GetOrganizationBudget(w http.ResponseWriter, r *http.Request) {
+func (oh *organizationHandler) GetOrganizationBudget(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 	pubKeyFromAuth, _ := ctx.Value(auth.ContextKey).(string)
 	uuid := chi.URLParam(r, "uuid")
@@ -540,7 +544,7 @@ func GetOrganizationBudget(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// if not the organization admin
-	hasRole := db.UserHasAccess(pubKeyFromAuth, uuid, db.ViewReport)
+	hasRole := oh.db.UserHasAccess(pubKeyFromAuth, uuid, db.ViewReport)
 	if !hasRole {
 		w.WriteHeader(http.StatusUnauthorized)
 		json.NewEncoder(w).Encode("Don't have access to view budget")
@@ -548,19 +552,19 @@ func GetOrganizationBudget(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// get the organization budget
-	organizationBudget := db.DB.GetOrganizationBudget(uuid)
+	organizationBudget := oh.db.GetOrganizationBudget(uuid)
 
 	w.WriteHeader(http.StatusOK)
 	json.NewEncoder(w).Encode(organizationBudget)
 }
 
-func GetOrganizationBudgetHistory(w http.ResponseWriter, r *http.Request) {
+func (oh *organizationHandler) GetOrganizationBudgetHistory(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 	pubKeyFromAuth, _ := ctx.Value(auth.ContextKey).(string)
 	uuid := chi.URLParam(r, "uuid")
 
 	// if not the organization admin
-	hasRole := db.UserHasAccess(pubKeyFromAuth, uuid, db.ViewReport)
+	hasRole := oh.db.UserHasAccess(pubKeyFromAuth, uuid, db.ViewReport)
 	if !hasRole {
 		w.WriteHeader(http.StatusUnauthorized)
 		json.NewEncoder(w).Encode("Don't have access to view budget history")
@@ -568,7 +572,7 @@ func GetOrganizationBudgetHistory(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// get the organization budget
-	organizationBudget := db.DB.GetOrganizationBudgetHistory(uuid)
+	organizationBudget := oh.db.GetOrganizationBudgetHistory(uuid)
 
 	w.WriteHeader(http.StatusOK)
 	json.NewEncoder(w).Encode(organizationBudget)

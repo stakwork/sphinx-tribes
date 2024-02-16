@@ -135,4 +135,5 @@ type Database interface {
 	GetBountiesByDateRangeCount(r PaymentDateRange, re *http.Request) int64
 	PersonUniqueNameFromName(name string) (string, error)
 	ProcessAlerts(p Person)
+	UserHasAccess(pubKeyFromAuth string, uuid string, role string) bool
 }

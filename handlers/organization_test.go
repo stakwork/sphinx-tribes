@@ -305,3 +305,169 @@ func TestDeleteOrganization(t *testing.T) {
 		mockDb.AssertExpectations(t)
 	})
 }
+
+func TestGetOrganizationBounties(t *testing.T) {
+	ctx := context.WithValue(context.Background(), auth.ContextKey, "test-key")
+	mockDb := mocks.NewDatabase(t)
+	mockGenerateBountyHandler := func(bounties []db.Bounty) []db.BountyResponse {
+		return []db.BountyResponse{} // Mocked response
+	}
+	oHandler := NewOrganizationHandler(mockDb)
+
+	t.Run("Should test that an organization's bounties can be listed without authentication", func(t *testing.T) {
+		orgUUID := "valid-uuid"
+		oHandler.generateBountyHandler = mockGenerateBountyHandler
+
+		expectedBounties := []db.Bounty{{}, {}} // Mocked response
+		mockDb.On("GetOrganizationBounties", mock.AnythingOfType("*http.Request"), orgUUID).Return(expectedBounties).Once()
+
+		rr := httptest.NewRecorder()
+		handler := http.HandlerFunc(oHandler.GetOrganizationBounties)
+
+		rctx := chi.NewRouteContext()
+		rctx.URLParams.Add("uuid", orgUUID)
+		req, err := http.NewRequestWithContext(context.WithValue(context.Background(), chi.RouteCtxKey, rctx), http.MethodGet, "/bounties/"+orgUUID, nil)
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		handler.ServeHTTP(rr, req)
+
+		assert.Equal(t, http.StatusOK, rr.Code)
+	})
+
+	t.Run("should return empty array when wrong organization UUID is passed", func(t *testing.T) {
+		orgUUID := "wrong-uuid"
+
+		mockDb.On("GetOrganizationBounties", mock.AnythingOfType("*http.Request"), orgUUID).Return([]db.Bounty{}).Once()
+
+		rr := httptest.NewRecorder()
+		handler := http.HandlerFunc(oHandler.GetOrganizationBounties)
+
+		rctx := chi.NewRouteContext()
+		rctx.URLParams.Add("uuid", orgUUID)
+		req, err := http.NewRequestWithContext(context.WithValue(ctx, chi.RouteCtxKey, rctx), http.MethodGet, "/bounties/"+orgUUID+"?limit=10&sortBy=created&search=test&page=1&resetPage=true", nil)
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		handler.ServeHTTP(rr, req)
+
+		// Assert that the response status code is as expected
+		assert.Equal(t, http.StatusOK, rr.Code)
+
+		// Assert that the response body is an empty array
+		assert.Equal(t, "[]\n", rr.Body.String())
+	})
+}
+
+func TestGetOrganizationBudget(t *testing.T) {
+	ctx := context.WithValue(context.Background(), auth.ContextKey, "test-key")
+	mockDb := mocks.NewDatabase(t)
+	oHandler := NewOrganizationHandler(mockDb)
+
+	t.Run("Should test that a 401 is returned when trying to view an organization's budget without a token", func(t *testing.T) {
+		orgUUID := "valid-uuid"
+
+		rctx := chi.NewRouteContext()
+		rctx.URLParams.Add("uuid", orgUUID)
+		req, err := http.NewRequestWithContext(context.WithValue(context.Background(), chi.RouteCtxKey, rctx), http.MethodGet, "/budget/"+orgUUID, nil)
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		rr := httptest.NewRecorder()
+		http.HandlerFunc(oHandler.GetOrganizationBudget).ServeHTTP(rr, req)
+
+		assert.Equal(t, http.StatusUnauthorized, rr.Code)
+	})
+
+	t.Run("Should test that the right organization budget is returned, if the user is the organization admin or has the ViewReport role", func(t *testing.T) {
+		orgUUID := "valid-uuid"
+		expectedBudget := db.BountyBudget{
+			ID:          1,
+			OrgUuid:     orgUUID,
+			TotalBudget: 1000,
+			Created:     nil,
+			Updated:     nil,
+		}
+
+		mockDb.On("UserHasAccess", "test-key", orgUUID, "VIEW REPORT").Return(true).Once()
+		mockDb.On("GetOrganizationBudget", orgUUID).Return(expectedBudget).Once()
+
+		rctx := chi.NewRouteContext()
+		rctx.URLParams.Add("uuid", orgUUID)
+		req, err := http.NewRequestWithContext(context.WithValue(ctx, chi.RouteCtxKey, rctx), http.MethodGet, "/budget/"+orgUUID, nil)
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		rr := httptest.NewRecorder()
+		http.HandlerFunc(oHandler.GetOrganizationBudget).ServeHTTP(rr, req)
+
+		assert.Equal(t, http.StatusOK, rr.Code)
+
+		var responseBudget db.BountyBudget
+		err = json.Unmarshal(rr.Body.Bytes(), &responseBudget)
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		assert.Equal(t, expectedBudget, responseBudget)
+	})
+}
+
+func TestGetOrganizationBudgetHistory(t *testing.T) {
+	ctx := context.WithValue(context.Background(), auth.ContextKey, "test-key")
+	mockDb := mocks.NewDatabase(t)
+	oHandler := NewOrganizationHandler(mockDb)
+
+	t.Run("Should test that a 401 is returned when trying to view an organization's budget history without a token", func(t *testing.T) {
+		orgUUID := "valid-uuid"
+
+		mockDb.On("UserHasAccess", "", orgUUID, "VIEW REPORT").Return(false).Once()
+
+		rctx := chi.NewRouteContext()
+		rctx.URLParams.Add("uuid", orgUUID)
+		req, err := http.NewRequestWithContext(context.WithValue(context.Background(), chi.RouteCtxKey, rctx), http.MethodGet, "/budget/history/"+orgUUID, nil)
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		rr := httptest.NewRecorder()
+		http.HandlerFunc(oHandler.GetOrganizationBudgetHistory).ServeHTTP(rr, req)
+
+		assert.Equal(t, http.StatusUnauthorized, rr.Code)
+	})
+
+	t.Run("Should test that the right budget history is returned, if the user is the organization admin or has the ViewReport role", func(t *testing.T) {
+		orgUUID := "valid-uuid"
+		expectedBudgetHistory := []db.BudgetHistoryData{
+			{BudgetHistory: db.BudgetHistory{ID: 1, OrgUuid: orgUUID, Created: nil, Updated: nil}, SenderName: "Sender1"},
+			{BudgetHistory: db.BudgetHistory{ID: 2, OrgUuid: orgUUID, Created: nil, Updated: nil}, SenderName: "Sender2"},
+		}
+
+		mockDb.On("UserHasAccess", "test-key", orgUUID, "VIEW REPORT").Return(true).Once()
+		mockDb.On("GetOrganizationBudgetHistory", orgUUID).Return(expectedBudgetHistory).Once()
+
+		rctx := chi.NewRouteContext()
+		rctx.URLParams.Add("uuid", orgUUID)
+		req, err := http.NewRequestWithContext(context.WithValue(ctx, chi.RouteCtxKey, rctx), http.MethodGet, "/budget/history/"+orgUUID, nil)
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		rr := httptest.NewRecorder()
+		http.HandlerFunc(oHandler.GetOrganizationBudgetHistory).ServeHTTP(rr, req)
+
+		assert.Equal(t, http.StatusOK, rr.Code)
+
+		var responseBudgetHistory []db.BudgetHistoryData
+		err = json.Unmarshal(rr.Body.Bytes(), &responseBudgetHistory)
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		assert.Equal(t, expectedBudgetHistory, responseBudgetHistory)
+	})
+}

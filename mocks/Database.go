@@ -6166,6 +6166,54 @@ func (_c *Database_UpdateTwitterConfirmed_Call) RunAndReturn(run func(uint, bool
 	return _c
 }
 
+// UserHasAccess provides a mock function with given fields: pubKeyFromAuth, uuid, role
+func (_m *Database) UserHasAccess(pubKeyFromAuth string, uuid string, role string) bool {
+	ret := _m.Called(pubKeyFromAuth, uuid, role)
+
+	if len(ret) == 0 {
+		panic("no return value specified for UserHasAccess")
+	}
+
+	var r0 bool
+	if rf, ok := ret.Get(0).(func(string, string, string) bool); ok {
+		r0 = rf(pubKeyFromAuth, uuid, role)
+	} else {
+		r0 = ret.Get(0).(bool)
+	}
+
+	return r0
+}
+
+// Database_UserHasAccess_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'UserHasAccess'
+type Database_UserHasAccess_Call struct {
+	*mock.Call
+}
+
+// UserHasAccess is a helper method to define mock.On call
+//   - pubKeyFromAuth string
+//   - uuid string
+//   - role string
+func (_e *Database_Expecter) UserHasAccess(pubKeyFromAuth interface{}, uuid interface{}, role interface{}) *Database_UserHasAccess_Call {
+	return &Database_UserHasAccess_Call{Call: _e.mock.On("UserHasAccess", pubKeyFromAuth, uuid, role)}
+}
+
+func (_c *Database_UserHasAccess_Call) Run(run func(pubKeyFromAuth string, uuid string, role string)) *Database_UserHasAccess_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(string), args[1].(string), args[2].(string))
+	})
+	return _c
+}
+
+func (_c *Database_UserHasAccess_Call) Return(_a0 bool) *Database_UserHasAccess_Call {
+	_c.Call.Return(_a0)
+	return _c
+}
+
+func (_c *Database_UserHasAccess_Call) RunAndReturn(run func(string, string, string) bool) *Database_UserHasAccess_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
 // UserHasManageBountyRoles provides a mock function with given fields: pubKeyFromAuth, uuid
 func (_m *Database) UserHasManageBountyRoles(pubKeyFromAuth string, uuid string) bool {
 	ret := _m.Called(pubKeyFromAuth, uuid)
