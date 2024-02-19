@@ -449,3 +449,117 @@ func TestDeleteBounty(t *testing.T) {
 		mockDb.AssertExpectations(t)
 	})
 }
+
+func TestGetBountyByCreated(t *testing.T) {
+	ctx := context.WithValue(context.Background(), auth.ContextKey, "test-key")
+	mockDb := dbMocks.NewDatabase(t)
+	mockGenerateBountyResponse := func(bounties []db.Bounty) []db.BountyResponse {
+		return []db.BountyResponse{} // Mocked response
+	}
+	mockHttpClient := mocks.NewHttpClient(t)
+	bHandler := NewBountyHandler(mockHttpClient, mockDb)
+
+	t.Run("Should return bounty by its created value", func(t *testing.T) {
+		bHandler.generateBountyResponse = mockGenerateBountyResponse
+
+		expectedBounty := []db.Bounty{{
+			ID:          1,
+			Type:        "type1",
+			Title:       "Test Bounty",
+			Description: "Description",
+			Created:     123456789,
+		}}
+		mockDb.On("GetBountyDataByCreated", "123456789").Return(expectedBounty, nil).Once()
+
+		rr := httptest.NewRecorder()
+		handler := http.HandlerFunc(bHandler.GetBountyByCreated)
+
+		req, err := http.NewRequestWithContext(ctx, "GET", "/bounty/123456789", nil)
+		if err != nil {
+			t.Fatal(err)
+		}
+		chiCtx := chi.NewRouteContext()
+		chiCtx.URLParams.Add("created", "123456789")
+		req = req.WithContext(context.WithValue(req.Context(), chi.RouteCtxKey, chiCtx))
+
+		handler.ServeHTTP(rr, req)
+
+		assert.Equal(t, http.StatusOK, rr.Code)
+	})
+}
+
+func TestGetNextBountyByCreated(t *testing.T) {
+	ctx := context.Background()
+	mockDb := dbMocks.NewDatabase(t)
+	mockHttpClient := mocks.NewHttpClient(t)
+	bHandler := NewBountyHandler(mockHttpClient, mockDb)
+
+	t.Run("Should test that the next bounty on the bounties homepage can be gotten by its created value and the selected filters", func(t *testing.T) {
+		mockDb.On("GetNextBountyByCreated", mock.Anything).Return(uint(1), nil).Once()
+
+		rr := httptest.NewRecorder()
+		req, _ := http.NewRequest("GET", "/next/123456789", nil)
+
+		bHandler.GetNextBountyByCreated(rr, req.WithContext(ctx))
+
+		assert.Equal(t, http.StatusOK, rr.Code)
+		mockDb.AssertExpectations(t)
+	})
+}
+
+func TestGetPreviousBountyByCreated(t *testing.T) {
+	ctx := context.Background()
+	mockDb := dbMocks.NewDatabase(t)
+	mockHttpClient := mocks.NewHttpClient(t)
+	bHandler := NewBountyHandler(mockHttpClient, mockDb)
+
+	t.Run("Should test that the previous bounty on the bounties homepage can be gotten by its created value and the selected filters", func(t *testing.T) {
+		mockDb.On("GetPreviousBountyByCreated", mock.Anything).Return(uint(1), nil).Once()
+
+		rr := httptest.NewRecorder()
+		req, _ := http.NewRequest("GET", "/previous/123456789", nil)
+
+		bHandler.GetPreviousBountyByCreated(rr, req.WithContext(ctx))
+
+		assert.Equal(t, http.StatusOK, rr.Code)
+		mockDb.AssertExpectations(t)
+	})
+}
+
+func TestGetOrganizationNextBountyByCreated(t *testing.T) {
+	ctx := context.Background()
+	mockDb := dbMocks.NewDatabase(t)
+	mockHttpClient := mocks.NewHttpClient(t)
+	bHandler := NewBountyHandler(mockHttpClient, mockDb)
+
+	t.Run("Should test that the next bounty on the organization bounties homepage can be gotten by its created value and the selected filters", func(t *testing.T) {
+		mockDb.On("GetNextOrganizationBountyByCreated", mock.AnythingOfType("*http.Request")).Return(uint(1), nil).Once()
+
+		rr := httptest.NewRecorder()
+		req, _ := http.NewRequest("GET", "/org/next/org-uuid/123456789", nil)
+
+		bHandler.GetOrganizationNextBountyByCreated(rr, req.WithContext(ctx))
+
+		assert.Equal(t, http.StatusOK, rr.Code)
+		mockDb.AssertExpectations(t)
+	})
+}
+
+func TestGetOrganizationPreviousBountyByCreated(t *testing.T) {
+	ctx := context.Background()
+	mockDb := dbMocks.NewDatabase(t)
+	mockHttpClient := mocks.NewHttpClient(t)
+	bHandler := NewBountyHandler(mockHttpClient, mockDb)
+
+	t.Run("Should test that the previous bounty on the organization bounties homepage can be gotten by its created value and the selected filters", func(t *testing.T) {
+		mockDb.On("GetPreviousOrganizationBountyByCreated", mock.AnythingOfType("*http.Request")).Return(uint(1), nil).Once()
+
+		rr := httptest.NewRecorder()
+		req, _ := http.NewRequest("GET", "/org/previous/org-uuid/123456789", nil)
+
+		bHandler.GetOrganizationPreviousBountyByCreated(rr, req.WithContext(ctx))
+
+		assert.Equal(t, http.StatusOK, rr.Code)
+		mockDb.AssertExpectations(t)
+	})
+}
