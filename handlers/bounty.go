@@ -21,14 +21,14 @@ import (
 type bountyHandler struct {
 	httpClient            HttpClient
 	db                    db.Database
-	generateBountyHandler func(bounties []db.Bounty) []db.BountyResponse
+	generateBountyResponse func(bounties []db.Bounty) []db.BountyResponse
 }
 
 func NewBountyHandler(httpClient HttpClient, db db.Database) *bountyHandler {
 	return &bountyHandler{
 		httpClient:            httpClient,
 		db:                    db,
-		generateBountyHandler: GenerateBountyResponse,
+		generateBountyResponse: GenerateBountyResponse,
 	}
 }
 
@@ -120,7 +120,7 @@ func (h *bountyHandler) GetBountyByCreated(w http.ResponseWriter, r *http.Reques
 		w.WriteHeader(http.StatusBadRequest)
 		fmt.Println("Error", err)
 	} else {
-		var bountyResponse []db.BountyResponse = h.generateBountyHandler(bounties)
+		var bountyResponse []db.BountyResponse = h.generateBountyResponse(bounties)
 		w.WriteHeader(http.StatusOK)
 		json.NewEncoder(w).Encode(bountyResponse)
 	}

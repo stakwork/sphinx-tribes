@@ -453,14 +453,14 @@ func TestDeleteBounty(t *testing.T) {
 func TestGetBountyByCreated(t *testing.T) {
 	ctx := context.WithValue(context.Background(), auth.ContextKey, "test-key")
 	mockDb := dbMocks.NewDatabase(t)
-	mockGenerateBountyHandler := func(bounties []db.Bounty) []db.BountyResponse {
+	mockGenerateBountyResponse := func(bounties []db.Bounty) []db.BountyResponse {
 		return []db.BountyResponse{} // Mocked response
 	}
 	mockHttpClient := mocks.NewHttpClient(t)
 	bHandler := NewBountyHandler(mockHttpClient, mockDb)
 
 	t.Run("Should return bounty by its created value", func(t *testing.T) {
-		bHandler.generateBountyHandler = mockGenerateBountyHandler
+		bHandler.generateBountyResponse = mockGenerateBountyResponse
 
 		expectedBounty := []db.Bounty{{
 			ID:          1,
