@@ -258,3 +258,181 @@ func TestDeletePerson(t *testing.T) {
 		mockDb.AssertExpectations(t)
 	})
 }
+
+func TestGetPeopleBySearch(t *testing.T) {
+	mockDb := mocks.NewDatabase(t)
+	pHandler := NewPeopleHandler(mockDb)
+
+	t.Run("should return users that match the search text", func(t *testing.T) {
+		rr := httptest.NewRecorder()
+		handler := http.HandlerFunc(pHandler.GetPeopleBySearch)
+		expectedPeople := []db.Person{
+			{ID: 1, Uuid: "uuid1", OwnerPubKey: "pubkey1", OwnerAlias: "John Doe"},
+			{ID: 2, Uuid: "uuid2", OwnerPubKey: "pubkey2", OwnerAlias: "John Smith"},
+		}
+
+		rctx := chi.NewRouteContext()
+		req, err := http.NewRequestWithContext(context.WithValue(context.Background(), chi.RouteCtxKey, rctx), http.MethodGet, "/search?search=John", nil)
+		assert.NoError(t, err)
+
+		mockDb.On("GetPeopleBySearch", mock.Anything).Return(expectedPeople)
+		handler.ServeHTTP(rr, req)
+
+		var returnedPeople []db.Person
+		err = json.Unmarshal(rr.Body.Bytes(), &returnedPeople)
+		assert.NoError(t, err)
+		assert.Equal(t, http.StatusOK, rr.Code)
+		assert.EqualValues(t, expectedPeople, returnedPeople)
+		mockDb.AssertExpectations(t)
+	})
+
+	t.Run("should return an empty search result when no user matches the search text", func(t *testing.T) {
+		mockDb.ExpectedCalls = nil
+		rr := httptest.NewRecorder()
+		handler := http.HandlerFunc(pHandler.GetPeopleBySearch)
+		expectedPeople := []db.Person{}
+
+		rctx := chi.NewRouteContext()
+		req, err := http.NewRequestWithContext(context.WithValue(context.Background(), chi.RouteCtxKey, rctx), http.MethodGet, "/search?search=user not matched", nil)
+		assert.NoError(t, err)
+
+		mockDb.On("GetPeopleBySearch", mock.Anything).Return(expectedPeople)
+		handler.ServeHTTP(rr, req)
+
+		var returnedPeople []db.Person
+		err = json.Unmarshal(rr.Body.Bytes(), &returnedPeople)
+		assert.NoError(t, err)
+		assert.Equal(t, http.StatusOK, rr.Code)
+		assert.EqualValues(t, expectedPeople, returnedPeople)
+		mockDb.AssertExpectations(t)
+	})
+}
+
+func TestGetListedPeople(t *testing.T) {
+	mockDb := mocks.NewDatabase(t)
+	pHandler := NewPeopleHandler(mockDb)
+
+	t.Run("should return all listed users", func(t *testing.T) {
+		rr := httptest.NewRecorder()
+		handler := http.HandlerFunc(pHandler.GetListedPeople)
+		expectedPeople := []db.Person{
+			{ID: 1, Uuid: "uuid1", OwnerPubKey: "pubkey1", OwnerAlias: "John Doe"},
+			{ID: 2, Uuid: "uuid2", OwnerPubKey: "pubkey2", OwnerAlias: "John Smith"},
+		}
+
+		rctx := chi.NewRouteContext()
+		req, err := http.NewRequestWithContext(context.WithValue(context.Background(), chi.RouteCtxKey, rctx), http.MethodGet, "/?page=1&limit=10", nil)
+		assert.NoError(t, err)
+
+		mockDb.On("GetListedPeople", mock.Anything).Return(expectedPeople)
+		handler.ServeHTTP(rr, req)
+
+		var returnedPeople []db.Person
+		err = json.Unmarshal(rr.Body.Bytes(), &returnedPeople)
+		assert.NoError(t, err)
+		assert.Equal(t, http.StatusOK, rr.Code)
+		assert.EqualValues(t, expectedPeople, returnedPeople)
+		mockDb.AssertExpectations(t)
+	})
+
+	t.Run("should return only users that match a search text when a search is added to the URL query", func(t *testing.T) {
+		mockDb.ExpectedCalls = nil
+		rr := httptest.NewRecorder()
+		handler := http.HandlerFunc(pHandler.GetListedPeople)
+		expectedPeople := []db.Person{
+			{ID: 1, Uuid: "uuid1", OwnerPubKey: "pubkey1", OwnerAlias: "John Doe"},
+			{ID: 2, Uuid: "uuid2", OwnerPubKey: "pubkey2", OwnerAlias: "John Smith"},
+		}
+
+		rctx := chi.NewRouteContext()
+		req, err := http.NewRequestWithContext(context.WithValue(context.Background(), chi.RouteCtxKey, rctx), http.MethodGet, "/?page=1&limit=10&search=John", nil)
+		assert.NoError(t, err)
+
+		mockDb.On("GetListedPeople", mock.Anything).Return(expectedPeople)
+		handler.ServeHTTP(rr, req)
+
+		var returnedPeople []db.Person
+		err = json.Unmarshal(rr.Body.Bytes(), &returnedPeople)
+		assert.NoError(t, err)
+		assert.Equal(t, http.StatusOK, rr.Code)
+		assert.EqualValues(t, expectedPeople, returnedPeople)
+		mockDb.AssertExpectations(t)
+	})
+
+	t.Run("should return only users that match a skill set when languages are passed to the URL query", func(t *testing.T) {
+		mockDb.ExpectedCalls = nil
+		rr := httptest.NewRecorder()
+		handler := http.HandlerFunc(pHandler.GetListedPeople)
+		expectedPeople := []db.Person{
+			{ID: 1, Uuid: "uuid1", OwnerPubKey: "pubkey1", OwnerAlias: "John Doe"},
+		}
+
+		rctx := chi.NewRouteContext()
+		req, err := http.NewRequestWithContext(context.WithValue(context.Background(), chi.RouteCtxKey, rctx), http.MethodGet, "/?page=1&limit=10&languages=typescript", nil)
+		assert.NoError(t, err)
+
+		mockDb.On("GetListedPeople", mock.Anything).Return(expectedPeople)
+		handler.ServeHTTP(rr, req)
+
+		var returnedPeople []db.Person
+		err = json.Unmarshal(rr.Body.Bytes(), &returnedPeople)
+		assert.NoError(t, err)
+		assert.Equal(t, http.StatusOK, rr.Code)
+		assert.EqualValues(t, expectedPeople, returnedPeople)
+		mockDb.AssertExpectations(t)
+	})
+}
+
+func TestGetPersonByUuid(t *testing.T) {
+	mockDb := mocks.NewDatabase(t)
+	pHandler := NewPeopleHandler(mockDb)
+
+	t.Run("should return a user with the right UUID", func(t *testing.T) {
+		rr := httptest.NewRecorder()
+		handler := http.HandlerFunc(pHandler.GetPersonByUuid)
+		expectedPerson := db.Person{
+			ID:          1,
+			Uuid:        uuid.New().String(),
+			OwnerPubKey: "person-pub-key",
+			OwnerAlias:  "owner",
+			UniqueName:  "test_user",
+			Description: "test user",
+		}
+
+		rctx := chi.NewRouteContext()
+		rctx.URLParams.Add("uuid", "uuid")
+		req, err := http.NewRequestWithContext(context.WithValue(context.Background(), chi.RouteCtxKey, rctx), http.MethodGet, "/uuid", nil)
+		assert.NoError(t, err)
+
+		mockDb.On("GetPersonByUuid", mock.Anything).Return(expectedPerson)
+		handler.ServeHTTP(rr, req)
+
+		var returnedPerson db.Person
+		err = json.Unmarshal(rr.Body.Bytes(), &returnedPerson)
+		assert.NoError(t, err)
+		assert.Equal(t, http.StatusOK, rr.Code)
+		assert.EqualValues(t, expectedPerson, returnedPerson)
+		mockDb.AssertExpectations(t)
+	})
+
+	t.Run("should return no user for a wrong UUID", func(t *testing.T) {
+		mockDb.ExpectedCalls = nil
+		rr := httptest.NewRecorder()
+		handler := http.HandlerFunc(pHandler.GetPersonByUuid)
+		expectedPerson := db.Person{}
+
+		rctx := chi.NewRouteContext()
+		rctx.URLParams.Add("uuid", "wrong-uuid")
+		req, err := http.NewRequestWithContext(context.WithValue(context.Background(), chi.RouteCtxKey, rctx), http.MethodGet, "/uuid", nil)
+		assert.NoError(t, err)
+
+		mockDb.On("GetPersonByUuid", mock.Anything).Return(expectedPerson)
+		handler.ServeHTTP(rr, req)
+
+		var returnedPerson db.Person
+		err = json.Unmarshal(rr.Body.Bytes(), &returnedPerson)
+		assert.NoError(t, err)
+		assert.EqualValues(t, expectedPerson, returnedPerson)
+		mockDb.AssertExpectations(t)
+	})
+}

@@ -359,9 +359,9 @@ func (ph *peopleHandler) GetPersonById(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(person)
 }
 
-func GetPersonByUuid(w http.ResponseWriter, r *http.Request) {
+func (ph *peopleHandler) GetPersonByUuid(w http.ResponseWriter, r *http.Request) {
 	uuid := chi.URLParam(r, "uuid")
-	person := db.DB.GetPersonByUuid(uuid)
+	person := ph.db.GetPersonByUuid(uuid)
 	assetBalanceData, err := GetAssetByPubkey(person.OwnerPubKey)
 
 	personResponse := make(map[string]interface{})
@@ -623,14 +623,14 @@ func GetPeopleShortList(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(people)
 }
 
-func GetPeopleBySearch(w http.ResponseWriter, r *http.Request) {
-	people := db.DB.GetPeopleBySearch(r)
+func (ph *peopleHandler) GetPeopleBySearch(w http.ResponseWriter, r *http.Request) {
+	people := ph.db.GetPeopleBySearch(r)
 	w.WriteHeader(http.StatusOK)
 	json.NewEncoder(w).Encode(people)
 }
 
-func GetListedPeople(w http.ResponseWriter, r *http.Request) {
-	people := db.DB.GetListedPeople(r)
+func (ph *peopleHandler) GetListedPeople(w http.ResponseWriter, r *http.Request) {
+	people := ph.db.GetListedPeople(r)
 	w.WriteHeader(http.StatusOK)
 	json.NewEncoder(w).Encode(people)
 }
