@@ -20,6 +20,7 @@ import (
 // NewRouter creates a chi router
 func NewRouter() *http.Server {
 	r := initChi()
+	tribeHandlers := handlers.NewTribeHandler(db.DB)
 
 	r.Mount("/tribes", TribeRoutes())
 	r.Mount("/bots", BotsRoutes())
@@ -36,7 +37,7 @@ func NewRouter() *http.Server {
 		r.Get("/tribe_by_feed", handlers.GetFirstTribeByFeed)
 		r.Get("/leaderboard/{tribe_uuid}", handlers.GetLeaderBoard)
 		r.Get("/tribe_by_un/{un}", handlers.GetTribeByUniqueName)
-		r.Get("/tribes_by_owner/{pubkey}", handlers.GetTribesByOwner)
+		r.Get("/tribes_by_owner/{pubkey}", tribeHandlers.GetTribesByOwner)
 
 		r.Get("/search/bots/{query}", handlers.SearchBots)
 		r.Get("/podcast", handlers.GetPodcast)
