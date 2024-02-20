@@ -17,6 +17,14 @@ import (
 	"github.com/stakwork/sphinx-tribes/utils"
 )
 
+type tribeHandler struct {
+	db db.Database
+}
+
+func NewTribeHandler(db db.Database) *tribeHandler {
+	return &tribeHandler{db: db}
+}
+
 func GetAllTribes(w http.ResponseWriter, r *http.Request) {
 	tribes := db.DB.GetAllTribes()
 	w.WriteHeader(http.StatusOK)
@@ -35,23 +43,23 @@ func GetListedTribes(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(tribes)
 }
 
-func GetTribesByOwner(w http.ResponseWriter, r *http.Request) {
+func (th *tribeHandler) GetTribesByOwner(w http.ResponseWriter, r *http.Request) {
 	all := r.URL.Query().Get("all")
 	tribes := []db.Tribe{}
 	pubkey := chi.URLParam(r, "pubkey")
 	if all == "true" {
-		tribes = db.DB.GetAllTribesByOwner(pubkey)
+		tribes = th.db.GetAllTribesByOwner(pubkey)
 	} else {
-		tribes = db.DB.GetTribesByOwner(pubkey)
+		tribes = th.db.GetTribesByOwner(pubkey)
 	}
 	w.WriteHeader(http.StatusOK)
 	json.NewEncoder(w).Encode(tribes)
 }
 
-func GetTribesByAppUrl(w http.ResponseWriter, r *http.Request) {
+func (th *tribeHandler) GetTribesByAppUrl(w http.ResponseWriter, r *http.Request) {
 	tribes := []db.Tribe{}
 	app_url := chi.URLParam(r, "app_url")
-	tribes = db.DB.GetTribesByAppUrl(app_url)
+	tribes = th.db.GetTribesByAppUrl(app_url)
 	w.WriteHeader(http.StatusOK)
 	json.NewEncoder(w).Encode(tribes)
 }
@@ -144,15 +152,15 @@ func DeleteTribe(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(true)
 }
 
-func GetTribe(w http.ResponseWriter, r *http.Request) {
+func (th *tribeHandler) GetTribe(w http.ResponseWriter, r *http.Request) {
 	uuid := chi.URLParam(r, "uuid")
-	tribe := db.DB.GetTribe(uuid)
+	tribe := th.db.GetTribe(uuid)
 
 	var theTribe map[string]interface{}
 	j, _ := json.Marshal(tribe)
 	json.Unmarshal(j, &theTribe)
 
-	theTribe["channels"] = db.DB.GetChannelsByTribe(uuid)
+	theTribe["channels"] = th.db.GetChannelsByTribe(uuid)
 
 	w.WriteHeader(http.StatusOK)
 	json.NewEncoder(w).Encode(theTribe)
