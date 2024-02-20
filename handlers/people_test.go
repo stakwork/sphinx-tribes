@@ -368,10 +368,7 @@ func TestGetListedPeople(t *testing.T) {
 		}
 
 		rctx := chi.NewRouteContext()
-		rctx.URLParams.Add("page", "1")
-		rctx.URLParams.Add("limit", "10")
-		rctx.URLParams.Add("languages", "typescript")
-		req, err := http.NewRequestWithContext(context.WithValue(context.Background(), chi.RouteCtxKey, rctx), http.MethodGet, "/", nil)
+		req, err := http.NewRequestWithContext(context.WithValue(context.Background(), chi.RouteCtxKey, rctx), http.MethodGet, "/?page=1&limit=10&languages=typescript", nil)
 		assert.NoError(t, err)
 
 		mockDb.On("GetListedPeople", mock.Anything).Return(expectedPeople)
