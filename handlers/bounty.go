@@ -32,23 +32,23 @@ func NewBountyHandler(httpClient HttpClient, db db.Database) *bountyHandler {
 
 func (h *bountyHandler) GetAllBounties(w http.ResponseWriter, r *http.Request) {
 	bounties := h.db.GetAllBounties(r)
-	var bountyResponse []db.BountyResponse = GenerateBountyResponse(bounties)
+	var bountyResponse []db.BountyResponse = h.GenerateBountyResponse(bounties)
 
 	w.WriteHeader(http.StatusOK)
 	json.NewEncoder(w).Encode(bountyResponse)
 }
 
-func GetBountyById(w http.ResponseWriter, r *http.Request) {
+func (h *bountyHandler) GetBountyById(w http.ResponseWriter, r *http.Request) {
 	bountyId := chi.URLParam(r, "bountyId")
 	if bountyId == "" {
 		w.WriteHeader(http.StatusNotFound)
 	}
-	bounties, err := db.DB.GetBountyById(bountyId)
+	bounties, err := h.db.GetBountyById(bountyId)
 	if err != nil {
 		w.WriteHeader(http.StatusBadRequest)
 		fmt.Println("Error", err)
 	} else {
-		var bountyResponse []db.BountyResponse = GenerateBountyResponse(bounties)
+		var bountyResponse []db.BountyResponse = h.GenerateBountyResponse(bounties)
 		w.WriteHeader(http.StatusOK)
 		json.NewEncoder(w).Encode(bountyResponse)
 	}
@@ -98,7 +98,7 @@ func GetOrganizationPreviousBountyByCreated(w http.ResponseWriter, r *http.Reque
 	}
 }
 
-func GetBountyIndexById(w http.ResponseWriter, r *http.Request) {
+func (h *bountyHandler) GetBountyIndexById(w http.ResponseWriter, r *http.Request) {
 	bountyId := chi.URLParam(r, "bountyId")
 	if bountyId == "" {
 		w.WriteHeader(http.StatusNotFound)
@@ -108,17 +108,17 @@ func GetBountyIndexById(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(bountyIndex)
 }
 
-func GetBountyByCreated(w http.ResponseWriter, r *http.Request) {
+func (h *bountyHandler) GetBountyByCreated(w http.ResponseWriter, r *http.Request) {
 	created := chi.URLParam(r, "created")
 	if created == "" {
 		w.WriteHeader(http.StatusNotFound)
 	}
-	bounties, err := db.DB.GetBountyDataByCreated(created)
+	bounties, err := h.db.GetBountyDataByCreated(created)
 	if err != nil {
 		w.WriteHeader(http.StatusBadRequest)
 		fmt.Println("Error", err)
 	} else {
-		var bountyResponse []db.BountyResponse = GenerateBountyResponse(bounties)
+		var bountyResponse []db.BountyResponse = h.GenerateBountyResponse(bounties)
 		w.WriteHeader(http.StatusOK)
 		json.NewEncoder(w).Encode(bountyResponse)
 	}
@@ -143,25 +143,25 @@ func GetBountyCount(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(bountyCount)
 }
 
-func GetPersonCreatedBounties(w http.ResponseWriter, r *http.Request) {
-	bounties, err := db.DB.GetCreatedBounties(r)
+func (h *bountyHandler) GetPersonCreatedBounties(w http.ResponseWriter, r *http.Request) {
+	bounties, err := h.db.GetCreatedBounties(r)
 	if err != nil {
 		w.WriteHeader(http.StatusBadRequest)
 		fmt.Println("Error", err)
 	} else {
-		var bountyResponse []db.BountyResponse = GenerateBountyResponse(bounties)
+		var bountyResponse []db.BountyResponse = h.GenerateBountyResponse(bounties)
 		w.WriteHeader(http.StatusOK)
 		json.NewEncoder(w).Encode(bountyResponse)
 	}
 }
 
-func GetPersonAssignedBounties(w http.ResponseWriter, r *http.Request) {
-	bounties, err := db.DB.GetAssignedBounties(r)
+func (h *bountyHandler) GetPersonAssignedBounties(w http.ResponseWriter, r *http.Request) {
+	bounties, err := h.db.GetAssignedBounties(r)
 	if err != nil {
 		w.WriteHeader(http.StatusBadRequest)
 		fmt.Println("Error", err)
 	} else {
-		var bountyResponse []db.BountyResponse = GenerateBountyResponse(bounties)
+		var bountyResponse []db.BountyResponse = h.GenerateBountyResponse(bounties)
 		w.WriteHeader(http.StatusOK)
 		json.NewEncoder(w).Encode(bountyResponse)
 	}
@@ -317,15 +317,15 @@ func UpdatePaymentStatus(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(bounty)
 }
 
-func GenerateBountyResponse(bounties []db.Bounty) []db.BountyResponse {
+func (h *bountyHandler) GenerateBountyResponse(bounties []db.Bounty) []db.BountyResponse {
 	var bountyResponse []db.BountyResponse
 
 	for i := 0; i < len(bounties); i++ {
 		bounty := bounties[i]
 
-		owner := db.DB.GetPersonByPubkey(bounty.OwnerID)
-		assignee := db.DB.GetPersonByPubkey(bounty.Assignee)
-		organization := db.DB.GetOrganizationByUuid(bounty.OrgUuid)
+		owner := h.db.GetPersonByPubkey(bounty.OwnerID)
+		assignee := h.db.GetPersonByPubkey(bounty.Assignee)
+		organization := h.db.GetOrganizationByUuid(bounty.OrgUuid)
 
 		b := db.BountyResponse{
 			Bounty: db.Bounty{
