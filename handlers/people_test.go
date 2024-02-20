@@ -272,8 +272,7 @@ func TestGetPeopleBySearch(t *testing.T) {
 		}
 
 		rctx := chi.NewRouteContext()
-		rctx.URLParams.Add("search", "John")
-		req, err := http.NewRequestWithContext(context.WithValue(context.Background(), chi.RouteCtxKey, rctx), http.MethodGet, "/search", nil)
+		req, err := http.NewRequestWithContext(context.WithValue(context.Background(), chi.RouteCtxKey, rctx), http.MethodGet, "/search?search=John", nil)
 		assert.NoError(t, err)
 
 		mockDb.On("GetPeopleBySearch", mock.Anything).Return(expectedPeople)
@@ -294,8 +293,7 @@ func TestGetPeopleBySearch(t *testing.T) {
 		expectedPeople := []db.Person{}
 
 		rctx := chi.NewRouteContext()
-		rctx.URLParams.Add("search", "user not matched")
-		req, err := http.NewRequestWithContext(context.WithValue(context.Background(), chi.RouteCtxKey, rctx), http.MethodGet, "/search", nil)
+		req, err := http.NewRequestWithContext(context.WithValue(context.Background(), chi.RouteCtxKey, rctx), http.MethodGet, "/search?search=user not matched", nil)
 		assert.NoError(t, err)
 
 		mockDb.On("GetPeopleBySearch", mock.Anything).Return(expectedPeople)
@@ -323,9 +321,7 @@ func TestGetListedPeople(t *testing.T) {
 		}
 
 		rctx := chi.NewRouteContext()
-		rctx.URLParams.Add("page", "1")
-		rctx.URLParams.Add("limit", "10")
-		req, err := http.NewRequestWithContext(context.WithValue(context.Background(), chi.RouteCtxKey, rctx), http.MethodGet, "/", nil)
+		req, err := http.NewRequestWithContext(context.WithValue(context.Background(), chi.RouteCtxKey, rctx), http.MethodGet, "/?page=1&limit=10", nil)
 		assert.NoError(t, err)
 
 		mockDb.On("GetListedPeople", mock.Anything).Return(expectedPeople)
@@ -349,10 +345,7 @@ func TestGetListedPeople(t *testing.T) {
 		}
 
 		rctx := chi.NewRouteContext()
-		rctx.URLParams.Add("page", "1")
-		rctx.URLParams.Add("limit", "10")
-		rctx.URLParams.Add("search", "John")
-		req, err := http.NewRequestWithContext(context.WithValue(context.Background(), chi.RouteCtxKey, rctx), http.MethodGet, "/", nil)
+		req, err := http.NewRequestWithContext(context.WithValue(context.Background(), chi.RouteCtxKey, rctx), http.MethodGet, "/?page=1&limit=10&search=John", nil)
 		assert.NoError(t, err)
 
 		mockDb.On("GetListedPeople", mock.Anything).Return(expectedPeople)
