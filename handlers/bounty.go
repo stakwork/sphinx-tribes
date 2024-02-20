@@ -19,14 +19,16 @@ import (
 )
 
 type bountyHandler struct {
-	httpClient HttpClient
-	db         db.Database
+	httpClient            HttpClient
+	db                    db.Database
+	generateBountyResponse func(bounties []db.Bounty) []db.BountyResponse
 }
 
 func NewBountyHandler(httpClient HttpClient, db db.Database) *bountyHandler {
 	return &bountyHandler{
-		httpClient: httpClient,
-		db:         db,
+		httpClient:            httpClient,
+		db:                    db,
+		generateBountyResponse: GenerateBountyResponse,
 	}
 }
 
@@ -54,8 +56,8 @@ func (h *bountyHandler) GetBountyById(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func GetNextBountyByCreated(w http.ResponseWriter, r *http.Request) {
-	bounties, err := db.DB.GetNextBountyByCreated(r)
+func (h *bountyHandler) GetNextBountyByCreated(w http.ResponseWriter, r *http.Request) {
+	bounties, err := h.db.GetNextBountyByCreated(r)
 	if err != nil {
 		w.WriteHeader(http.StatusBadRequest)
 		fmt.Println("Error", err)
@@ -65,8 +67,8 @@ func GetNextBountyByCreated(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func GetPreviousBountyByCreated(w http.ResponseWriter, r *http.Request) {
-	bounties, err := db.DB.GetPreviousBountyByCreated(r)
+func (h *bountyHandler) GetPreviousBountyByCreated(w http.ResponseWriter, r *http.Request) {
+	bounties, err := h.db.GetPreviousBountyByCreated(r)
 	if err != nil {
 		w.WriteHeader(http.StatusBadRequest)
 		fmt.Println("Error", err)
@@ -76,8 +78,8 @@ func GetPreviousBountyByCreated(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func GetOrganizationNextBountyByCreated(w http.ResponseWriter, r *http.Request) {
-	bounties, err := db.DB.GetNextOrganizationBountyByCreated(r)
+func (h *bountyHandler) GetOrganizationNextBountyByCreated(w http.ResponseWriter, r *http.Request) {
+	bounties, err := h.db.GetNextOrganizationBountyByCreated(r)
 	if err != nil {
 		w.WriteHeader(http.StatusBadRequest)
 		fmt.Println("Error", err)
@@ -87,8 +89,8 @@ func GetOrganizationNextBountyByCreated(w http.ResponseWriter, r *http.Request) 
 	}
 }
 
-func GetOrganizationPreviousBountyByCreated(w http.ResponseWriter, r *http.Request) {
-	bounties, err := db.DB.GetPreviousOrganizationBountyByCreated(r)
+func (h *bountyHandler) GetOrganizationPreviousBountyByCreated(w http.ResponseWriter, r *http.Request) {
+	bounties, err := h.db.GetPreviousOrganizationBountyByCreated(r)
 	if err != nil {
 		w.WriteHeader(http.StatusBadRequest)
 		fmt.Println("Error", err)
@@ -119,6 +121,7 @@ func (h *bountyHandler) GetBountyByCreated(w http.ResponseWriter, r *http.Reques
 		fmt.Println("Error", err)
 	} else {
 		var bountyResponse []db.BountyResponse = h.GenerateBountyResponse(bounties)
+
 		w.WriteHeader(http.StatusOK)
 		json.NewEncoder(w).Encode(bountyResponse)
 	}

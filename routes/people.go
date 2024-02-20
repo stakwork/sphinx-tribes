@@ -11,9 +11,12 @@ import (
 func PeopleRoutes() chi.Router {
 	r := chi.NewRouter()
 	bountyHandler := handlers.NewBountyHandler(http.DefaultClient, db.DB)
+
+	peopleHandler := handlers.NewPeopleHandler(db.DB)
+
 	r.Group(func(r chi.Router) {
-		r.Get("/", handlers.GetListedPeople)
-		r.Get("/search", handlers.GetPeopleBySearch)
+		r.Get("/", peopleHandler.GetListedPeople)
+		r.Get("/search", peopleHandler.GetPeopleBySearch)
 		r.Get("/posts", handlers.GetListedPosts)
 		r.Get("/wanteds/assigned/{uuid}", bountyHandler.GetPersonAssignedBounties)
 		r.Get("/wanteds/created/{uuid}", bountyHandler.GetPersonCreatedBounties)
