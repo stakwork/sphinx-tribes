@@ -12,10 +12,8 @@ import (
 	"strconv"
 	"strings"
 	"testing"
-	"time"
 
 	"github.com/go-chi/chi"
-	"github.com/lib/pq"
 	"github.com/stakwork/sphinx-tribes/auth"
 	"github.com/stakwork/sphinx-tribes/config"
 	"github.com/stakwork/sphinx-tribes/db"
@@ -453,7 +451,6 @@ func TestDeleteBounty(t *testing.T) {
 	})
 }
 
-
 func TestGetBountyByCreated(t *testing.T) {
 	mockDb := dbMocks.NewDatabase(t)
 	mockHttpClient := mocks.NewHttpClient(t)
@@ -493,7 +490,10 @@ func TestGetBountyByCreated(t *testing.T) {
 }
 
 func TestGetPersonAssignedBounties(t *testing.T) {
-  	t.Run("Should successfull Get Person Assigned Bounties", func(t *testing.T) {
+	mockDb := dbMocks.NewDatabase(t)
+	mockHttpClient := mocks.NewHttpClient(t)
+	bHandler := NewBountyHandler(mockHttpClient, mockDb)
+	t.Run("Should successfull Get Person Assigned Bounties", func(t *testing.T) {
 		rr := httptest.NewRecorder()
 		handler := http.HandlerFunc(bHandler.GetPersonAssignedBounties)
 		bounty := db.Bounty{
@@ -529,51 +529,12 @@ func TestGetPersonAssignedBounties(t *testing.T) {
 	})
 }
 
-func TestGetBountyByCreated(t *testing.T) {
-	ctx := context.WithValue(context.Background(), auth.ContextKey, "test-key")
-	mockDb := dbMocks.NewDatabase(t)
-	mockGenerateBountyResponse := func(bounties []db.Bounty) []db.BountyResponse {
-		return []db.BountyResponse{} // Mocked response
-	}
-	mockHttpClient := mocks.NewHttpClient(t)
-	bHandler := NewBountyHandler(mockHttpClient, mockDb)
-
-	t.Run("Should return bounty by its created value", func(t *testing.T) {
-		bHandler.generateBountyResponse = mockGenerateBountyResponse
-
-		expectedBounty := []db.Bounty{{
-			ID:          1,
-			Type:        "type1",
-			Title:       "Test Bounty",
-			Description: "Description",
-			Created:     123456789,
-		}}
-		mockDb.On("GetBountyDataByCreated", "123456789").Return(expectedBounty, nil).Once()
-
-		rr := httptest.NewRecorder()
-		handler := http.HandlerFunc(bHandler.GetBountyByCreated)
-
-		req, err := http.NewRequestWithContext(ctx, "GET", "/bounty/123456789", nil)
-		if err != nil {
-			t.Fatal(err)
-		}
-		chiCtx := chi.NewRouteContext()
-		chiCtx.URLParams.Add("created", "123456789")
-		req = req.WithContext(context.WithValue(req.Context(), chi.RouteCtxKey, chiCtx))
-
-		handler.ServeHTTP(rr, req)
-
-		assert.Equal(t, http.StatusOK, rr.Code)
-	})
-}
-
 func TestGetNextBountyByCreated(t *testing.T) {
 	ctx := context.Background()
 
 	mockDb := dbMocks.NewDatabase(t)
 	mockHttpClient := mocks.NewHttpClient(t)
 	bHandler := NewBountyHandler(mockHttpClient, mockDb)
-
 
 	t.Run("Should test that the next bounty on the bounties homepage can be gotten by its created value and the selected filters", func(t *testing.T) {
 		mockDb.On("GetNextBountyByCreated", mock.Anything).Return(uint(1), nil).Once()
