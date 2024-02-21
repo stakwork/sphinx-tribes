@@ -28,7 +28,6 @@ func NewBountyHandler(httpClient HttpClient, db db.Database) *bountyHandler {
 	return &bountyHandler{
 		httpClient:            httpClient,
 		db:                    db,
-		generateBountyResponse: GenerateBountyResponse,
 	}
 }
 
