@@ -34,9 +34,9 @@ func NewRouter() *http.Server {
 	r.Mount("/metrics", MetricsRoutes())
 
 	r.Group(func(r chi.Router) {
-		r.Get("/tribe_by_feed", handlers.GetFirstTribeByFeed)
+		r.Get("/tribe_by_feed", tribeHandlers.GetFirstTribeByFeed)
 		r.Get("/leaderboard/{tribe_uuid}", handlers.GetLeaderBoard)
-		r.Get("/tribe_by_un/{un}", handlers.GetTribeByUniqueName)
+		r.Get("/tribe_by_un/{un}", tribeHandlers.GetTribeByUniqueName)
 		r.Get("/tribes_by_owner/{pubkey}", tribeHandlers.GetTribesByOwner)
 
 		r.Get("/search/bots/{query}", handlers.SearchBots)
@@ -63,11 +63,11 @@ func NewRouter() *http.Server {
 		r.Post("/channel", handlers.CreateChannel)
 		r.Post("/leaderboard/{tribe_uuid}", handlers.CreateLeaderBoard)
 		r.Put("/leaderboard/{tribe_uuid}", handlers.UpdateLeaderBoard)
-		r.Put("/tribe", handlers.CreateOrEditTribe)
+		r.Put("/tribe", tribeHandlers.CreateOrEditTribe)
 		r.Put("/tribestats", handlers.PutTribeStats)
-		r.Delete("/tribe/{uuid}", handlers.DeleteTribe)
+		r.Delete("/tribe/{uuid}", tribeHandlers.DeleteTribe)
 		r.Put("/tribeactivity/{uuid}", handlers.PutTribeActivity)
-		r.Put("/tribepreview/{uuid}", handlers.SetTribePreview)
+		r.Put("/tribepreview/{uuid}", tribeHandlers.SetTribePreview)
 		r.Post("/verify/{challenge}", db.Verify)
 		r.Post("/badges", handlers.AddOrRemoveBadge)
 		r.Delete("/channel/{id}", handlers.DeleteChannel)

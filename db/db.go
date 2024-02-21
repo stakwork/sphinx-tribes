@@ -656,6 +656,76 @@ func (db database) GetOrganizationBounties(r *http.Request, org_uuid string) []B
 	return ms
 }
 
+func (db database) GetOrganizationBountiesCount(r *http.Request, org_uuid string) int64 {
+	keys := r.URL.Query()
+	tags := keys.Get("tags") // this is a string of tags separated by commas
+	search := keys.Get("search")
+	open := keys.Get("Open")
+	assingned := keys.Get("Assigned")
+	paid := keys.Get("Paid")
+	languages := keys.Get("languages")
+	languageArray := strings.Split(languages, ",")
+	languageLength := len(languageArray)
+
+	searchQuery := ""
+	languageQuery := ""
+
+	if search != "" {
+		searchQuery = fmt.Sprintf("AND LOWER(title) LIKE %s", "'%"+strings.ToLower(search)+"%'")
+	}
+
+	var statusConditions []string
+
+	if open == "true" {
+		statusConditions = append(statusConditions, "assignee = '' AND paid != true")
+	}
+	if assingned == "true" {
+		statusConditions = append(statusConditions, "assignee != '' AND paid = false")
+	}
+	if paid == "true" {
+		statusConditions = append(statusConditions, "paid = true")
+	}
+
+	var statusQuery string
+	if len(statusConditions) > 0 {
+		statusQuery = " AND (" + strings.Join(statusConditions, " OR ") + ")"
+	} else {
+		statusQuery = ""
+	}
+
+	if languageLength > 0 {
+		langs := ""
+		for i, val := range languageArray {
+			if val != "" {
+				if i == 0 {
+					langs = "'" + val + "'"
+				} else {
+					langs = langs + ", '" + val + "'"
+				}
+				languageQuery = "AND coding_languages && ARRAY[" + langs + "]"
+			}
+		}
+	}
+
+	var count int64
+
+	query := `SELECT COUNT(*) FROM bounty WHERE org_uuid = '` + org_uuid + `'`
+	allQuery := query + " " + statusQuery + " " + searchQuery + " " + languageQuery
+	theQuery := db.db.Raw(allQuery)
+
+	if tags != "" {
+		// pull out the tags and add them in here
+		t := strings.Split(tags, ",")
+		for _, s := range t {
+			theQuery = theQuery.Where("'" + s + "'" + " = any (tags)")
+		}
+	}
+
+	theQuery.Scan(&count)
+
+	return count
+}
+
 func (db database) GetAssignedBounties(r *http.Request) ([]Bounty, error) {
 	offset, limit, sortBy, direction, _ := utils.GetPaginationParams(r)
 	uuid := chi.URLParam(r, "uuid")
@@ -1050,7 +1120,7 @@ func (db database) GetAllBounties(r *http.Request) []Bounty {
 	query := "SELECT * FROM public.bounty WHERE show != false"
 
 	allQuery := query + " " + statusQuery + " " + searchQuery + " " + orgQuery + " " + languageQuery + " " + orderQuery + " " + limitQuery
-	
+
 	theQuery := db.db.Raw(allQuery)
 
 	if tags != "" {
