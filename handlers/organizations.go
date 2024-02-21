@@ -720,3 +720,86 @@ func (oh *organizationHandler) DeleteOrganization(w http.ResponseWriter, r *http
 }
 
 
+func GenerateBountyResponse(bounties []db.Bounty) []db.BountyResponse {
+	var bountyResponse []db.BountyResponse
+
+	for i := 0; i < len(bounties); i++ {
+		bounty := bounties[i]
+
+		owner := db.DB.GetPersonByPubkey(bounty.OwnerID)
+		assignee := db.DB.GetPersonByPubkey(bounty.Assignee)
+		organization := db.DB.GetOrganizationByUuid(bounty.OrgUuid)
+
+		b := db.BountyResponse{
+			Bounty: db.Bounty{
+				ID:                      bounty.ID,
+				OwnerID:                 bounty.OwnerID,
+				Paid:                    bounty.Paid,
+				Show:                    bounty.Show,
+				Type:                    bounty.Type,
+				Award:                   bounty.Award,
+				AssignedHours:           bounty.AssignedHours,
+				BountyExpires:           bounty.BountyExpires,
+				CommitmentFee:           bounty.CommitmentFee,
+				Price:                   bounty.Price,
+				Title:                   bounty.Title,
+				Tribe:                   bounty.Tribe,
+				Created:                 bounty.Created,
+				Assignee:                bounty.Assignee,
+				TicketUrl:               bounty.TicketUrl,
+				Description:             bounty.Description,
+				WantedType:              bounty.WantedType,
+				Deliverables:            bounty.Deliverables,
+				GithubDescription:       bounty.GithubDescription,
+				OneSentenceSummary:      bounty.OneSentenceSummary,
+				EstimatedSessionLength:  bounty.EstimatedSessionLength,
+				EstimatedCompletionDate: bounty.EstimatedCompletionDate,
+				OrgUuid:                 bounty.OrgUuid,
+				Updated:                 bounty.Updated,
+				CodingLanguages:         bounty.CodingLanguages,
+			},
+			Assignee: db.Person{
+				ID:               assignee.ID,
+				Uuid:             assignee.Uuid,
+				OwnerPubKey:      assignee.OwnerPubKey,
+				OwnerAlias:       assignee.OwnerAlias,
+				UniqueName:       assignee.UniqueName,
+				Description:      assignee.Description,
+				Tags:             assignee.Tags,
+				Img:              assignee.Img,
+				Created:          assignee.Created,
+				Updated:          assignee.Updated,
+				LastLogin:        assignee.LastLogin,
+				OwnerRouteHint:   assignee.OwnerRouteHint,
+				OwnerContactKey:  assignee.OwnerContactKey,
+				PriceToMeet:      assignee.PriceToMeet,
+				TwitterConfirmed: assignee.TwitterConfirmed,
+			},
+			Owner: db.Person{
+				ID:               owner.ID,
+				Uuid:             owner.Uuid,
+				OwnerPubKey:      owner.OwnerPubKey,
+				OwnerAlias:       owner.OwnerAlias,
+				UniqueName:       owner.UniqueName,
+				Description:      owner.Description,
+				Tags:             owner.Tags,
+				Img:              owner.Img,
+				Created:          owner.Created,
+				Updated:          owner.Updated,
+				LastLogin:        owner.LastLogin,
+				OwnerRouteHint:   owner.OwnerRouteHint,
+				OwnerContactKey:  owner.OwnerContactKey,
+				PriceToMeet:      owner.PriceToMeet,
+				TwitterConfirmed: owner.TwitterConfirmed,
+			},
+			Organization: db.OrganizationShort{
+				Name: organization.Name,
+				Uuid: organization.Uuid,
+				Img:  organization.Img,
+			},
+		}
+		bountyResponse = append(bountyResponse, b)
+	}
+
+	return bountyResponse
+}
