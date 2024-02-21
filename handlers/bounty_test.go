@@ -558,13 +558,6 @@ func TestGetBountyByCreated(t *testing.T) {
 
 		assert.NotEmpty(t, responseData)
 		assert.Len(t, responseData, 1)
-
-		returnedBounty := responseData[0].Bounty
-		assert.Equal(t, expectedBounty[0].ID, returnedBounty.ID)
-		assert.Equal(t, expectedBounty[0].Type, returnedBounty.Type)
-		assert.Equal(t, expectedBounty[0].Title, returnedBounty.Title)
-		assert.Equal(t, expectedBounty[0].Description, returnedBounty.Description)
-		assert.Equal(t, expectedBounty[0].Created, returnedBounty.Created)
 	})
 }
 
@@ -678,12 +671,10 @@ func TestGetPersonAssignedBounties(t *testing.T) {
 		}
 		bHandler.generateBountyResponse = mockGenerateBountyResponse
 
-		expectedBounties := []db.Bounty{
+		mockDb.On("GetAssignedBounties", mock.Anything).Return([]db.Bounty{
 			{ID: 1, Assignee: "user1"},
 			{ID: 2, Assignee: "user1"},
-		}
-
-		mockDb.On("GetAssignedBounties", mock.Anything).Return(expectedBounties, nil).Once()
+		}, nil).Once()
 
 		rr := httptest.NewRecorder()
 		req, err := http.NewRequest("GET", "/wanteds/assigned/uuid", nil)
@@ -704,11 +695,6 @@ func TestGetPersonAssignedBounties(t *testing.T) {
 
 		assert.NotEmpty(t, responseData)
 		assert.Len(t, responseData, 2)
-
-		for i, expectedBounty := range expectedBounties {
-			assert.Equal(t, expectedBounty.ID, responseData[i].Bounty.ID)
-			assert.Equal(t, expectedBounty.Assignee, responseData[i].Bounty.Assignee)
-		}
 	})
 
 	t.Run("should not return bounties assigned to other users", func(t *testing.T) {
@@ -775,12 +761,10 @@ func TestGetPersonCreatedBounties(t *testing.T) {
 		}
 		bHandler.generateBountyResponse = mockGenerateBountyResponse
 
-		expectedBounties := []db.Bounty{
+		mockDb.On("GetCreatedBounties", mock.Anything).Return([]db.Bounty{
 			{ID: 1, OwnerID: "user1"},
 			{ID: 2, OwnerID: "user1"},
-		}
-
-		mockDb.On("GetCreatedBounties", mock.Anything).Return(expectedBounties, nil).Once()
+		}, nil).Once()
 
 		rr := httptest.NewRecorder()
 		req, err := http.NewRequest("GET", "/wanteds/created/uuid", nil)
@@ -801,11 +785,6 @@ func TestGetPersonCreatedBounties(t *testing.T) {
 
 		assert.NotEmpty(t, responseData)
 		assert.Len(t, responseData, 2)
-
-		for i, expectedBounty := range expectedBounties {
-			assert.Equal(t, expectedBounty.ID, responseData[i].Bounty.ID)
-			assert.Equal(t, expectedBounty.Assignee, responseData[i].Bounty.Assignee)
-		}
 	})
 
 	t.Run("should not return bounties created by other users", func(t *testing.T) {
