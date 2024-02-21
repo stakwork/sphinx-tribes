@@ -28,7 +28,7 @@ func GetPaginationParams(r *http.Request) (int, int, string, string, string) {
 		intPage = 1
 	}
 	if intLimit == 0 {
-		intLimit = -1
+		intLimit = 1
 	}
 	if sortBy == "" {
 		sortBy = "created"
