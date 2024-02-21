@@ -1,0 +1,35 @@
+DatePosted,Organization,BountyAmount,Provider,Hunter,BountyTitle,BountyLink,BountyStatus,DateAssigned,DatePaid
+2024-01-07 18:12:36 +0530 IST,Guardians,1000000,Evan,Evan,Test Bounty ,https://community.sphinx.chat/bounty/1,Assigned,2024-01-07 19:10:11.410492 +0530 IST,<nil>
+2024-01-06 04:04:03 +0530 IST,,100000,,,Hunter Referral Bonus,https://community.sphinx.chat/bounty/1086,Assigned,<nil>,<nil>
+2024-01-05 23:53:05 +0530 IST,,300000,,,Make Admin Metrics Page Responsive On All Screens,https://community.sphinx.chat/bounty/1081,Assigned,<nil>,<nil>
+2024-01-05 17:52:19 +0530 IST,,150000,,,Add loading state when changing display,https://community.sphinx.chat/bounty/1077,Assigned,<nil>,<nil>
+2024-01-04 23:12:32 +0530 IST,,200000,,,Admin is not showing the hunter/provider alias of the sphinx profiles,https://community.sphinx.chat/bounty/1068,Assigned,<nil>,<nil>
+2024-01-03 23:50:58 +0530 IST,,100000,,,Refer a hunter to the bounties platform,https://community.sphinx.chat/bounty/1055,Assigned,<nil>,<nil>
+2024-01-03 21:57:35 +0530 IST,,300000,,,Create component test for OrganizationView,https://community.sphinx.chat/bounty/1049,Assigned,<nil>,<nil>
+2024-01-03 14:57:50 +0530 IST,,600000,,,[Date Range] Implement custom time filters,https://community.sphinx.chat/bounty/1042,Assigned,<nil>,<nil>
+2024-01-02 23:28:25 +0530 IST,,300000,,,Hide tribe button if no tribe is attached to a bounty ,https://community.sphinx.chat/bounty/1035,Assigned,<nil>,<nil>
+2024-01-02 23:25:45 +0530 IST,,200000,,,Create unit test for people.ts,https://community.sphinx.chat/bounty/1034,Assigned,<nil>,<nil>
+2024-01-02 23:24:17 +0530 IST,,400000,,,Add ability to manually enlarge the height of the description box when creating bounty,https://community.sphinx.chat/bounty/1033,Assigned,<nil>,<nil>
+2023-12-27 17:46:08 +0530 IST,,400000,,,Create error notification if bounty fails to get created,https://community.sphinx.chat/bounty/1016,Assigned,<nil>,<nil>
+2023-12-22 17:28:39 +0530 IST,,150000,,,Remove details section for person node,https://community.sphinx.chat/bounty/967,Assigned,<nil>,<nil>
+2023-12-21 16:28:06 +0530 IST,,250000,,,Get video IDs inside Jarvis and check for duplicates,https://community.sphinx.chat/bounty/963,Assigned,<nil>,<nil>
+2023-12-09 02:11:18 +0530 IST,,50000,,,Unable to upload a picture to an organization even with right permissions,https://community.sphinx.chat/bounty/875,Assigned,<nil>,<nil>
+2023-12-08 22:55:40 +0530 IST,,300000,,,Display new UI for Clips from an Episode view in details section,https://community.sphinx.chat/bounty/874,Assigned,<nil>,<nil>
+2023-12-08 01:32:34 +0530 IST,,700000,,,"Create ""Add secondbrain flow""",https://community.sphinx.chat/bounty/870,Assigned,<nil>,<nil>
+2023-12-01 00:34:59 +0530 IST,,1050000,,,Consultation for implementing a full testing suite,https://community.sphinx.chat/bounty/819,Assigned,<nil>,<nil>
+2023-11-28 19:28:36 +0530 IST,,400000,,,Transaction List Improvement,https://community.sphinx.chat/bounty/804,Assigned,<nil>,<nil>
+2023-11-23 16:47:40 +0530 IST,,250000,,,Store default graph view in local storage,https://community.sphinx.chat/bounty/776,Assigned,<nil>,<nil>
+2023-11-17 02:12:24 +0530 IST,,600000,,,Prevent jitsi recordings from stopping after 10 minutes,https://community.sphinx.chat/bounty/375,Assigned,<nil>,<nil>
+2023-11-03 22:55:26 +0530 IST,,6500000,,,Implement Bitcoin Script interpreter,https://community.sphinx.chat/bounty/650,Assigned,<nil>,<nil>
+2023-11-03 00:12:45 +0530 IST,,200000,,,Add coverage for component testing,https://community.sphinx.chat/bounty/630,Assigned,<nil>,<nil>
+2023-11-02 21:00:16 +0530 IST,,1000000,,,Embed Jitsi into Mac desktop app,https://community.sphinx.chat/bounty/386,Assigned,<nil>,<nil>
+2023-10-11 04:06:52 +0530 IST,,145678,,,Design 3 logos and a color palette,https://community.sphinx.chat/bounty/532,Assigned,<nil>,<nil>
+2023-10-06 05:24:36 +0530 IST,,400000,,,[NOSTR] Configure NOSTR node for support channel and website chat widget,https://community.sphinx.chat/bounty/510,Assigned,<nil>,<nil>
+2023-10-03 22:58:44 +0530 IST,,500000,,,Implement Script to Download Loom Videos,https://community.sphinx.chat/bounty/482,Assigned,<nil>,<nil>
+2023-09-30 03:27:22 +0530 IST,,500000,,,Graphics Artist for Postcard,https://community.sphinx.chat/bounty/468,Assigned,<nil>,<nil>
+2023-09-14 22:12:11 +0530 IST,,750000,,,Fix Jitsi - one way audio issues,https://community.sphinx.chat/bounty/387,Assigned,<nil>,<nil>
+2023-06-10 00:44:18 +0530 IST,,500000,,,Write a Neo4j query that can search multiple words in a graph,https://community.sphinx.chat/bounty/177,Assigned,<nil>,<nil>
+2023-06-04 10:30:30 +0530 IST,,1250000,,,Affinity integration,https://community.sphinx.chat/bounty/278,Assigned,<nil>,<nil>
+2023-03-24 20:52:33 +0530 IST,,200000,,,Channel opening docs improvement,https://community.sphinx.chat/bounty/51,Assigned,<nil>,<nil>
+2023-02-17 05:01:00 +0530 IST,,800000,,,Speaker Matching Model,https://community.sphinx.chat/bounty/108,Assigned,<nil>,<nil>
+2023-02-17 04:48:49 +0530 IST,,800000,,,Dockerize Python Library,https://community.sphinx.chat/bounty/259,Assigned,<nil>,<nil>

@@ -1,0 +1,228 @@
+Arguments: 
+  /home/z0049w7n/.nvm/versions/node/v18.14.2/bin/node /home/z0049w7n/.cache/node/corepack/yarn/1.22.19/bin/yarn.js
+
+PATH: 
+  /home/z0049w7n/.nvm/versions/node/v18.14.2/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/snap/bin:/usr/local/go/bin:/home/z0049w7n/go/bin
+
+Yarn version: 
+  1.22.19
+
+Node version: 
+  18.14.2
+
+Platform: 
+  linux x64
+
+Trace: 
+  Error: getaddrinfo EAI_AGAIN registry.npmjs.org
+      at GetAddrInfoReqWrap.onlookup [as oncomplete] (node:dns:107:26)
+
+npm manifest: 
+  {
+    "name": "catcher",
+    "version": "0.1.0",
+    "prettier": "prettier.json",
+    "private": true,
+    "scripts": {
+      "start": "craco start",
+      "start:tribes:docker": "PORT=23000 craco start",
+      "start:tribes:cluster": "PORT=13000 craco start",
+      "start:people": "PORT=3007 craco start",
+      "start:people:docker": "PORT=23007 craco start",
+      "start:people:cluster": "PORT=13007 craco start",
+      "build": "craco build",
+      "eject": "craco eject",
+      "lint": "eslint src --max-warnings 71 --ext .ts --ext .tsx --ignore-pattern *.spec.tsx --ignore-pattern *.spec.ts",
+      "lint:fix": "npm run lint -- --fix",
+      "prettier": "npx prettier --config .prettierrc.json -w ./src",
+      "prettier:check": "npx prettier --config .prettierrc.json --check ./src",
+      "prepare": "cd ../.. && husky install frontend/app/.husky",
+      "test": "yarn run test-jest",
+      "test-jest": "REACT_APP_IS_TEST=true NODE_ENV=test yarn jest --coverage --no-cache --transformIgnorePatterns \"./frontend/app/svg/\""
+    },
+    "dependencies": {
+      "@elastic/datemath": "^5.0.2",
+      "@elastic/eui": "^64.0.4",
+      "@emotion/react": "^11.11.1",
+      "@emotion/styled": "^11.11.0",
+      "@loomhq/loom-embed": "^1.4.0",
+      "@loomhq/record-sdk": "^2.35.16",
+      "@material/react-material-icon": "^0.15.0",
+      "@mui/base": "^5.0.0-beta.16",
+      "@mui/system": "^5.14.10",
+      "@types/date-fns": "^2.6.0",
+      "add": "^2.0.6",
+      "bootstrap": "^4.5.0",
+      "clsx": "^2.0.0",
+      "compose-function": "^3.0.3",
+      "date-fns": "^3.2.0",
+      "dateformat": "^3.0.3",
+      "formik": "^2.2.6",
+      "fuse.js": "^5.2.3",
+      "jest-fetch-mock": "^3.0.3",
+      "light-bolt11-decoder": "^3.0.0",
+      "lodash": "^4.17.15",
+      "memo-decorator": "^2.0.1",
+      "mobx": "^6.8.0",
+      "mobx-persist": "^0.4.1",
+      "mobx-persist-store": "^1.1.3",
+      "mobx-react-lite": "^3.4.3",
+      "moment": "^2.29.4",
+      "react": "^16.12.0",
+      "react-dom": "^16.12.0",
+      "react-dropzone": "^14.2.3",
+      "react-intersection-observer": "^9.4.1",
+      "react-markdown": "^8.0.3",
+      "react-qr-svg": "^2.2.2",
+      "react-qrcode-logo": "^2.5.0",
+      "react-router-dom": "^5.2.0",
+      "react-scripts": "5.0.1",
+      "react-select": "^5.1.0",
+      "rehype-raw": "^6.1.1",
+      "remark-gfm": "^3.0.1",
+      "remark-rehype": "^10.1.0",
+      "socket.io-client": "^4.6.1",
+      "styled-components": "^5.1.0",
+      "yarn": "^1.22.19",
+      "yup": "^0.32.9"
+    },
+    "eslintConfig": {
+      "extends": [
+        "react-app",
+        "eslint:recommended",
+        "plugin:react/recommended",
+        "plugin:@typescript-eslint/recommended"
+      ],
+      "parser": "@typescript-eslint/parser",
+      "plugins": [
+        "@typescript-eslint"
+      ],
+      "root": true,
+      "rules": {
+        "arrow-body-style": [
+          "warn",
+          "as-needed"
+        ],
+        "@typescript-eslint/typedef": [
+          "error",
+          {
+            "parameter": true,
+            "objectDestructuring": false,
+            "arrowParameter": true,
+            "memberVariableDeclaration": false
+          }
+        ],
+        "no-use-before-define": [
+          "error",
+          {
+            "functions": true,
+            "classes": true,
+            "variables": true,
+            "allowNamedExports": false
+          }
+        ],
+        "import/order": "error",
+        "camelcase": "off",
+        "comma-dangle": "off",
+        "@typescript-eslint/no-explicit-any": "off",
+        "@typescript-eslint/no-inferrable-types": "warn",
+        "@typescript-eslint/no-empty-function": "error",
+        "@typescript-eslint/no-empty-interface": "error",
+        "@typescript-eslint/ban-types": "warn",
+        "@typescript-eslint/ban-ts-comment": "warn",
+        "react-hooks/rules-of-hooks": "warn",
+        "react-hooks/exhaustive-deps": "warn",
+        "react/prop-types": "warn",
+        "no-unused-vars": "warn",
+        "no-var": "warn",
+        "no-extra-boolean-cast": "warn",
+        "no-useless-escape": "warn",
+        "no-prototype-builtins": "warn",
+        "no-empty-pattern": "warn",
+        "no-empty": "warn",
+        "no-multiple-empty-lines": "error",
+        "no-unreachable": "error",
+        "no-useless-catch": "warn",
+        "react/jsx-closing-bracket-location": [
+          "warn",
+          "tag-aligned"
+        ],
+        "react/jsx-closing-tag-location": "warn",
+        "jsx-quotes": [
+          "error",
+          "prefer-double"
+        ],
+        "prefer-const": "warn",
+        "no-const-assign": "warn",
+        "prefer-destructuring": [
+          "error",
+          {
+            "object": true,
+            "array": false
+          }
+        ],
+        "prefer-template": "warn",
+        "func-style": "off",
+        "react/self-closing-comp": "warn",
+        "react/jsx-no-target-blank": "warn",
+        "react/jsx-key": "warn",
+        "react/no-children-prop": "warn",
+        "react/no-unescaped-entities": "warn",
+        "@typescript-eslint/no-unused-vars": [
+          "warn",
+          {
+            "varsIgnorePattern": "_"
+          }
+        ]
+      }
+    },
+    "browserslist": {
+      "production": [
+        ">0.2%",
+        "not dead",
+        "not op_mini all"
+      ],
+      "development": [
+        "last 1 chrome version",
+        "last 1 firefox version",
+        "last 1 safari version"
+      ]
+    },
+    "devDependencies": {
+      "@babel/plugin-transform-modules-commonjs": "^7.23.3",
+      "@babel/preset-typescript": "^7.23.3",
+      "@craco/craco": "^7.0.0",
+      "@testing-library/jest-dom": "^5.16.5",
+      "@testing-library/react": "^12.1.2",
+      "@testing-library/react-hooks": "^8.0.1",
+      "@testing-library/user-event": "^7.1.2",
+      "@types/dateformat": "^3.0.1",
+      "@types/jest": "^24.9.1",
+      "@types/node": "^12.12.27",
+      "@types/react-dom": "18.0.4",
+      "@types/react-router-dom": "^5.1.8",
+      "@types/sinon": "^17.0.2",
+      "@types/styled-components": "^5.1.0",
+      "@typescript-eslint/eslint-plugin": "^5.57.1",
+      "@typescript-eslint/parser": "^5.57.1",
+      "bootstrap": "^4.5.0",
+      "eslint": "^8.37.0",
+      "eslint-config-airbnb": "^19.0.4",
+      "eslint-config-react": "^1.1.7",
+      "eslint-plugin-react": "^7.31.10",
+      "husky": "^8.0.3",
+      "nock": "^13.3.0",
+      "prettier": "3.0.3",
+      "react-error-overlay": "6.0.9",
+      "sinon": "^17.0.1",
+      "ts-jest": "^29.1.1",
+      "ts-loader": "^9.5.1",
+      "typescript": "^5.3.2"
+    }
+  }
+
+yarn manifest: 
+  No manifest
+
+Lockfile: 
+  No lockfile
