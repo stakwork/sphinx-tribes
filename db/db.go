@@ -1814,7 +1814,7 @@ func (db database) GetPaymentHistory(org_uuid string, r *http.Request) []Payment
 
 	limitQuery = fmt.Sprintf("LIMIT %d  OFFSET %d", limit, offset)
 
-	query := `SELECT * FROM payment_histories WHERE org_uuid = '` + org_uuid + `' ORDER BY created DESC`
+	query := `SELECT * FROM payment_histories WHERE org_uuid = '` + org_uuid + `' AND status = true ORDER BY created DESC`
 
 	db.db.Raw(query + " " + limitQuery).Find(&payment)
 	return payment
