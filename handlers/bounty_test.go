@@ -785,3 +785,55 @@ func TestGetAllBounties(t *testing.T) {
 	})
 
 }
+
+func TestGetBountyIndexById(t *testing.T) {
+	mockDb := dbMocks.NewDatabase(t)
+	mockHttpClient := mocks.NewHttpClient(t)
+	bHandler := NewBountyHandler(mockHttpClient, mockDb)
+
+	t.Run("successful retrieval of bounty by Index ID", func(t *testing.T) {
+		rr := httptest.NewRecorder()
+		handler := http.HandlerFunc(bHandler.GetBountyIndexById)
+
+		bounty := db.Bounty{
+			ID: 1,
+		}
+
+		rctx := chi.NewRouteContext()
+		rctx.URLParams.Add("bountyId", strconv.Itoa(int(bounty.ID)))
+		req, err := http.NewRequestWithContext(context.WithValue(context.Background(), chi.RouteCtxKey, rctx), http.MethodGet, "/index/1", nil)
+		assert.NoError(t, err)
+
+		mockDb.On("GetBountyIndexById", "1").Return(int64(12), nil).Once()
+		handler.ServeHTTP(rr, req)
+
+		responseBody := rr.Body.Bytes()
+		responseString := strings.TrimSpace(string(responseBody))
+		returnedIndex, err := strconv.Atoi(responseString)
+		assert.NoError(t, err)
+		assert.Equal(t, 12, returnedIndex)
+
+		assert.Equal(t, http.StatusOK, rr.Code)
+
+		mockDb.AssertExpectations(t)
+	})
+
+	t.Run("bounty index by ID not found", func(t *testing.T) {
+		rr := httptest.NewRecorder()
+		handler := http.HandlerFunc(bHandler.GetBountyIndexById)
+
+		bountyID := ""
+		rctx := chi.NewRouteContext()
+		rctx.URLParams.Add("bountyId", bountyID)
+		req, err := http.NewRequestWithContext(context.WithValue(context.Background(), chi.RouteCtxKey, rctx), http.MethodGet, "/index/"+bountyID, nil)
+		assert.NoError(t, err)
+
+		mockDb.On("GetBountyIndexById", bountyID).Return(int64(0), fmt.Errorf("bounty not found")).Once()
+
+		handler.ServeHTTP(rr, req)
+		assert.Equal(t, http.StatusNotFound, rr.Code)
+
+		mockDb.AssertExpectations(t)
+	})
+
+}
