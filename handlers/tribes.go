@@ -18,11 +18,17 @@ import (
 )
 
 type tribeHandler struct {
-	db db.Database
+	db                      db.Database
+	verifyTribeUUID         func(uuid string, checkTimestamp bool) (string, error)
+	tribeUniqueNameFromName func(name string) (string, error)
 }
 
 func NewTribeHandler(db db.Database) *tribeHandler {
-	return &tribeHandler{db: db}
+	return &tribeHandler{
+		db:                      db,
+		verifyTribeUUID:         auth.VerifyTribeUUID,
+		tribeUniqueNameFromName: TribeUniqueNameFromName,
+	}
 }
 
 func GetAllTribes(w http.ResponseWriter, r *http.Request) {
@@ -185,21 +191,21 @@ func GetFirstTribeByFeed(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(theTribe)
 }
 
-func GetTribeByUniqueName(w http.ResponseWriter, r *http.Request) {
+func (th *tribeHandler) GetTribeByUniqueName(w http.ResponseWriter, r *http.Request) {
 	uuid := chi.URLParam(r, "un")
-	tribe := db.DB.GetTribeByUniqueName(uuid)
+	tribe := th.db.GetTribeByUniqueName(uuid)
 
 	var theTribe map[string]interface{}
 	j, _ := json.Marshal(tribe)
 	json.Unmarshal(j, &theTribe)
 
-	theTribe["channels"] = db.DB.GetChannelsByTribe(tribe.UUID)
+	theTribe["channels"] = th.db.GetChannelsByTribe(tribe.UUID)
 
 	w.WriteHeader(http.StatusOK)
 	json.NewEncoder(w).Encode(theTribe)
 }
 
-func CreateOrEditTribe(w http.ResponseWriter, r *http.Request) {
+func (th *tribeHandler) CreateOrEditTribe(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 	pubKeyFromAuth, _ := ctx.Value(auth.ContextKey).(string)
 
@@ -221,7 +227,7 @@ func CreateOrEditTribe(w http.ResponseWriter, r *http.Request) {
 
 	now := time.Now() //.Format(time.RFC3339)
 
-	extractedPubkey, err := auth.VerifyTribeUUID(tribe.UUID, false)
+	extractedPubkey, err := th.verifyTribeUUID(tribe.UUID, false)
 	if err != nil {
 		fmt.Println("extract UUID error", err)
 		w.WriteHeader(http.StatusUnauthorized)
@@ -238,9 +244,9 @@ func CreateOrEditTribe(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
-	existing := db.DB.GetTribe(tribe.UUID)
+	existing := th.db.GetTribe(tribe.UUID)
 	if existing.UUID == "" { // if doesn't exist already, create unique name
-		tribe.UniqueName, _ = TribeUniqueNameFromName(tribe.Name)
+		tribe.UniqueName, _ = th.tribeUniqueNameFromName(tribe.Name)
 	} else { // already exists! make sure it's owned
 		if existing.OwnerPubKey != extractedPubkey {
 			fmt.Println("createOrEditTribe tribe.ownerPubKey not match")
@@ -255,7 +261,7 @@ func CreateOrEditTribe(w http.ResponseWriter, r *http.Request) {
 	tribe.Updated = &now
 	tribe.LastActive = now.Unix()
 
-	_, err = db.DB.CreateOrEditTribe(tribe)
+	_, err = th.db.CreateOrEditTribe(tribe)
 	if err != nil {
 		fmt.Println("=> ERR createOrEditTribe", err)
 		w.WriteHeader(http.StatusBadRequest)
