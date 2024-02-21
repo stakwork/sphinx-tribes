@@ -126,7 +126,7 @@ func PutTribeStats(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(true)
 }
 
-func DeleteTribe(w http.ResponseWriter, r *http.Request) {
+func (th *tribeHandler) DeleteTribe(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 	pubKeyFromAuth, _ := ctx.Value(auth.ContextKey).(string)
 
@@ -137,7 +137,7 @@ func DeleteTribe(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	extractedPubkey, err := auth.VerifyTribeUUID(uuid, false)
+	extractedPubkey, err := th.verifyTribeUUID(uuid, false)
 	if err != nil {
 		fmt.Println(err)
 		w.WriteHeader(http.StatusUnauthorized)
@@ -150,7 +150,7 @@ func DeleteTribe(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	db.DB.UpdateTribe(uuid, map[string]interface{}{
+	th.db.UpdateTribe(uuid, map[string]interface{}{
 		"deleted": true,
 	})
 
@@ -172,9 +172,9 @@ func (th *tribeHandler) GetTribe(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(theTribe)
 }
 
-func GetFirstTribeByFeed(w http.ResponseWriter, r *http.Request) {
+func (th *tribeHandler) GetFirstTribeByFeed(w http.ResponseWriter, r *http.Request) {
 	url := r.URL.Query().Get("url")
-	tribe := db.DB.GetFirstTribeByFeedURL(url)
+	tribe := th.db.GetFirstTribeByFeedURL(url)
 
 	if tribe.UUID == "" {
 		w.WriteHeader(http.StatusNotFound)
@@ -185,7 +185,7 @@ func GetFirstTribeByFeed(w http.ResponseWriter, r *http.Request) {
 	j, _ := json.Marshal(tribe)
 	json.Unmarshal(j, &theTribe)
 
-	theTribe["channels"] = db.DB.GetChannelsByTribe(tribe.UUID)
+	theTribe["channels"] = th.db.GetChannelsByTribe(tribe.UUID)
 
 	w.WriteHeader(http.StatusOK)
 	json.NewEncoder(w).Encode(theTribe)
@@ -304,7 +304,7 @@ func PutTribeActivity(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(true)
 }
 
-func SetTribePreview(w http.ResponseWriter, r *http.Request) {
+func (th *tribeHandler) SetTribePreview(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 	pubKeyFromAuth, _ := ctx.Value(auth.ContextKey).(string)
 
@@ -314,7 +314,7 @@ func SetTribePreview(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	extractedPubkey, err := auth.VerifyTribeUUID(uuid, false)
+	extractedPubkey, err := th.verifyTribeUUID(uuid, false)
 	if err != nil {
 		fmt.Println(err)
 		w.WriteHeader(http.StatusUnauthorized)
@@ -328,7 +328,7 @@ func SetTribePreview(w http.ResponseWriter, r *http.Request) {
 	}
 
 	preview := r.URL.Query().Get("preview")
-	db.DB.UpdateTribe(uuid, map[string]interface{}{
+	th.db.UpdateTribe(uuid, map[string]interface{}{
 		"preview": preview,
 	})
 
