@@ -489,6 +489,23 @@ func TestGetBountyByCreated(t *testing.T) {
 		assert.NotEmpty(t, returnedBounty)
 
 	})
+	t.Run("Should return 404 if bounty is not present in db", func(t *testing.T) {
+		rr := httptest.NewRecorder()
+		handler := http.HandlerFunc(bHandler.GetBountyByCreated)
+		createdStr := ""
+
+		rctx := chi.NewRouteContext()
+		rctx.URLParams.Add("created", createdStr)
+		req, _ := http.NewRequestWithContext(context.WithValue(context.Background(), chi.RouteCtxKey, rctx), http.MethodGet, "/gobounties/created/"+createdStr, nil)
+
+		mockDb.On("GetBountyDataByCreated", createdStr).Return([]db.Bounty{}, nil).Once()
+
+		handler.ServeHTTP(rr, req)
+		assert.Equal(t, http.StatusNotFound, rr.Code, "Expected 404 Not Found for nonexistent bounty")
+
+		mockDb.AssertExpectations(t)
+	})
+
 }
 
 func TestGetPersonAssignedBounties(t *testing.T) {
