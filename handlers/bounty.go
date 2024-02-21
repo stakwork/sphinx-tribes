@@ -19,15 +19,15 @@ import (
 )
 
 type bountyHandler struct {
-	httpClient            HttpClient
-	db                    db.Database
+	httpClient             HttpClient
+	db                     db.Database
 	generateBountyResponse func(bounties []db.Bounty) []db.BountyResponse
 }
 
 func NewBountyHandler(httpClient HttpClient, db db.Database) *bountyHandler {
 	return &bountyHandler{
-		httpClient:            httpClient,
-		db:                    db,
+		httpClient:             httpClient,
+		db:                     db,
 		generateBountyResponse: GenerateBountyResponse,
 	}
 }
@@ -188,9 +188,6 @@ func (h *bountyHandler) CreateOrEditBounty(w http.ResponseWriter, r *http.Reques
 
 	//Check if bounty exists
 	bounty.Updated = &now
-	if bounty.Created == 0 {
-		bounty.Created = time.Now().Unix()
-	}
 
 	if bounty.Type == "" {
 		w.WriteHeader(http.StatusBadRequest)
@@ -225,6 +222,10 @@ func (h *bountyHandler) CreateOrEditBounty(w http.ResponseWriter, r *http.Reques
 
 	if bounty.Title != "" && bounty.Assignee == "" {
 		h.db.UpdateBountyNullColumn(bounty, "assignee")
+	}
+
+	if bounty.ID == 0 && bounty.Created == 0 {
+		bounty.Created = time.Now().Unix()
 	}
 
 	if bounty.Title != "" && bounty.ID != 0 {
