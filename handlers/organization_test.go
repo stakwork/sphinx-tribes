@@ -6,16 +6,17 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"net/http"
+	"net/http/httptest"
+	"strings"
+	"testing"
+
 	"github.com/go-chi/chi"
 	"github.com/stakwork/sphinx-tribes/auth"
 	"github.com/stakwork/sphinx-tribes/db"
 	mocks "github.com/stakwork/sphinx-tribes/mocks"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
-	"net/http"
-	"net/http/httptest"
-	"strings"
-	"testing"
 )
 
 func TestUnitCreateOrEditOrganization(t *testing.T) {
@@ -469,5 +470,38 @@ func TestGetOrganizationBudgetHistory(t *testing.T) {
 		}
 
 		assert.Equal(t, expectedBudgetHistory, responseBudgetHistory)
+	})
+}
+
+func TestGetOrganizationBountiesCount(t *testing.T) {
+	ctx := context.WithValue(context.Background(), auth.ContextKey, "test-key")
+	mockDb := mocks.NewDatabase(t)
+	oHandler := NewOrganizationHandler(mockDb)
+
+	t.Run("should return the count of organization bounties", func(t *testing.T) {
+		orgUUID := "valid-uuid"
+		expectedCount := int64(5)
+
+		mockDb.On("GetOrganizationBountiesCount", mock.AnythingOfType("*http.Request"), orgUUID).Return(expectedCount).Once()
+
+		rctx := chi.NewRouteContext()
+		rctx.URLParams.Add("uuid", orgUUID)
+		req, err := http.NewRequestWithContext(context.WithValue(ctx, chi.RouteCtxKey, rctx), http.MethodGet, "/bounties/"+orgUUID+"/count/", nil)
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		rr := httptest.NewRecorder()
+		http.HandlerFunc(oHandler.GetOrganizationBountiesCount).ServeHTTP(rr, req)
+
+		assert.Equal(t, http.StatusOK, rr.Code)
+
+		var count int64
+		err = json.Unmarshal(rr.Body.Bytes(), &count)
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		assert.Equal(t, expectedCount, count)
 	})
 }
