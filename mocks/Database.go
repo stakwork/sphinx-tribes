@@ -3224,6 +3224,53 @@ func (_c *Database_GetOrganizationBounties_Call) RunAndReturn(run func(*http.Req
 	return _c
 }
 
+// GetOrganizationBountiesCount provides a mock function with given fields: r, org_uuid
+func (_m *Database) GetOrganizationBountiesCount(r *http.Request, org_uuid string) int64 {
+	ret := _m.Called(r, org_uuid)
+
+	if len(ret) == 0 {
+		panic("no return value specified for GetOrganizationBountiesCount")
+	}
+
+	var r0 int64
+	if rf, ok := ret.Get(0).(func(*http.Request, string) int64); ok {
+		r0 = rf(r, org_uuid)
+	} else {
+		r0 = ret.Get(0).(int64)
+	}
+
+	return r0
+}
+
+// Database_GetOrganizationBountiesCount_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'GetOrganizationBountiesCount'
+type Database_GetOrganizationBountiesCount_Call struct {
+	*mock.Call
+}
+
+// GetOrganizationBountiesCount is a helper method to define mock.On call
+//   - r *http.Request
+//   - org_uuid string
+func (_e *Database_Expecter) GetOrganizationBountiesCount(r interface{}, org_uuid interface{}) *Database_GetOrganizationBountiesCount_Call {
+	return &Database_GetOrganizationBountiesCount_Call{Call: _e.mock.On("GetOrganizationBountiesCount", r, org_uuid)}
+}
+
+func (_c *Database_GetOrganizationBountiesCount_Call) Run(run func(r *http.Request, org_uuid string)) *Database_GetOrganizationBountiesCount_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(*http.Request), args[1].(string))
+	})
+	return _c
+}
+
+func (_c *Database_GetOrganizationBountiesCount_Call) Return(_a0 int64) *Database_GetOrganizationBountiesCount_Call {
+	_c.Call.Return(_a0)
+	return _c
+}
+
+func (_c *Database_GetOrganizationBountiesCount_Call) RunAndReturn(run func(*http.Request, string) int64) *Database_GetOrganizationBountiesCount_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
 // GetOrganizationBountyCount provides a mock function with given fields: uuid
 func (_m *Database) GetOrganizationBountyCount(uuid string) int64 {
 	ret := _m.Called(uuid)

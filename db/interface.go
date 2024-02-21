@@ -32,6 +32,7 @@ type Database interface {
 	GetUserBountiesCount(personKey string, tabType string) int64
 	GetBountiesCount(r *http.Request) int64
 	GetOrganizationBounties(r *http.Request, org_uuid string) []Bounty
+	GetOrganizationBountiesCount(r *http.Request, org_uuid string) int64
 	GetAssignedBounties(r *http.Request) ([]Bounty, error)
 	GetCreatedBounties(r *http.Request) ([]Bounty, error)
 	GetBountyById(id string) ([]Bounty, error)

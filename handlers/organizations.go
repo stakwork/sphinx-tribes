@@ -532,6 +532,15 @@ func (oh *organizationHandler) GetOrganizationBounties(w http.ResponseWriter, r 
 	json.NewEncoder(w).Encode(bountyResponse)
 }
 
+func (oh *organizationHandler) GetOrganizationBountiesCount(w http.ResponseWriter, r *http.Request) {
+	uuid := chi.URLParam(r, "uuid")
+
+	organizationBountiesCount := oh.db.GetOrganizationBountiesCount(r, uuid)
+
+	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode(organizationBountiesCount)
+}
+
 func (oh *organizationHandler) GetOrganizationBudget(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 	pubKeyFromAuth, _ := ctx.Value(auth.ContextKey).(string)
