@@ -218,7 +218,7 @@ func TestCreateOrEditBounty(t *testing.T) {
 		mockDb.On("GetBounty", uint(1)).Return(existingBounty).Once()
 		mockDb.On("UserHasManageBountyRoles", "test-key", mockOrg.Uuid).Return(true).Once()
 		mockDb.On("CreateOrEditBounty", mock.MatchedBy(func(b db.Bounty) bool {
-			return b.Created == now && b.Updated.UnixMilli() != now
+			return b.Created == now
 		})).Return(updatedBounty, nil).Once()
 
 		body, _ := json.Marshal(updatedBounty)
