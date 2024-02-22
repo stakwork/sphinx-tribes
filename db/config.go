@@ -50,6 +50,7 @@ func InitDB() {
 	fmt.Println("db connected")
 
 	// migrate table changes
+	db.AutoMigrate(&Tribe{})
 	db.AutoMigrate(&Person{})
 	db.AutoMigrate(&Channel{})
 	db.AutoMigrate(&LeaderBoard{})
