@@ -182,7 +182,6 @@ func TestMetricsBounties(t *testing.T) {
 		dateRange := db.PaymentDateRange{
 			StartDate: "1111",
 			EndDate:   "2222",
-			Providers: []string{"provider1", "provider2", "provider3"},
 		}
 		body, _ := json.Marshal(dateRange)
 		req, err := http.NewRequestWithContext(ctx, http.MethodPost, "/boutnies", bytes.NewReader(body))
@@ -205,43 +204,11 @@ func TestMetricsBounties(t *testing.T) {
 			},
 			{
 				ID:          2,
-				OwnerID:     "provider1",
+				OwnerID:     "provider2",
 				Price:       100,
 				Title:       "bounty 2",
 				Description: "test bounty",
 				Created:     1112,
-			},
-			{
-				ID:          3,
-				OwnerID:     "provider2",
-				Price:       200,
-				Title:       "bounty 3",
-				Description: "test bounty",
-				Created:     1113,
-			},
-			{
-				ID:          4,
-				OwnerID:     "provider2",
-				Price:       200,
-				Title:       "bounty 4",
-				Description: "test bounty",
-				Created:     1113,
-			},
-			{
-				ID:          5,
-				OwnerID:     "provider3",
-				Price:       200,
-				Title:       "bounty 5",
-				Description: "test bounty",
-				Created:     1113,
-			},
-			{
-				ID:          6,
-				OwnerID:     "provider3",
-				Price:       200,
-				Title:       "bounty 6",
-				Description: "test bounty",
-				Created:     1113,
 			},
 		}
 		// Mock the database call to return bounties for the selected providers
@@ -249,19 +216,7 @@ func TestMetricsBounties(t *testing.T) {
 		mockDb.On("GetPersonByPubkey", "provider1").Return(db.Person{ID: 1}).Once()
 		mockDb.On("GetPersonByPubkey", "").Return(db.Person{}).Once()
 		mockDb.On("GetOrganizationByUuid", "").Return(db.Organization{}).Once()
-		mockDb.On("GetPersonByPubkey", "provider1").Return(db.Person{ID: 1}).Once()
-		mockDb.On("GetPersonByPubkey", "").Return(db.Person{}).Once()
-		mockDb.On("GetOrganizationByUuid", "").Return(db.Organization{}).Once()
-		mockDb.On("GetPersonByPubkey", "provider2").Return(db.Person{ID: 1}).Once()
-		mockDb.On("GetPersonByPubkey", "").Return(db.Person{}).Once()
-		mockDb.On("GetOrganizationByUuid", "").Return(db.Organization{}).Once()
-		mockDb.On("GetPersonByPubkey", "provider2").Return(db.Person{ID: 1}).Once()
-		mockDb.On("GetPersonByPubkey", "").Return(db.Person{}).Once()
-		mockDb.On("GetOrganizationByUuid", "").Return(db.Organization{}).Once()
-		mockDb.On("GetPersonByPubkey", "provider3").Return(db.Person{ID: 1}).Once()
-		mockDb.On("GetPersonByPubkey", "").Return(db.Person{}).Once()
-		mockDb.On("GetOrganizationByUuid", "").Return(db.Organization{}).Once()
-		mockDb.On("GetPersonByPubkey", "provider3").Return(db.Person{ID: 1}).Once()
+		mockDb.On("GetPersonByPubkey", "provider2").Return(db.Person{ID: 2}).Once()
 		mockDb.On("GetPersonByPubkey", "").Return(db.Person{}).Once()
 		mockDb.On("GetOrganizationByUuid", "").Return(db.Organization{}).Once()
 
@@ -274,7 +229,7 @@ func TestMetricsBounties(t *testing.T) {
 
 		// Assert that the response contains bounties only from the selected providers
 		for _, bounty := range res {
-			assert.Contains(t, []string{"provider1", "provider2", "provider3"}, bounty.OwnerID)
+			assert.Contains(t, []string{"provider1", "provider2"}, bounty.OwnerID)
 		}
 	})
 }
@@ -345,7 +300,6 @@ func TestMetricsBountiesCount(t *testing.T) {
 		dateRange := db.PaymentDateRange{
 			StartDate: "1111",
 			EndDate:   "2222",
-			Providers: []string{"provider1"},
 		}
 		body, _ := json.Marshal(dateRange)
 		req, err := http.NewRequestWithContext(ctx, http.MethodPost, "/boutnies/count", bytes.NewReader(body))

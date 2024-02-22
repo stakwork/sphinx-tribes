@@ -611,7 +611,6 @@ type PaymentDateRange struct {
 	StartDate   string      `json:"start_date"`
 	EndDate     string      `json:"end_date"`
 	PaymentType PaymentType `json:"payment_type,omitempty"`
-	Providers   []string    `json:"providers,omitempty"`
 }
 
 type MemeChallenge struct {
