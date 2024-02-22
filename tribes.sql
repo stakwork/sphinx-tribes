@@ -22,6 +22,7 @@ CREATE TABLE tribes (
   deleted boolean,
   app_url TEXT,
   feed_url TEXT,
+  second_brain_url TEXT,
   feed_type INT,
   last_active BIGINT,
   bots TEXT,
