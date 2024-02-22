@@ -188,6 +188,8 @@ func (mh *metricHandler) MetricsBounties(w http.ResponseWriter, r *http.Request)
 		return
 	}
 
+	providers := r.URL.Query()["provider"]
+
 	request := db.PaymentDateRange{}
 	body, err := io.ReadAll(r.Body)
 	r.Body.Close()
@@ -198,6 +200,8 @@ func (mh *metricHandler) MetricsBounties(w http.ResponseWriter, r *http.Request)
 		json.NewEncoder(w).Encode("Request body not accepted")
 		return
 	}
+
+	request.Providers = providers
 
 	metricBounties := mh.db.GetBountiesByDateRange(request, r)
 	metricBountiesData := mh.GetMetricsBountiesData(metricBounties)
@@ -216,6 +220,8 @@ func (mh *metricHandler) MetricsBountiesCount(w http.ResponseWriter, r *http.Req
 		return
 	}
 
+	providers := r.URL.Query()["provider"]
+
 	request := db.PaymentDateRange{}
 	body, err := io.ReadAll(r.Body)
 	r.Body.Close()
@@ -226,6 +232,8 @@ func (mh *metricHandler) MetricsBountiesCount(w http.ResponseWriter, r *http.Req
 		json.NewEncoder(w).Encode("Request body not accepted")
 		return
 	}
+
+	request.Providers = providers
 
 	MetricsBountiesCount := mh.db.GetBountiesByDateRangeCount(request, r)
 	w.WriteHeader(http.StatusOK)
