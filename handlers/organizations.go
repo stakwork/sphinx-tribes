@@ -48,6 +48,8 @@ func (oh *organizationHandler) CreateOrEditOrganization(w http.ResponseWriter, r
 		return
 	}
 
+	org.Name = strings.TrimSpace(org.Name)
+
 	if len(org.Name) == 0 || len(org.Name) > 20 {
 		fmt.Printf("invalid organization name %s\n", org.Name)
 		w.WriteHeader(http.StatusBadRequest)
