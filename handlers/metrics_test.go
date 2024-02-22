@@ -10,11 +10,12 @@ import (
 	"testing"
 
 	"fmt"
+	"time"
+
 	"github.com/stakwork/sphinx-tribes/auth"
 	"github.com/stakwork/sphinx-tribes/db"
 	mocks "github.com/stakwork/sphinx-tribes/mocks"
 	"github.com/stretchr/testify/assert"
-	"time"
 )
 
 func TestBountyMetrics(t *testing.T) {
@@ -173,6 +174,109 @@ func TestMetricsBounties(t *testing.T) {
 		assert.Equal(t, res[0].BountyDescription, "test bounty")
 		assert.Equal(t, res[0].BountyCreated, int64(1112))
 	})
+
+	t.Run("should fetch bounties from db for selected providers", func(t *testing.T) {
+		db.RedisError = errors.New("redis not initialized")
+		rr := httptest.NewRecorder()
+		handler := http.HandlerFunc(mh.MetricsBounties)
+		dateRange := db.PaymentDateRange{
+			StartDate: "1111",
+			EndDate:   "2222",
+			Providers: []string{"provider1", "provider2", "provider3"},
+		}
+		body, _ := json.Marshal(dateRange)
+		req, err := http.NewRequestWithContext(ctx, http.MethodPost, "/boutnies", bytes.NewReader(body))
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		// Provide multiple provider IDs in the request query parameters
+		req.URL.RawQuery = "provider=provider1&provider=provider2&provider=provider3"
+
+		// Mock bounties data for multiple providers
+		bounties := []db.Bounty{
+			{
+				ID:          1,
+				OwnerID:     "provider1",
+				Price:       100,
+				Title:       "bounty 1",
+				Description: "test bounty",
+				Created:     1112,
+			},
+			{
+				ID:          2,
+				OwnerID:     "provider1",
+				Price:       100,
+				Title:       "bounty 2",
+				Description: "test bounty",
+				Created:     1112,
+			},
+			{
+				ID:          3,
+				OwnerID:     "provider2",
+				Price:       200,
+				Title:       "bounty 3",
+				Description: "test bounty",
+				Created:     1113,
+			},
+			{
+				ID:          4,
+				OwnerID:     "provider2",
+				Price:       200,
+				Title:       "bounty 4",
+				Description: "test bounty",
+				Created:     1113,
+			},
+			{
+				ID:          5,
+				OwnerID:     "provider3",
+				Price:       200,
+				Title:       "bounty 5",
+				Description: "test bounty",
+				Created:     1113,
+			},
+			{
+				ID:          6,
+				OwnerID:     "provider3",
+				Price:       200,
+				Title:       "bounty 6",
+				Description: "test bounty",
+				Created:     1113,
+			},
+		}
+		// Mock the database call to return bounties for the selected providers
+		mockDb.On("GetBountiesByDateRange", dateRange, req).Return(bounties).Once()
+		mockDb.On("GetPersonByPubkey", "provider1").Return(db.Person{ID: 1}).Once()
+		mockDb.On("GetPersonByPubkey", "").Return(db.Person{}).Once()
+		mockDb.On("GetOrganizationByUuid", "").Return(db.Organization{}).Once()
+		mockDb.On("GetPersonByPubkey", "provider1").Return(db.Person{ID: 1}).Once()
+		mockDb.On("GetPersonByPubkey", "").Return(db.Person{}).Once()
+		mockDb.On("GetOrganizationByUuid", "").Return(db.Organization{}).Once()
+		mockDb.On("GetPersonByPubkey", "provider2").Return(db.Person{ID: 1}).Once()
+		mockDb.On("GetPersonByPubkey", "").Return(db.Person{}).Once()
+		mockDb.On("GetOrganizationByUuid", "").Return(db.Organization{}).Once()
+		mockDb.On("GetPersonByPubkey", "provider2").Return(db.Person{ID: 1}).Once()
+		mockDb.On("GetPersonByPubkey", "").Return(db.Person{}).Once()
+		mockDb.On("GetOrganizationByUuid", "").Return(db.Organization{}).Once()
+		mockDb.On("GetPersonByPubkey", "provider3").Return(db.Person{ID: 1}).Once()
+		mockDb.On("GetPersonByPubkey", "").Return(db.Person{}).Once()
+		mockDb.On("GetOrganizationByUuid", "").Return(db.Organization{}).Once()
+		mockDb.On("GetPersonByPubkey", "provider3").Return(db.Person{ID: 1}).Once()
+		mockDb.On("GetPersonByPubkey", "").Return(db.Person{}).Once()
+		mockDb.On("GetOrganizationByUuid", "").Return(db.Organization{}).Once()
+
+		handler.ServeHTTP(rr, req)
+
+		var res []db.BountyData
+		_ = json.Unmarshal(rr.Body.Bytes(), &res)
+
+		assert.Equal(t, http.StatusOK, rr.Code)
+
+		// Assert that the response contains bounties only from the selected providers
+		for _, bounty := range res {
+			assert.Contains(t, []string{"provider1", "provider2", "provider3"}, bounty.OwnerID)
+		}
+	})
 }
 
 func TestMetricsBountiesCount(t *testing.T) {
@@ -232,6 +336,34 @@ func TestMetricsBountiesCount(t *testing.T) {
 
 		assert.Equal(t, http.StatusOK, rr.Code)
 		assert.Equal(t, res, int64(100))
+	})
+
+	t.Run("should fetch bounties count within specified date range for selected providers", func(t *testing.T) {
+		db.RedisError = errors.New("redis not initialized")
+		rr := httptest.NewRecorder()
+		handler := http.HandlerFunc(mh.MetricsBountiesCount)
+		dateRange := db.PaymentDateRange{
+			StartDate: "1111",
+			EndDate:   "2222",
+			Providers: []string{"provider1"},
+		}
+		body, _ := json.Marshal(dateRange)
+		req, err := http.NewRequestWithContext(ctx, http.MethodPost, "/boutnies/count", bytes.NewReader(body))
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		// Provide provider IDs in the request query parameters
+		req.URL.RawQuery = "provider=provider1"
+
+		mockDb.On("GetBountiesByDateRangeCount", dateRange, req).Return(int64(50)).Once()
+		handler.ServeHTTP(rr, req)
+
+		var res int64
+		_ = json.Unmarshal(rr.Body.Bytes(), &res)
+
+		assert.Equal(t, http.StatusOK, rr.Code)
+		assert.Equal(t, res, int64(50))
 	})
 }
 
