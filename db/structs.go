@@ -36,6 +36,7 @@ type Tribe struct {
 	Deleted         bool           `json:"deleted"`
 	AppURL          string         `json:"app_url"`
 	FeedURL         string         `json:"feed_url"`
+	SecondBrainUrl  string         `json:"second_brain_url"`
 	FeedType        uint64         `json:"feed_type"`
 	LastActive      int64          `json:"last_active"`
 	Bots            string         `json:"bots"`
