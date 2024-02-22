@@ -6,9 +6,11 @@ import (
 	"encoding/json"
 	"net/http"
 	"net/http/httptest"
+	"strings"
 	"testing"
 
 	"github.com/go-chi/chi"
+	"github.com/lib/pq"
 	"github.com/stakwork/sphinx-tribes/auth"
 	"github.com/stakwork/sphinx-tribes/db"
 	mocks "github.com/stakwork/sphinx-tribes/mocks"
@@ -470,4 +472,126 @@ func TestGetTribeByUniqueName(t *testing.T) {
 		}
 		assert.Equal(t, mockUniqueName, responseData["unique_name"])
 	})
+}
+
+func TestGetAllTribes(t *testing.T) {
+	mockDb := mocks.NewDatabase(t)
+	tHandler := NewTribeHandler(mockDb)
+	t.Run("should return all tribes", func(t *testing.T) {
+		rr := httptest.NewRecorder()
+		handler := http.HandlerFunc(tHandler.GetAllTribes)
+
+		expectedTribes := []db.Tribe{
+			{UUID: "uuid", Name: "Tribe1"},
+			{UUID: "uuid", Name: "Tribe2"},
+			{UUID: "uuid", Name: "Tribe3"},
+		}
+
+		rctx := chi.NewRouteContext()
+		req, err := http.NewRequestWithContext(context.WithValue(context.Background(), chi.RouteCtxKey, rctx), http.MethodGet, "/", nil)
+		assert.NoError(t, err)
+
+		mockDb.On("GetAllTribes", mock.Anything).Return(expectedTribes)
+		handler.ServeHTTP(rr, req)
+		var returnedTribes []db.Tribe
+		err = json.Unmarshal(rr.Body.Bytes(), &returnedTribes)
+		assert.NoError(t, err)
+		assert.Equal(t, http.StatusOK, rr.Code)
+		assert.EqualValues(t, expectedTribes, returnedTribes)
+		mockDb.AssertExpectations(t)
+
+	})
+}
+
+func TestGetTotalTribes(t *testing.T) {
+	mockDb := mocks.NewDatabase(t)
+	tHandler := NewTribeHandler(mockDb)
+	t.Run("should return the total number of tribes", func(t *testing.T) {
+		rr := httptest.NewRecorder()
+		handler := http.HandlerFunc(tHandler.GetTotalTribes)
+
+		expectedTribes := []db.Tribe{
+			{UUID: "uuid", Name: "Tribe1"},
+			{UUID: "uuid", Name: "Tribe2"},
+			{UUID: "uuid", Name: "Tribe3"},
+		}
+
+		expectedTribesCount := int64(len(expectedTribes))
+
+		rctx := chi.NewRouteContext()
+		req, err := http.NewRequestWithContext(context.WithValue(context.Background(), chi.RouteCtxKey, rctx), http.MethodGet, "/total", nil)
+		assert.NoError(t, err)
+
+		mockDb.On("GetTribesTotal", mock.Anything).Return(expectedTribesCount)
+
+		handler.ServeHTTP(rr, req)
+		var returnedTribesCount int64
+		err = json.Unmarshal(rr.Body.Bytes(), &returnedTribesCount)
+		assert.NoError(t, err)
+		assert.Equal(t, http.StatusOK, rr.Code)
+		assert.EqualValues(t, expectedTribesCount, returnedTribesCount)
+		mockDb.AssertExpectations(t)
+
+	})
+}
+
+func TestGetListedTribes(t *testing.T) {
+	mockDb := mocks.NewDatabase(t)
+	tHandler := NewTribeHandler(mockDb)
+
+	t.Run("should only return tribes associated with a passed tag query", func(t *testing.T) {
+		rr := httptest.NewRecorder()
+		handler := http.HandlerFunc(tHandler.GetListedTribes)
+		expectedTribes := []db.Tribe{
+			{UUID: "1", Name: "Tribe 1", Tags: pq.StringArray{"tag1", "tag2", "tag3"}},
+			{UUID: "2", Name: "Tribe 2", Tags: pq.StringArray{"tag4", "tag5"}},
+			{UUID: "3", Name: "Tribe 3", Tags: pq.StringArray{"tag6", "tag7", "tag8"}},
+		}
+		rctx := chi.NewRouteContext()
+		tagVals := pq.StringArray{"tag1", "tag4", "tag7"}
+		tags := strings.Join(tagVals, ",")
+		rctx.URLParams.Add("tags", tags)
+		req, err := http.NewRequestWithContext(context.WithValue(context.Background(), chi.RouteCtxKey, rctx), http.MethodGet, "/", nil)
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		mockDb.On("GetListedTribes", req).Return(expectedTribes)
+		handler.ServeHTTP(rr, req)
+		var returnedTribes []db.Tribe
+		err = json.Unmarshal(rr.Body.Bytes(), &returnedTribes)
+		assert.NoError(t, err)
+		assert.Equal(t, http.StatusOK, rr.Code)
+		assert.EqualValues(t, expectedTribes, returnedTribes)
+
+	})
+
+	t.Run("should return all tribes when no tag queries are passed", func(t *testing.T) {
+		rr := httptest.NewRecorder()
+		handler := http.HandlerFunc(tHandler.GetListedTribes)
+		expectedTribes := []db.Tribe{
+			{UUID: "1", Name: "Tribe 1", Tags: pq.StringArray{"tag1", "tag2", "tag3"}},
+			{UUID: "2", Name: "Tribe 2", Tags: pq.StringArray{"tag4", "tag5"}},
+			{UUID: "3", Name: "Tribe 3", Tags: pq.StringArray{"tag6", "tag7", "tag8"}},
+		}
+		rctx := chi.NewRouteContext()
+		tagVals := pq.StringArray{}
+		tags := strings.Join(tagVals, ",")
+		rctx.URLParams.Add("tags", tags)
+		req, err := http.NewRequestWithContext(context.WithValue(context.Background(), chi.RouteCtxKey, rctx), http.MethodGet, "/", nil)
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		mockDb.On("GetListedTribes", req).Return(expectedTribes)
+		handler.ServeHTTP(rr, req)
+
+		var returnedTribes []db.Tribe
+		err = json.Unmarshal(rr.Body.Bytes(), &returnedTribes)
+		assert.NoError(t, err)
+		assert.Equal(t, http.StatusOK, rr.Code)
+		assert.EqualValues(t, expectedTribes, returnedTribes)
+
+	})
+
 }
