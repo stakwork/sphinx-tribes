@@ -101,6 +101,35 @@ func TestUnitCreateOrEditOrganization(t *testing.T) {
 		assert.Equal(t, http.StatusBadRequest, rr.Code)
 	})
 
+	t.Run("should trim spaces from organization name", func(t *testing.T) {
+		rr := httptest.NewRecorder()
+		handler := http.HandlerFunc(oHandler.CreateOrEditOrganization)
+
+		mockDb.On("GetOrganizationByUuid", mock.AnythingOfType("string")).Return(db.Organization{}).Once()
+		mockDb.On("GetOrganizationByName", "Abdul").Return(db.Organization{}).Once()
+		mockDb.On("CreateOrEditOrganization", mock.MatchedBy(func(org db.Organization) bool {
+			return org.Name == "Abdul" && org.Uuid != "" && org.Updated != nil && org.Created != nil
+		})).Return(db.Organization{Name: "Abdul"}, nil).Once()
+
+		jsonInput := []byte(`{"name": " Abdul ", "owner_pubkey": "test-key" ,"description": "Test"}`)
+		req, err := http.NewRequestWithContext(ctx, http.MethodPost, "/", bytes.NewReader(jsonInput))
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		handler.ServeHTTP(rr, req)
+
+		assert.Equal(t, http.StatusOK, rr.Code)
+
+		var responseOrg db.Organization
+		err = json.Unmarshal(rr.Body.Bytes(), &responseOrg)
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		assert.Equal(t, "Abdul", responseOrg.Name)
+	})
+
 	t.Run("should successfully add organization if request is valid", func(t *testing.T) {
 		rr := httptest.NewRecorder()
 		handler := http.HandlerFunc(oHandler.CreateOrEditOrganization)
