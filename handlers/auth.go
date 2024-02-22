@@ -7,17 +7,24 @@ import (
 	"net/http"
 	"time"
 
+	"github.com/form3tech-oss/jwt-go"
 	"github.com/stakwork/sphinx-tribes/auth"
 	"github.com/stakwork/sphinx-tribes/config"
 	"github.com/stakwork/sphinx-tribes/db"
 )
 
 type authHandler struct {
-	db db.Database
+	db        db.Database
+	decodeJwt func(token string) (jwt.MapClaims, error)
+	encodeJwt func(pubkey string) (string, error)
 }
 
 func NewAuthHandler(db db.Database) *authHandler {
-	return &authHandler{db: db}
+	return &authHandler{
+		db:        db,
+		decodeJwt: auth.DecodeJwt,
+		encodeJwt: auth.EncodeJwt,
+	}
 }
 
 func GetAdminPubkeys(w http.ResponseWriter, r *http.Request) {
@@ -31,7 +38,7 @@ func GetAdminPubkeys(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusOK)
 }
 
-func GetIsAdmin(w http.ResponseWriter, r *http.Request) {
+func (ah *authHandler) GetIsAdmin(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 	pubKeyFromAuth, _ := ctx.Value(auth.ContextKey).(string)
 	isAdmin := auth.AdminCheck(pubKeyFromAuth)
@@ -165,11 +172,11 @@ func ReceiveLnAuthData(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(responseMsg)
 }
 
-func RefreshToken(w http.ResponseWriter, r *http.Request) {
+func (ah *authHandler) RefreshToken(w http.ResponseWriter, r *http.Request) {
 	token := r.Header.Get("x-jwt")
 
 	responseData := make(map[string]interface{})
-	claims, err := auth.DecodeJwt(token)
+	claims, err := ah.decodeJwt(token)
 
 	if err != nil {
 		fmt.Println("Failed to parse JWT")
@@ -180,11 +187,11 @@ func RefreshToken(w http.ResponseWriter, r *http.Request) {
 
 	pubkey := fmt.Sprint(claims["pubkey"])
 
-	userCount := db.DB.GetLnUser(pubkey)
+	userCount := ah.db.GetLnUser(pubkey)
 
 	if userCount > 0 {
 		// Generate a new token
-		tokenString, err := auth.EncodeJwt(pubkey)
+		tokenString, err := ah.encodeJwt(pubkey)
 
 		if err != nil {
 			fmt.Println("error creating  refresh JWT")
@@ -193,7 +200,7 @@ func RefreshToken(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
-		person := db.DB.GetPersonByPubkey(pubkey)
+		person := ah.db.GetPersonByPubkey(pubkey)
 		user := returnUserMap(person)
 
 		responseData["k1"] = ""
