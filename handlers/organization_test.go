@@ -127,8 +127,6 @@ func TestUnitCreateOrEditOrganization(t *testing.T) {
 			t.Fatal(err)
 		}
 
-		fmt.Println("responseOrg: ", responseOrg)
-
 		assert.Equal(t, "Abdul", responseOrg.Name)
 	})
 
