@@ -1,0 +1,85 @@
+name: Cypress Frontend E2E tests
+on:
+  pull_request:
+    branches:
+      - master
+
+jobs:
+  cypress-run:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Enable docker.host.internal for Ubuntu
+        run: |
+          pwd && sudo bash -c 'echo "172.17.0.1 host.docker.internal" >> /etc/hosts'
+
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v3
+        with:
+          node-version: 20
+
+      - name: Build Tribes Image
+        working-directory: ./sphinx-tribes
+        run: docker build -t sphinxlightning/sphinx-tribes:latest .
+
+      - name: Clone Stack
+        run: |
+          git clone https://github.com/stakwork/sphinx-stack.git stack
+
+      - name: Clone Sphinx Tribes Frontend
+        run: |
+          git clone https://github.com/stakwork/sphinx-tribes-frontend.git tribes-frontend
+
+      - name: Give Permissions to Stack
+        working-directory: ./stack
+        run: |
+          chmod 777 ./bitcoind;    
+          chmod 777 -R ./relay;
+          chmod 777 -R ./lnd;
+          chmod 777 -R ./proxy;
+          chmod 777 -R ./cln;
+      
+      - name: Check for NODES
+        uses: nick-fields/retry@v2
+        with: 
+          timeout_minutes: 10
+          max_attempts: 3
+          command: |
+            GITACTION_ENV=gitactionenv docker-compose -f ./stack/alts/proxy.yml --project-dir ./stack up -d;
+            sleep 240;
+            docker ps
+            docker logs meme.sphinx
+            docker logs dave.sphinx
+            docker wait stack_relaysetup_1
+            cat stack/relay/NODES.json;
+      
+      - name: Copy Node.json
+        uses: canastro/copy-file-action@master
+        with:
+          source: 'stack/relay/NODES.json'
+          target: 'tribes-frontend/cypress/fixtures/nodes.json'
+
+      - name: Install Frontend Dependencies
+        working-directory: ./tribes-frontend
+        run: yarn install
+
+      - name: Start Server
+        run: yarn run start:cypress &
+
+      - name: Run Cypress Test
+        run: |
+          sleep 20
+          yarn run cypress:run
+      
+      - name: Upload Cypress logs
+        if: failure()
+        uses: actions/upload-artifact@v2
+        with:
+          name: cypress-logs
+          path: tribes-frontend/cypress/videos
+      
+      - name: Stop Stack
+        working-directory: ./stack
+        run: docker-compose down
