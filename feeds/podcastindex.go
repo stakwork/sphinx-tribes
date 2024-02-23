@@ -5,7 +5,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"io/ioutil"
+	"io"
 	"net/http"
 	"os"
 	"strconv"
@@ -122,7 +122,7 @@ func PodcastFeed(url string, fulltext bool) (*Podcast, error) {
 	defer resp.Body.Close()
 
 	var r PodcastResponse
-	body, err := ioutil.ReadAll(resp.Body)
+	body, err := io.ReadAll(resp.Body)
 	err = json.Unmarshal(body, &r)
 	if err != nil {
 		fmt.Println("=> json unmarshall error", err)
@@ -158,7 +158,7 @@ func PodcastEpisodes(url string, fulltext bool) ([]Episode, error) {
 	defer resp.Body.Close()
 
 	var r EpisodeResponse
-	body, err := ioutil.ReadAll(resp.Body)
+	body, err := io.ReadAll(resp.Body)
 	err = json.Unmarshal(body, &r)
 	if err != nil {
 		fmt.Println("json unmarshall error", err)
@@ -234,7 +234,7 @@ func PodcastEpisodesByPerson(query string, fulltext bool) ([]Episode, error) {
 	defer resp.Body.Close()
 
 	var r EpisodeResponse
-	body, err := ioutil.ReadAll(resp.Body)
+	body, err := io.ReadAll(resp.Body)
 	err = json.Unmarshal(body, &r)
 	if err != nil {
 		fmt.Println("json unmarshall error", err)
