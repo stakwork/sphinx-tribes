@@ -5,7 +5,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"io/ioutil"
+	"io"
 	"net/http"
 	"strconv"
 	"time"
@@ -175,7 +175,7 @@ func Verify(w http.ResponseWriter, r *http.Request) {
 	}
 
 	payload := VerifyPayload{}
-	body, err := ioutil.ReadAll(r.Body)
+	body, err := io.ReadAll(r.Body)
 	r.Body.Close()
 	err = json.Unmarshal(body, &payload)
 	if err != nil {
@@ -263,7 +263,7 @@ type Save struct {
 func PostSave(w http.ResponseWriter, r *http.Request) {
 
 	save := Save{}
-	body, err := ioutil.ReadAll(r.Body)
+	body, err := io.ReadAll(r.Body)
 	r.Body.Close()
 	err = json.Unmarshal(body, &save)
 	if err != nil {
