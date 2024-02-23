@@ -5,7 +5,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
-	"io/ioutil"
 	"log"
 	"net/http"
 	"os"
@@ -479,7 +478,7 @@ func GetAssetByPubkey(pubkey string) ([]db.AssetBalanceData, error) {
 	defer resp.Body.Close()
 
 	var r db.AssetResponse
-	body, err := ioutil.ReadAll(resp.Body)
+	body, err := io.ReadAll(resp.Body)
 	err = json.Unmarshal(body, &r)
 	if err != nil {
 		fmt.Println("json unmarshall error", err)
@@ -512,7 +511,7 @@ func GetAssetList(pubkey string) ([]db.AssetListData, error) {
 	defer resp.Body.Close()
 
 	var r []db.AssetListData
-	body, err := ioutil.ReadAll(resp.Body)
+	body, err := io.ReadAll(resp.Body)
 	err = json.Unmarshal(body, &r)
 	if err != nil {
 		fmt.Println("json unmarshall error", err)
@@ -527,7 +526,7 @@ func AddOrRemoveBadge(w http.ResponseWriter, r *http.Request) {
 	pubKeyFromAuth, _ := ctx.Value(auth.ContextKey).(string)
 
 	badgeCreationData := db.BadgeCreationData{}
-	body, err := ioutil.ReadAll(r.Body)
+	body, err := io.ReadAll(r.Body)
 	r.Body.Close()
 	err = json.Unmarshal(body, &badgeCreationData)
 	if err != nil {
