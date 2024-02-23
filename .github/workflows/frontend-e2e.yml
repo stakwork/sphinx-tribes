@@ -65,9 +65,11 @@ jobs:
         run: yarn install
 
       - name: Start Server
+        working-directory: ./tribes-frontend
         run: yarn run start:cypress &
 
       - name: Run Cypress Test
+        working-directory: ./tribes-frontend
         run: |
           sleep 20
           yarn run cypress:run
