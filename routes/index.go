@@ -3,7 +3,7 @@ package routes
 import (
 	"encoding/json"
 	"fmt"
-	"io/ioutil"
+	"io"
 	"net/http"
 	"os"
 	"time"
@@ -116,7 +116,7 @@ func getFromAuth(path string) (*extractResponse, error) {
 		return nil, err
 	}
 	defer resp.Body.Close()
-	body2, err := ioutil.ReadAll(resp.Body)
+	body2, err := io.ReadAll(resp.Body)
 	if err != nil {
 		return nil, err
 	}
