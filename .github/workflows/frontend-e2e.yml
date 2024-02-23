@@ -22,7 +22,7 @@ jobs:
 
       - name: Build Tribes Image
         working-directory: ./sphinx-tribes
-        run: docker build -t sphinxlightning/sphinx-tribes:latest .
+        run: pwd && ls && docker build -t sphinxlightning/sphinx-tribes:latest .
 
       - name: Clone Stack
         run: |
