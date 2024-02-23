@@ -21,7 +21,6 @@ jobs:
           node-version: 20
 
       - name: Build Tribes Image
-        working-directory: ./sphinx-tribes
         run: pwd && ls && docker build -t sphinxlightning/sphinx-tribes:latest .
 
       - name: Clone Stack
