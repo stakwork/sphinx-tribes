@@ -31,20 +31,20 @@ func NewTribeHandler(db db.Database) *tribeHandler {
 	}
 }
 
-func GetAllTribes(w http.ResponseWriter, r *http.Request) {
-	tribes := db.DB.GetAllTribes()
+func (th *tribeHandler) GetAllTribes(w http.ResponseWriter, r *http.Request) {
+	tribes := th.db.GetAllTribes()
 	w.WriteHeader(http.StatusOK)
 	json.NewEncoder(w).Encode(tribes)
 }
 
-func GetTotalribes(w http.ResponseWriter, r *http.Request) {
-	tribesTotal := db.DB.GetTribesTotal()
+func (th *tribeHandler) GetTotalribes(w http.ResponseWriter, r *http.Request) {
+	tribesTotal := th.db.GetTribesTotal()
 	w.WriteHeader(http.StatusOK)
 	json.NewEncoder(w).Encode(tribesTotal)
 }
 
-func GetListedTribes(w http.ResponseWriter, r *http.Request) {
-	tribes := db.DB.GetListedTribes(r)
+func (th *tribeHandler) GetListedTribes(w http.ResponseWriter, r *http.Request) {
+	tribes := th.db.GetListedTribes(r)
 	w.WriteHeader(http.StatusOK)
 	json.NewEncoder(w).Encode(tribes)
 }
