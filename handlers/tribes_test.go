@@ -547,17 +547,11 @@ func TestGetListedTribes(t *testing.T) {
 			{UUID: "2", Name: "Tribe 2", Tags: pq.StringArray{"tag4", "tag5"}},
 			{UUID: "3", Name: "Tribe 3", Tags: pq.StringArray{"tag6", "tag7", "tag8"}},
 		}
-
-		req, err := http.NewRequest("GET", "/tribes", nil)
-		if err != nil {
-			t.Fatal(err)
-		}
-
-		query := req.URL.Query()
-		tagVals := pq.StringArray{}
+		rctx := chi.NewRouteContext()
+		tagVals := pq.StringArray{"tag1", "tag4", "tag7"}
 		tags := strings.Join(tagVals, ",")
-		query.Set("tags", tags)
-		req.URL.RawQuery = query.Encode()
+		rctx.URLParams.Add("tags", tags)
+		req, err := http.NewRequestWithContext(context.WithValue(context.Background(), chi.RouteCtxKey, rctx), http.MethodGet, "/", nil)
 		if err != nil {
 			t.Fatal(err)
 		}
@@ -580,17 +574,11 @@ func TestGetListedTribes(t *testing.T) {
 			{UUID: "2", Name: "Tribe 2", Tags: pq.StringArray{"tag4", "tag5"}},
 			{UUID: "3", Name: "Tribe 3", Tags: pq.StringArray{"tag6", "tag7", "tag8"}},
 		}
-
-		req, err := http.NewRequest("GET", "/tribes", nil)
-		if err != nil {
-			t.Fatal(err)
-		}
-
-		query := req.URL.Query()
+		rctx := chi.NewRouteContext()
 		tagVals := pq.StringArray{}
 		tags := strings.Join(tagVals, ",")
-		query.Set("tags", tags)
-		req.URL.RawQuery = query.Encode()
+		rctx.URLParams.Add("tags", tags)
+		req, err := http.NewRequestWithContext(context.WithValue(context.Background(), chi.RouteCtxKey, rctx), http.MethodGet, "/", nil)
 		if err != nil {
 			t.Fatal(err)
 		}

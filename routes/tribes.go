@@ -10,7 +10,7 @@ func TribeRoutes() chi.Router {
 	r := chi.NewRouter()
 	tribeHandlers := handlers.NewTribeHandler(db.DB)
 	r.Group(func(r chi.Router) {
-		r.Get("/", tribeHandlers.GetListedTribes)
+		r.Get("/{tags}", tribeHandlers.GetListedTribes)
 		r.Get("/app_url/{app_url}", tribeHandlers.GetTribesByAppUrl)
 		r.Get("/app_urls/{app_urls}", handlers.GetTribesByAppUrls)
 		r.Get("/{uuid}", tribeHandlers.GetTribe)
