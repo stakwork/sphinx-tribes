@@ -3,7 +3,7 @@ package routes
 import (
 	"encoding/json"
 	"fmt"
-	"io/ioutil"
+	"io"
 	"net/http"
 	"os"
 	"time"
@@ -21,6 +21,7 @@ import (
 func NewRouter() *http.Server {
 	r := initChi()
 	tribeHandlers := handlers.NewTribeHandler(db.DB)
+	authHandler := handlers.NewAuthHandler(db.DB)
 
 	r.Mount("/tribes", TribeRoutes())
 	r.Mount("/bots", BotsRoutes())
@@ -74,13 +75,13 @@ func NewRouter() *http.Server {
 		r.Delete("/ticket/{pubKey}/{created}", handlers.DeleteTicketByAdmin)
 		r.Get("/poll/invoice/{paymentRequest}", handlers.PollInvoice)
 		r.Post("/meme_upload", handlers.MemeImageUpload)
-		r.Get("/admin/auth", handlers.GetIsAdmin)
+		r.Get("/admin/auth", authHandler.GetIsAdmin)
 	})
 
 	r.Group(func(r chi.Router) {
 		r.Get("/lnauth_login", handlers.ReceiveLnAuthData)
 		r.Get("/lnauth", handlers.GetLnurlAuth)
-		r.Get("/refresh_jwt", handlers.RefreshToken)
+		r.Get("/refresh_jwt", authHandler.RefreshToken)
 		r.Post("/invoices", handlers.GenerateInvoice)
 		r.Post("/budgetinvoices", handlers.GenerateBudgetInvoice)
 	})
@@ -115,7 +116,7 @@ func getFromAuth(path string) (*extractResponse, error) {
 		return nil, err
 	}
 	defer resp.Body.Close()
-	body2, err := ioutil.ReadAll(resp.Body)
+	body2, err := io.ReadAll(resp.Body)
 	if err != nil {
 		return nil, err
 	}

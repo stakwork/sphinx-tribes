@@ -6,7 +6,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"io/ioutil"
+	"io"
 	"net/http"
 	"os"
 	"strings"
@@ -53,7 +53,7 @@ func DownloadYoutubeFeed(w http.ResponseWriter, r *http.Request) {
 	tube, err := youtube.NewService(ctx, option.WithAPIKey(apiKey))
 
 	youtube_download := db.YoutubeDownload{}
-	body, err := ioutil.ReadAll(r.Body)
+	body, err := io.ReadAll(r.Body)
 
 	r.Body.Close()
 	err = json.Unmarshal(body, &youtube_download)
@@ -143,7 +143,7 @@ func processYoutubeDownload(data []string) {
 			fmt.Println("Youtube Download Request Error ===", err)
 		}
 		defer response.Body.Close()
-		res, err := ioutil.ReadAll(response.Body)
+		res, err := io.ReadAll(response.Body)
 		if err != nil {
 			fmt.Println("Youtube Download Request Error ==", err)
 		}
@@ -272,7 +272,7 @@ func getFeed(feedURL string, feedID string) (*feeds.Podcast, error) {
 	defer resp.Body.Close()
 
 	var r feeds.PodcastResponse
-	body, err := ioutil.ReadAll(resp.Body)
+	body, err := io.ReadAll(resp.Body)
 	err = json.Unmarshal(body, &r)
 	if err != nil {
 		fmt.Println("json unmarshall error", err)
@@ -314,7 +314,7 @@ func getEpisodes(feedURL string, feedID string) ([]feeds.Episode, error) {
 	defer resp.Body.Close()
 
 	var r feeds.EpisodeResponse
-	body, err := ioutil.ReadAll(resp.Body)
+	body, err := io.ReadAll(resp.Body)
 	err = json.Unmarshal(body, &r)
 	if err != nil {
 		fmt.Println("json unmarshall error", err)
@@ -348,7 +348,7 @@ func searchPodcastIndex(term string) ([]feeds.Podcast, error) {
 	defer resp.Body.Close()
 
 	var r feeds.PodcastSearchResponse
-	body, err := ioutil.ReadAll(resp.Body)
+	body, err := io.ReadAll(resp.Body)
 	err = json.Unmarshal(body, &r)
 	if err != nil {
 		fmt.Println("json unmarshall error", err)

@@ -3,7 +3,7 @@ package handlers
 import (
 	"encoding/json"
 	"fmt"
-	"io/ioutil"
+	"io"
 	"log"
 	"net/http"
 	"reflect"
@@ -46,7 +46,7 @@ func GetBountiesLeaderboard(w http.ResponseWriter, _ *http.Request) {
 
 func DeleteBountyAssignee(w http.ResponseWriter, r *http.Request) {
 	invoice := db.DeleteBountyAssignee{}
-	body, err := ioutil.ReadAll(r.Body)
+	body, err := io.ReadAll(r.Body)
 	var deletedAssignee bool
 
 	r.Body.Close()

@@ -3,7 +3,7 @@ package handlers
 import (
 	"encoding/json"
 	"fmt"
-	"io/ioutil"
+	"io"
 	"net/http"
 	"strconv"
 
@@ -56,7 +56,7 @@ func CreateChannel(w http.ResponseWriter, r *http.Request) {
 	pubKeyFromAuth, _ := ctx.Value(auth.ContextKey).(string)
 
 	channel := db.Channel{}
-	body, err := ioutil.ReadAll(r.Body)
+	body, err := io.ReadAll(r.Body)
 	r.Body.Close()
 	err = json.Unmarshal(body, &channel)
 	if err != nil {
