@@ -924,7 +924,8 @@ func TestGetAllBounties(t *testing.T) {
 		}
 
 		mockDb.On("GetAssignedBounties", mock.Anything).Return(expectedBounties, nil).Once()
-
+		mockDb.On("GetPersonByPubkey", mock.Anything).Return(db.Person{}, nil)
+		mockDb.On("GetOrganizationByUuid", mock.Anything).Return(db.Organization{}, nil)
 		rr := httptest.NewRecorder()
 		req, err := http.NewRequest("GET", "/wanteds/assigned/uuid", nil)
 		req = req.WithContext(ctx)
@@ -1001,6 +1002,7 @@ func TestGetBountyIndexById(t *testing.T) {
 		assert.NoError(t, err)
 
 		mockDb.On("GetBountyIndexById", "1").Return(int64(12), nil).Once()
+
 		handler.ServeHTTP(rr, req)
 
 		responseBody := rr.Body.Bytes()
@@ -1066,7 +1068,8 @@ func TestGetBountyIndexById(t *testing.T) {
 		}
 
 		mockDb.On("GetCreatedBounties", mock.Anything).Return(expectedBounties, nil).Once()
-
+		mockDb.On("GetPersonByPubkey", mock.Anything).Return(db.Person{}, nil)
+		mockDb.On("GetOrganizationByUuid", mock.Anything).Return(db.Organization{}, nil)
 		rr := httptest.NewRecorder()
 		req, err := http.NewRequest("GET", "/wanteds/created/uuid", nil)
 		req = req.WithContext(ctx)
