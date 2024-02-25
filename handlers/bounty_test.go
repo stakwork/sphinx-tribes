@@ -527,15 +527,6 @@ func TestGetBountyByCreated(t *testing.T) {
 		}
 		bHandler.generateBountyResponse = mockGenerateBountyResponse
 
-		expectedBounty := []db.Bounty{{
-			ID:          1,
-			Type:        "type1",
-			Title:       "Test Bounty",
-			Description: "Description",
-			Created:     123456789,
-		}}
-		mockDb.On("GetBountyDataByCreated", "123456789").Return(expectedBounty, nil).Once()
-
 		rr := httptest.NewRecorder()
 		handler := http.HandlerFunc(bHandler.GetBountyByCreated)
 		bounty := db.Bounty{
