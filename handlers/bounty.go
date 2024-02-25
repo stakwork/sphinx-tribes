@@ -27,9 +27,8 @@ type bountyHandler struct {
 func NewBountyHandler(httpClient HttpClient, db db.Database) *bountyHandler {
 	return &bountyHandler{
 
-		httpClient:            httpClient,
-		db:                    db,
-
+		httpClient: httpClient,
+		db:         db,
 	}
 }
 
