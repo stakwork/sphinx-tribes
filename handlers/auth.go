@@ -121,6 +121,15 @@ func GetLnurlAuth(w http.ResponseWriter, r *http.Request) {
 func ReceiveLnAuthData(w http.ResponseWriter, r *http.Request) {
 	userKey := r.URL.Query().Get("key")
 	k1 := r.URL.Query().Get("k1")
+	sig := r.URL.Query().Get("sig")
+
+	exVerify, err := auth.VerifyDerSig(sig, k1, userKey)
+	if err != nil || !exVerify {
+		fmt.Println("Error signing signature")
+		w.WriteHeader(http.StatusUnauthorized)
+		json.NewEncoder(w).Encode(err.Error())
+		return
+	}
 
 	responseMsg := make(map[string]string)
 
