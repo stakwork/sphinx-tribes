@@ -219,6 +219,31 @@ func VerifyAndExtract(msg, sig []byte) (string, bool, error) {
 	return pubKeyHex, valid, nil
 }
 
+// all 3 arguments are hex strings
+func VerifyDerSig(sig string, hash string, pubkey string) (bool, error) {
+	decoded, err := hex.DecodeString(sig)
+	if err != nil {
+		return false, err
+	}
+	signature, err := btcecdsa.ParseDERSignature(decoded)
+	if err != nil {
+		return false, err
+	}
+	msg, err := hex.DecodeString(hash)
+	if err != nil {
+		return false, err
+	}
+	pubkeyBytes, err := hex.DecodeString(pubkey)
+	if err != nil {
+		return false, err
+	}
+	publicKey, err := btcec.ParsePubKey(pubkeyBytes)
+	if err != nil {
+		return false, err
+	}
+	return signature.Verify(msg, publicKey), nil
+}
+
 func DecodeJwt(token string) (jwt.MapClaims, error) {
 	claims := jwt.MapClaims{}
 	_, err := jwt.ParseWithClaims(token, claims, func(token *jwt.Token) (interface{}, error) {
