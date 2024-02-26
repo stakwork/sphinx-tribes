@@ -123,17 +123,13 @@ func ReceiveLnAuthData(w http.ResponseWriter, r *http.Request) {
 	k1 := r.URL.Query().Get("k1")
 	sig := r.URL.Query().Get("sig")
 
-	fmt.Println("LN Sig ====", sig)
-	fmt.Println("K1 ====", k1)
-	fmt.Println("PUBkey ===", userKey)
-	exVerify := auth.VerifySig(sig, k1)
-
-	// urlSig := base64.URLEncoding.EncodeToString([]byte(sig))
-
-	// abVerify, _ := auth.VerifyArbitrary(userKey, sig)
-
-	// fmt.Println("AB Verify ====", abVerify)
-	fmt.Println("Ex Verify ====", exVerify)
+	exVerify, err := auth.VerifyDerSig(sig, k1, userKey)
+	if err != nil || !exVerify {
+		fmt.Println("Error signing signature")
+		w.WriteHeader(http.StatusUnauthorized)
+		json.NewEncoder(w).Encode(err.Error())
+		return
+	}
 
 	responseMsg := make(map[string]string)
 
