@@ -1,7 +1,6 @@
 package handlers
 
 import (
-	"encoding/base64"
 	"encoding/json"
 	"fmt"
 	"io"
@@ -125,14 +124,16 @@ func ReceiveLnAuthData(w http.ResponseWriter, r *http.Request) {
 	sig := r.URL.Query().Get("sig")
 
 	fmt.Println("LN Sig ====", sig)
-
-	urlSig := base64.URLEncoding.EncodeToString([]byte(sig))
-
-	// abVerify, _ := auth.VerifyArbitrary(userKey, sig)
+	fmt.Println("K1 ====", k1)
+	fmt.Println("PUBkey ===", userKey)
 	exVerify := auth.VerifySig(sig, k1)
 
+	// urlSig := base64.URLEncoding.EncodeToString([]byte(sig))
+
+	// abVerify, _ := auth.VerifyArbitrary(userKey, sig)
+
 	// fmt.Println("AB Verify ====", abVerify)
-	fmt.Println("Ex Verify ====", urlSig, exVerify)
+	fmt.Println("Ex Verify ====", exVerify)
 
 	responseMsg := make(map[string]string)
 
