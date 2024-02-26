@@ -1015,36 +1015,31 @@ func TestGetBountyIndexById(t *testing.T) {
 	})
 }
 
-func GetAllBounties(t *testing.T) {
+func TestGetAllBounties(t *testing.T) {
 	mockDb := dbMocks.NewDatabase(t)
 	mockHttpClient := mocks.NewHttpClient(t)
 	bHandler := NewBountyHandler(mockHttpClient, mockDb)
-	t.Run("Should successfull Get Person Created Bounties", func(t *testing.T) {
+	t.Run("Should successfull All Bounties", func(t *testing.T) {
 		rr := httptest.NewRecorder()
-		handler := http.HandlerFunc(bHandler.GetPersonCreatedBounties)
-		bounty := db.Bounty{
-			ID:          1,
-			Type:        "coding",
-			Title:       "first bounty",
-			Description: "first bounty description",
-			OrgUuid:     "org-1",
-			Assignee:    "user1",
-			Created:     1707991475,
-			OwnerID:     "owner-1",
+		handler := http.HandlerFunc(bHandler.GetAllBounties)
+		bounties := []db.Bounty{
+			{ID: 1,
+				Type:        "coding",
+				Title:       "first bounty",
+				Description: "first bounty description",
+				OrgUuid:     "org-1",
+				Assignee:    "user1",
+				Created:     1707991475,
+				OwnerID:     "owner-1",
+			},
 		}
 
 		rctx := chi.NewRouteContext()
-		rctx.URLParams.Add("uuid", "clu80datu2rjujsmim40")
-		rctx.URLParams.Add("sortBy", "paid")
-		rctx.URLParams.Add("page", "1")
-		rctx.URLParams.Add("limit", "20")
-		rctx.URLParams.Add("search", "")
-		req, _ := http.NewRequestWithContext(context.WithValue(context.Background(), chi.RouteCtxKey, rctx), http.MethodGet, "people/wanteds/created/clu80datu2rjujsmim40?sortBy=paid&page=1&limit=20&search=", nil)
+		req, _ := http.NewRequestWithContext(context.WithValue(context.Background(), chi.RouteCtxKey, rctx), http.MethodGet, "/all", nil)
 
-		mockDb.On("GetCreatedBounties", req).Return([]db.Bounty{bounty}, nil).Once()
-		mockDb.On("GetPersonByPubkey", "owner-1").Return(db.Person{}, nil).Once()
-		mockDb.On("GetPersonByPubkey", "user1").Return(db.Person{}, nil).Once()
-		mockDb.On("GetOrganizationByUuid", "org-1").Return(db.Organization{}, nil).Once()
+		mockDb.On("GetAllBounties", req).Return(bounties)
+		mockDb.On("GetPersonByPubkey", mock.Anything).Return(db.Person{}, nil)
+		mockDb.On("GetOrganizationByUuid", mock.Anything).Return(db.Organization{}, nil)
 		handler.ServeHTTP(rr, req)
 
 		var returnedBounty []db.BountyResponse
@@ -1052,15 +1047,6 @@ func GetAllBounties(t *testing.T) {
 		assert.NoError(t, err)
 		assert.Equal(t, http.StatusOK, rr.Code)
 		assert.NotEmpty(t, returnedBounty)
-
-		var responseData []db.BountyResponse
-		err = json.Unmarshal(rr.Body.Bytes(), &responseData)
-		if err != nil {
-			t.Fatalf("Error decoding JSON response: %s", err)
-		}
-
-		assert.NotEmpty(t, responseData)
-		assert.Len(t, responseData, 1)
 
 	})
 }
