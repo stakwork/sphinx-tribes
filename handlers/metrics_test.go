@@ -190,7 +190,7 @@ func TestMetricsBounties(t *testing.T) {
 		}
 
 		// Provide multiple provider IDs in the request query parameters
-		req.URL.RawQuery = "provider=provider1&provider=provider2&provider=provider3"
+		req.URL.RawQuery = "provider=provider1,provider2"
 
 		// Mock bounties data for multiple providers
 		bounties := []db.Bounty{
