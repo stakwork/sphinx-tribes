@@ -161,6 +161,7 @@ func (db database) GetBountiesByDateRange(r PaymentDateRange, re *http.Request) 
 	open := keys.Get("Open")
 	assingned := keys.Get("Assigned")
 	paid := keys.Get("Paid")
+	providers := keys.Get("provider")
 
 	orderQuery := ""
 	limitQuery := ""
@@ -193,7 +194,13 @@ func (db database) GetBountiesByDateRange(r PaymentDateRange, re *http.Request) 
 		limitQuery = fmt.Sprintf("LIMIT %d  OFFSET %d", limit, offset)
 	}
 
-	query := `SELECT * FROM public.bounty WHERE created >= '` + r.StartDate + `'  AND created <= '` + r.EndDate + `'`
+	providerCondition := ""
+	if len(providers) > 0 {
+		providerSlice := strings.Split(providers, ",")
+		providerCondition = " AND owner_id IN ('" + strings.Join(providerSlice, "','") + "')"
+	}
+
+	query := `SELECT * FROM public.bounty WHERE created >= '` + r.StartDate + `'  AND created <= '` + r.EndDate + `'` + providerCondition
 	allQuery := query + " " + statusQuery + " " + orderQuery + " " + limitQuery
 
 	b := []Bounty{}
@@ -206,6 +213,7 @@ func (db database) GetBountiesByDateRangeCount(r PaymentDateRange, re *http.Requ
 	open := keys.Get("Open")
 	assingned := keys.Get("Assigned")
 	paid := keys.Get("Paid")
+	providers := keys.Get("provider")
 
 	var statusConditions []string
 
@@ -226,9 +234,15 @@ func (db database) GetBountiesByDateRangeCount(r PaymentDateRange, re *http.Requ
 		statusQuery = ""
 	}
 
+	providerCondition := ""
+	if len(providers) > 0 {
+		providerSlice := strings.Split(providers, ",")
+		providerCondition = " AND owner_id IN ('" + strings.Join(providerSlice, "','") + "')"
+	}
+
 	var count int64
 
-	query := `SELECT COUNT(*) FROM public.bounty WHERE created >= '` + r.StartDate + `'  AND created <= '` + r.EndDate + `'`
+	query := `SELECT COUNT(*) FROM public.bounty WHERE created >= '` + r.StartDate + `'  AND created <= '` + r.EndDate + `'` + providerCondition
 	allQuery := query + " " + statusQuery
 	db.db.Raw(allQuery).Scan(&count)
 	return count
