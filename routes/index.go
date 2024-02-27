@@ -22,6 +22,7 @@ func NewRouter() *http.Server {
 	r := initChi()
 	tribeHandlers := handlers.NewTribeHandler(db.DB)
 	authHandler := handlers.NewAuthHandler(db.DB)
+	channelHandler := handlers.NewChannelHandler(db.DB)
 
 	r.Mount("/tribes", TribeRoutes())
 	r.Mount("/bots", BotsRoutes())
@@ -61,7 +62,7 @@ func NewRouter() *http.Server {
 
 	r.Group(func(r chi.Router) {
 		r.Use(auth.PubKeyContext)
-		r.Post("/channel", handlers.CreateChannel)
+		r.Post("/channel", channelHandler.CreateChannel)
 		r.Post("/leaderboard/{tribe_uuid}", handlers.CreateLeaderBoard)
 		r.Put("/leaderboard/{tribe_uuid}", handlers.UpdateLeaderBoard)
 		r.Put("/tribe", tribeHandlers.CreateOrEditTribe)
@@ -71,7 +72,7 @@ func NewRouter() *http.Server {
 		r.Put("/tribepreview/{uuid}", tribeHandlers.SetTribePreview)
 		r.Post("/verify/{challenge}", db.Verify)
 		r.Post("/badges", handlers.AddOrRemoveBadge)
-		r.Delete("/channel/{id}", handlers.DeleteChannel)
+		r.Delete("/channel/{id}", channelHandler.DeleteChannel)
 		r.Delete("/ticket/{pubKey}/{created}", handlers.DeleteTicketByAdmin)
 		r.Get("/poll/invoice/{paymentRequest}", handlers.PollInvoice)
 		r.Post("/meme_upload", handlers.MemeImageUpload)

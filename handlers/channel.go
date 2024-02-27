@@ -12,7 +12,17 @@ import (
 	"github.com/stakwork/sphinx-tribes/db"
 )
 
-func DeleteChannel(w http.ResponseWriter, r *http.Request) {
+type channelHandler struct {
+	db db.Database
+}
+
+func NewChannelHandler(db db.Database) *channelHandler {
+	return &channelHandler{
+		db: db,
+	}
+}
+
+func (ch *channelHandler) DeleteChannel(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 	pubKeyFromAuth, _ := ctx.Value(auth.ContextKey).(string)
 
@@ -30,8 +40,8 @@ func DeleteChannel(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	existing := db.DB.GetChannel(uint(id))
-	existingTribe := db.DB.GetTribe(existing.TribeUUID)
+	existing := ch.db.GetChannel(uint(id))
+	existingTribe := ch.db.GetTribe(existing.TribeUUID)
 	if existing.ID == 0 {
 		fmt.Println("existing id is 0")
 		w.WriteHeader(http.StatusUnauthorized)
@@ -43,7 +53,7 @@ func DeleteChannel(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	db.DB.UpdateChannel(uint(id), map[string]interface{}{
+	ch.db.UpdateChannel(uint(id), map[string]interface{}{
 		"deleted": true,
 	})
 
@@ -51,7 +61,7 @@ func DeleteChannel(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(true)
 }
 
-func CreateChannel(w http.ResponseWriter, r *http.Request) {
+func (ch *channelHandler) CreateChannel(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 	pubKeyFromAuth, _ := ctx.Value(auth.ContextKey).(string)
 
@@ -66,14 +76,14 @@ func CreateChannel(w http.ResponseWriter, r *http.Request) {
 	}
 
 	//check that the tribe has the same pubKeyFromAuth
-	tribe := db.DB.GetTribe(channel.TribeUUID)
+	tribe := ch.db.GetTribe(channel.TribeUUID)
 	if tribe.OwnerPubKey != pubKeyFromAuth {
 		fmt.Println(err)
-		w.WriteHeader(http.StatusNotAcceptable)
+		w.WriteHeader(http.StatusUnauthorized)
 		return
 	}
 
-	tribeChannels := db.DB.GetChannelsByTribe(channel.TribeUUID)
+	tribeChannels := ch.db.GetChannelsByTribe(channel.TribeUUID)
 	for _, tribeChannel := range tribeChannels {
 		if tribeChannel.Name == channel.Name {
 			fmt.Println("Channel name already in use")
@@ -83,7 +93,7 @@ func CreateChannel(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
-	channel, err = db.DB.CreateChannel(channel)
+	channel, err = ch.db.CreateChannel(channel)
 	if err != nil {
 		fmt.Println(err)
 		w.WriteHeader(http.StatusNotAcceptable)
