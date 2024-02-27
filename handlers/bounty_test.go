@@ -543,7 +543,7 @@ func TestGetBountyByCreated(t *testing.T) {
 
 		rctx := chi.NewRouteContext()
 		rctx.URLParams.Add("created", "1707991475")
-		req, _ := http.NewRequestWithContext(context.WithValue(context.Background(), chi.RouteCtxKey, rctx), http.MethodGet, "gobounties/created/1707991475", nil)
+		req, _ := http.NewRequestWithContext(context.WithValue(context.Background(), chi.RouteCtxKey, rctx), http.MethodGet, "/created/1707991475", nil)
 		mockDb.On("GetBountyDataByCreated", createdStr).Return([]db.Bounty{bounty}, nil).Once()
 		mockDb.On("GetPersonByPubkey", "owner-1").Return(db.Person{}).Once()
 		mockDb.On("GetPersonByPubkey", "user1").Return(db.Person{}).Once()
@@ -564,7 +564,7 @@ func TestGetBountyByCreated(t *testing.T) {
 
 		rctx := chi.NewRouteContext()
 		rctx.URLParams.Add("created", createdStr)
-		req, _ := http.NewRequestWithContext(context.WithValue(context.Background(), chi.RouteCtxKey, rctx), http.MethodGet, "/gobounties/created/"+createdStr, nil)
+		req, _ := http.NewRequestWithContext(context.WithValue(context.Background(), chi.RouteCtxKey, rctx), http.MethodGet, "/created/"+createdStr, nil)
 
 		mockDb.On("GetBountyDataByCreated", createdStr).Return([]db.Bounty{}, nil).Once()
 
@@ -600,7 +600,7 @@ func TestGetPersonAssignedBounties(t *testing.T) {
 		rctx.URLParams.Add("page", "1")
 		rctx.URLParams.Add("limit", "20")
 		rctx.URLParams.Add("search", "")
-		req, _ := http.NewRequestWithContext(context.WithValue(context.Background(), chi.RouteCtxKey, rctx), http.MethodGet, "people/wanteds/assigned/clu80datu2rjujsmim40?sortBy=paid&page=1&limit=20&search=", nil)
+		req, _ := http.NewRequestWithContext(context.WithValue(context.Background(), chi.RouteCtxKey, rctx), http.MethodGet, "/people/wanteds/assigned/clu80datu2rjujsmim40?sortBy=paid&page=1&limit=20&search=", nil)
 
 		mockDb.On("GetAssignedBounties", req).Return([]db.Bounty{bounty}, nil).Once()
 		mockDb.On("GetPersonByPubkey", "owner-1").Return(db.Person{}, nil).Once()
@@ -613,6 +613,104 @@ func TestGetPersonAssignedBounties(t *testing.T) {
 		assert.NoError(t, err)
 		assert.Equal(t, http.StatusOK, rr.Code)
 		assert.NotEmpty(t, returnedBounty)
+	})
+}
+
+func TestGetPersonCreatedBounties(t *testing.T) {
+	ctx := context.Background()
+	mockDb := dbMocks.NewDatabase(t)
+	mockHttpClient := mocks.NewHttpClient(t)
+	bHandler := NewBountyHandler(mockHttpClient, mockDb)
+
+	t.Run("should return bounties created by the user", func(t *testing.T) {
+		mockGenerateBountyResponse := func(bounties []db.Bounty) []db.BountyResponse {
+			var bountyResponses []db.BountyResponse
+
+			for _, bounty := range bounties {
+				owner := db.Person{
+					ID: 1,
+				}
+				assignee := db.Person{
+					ID: 1,
+				}
+				organization := db.OrganizationShort{
+					Uuid: "uuid",
+				}
+
+				bountyResponse := db.BountyResponse{
+					Bounty:       bounty,
+					Assignee:     assignee,
+					Owner:        owner,
+					Organization: organization,
+				}
+				bountyResponses = append(bountyResponses, bountyResponse)
+			}
+
+			return bountyResponses
+		}
+		bHandler.generateBountyResponse = mockGenerateBountyResponse
+
+		expectedBounties := []db.Bounty{
+			{ID: 1, OwnerID: "user1"},
+			{ID: 2, OwnerID: "user1"},
+		}
+
+		mockDb.On("GetCreatedBounties", mock.Anything).Return(expectedBounties, nil).Once()
+		mockDb.On("GetPersonByPubkey", mock.Anything).Return(db.Person{}, nil)
+		mockDb.On("GetOrganizationByUuid", mock.Anything).Return(db.Organization{}, nil)
+		rr := httptest.NewRecorder()
+		req, err := http.NewRequest("GET", "/people/wanteds/created/uuid", nil)
+		req = req.WithContext(ctx)
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		bHandler.GetPersonCreatedBounties(rr, req)
+
+		assert.Equal(t, http.StatusOK, rr.Code)
+
+		var responseData []db.BountyResponse
+		err = json.Unmarshal(rr.Body.Bytes(), &responseData)
+		if err != nil {
+			t.Fatalf("Error decoding JSON response: %s", err)
+		}
+
+		assert.NotEmpty(t, responseData)
+		assert.Len(t, responseData, 2)
+
+		for i, expectedBounty := range expectedBounties {
+			assert.Equal(t, expectedBounty.ID, responseData[i].Bounty.ID)
+			assert.Equal(t, expectedBounty.Assignee, responseData[i].Bounty.Assignee)
+		}
+	})
+
+	t.Run("should not return bounties created by other users", func(t *testing.T) {
+		mockGenerateBountyResponse := func(bounties []db.Bounty) []db.BountyResponse {
+			return []db.BountyResponse{}
+		}
+		bHandler.generateBountyResponse = mockGenerateBountyResponse
+
+		mockDb.On("GetCreatedBounties", mock.Anything).Return([]db.Bounty{}, nil).Once()
+
+		rr := httptest.NewRecorder()
+		req, err := http.NewRequest("GET", "/people/wanteds/created/uuid", nil)
+		req = req.WithContext(ctx)
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		bHandler.GetPersonCreatedBounties(rr, req)
+
+		assert.Equal(t, http.StatusOK, rr.Code)
+
+		var responseData []db.BountyResponse
+		err = json.Unmarshal(rr.Body.Bytes(), &responseData)
+		if err != nil {
+			t.Fatalf("Error decoding JSON response: %s", err)
+		}
+
+		assert.Empty(t, responseData)
+		assert.Len(t, responseData, 0)
 	})
 }
 
@@ -739,7 +837,7 @@ func TestGetBountyById(t *testing.T) {
 
 		rctx := chi.NewRouteContext()
 		rctx.URLParams.Add("bountyId", strconv.Itoa(int(bounty.ID)))
-		req, err := http.NewRequestWithContext(context.WithValue(context.Background(), chi.RouteCtxKey, rctx), http.MethodGet, "gobounties/bounty/1", nil)
+		req, err := http.NewRequestWithContext(context.WithValue(context.Background(), chi.RouteCtxKey, rctx), http.MethodGet, "/bounty/1", nil)
 		assert.NoError(t, err)
 
 		mockDb.On("GetBountyById", mock.Anything).Return([]db.Bounty{bounty}, nil).Once()
@@ -762,7 +860,7 @@ func TestGetBountyById(t *testing.T) {
 
 		rctx := chi.NewRouteContext()
 		rctx.URLParams.Add("bountyId", "999")
-		req, err := http.NewRequestWithContext(context.WithValue(context.Background(), chi.RouteCtxKey, rctx), http.MethodGet, "gobounties/bounty/999", nil)
+		req, err := http.NewRequestWithContext(context.WithValue(context.Background(), chi.RouteCtxKey, rctx), http.MethodGet, "/bounty/999", nil)
 		assert.NoError(t, err)
 
 		mockDb.On("GetBountyById", "999").Return(nil, errors.New("not-found")).Once()
@@ -774,7 +872,6 @@ func TestGetBountyById(t *testing.T) {
 }
 
 func GetPersonAssigned(t *testing.T) {
-
 	ctx := context.Background()
 	mockDb := dbMocks.NewDatabase(t)
 	mockHttpClient := mocks.NewHttpClient(t)
@@ -871,8 +968,6 @@ func GetPersonAssigned(t *testing.T) {
 	})
 }
 func TestGetBountyIndexById(t *testing.T) {
-
-	ctx := context.Background()
 	mockDb := dbMocks.NewDatabase(t)
 	mockHttpClient := mocks.NewHttpClient(t)
 	bHandler := NewBountyHandler(mockHttpClient, mockDb)
@@ -887,7 +982,7 @@ func TestGetBountyIndexById(t *testing.T) {
 
 		rctx := chi.NewRouteContext()
 		rctx.URLParams.Add("bountyId", strconv.Itoa(int(bounty.ID)))
-		req, err := http.NewRequestWithContext(context.WithValue(context.Background(), chi.RouteCtxKey, rctx), http.MethodGet, "gobounties/index/1", nil)
+		req, err := http.NewRequestWithContext(context.WithValue(context.Background(), chi.RouteCtxKey, rctx), http.MethodGet, "/index/1", nil)
 		assert.NoError(t, err)
 
 		mockDb.On("GetBountyIndexById", "1").Return(int64(12), nil).Once()
@@ -912,7 +1007,7 @@ func TestGetBountyIndexById(t *testing.T) {
 		bountyID := ""
 		rctx := chi.NewRouteContext()
 		rctx.URLParams.Add("bountyId", bountyID)
-		req, err := http.NewRequestWithContext(context.WithValue(context.Background(), chi.RouteCtxKey, rctx), http.MethodGet, "gobounties/index/"+bountyID, nil)
+		req, err := http.NewRequestWithContext(context.WithValue(context.Background(), chi.RouteCtxKey, rctx), http.MethodGet, "/index/"+bountyID, nil)
 		assert.NoError(t, err)
 
 		mockDb.On("GetBountyIndexById", bountyID).Return(int64(0), fmt.Errorf("bounty not found")).Once()
@@ -921,97 +1016,6 @@ func TestGetBountyIndexById(t *testing.T) {
 		assert.Equal(t, http.StatusNotFound, rr.Code)
 
 		mockDb.AssertExpectations(t)
-	})
-
-	t.Run("should return bounties created by the user", func(t *testing.T) {
-		mockGenerateBountyResponse := func(bounties []db.Bounty) []db.BountyResponse {
-			var bountyResponses []db.BountyResponse
-
-			for _, bounty := range bounties {
-				owner := db.Person{
-					ID: 1,
-				}
-				assignee := db.Person{
-					ID: 1,
-				}
-				organization := db.OrganizationShort{
-					Uuid: "uuid",
-				}
-
-				bountyResponse := db.BountyResponse{
-					Bounty:       bounty,
-					Assignee:     assignee,
-					Owner:        owner,
-					Organization: organization,
-				}
-				bountyResponses = append(bountyResponses, bountyResponse)
-			}
-
-			return bountyResponses
-		}
-		bHandler.generateBountyResponse = mockGenerateBountyResponse
-
-		expectedBounties := []db.Bounty{
-			{ID: 1, OwnerID: "user1"},
-			{ID: 2, OwnerID: "user1"},
-		}
-
-		mockDb.On("GetCreatedBounties", mock.Anything).Return(expectedBounties, nil).Once()
-		mockDb.On("GetPersonByPubkey", mock.Anything).Return(db.Person{}, nil)
-		mockDb.On("GetOrganizationByUuid", mock.Anything).Return(db.Organization{}, nil)
-		rr := httptest.NewRecorder()
-		req, err := http.NewRequest("GET", "/wanteds/created/uuid", nil)
-		req = req.WithContext(ctx)
-		if err != nil {
-			t.Fatal(err)
-		}
-
-		bHandler.GetPersonCreatedBounties(rr, req)
-
-		assert.Equal(t, http.StatusOK, rr.Code)
-
-		var responseData []db.BountyResponse
-		err = json.Unmarshal(rr.Body.Bytes(), &responseData)
-		if err != nil {
-			t.Fatalf("Error decoding JSON response: %s", err)
-		}
-
-		assert.NotEmpty(t, responseData)
-		assert.Len(t, responseData, 2)
-
-		for i, expectedBounty := range expectedBounties {
-			assert.Equal(t, expectedBounty.ID, responseData[i].Bounty.ID)
-			assert.Equal(t, expectedBounty.Assignee, responseData[i].Bounty.Assignee)
-		}
-	})
-
-	t.Run("should not return bounties created by other users", func(t *testing.T) {
-		mockGenerateBountyResponse := func(bounties []db.Bounty) []db.BountyResponse {
-			return []db.BountyResponse{}
-		}
-		bHandler.generateBountyResponse = mockGenerateBountyResponse
-
-		mockDb.On("GetCreatedBounties", mock.Anything).Return([]db.Bounty{}, nil).Once()
-
-		rr := httptest.NewRecorder()
-		req, err := http.NewRequest("GET", "/wanteds/created/uuid", nil)
-		req = req.WithContext(ctx)
-		if err != nil {
-			t.Fatal(err)
-		}
-
-		bHandler.GetPersonCreatedBounties(rr, req)
-
-		assert.Equal(t, http.StatusOK, rr.Code)
-
-		var responseData []db.BountyResponse
-		err = json.Unmarshal(rr.Body.Bytes(), &responseData)
-		if err != nil {
-			t.Fatalf("Error decoding JSON response: %s", err)
-		}
-
-		assert.Empty(t, responseData)
-		assert.Len(t, responseData, 0)
 	})
 }
 
@@ -1035,7 +1039,7 @@ func TestGetAllBounties(t *testing.T) {
 		}
 
 		rctx := chi.NewRouteContext()
-		req, _ := http.NewRequestWithContext(context.WithValue(context.Background(), chi.RouteCtxKey, rctx), http.MethodGet, "gobounties/all", nil)
+		req, _ := http.NewRequestWithContext(context.WithValue(context.Background(), chi.RouteCtxKey, rctx), http.MethodGet, "/all", nil)
 
 		mockDb.On("GetAllBounties", req).Return(bounties)
 		mockDb.On("GetPersonByPubkey", mock.Anything).Return(db.Person{}, nil)
