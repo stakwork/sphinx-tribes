@@ -739,7 +739,7 @@ func TestGetBountyById(t *testing.T) {
 
 		rctx := chi.NewRouteContext()
 		rctx.URLParams.Add("bountyId", strconv.Itoa(int(bounty.ID)))
-		req, err := http.NewRequestWithContext(context.WithValue(context.Background(), chi.RouteCtxKey, rctx), http.MethodGet, "/bounty/1", nil)
+		req, err := http.NewRequestWithContext(context.WithValue(context.Background(), chi.RouteCtxKey, rctx), http.MethodGet, "gobounties/bounty/1", nil)
 		assert.NoError(t, err)
 
 		mockDb.On("GetBountyById", mock.Anything).Return([]db.Bounty{bounty}, nil).Once()
@@ -762,7 +762,7 @@ func TestGetBountyById(t *testing.T) {
 
 		rctx := chi.NewRouteContext()
 		rctx.URLParams.Add("bountyId", "999")
-		req, err := http.NewRequestWithContext(context.WithValue(context.Background(), chi.RouteCtxKey, rctx), http.MethodGet, "/bounty/999", nil)
+		req, err := http.NewRequestWithContext(context.WithValue(context.Background(), chi.RouteCtxKey, rctx), http.MethodGet, "gobounties/bounty/999", nil)
 		assert.NoError(t, err)
 
 		mockDb.On("GetBountyById", "999").Return(nil, errors.New("not-found")).Once()
