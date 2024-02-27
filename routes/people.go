@@ -10,8 +10,9 @@ import (
 
 func PeopleRoutes() chi.Router {
 	r := chi.NewRouter()
-	peopleHandler := handlers.NewPeopleHandler(db.DB)
 	bountyHandler := handlers.NewBountyHandler(http.DefaultClient, db.DB)
+
+	peopleHandler := handlers.NewPeopleHandler(db.DB)
 	r.Group(func(r chi.Router) {
 		r.Get("/", peopleHandler.GetListedPeople)
 		r.Get("/search", peopleHandler.GetPeopleBySearch)

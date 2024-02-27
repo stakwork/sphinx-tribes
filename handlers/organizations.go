@@ -21,9 +21,10 @@ type organizationHandler struct {
 }
 
 func NewOrganizationHandler(db db.Database) *organizationHandler {
+	bHandler := NewBountyHandler(http.DefaultClient, db)
 	return &organizationHandler{
 		db:                    db,
-		generateBountyHandler: GenerateBountyResponse,
+		generateBountyHandler: bHandler.GenerateBountyResponse,
 	}
 }
 
