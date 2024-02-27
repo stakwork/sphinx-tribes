@@ -887,7 +887,7 @@ func TestGetBountyIndexById(t *testing.T) {
 
 		rctx := chi.NewRouteContext()
 		rctx.URLParams.Add("bountyId", strconv.Itoa(int(bounty.ID)))
-		req, err := http.NewRequestWithContext(context.WithValue(context.Background(), chi.RouteCtxKey, rctx), http.MethodGet, "/index/1", nil)
+		req, err := http.NewRequestWithContext(context.WithValue(context.Background(), chi.RouteCtxKey, rctx), http.MethodGet, "gobounties/index/1", nil)
 		assert.NoError(t, err)
 
 		mockDb.On("GetBountyIndexById", "1").Return(int64(12), nil).Once()
@@ -912,7 +912,7 @@ func TestGetBountyIndexById(t *testing.T) {
 		bountyID := ""
 		rctx := chi.NewRouteContext()
 		rctx.URLParams.Add("bountyId", bountyID)
-		req, err := http.NewRequestWithContext(context.WithValue(context.Background(), chi.RouteCtxKey, rctx), http.MethodGet, "/index/"+bountyID, nil)
+		req, err := http.NewRequestWithContext(context.WithValue(context.Background(), chi.RouteCtxKey, rctx), http.MethodGet, "gobounties/index/"+bountyID, nil)
 		assert.NoError(t, err)
 
 		mockDb.On("GetBountyIndexById", bountyID).Return(int64(0), fmt.Errorf("bounty not found")).Once()
@@ -1035,7 +1035,7 @@ func TestGetAllBounties(t *testing.T) {
 		}
 
 		rctx := chi.NewRouteContext()
-		req, _ := http.NewRequestWithContext(context.WithValue(context.Background(), chi.RouteCtxKey, rctx), http.MethodGet, "/all", nil)
+		req, _ := http.NewRequestWithContext(context.WithValue(context.Background(), chi.RouteCtxKey, rctx), http.MethodGet, "gobounties/all", nil)
 
 		mockDb.On("GetAllBounties", req).Return(bounties)
 		mockDb.On("GetPersonByPubkey", mock.Anything).Return(db.Person{}, nil)
