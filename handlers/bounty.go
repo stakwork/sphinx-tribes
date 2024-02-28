@@ -314,6 +314,9 @@ func UpdatePaymentStatus(w http.ResponseWriter, r *http.Request) {
 		if bounty.Paid {
 			bounty.CompletionDate = &now
 			bounty.MarkAsPaidDate = &now
+			if bounty.PaidDate == nil {
+				bounty.PaidDate = &now
+			}
 		}
 		db.DB.UpdateBountyPayment(bounty)
 	}
