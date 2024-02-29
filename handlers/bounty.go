@@ -408,7 +408,7 @@ func (h *bountyHandler) GenerateBountyResponse(bounties []db.Bounty) []db.Bounty
 	return bountyResponse
 }
 
-func MakeBountyPayment(w http.ResponseWriter, r *http.Request) {
+func (h *bountyHandler) MakeBountyPayment(w http.ResponseWriter, r *http.Request) {
 	var m sync.Mutex
 	m.Lock()
 
@@ -429,7 +429,7 @@ func MakeBountyPayment(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	bounty := db.DB.GetBounty(id)
+	bounty := h.db.GetBounty(id)
 	amount := bounty.Price
 
 	if bounty.ID != id {
@@ -445,7 +445,7 @@ func MakeBountyPayment(w http.ResponseWriter, r *http.Request) {
 
 	// check if user is the admin of the organization
 	// or has a pay bounty role
-	hasRole := db.UserHasAccess(pubKeyFromAuth, bounty.OrgUuid, db.PayBounty)
+	hasRole := h.db.UserHasAccess(pubKeyFromAuth, bounty.OrgUuid, db.PayBounty)
 	if !hasRole {
 		w.WriteHeader(http.StatusUnauthorized)
 		json.NewEncoder(w).Encode("You don't have appropriate permissions to pay bounties")
@@ -454,7 +454,7 @@ func MakeBountyPayment(w http.ResponseWriter, r *http.Request) {
 
 	// check if the organization bounty balance
 	// is greater than the amount
-	orgBudget := db.DB.GetOrganizationBudget(bounty.OrgUuid)
+	orgBudget := h.db.GetOrganizationBudget(bounty.OrgUuid)
 	if orgBudget.TotalBudget < amount {
 		w.WriteHeader(http.StatusForbidden)
 		json.NewEncoder(w).Encode("organization budget is not enough to pay the amount")
@@ -474,7 +474,7 @@ func MakeBountyPayment(w http.ResponseWriter, r *http.Request) {
 
 	url := fmt.Sprintf("%s/payment", config.RelayUrl)
 
-	assignee := db.DB.GetPersonByPubkey(bounty.Assignee)
+	assignee := h.db.GetPersonByPubkey(bounty.Assignee)
 	bodyData := utils.BuildKeysendBodyData(amount, assignee.OwnerPubKey, assignee.OwnerRouteHint)
 
 	jsonBody := []byte(bodyData)
