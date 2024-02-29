@@ -15,6 +15,18 @@ import (
 	"github.com/stakwork/sphinx-tribes/db"
 )
 
+type botHandler struct {
+	db              db.Database
+	verifyTribeUUID func(uuid string, checkTimestamp bool) (string, error)
+}
+
+func NewBotHandler(db db.Database) *botHandler {
+	return &botHandler{
+		db:              db,
+		verifyTribeUUID: auth.VerifyTribeUUID,
+	}
+}
+
 func CreateOrEditBot(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 	pubKeyFromAuth, _ := ctx.Value(auth.ContextKey).(string)
@@ -80,21 +92,21 @@ func GetBot(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(bot)
 }
 
-func GetBotByUniqueName(w http.ResponseWriter, r *http.Request) {
+func (bt *botHandler) GetBotByUniqueName(w http.ResponseWriter, r *http.Request) {
 	name := chi.URLParam(r, "name")
-	bot := db.DB.GetBotByUniqueName(name)
+	bot := bt.db.GetBotByUniqueName(name)
 	w.WriteHeader(http.StatusOK)
 	json.NewEncoder(w).Encode(bot)
 }
 
-func GetBotsByOwner(w http.ResponseWriter, r *http.Request) {
+func (bt *botHandler) GetBotsByOwner(w http.ResponseWriter, r *http.Request) {
 	name := chi.URLParam(r, "pubkey")
-	bots := db.DB.GetBotsByOwner(name)
+	bots := bt.db.GetBotsByOwner(name)
 	w.WriteHeader(http.StatusOK)
 	json.NewEncoder(w).Encode(bots)
 }
 
-func SearchBots(w http.ResponseWriter, r *http.Request) {
+func (bt *botHandler) SearchBots(w http.ResponseWriter, r *http.Request) {
 	query := chi.URLParam(r, "query")
 	limitString := r.URL.Query().Get("limit")
 	offsetString := r.URL.Query().Get("offset")
@@ -104,23 +116,25 @@ func SearchBots(w http.ResponseWriter, r *http.Request) {
 	if limit == 0 {
 		limit = 10
 	}
-	bots := db.DB.SearchBots(query, limit, offset)
+	bots := bt.db.SearchBots(query, limit, offset)
 	w.WriteHeader(http.StatusOK)
 	json.NewEncoder(w).Encode(bots)
 }
 
-func DeleteBot(w http.ResponseWriter, r *http.Request) {
+func (bt *botHandler) DeleteBot(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 	pubKeyFromAuth, _ := ctx.Value(auth.ContextKey).(string)
 
 	uuid := chi.URLParam(r, "uuid")
+
+	fmt.Println("uuid: ", uuid)
 
 	if uuid == "" {
 		w.WriteHeader(http.StatusUnauthorized)
 		return
 	}
 
-	extractedPubkey, err := auth.VerifyTribeUUID(uuid, false)
+	extractedPubkey, err := bt.verifyTribeUUID(uuid, false)
 	if err != nil {
 		fmt.Println(err)
 		w.WriteHeader(http.StatusUnauthorized)
@@ -133,7 +147,7 @@ func DeleteBot(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	db.DB.UpdateBot(uuid, map[string]interface{}{
+	bt.db.UpdateBot(uuid, map[string]interface{}{
 		"deleted": true,
 	})
 
