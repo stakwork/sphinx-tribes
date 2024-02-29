@@ -1,6 +1,7 @@
 package handlers
 
 import (
+	"bytes"
 	"context"
 	"encoding/json"
 	"net/http"
@@ -244,4 +245,245 @@ func TestDeleteBot(t *testing.T) {
 
 		mockDb.AssertCalled(t, "UpdateBot", expectedUUID, map[string]interface{}{"deleted": true})
 	})
+}
+func TestCreateOrEditBot(t *testing.T) {
+	mockDb := dbMocks.NewDatabase(t)
+	bHandler := NewBotHandler(mockDb)
+
+	t.Run("should test that a 401 error is returned during bot creation if there is no bot uuid", func(t *testing.T) {
+		mockUUID := "valid_uuid"
+
+		requestBody := map[string]interface{}{
+			"UUID": mockUUID,
+		}
+
+		requestBodyBytes, err := json.Marshal(requestBody)
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		req, err := http.NewRequest("POST", "/", bytes.NewBuffer(requestBodyBytes))
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		rr := httptest.NewRecorder()
+		handler := http.HandlerFunc(bHandler.CreateOrEditBot)
+
+		handler.ServeHTTP(rr, req)
+
+		assert.Equal(t, http.StatusUnauthorized, rr.Code)
+	})
+
+	t.Run("should test that a 401 error is returned if the user public key can't be verified during bot creation", func(t *testing.T) {
+		ctx := context.WithValue(context.Background(), auth.ContextKey, "pubkey")
+		mockPubKey := "valid_pubkey"
+		mockUUID := "valid_uuid"
+
+		requestBody := map[string]interface{}{
+			"UUID": mockUUID,
+		}
+
+		requestBodyBytes, err := json.Marshal(requestBody)
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		mockVerifyTribeUUID := func(uuid string, checkTimestamp bool) (string, error) {
+			return mockPubKey, nil
+		}
+
+		bHandler.verifyTribeUUID = mockVerifyTribeUUID
+
+		rr := httptest.NewRecorder()
+		handler := http.HandlerFunc(bHandler.CreateOrEditBot)
+
+		req, err := http.NewRequestWithContext(ctx, "POST", "/", bytes.NewBuffer(requestBodyBytes))
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		chiCtx := chi.NewRouteContext()
+		chiCtx.URLParams.Add("uuid", mockUUID)
+
+		req = req.WithContext(context.WithValue(req.Context(), chi.RouteCtxKey, chiCtx))
+		handler.ServeHTTP(rr, req)
+
+		assert.Equal(t, http.StatusUnauthorized, rr.Code)
+	})
+
+	t.Run("should test that a bot gets created successfully if an authenticated user sends the right data", func(t *testing.T) {
+		mockPubKey := "valid_pubkey"
+		mockUUID := "valid_uuid"
+		mockName := "Test Bot"
+		mockUniqueName := "unique test bot"
+
+		mockVerifyTribeUUID := func(uuid string, checkTimestamp bool) (string, error) {
+			return mockPubKey, nil
+		}
+
+		bHandler.verifyTribeUUID = mockVerifyTribeUUID
+
+		requestBody := map[string]interface{}{
+			"UUID": mockUUID,
+			"Name": mockName,
+		}
+		requestBodyBytes, err := json.Marshal(requestBody)
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		mockDb.On("GetBotByUniqueName", mock.Anything).Return(db.Bot{
+			UniqueName: mockUniqueName,
+		}, nil)
+
+		mockDb.On("CreateOrEditBot", mock.Anything).Return(db.Bot{
+			UUID: mockUUID,
+		}, nil)
+
+		req, err := http.NewRequest("POST", "/", bytes.NewBuffer(requestBodyBytes))
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		ctx := context.WithValue(req.Context(), auth.ContextKey, mockPubKey)
+		req = req.WithContext(ctx)
+
+		rr := httptest.NewRecorder()
+		handler := http.HandlerFunc(bHandler.CreateOrEditBot)
+		handler.ServeHTTP(rr, req)
+
+		assert.Equal(t, http.StatusOK, rr.Code)
+		var responseData map[string]interface{}
+		err = json.Unmarshal(rr.Body.Bytes(), &responseData)
+		if err != nil {
+			t.Fatalf("Error decoding JSON response: %s", err)
+		}
+		assert.Equal(t, mockUUID, responseData["uuid"])
+	})
+
+	t.Run("should test that an existing bot gets updated when passed to POST bots", func(t *testing.T) {
+		mockPubKey := "valid_pubkey"
+		mockUUID := "valid_uuid"
+		mockName := "Updated Test Bot"
+		mockUniqueName := "unique test bot"
+
+		mockVerifyTribeUUID := func(uuid string, checkTimestamp bool) (string, error) {
+			return mockPubKey, nil
+		}
+		bHandler.verifyTribeUUID = mockVerifyTribeUUID
+
+		requestBody := map[string]interface{}{
+			"UUID": mockUUID,
+			"Name": mockName,
+		}
+		requestBodyBytes, err := json.Marshal(requestBody)
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		mockDb.On("GetBotByUniqueName", mock.Anything).Return(db.Bot{
+			UUID:       mockUUID,
+			UniqueName: mockUniqueName,
+			Name:       "Original Test Bot",
+		}, nil)
+
+		mockDb.On("CreateOrEditBot", mock.Anything).Return(db.Bot{
+			UUID: mockUUID,
+			Name: mockName,
+		}, nil)
+
+		req, err := http.NewRequest("POST", "/", bytes.NewBuffer(requestBodyBytes))
+		if err != nil {
+			t.Fatal(err)
+		}
+		ctx := context.WithValue(req.Context(), auth.ContextKey, mockPubKey)
+		req = req.WithContext(ctx)
+
+		rr := httptest.NewRecorder()
+		handler := http.HandlerFunc(bHandler.CreateOrEditBot)
+		handler.ServeHTTP(rr, req)
+
+		assert.Equal(t, http.StatusOK, rr.Code)
+		var responseData map[string]interface{}
+		err = json.Unmarshal(rr.Body.Bytes(), &responseData)
+		if err != nil {
+			t.Fatalf("Error decoding JSON response: %s", err)
+		}
+		assert.Equal(t, mockUUID, responseData["uuid"])
+		assert.Equal(t, mockName, responseData["name"])
+	})
+
+}
+
+func TestGetBot(t *testing.T) {
+	mockDb := dbMocks.NewDatabase(t)
+	bHandler := NewBotHandler(mockDb)
+
+	t.Run("should test that a bot can be fetched with its uuid", func(t *testing.T) {
+
+		mockUUID := "valid_uuid"
+		mockBot := db.Bot{UUID: mockUUID, Name: "Test Bot"}
+		mockDb.On("GetBot", mock.Anything).Return(mockBot).Once()
+
+		rr := httptest.NewRecorder()
+		rctx := chi.NewRouteContext()
+		rctx.URLParams.Add("uuid", mockUUID)
+		req, err := http.NewRequestWithContext(context.WithValue(context.Background(), chi.RouteCtxKey, rctx), http.MethodGet, "/"+mockUUID, nil)
+
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		handler := http.HandlerFunc(bHandler.GetBot)
+		handler.ServeHTTP(rr, req)
+
+		assert.Equal(t, http.StatusOK, rr.Code)
+		var returnedBot db.Bot
+		json.Unmarshal(rr.Body.Bytes(), &returnedBot)
+		assert.Equal(t, mockBot, returnedBot)
+	})
+}
+
+func TestGetListedBots(t *testing.T) {
+	mockDb := dbMocks.NewDatabase(t)
+	bHandler := NewBotHandler(mockDb)
+
+	t.Run("should test that all bots that are not unlisted or deleted get listed", func(t *testing.T) {
+		rr := httptest.NewRecorder()
+		handler := http.HandlerFunc(bHandler.GetListedBots)
+
+		allBots := []db.Bot{
+			{UUID: "uuid1", Name: "Bot1", Unlisted: false, Deleted: false},
+			{UUID: "uuid2", Name: "Bot2", Unlisted: false, Deleted: true},
+			{UUID: "uuid3", Name: "Bot3", Unlisted: true, Deleted: false},
+			{UUID: "uuid4", Name: "Bot4", Unlisted: true, Deleted: true},
+		}
+
+		expectedBots := []db.Bot{
+			{UUID: "uuid1", Name: "Bot1", Unlisted: false, Deleted: false},
+		}
+
+		rctx := chi.NewRouteContext()
+		req, err := http.NewRequestWithContext(context.WithValue(context.Background(), chi.RouteCtxKey, rctx), http.MethodGet, "/", nil)
+		assert.NoError(t, err)
+
+		mockDb.On("GetListedBots", mock.Anything).Return(allBots)
+		handler.ServeHTTP(rr, req)
+		var returnedBots []db.Bot
+		err = json.Unmarshal(rr.Body.Bytes(), &returnedBots)
+		assert.NoError(t, err)
+		assert.Equal(t, http.StatusOK, rr.Code)
+
+		var filteredBots []db.Bot
+		for _, bot := range returnedBots {
+			if !bot.Deleted && !bot.Unlisted {
+				filteredBots = append(filteredBots, bot)
+			}
+		}
+
+		assert.ElementsMatch(t, expectedBots, filteredBots)
+		mockDb.AssertExpectations(t)
+	})
+
 }
