@@ -757,9 +757,32 @@ func (db database) GetCreatedBounties(r *http.Request) ([]Bounty, error) {
 	uuid := chi.URLParam(r, "uuid")
 	person := db.GetPersonByUuid(uuid)
 	pubkey := person.OwnerPubKey
+	keys := r.URL.Query()
+
+	open := keys.Get("Open")
+	assingned := keys.Get("Assigned")
+	paid := keys.Get("Paid")
 
 	orderQuery := ""
 	limitQuery := ""
+	var statusQuery string
+	var statusConditions []string
+
+	if open == "true" {
+		statusConditions = append(statusConditions, "assignee = '' AND paid != true")
+	}
+	if assingned == "true" {
+		statusConditions = append(statusConditions, "assignee != '' AND paid = false")
+	}
+	if paid == "true" {
+		statusConditions = append(statusConditions, "paid = true")
+	}
+
+	if len(statusConditions) > 0 {
+		statusQuery = " AND (" + strings.Join(statusConditions, " OR ") + ")"
+	} else {
+		statusQuery = ""
+	}
 
 	if sortBy != "" && direction != "" {
 		orderQuery = "ORDER BY " + sortBy + " " + direction
@@ -774,7 +797,7 @@ func (db database) GetCreatedBounties(r *http.Request) ([]Bounty, error) {
 	ms := []Bounty{}
 
 	query := `SELECT * FROM public.bounty WHERE owner_id = '` + pubkey + `'`
-	allQuery := query + " " + orderQuery + " " + limitQuery
+	allQuery := query + " " + statusQuery + " " + orderQuery + " " + limitQuery
 
 	err := db.db.Raw(allQuery).Find(&ms).Error
 	return ms, err
