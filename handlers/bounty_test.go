@@ -712,6 +712,69 @@ func TestGetPersonCreatedBounties(t *testing.T) {
 		assert.Empty(t, responseData)
 		assert.Len(t, responseData, 0)
 	})
+
+	t.Run("should filter bounties by status and apply pagination", func(t *testing.T) {
+		mockGenerateBountyResponse := func(bounties []db.Bounty) []db.BountyResponse {
+			var bountyResponses []db.BountyResponse
+
+			for _, bounty := range bounties {
+				owner := db.Person{
+					ID: 1,
+				}
+				assignee := db.Person{
+					ID: 1,
+				}
+				organization := db.OrganizationShort{
+					Uuid: "uuid",
+				}
+
+				bountyResponse := db.BountyResponse{
+					Bounty:       bounty,
+					Assignee:     assignee,
+					Owner:        owner,
+					Organization: organization,
+				}
+				bountyResponses = append(bountyResponses, bountyResponse)
+			}
+
+			return bountyResponses
+		}
+		bHandler.generateBountyResponse = mockGenerateBountyResponse
+
+		expectedBounties := []db.Bounty{
+			{ID: 1, OwnerID: "user1", Assignee: "assignee1"},
+			{ID: 2, OwnerID: "user1", Assignee: "assignee2", Paid: true},
+			{ID: 3, OwnerID: "user1", Assignee: "", Paid: true},
+		}
+
+		mockDb.On("GetCreatedBounties", mock.Anything).Return(expectedBounties, nil).Once()
+		mockDb.On("GetPersonByPubkey", mock.Anything).Return(db.Person{}, nil)
+		mockDb.On("GetOrganizationByUuid", mock.Anything).Return(db.Organization{}, nil)
+
+		rr := httptest.NewRecorder()
+		req, err := http.NewRequest("GET", "/people/wanteds/created/uuid?Open=true&Assigned=true&Paid=true&offset=0&limit=2", nil)
+		req = req.WithContext(ctx)
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		bHandler.GetPersonCreatedBounties(rr, req)
+
+		assert.Equal(t, http.StatusOK, rr.Code)
+
+		var responseData []db.BountyResponse
+		err = json.Unmarshal(rr.Body.Bytes(), &responseData)
+		if err != nil {
+			t.Fatalf("Error decoding JSON response: %s", err)
+		}
+
+		assert.Len(t, responseData, 3)
+
+		// Assert that bounties are filtered correctly
+		assert.Equal(t, expectedBounties[0].ID, responseData[0].Bounty.ID)
+		assert.Equal(t, expectedBounties[1].ID, responseData[1].Bounty.ID)
+		assert.Equal(t, expectedBounties[2].ID, responseData[2].Bounty.ID)
+	})
 }
 
 func TestGetNextBountyByCreated(t *testing.T) {
