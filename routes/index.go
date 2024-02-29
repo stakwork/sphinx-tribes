@@ -23,6 +23,7 @@ func NewRouter() *http.Server {
 	tribeHandlers := handlers.NewTribeHandler(db.DB)
 	authHandler := handlers.NewAuthHandler(db.DB)
 	channelHandler := handlers.NewChannelHandler(db.DB)
+	botHandler := handlers.NewBotHandler(db.DB)
 
 	r.Mount("/tribes", TribeRoutes())
 	r.Mount("/bots", BotsRoutes())
@@ -41,7 +42,7 @@ func NewRouter() *http.Server {
 		r.Get("/tribe_by_un/{un}", tribeHandlers.GetTribeByUniqueName)
 		r.Get("/tribes_by_owner/{pubkey}", tribeHandlers.GetTribesByOwner)
 
-		r.Get("/search/bots/{query}", handlers.SearchBots)
+		r.Get("/search/bots/{query}", botHandler.SearchBots)
 		r.Get("/podcast", handlers.GetPodcast)
 		r.Get("/feed", handlers.GetGenericFeed)
 		r.Post("/feed/download", handlers.DownloadYoutubeFeed)
@@ -145,8 +146,7 @@ func initChi() *chi.Mux {
 		AllowedMethods:   []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"},
 		AllowedHeaders:   []string{"Accept", "Authorization", "Content-Type", "X-CSRF-Token", "X-User", "authorization", "x-jwt", "Referer", "User-Agent"},
 		AllowCredentials: true,
-		MaxAge:           300, // Maximum value not ignored by any of major browsers
-		// Debug:            true,
+		MaxAge:           300,
 	})
 	r.Use(cors.Handler)
 	r.Use(middleware.Timeout(60 * time.Second))
