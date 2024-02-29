@@ -11,6 +11,7 @@ import (
 	"net/http/httptest"
 	"strconv"
 	"strings"
+	"sync"
 	"testing"
 	"time"
 
@@ -1116,4 +1117,154 @@ func TestGetAllBounties(t *testing.T) {
 		assert.NotEmpty(t, returnedBounty)
 
 	})
+}
+
+func TestMakeBountyPayment(t *testing.T) {
+	ctx := context.Background()
+	mockDb := dbMocks.NewDatabase(t)
+	mockHttpClient := mocks.NewHttpClient(t)
+	bHandler := NewBountyHandler(mockHttpClient, mockDb)
+
+	unauthorizedCtx := context.WithValue(ctx, auth.ContextKey, "")
+	authorizedCtx := context.WithValue(ctx, auth.ContextKey, "valid-key")
+
+	var mutex sync.Mutex
+	var processingTimes []time.Time
+
+	t.Run("mutex lock ensures sequential access", func(t *testing.T) {
+		server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			mutex.Lock()
+			processingTimes = append(processingTimes, time.Now())
+			time.Sleep(10 * time.Millisecond)
+			mutex.Unlock()
+
+			bHandler.MakeBountyPayment(w, r)
+		}))
+		defer server.Close()
+
+		var wg sync.WaitGroup
+		for i := 0; i < 3; i++ {
+			wg.Add(1)
+			go func() {
+				defer wg.Done()
+				_, err := http.Get(server.URL)
+				if err != nil {
+					t.Errorf("Failed to send request: %v", err)
+				}
+			}()
+		}
+		wg.Wait()
+
+		for i := 1; i < len(processingTimes); i++ {
+			assert.True(t, processingTimes[i].After(processingTimes[i-1]),
+				"Expected processing times to be sequential, indicating mutex is locking effectively.")
+		}
+	})
+
+	t.Run("401 unauthorized error when unauthorized user hits endpoint", func(t *testing.T) {
+
+		r := chi.NewRouter()
+		r.Post("/gobounties/pay/{id}", bHandler.MakeBountyPayment)
+
+		rr := httptest.NewRecorder()
+		req, err := http.NewRequestWithContext(unauthorizedCtx, http.MethodPost, "/gobounties/pay/1", nil)
+
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		r.ServeHTTP(rr, req)
+
+		assert.Equal(t, http.StatusUnauthorized, rr.Code, "Expected 401 Unauthorized for unauthorized access")
+		mockDb.AssertExpectations(t)
+	})
+
+	t.Run("405 when trying to pay an already-paid bounty", func(t *testing.T) {
+		mockDb.On("GetBounty", mock.AnythingOfType("uint")).Return(db.Bounty{
+			ID:       1,
+			Price:    1000,
+			OrgUuid:  "org-1",
+			Assignee: "assignee-1",
+			Paid:     true,
+		}, nil)
+
+		mockDb.On("UserHasAccess", "valid-key", "org-1", db.PayBounty).Return(true)
+		mockDb.On("GetOrganizationBudget", "org-1").Return(db.BountyBudget{TotalBudget: 1000}, nil)
+		mockDb.On("GetPersonByPubkey", "assignee-1").Return(db.Person{
+			OwnerPubKey: "assignee-1",
+		}, nil)
+
+		r := chi.NewRouter()
+		r.Post("/gobounties/pay/{id}", bHandler.MakeBountyPayment)
+
+		requestBody := bytes.NewBuffer([]byte("{}"))
+		rr := httptest.NewRecorder()
+		req, err := http.NewRequestWithContext(authorizedCtx, http.MethodPost, "/gobounties/pay/1", requestBody)
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		r.ServeHTTP(rr, req)
+		assert.Equal(t, http.StatusMethodNotAllowed, rr.Code, "Expected 405 Method Not Allowed for an already-paid bounty")
+		mockDb.AssertExpectations(t)
+	})
+
+	t.Run("401 error if user not organization admin or does not have PAY BOUNTY role", func(t *testing.T) {
+		mockDb.On("GetBounty", mock.AnythingOfType("uint")).Return(db.Bounty{
+			ID:       1,
+			Price:    1000,
+			OrgUuid:  "org-1",
+			Assignee: "assignee-1",
+			Paid:     false,
+		}, nil)
+		mockDb.On("UserHasAccess", "valid-key", "org-1", db.PayBounty).Return(false)
+
+		r := chi.NewRouter()
+		r.Post("/gobounties/pay/{id}", bHandler.MakeBountyPayment)
+
+		rr := httptest.NewRecorder()
+		req, err := http.NewRequestWithContext(unauthorizedCtx, http.MethodPost, "/gobounties/pay/1", bytes.NewBufferString(`{}`))
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		r.ServeHTTP(rr, req)
+
+		assert.Equal(t, http.StatusUnauthorized, rr.Code, "Expected 401 Unauthorized when the user lacks the PAY BOUNTY role")
+
+	})
+
+	t.Run("403 error when amount exceeds organization's budget balance", func(t *testing.T) {
+		ctx := context.WithValue(context.Background(), auth.ContextKey, "valid-key")
+
+		mockDb := dbMocks.NewDatabase(t)
+		mockHttpClient := mocks.NewHttpClient(t)
+		bHandler := NewBountyHandler(mockHttpClient, mockDb)
+		mockDb.On("GetBounty", mock.AnythingOfType("uint")).Return(db.Bounty{
+			ID:       1,
+			Price:    1000,
+			OrgUuid:  "org-1",
+			Assignee: "assignee-1",
+			Paid:     false,
+		}, nil)
+		mockDb.On("UserHasAccess", "valid-key", "org-1", db.PayBounty).Return(true)
+		mockDb.On("GetOrganizationBudget", "org-1").Return(db.BountyBudget{
+			TotalBudget: 500,
+		}, nil)
+
+		r := chi.NewRouter()
+		r.Post("/gobounties/pay/{id}", bHandler.MakeBountyPayment)
+
+		rr := httptest.NewRecorder()
+		req, err := http.NewRequestWithContext(ctx, http.MethodPost, "/gobounties/pay/1", nil)
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		r.ServeHTTP(rr, req)
+
+		assert.Equal(t, http.StatusForbidden, rr.Code, "Expected 403 Forbidden when the payment exceeds the organization's budget")
+
+	})
+
 }
