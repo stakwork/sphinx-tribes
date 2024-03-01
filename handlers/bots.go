@@ -27,7 +27,7 @@ func NewBotHandler(db db.Database) *botHandler {
 	}
 }
 
-func CreateOrEditBot(w http.ResponseWriter, r *http.Request) {
+func (bt *botHandler) CreateOrEditBot(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 	pubKeyFromAuth, _ := ctx.Value(auth.ContextKey).(string)
 
@@ -48,7 +48,7 @@ func CreateOrEditBot(w http.ResponseWriter, r *http.Request) {
 
 	now := time.Now()
 
-	extractedPubkey, err := auth.VerifyTribeUUID(bot.UUID, false)
+	extractedPubkey, err := bt.verifyTribeUUID(bot.UUID, false)
 	if err != nil {
 		fmt.Println(err)
 		w.WriteHeader(http.StatusUnauthorized)
@@ -66,9 +66,9 @@ func CreateOrEditBot(w http.ResponseWriter, r *http.Request) {
 
 	bot.OwnerPubKey = extractedPubkey
 	bot.Updated = &now
-	bot.UniqueName, _ = BotUniqueNameFromName(bot.Name)
+	bot.UniqueName, _ = bt.BotUniqueNameFromName(bot.Name)
 
-	_, err = db.DB.CreateOrEditBot(bot)
+	_, err = bt.db.CreateOrEditBot(bot)
 	if err != nil {
 		fmt.Println("=> ERR createOrEditBot", err)
 		w.WriteHeader(http.StatusBadRequest)
@@ -79,15 +79,15 @@ func CreateOrEditBot(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(bot)
 }
 
-func GetListedBots(w http.ResponseWriter, r *http.Request) {
-	bots := db.DB.GetListedBots(r)
+func (bt *botHandler) GetListedBots(w http.ResponseWriter, r *http.Request) {
+	bots := bt.db.GetListedBots(r)
 	w.WriteHeader(http.StatusOK)
 	json.NewEncoder(w).Encode(bots)
 }
 
-func GetBot(w http.ResponseWriter, r *http.Request) {
+func (bt *botHandler) GetBot(w http.ResponseWriter, r *http.Request) {
 	uuid := chi.URLParam(r, "uuid")
-	bot := db.DB.GetBot(uuid)
+	bot := bt.db.GetBot(uuid)
 	w.WriteHeader(http.StatusOK)
 	json.NewEncoder(w).Encode(bot)
 }
@@ -155,7 +155,7 @@ func (bt *botHandler) DeleteBot(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(true)
 }
 
-func BotUniqueNameFromName(name string) (string, error) {
+func (h *botHandler) BotUniqueNameFromName(name string) (string, error) {
 	pathOne := strings.ToLower(strings.Join(strings.Fields(name), ""))
 	reg, err := regexp.Compile("[^a-zA-Z0-9]+")
 	if err != nil {
@@ -168,7 +168,7 @@ func BotUniqueNameFromName(name string) (string, error) {
 		if n > 0 {
 			uniquepath = path + strconv.Itoa(n)
 		}
-		existing := db.DB.GetBotByUniqueName(uniquepath)
+		existing := h.db.GetBotByUniqueName(uniquepath)
 		if existing.UUID != "" {
 			n = n + 1
 		} else {

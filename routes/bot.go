@@ -16,7 +16,7 @@ func BotRoutes() chi.Router {
 	r.Group(func(r chi.Router) {
 		r.Use(auth.PubKeyContext)
 
-		r.Put("/", handlers.CreateOrEditBot)
+		r.Put("/", botHandler.CreateOrEditBot)
 		r.Delete("/{uuid}", botHandler.DeleteBot)
 	})
 	return r
