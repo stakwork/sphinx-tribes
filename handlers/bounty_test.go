@@ -11,6 +11,7 @@ import (
 	"net/http/httptest"
 	"strconv"
 	"strings"
+	"sync"
 	"testing"
 	"time"
 
@@ -712,6 +713,69 @@ func TestGetPersonCreatedBounties(t *testing.T) {
 		assert.Empty(t, responseData)
 		assert.Len(t, responseData, 0)
 	})
+
+	t.Run("should filter bounties by status and apply pagination", func(t *testing.T) {
+		mockGenerateBountyResponse := func(bounties []db.Bounty) []db.BountyResponse {
+			var bountyResponses []db.BountyResponse
+
+			for _, bounty := range bounties {
+				owner := db.Person{
+					ID: 1,
+				}
+				assignee := db.Person{
+					ID: 1,
+				}
+				organization := db.OrganizationShort{
+					Uuid: "uuid",
+				}
+
+				bountyResponse := db.BountyResponse{
+					Bounty:       bounty,
+					Assignee:     assignee,
+					Owner:        owner,
+					Organization: organization,
+				}
+				bountyResponses = append(bountyResponses, bountyResponse)
+			}
+
+			return bountyResponses
+		}
+		bHandler.generateBountyResponse = mockGenerateBountyResponse
+
+		expectedBounties := []db.Bounty{
+			{ID: 1, OwnerID: "user1", Assignee: "assignee1"},
+			{ID: 2, OwnerID: "user1", Assignee: "assignee2", Paid: true},
+			{ID: 3, OwnerID: "user1", Assignee: "", Paid: true},
+		}
+
+		mockDb.On("GetCreatedBounties", mock.Anything).Return(expectedBounties, nil).Once()
+		mockDb.On("GetPersonByPubkey", mock.Anything).Return(db.Person{}, nil)
+		mockDb.On("GetOrganizationByUuid", mock.Anything).Return(db.Organization{}, nil)
+
+		rr := httptest.NewRecorder()
+		req, err := http.NewRequest("GET", "/people/wanteds/created/uuid?Open=true&Assigned=true&Paid=true&offset=0&limit=2", nil)
+		req = req.WithContext(ctx)
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		bHandler.GetPersonCreatedBounties(rr, req)
+
+		assert.Equal(t, http.StatusOK, rr.Code)
+
+		var responseData []db.BountyResponse
+		err = json.Unmarshal(rr.Body.Bytes(), &responseData)
+		if err != nil {
+			t.Fatalf("Error decoding JSON response: %s", err)
+		}
+
+		assert.Len(t, responseData, 3)
+
+		// Assert that bounties are filtered correctly
+		assert.Equal(t, expectedBounties[0].ID, responseData[0].Bounty.ID)
+		assert.Equal(t, expectedBounties[1].ID, responseData[1].Bounty.ID)
+		assert.Equal(t, expectedBounties[2].ID, responseData[2].Bounty.ID)
+	})
 }
 
 func TestGetNextBountyByCreated(t *testing.T) {
@@ -907,13 +971,15 @@ func GetPersonAssigned(t *testing.T) {
 		expectedBounties := []db.Bounty{
 			{ID: 1, Assignee: "user1"},
 			{ID: 2, Assignee: "user1"},
+			{ID: 3, OwnerID: "user2", Assignee: "user1"},
+			{ID: 4, OwnerID: "user2", Assignee: "user1", Paid: true},
 		}
 
 		mockDb.On("GetAssignedBounties", mock.Anything).Return(expectedBounties, nil).Once()
 		mockDb.On("GetPersonByPubkey", mock.Anything).Return(db.Person{}, nil)
 		mockDb.On("GetOrganizationByUuid", mock.Anything).Return(db.Organization{}, nil)
 		rr := httptest.NewRecorder()
-		req, err := http.NewRequest("GET", "/wanteds/assigned/uuid", nil)
+		req, err := http.NewRequest("GET", "/wanteds/assigned/uuid?Assigned=true&Paid=true&offset=0&limit=4", nil)
 		req = req.WithContext(ctx)
 		if err != nil {
 			t.Fatal(err)
@@ -1056,6 +1122,157 @@ func TestGetAllBounties(t *testing.T) {
 }
 
 func TestMakeBountyPayment(t *testing.T) {
+	ctx := context.Background()
+	mockDb := dbMocks.NewDatabase(t)
+	mockHttpClient := mocks.NewHttpClient(t)
+	bHandler := NewBountyHandler(mockHttpClient, mockDb)
+
+	unauthorizedCtx := context.WithValue(ctx, auth.ContextKey, "")
+	authorizedCtx := context.WithValue(ctx, auth.ContextKey, "valid-key")
+
+	var mutex sync.Mutex
+	var processingTimes []time.Time
+
+	t.Run("mutex lock ensures sequential access", func(t *testing.T) {
+		server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			mutex.Lock()
+			processingTimes = append(processingTimes, time.Now())
+			time.Sleep(10 * time.Millisecond)
+			mutex.Unlock()
+
+			bHandler.MakeBountyPayment(w, r)
+		}))
+		defer server.Close()
+
+		var wg sync.WaitGroup
+		for i := 0; i < 3; i++ {
+			wg.Add(1)
+			go func() {
+				defer wg.Done()
+				_, err := http.Get(server.URL)
+				if err != nil {
+					t.Errorf("Failed to send request: %v", err)
+				}
+			}()
+		}
+		wg.Wait()
+
+		for i := 1; i < len(processingTimes); i++ {
+			assert.True(t, processingTimes[i].After(processingTimes[i-1]),
+				"Expected processing times to be sequential, indicating mutex is locking effectively.")
+		}
+	})
+
+	t.Run("401 unauthorized error when unauthorized user hits endpoint", func(t *testing.T) {
+
+		r := chi.NewRouter()
+		r.Post("/gobounties/pay/{id}", bHandler.MakeBountyPayment)
+
+		rr := httptest.NewRecorder()
+		req, err := http.NewRequestWithContext(unauthorizedCtx, http.MethodPost, "/gobounties/pay/1", nil)
+
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		r.ServeHTTP(rr, req)
+
+		assert.Equal(t, http.StatusUnauthorized, rr.Code, "Expected 401 Unauthorized for unauthorized access")
+		mockDb.AssertExpectations(t)
+	})
+
+	t.Run("405 when trying to pay an already-paid bounty", func(t *testing.T) {
+		mockDb.On("GetBounty", mock.AnythingOfType("uint")).Return(db.Bounty{
+			ID:       1,
+			Price:    1000,
+			OrgUuid:  "org-1",
+			Assignee: "assignee-1",
+			Paid:     true,
+		}, nil)
+
+		mockDb.On("UserHasAccess", "valid-key", "org-1", db.PayBounty).Return(true)
+		mockDb.On("GetOrganizationBudget", "org-1").Return(db.BountyBudget{TotalBudget: 1000}, nil)
+		mockDb.On("GetPersonByPubkey", "assignee-1").Return(db.Person{
+			OwnerPubKey: "assignee-1",
+		}, nil)
+
+		r := chi.NewRouter()
+		r.Post("/gobounties/pay/{id}", bHandler.MakeBountyPayment)
+
+		requestBody := bytes.NewBuffer([]byte("{}"))
+		rr := httptest.NewRecorder()
+		req, err := http.NewRequestWithContext(authorizedCtx, http.MethodPost, "/gobounties/pay/1", requestBody)
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		r.ServeHTTP(rr, req)
+		assert.Equal(t, http.StatusMethodNotAllowed, rr.Code, "Expected 405 Method Not Allowed for an already-paid bounty")
+		mockDb.AssertExpectations(t)
+	})
+
+	t.Run("401 error if user not organization admin or does not have PAY BOUNTY role", func(t *testing.T) {
+		mockDb.On("GetBounty", mock.AnythingOfType("uint")).Return(db.Bounty{
+			ID:       1,
+			Price:    1000,
+			OrgUuid:  "org-1",
+			Assignee: "assignee-1",
+			Paid:     false,
+		}, nil)
+		mockDb.On("UserHasAccess", "valid-key", "org-1", db.PayBounty).Return(false)
+
+		r := chi.NewRouter()
+		r.Post("/gobounties/pay/{id}", bHandler.MakeBountyPayment)
+
+		rr := httptest.NewRecorder()
+		req, err := http.NewRequestWithContext(unauthorizedCtx, http.MethodPost, "/gobounties/pay/1", bytes.NewBufferString(`{}`))
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		r.ServeHTTP(rr, req)
+
+		assert.Equal(t, http.StatusUnauthorized, rr.Code, "Expected 401 Unauthorized when the user lacks the PAY BOUNTY role")
+
+	})
+
+	t.Run("403 error when amount exceeds organization's budget balance", func(t *testing.T) {
+		ctx := context.WithValue(context.Background(), auth.ContextKey, "valid-key")
+
+		mockDb := dbMocks.NewDatabase(t)
+		mockHttpClient := mocks.NewHttpClient(t)
+		bHandler := NewBountyHandler(mockHttpClient, mockDb)
+		mockDb.On("GetBounty", mock.AnythingOfType("uint")).Return(db.Bounty{
+			ID:       1,
+			Price:    1000,
+			OrgUuid:  "org-1",
+			Assignee: "assignee-1",
+			Paid:     false,
+		}, nil)
+		mockDb.On("UserHasAccess", "valid-key", "org-1", db.PayBounty).Return(true)
+		mockDb.On("GetOrganizationBudget", "org-1").Return(db.BountyBudget{
+			TotalBudget: 500,
+		}, nil)
+
+		r := chi.NewRouter()
+		r.Post("/gobounties/pay/{id}", bHandler.MakeBountyPayment)
+
+		rr := httptest.NewRecorder()
+		req, err := http.NewRequestWithContext(ctx, http.MethodPost, "/gobounties/pay/1", nil)
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		r.ServeHTTP(rr, req)
+
+		assert.Equal(t, http.StatusForbidden, rr.Code, "Expected 403 Forbidden when the payment exceeds the organization's budget")
+
+	})
+
+
+}
+
+func TestMakeBountyPayments(t *testing.T) {
 	pubKey := "test-pubkey"
 	ctx := context.WithValue(context.Background(), auth.ContextKey, pubKey)
 	mockDb := dbMocks.NewDatabase(t)
@@ -1118,3 +1335,4 @@ func TestMakeBountyPayment(t *testing.T) {
 
 	mockDb.AssertExpectations(t)
 }
+
