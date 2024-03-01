@@ -971,13 +971,15 @@ func GetPersonAssigned(t *testing.T) {
 		expectedBounties := []db.Bounty{
 			{ID: 1, Assignee: "user1"},
 			{ID: 2, Assignee: "user1"},
+			{ID: 3, OwnerID: "user2", Assignee: "user1"},
+			{ID: 4, OwnerID: "user2", Assignee: "user1", Paid: true},
 		}
 
 		mockDb.On("GetAssignedBounties", mock.Anything).Return(expectedBounties, nil).Once()
 		mockDb.On("GetPersonByPubkey", mock.Anything).Return(db.Person{}, nil)
 		mockDb.On("GetOrganizationByUuid", mock.Anything).Return(db.Organization{}, nil)
 		rr := httptest.NewRecorder()
-		req, err := http.NewRequest("GET", "/wanteds/assigned/uuid", nil)
+		req, err := http.NewRequest("GET", "/wanteds/assigned/uuid?Assigned=true&Paid=true&offset=0&limit=4", nil)
 		req = req.WithContext(ctx)
 		if err != nil {
 			t.Fatal(err)
