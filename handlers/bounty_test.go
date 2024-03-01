@@ -1054,3 +1054,67 @@ func TestGetAllBounties(t *testing.T) {
 
 	})
 }
+
+func TestMakeBountyPayment(t *testing.T) {
+	pubKey := "test-pubkey"
+	ctx := context.WithValue(context.Background(), auth.ContextKey, pubKey)
+	mockDb := dbMocks.NewDatabase(t)
+	mockHttpClient := mocks.NewHttpClient(t)
+	bHandler := NewBountyHandler(mockHttpClient, mockDb)
+	jsonBody := `{"someKey": "someValue"}`
+	existingBounty := db.Bounty{
+		ID:          12,
+		Type:        "coding",
+		Title:       "first bounty",
+		Description: "first bounty description",
+		OrgUuid:     "org-1",
+		Assignee:    "user1",
+		Price:       100,
+	}
+
+	tests := []struct {
+		name            string
+		setupMocks      func()
+		expectedStatus  int
+		expectedMessage string
+	}{
+		{
+			name: "Success payment",
+			setupMocks: func() {
+				mockDb.On("GetBounty", uint(12)).Return(existingBounty, nil).Once()
+				mockDb.On("UserHasAccess", pubKey, mock.AnythingOfType("string"), "PAY BOUNTY").Return(true).Times(2)
+				mockDb.On("GetOrganizationBudget", mock.AnythingOfType("string")).Return(db.BountyBudget{TotalBudget: 200}, nil).Times(2)
+				mockDb.On("GetPersonByPubkey", mock.AnythingOfType("string")).Return(db.Person{}).Times(2)
+			},
+			expectedStatus:  http.StatusOK,
+			expectedMessage: "keysend_success",
+		},
+		{
+			name: "Bounty already paid",
+			setupMocks: func() {
+				mockDb.On("GetBounty", uint(12)).Return(db.Bounty{ID: 12, Paid: true}, nil).Once()
+			},
+			expectedStatus:  http.StatusMethodNotAllowed,
+			expectedMessage: "Bounty has already been paid",
+		},
+	}
+
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			tc.setupMocks()
+
+			rr := httptest.NewRecorder()
+			req, _ := http.NewRequestWithContext(ctx, http.MethodPost, "/pay/12", strings.NewReader(jsonBody))
+
+			rctx := chi.NewRouteContext()
+			rctx.URLParams.Add("id", "12")
+			req = req.WithContext(context.WithValue(ctx, chi.RouteCtxKey, rctx))
+
+			bHandler.MakeBountyPayment(rr, req)
+
+			assert.Equal(t, tc.expectedStatus, rr.Code)
+		})
+	}
+
+	mockDb.AssertExpectations(t)
+}
