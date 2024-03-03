@@ -225,8 +225,8 @@ func (db database) ConvertMetricsBountiesToMap(metricsCsv []MetricsBountyCsv) []
 	return metricsMap
 }
 
-func RolesCheck(userRoles []UserRoles, check string) bool {
-	rolesMap := GetRolesMap()
+func RolesCheck(rolesMap map[string]string, userRoles []UserRoles, check string) bool {
+
 	userRolesMap := GetUserRolesMap(userRoles)
 
 	// check if roles exist in config
@@ -257,7 +257,8 @@ func UserHasAccess(pubKeyFromAuth string, uuid string, role string) bool {
 	var hasRole bool = false
 	if pubKeyFromAuth != org.OwnerPubKey {
 		userRoles := DB.GetUserRoles(uuid, pubKeyFromAuth)
-		hasRole = RolesCheck(userRoles, role)
+		rolesMap := GetRolesMap()
+		hasRole = RolesCheck(rolesMap, userRoles, role)
 		return hasRole
 	}
 	return true
@@ -268,7 +269,8 @@ func (db database) UserHasAccess(pubKeyFromAuth string, uuid string, role string
 	var hasRole bool = false
 	if pubKeyFromAuth != org.OwnerPubKey {
 		userRoles := DB.GetUserRoles(uuid, pubKeyFromAuth)
-		hasRole = RolesCheck(userRoles, role)
+		rolesMap := GetRolesMap()
+		hasRole = RolesCheck(rolesMap, userRoles, role)
 		return hasRole
 	}
 	return true
@@ -279,10 +281,11 @@ func (db database) UserHasManageBountyRoles(pubKeyFromAuth string, uuid string) 
 	org := DB.GetOrganizationByUuid(uuid)
 	if pubKeyFromAuth != org.OwnerPubKey {
 		userRoles := DB.GetUserRoles(uuid, pubKeyFromAuth)
+		rolesMap := GetRolesMap()
 
 		for _, role := range ManageBountiesGroup {
 			// check for the manage bounty roles
-			hasRole := RolesCheck(userRoles, role)
+			hasRole := RolesCheck(rolesMap, userRoles, role)
 			if hasRole {
 				manageRolesCount--
 			}
