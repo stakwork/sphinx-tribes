@@ -2,6 +2,7 @@ package handlers
 
 import (
 	"bytes"
+	"context"
 	"encoding/csv"
 	"encoding/json"
 	"fmt"
@@ -12,8 +13,8 @@ import (
 	"path"
 	"time"
 
-	"github.com/aws/aws-sdk-go/aws"
-	"github.com/aws/aws-sdk-go/service/s3"
+	"github.com/aws/aws-sdk-go-v2/aws"
+	"github.com/aws/aws-sdk-go-v2/service/s3"
 	"github.com/fatih/structs"
 	"github.com/stakwork/sphinx-tribes/auth"
 	"github.com/stakwork/sphinx-tribes/config"
@@ -379,20 +380,62 @@ func UploadMetricsCsv(data [][]string, request db.PaymentDateRange) (error, stri
 
 	key := fmt.Sprintf("metrics%s-%s.csv", request.StartDate, request.EndDate)
 	path := fmt.Sprintf("%s/%s", config.S3FolderName, key)
-	_, err = config.S3Client.PutObject(&s3.PutObjectInput{
-		Bucket:               aws.String(config.S3BucketName),
-		Key:                  aws.String(path),
-		Body:                 bytes.NewReader(fileBuffer),
-		ContentLength:        aws.Int64(fileSize),
-		ContentType:          aws.String("application/csv"),
-		ContentDisposition:   aws.String("attachment"),
-		ServerSideEncryption: aws.String("AES256"),
-	})
 
-	url := fmt.Sprintf("%s/%s/%s", config.S3Url, config.S3FolderName, key)
+	err, postPresignedUrl := createPresignedUrl(path)
+
+	if err != nil {
+		fmt.Println("Presigned Error", err)
+	}
+
+	r, err := http.NewRequest(http.MethodPut, postPresignedUrl, bytes.NewReader(fileBuffer))
+	if err != nil {
+		fmt.Println("Posting presign s3 error:", err)
+	}
+	r.Header.Set("Content-Type", "multipart/form-data")
+	client := &http.Client{}
+	_, err = client.Do(r)
+
+	if err != nil {
+		fmt.Println("Error occured while posting presigned URL", err)
+	}
 
 	// Delete image from uploads folder
 	DeleteFileFromUploadsFolder(filePath)
 
-	return err, url
+	err, presignedUrlGet := getPresignedUrl(path)
+
+	return err, presignedUrlGet
+}
+
+func createPresignedUrl(path string) (error, string) {
+	presignedUrl, err := config.PresignClient.PresignPutObject(context.Background(),
+		&s3.PutObjectInput{
+			Bucket: aws.String(config.S3BucketName),
+			Key:    aws.String(path),
+		},
+		s3.WithPresignExpires(time.Minute*15),
+	)
+
+	if err != nil {
+		return err, ""
+	}
+
+	return nil, presignedUrl.URL
+}
+
+func getPresignedUrl(path string) (error, string) {
+	presignedUrl, err := config.PresignClient.PresignGetObject(context.Background(),
+		&s3.GetObjectInput{
+			Bucket:                     aws.String(config.S3BucketName),
+			Key:                        aws.String(path),
+			ResponseContentDisposition: aws.String("attachment"),
+		},
+		s3.WithPresignExpires(time.Minute*15),
+	)
+
+	if err != nil {
+		return err, ""
+	}
+
+	return nil, presignedUrl.URL
 }
