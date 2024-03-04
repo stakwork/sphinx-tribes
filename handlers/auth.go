@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"io"
 	"net/http"
-	"time"
 
 	"github.com/form3tech-oss/jwt-go"
 	"github.com/stakwork/sphinx-tribes/auth"
@@ -56,7 +55,6 @@ func (ah *authHandler) GetIsAdmin(w http.ResponseWriter, r *http.Request) {
 func (ah *authHandler) CreateConnectionCode(w http.ResponseWriter, r *http.Request) {
 	codeArr := []db.ConnectionCodes{}
 	codeStrArr := []string{}
-	now := time.Now()
 
 	body, err := io.ReadAll(r.Body)
 	r.Body.Close()
@@ -67,7 +65,6 @@ func (ah *authHandler) CreateConnectionCode(w http.ResponseWriter, r *http.Reque
 		code := db.ConnectionCodes{
 			ConnectionString: code,
 			IsUsed:           false,
-			DateCreated:      &now,
 		}
 		codeArr = append(codeArr, code)
 	}
