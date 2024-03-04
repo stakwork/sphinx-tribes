@@ -2,6 +2,7 @@ package handlers
 
 import (
 	"bytes"
+	"context"
 	"encoding/csv"
 	"encoding/json"
 	"fmt"
@@ -12,8 +13,8 @@ import (
 	"path"
 	"time"
 
-	"github.com/aws/aws-sdk-go/aws"
-	"github.com/aws/aws-sdk-go/service/s3"
+	"github.com/aws/aws-sdk-go-v2/aws"
+	"github.com/aws/aws-sdk-go-v2/service/s3"
 	"github.com/fatih/structs"
 	"github.com/stakwork/sphinx-tribes/auth"
 	"github.com/stakwork/sphinx-tribes/config"
@@ -379,20 +380,19 @@ func UploadMetricsCsv(data [][]string, request db.PaymentDateRange) (error, stri
 
 	key := fmt.Sprintf("metrics%s-%s.csv", request.StartDate, request.EndDate)
 	path := fmt.Sprintf("%s/%s", config.S3FolderName, key)
-	_, err = config.S3Client.PutObject(&s3.PutObjectInput{
+	_, err = config.S3Client.PutObject(context.Background(), &s3.PutObjectInput{
 		Bucket:               aws.String(config.S3BucketName),
 		Key:                  aws.String(path),
 		Body:                 bytes.NewReader(fileBuffer),
 		ContentLength:        aws.Int64(fileSize),
 		ContentType:          aws.String("application/csv"),
 		ContentDisposition:   aws.String("attachment"),
-		ServerSideEncryption: aws.String("AES256"),
+		ServerSideEncryption: "AES256",
 	})
-
-	url := fmt.Sprintf("%s/%s/%s", config.S3Url, config.S3FolderName, key)
 
 	// Delete image from uploads folder
 	DeleteFileFromUploadsFolder(filePath)
 
+	url := fmt.Sprintf("%s/%s/%s", config.S3Url, config.S3FolderName, key)
 	return err, url
 }

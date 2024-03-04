@@ -1,6 +1,7 @@
 package config
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
 	"io"
@@ -11,10 +12,9 @@ import (
 	"strings"
 	"time"
 
-	"github.com/aws/aws-sdk-go/aws"
-	"github.com/aws/aws-sdk-go/aws/credentials"
-	"github.com/aws/aws-sdk-go/aws/session"
-	"github.com/aws/aws-sdk-go/service/s3"
+	"github.com/aws/aws-sdk-go-v2/config"
+	"github.com/aws/aws-sdk-go-v2/credentials"
+	"github.com/aws/aws-sdk-go-v2/service/s3"
 )
 
 var Host string
@@ -34,7 +34,8 @@ var S3Url string
 var AdminCheck string
 var AdminDevFreePass = "FREE_PASS"
 
-var S3Client *s3.S3
+var S3Client *s3.Client
+var PresignClient *s3.PresignClient
 
 func InitConfig() {
 	Host = os.Getenv("LN_SERVER_BASE_URL")
@@ -54,21 +55,36 @@ func InitConfig() {
 	// Add to super admins
 	SuperAdmins = StripSuperAdmins(AdminStrings)
 
-	awsConfig := aws.Config{
-		Credentials: credentials.NewStaticCredentials(AwsAccess, AwsSecret, ""),
-		Region:      aws.String(AwsRegion),
-	}
-
-	awsSession, err := session.NewSessionWithOptions(session.Options{
-		Config: awsConfig,
-	})
+	awsConfig, err := config.LoadDefaultConfig(context.TODO(),
+		config.WithRegion(AwsRegion),
+		config.WithCredentialsProvider(credentials.NewStaticCredentialsProvider(AwsAccess, AwsSecret, "")),
+	)
 
 	if err != nil {
 		fmt.Println("Could not setup AWS session", err)
 	}
 
 	// create a s3 client session
-	S3Client = s3.New(awsSession)
+	S3Client = s3.NewFromConfig(awsConfig)
+
+	count := 10
+	fmt.Printf("Let's list up to %v buckets for your account.\n", count)
+	result, err := S3Client.ListBuckets(context.TODO(), &s3.ListBucketsInput{})
+	if err != nil {
+		fmt.Printf("Couldn't list buckets for your account. Here's why: %v\n", err)
+		return
+	}
+	if len(result.Buckets) == 0 {
+		fmt.Println("You don't have any buckets!")
+	} else {
+		if count > len(result.Buckets) {
+			count = len(result.Buckets)
+		}
+		for _, bucket := range result.Buckets[:count] {
+			fmt.Printf("\t%v\n", *bucket.Name)
+		}
+	}
+	PresignClient = s3.NewPresignClient(S3Client)
 
 	// only make this call if there is a Relay auth key
 	if RelayAuthKey != "" {
