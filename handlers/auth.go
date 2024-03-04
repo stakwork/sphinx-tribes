@@ -85,6 +85,8 @@ func (ah *authHandler) CreateConnectionCode(w http.ResponseWriter, r *http.Reque
 		w.WriteHeader(http.StatusBadRequest)
 		return
 	}
+	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode("Codes created successfully")
 }
 
 func (ah *authHandler) GetConnectionCode(w http.ResponseWriter, _ *http.Request) {

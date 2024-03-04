@@ -37,7 +37,7 @@ func PubKeyContext(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		token := r.URL.Query().Get("token")
 		if token == "" {
-			token = r.Header.Get("x-jwt")
+			token = r.Header.Get("token")
 		}
 
 		if token == "" {
@@ -149,10 +149,7 @@ func PubKeyContextSuperAdmin(next http.Handler) http.Handler {
 // ConnectionContext parses token for connection code
 func ConnectionCodeContext(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		token := r.URL.Query().Get("token")
-		if token == "" {
-			token = r.Header.Get("x-jwt")
-		}
+		token := r.Header.Get("token")
 
 		if token == "" {
 			fmt.Println("[auth] no token")
