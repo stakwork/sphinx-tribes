@@ -33,6 +33,7 @@ var S3FolderName string
 var S3Url string
 var AdminCheck string
 var AdminDevFreePass = "FREE_PASS"
+var Connection_Auth string
 
 var S3Client *s3.S3
 
@@ -50,6 +51,7 @@ func InitConfig() {
 	S3FolderName = os.Getenv("S3_FOLDER_NAME")
 	S3Url = os.Getenv("S3_URL")
 	AdminCheck = os.Getenv("ADMIN_CHECK")
+	Connection_Auth = os.Getenv("CONNECTION_AUTH")
 
 	// Add to super admins
 	SuperAdmins = StripSuperAdmins(AdminStrings)

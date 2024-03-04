@@ -54,16 +54,23 @@ func (ah *authHandler) GetIsAdmin(w http.ResponseWriter, r *http.Request) {
 }
 
 func (ah *authHandler) CreateConnectionCode(w http.ResponseWriter, r *http.Request) {
-	code := db.ConnectionCodes{}
+	codeArr := []db.ConnectionCodes{}
+	codeStrArr := []string{}
 	now := time.Now()
 
 	body, err := io.ReadAll(r.Body)
 	r.Body.Close()
 
-	err = json.Unmarshal(body, &code)
+	err = json.Unmarshal(body, &codeStrArr)
 
-	code.IsUsed = false
-	code.DateCreated = &now
+	for _, code := range codeStrArr {
+		code := db.ConnectionCodes{
+			ConnectionString: code,
+			IsUsed:           false,
+			DateCreated:      &now,
+		}
+		codeArr = append(codeArr, code)
+	}
 
 	if err != nil {
 		fmt.Println(err)
@@ -71,7 +78,7 @@ func (ah *authHandler) CreateConnectionCode(w http.ResponseWriter, r *http.Reque
 		return
 	}
 
-	_, err = ah.db.CreateConnectionCode(code)
+	_, err = ah.db.CreateConnectionCode(codeArr)
 
 	if err != nil {
 		fmt.Println("=> ERR create connection code", err)
