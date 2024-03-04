@@ -18,7 +18,6 @@ import (
 	"github.com/stakwork/sphinx-tribes/db"
 	mocks "github.com/stakwork/sphinx-tribes/mocks"
 	"github.com/stretchr/testify/assert"
-	"github.com/stretchr/testify/mock"
 )
 
 func TestGetAdminPubkeys(t *testing.T) {
@@ -52,16 +51,21 @@ func TestGetAdminPubkeys(t *testing.T) {
 }
 
 func TestCreateConnectionCode(t *testing.T) {
-
 	mockDb := mocks.NewDatabase(t)
 	aHandler := NewAuthHandler(mockDb)
 	t.Run("should create connection code successful", func(t *testing.T) {
-		codeToBeInserted := db.ConnectionCodes{
-			ConnectionString: "custom connection string",
+		codeToBeInserted := []string{"custom connection string", "custom connection string 2"}
+
+		codeArr := []db.ConnectionCodes{}
+		for _, code := range codeToBeInserted {
+			code := db.ConnectionCodes{
+				ConnectionString: code,
+				IsUsed:           false,
+			}
+			codeArr = append(codeArr, code)
 		}
-		mockDb.On("CreateConnectionCode", mock.MatchedBy(func(code db.ConnectionCodes) bool {
-			return code.IsUsed == false && code.ConnectionString == codeToBeInserted.ConnectionString
-		})).Return(codeToBeInserted, nil).Once()
+
+		mockDb.On("CreateConnectionCode", codeArr).Return(codeArr, nil).Once()
 
 		body, _ := json.Marshal(codeToBeInserted)
 		req, err := http.NewRequest("POST", "/connectioncodes", bytes.NewBuffer(body))
@@ -77,12 +81,18 @@ func TestCreateConnectionCode(t *testing.T) {
 	})
 
 	t.Run("should return error if failed to add connection code", func(t *testing.T) {
-		codeToBeInserted := db.ConnectionCodes{
-			ConnectionString: "custom connection string",
+		codeToBeInserted := []string{"custom connection string", "custom connection string 2"}
+
+		codeArr := []db.ConnectionCodes{}
+		for _, code := range codeToBeInserted {
+			code := db.ConnectionCodes{
+				ConnectionString: code,
+				IsUsed:           false,
+			}
+			codeArr = append(codeArr, code)
 		}
-		mockDb.On("CreateConnectionCode", mock.MatchedBy(func(code db.ConnectionCodes) bool {
-			return code.IsUsed == false && code.ConnectionString == codeToBeInserted.ConnectionString
-		})).Return(codeToBeInserted, errors.New("failed to create connection")).Once()
+
+		mockDb.On("CreateConnectionCode", codeArr).Return(codeArr, errors.New("failed to create connection")).Once()
 
 		body, _ := json.Marshal(codeToBeInserted)
 		req, err := http.NewRequest("POST", "/connectioncodes", bytes.NewBuffer(body))
