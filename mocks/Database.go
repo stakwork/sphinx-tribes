@@ -643,25 +643,27 @@ func (_c *Database_CreateChannel_Call) RunAndReturn(run func(db.Channel) (db.Cha
 }
 
 // CreateConnectionCode provides a mock function with given fields: c
-func (_m *Database) CreateConnectionCode(c db.ConnectionCodes) (db.ConnectionCodes, error) {
+func (_m *Database) CreateConnectionCode(c []db.ConnectionCodes) ([]db.ConnectionCodes, error) {
 	ret := _m.Called(c)
 
 	if len(ret) == 0 {
 		panic("no return value specified for CreateConnectionCode")
 	}
 
-	var r0 db.ConnectionCodes
+	var r0 []db.ConnectionCodes
 	var r1 error
-	if rf, ok := ret.Get(0).(func(db.ConnectionCodes) (db.ConnectionCodes, error)); ok {
+	if rf, ok := ret.Get(0).(func([]db.ConnectionCodes) ([]db.ConnectionCodes, error)); ok {
 		return rf(c)
 	}
-	if rf, ok := ret.Get(0).(func(db.ConnectionCodes) db.ConnectionCodes); ok {
+	if rf, ok := ret.Get(0).(func([]db.ConnectionCodes) []db.ConnectionCodes); ok {
 		r0 = rf(c)
 	} else {
-		r0 = ret.Get(0).(db.ConnectionCodes)
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).([]db.ConnectionCodes)
+		}
 	}
 
-	if rf, ok := ret.Get(1).(func(db.ConnectionCodes) error); ok {
+	if rf, ok := ret.Get(1).(func([]db.ConnectionCodes) error); ok {
 		r1 = rf(c)
 	} else {
 		r1 = ret.Error(1)
@@ -676,24 +678,24 @@ type Database_CreateConnectionCode_Call struct {
 }
 
 // CreateConnectionCode is a helper method to define mock.On call
-//   - c db.ConnectionCodes
+//   - c []db.ConnectionCodes
 func (_e *Database_Expecter) CreateConnectionCode(c interface{}) *Database_CreateConnectionCode_Call {
 	return &Database_CreateConnectionCode_Call{Call: _e.mock.On("CreateConnectionCode", c)}
 }
 
-func (_c *Database_CreateConnectionCode_Call) Run(run func(c db.ConnectionCodes)) *Database_CreateConnectionCode_Call {
+func (_c *Database_CreateConnectionCode_Call) Run(run func(c []db.ConnectionCodes)) *Database_CreateConnectionCode_Call {
 	_c.Call.Run(func(args mock.Arguments) {
-		run(args[0].(db.ConnectionCodes))
+		run(args[0].([]db.ConnectionCodes))
 	})
 	return _c
 }
 
-func (_c *Database_CreateConnectionCode_Call) Return(_a0 db.ConnectionCodes, _a1 error) *Database_CreateConnectionCode_Call {
+func (_c *Database_CreateConnectionCode_Call) Return(_a0 []db.ConnectionCodes, _a1 error) *Database_CreateConnectionCode_Call {
 	_c.Call.Return(_a0, _a1)
 	return _c
 }
 
-func (_c *Database_CreateConnectionCode_Call) RunAndReturn(run func(db.ConnectionCodes) (db.ConnectionCodes, error)) *Database_CreateConnectionCode_Call {
+func (_c *Database_CreateConnectionCode_Call) RunAndReturn(run func([]db.ConnectionCodes) ([]db.ConnectionCodes, error)) *Database_CreateConnectionCode_Call {
 	_c.Call.Return(run)
 	return _c
 }
