@@ -7,10 +7,9 @@ import (
 )
 
 func GetPaginationParams(r *http.Request) (int, int, string, string, string) {
-
 	// there are cases when the request is not passed in
 	if r == nil {
-		return 0, -1, "updated", "asc", ""
+		return 0, 1, "updated", "asc", ""
 	}
 
 	keys := r.URL.Query()
