@@ -21,14 +21,16 @@ import (
 type bountyHandler struct {
 	httpClient             HttpClient
 	db                     db.Database
+	getSocketConnections   func(host string) (db.Client, error)
 	generateBountyResponse func(bounties []db.Bounty) []db.BountyResponse
 }
 
-func NewBountyHandler(httpClient HttpClient, db db.Database) *bountyHandler {
+func NewBountyHandler(httpClient HttpClient, database db.Database) *bountyHandler {
 	return &bountyHandler{
 
-		httpClient: httpClient,
-		db:         db,
+		httpClient:           httpClient,
+		db:                   database,
+		getSocketConnections: db.Store.GetSocketConnections,
 	}
 }
 
@@ -441,6 +443,7 @@ func (h *bountyHandler) MakeBountyPayment(w http.ResponseWriter, r *http.Request
 	if bounty.Paid {
 		w.WriteHeader(http.StatusMethodNotAllowed)
 		json.NewEncoder(w).Encode("Bounty has already been paid")
+		return
 	}
 
 	// check if user is the admin of the organization
@@ -479,11 +482,10 @@ func (h *bountyHandler) MakeBountyPayment(w http.ResponseWriter, r *http.Request
 
 	jsonBody := []byte(bodyData)
 
-	client := &http.Client{}
 	req, _ := http.NewRequest(http.MethodPost, url, bytes.NewBuffer(jsonBody))
 	req.Header.Set("x-user-token", config.RelayAuthKey)
 	req.Header.Set("Content-Type", "application/json")
-	res, err := client.Do(req)
+	res, err := h.httpClient.Do(req)
 
 	if err != nil {
 		log.Printf("Request Failed: %s", err)
@@ -513,17 +515,17 @@ func (h *bountyHandler) MakeBountyPayment(w http.ResponseWriter, r *http.Request
 			Status:         true,
 			PaymentType:    "payment",
 		}
-		db.DB.AddPaymentHistory(paymentHistory)
+		h.db.AddPaymentHistory(paymentHistory)
 
 		bounty.Paid = true
 		bounty.PaidDate = &now
 		bounty.CompletionDate = &now
-		db.DB.UpdateBounty(bounty)
+		h.db.UpdateBounty(bounty)
 
 		msg["msg"] = "keysend_success"
 		msg["invoice"] = ""
 
-		socket, err := db.Store.GetSocketConnections(request.Websocket_token)
+		socket, err := h.getSocketConnections(request.Websocket_token)
 		if err == nil {
 			socket.Conn.WriteJSON(msg)
 		}
@@ -531,7 +533,7 @@ func (h *bountyHandler) MakeBountyPayment(w http.ResponseWriter, r *http.Request
 		msg["msg"] = "keysend_error"
 		msg["invoice"] = ""
 
-		socket, err := db.Store.GetSocketConnections(request.Websocket_token)
+		socket, err := h.getSocketConnections(request.Websocket_token)
 		if err == nil {
 			socket.Conn.WriteJSON(msg)
 		}
