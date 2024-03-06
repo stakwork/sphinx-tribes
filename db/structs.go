@@ -388,6 +388,10 @@ type Bounty struct {
 	CodingLanguages         pq.StringArray `gorm:"type:text[];not null default:'[]'" json:"coding_languages"`
 }
 
+type BountyOwners struct {
+	OwnerID string `json:"owner_id"`
+}
+
 type BountyData struct {
 	Bounty
 	BountyId          uint       `json:"bounty_id"`

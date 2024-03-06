@@ -11,7 +11,6 @@ func MetricsRoutes() chi.Router {
 	r := chi.NewRouter()
 	mh := handlers.NewMetricHandler(db.DB)
 	r.Group(func(r chi.Router) {
-		// Todo: change auth to superadmin context
 		r.Use(auth.PubKeyContextSuperAdmin)
 
 		r.Post("/payment", handlers.PaymentMetrics)
@@ -20,6 +19,7 @@ func MetricsRoutes() chi.Router {
 		r.Post("/bounty_stats", mh.BountyMetrics)
 		r.Post("/bounties", mh.MetricsBounties)
 		r.Post("/bounties/count", mh.MetricsBountiesCount)
+		r.Post("/bounties/providers", mh.MetricsBountiesProviders)
 		r.Post("/csv", handlers.MetricsCsv)
 	})
 	return r
