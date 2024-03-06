@@ -1961,6 +1961,55 @@ func (_c *Database_GetBountiesLeaderboard_Call) RunAndReturn(run func() []db.Lea
 	return _c
 }
 
+// GetBountiesProviders provides a mock function with given fields: r, re
+func (_m *Database) GetBountiesProviders(r db.PaymentDateRange, re *http.Request) []db.Person {
+	ret := _m.Called(r, re)
+
+	if len(ret) == 0 {
+		panic("no return value specified for GetBountiesProviders")
+	}
+
+	var r0 []db.Person
+	if rf, ok := ret.Get(0).(func(db.PaymentDateRange, *http.Request) []db.Person); ok {
+		r0 = rf(r, re)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).([]db.Person)
+		}
+	}
+
+	return r0
+}
+
+// Database_GetBountiesProviders_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'GetBountiesProviders'
+type Database_GetBountiesProviders_Call struct {
+	*mock.Call
+}
+
+// GetBountiesProviders is a helper method to define mock.On call
+//   - r db.PaymentDateRange
+//   - re *http.Request
+func (_e *Database_Expecter) GetBountiesProviders(r interface{}, re interface{}) *Database_GetBountiesProviders_Call {
+	return &Database_GetBountiesProviders_Call{Call: _e.mock.On("GetBountiesProviders", r, re)}
+}
+
+func (_c *Database_GetBountiesProviders_Call) Run(run func(r db.PaymentDateRange, re *http.Request)) *Database_GetBountiesProviders_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(db.PaymentDateRange), args[1].(*http.Request))
+	})
+	return _c
+}
+
+func (_c *Database_GetBountiesProviders_Call) Return(_a0 []db.Person) *Database_GetBountiesProviders_Call {
+	_c.Call.Return(_a0)
+	return _c
+}
+
+func (_c *Database_GetBountiesProviders_Call) RunAndReturn(run func(db.PaymentDateRange, *http.Request) []db.Person) *Database_GetBountiesProviders_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
 // GetBounty provides a mock function with given fields: id
 func (_m *Database) GetBounty(id uint) db.Bounty {
 	ret := _m.Called(id)

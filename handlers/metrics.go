@@ -233,6 +233,32 @@ func (mh *metricHandler) MetricsBountiesCount(w http.ResponseWriter, r *http.Req
 	json.NewEncoder(w).Encode(MetricsBountiesCount)
 }
 
+func (mh *metricHandler) MetricsBountiesProviders(w http.ResponseWriter, r *http.Request) {
+	ctx := r.Context()
+	pubKeyFromAuth, _ := ctx.Value(auth.ContextKey).(string)
+
+	if pubKeyFromAuth == "" {
+		fmt.Println("no pubkey from auth")
+		w.WriteHeader(http.StatusUnauthorized)
+		return
+	}
+
+	request := db.PaymentDateRange{}
+	body, err := io.ReadAll(r.Body)
+	r.Body.Close()
+
+	err = json.Unmarshal(body, &request)
+	if err != nil {
+		w.WriteHeader(http.StatusNotAcceptable)
+		json.NewEncoder(w).Encode("Request body not accepted")
+		return
+	}
+
+	bountiesProviders := mh.db.GetBountiesProviders(request, r)
+	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode(bountiesProviders)
+}
+
 func MetricsCsv(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 	pubKeyFromAuth, _ := ctx.Value(auth.ContextKey).(string)

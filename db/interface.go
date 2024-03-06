@@ -134,6 +134,7 @@ type Database interface {
 	GetPersonByPubkey(pubkey string) Person
 	GetBountiesByDateRange(r PaymentDateRange, re *http.Request) []Bounty
 	GetBountiesByDateRangeCount(r PaymentDateRange, re *http.Request) int64
+	GetBountiesProviders(r PaymentDateRange, re *http.Request) []Person
 	PersonUniqueNameFromName(name string) (string, error)
 	ProcessAlerts(p Person)
 	UserHasAccess(pubKeyFromAuth string, uuid string, role string) bool
