@@ -562,7 +562,7 @@ func (h *bountyHandler) BountyBudgetWithdraw(w http.ResponseWriter, r *http.Requ
 
 	// check if user is the admin of the organization
 	// or has a withdraw bounty budget role
-	hasRole := db.UserHasAccess(pubKeyFromAuth, request.OrgUuid, db.WithdrawBudget)
+	hasRole := h.db.UserHasAccess(pubKeyFromAuth, request.OrgUuid, db.WithdrawBudget)
 	if !hasRole {
 		w.WriteHeader(http.StatusUnauthorized)
 		errMsg := formatPayError("You don't have appropriate permissions to withdraw bounty budget")
@@ -575,7 +575,7 @@ func (h *bountyHandler) BountyBudgetWithdraw(w http.ResponseWriter, r *http.Requ
 	if err == nil && amount > 0 {
 		// check if the organization bounty balance
 		// is greater than the amount
-		orgBudget := db.DB.GetOrganizationBudget(request.OrgUuid)
+		orgBudget := h.db.GetOrganizationBudget(request.OrgUuid)
 		if amount > orgBudget.TotalBudget {
 			w.WriteHeader(http.StatusForbidden)
 			errMsg := formatPayError("Organization budget is not enough to withdraw the amount")
@@ -585,7 +585,7 @@ func (h *bountyHandler) BountyBudgetWithdraw(w http.ResponseWriter, r *http.Requ
 		paymentSuccess, paymentError := h.PayLightningInvoice(request.PaymentRequest)
 		if paymentSuccess.Success {
 			// withdraw amount from organization budget
-			db.DB.WithdrawBudget(pubKeyFromAuth, request.OrgUuid, amount)
+			h.db.WithdrawBudget(pubKeyFromAuth, request.OrgUuid, amount)
 			w.WriteHeader(http.StatusOK)
 			json.NewEncoder(w).Encode(paymentSuccess)
 		} else {
