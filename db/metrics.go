@@ -190,7 +190,7 @@ func (db database) GetBountiesByDateRange(r PaymentDateRange, re *http.Request) 
 	} else {
 		orderQuery = " ORDER BY " + sortBy + "" + "DESC"
 	}
-	if limit > 1 {
+	if limit > 0 {
 		limitQuery = fmt.Sprintf("LIMIT %d  OFFSET %d", limit, offset)
 	}
 
@@ -246,4 +246,57 @@ func (db database) GetBountiesByDateRangeCount(r PaymentDateRange, re *http.Requ
 	allQuery := query + " " + statusQuery
 	db.db.Raw(allQuery).Scan(&count)
 	return count
+}
+
+func (db database) GetBountiesProviders(r PaymentDateRange, re *http.Request) []Person {
+	offset, limit, _, _, _ := utils.GetPaginationParams(re)
+	keys := re.URL.Query()
+	open := keys.Get("Open")
+	assingned := keys.Get("Assigned")
+	paid := keys.Get("Paid")
+	providers := keys.Get("provider")
+
+	var statusConditions []string
+
+	limitQuery := ""
+
+	if open == "true" {
+		statusConditions = append(statusConditions, "assignee = '' AND paid != true")
+	}
+	if assingned == "true" {
+		statusConditions = append(statusConditions, "assignee != '' AND paid = false")
+	}
+	if paid == "true" {
+		statusConditions = append(statusConditions, "paid = true")
+	}
+
+	var statusQuery string
+	if len(statusConditions) > 0 {
+		statusQuery = " AND (" + strings.Join(statusConditions, " OR ") + ")"
+	} else {
+		statusQuery = ""
+	}
+
+	providerCondition := ""
+	if len(providers) > 0 {
+		providerSlice := strings.Split(providers, ",")
+		providerCondition = " AND owner_id IN ('" + strings.Join(providerSlice, "','") + "')"
+	}
+
+	if limit > 0 {
+		limitQuery = fmt.Sprintf("LIMIT %d  OFFSET %d", limit, offset)
+	}
+
+	bountyOwners := []BountyOwners{}
+	bountyProviders := []Person{}
+
+	query := `SELECT DISTINCT owner_id FROM public.bounty WHERE created >= '` + r.StartDate + `'  AND created <= '` + r.EndDate + `'` + providerCondition
+	allQuery := query + " " + statusQuery + " " + limitQuery
+	db.db.Raw(allQuery).Scan(&bountyOwners)
+
+	for _, owner := range bountyOwners {
+		person := db.GetPersonByPubkey(owner.OwnerID)
+		bountyProviders = append(bountyProviders, person)
+	}
+	return bountyProviders
 }
