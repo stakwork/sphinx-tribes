@@ -24,6 +24,7 @@ func NewRouter() *http.Server {
 	authHandler := handlers.NewAuthHandler(db.DB)
 	channelHandler := handlers.NewChannelHandler(db.DB)
 	botHandler := handlers.NewBotHandler(db.DB)
+	bHandler := handlers.NewBountyHandler(http.DefaultClient, db.DB)
 
 	r.Mount("/tribes", TribeRoutes())
 	r.Mount("/bots", BotsRoutes())
@@ -75,7 +76,7 @@ func NewRouter() *http.Server {
 		r.Post("/badges", handlers.AddOrRemoveBadge)
 		r.Delete("/channel/{id}", channelHandler.DeleteChannel)
 		r.Delete("/ticket/{pubKey}/{created}", handlers.DeleteTicketByAdmin)
-		r.Get("/poll/invoice/{paymentRequest}", handlers.PollInvoice)
+		r.Get("/poll/invoice/{paymentRequest}", bHandler.PollInvoice)
 		r.Post("/meme_upload", handlers.MemeImageUpload)
 		r.Get("/admin/auth", authHandler.GetIsAdmin)
 	})
