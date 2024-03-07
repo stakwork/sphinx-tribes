@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"io"
 	"net/http"
-	"time"
 
 	"github.com/form3tech-oss/jwt-go"
 	"github.com/stakwork/sphinx-tribes/auth"
@@ -54,16 +53,21 @@ func (ah *authHandler) GetIsAdmin(w http.ResponseWriter, r *http.Request) {
 }
 
 func (ah *authHandler) CreateConnectionCode(w http.ResponseWriter, r *http.Request) {
-	code := db.ConnectionCodes{}
-	now := time.Now()
+	codeArr := []db.ConnectionCodes{}
+	codeStrArr := []string{}
 
 	body, err := io.ReadAll(r.Body)
 	r.Body.Close()
 
-	err = json.Unmarshal(body, &code)
+	err = json.Unmarshal(body, &codeStrArr)
 
-	code.IsUsed = false
-	code.DateCreated = &now
+	for _, code := range codeStrArr {
+		code := db.ConnectionCodes{
+			ConnectionString: code,
+			IsUsed:           false,
+		}
+		codeArr = append(codeArr, code)
+	}
 
 	if err != nil {
 		fmt.Println(err)
@@ -71,13 +75,15 @@ func (ah *authHandler) CreateConnectionCode(w http.ResponseWriter, r *http.Reque
 		return
 	}
 
-	_, err = ah.db.CreateConnectionCode(code)
+	_, err = ah.db.CreateConnectionCode(codeArr)
 
 	if err != nil {
 		fmt.Println("=> ERR create connection code", err)
 		w.WriteHeader(http.StatusBadRequest)
 		return
 	}
+	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode("Codes created successfully")
 }
 
 func (ah *authHandler) GetConnectionCode(w http.ResponseWriter, _ *http.Request) {
