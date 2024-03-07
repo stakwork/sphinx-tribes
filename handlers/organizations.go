@@ -18,6 +18,7 @@ import (
 type organizationHandler struct {
 	db                    db.Database
 	generateBountyHandler func(bounties []db.Bounty) []db.BountyResponse
+	getLightningInvoice   func(payment_request string) (db.InvoiceResult, db.InvoiceError)
 }
 
 func NewOrganizationHandler(db db.Database) *organizationHandler {
@@ -25,6 +26,7 @@ func NewOrganizationHandler(db db.Database) *organizationHandler {
 	return &organizationHandler{
 		db:                    db,
 		generateBountyHandler: bHandler.GenerateBountyResponse,
+		getLightningInvoice:   bHandler.GetLightningInvoice,
 	}
 }
 
@@ -630,7 +632,7 @@ func GetPaymentHistory(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(paymentHistoryData)
 }
 
-func PollBudgetInvoices(w http.ResponseWriter, r *http.Request) {
+func (oh *organizationHandler) PollBudgetInvoices(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 	pubKeyFromAuth, _ := ctx.Value(auth.ContextKey).(string)
 	uuid := chi.URLParam(r, "uuid")
@@ -641,10 +643,10 @@ func PollBudgetInvoices(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	orgInvoices := db.DB.GetOrganizationInvoices(uuid)
+	orgInvoices := oh.db.GetOrganizationInvoices(uuid)
 
 	for _, inv := range orgInvoices {
-		invoiceRes, invoiceErr := GetLightningInvoice(inv.PaymentRequest)
+		invoiceRes, invoiceErr := oh.getLightningInvoice(inv.PaymentRequest)
 
 		if invoiceErr.Error != "" {
 			w.WriteHeader(http.StatusForbidden)
@@ -654,9 +656,9 @@ func PollBudgetInvoices(w http.ResponseWriter, r *http.Request) {
 
 		if invoiceRes.Response.Settled {
 			if !inv.Status && inv.Type == "BUDGET" {
-				db.DB.AddAndUpdateBudget(inv)
+				oh.db.AddAndUpdateBudget(inv)
 				// Update the invoice status
-				db.DB.UpdateInvoice(inv.PaymentRequest)
+				oh.db.UpdateInvoice(inv.PaymentRequest)
 			}
 		}
 	}

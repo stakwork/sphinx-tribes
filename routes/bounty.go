@@ -25,7 +25,7 @@ func BountyRoutes() chi.Router {
 		r.Get("/created/{created}", bountyHandler.GetBountyByCreated)
 		r.Get("/count/{personKey}/{tabType}", handlers.GetUserBountyCount)
 		r.Get("/count", handlers.GetBountyCount)
-		r.Get("/invoice/{paymentRequest}", handlers.GetInvoiceData)
+		r.Get("/invoice/{paymentRequest}", bountyHandler.GetInvoiceData)
 		r.Get("/filter/count", handlers.GetFilterCount)
 
 	})

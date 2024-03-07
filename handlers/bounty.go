@@ -606,15 +606,14 @@ func formatPayError(errorMsg string) db.InvoicePayError {
 	}
 }
 
-func GetLightningInvoice(payment_request string) (db.InvoiceResult, db.InvoiceError) {
+func (h *bountyHandler) GetLightningInvoice(payment_request string) (db.InvoiceResult, db.InvoiceError) {
 	url := fmt.Sprintf("%s/invoice?payment_request=%s", config.RelayUrl, payment_request)
 
-	client := &http.Client{}
 	req, err := http.NewRequest(http.MethodGet, url, nil)
 
 	req.Header.Set("x-user-token", config.RelayAuthKey)
 	req.Header.Set("Content-Type", "application/json")
-	res, _ := client.Do(req)
+	res, _ := h.httpClient.Do(req)
 
 	if err != nil {
 		log.Printf("Request Failed: %s", err)
@@ -693,9 +692,9 @@ func (h *bountyHandler) PayLightningInvoice(payment_request string) (db.InvoiceP
 	}
 }
 
-func GetInvoiceData(w http.ResponseWriter, r *http.Request) {
+func (h *bountyHandler) GetInvoiceData(w http.ResponseWriter, r *http.Request) {
 	paymentRequest := chi.URLParam(r, "paymentRequest")
-	invoiceData, invoiceErr := GetLightningInvoice(paymentRequest)
+	invoiceData, invoiceErr := h.GetLightningInvoice(paymentRequest)
 
 	if invoiceErr.Error != "" {
 		w.WriteHeader(http.StatusForbidden)
@@ -707,7 +706,7 @@ func GetInvoiceData(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(invoiceData)
 }
 
-func PollInvoice(w http.ResponseWriter, r *http.Request) {
+func (h *bountyHandler) PollInvoice(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 	pubKeyFromAuth, _ := ctx.Value(auth.ContextKey).(string)
 	paymentRequest := chi.URLParam(r, "paymentRequest")
@@ -719,7 +718,7 @@ func PollInvoice(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	invoiceRes, invoiceErr := GetLightningInvoice(paymentRequest)
+	invoiceRes, invoiceErr := h.GetLightningInvoice(paymentRequest)
 
 	if invoiceErr.Error != "" {
 		w.WriteHeader(http.StatusForbidden)
@@ -729,14 +728,14 @@ func PollInvoice(w http.ResponseWriter, r *http.Request) {
 
 	if invoiceRes.Response.Settled {
 		// Todo if an invoice is settled
-		invoice := db.DB.GetInvoice(paymentRequest)
-		invData := db.DB.GetUserInvoiceData(paymentRequest)
-		dbInvoice := db.DB.GetInvoice(paymentRequest)
+		invoice := h.db.GetInvoice(paymentRequest)
+		invData := h.db.GetUserInvoiceData(paymentRequest)
+		dbInvoice := h.db.GetInvoice(paymentRequest)
 
 		// Make any change only if the invoice has not been settled
 		if !dbInvoice.Status {
 			if invoice.Type == "BUDGET" {
-				db.DB.AddAndUpdateBudget(invoice)
+				h.db.AddAndUpdateBudget(invoice)
 			} else if invoice.Type == "KEYSEND" {
 				url := fmt.Sprintf("%s/payment", config.RelayUrl)
 
@@ -746,12 +745,11 @@ func PollInvoice(w http.ResponseWriter, r *http.Request) {
 
 				jsonBody := []byte(bodyData)
 
-				client := &http.Client{}
 				req, _ := http.NewRequest(http.MethodPost, url, bytes.NewBuffer(jsonBody))
 
 				req.Header.Set("x-user-token", config.RelayAuthKey)
 				req.Header.Set("Content-Type", "application/json")
-				res, _ := client.Do(req)
+				res, _ := h.httpClient.Do(req)
 
 				if err != nil {
 					log.Printf("Request Failed: %s", err)
@@ -767,13 +765,13 @@ func PollInvoice(w http.ResponseWriter, r *http.Request) {
 					keysendRes := db.KeysendSuccess{}
 					err = json.Unmarshal(body, &keysendRes)
 
-					bounty, err := db.DB.GetBountyByCreated(uint(invData.Created))
+					bounty, err := h.db.GetBountyByCreated(uint(invData.Created))
 
 					if err == nil {
 						bounty.Paid = true
 					}
 
-					db.DB.UpdateBounty(bounty)
+					h.db.UpdateBounty(bounty)
 				} else {
 					// Unmarshal result
 					keysendError := db.KeysendError{}
@@ -782,7 +780,7 @@ func PollInvoice(w http.ResponseWriter, r *http.Request) {
 				}
 			}
 			// Update the invoice status
-			db.DB.UpdateInvoice(paymentRequest)
+			h.db.UpdateInvoice(paymentRequest)
 		}
 
 	}
