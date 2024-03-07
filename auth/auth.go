@@ -146,6 +146,27 @@ func PubKeyContextSuperAdmin(next http.Handler) http.Handler {
 	})
 }
 
+// ConnectionContext parses token for connection code
+func ConnectionCodeContext(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		token := r.Header.Get("token")
+
+		if token == "" {
+			fmt.Println("[auth] no token")
+			http.Error(w, http.StatusText(401), 401)
+			return
+		}
+
+		if token != config.Connection_Auth {
+			fmt.Println("Not a super admin : auth")
+			http.Error(w, http.StatusText(401), 401)
+			return
+		}
+		ctx := context.WithValue(r.Context(), ContextKey, token)
+		next.ServeHTTP(w, r.WithContext(ctx))
+	})
+}
+
 func AdminCheck(pubkey string) bool {
 	for _, val := range config.SuperAdmins {
 		if val == pubkey {

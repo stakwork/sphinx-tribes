@@ -1495,10 +1495,12 @@ func (db database) GetPeopleListShort(count uint32) *[]PersonInShort {
 	return &p
 }
 
-func (db database) CreateConnectionCode(c ConnectionCodes) (ConnectionCodes, error) {
-	if c.DateCreated == nil {
-		now := time.Now()
-		c.DateCreated = &now
+func (db database) CreateConnectionCode(c []ConnectionCodes) ([]ConnectionCodes, error) {
+	now := time.Now()
+	for _, code := range c {
+		if code.DateCreated.IsZero() {
+			code.DateCreated = &now
+		}
 	}
 	db.db.Create(&c)
 	return c, nil
