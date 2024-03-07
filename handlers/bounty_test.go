@@ -6,7 +6,6 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"github.com/stakwork/sphinx-tribes/utils"
 	"io"
 	"net/http"
 	"net/http/httptest"
@@ -15,6 +14,8 @@ import (
 	"sync"
 	"testing"
 	"time"
+
+	"github.com/stakwork/sphinx-tribes/utils"
 
 	"github.com/go-chi/chi"
 	"github.com/lib/pq"
@@ -1429,5 +1430,88 @@ func TestBountyBudgetWithdraw(t *testing.T) {
 		assert.False(t, response["success"].(bool))
 		assert.Equal(t, "Payment error", response["error"].(string))
 		mockHttpClient.AssertCalled(t, "Do", mock.AnythingOfType("*http.Request"))
+	})
+}
+
+func TestPollInvoice(t *testing.T) {
+	ctx := context.Background()
+	mockDb := &dbMocks.Database{}
+	mockHttpClient := &mocks.HttpClient{}
+	bHandler := NewBountyHandler(mockHttpClient, mockDb)
+
+	unauthorizedCtx := context.WithValue(ctx, auth.ContextKey, "")
+	authorizedCtx := context.WithValue(ctx, auth.ContextKey, "valid-key")
+
+	t.Run("Should test that a 401 error is returned if a user is unauthorized", func(t *testing.T) {
+		r := chi.NewRouter()
+		r.Post("/poll/invoice/{paymentRequest}", bHandler.PollInvoice)
+
+		rr := httptest.NewRecorder()
+		req, err := http.NewRequestWithContext(unauthorizedCtx, http.MethodPost, "/poll/invoice/1", bytes.NewBufferString(`{}`))
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		r.ServeHTTP(rr, req)
+
+		assert.Equal(t, http.StatusUnauthorized, rr.Code, "Expected 401 error if a user is unauthorized")
+	})
+
+	t.Run("Should test that a 403 error is returned if there is an invoice error", func(t *testing.T) {
+		expectedUrl := fmt.Sprintf("%s/invoice?payment_request=%s", config.RelayUrl, "1")
+
+		r := io.NopCloser(bytes.NewReader([]byte(`{"success": false, "error": "Internel server error"}`)))
+		mockHttpClient.On("Do", mock.MatchedBy(func(req *http.Request) bool {
+			return req.Method == http.MethodGet && expectedUrl == req.URL.String() && req.Header.Get("x-user-token") == config.RelayAuthKey
+		})).Return(&http.Response{
+			StatusCode: 500,
+			Body:       r,
+		}, nil).Once()
+
+		ro := chi.NewRouter()
+		ro.Post("/poll/invoice/{paymentRequest}", bHandler.PollInvoice)
+
+		rr := httptest.NewRecorder()
+		req, err := http.NewRequestWithContext(authorizedCtx, http.MethodPost, "/poll/invoice/1", bytes.NewBufferString(`{}`))
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		ro.ServeHTTP(rr, req)
+
+		assert.Equal(t, http.StatusForbidden, rr.Code, "Expected 403 error if there is an invoice error")
+		mockHttpClient.AssertExpectations(t)
+	})
+
+	t.Run("If the invoice is settled and the invoice.Type is equal to BUDGET the invoice amount should be added to the organization budget and the payment status of the related invoice should be sent to true on the payment history table", func(t *testing.T) {
+		expectedUrl := fmt.Sprintf("%s/invoice?payment_request=%s", config.RelayUrl, "1")
+
+		r := io.NopCloser(bytes.NewReader([]byte(`{"success": true, "response": { "settled": true, "payment_request": "1", "payment_hash": "payment_hash", "preimage": "preimage", "Amount": "1000"}}`)))
+		mockHttpClient.On("Do", mock.MatchedBy(func(req *http.Request) bool {
+			return req.Method == http.MethodGet && expectedUrl == req.URL.String() && req.Header.Get("x-user-token") == config.RelayAuthKey
+		})).Return(&http.Response{
+			StatusCode: 200,
+			Body:       r,
+		}, nil).Once()
+
+		mockDb.On("GetInvoice", "1").Return(db.InvoiceList{Type: "BUDGET"})
+		mockDb.On("GetUserInvoiceData", "1").Return(db.UserInvoiceData{Amount: 1000, UserPubkey: "UserPubkey", RouteHint: "RouteHint", Created: 1234})
+		mockDb.On("GetInvoice", "1").Return(db.InvoiceList{Status: false})
+		mockDb.On("AddAndUpdateBudget", mock.Anything).Return(db.PaymentHistory{})
+		mockDb.On("UpdateInvoice", "1").Return(db.InvoiceList{}).Once()
+
+		ro := chi.NewRouter()
+		ro.Post("/poll/invoice/{paymentRequest}", bHandler.PollInvoice)
+
+		rr := httptest.NewRecorder()
+		req, err := http.NewRequestWithContext(authorizedCtx, http.MethodPost, "/poll/invoice/1", bytes.NewBufferString(`{}`))
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		ro.ServeHTTP(rr, req)
+
+		assert.Equal(t, http.StatusOK, rr.Code)
+		mockHttpClient.AssertExpectations(t)
 	})
 }
