@@ -1549,4 +1549,41 @@ func TestPollInvoice(t *testing.T) {
 		assert.Equal(t, http.StatusOK, rr.Code)
 		mockHttpClient.AssertExpectations(t)
 	})
+
+	t.Run("If the invoice is settled and the invoice.Type is equal to BUDGET the invoice amount should be added to the organization budget and the payment status of the related invoice should be sent to true on the payment history table", func(t *testing.T) {
+		ctx := context.Background()
+		mockDb := &dbMocks.Database{}
+		mockHttpClient := &mocks.HttpClient{}
+		bHandler := NewBountyHandler(mockHttpClient, mockDb)
+		authorizedCtx := context.WithValue(ctx, auth.ContextKey, "valid-key")
+		expectedUrl := fmt.Sprintf("%s/invoice?payment_request=%s", config.RelayUrl, "1")
+
+		r := io.NopCloser(bytes.NewReader([]byte(`{"success": true, "response": { "settled": true, "payment_request": "1", "payment_hash": "payment_hash", "preimage": "preimage", "Amount": "1000"}}`)))
+		mockHttpClient.On("Do", mock.MatchedBy(func(req *http.Request) bool {
+			return req.Method == http.MethodGet && expectedUrl == req.URL.String() && req.Header.Get("x-user-token") == config.RelayAuthKey
+		})).Return(&http.Response{
+			StatusCode: 200,
+			Body:       r,
+		}, nil).Once()
+
+		mockDb.On("GetInvoice", "1").Return(db.InvoiceList{Type: "BUDGET"})
+		mockDb.On("GetUserInvoiceData", "1").Return(db.UserInvoiceData{Amount: 1000, UserPubkey: "UserPubkey", RouteHint: "RouteHint", Created: 1234})
+		mockDb.On("GetInvoice", "1").Return(db.InvoiceList{Status: false})
+		mockDb.On("AddAndUpdateBudget", mock.Anything).Return(db.PaymentHistory{})
+		mockDb.On("UpdateInvoice", "1").Return(db.InvoiceList{}).Once()
+
+		ro := chi.NewRouter()
+		ro.Post("/poll/invoice/{paymentRequest}", bHandler.PollInvoice)
+
+		rr := httptest.NewRecorder()
+		req, err := http.NewRequestWithContext(authorizedCtx, http.MethodPost, "/poll/invoice/1", bytes.NewBufferString(`{}`))
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		ro.ServeHTTP(rr, req)
+
+		assert.Equal(t, http.StatusOK, rr.Code)
+		mockHttpClient.AssertExpectations(t)
+	})
 }
