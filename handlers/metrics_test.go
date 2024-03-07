@@ -16,6 +16,7 @@ import (
 	"github.com/stakwork/sphinx-tribes/db"
 	mocks "github.com/stakwork/sphinx-tribes/mocks"
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/mock"
 )
 
 func TestBountyMetrics(t *testing.T) {
@@ -344,4 +345,70 @@ func TestConvertMetricsToCSV(t *testing.T) {
 		assert.EqualValues(t, expectedHeaders, results[0])
 	})
 
+}
+
+func TestMetricsBountiesProviders(t *testing.T) {
+	ctx := context.Background()
+	mockDb := mocks.NewDatabase(t)
+	mh := NewMetricHandler(mockDb)
+	unauthorizedCtx := context.WithValue(context.Background(), auth.ContextKey, "")
+	authorizedCtx := context.WithValue(ctx, auth.ContextKey, "valid-key")
+
+	t.Run("should return 401 error if user is unauthorized", func(t *testing.T) {
+		rr := httptest.NewRecorder()
+		handler := http.HandlerFunc(mh.MetricsBountiesProviders)
+
+		req, err := http.NewRequestWithContext(unauthorizedCtx, http.MethodPost, "/bounties/providers", nil)
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		handler.ServeHTTP(rr, req)
+
+		assert.Equal(t, http.StatusUnauthorized, rr.Code)
+	})
+
+	t.Run("should return 406 error if wrong data is passed", func(t *testing.T) {
+		rr := httptest.NewRecorder()
+		handler := http.HandlerFunc(mh.MetricsBountiesProviders)
+
+		invalidJson := []byte(`{"start_date": "2021-01-01"`)
+		req, err := http.NewRequestWithContext(authorizedCtx, http.MethodPost, "/bounties/providers", bytes.NewReader(invalidJson))
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		handler.ServeHTTP(rr, req)
+
+		assert.Equal(t, http.StatusNotAcceptable, rr.Code)
+	})
+
+	t.Run("should return bounty providers and 200 status code if there is no error", func(t *testing.T) {
+		rr := httptest.NewRecorder()
+		handler := http.HandlerFunc(mh.MetricsBountiesProviders)
+
+		validJson := []byte(`{"start_date": "2021-01-01", "end_date": "2021-12-31"}`)
+		req, err := http.NewRequestWithContext(authorizedCtx, http.MethodPost, "/bounties/providers", bytes.NewReader(validJson))
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		expectedProviders := []db.Person{
+			{ID: 1, OwnerAlias: "Provider One"},
+			{ID: 2, OwnerAlias: "Provider Two"},
+		}
+
+		mockDb.On("GetBountiesProviders", mock.Anything, req).Return(expectedProviders).Once()
+
+		handler.ServeHTTP(rr, req)
+
+		var actualProviders []db.Person
+		err = json.Unmarshal(rr.Body.Bytes(), &actualProviders)
+		if err != nil {
+			t.Fatal("Failed to unmarshal response:", err)
+		}
+
+		assert.Equal(t, http.StatusOK, rr.Code)
+		assert.EqualValues(t, expectedProviders, actualProviders)
+	})
 }
