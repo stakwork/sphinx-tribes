@@ -543,7 +543,7 @@ func GenerateInvoice(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(invoiceRes)
 }
 
-func GenerateBudgetInvoice(w http.ResponseWriter, r *http.Request) {
+func (th *tribeHandler) GenerateBudgetInvoice(w http.ResponseWriter, r *http.Request) {
 	invoice := db.BudgetInvoiceRequest{}
 	body, err := io.ReadAll(r.Body)
 
@@ -612,8 +612,8 @@ func GenerateBudgetInvoice(w http.ResponseWriter, r *http.Request) {
 		Status:         false,
 	}
 
-	db.DB.AddPaymentHistory(paymentHistory)
-	db.DB.AddInvoice(newInvoice)
+	th.db.AddPaymentHistory(paymentHistory)
+	th.db.AddInvoice(newInvoice)
 
 	w.WriteHeader(http.StatusOK)
 	json.NewEncoder(w).Encode(invoiceRes)
