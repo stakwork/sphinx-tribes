@@ -37,7 +37,7 @@ func PubKeyContext(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		token := r.URL.Query().Get("token")
 		if token == "" {
-			token = r.Header.Get("token")
+			token = r.Header.Get("x-jwt")
 		}
 
 		if token == "" {
