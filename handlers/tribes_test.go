@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"context"
 	"encoding/json"
+	"github.com/stakwork/sphinx-tribes/config"
 	"net/http"
 	"net/http/httptest"
 	"strings"
@@ -603,4 +604,137 @@ func TestGetListedTribes(t *testing.T) {
 
 	})
 
+}
+
+func TestGenerateBudgetInvoice(t *testing.T) {
+	ctx := context.Background()
+	mockDb := mocks.NewDatabase(t)
+	tHandler := NewTribeHandler(mockDb)
+	authorizedCtx := context.WithValue(ctx, auth.ContextKey, "valid-key")
+
+	userAmount := uint(1000)
+	invoiceResponse := db.InvoiceResponse{
+		Succcess: true,
+		Response: db.Invoice{
+			Invoice: "example_invoice",
+		},
+	}
+
+	t.Run("Should test that a wrong Post body returns a 406 error", func(t *testing.T) {
+		invalidBody := []byte(`"key": "value"`)
+		req, err := http.NewRequestWithContext(authorizedCtx, http.MethodPost, "/budgetinvoices", bytes.NewBuffer(invalidBody))
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		rr := httptest.NewRecorder()
+		handler := http.HandlerFunc(tHandler.GenerateBudgetInvoice)
+		handler.ServeHTTP(rr, req)
+
+		assert.Equal(t, http.StatusNotAcceptable, rr.Code)
+	})
+
+	t.Run("Should mock a call to relay /invoices with the correct body", func(t *testing.T) {
+
+		mockDb.On("AddPaymentHistory", mock.AnythingOfType("db.PaymentHistory")).Return(db.PaymentHistory{}, nil)
+		mockDb.On("AddInvoice", mock.AnythingOfType("db.InvoiceList")).Return(db.InvoiceList{}, nil)
+
+		ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+
+			expectedBody := map[string]interface{}{"amount": float64(0), "memo": "Budget Invoice"}
+			var body map[string]interface{}
+			err := json.NewDecoder(r.Body).Decode(&body)
+			assert.NoError(t, err)
+
+			assert.Equal(t, expectedBody, body)
+
+			w.WriteHeader(http.StatusOK)
+			json.NewEncoder(w).Encode(map[string]interface{}{"result": "success"})
+		}))
+		defer ts.Close()
+
+		config.RelayUrl = ts.URL
+
+		reqBody := map[string]interface{}{"amount": 0}
+		bodyBytes, _ := json.Marshal(reqBody)
+
+		req, err := http.NewRequestWithContext(authorizedCtx, http.MethodPost, "/budgetinvoices", bytes.NewBuffer(bodyBytes))
+		assert.NoError(t, err)
+
+		rr := httptest.NewRecorder()
+		handler := http.HandlerFunc(tHandler.GenerateBudgetInvoice)
+		handler.ServeHTTP(rr, req)
+
+		assert.Equal(t, http.StatusOK, rr.Code)
+	})
+
+	t.Run("Should test that the amount passed by the user is equal to the amount sent for invoice generation", func(t *testing.T) {
+
+		userAmount := float64(1000)
+
+		mockDb.On("AddPaymentHistory", mock.AnythingOfType("db.PaymentHistory")).Return(db.PaymentHistory{}, nil)
+		mockDb.On("AddInvoice", mock.AnythingOfType("db.InvoiceList")).Return(db.InvoiceList{}, nil)
+
+		ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			var body map[string]interface{}
+			err := json.NewDecoder(r.Body).Decode(&body)
+			assert.NoError(t, err)
+
+			assert.Equal(t, userAmount, body["amount"])
+
+			w.WriteHeader(http.StatusOK)
+			json.NewEncoder(w).Encode(map[string]interface{}{"result": "success"})
+		}))
+		defer ts.Close()
+
+		config.RelayUrl = ts.URL
+
+		reqBody := map[string]interface{}{"amount": userAmount}
+		bodyBytes, _ := json.Marshal(reqBody)
+
+		req, err := http.NewRequestWithContext(authorizedCtx, http.MethodPost, "/budgetinvoices", bytes.NewBuffer(bodyBytes))
+		assert.NoError(t, err)
+
+		rr := httptest.NewRecorder()
+		handler := http.HandlerFunc(tHandler.GenerateBudgetInvoice)
+		handler.ServeHTTP(rr, req)
+
+		assert.Equal(t, http.StatusOK, rr.Code)
+	})
+
+	t.Run("Should add payments to the payment history and invoice to the invoice list upon successful relay call", func(t *testing.T) {
+		expectedPaymentHistory := db.PaymentHistory{Amount: userAmount}
+		expectedInvoice := db.InvoiceList{PaymentRequest: invoiceResponse.Response.Invoice}
+
+		mockDb.On("AddPaymentHistory", mock.AnythingOfType("db.PaymentHistory")).Return(expectedPaymentHistory, nil)
+		mockDb.On("AddInvoice", mock.AnythingOfType("db.InvoiceList")).Return(expectedInvoice, nil)
+
+		ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			w.WriteHeader(http.StatusOK)
+			json.NewEncoder(w).Encode(invoiceResponse)
+		}))
+		defer ts.Close()
+
+		config.RelayUrl = ts.URL
+
+		reqBody := map[string]interface{}{"amount": userAmount}
+		bodyBytes, _ := json.Marshal(reqBody)
+		req, err := http.NewRequestWithContext(authorizedCtx, http.MethodPost, "/budgetinvoices", bytes.NewBuffer(bodyBytes))
+		assert.NoError(t, err)
+
+		rr := httptest.NewRecorder()
+		handler := http.HandlerFunc(tHandler.GenerateBudgetInvoice)
+		handler.ServeHTTP(rr, req)
+
+		assert.Equal(t, http.StatusOK, rr.Code)
+
+		var response db.InvoiceResponse
+		err = json.Unmarshal(rr.Body.Bytes(), &response)
+		assert.NoError(t, err)
+		assert.True(t, response.Succcess, "Invoice generation should be successful")
+		assert.Equal(t, "example_invoice", response.Response.Invoice, "The invoice in the response should match the mock")
+
+		mockDb.AssertCalled(t, "AddPaymentHistory", mock.AnythingOfType("db.PaymentHistory"))
+		mockDb.AssertCalled(t, "AddInvoice", mock.AnythingOfType("db.InvoiceList"))
+	})
 }
