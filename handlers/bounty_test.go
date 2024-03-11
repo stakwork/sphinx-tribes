@@ -1568,6 +1568,54 @@ func TestBountyBudgetWithdraw(t *testing.T) {
 		mockHttpClient.AssertCalled(t, "Do", mock.AnythingOfType("*http.Request"))
 	})
 
+	t.Run("Should test that an Organization's Budget Total Amount is accurate after three (3) successful 'Budget Withdrawal Requests'", func(t *testing.T) {
+		ctxs := context.WithValue(context.Background(), auth.ContextKey, "valid-key")
+		mockDb := dbMocks.NewDatabase(t)
+		mockHttpClient := mocks.NewHttpClient(t)
+		bHandler := NewBountyHandler(mockHttpClient, mockDb)
+
+		paymentAmount := uint(1500)
+		initialBudget := uint(5000)
+		invoice := "lnbc15u1p3xnhl2pp5jptserfk3zk4qy42tlucycrfwxhydvlemu9pqr93tuzlv9cc7g3sdqsvfhkcap3xyhx7un8cqzpgxqzjcsp5f8c52y2stc300gl6s4xswtjpc37hrnnr3c9wvtgjfuvqmpm35evq9qyyssqy4lgd8tj637qcjp05rdpxxykjenthxftej7a2zzmwrmrl70fyj9hvj0rewhzj7jfyuwkwcg9g2jpwtk3wkjtwnkdks84hsnu8xps5vsq4gj5hs"
+
+		for i := 0; i < 3; i++ {
+			expectedFinalBudget := initialBudget - (paymentAmount * uint(i))
+
+			mockDb.ExpectedCalls = nil
+			mockDb.Calls = nil
+			mockHttpClient.ExpectedCalls = nil
+			mockHttpClient.Calls = nil
+
+			mockDb.On("UserHasAccess", "valid-key", "org-1", db.WithdrawBudget).Return(true)
+			mockDb.On("GetOrganizationBudget", "org-1").Return(db.BountyBudget{
+				TotalBudget: expectedFinalBudget,
+			}, nil)
+			mockDb.On("WithdrawBudget", "valid-key", "org-1", paymentAmount).Return(nil)
+			mockHttpClient.On("Do", mock.AnythingOfType("*http.Request")).Return(&http.Response{
+				StatusCode: 200,
+				Body:       io.NopCloser(bytes.NewBufferString(`{"success": true}`)),
+			}, nil)
+
+			withdrawRequest := db.WithdrawBudgetRequest{
+				PaymentRequest: invoice,
+				OrgUuid:        "org-1",
+			}
+			requestBody, _ := json.Marshal(withdrawRequest)
+			req, _ := http.NewRequestWithContext(ctxs, http.MethodPost, "/budget/withdraw", bytes.NewReader(requestBody))
+
+			rr := httptest.NewRecorder()
+
+			bHandler.BountyBudgetWithdraw(rr, req)
+			assert.Equal(t, http.StatusOK, rr.Code)
+			var response db.InvoicePaySuccess
+			err := json.Unmarshal(rr.Body.Bytes(), &response)
+			assert.NoError(t, err)
+			assert.True(t, response.Success, "Expected invoice payment to succeed")
+			finalBudget := mockDb.GetOrganizationBudget("org-1")
+			assert.Equal(t, expectedFinalBudget, finalBudget.TotalBudget, "The organization's final budget should reflect the deductions from the successful withdrawals")
+
+		}
+	})
 }
 
 func TestPollInvoice(t *testing.T) {
