@@ -1625,11 +1625,7 @@ func TestBountyBudgetWithdraw(t *testing.T) {
 
 		paymentAmount := uint(1500)
 		initialBudget := uint(5000)
-		invoices := []string{
-			"lnbc15u1pj773m8pp5pj0neu674ka9g75tzc9em2crjnzdn2tfjplwua5dhzr2dcg5mrmsdqhgf6kgem9wssyjmnkda5kxegcqzpgxqyz5vqrzjqwnw5tv745sjpvft6e3f9w62xqk826vrm3zaev4nvj6xr3n065aukqqqqyqqqqsqqyqqqqqqqqqqqqqqqqsp5cg7rnce0u7sgqs5ayws0nuapcndps2uecgmflcrdvhs86cvr3spq9qrssql866kyj3cmcjts3mv927p92zaf0yhpl4uxnj7c429308gr4dwaxkh5rnhksuvrxd96dja60gl8p44rnuavszvy2p8h7a9ak7cllfrjcq2t04yg",
-			"lnbc15u1pj773a7pp5d934ereytmkh83f88fd5fn0388sfj54xdru2tcgmzlywmk3x0jvqdqhgf6kgem9wssyjmnkda5kxegcqzpgxqyz5vqrzjqwnw5tv745sjpvft6e3f9w62xqk826vrm3zaev4nvj6xr3n065aukqqqqyqqqqsqqyqqqqqqqqqqqqqqqqsp5dgn9x240n5pn2r8hazc9udxpg8tsrl8kwud2xjphx3f7natn7dws9qrssq64rhcg9syd90jxc8vz9l6xlfku7vyq8p20s9fjydggqh48ptkz9rwnm4f8qmsntjqqa3qv5qh7mm9gm2efxeqph5p93zgn2cs708pgcpy9dlue",
-			"lnbc15u1pj773ldpp5cgps7hk2cnwnj85a50zzgcap32srmd2zh20spek27mfgwddv9vksdqhgf6kgem9wssyjmnkda5kxegcqzpgxqyz5vqrzjqwnw5tv745sjpvft6e3f9w62xqk826vrm3zaev4nvj6xr3n065aukqqqqyqqqqsqqyqqqqqqqqqqqqqqqqsp5z8u0laltkm4dchcrd66pyx6x7a0lawqludzz9lr0pplkdtj5k5ds9qrssqt4vj5q9k3nffjqdsgw3dd83reu93k6skyydw2tst3vmuxvsyu5f5cftt2ucmmj0r2535tzsyx6rwuav4fgynmsdx6jrlvd7zw54tkccprxkzl2",
-		}
+		invoice := "lnbc15u1p3xnhl2pp5jptserfk3zk4qy42tlucycrfwxhydvlemu9pqr93tuzlv9cc7g3sdqsvfhkcap3xyhx7un8cqzpgxqzjcsp5f8c52y2stc300gl6s4xswtjpc37hrnnr3c9wvtgjfuvqmpm35evq9qyyssqy4lgd8tj637qcjp05rdpxxykjenthxftej7a2zzmwrmrl70fyj9hvj0rewhzj7jfyuwkwcg9g2jpwtk3wkjtwnkdks84hsnu8xps5vsq4gj5hs"
 
 		for i := 0; i < 3; i++ {
 			expectedFinalBudget := initialBudget - (paymentAmount * uint(i))
@@ -1651,7 +1647,7 @@ func TestBountyBudgetWithdraw(t *testing.T) {
 			}, nil)
 
 			withdrawRequest := db.WithdrawBudgetRequest{
-				PaymentRequest: invoices[i],
+				PaymentRequest: invoice,
 				OrgUuid:        "org-1",
 			}
 			requestBody, _ := json.Marshal(withdrawRequest)
