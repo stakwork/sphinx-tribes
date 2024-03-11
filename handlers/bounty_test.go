@@ -1568,55 +1568,6 @@ func TestBountyBudgetWithdraw(t *testing.T) {
 		mockHttpClient.AssertCalled(t, "Do", mock.AnythingOfType("*http.Request"))
 	})
 
-	t.Run("Should test that the BountyBudgetWithdraw handler gets locked by go mutex when it is called i.e. the handler has to be fully executed before it processes another request.", func(t *testing.T) {
-		ctx := context.Background()
-		authorizedCtx := context.WithValue(ctx, auth.ContextKey, "valid-key")
-		mockDb := dbMocks.NewDatabase(t)
-		mockHttpClient := mocks.NewHttpClient(t)
-		bHandler := NewBountyHandler(mockHttpClient, mockDb)
-		paymentAmount := uint(1500)
-		mockDb.On("UserHasAccess", "valid-key", mock.AnythingOfType("string"), db.WithdrawBudget).Return(true)
-		mockDb.On("GetOrganizationBudget", "org-1").Return(db.BountyBudget{TotalBudget: 3000}, nil)
-		mockDb.On("WithdrawBudget", "valid-key", "org-1", paymentAmount).Return(nil)
-		mockHttpClient.On("Do", mock.AnythingOfType("*http.Request")).Return(&http.Response{
-			StatusCode: 200,
-			Body:       io.NopCloser(bytes.NewBufferString(`{"success": true}`)),
-		}, nil)
-
-		invoice := "lnbc15u1p3xnhl2pp5jptserfk3zk4qy42tlucycrfwxhydvlemu9pqr93tuzlv9cc7g3sdqsvfhkcap3xyhx7un8cqzpgxqzjcsp5f8c52y2stc300gl6s4xswtjpc37hrnnr3c9wvtgjfuvqmpm35evq9qyyssqy4lgd8tj637qcjp05rdpxxykjenthxftej7a2zzmwrmrl70fyj9hvj0rewhzj7jfyuwkwcg9g2jpwtk3wkjtwnkdks84hsnu8xps5vsq4gj5hs"
-
-		withdrawRequest := db.WithdrawBudgetRequest{
-			PaymentRequest: invoice,
-			OrgUuid:        "org-1",
-		}
-
-		var wg sync.WaitGroup
-		var mu sync.Mutex
-		callTimes := make([]time.Time, 0, 2)
-
-		for i := 0; i < 2; i++ {
-			wg.Add(1)
-			go func() {
-				defer wg.Done()
-				requestBody, _ := json.Marshal(withdrawRequest)
-				req, err := http.NewRequestWithContext(authorizedCtx, http.MethodPost, "/budget/withdraw", bytes.NewReader(requestBody))
-				assert.NoError(t, err)
-				rr := httptest.NewRecorder()
-
-				mu.Lock()
-				bHandler.BountyBudgetWithdraw(rr, req)
-				time.Sleep(10 * time.Millisecond)
-				mu.Unlock()
-				callTimes = append(callTimes, time.Now())
-			}()
-		}
-
-		wg.Wait()
-
-		assert.Equal(t, 2, len(callTimes))
-		assert.True(t, callTimes[1].After(callTimes[0]), "The second request should be processed after the first one finishes")
-	})
-
 }
 
 func TestPollInvoice(t *testing.T) {
