@@ -11,7 +11,17 @@ import (
 )
 
 type database struct {
-	db *gorm.DB
+	db                    *gorm.DB
+	getOrganizationByUuid func(uuid string) Organization
+	getUserRoles          func(uuid string, pubkey string) []UserRoles
+}
+
+func NewDatabaseConfig(db *gorm.DB) *database {
+	return &database{
+		db:                    db,
+		getOrganizationByUuid: DB.GetOrganizationByUuid,
+		getUserRoles:          DB.GetUserRoles,
+	}
 }
 
 // DB is the object
@@ -264,10 +274,10 @@ func UserHasAccess(pubKeyFromAuth string, uuid string, role string) bool {
 }
 
 func (db database) UserHasAccess(pubKeyFromAuth string, uuid string, role string) bool {
-	org := DB.GetOrganizationByUuid(uuid)
+	org := db.getOrganizationByUuid(uuid)
 	var hasRole bool = false
 	if pubKeyFromAuth != org.OwnerPubKey {
-		userRoles := DB.GetUserRoles(uuid, pubKeyFromAuth)
+		userRoles := db.getUserRoles(uuid, pubKeyFromAuth)
 		hasRole = RolesCheck(userRoles, role)
 		return hasRole
 	}
@@ -276,9 +286,9 @@ func (db database) UserHasAccess(pubKeyFromAuth string, uuid string, role string
 
 func (db database) UserHasManageBountyRoles(pubKeyFromAuth string, uuid string) bool {
 	var manageRolesCount = len(ManageBountiesGroup)
-	org := DB.GetOrganizationByUuid(uuid)
+	org := db.getOrganizationByUuid(uuid)
 	if pubKeyFromAuth != org.OwnerPubKey {
-		userRoles := DB.GetUserRoles(uuid, pubKeyFromAuth)
+		userRoles := db.getUserRoles(uuid, pubKeyFromAuth)
 
 		for _, role := range ManageBountiesGroup {
 			// check for the manage bounty roles
