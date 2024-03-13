@@ -409,6 +409,9 @@ func TestGetOrganizationBounties(t *testing.T) {
 func TestGetOrganizationBudget(t *testing.T) {
 	ctx := context.WithValue(context.Background(), auth.ContextKey, "test-key")
 	mockDb := mocks.NewDatabase(t)
+	mockUserHasAccess := func(pubKeyFromAuth string, uuid string, role string) bool {
+		return true
+	}
 	oHandler := NewOrganizationHandler(mockDb)
 
 	t.Run("Should test that a 401 is returned when trying to view an organization's budget without a token", func(t *testing.T) {
@@ -437,7 +440,7 @@ func TestGetOrganizationBudget(t *testing.T) {
 			Updated:     nil,
 		}
 
-		mockDb.On("UserHasAccess", "test-key", orgUUID, "VIEW REPORT").Return(true).Once()
+		oHandler.userHasAccess = mockUserHasAccess
 		mockDb.On("GetOrganizationBudget", orgUUID).Return(expectedBudget).Once()
 
 		rctx := chi.NewRouteContext()
@@ -470,7 +473,10 @@ func TestGetOrganizationBudgetHistory(t *testing.T) {
 	t.Run("Should test that a 401 is returned when trying to view an organization's budget history without a token", func(t *testing.T) {
 		orgUUID := "valid-uuid"
 
-		mockDb.On("UserHasAccess", "", orgUUID, "VIEW REPORT").Return(false).Once()
+		mockUserHasAccess := func(pubKeyFromAuth string, uuid string, role string) bool {
+			return false
+		}
+		oHandler.userHasAccess = mockUserHasAccess
 
 		rctx := chi.NewRouteContext()
 		rctx.URLParams.Add("uuid", orgUUID)
@@ -492,7 +498,11 @@ func TestGetOrganizationBudgetHistory(t *testing.T) {
 			{BudgetHistory: db.BudgetHistory{ID: 2, OrgUuid: orgUUID, Created: nil, Updated: nil}, SenderName: "Sender2"},
 		}
 
-		mockDb.On("UserHasAccess", "test-key", orgUUID, "VIEW REPORT").Return(true).Once()
+		mockUserHasAccess := func(pubKeyFromAuth string, uuid string, role string) bool {
+			return true
+		}
+		oHandler.userHasAccess = mockUserHasAccess
+
 		mockDb.On("GetOrganizationBudgetHistory", orgUUID).Return(expectedBudgetHistory).Once()
 
 		rctx := chi.NewRouteContext()
