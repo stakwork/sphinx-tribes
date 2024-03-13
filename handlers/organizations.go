@@ -13,20 +13,26 @@ import (
 	"github.com/stakwork/sphinx-tribes/auth"
 	"github.com/stakwork/sphinx-tribes/db"
 	"github.com/stakwork/sphinx-tribes/utils"
+	"gorm.io/gorm"
 )
 
 type organizationHandler struct {
-	db                    db.Database
-	generateBountyHandler func(bounties []db.Bounty) []db.BountyResponse
-	getLightningInvoice   func(payment_request string) (db.InvoiceResult, db.InvoiceError)
+	db                       db.Database
+	generateBountyHandler    func(bounties []db.Bounty) []db.BountyResponse
+	getLightningInvoice      func(payment_request string) (db.InvoiceResult, db.InvoiceError)
+	userHasAccess            func(pubKeyFromAuth string, uuid string, role string) bool
+	userHasManageBountyRoles func(pubKeyFromAuth string, uuid string) bool
 }
 
-func NewOrganizationHandler(db db.Database) *organizationHandler {
-	bHandler := NewBountyHandler(http.DefaultClient, db)
+func NewOrganizationHandler(database db.Database) *organizationHandler {
+	bHandler := NewBountyHandler(http.DefaultClient, database)
+	dbConf := db.NewDatabaseConfig(&gorm.DB{})
 	return &organizationHandler{
-		db:                    db,
-		generateBountyHandler: bHandler.GenerateBountyResponse,
-		getLightningInvoice:   bHandler.GetLightningInvoice,
+		db:                       database,
+		generateBountyHandler:    bHandler.GenerateBountyResponse,
+		getLightningInvoice:      bHandler.GetLightningInvoice,
+		userHasAccess:            dbConf.UserHasAccess,
+		userHasManageBountyRoles: dbConf.UserHasManageBountyRoles,
 	}
 }
 
@@ -487,7 +493,7 @@ func (oh *organizationHandler) GetUserDropdownOrganizations(w http.ResponseWrite
 		organization := db.DB.GetOrganizationByUuid(uuid)
 		bountyCount := db.DB.GetOrganizationBountyCount(uuid)
 		hasRole := db.UserHasAccess(user.OwnerPubKey, uuid, db.ViewReport)
-		hasBountyRoles := oh.db.UserHasManageBountyRoles(user.OwnerPubKey, uuid)
+		hasBountyRoles := oh.userHasManageBountyRoles(user.OwnerPubKey, uuid)
 
 		// don't add deleted organizations to the list
 		if !organization.Deleted && hasBountyRoles {
@@ -558,7 +564,7 @@ func (oh *organizationHandler) GetOrganizationBudget(w http.ResponseWriter, r *h
 	}
 
 	// if not the organization admin
-	hasRole := oh.db.UserHasAccess(pubKeyFromAuth, uuid, db.ViewReport)
+	hasRole := oh.userHasAccess(pubKeyFromAuth, uuid, db.ViewReport)
 	if !hasRole {
 		w.WriteHeader(http.StatusUnauthorized)
 		json.NewEncoder(w).Encode("Don't have access to view budget")
@@ -578,7 +584,7 @@ func (oh *organizationHandler) GetOrganizationBudgetHistory(w http.ResponseWrite
 	uuid := chi.URLParam(r, "uuid")
 
 	// if not the organization admin
-	hasRole := oh.db.UserHasAccess(pubKeyFromAuth, uuid, db.ViewReport)
+	hasRole := oh.userHasAccess(pubKeyFromAuth, uuid, db.ViewReport)
 	if !hasRole {
 		w.WriteHeader(http.StatusUnauthorized)
 		json.NewEncoder(w).Encode("Don't have access to view budget history")
