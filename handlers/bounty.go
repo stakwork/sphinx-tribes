@@ -16,21 +16,27 @@ import (
 	"github.com/stakwork/sphinx-tribes/config"
 	"github.com/stakwork/sphinx-tribes/db"
 	"github.com/stakwork/sphinx-tribes/utils"
+	"gorm.io/gorm"
 )
 
 type bountyHandler struct {
-	httpClient             HttpClient
-	db                     db.Database
-	getSocketConnections   func(host string) (db.Client, error)
-	generateBountyResponse func(bounties []db.Bounty) []db.BountyResponse
+	httpClient               HttpClient
+	db                       db.Database
+	getSocketConnections     func(host string) (db.Client, error)
+	generateBountyResponse   func(bounties []db.Bounty) []db.BountyResponse
+	userHasAccess            func(pubKeyFromAuth string, uuid string, role string) bool
+	userHasManageBountyRoles func(pubKeyFromAuth string, uuid string) bool
 }
 
 func NewBountyHandler(httpClient HttpClient, database db.Database) *bountyHandler {
+	dbConf := db.NewDatabaseConfig(&gorm.DB{})
 	return &bountyHandler{
 
-		httpClient:           httpClient,
-		db:                   database,
-		getSocketConnections: db.Store.GetSocketConnections,
+		httpClient:               httpClient,
+		db:                       database,
+		getSocketConnections:     db.Store.GetSocketConnections,
+		userHasAccess:            dbConf.UserHasAccess,
+		userHasManageBountyRoles: dbConf.UserHasManageBountyRoles,
 	}
 }
 
@@ -239,7 +245,7 @@ func (h *bountyHandler) CreateOrEditBounty(w http.ResponseWriter, r *http.Reques
 		// check if bounty belongs to user
 		if pubKeyFromAuth != dbBounty.OwnerID {
 			if bounty.OrgUuid != "" {
-				hasBountyRoles := h.db.UserHasManageBountyRoles(pubKeyFromAuth, bounty.OrgUuid)
+				hasBountyRoles := h.userHasManageBountyRoles(pubKeyFromAuth, bounty.OrgUuid)
 				if !hasBountyRoles {
 					msg := "You don't have a=the right permission ton update bounty"
 					fmt.Println(msg)
@@ -448,7 +454,7 @@ func (h *bountyHandler) MakeBountyPayment(w http.ResponseWriter, r *http.Request
 
 	// check if user is the admin of the organization
 	// or has a pay bounty role
-	hasRole := h.db.UserHasAccess(pubKeyFromAuth, bounty.OrgUuid, db.PayBounty)
+	hasRole := h.userHasAccess(pubKeyFromAuth, bounty.OrgUuid, db.PayBounty)
 	if !hasRole {
 		w.WriteHeader(http.StatusUnauthorized)
 		json.NewEncoder(w).Encode("You don't have appropriate permissions to pay bounties")
@@ -567,7 +573,7 @@ func (h *bountyHandler) BountyBudgetWithdraw(w http.ResponseWriter, r *http.Requ
 
 	// check if user is the admin of the organization
 	// or has a withdraw bounty budget role
-	hasRole := h.db.UserHasAccess(pubKeyFromAuth, request.OrgUuid, db.WithdrawBudget)
+	hasRole := h.userHasAccess(pubKeyFromAuth, request.OrgUuid, db.WithdrawBudget)
 	if !hasRole {
 		w.WriteHeader(http.StatusUnauthorized)
 		errMsg := formatPayError("You don't have appropriate permissions to withdraw bounty budget")

@@ -34,6 +34,12 @@ func TestCreateOrEditBounty(t *testing.T) {
 	ctx := context.WithValue(context.Background(), auth.ContextKey, "test-key")
 	mockDb := dbMocks.NewDatabase(t)
 	mockClient := mocks.NewHttpClient(t)
+	mockUserHasManageBountyRolesTrue := func(pubKeyFromAuth string, uuid string) bool {
+		return true
+	}
+	mockUserHasManageBountyRolesFalse := func(pubKeyFromAuth string, uuid string) bool {
+		return false
+	}
 	bHandler := NewBountyHandler(mockClient, mockDb)
 
 	t.Run("should return error if body is not a valid json", func(t *testing.T) {
@@ -127,13 +133,8 @@ func TestCreateOrEditBounty(t *testing.T) {
 	t.Run("return error if user does not have required roles", func(t *testing.T) {
 		rr := httptest.NewRecorder()
 		handler := http.HandlerFunc(bHandler.CreateOrEditBounty)
+		bHandler.userHasManageBountyRoles = mockUserHasManageBountyRolesFalse
 
-		mockOrg := db.Organization{
-			ID:          1,
-			Uuid:        "org-1",
-			Name:        "custom org",
-			OwnerPubKey: "org-key",
-		}
 		existingBounty := db.Bounty{
 			ID:          1,
 			Type:        "coding",
@@ -147,7 +148,6 @@ func TestCreateOrEditBounty(t *testing.T) {
 		mockDb.On("UpdateBountyBoolColumn", mock.AnythingOfType("db.Bounty"), "show").Return(existingBounty)
 		mockDb.On("UpdateBountyNullColumn", mock.AnythingOfType("db.Bounty"), "assignee").Return(existingBounty)
 		mockDb.On("GetBounty", uint(1)).Return(existingBounty).Once()
-		mockDb.On("UserHasManageBountyRoles", "test-key", mockOrg.Uuid).Return(false).Once()
 
 		body, _ := json.Marshal(updatedBounty)
 		req, err := http.NewRequestWithContext(ctx, http.MethodPost, "/", bytes.NewReader(body))
@@ -163,13 +163,8 @@ func TestCreateOrEditBounty(t *testing.T) {
 	t.Run("should allow to add or edit bounty if user has role", func(t *testing.T) {
 		rr := httptest.NewRecorder()
 		handler := http.HandlerFunc(bHandler.CreateOrEditBounty)
+		bHandler.userHasManageBountyRoles = mockUserHasManageBountyRolesTrue
 
-		mockOrg := db.Organization{
-			ID:          1,
-			Uuid:        "org-1",
-			Name:        "custom org",
-			OwnerPubKey: "org-key",
-		}
 		existingBounty := db.Bounty{
 			ID:          1,
 			Type:        "coding",
@@ -183,7 +178,6 @@ func TestCreateOrEditBounty(t *testing.T) {
 		mockDb.On("UpdateBountyBoolColumn", mock.AnythingOfType("db.Bounty"), "show").Return(existingBounty)
 		mockDb.On("UpdateBountyNullColumn", mock.AnythingOfType("db.Bounty"), "assignee").Return(existingBounty)
 		mockDb.On("GetBounty", uint(1)).Return(existingBounty).Once()
-		mockDb.On("UserHasManageBountyRoles", "test-key", mockOrg.Uuid).Return(true).Once()
 		mockDb.On("CreateOrEditBounty", mock.AnythingOfType("db.Bounty")).Return(updatedBounty, nil).Once()
 
 		body, _ := json.Marshal(updatedBounty)
@@ -201,13 +195,9 @@ func TestCreateOrEditBounty(t *testing.T) {
 	t.Run("should not update created at when bounty is updated", func(t *testing.T) {
 		rr := httptest.NewRecorder()
 		handler := http.HandlerFunc(bHandler.CreateOrEditBounty)
+		bHandler.userHasManageBountyRoles = mockUserHasManageBountyRolesTrue
+
 		now := time.Now().UnixMilli()
-		mockOrg := db.Organization{
-			ID:          1,
-			Uuid:        "org-1",
-			Name:        "custom org",
-			OwnerPubKey: "org-key",
-		}
 		existingBounty := db.Bounty{
 			ID:          1,
 			Type:        "coding",
@@ -222,7 +212,6 @@ func TestCreateOrEditBounty(t *testing.T) {
 		mockDb.On("UpdateBountyBoolColumn", mock.AnythingOfType("db.Bounty"), "show").Return(existingBounty)
 		mockDb.On("UpdateBountyNullColumn", mock.AnythingOfType("db.Bounty"), "assignee").Return(existingBounty)
 		mockDb.On("GetBounty", uint(1)).Return(existingBounty).Once()
-		mockDb.On("UserHasManageBountyRoles", "test-key", mockOrg.Uuid).Return(true).Once()
 		mockDb.On("CreateOrEditBounty", mock.MatchedBy(func(b db.Bounty) bool {
 			return b.Created == now
 		})).Return(updatedBounty, nil).Once()
@@ -1151,6 +1140,12 @@ func TestMakeBountyPayment(t *testing.T) {
 	ctx := context.Background()
 	mockDb := &dbMocks.Database{}
 	mockHttpClient := &mocks.HttpClient{}
+	mockUserHasAccessTrue := func(pubKeyFromAuth string, uuid string, role string) bool {
+		return true
+	}
+	mockUserHasAccessFalse := func(pubKeyFromAuth string, uuid string, role string) bool {
+		return false
+	}
 	mockGetSocketConnections := func(host string) (db.Client, error) {
 		s, ws := MockNewWSServer(t)
 		defer s.Close()
@@ -1253,6 +1248,8 @@ func TestMakeBountyPayment(t *testing.T) {
 	})
 
 	t.Run("401 error if user not organization admin or does not have PAY BOUNTY role", func(t *testing.T) {
+		bHandler.userHasAccess = mockUserHasAccessFalse
+
 		mockDb.On("GetBounty", mock.AnythingOfType("uint")).Return(db.Bounty{
 			ID:       1,
 			Price:    1000,
@@ -1260,7 +1257,6 @@ func TestMakeBountyPayment(t *testing.T) {
 			Assignee: "assignee-1",
 			Paid:     false,
 		}, nil)
-		mockDb.On("UserHasAccess", "valid-key", "org-1", db.PayBounty).Return(false)
 
 		r := chi.NewRouter()
 		r.Post("/gobounties/pay/{id}", bHandler.MakeBountyPayment)
@@ -1283,6 +1279,7 @@ func TestMakeBountyPayment(t *testing.T) {
 		mockDb := dbMocks.NewDatabase(t)
 		mockHttpClient := mocks.NewHttpClient(t)
 		bHandler := NewBountyHandler(mockHttpClient, mockDb)
+		bHandler.userHasAccess = mockUserHasAccessTrue
 		mockDb.On("GetBounty", mock.AnythingOfType("uint")).Return(db.Bounty{
 			ID:       1,
 			Price:    1000,
@@ -1290,7 +1287,6 @@ func TestMakeBountyPayment(t *testing.T) {
 			Assignee: "assignee-1",
 			Paid:     false,
 		}, nil)
-		mockDb.On("UserHasAccess", "valid-key", "org-1", db.PayBounty).Return(true)
 		mockDb.On("GetOrganizationBudget", "org-1").Return(db.BountyBudget{
 			TotalBudget: 500,
 		}, nil)
@@ -1313,6 +1309,7 @@ func TestMakeBountyPayment(t *testing.T) {
 	t.Run("Should test that a successful WebSocket message is sent if the payment is successful", func(t *testing.T) {
 		mockDb.ExpectedCalls = nil
 		bHandler.getSocketConnections = mockGetSocketConnections
+		bHandler.userHasAccess = mockUserHasAccessTrue
 
 		now := time.Now()
 		expectedBounty := db.Bounty{
@@ -1326,7 +1323,6 @@ func TestMakeBountyPayment(t *testing.T) {
 		}
 
 		mockDb.On("GetBounty", bountyID).Return(bounty, nil)
-		mockDb.On("UserHasAccess", "valid-key", bounty.OrgUuid, db.PayBounty).Return(true)
 		mockDb.On("GetOrganizationBudget", bounty.OrgUuid).Return(db.BountyBudget{TotalBudget: 2000}, nil)
 		mockDb.On("GetPersonByPubkey", bounty.Assignee).Return(db.Person{OwnerPubKey: "assignee-1", OwnerRouteHint: "OwnerRouteHint"}, nil)
 		mockDb.On("AddPaymentHistory", mock.AnythingOfType("db.PaymentHistory")).Return(db.PaymentHistory{ID: 1})
@@ -1373,9 +1369,9 @@ func TestMakeBountyPayment(t *testing.T) {
 
 		bHandler2 := NewBountyHandler(mockHttpClient2, mockDb2)
 		bHandler2.getSocketConnections = mockGetSocketConnections
+		bHandler2.userHasAccess = mockUserHasAccessTrue
 
 		mockDb2.On("GetBounty", bountyID).Return(bounty, nil)
-		mockDb2.On("UserHasAccess", "valid-key", bounty.OrgUuid, db.PayBounty).Return(true)
 		mockDb2.On("GetOrganizationBudget", bounty.OrgUuid).Return(db.BountyBudget{TotalBudget: 2000}, nil)
 		mockDb2.On("GetPersonByPubkey", bounty.Assignee).Return(db.Person{OwnerPubKey: "assignee-1", OwnerRouteHint: "OwnerRouteHint"}, nil)
 
@@ -1413,6 +1409,12 @@ func TestBountyBudgetWithdraw(t *testing.T) {
 	ctx := context.Background()
 	mockDb := dbMocks.NewDatabase(t)
 	mockHttpClient := mocks.NewHttpClient(t)
+	mockUserHasAccessTrue := func(pubKeyFromAuth string, uuid string, role string) bool {
+		return true
+	}
+	mockUserHasAccessFalse := func(pubKeyFromAuth string, uuid string, role string) bool {
+		return false
+	}
 	bHandler := NewBountyHandler(mockHttpClient, mockDb)
 	unauthorizedCtx := context.WithValue(context.Background(), auth.ContextKey, "")
 	authorizedCtx := context.WithValue(ctx, auth.ContextKey, "valid-key")
@@ -1446,9 +1448,10 @@ func TestBountyBudgetWithdraw(t *testing.T) {
 	})
 
 	t.Run("401 error if user is not the organization admin or does not have WithdrawBudget role", func(t *testing.T) {
+		bHandler.userHasAccess = mockUserHasAccessFalse
+
 		rr := httptest.NewRecorder()
 		handler := http.HandlerFunc(bHandler.BountyBudgetWithdraw)
-		mockDb.On("UserHasAccess", "valid-key", mock.AnythingOfType("string"), db.WithdrawBudget).Return(false)
 
 		validData := []byte(`{"orgUuid": "org-1", "paymentRequest": "invoice"}`)
 		req, err := http.NewRequestWithContext(authorizedCtx, http.MethodPost, "/budget/withdraw", bytes.NewReader(validData))
@@ -1467,8 +1470,8 @@ func TestBountyBudgetWithdraw(t *testing.T) {
 		mockDb := dbMocks.NewDatabase(t)
 		mockHttpClient := mocks.NewHttpClient(t)
 		bHandler := NewBountyHandler(mockHttpClient, mockDb)
+		bHandler.userHasAccess = mockUserHasAccessTrue
 
-		mockDb.On("UserHasAccess", "valid-key", "org-1", db.WithdrawBudget).Return(true)
 		mockDb.On("GetOrganizationBudget", "org-1").Return(db.BountyBudget{
 			TotalBudget: 500,
 		}, nil)
@@ -1497,10 +1500,10 @@ func TestBountyBudgetWithdraw(t *testing.T) {
 		mockDb := dbMocks.NewDatabase(t)
 		mockHttpClient := mocks.NewHttpClient(t)
 		bHandler := NewBountyHandler(mockHttpClient, mockDb)
+		bHandler.userHasAccess = mockUserHasAccessTrue
 
 		paymentAmount := uint(1500)
 
-		mockDb.On("UserHasAccess", "valid-key", "org-1", db.WithdrawBudget).Return(true)
 		mockDb.On("GetOrganizationBudget", "org-1").Return(db.BountyBudget{
 			TotalBudget: 5000,
 		}, nil)
@@ -1536,8 +1539,8 @@ func TestBountyBudgetWithdraw(t *testing.T) {
 		mockDb := dbMocks.NewDatabase(t)
 		mockHttpClient := mocks.NewHttpClient(t)
 		bHandler := NewBountyHandler(mockHttpClient, mockDb)
+		bHandler.userHasAccess = mockUserHasAccessTrue
 
-		mockDb.On("UserHasAccess", "valid-key", "org-1", db.WithdrawBudget).Return(true)
 		mockDb.On("GetOrganizationBudget", "org-1").Return(db.BountyBudget{
 			TotalBudget: 5000,
 		}, nil)
@@ -1573,6 +1576,7 @@ func TestBountyBudgetWithdraw(t *testing.T) {
 		mockDb := dbMocks.NewDatabase(t)
 		mockHttpClient := mocks.NewHttpClient(t)
 		bHandler := NewBountyHandler(mockHttpClient, mockDb)
+		bHandler.userHasAccess = mockUserHasAccessTrue
 
 		paymentAmount := uint(1500)
 		initialBudget := uint(5000)
@@ -1586,7 +1590,6 @@ func TestBountyBudgetWithdraw(t *testing.T) {
 			mockHttpClient.ExpectedCalls = nil
 			mockHttpClient.Calls = nil
 
-			mockDb.On("UserHasAccess", "valid-key", "org-1", db.WithdrawBudget).Return(true)
 			mockDb.On("GetOrganizationBudget", "org-1").Return(db.BountyBudget{
 				TotalBudget: expectedFinalBudget,
 			}, nil)
