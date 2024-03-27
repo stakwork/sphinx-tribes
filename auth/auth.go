@@ -177,7 +177,7 @@ func AdminCheck(pubkey string) bool {
 }
 
 func IsFreePass() bool {
-	if len(config.SuperAdmins) == 1 && config.SuperAdmins[0] == config.AdminDevFreePass {
+	if len(config.SuperAdmins) == 1 && config.SuperAdmins[0] == config.AdminDevFreePass || config.AdminStrings == "" {
 		return true
 	}
 	return false
