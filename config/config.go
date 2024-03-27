@@ -34,6 +34,7 @@ var S3Url string
 var AdminCheck string
 var AdminDevFreePass = "FREE_PASS"
 var Connection_Auth string
+var AdminStrings string
 
 var S3Client *s3.Client
 var PresignClient *s3.PresignClient
@@ -44,7 +45,7 @@ func InitConfig() {
 	RelayUrl = os.Getenv("RELAY_URL")
 	MemeUrl = os.Getenv("MEME_URL")
 	RelayAuthKey = os.Getenv("RELAY_AUTH_KEY")
-	AdminStrings := os.Getenv("ADMINS")
+	AdminStrings = os.Getenv("ADMINS")
 	AwsSecret := os.Getenv("AWS_SECRET_ACCESS")
 	AwsAccess := os.Getenv("AWS_ACCESS_KEY_ID")
 	AwsRegion := os.Getenv("AWS_REGION")
