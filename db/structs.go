@@ -361,6 +361,7 @@ type Bounty struct {
 	OwnerID                 string         `json:"owner_id"`
 	Paid                    bool           `json:"paid"`
 	Show                    bool           `gorm:"default:false" json:"show"`
+	Completed               bool           `gorm:"default:false" json:"completed"`
 	Type                    string         `json:"type"`
 	Award                   string         `json:"award"`
 	AssignedHours           uint8          `json:"assigned_hours"`
@@ -494,6 +495,14 @@ type BountyBudget struct {
 	TotalBudget uint       `json:"total_budget"`
 	Created     *time.Time `json:"created"`
 	Updated     *time.Time `json:"updated"`
+}
+
+type StatusBudget struct {
+	OrgUuid         string `json:"org_uuid"`
+	CurrentBudget   uint   `json:"current_budget"`
+	OpenBudget      uint   `json:"open_budget"`
+	AssignedBudget  uint   `json:"assigned_budget"`
+	CompletedBudget uint   `json:"completed_budget"`
 }
 
 type BudgetInvoiceRequest struct {

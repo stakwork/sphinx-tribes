@@ -103,6 +103,7 @@ type Database interface {
 	UpdateOrganizationBudget(budget BountyBudget) BountyBudget
 	GetPaymentHistoryByCreated(created *time.Time, org_uuid string) PaymentHistory
 	GetOrganizationBudget(org_uuid string) BountyBudget
+	GetOrganizationStatusBudget(org_uuid string) StatusBudget
 	GetOrganizationBudgetHistory(org_uuid string) []BudgetHistoryData
 	AddAndUpdateBudget(invoice InvoiceList) PaymentHistory
 	WithdrawBudget(sender_pubkey string, org_uuid string, amount uint)

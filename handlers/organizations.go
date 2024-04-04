@@ -572,7 +572,7 @@ func (oh *organizationHandler) GetOrganizationBudget(w http.ResponseWriter, r *h
 	}
 
 	// get the organization budget
-	organizationBudget := oh.db.GetOrganizationBudget(uuid)
+	organizationBudget := oh.db.GetOrganizationStatusBudget(uuid)
 
 	w.WriteHeader(http.StatusOK)
 	json.NewEncoder(w).Encode(organizationBudget)
