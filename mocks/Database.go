@@ -3648,6 +3648,52 @@ func (_c *Database_GetOrganizationInvoicesCount_Call) RunAndReturn(run func(stri
 	return _c
 }
 
+// GetOrganizationStatusBudget provides a mock function with given fields: org_uuid
+func (_m *Database) GetOrganizationStatusBudget(org_uuid string) db.StatusBudget {
+	ret := _m.Called(org_uuid)
+
+	if len(ret) == 0 {
+		panic("no return value specified for GetOrganizationStatusBudget")
+	}
+
+	var r0 db.StatusBudget
+	if rf, ok := ret.Get(0).(func(string) db.StatusBudget); ok {
+		r0 = rf(org_uuid)
+	} else {
+		r0 = ret.Get(0).(db.StatusBudget)
+	}
+
+	return r0
+}
+
+// Database_GetOrganizationStatusBudget_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'GetOrganizationStatusBudget'
+type Database_GetOrganizationStatusBudget_Call struct {
+	*mock.Call
+}
+
+// GetOrganizationStatusBudget is a helper method to define mock.On call
+//   - org_uuid string
+func (_e *Database_Expecter) GetOrganizationStatusBudget(org_uuid interface{}) *Database_GetOrganizationStatusBudget_Call {
+	return &Database_GetOrganizationStatusBudget_Call{Call: _e.mock.On("GetOrganizationStatusBudget", org_uuid)}
+}
+
+func (_c *Database_GetOrganizationStatusBudget_Call) Run(run func(org_uuid string)) *Database_GetOrganizationStatusBudget_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(string))
+	})
+	return _c
+}
+
+func (_c *Database_GetOrganizationStatusBudget_Call) Return(_a0 db.StatusBudget) *Database_GetOrganizationStatusBudget_Call {
+	_c.Call.Return(_a0)
+	return _c
+}
+
+func (_c *Database_GetOrganizationStatusBudget_Call) RunAndReturn(run func(string) db.StatusBudget) *Database_GetOrganizationStatusBudget_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
 // GetOrganizationUser provides a mock function with given fields: pubkey, org_uuid
 func (_m *Database) GetOrganizationUser(pubkey string, org_uuid string) db.OrganizationUsers {
 	ret := _m.Called(pubkey, org_uuid)

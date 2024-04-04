@@ -1769,7 +1769,32 @@ func (db database) GetPaymentHistoryByCreated(created *time.Time, org_uuid strin
 func (db database) GetOrganizationBudget(org_uuid string) BountyBudget {
 	ms := BountyBudget{}
 	db.db.Where("org_uuid = ?", org_uuid).Find(&ms)
+
 	return ms
+}
+
+func (db database) GetOrganizationStatusBudget(org_uuid string) StatusBudget {
+
+	orgBudget := db.GetOrganizationBudget(org_uuid)
+
+	var openBudget uint
+	db.db.Model(&Bounty{}).Where("assignee = '' ").Select("SUM(price)").Row().Scan(&openBudget)
+
+	var assignedBudget uint
+	db.db.Model(&Bounty{}).Where("assignee != '' ").Select("SUM(price)").Row().Scan(&assignedBudget)
+
+	var completedBudget uint
+	db.db.Model(&Bounty{}).Where("completed = true ").Select("SUM(price)").Row().Scan(&completedBudget)
+
+	statusBudget := StatusBudget{
+		OrgUuid:         org_uuid,
+		CurrentBudget:   orgBudget.TotalBudget,
+		OpenBudget:      openBudget,
+		AssignedBudget:  assignedBudget,
+		CompletedBudget: completedBudget,
+	}
+
+	return statusBudget
 }
 
 func (db database) GetOrganizationBudgetHistory(org_uuid string) []BudgetHistoryData {
