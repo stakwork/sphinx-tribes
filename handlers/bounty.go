@@ -320,6 +320,7 @@ func UpdatePaymentStatus(w http.ResponseWriter, r *http.Request) {
 		// if setting paid as true by mark as paid
 		// set completion date and mark as paid
 		if bounty.Paid {
+			bounty.Completed = true
 			bounty.CompletionDate = &now
 			bounty.MarkAsPaidDate = &now
 			if bounty.PaidDate == nil {
@@ -525,6 +526,7 @@ func (h *bountyHandler) MakeBountyPayment(w http.ResponseWriter, r *http.Request
 
 		bounty.Paid = true
 		bounty.PaidDate = &now
+		bounty.Completed = true
 		bounty.CompletionDate = &now
 		h.db.UpdateBounty(bounty)
 
@@ -781,7 +783,12 @@ func (h *bountyHandler) PollInvoice(w http.ResponseWriter, r *http.Request) {
 					bounty, err := h.db.GetBountyByCreated(uint(invData.Created))
 
 					if err == nil {
+						now := time.Now()
+
 						bounty.Paid = true
+						bounty.PaidDate = &now
+						bounty.Completed = true
+						bounty.CompletionDate = &now
 					}
 
 					h.db.UpdateBounty(bounty)

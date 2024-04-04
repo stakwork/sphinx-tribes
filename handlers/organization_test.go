@@ -432,16 +432,16 @@ func TestGetOrganizationBudget(t *testing.T) {
 
 	t.Run("Should test that the right organization budget is returned, if the user is the organization admin or has the ViewReport role", func(t *testing.T) {
 		orgUUID := "valid-uuid"
-		expectedBudget := db.BountyBudget{
-			ID:          1,
-			OrgUuid:     orgUUID,
-			TotalBudget: 1000,
-			Created:     nil,
-			Updated:     nil,
+		statusBudget := db.StatusBudget{
+			OrgUuid:         orgUUID,
+			CurrentBudget:   10000,
+			OpenBudget:      1000,
+			AssignedBudget:  2000,
+			CompletedBudget: 3000,
 		}
 
 		oHandler.userHasAccess = mockUserHasAccess
-		mockDb.On("GetOrganizationBudget", orgUUID).Return(expectedBudget).Once()
+		mockDb.On("GetOrganizationStatusBudget", orgUUID).Return(statusBudget).Once()
 
 		rctx := chi.NewRouteContext()
 		rctx.URLParams.Add("uuid", orgUUID)
@@ -455,13 +455,13 @@ func TestGetOrganizationBudget(t *testing.T) {
 
 		assert.Equal(t, http.StatusOK, rr.Code)
 
-		var responseBudget db.BountyBudget
+		var responseBudget db.StatusBudget
 		err = json.Unmarshal(rr.Body.Bytes(), &responseBudget)
 		if err != nil {
 			t.Fatal(err)
 		}
 
-		assert.Equal(t, expectedBudget, responseBudget)
+		assert.Equal(t, statusBudget, responseBudget)
 	})
 }
 
