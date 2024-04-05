@@ -8,6 +8,7 @@ import (
 	"io"
 	"net/http"
 	"strconv"
+	"sync"
 	"time"
 
 	"github.com/go-chi/chi"
@@ -132,9 +133,12 @@ func (s StoreData) GetChallengeCache(key string) (string, error) {
 }
 
 func Ask(w http.ResponseWriter, r *http.Request) {
+	var m sync.Mutex
+	m.Lock()
+
 	ts := strconv.Itoa(int(time.Now().Unix()))
 	h := []byte(ts)
-	// h := blake2b.Sum256([]byte(ts))
+
 	challenge := base64.URLEncoding.EncodeToString(h[:])
 
 	Store.SetChallengeCache(challenge, ts)
@@ -144,6 +148,8 @@ func Ask(w http.ResponseWriter, r *http.Request) {
 		"challenge": challenge,
 		"ts":        ts,
 	})
+
+	m.Unlock()
 }
 
 type VerifyPayload struct {
