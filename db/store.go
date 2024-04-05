@@ -1,17 +1,18 @@
 package db
 
 import (
-	"encoding/base64"
 	"encoding/json"
 	"errors"
 	"fmt"
 	"io"
 	"net/http"
 	"strconv"
+	"sync"
 	"time"
 
 	"github.com/go-chi/chi"
 	"github.com/patrickmn/go-cache"
+	"github.com/rs/xid"
 	"github.com/stakwork/sphinx-tribes/auth"
 	"github.com/stakwork/sphinx-tribes/config"
 )
@@ -132,10 +133,11 @@ func (s StoreData) GetChallengeCache(key string) (string, error) {
 }
 
 func Ask(w http.ResponseWriter, r *http.Request) {
+	var m sync.Mutex
+	m.Lock()
+
 	ts := strconv.Itoa(int(time.Now().Unix()))
-	h := []byte(ts)
-	// h := blake2b.Sum256([]byte(ts))
-	challenge := base64.URLEncoding.EncodeToString(h[:])
+	challenge := xid.New().String()
 
 	Store.SetChallengeCache(challenge, ts)
 
@@ -144,6 +146,7 @@ func Ask(w http.ResponseWriter, r *http.Request) {
 		"challenge": challenge,
 		"ts":        ts,
 	})
+	m.Unlock()
 }
 
 type VerifyPayload struct {

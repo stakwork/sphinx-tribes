@@ -1778,13 +1778,13 @@ func (db database) GetOrganizationStatusBudget(org_uuid string) StatusBudget {
 	orgBudget := db.GetOrganizationBudget(org_uuid)
 
 	var openBudget uint
-	db.db.Model(&Bounty{}).Where("assignee = '' ").Select("SUM(price)").Row().Scan(&openBudget)
+	db.db.Model(&Bounty{}).Where("assignee = '' ").Where("paid != true").Select("SUM(price)").Row().Scan(&openBudget)
 
 	var assignedBudget uint
-	db.db.Model(&Bounty{}).Where("assignee != '' ").Select("SUM(price)").Row().Scan(&assignedBudget)
+	db.db.Model(&Bounty{}).Where("assignee != '' ").Where("paid != true").Select("SUM(price)").Row().Scan(&assignedBudget)
 
 	var completedBudget uint
-	db.db.Model(&Bounty{}).Where("completed = true ").Select("SUM(price)").Row().Scan(&completedBudget)
+	db.db.Model(&Bounty{}).Where("completed = true ").Where("paid != true").Select("SUM(price)").Row().Scan(&completedBudget)
 
 	statusBudget := StatusBudget{
 		OrgUuid:         org_uuid,
