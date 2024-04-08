@@ -1234,6 +1234,15 @@ func (db database) UpdateBountyPayment(b Bounty) (Bounty, error) {
 	db.db.Model(&b).Where("created", b.Created).Updates(map[string]interface{}{
 		"paid": b.Paid,
 	})
+	db.db.Model(&b).Where("created", b.Created).Updates(b)
+	return b, nil
+}
+
+func (db database) UpdateBountyCompleted(b Bounty) (Bounty, error) {
+	db.db.Model(&b).Where("created", b.Created).Updates(map[string]interface{}{
+		"completed": b.Completed,
+	})
+	db.db.Model(&b).Where("created", b.Created).Updates(b)
 	return b, nil
 }
 

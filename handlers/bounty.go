@@ -333,6 +333,24 @@ func UpdatePaymentStatus(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(bounty)
 }
 
+func UpdateCompletedStatus(w http.ResponseWriter, r *http.Request) {
+	createdParam := chi.URLParam(r, "created")
+	created, _ := strconv.ParseUint(createdParam, 10, 32)
+
+	bounty, _ := db.DB.GetBountyByCreated(uint(created))
+	if bounty.ID != 0 && bounty.Created == int64(created) {
+		now := time.Now()
+		// set bounty as completed
+		if !bounty.Paid && !bounty.Completed {
+			bounty.CompletionDate = &now
+			bounty.Completed = true
+		}
+		db.DB.UpdateBountyCompleted(bounty)
+	}
+	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode(bounty)
+}
+
 func (h *bountyHandler) GenerateBountyResponse(bounties []db.Bounty) []db.BountyResponse {
 	var bountyResponse []db.BountyResponse
 
@@ -370,6 +388,7 @@ func (h *bountyHandler) GenerateBountyResponse(bounties []db.Bounty) []db.Bounty
 				OrgUuid:                 bounty.OrgUuid,
 				Updated:                 bounty.Updated,
 				CodingLanguages:         bounty.CodingLanguages,
+				Completed:               bounty.Completed,
 			},
 			Assignee: db.Person{
 				ID:               assignee.ID,
