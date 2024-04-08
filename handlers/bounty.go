@@ -342,8 +342,8 @@ func UpdateCompletedStatus(w http.ResponseWriter, r *http.Request) {
 		now := time.Now()
 		// set bounty as completed
 		if !bounty.Paid && !bounty.Completed {
-			bounty.Completed = true
 			bounty.CompletionDate = &now
+			bounty.Completed = true
 		}
 		db.DB.UpdateBountyCompleted(bounty)
 	}
