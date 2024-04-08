@@ -345,7 +345,7 @@ func UpdateCompletedStatus(w http.ResponseWriter, r *http.Request) {
 			bounty.Completed = true
 			bounty.CompletionDate = &now
 		}
-		db.DB.UpdateBountyPayment(bounty)
+		db.DB.UpdateBountyCompleted(bounty)
 	}
 	w.WriteHeader(http.StatusOK)
 	json.NewEncoder(w).Encode(bounty)
@@ -388,6 +388,7 @@ func (h *bountyHandler) GenerateBountyResponse(bounties []db.Bounty) []db.Bounty
 				OrgUuid:                 bounty.OrgUuid,
 				Updated:                 bounty.Updated,
 				CodingLanguages:         bounty.CodingLanguages,
+				Completed:               bounty.Completed,
 			},
 			Assignee: db.Person{
 				ID:               assignee.ID,
