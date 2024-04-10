@@ -30,7 +30,8 @@ CREATE TABLE tribes (
   unique_name TEXT,
   pin TEXT,
   preview TEXT,
-  profile_filters TEXT
+  profile_filters TEXT,
+  second_brain_url TEXT
 );
 
 -- for searching 
