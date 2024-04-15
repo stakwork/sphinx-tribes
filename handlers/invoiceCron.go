@@ -202,7 +202,7 @@ func InitInvoiceCron() {
 				err = json.Unmarshal(body, &invoiceRes)
 
 				if err != nil {
-					log.Printf("Reading Organization Invoice body failed: %s", err)
+					log.Printf("Reading Workspace Invoice body failed: %s", err)
 					return
 				}
 

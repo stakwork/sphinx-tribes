@@ -34,7 +34,7 @@ func NewRouter() *http.Server {
 	r.Mount("/connectioncodes", ConnectionCodesRoutes())
 	r.Mount("/github_issue", GithubIssuesRoutes())
 	r.Mount("/gobounties", BountyRoutes())
-	r.Mount("/organizations", OrganizationRoutes())
+	r.Mount("/workspaces", WorkspaceRoutes())
 	r.Mount("/metrics", MetricsRoutes())
 
 	r.Group(func(r chi.Router) {

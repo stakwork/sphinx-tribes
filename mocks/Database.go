@@ -449,12 +449,12 @@ func (_c *Database_BountiesPaidPercentage_Call) RunAndReturn(run func(db.Payment
 	return _c
 }
 
-// ChangeOrganizationDeleteStatus provides a mock function with given fields: org_uuid, status
-func (_m *Database) ChangeOrganizationDeleteStatus(org_uuid string, status bool) db.Organization {
+// ChangeWorkspaceDeleteStatus provides a mock function with given fields: org_uuid, status
+func (_m *Database) ChangeWorkspaceDeleteStatus(org_uuid string, status bool) db.Organization {
 	ret := _m.Called(org_uuid, status)
 
 	if len(ret) == 0 {
-		panic("no return value specified for ChangeOrganizationDeleteStatus")
+		panic("no return value specified for ChangeWorkspaceDeleteStatus")
 	}
 
 	var r0 db.Organization
@@ -467,31 +467,31 @@ func (_m *Database) ChangeOrganizationDeleteStatus(org_uuid string, status bool)
 	return r0
 }
 
-// Database_ChangeOrganizationDeleteStatus_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'ChangeOrganizationDeleteStatus'
-type Database_ChangeOrganizationDeleteStatus_Call struct {
+// Database_ChangeWorkspaceDeleteStatus_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'ChangeWorkspaceDeleteStatus'
+type Database_ChangeWorkspaceDeleteStatus_Call struct {
 	*mock.Call
 }
 
-// ChangeOrganizationDeleteStatus is a helper method to define mock.On call
+// ChangeWorkspaceDeleteStatus is a helper method to define mock.On call
 //   - org_uuid string
 //   - status bool
-func (_e *Database_Expecter) ChangeOrganizationDeleteStatus(org_uuid interface{}, status interface{}) *Database_ChangeOrganizationDeleteStatus_Call {
-	return &Database_ChangeOrganizationDeleteStatus_Call{Call: _e.mock.On("ChangeOrganizationDeleteStatus", org_uuid, status)}
+func (_e *Database_Expecter) ChangeWorkspaceDeleteStatus(org_uuid interface{}, status interface{}) *Database_ChangeWorkspaceDeleteStatus_Call {
+	return &Database_ChangeWorkspaceDeleteStatus_Call{Call: _e.mock.On("ChangeWorkspaceDeleteStatus", org_uuid, status)}
 }
 
-func (_c *Database_ChangeOrganizationDeleteStatus_Call) Run(run func(org_uuid string, status bool)) *Database_ChangeOrganizationDeleteStatus_Call {
+func (_c *Database_ChangeWorkspaceDeleteStatus_Call) Run(run func(org_uuid string, status bool)) *Database_ChangeWorkspaceDeleteStatus_Call {
 	_c.Call.Run(func(args mock.Arguments) {
 		run(args[0].(string), args[1].(bool))
 	})
 	return _c
 }
 
-func (_c *Database_ChangeOrganizationDeleteStatus_Call) Return(_a0 db.Organization) *Database_ChangeOrganizationDeleteStatus_Call {
+func (_c *Database_ChangeWorkspaceDeleteStatus_Call) Return(_a0 db.Organization) *Database_ChangeWorkspaceDeleteStatus_Call {
 	_c.Call.Return(_a0)
 	return _c
 }
 
-func (_c *Database_ChangeOrganizationDeleteStatus_Call) RunAndReturn(run func(string, bool) db.Organization) *Database_ChangeOrganizationDeleteStatus_Call {
+func (_c *Database_ChangeWorkspaceDeleteStatus_Call) RunAndReturn(run func(string, bool) db.Organization) *Database_ChangeWorkspaceDeleteStatus_Call {
 	_c.Call.Return(run)
 	return _c
 }
@@ -927,62 +927,6 @@ func (_c *Database_CreateOrEditBounty_Call) RunAndReturn(run func(db.Bounty) (db
 	return _c
 }
 
-// CreateOrEditOrganization provides a mock function with given fields: m
-func (_m *Database) CreateOrEditOrganization(m db.Organization) (db.Organization, error) {
-	ret := _m.Called(m)
-
-	if len(ret) == 0 {
-		panic("no return value specified for CreateOrEditOrganization")
-	}
-
-	var r0 db.Organization
-	var r1 error
-	if rf, ok := ret.Get(0).(func(db.Organization) (db.Organization, error)); ok {
-		return rf(m)
-	}
-	if rf, ok := ret.Get(0).(func(db.Organization) db.Organization); ok {
-		r0 = rf(m)
-	} else {
-		r0 = ret.Get(0).(db.Organization)
-	}
-
-	if rf, ok := ret.Get(1).(func(db.Organization) error); ok {
-		r1 = rf(m)
-	} else {
-		r1 = ret.Error(1)
-	}
-
-	return r0, r1
-}
-
-// Database_CreateOrEditOrganization_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'CreateOrEditOrganization'
-type Database_CreateOrEditOrganization_Call struct {
-	*mock.Call
-}
-
-// CreateOrEditOrganization is a helper method to define mock.On call
-//   - m db.Organization
-func (_e *Database_Expecter) CreateOrEditOrganization(m interface{}) *Database_CreateOrEditOrganization_Call {
-	return &Database_CreateOrEditOrganization_Call{Call: _e.mock.On("CreateOrEditOrganization", m)}
-}
-
-func (_c *Database_CreateOrEditOrganization_Call) Run(run func(m db.Organization)) *Database_CreateOrEditOrganization_Call {
-	_c.Call.Run(func(args mock.Arguments) {
-		run(args[0].(db.Organization))
-	})
-	return _c
-}
-
-func (_c *Database_CreateOrEditOrganization_Call) Return(_a0 db.Organization, _a1 error) *Database_CreateOrEditOrganization_Call {
-	_c.Call.Return(_a0, _a1)
-	return _c
-}
-
-func (_c *Database_CreateOrEditOrganization_Call) RunAndReturn(run func(db.Organization) (db.Organization, error)) *Database_CreateOrEditOrganization_Call {
-	_c.Call.Return(run)
-	return _c
-}
-
 // CreateOrEditPerson provides a mock function with given fields: m
 func (_m *Database) CreateOrEditPerson(m db.Person) (db.Person, error) {
 	ret := _m.Called(m)
@@ -1095,94 +1039,58 @@ func (_c *Database_CreateOrEditTribe_Call) RunAndReturn(run func(db.Tribe) (db.T
 	return _c
 }
 
-// CreateOrganizationBudget provides a mock function with given fields: budget
-func (_m *Database) CreateOrganizationBudget(budget db.BountyBudget) db.BountyBudget {
-	ret := _m.Called(budget)
+// CreateOrEditWorkspace provides a mock function with given fields: m
+func (_m *Database) CreateOrEditWorkspace(m db.Organization) (db.Organization, error) {
+	ret := _m.Called(m)
 
 	if len(ret) == 0 {
-		panic("no return value specified for CreateOrganizationBudget")
+		panic("no return value specified for CreateOrEditWorkspace")
 	}
 
-	var r0 db.BountyBudget
-	if rf, ok := ret.Get(0).(func(db.BountyBudget) db.BountyBudget); ok {
-		r0 = rf(budget)
+	var r0 db.Organization
+	var r1 error
+	if rf, ok := ret.Get(0).(func(db.Organization) (db.Organization, error)); ok {
+		return rf(m)
+	}
+	if rf, ok := ret.Get(0).(func(db.Organization) db.Organization); ok {
+		r0 = rf(m)
 	} else {
-		r0 = ret.Get(0).(db.BountyBudget)
+		r0 = ret.Get(0).(db.Organization)
 	}
 
-	return r0
+	if rf, ok := ret.Get(1).(func(db.Organization) error); ok {
+		r1 = rf(m)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
 }
 
-// Database_CreateOrganizationBudget_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'CreateOrganizationBudget'
-type Database_CreateOrganizationBudget_Call struct {
+// Database_CreateOrEditWorkspace_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'CreateOrEditWorkspace'
+type Database_CreateOrEditWorkspace_Call struct {
 	*mock.Call
 }
 
-// CreateOrganizationBudget is a helper method to define mock.On call
-//   - budget db.BountyBudget
-func (_e *Database_Expecter) CreateOrganizationBudget(budget interface{}) *Database_CreateOrganizationBudget_Call {
-	return &Database_CreateOrganizationBudget_Call{Call: _e.mock.On("CreateOrganizationBudget", budget)}
+// CreateOrEditWorkspace is a helper method to define mock.On call
+//   - m db.Organization
+func (_e *Database_Expecter) CreateOrEditWorkspace(m interface{}) *Database_CreateOrEditWorkspace_Call {
+	return &Database_CreateOrEditWorkspace_Call{Call: _e.mock.On("CreateOrEditWorkspace", m)}
 }
 
-func (_c *Database_CreateOrganizationBudget_Call) Run(run func(budget db.BountyBudget)) *Database_CreateOrganizationBudget_Call {
+func (_c *Database_CreateOrEditWorkspace_Call) Run(run func(m db.Organization)) *Database_CreateOrEditWorkspace_Call {
 	_c.Call.Run(func(args mock.Arguments) {
-		run(args[0].(db.BountyBudget))
+		run(args[0].(db.Organization))
 	})
 	return _c
 }
 
-func (_c *Database_CreateOrganizationBudget_Call) Return(_a0 db.BountyBudget) *Database_CreateOrganizationBudget_Call {
-	_c.Call.Return(_a0)
+func (_c *Database_CreateOrEditWorkspace_Call) Return(_a0 db.Organization, _a1 error) *Database_CreateOrEditWorkspace_Call {
+	_c.Call.Return(_a0, _a1)
 	return _c
 }
 
-func (_c *Database_CreateOrganizationBudget_Call) RunAndReturn(run func(db.BountyBudget) db.BountyBudget) *Database_CreateOrganizationBudget_Call {
-	_c.Call.Return(run)
-	return _c
-}
-
-// CreateOrganizationUser provides a mock function with given fields: orgUser
-func (_m *Database) CreateOrganizationUser(orgUser db.OrganizationUsers) db.OrganizationUsers {
-	ret := _m.Called(orgUser)
-
-	if len(ret) == 0 {
-		panic("no return value specified for CreateOrganizationUser")
-	}
-
-	var r0 db.OrganizationUsers
-	if rf, ok := ret.Get(0).(func(db.OrganizationUsers) db.OrganizationUsers); ok {
-		r0 = rf(orgUser)
-	} else {
-		r0 = ret.Get(0).(db.OrganizationUsers)
-	}
-
-	return r0
-}
-
-// Database_CreateOrganizationUser_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'CreateOrganizationUser'
-type Database_CreateOrganizationUser_Call struct {
-	*mock.Call
-}
-
-// CreateOrganizationUser is a helper method to define mock.On call
-//   - orgUser db.OrganizationUsers
-func (_e *Database_Expecter) CreateOrganizationUser(orgUser interface{}) *Database_CreateOrganizationUser_Call {
-	return &Database_CreateOrganizationUser_Call{Call: _e.mock.On("CreateOrganizationUser", orgUser)}
-}
-
-func (_c *Database_CreateOrganizationUser_Call) Run(run func(orgUser db.OrganizationUsers)) *Database_CreateOrganizationUser_Call {
-	_c.Call.Run(func(args mock.Arguments) {
-		run(args[0].(db.OrganizationUsers))
-	})
-	return _c
-}
-
-func (_c *Database_CreateOrganizationUser_Call) Return(_a0 db.OrganizationUsers) *Database_CreateOrganizationUser_Call {
-	_c.Call.Return(_a0)
-	return _c
-}
-
-func (_c *Database_CreateOrganizationUser_Call) RunAndReturn(run func(db.OrganizationUsers) db.OrganizationUsers) *Database_CreateOrganizationUser_Call {
+func (_c *Database_CreateOrEditWorkspace_Call) RunAndReturn(run func(db.Organization) (db.Organization, error)) *Database_CreateOrEditWorkspace_Call {
 	_c.Call.Return(run)
 	return _c
 }
@@ -1237,12 +1145,104 @@ func (_c *Database_CreateUserRoles_Call) RunAndReturn(run func([]db.UserRoles, s
 	return _c
 }
 
-// DeleteAllUsersFromOrganization provides a mock function with given fields: uuid
-func (_m *Database) DeleteAllUsersFromOrganization(uuid string) error {
+// CreateWorkspaceBudget provides a mock function with given fields: budget
+func (_m *Database) CreateWorkspaceBudget(budget db.BountyBudget) db.BountyBudget {
+	ret := _m.Called(budget)
+
+	if len(ret) == 0 {
+		panic("no return value specified for CreateWorkspaceBudget")
+	}
+
+	var r0 db.BountyBudget
+	if rf, ok := ret.Get(0).(func(db.BountyBudget) db.BountyBudget); ok {
+		r0 = rf(budget)
+	} else {
+		r0 = ret.Get(0).(db.BountyBudget)
+	}
+
+	return r0
+}
+
+// Database_CreateWorkspaceBudget_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'CreateWorkspaceBudget'
+type Database_CreateWorkspaceBudget_Call struct {
+	*mock.Call
+}
+
+// CreateWorkspaceBudget is a helper method to define mock.On call
+//   - budget db.BountyBudget
+func (_e *Database_Expecter) CreateWorkspaceBudget(budget interface{}) *Database_CreateWorkspaceBudget_Call {
+	return &Database_CreateWorkspaceBudget_Call{Call: _e.mock.On("CreateWorkspaceBudget", budget)}
+}
+
+func (_c *Database_CreateWorkspaceBudget_Call) Run(run func(budget db.BountyBudget)) *Database_CreateWorkspaceBudget_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(db.BountyBudget))
+	})
+	return _c
+}
+
+func (_c *Database_CreateWorkspaceBudget_Call) Return(_a0 db.BountyBudget) *Database_CreateWorkspaceBudget_Call {
+	_c.Call.Return(_a0)
+	return _c
+}
+
+func (_c *Database_CreateWorkspaceBudget_Call) RunAndReturn(run func(db.BountyBudget) db.BountyBudget) *Database_CreateWorkspaceBudget_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
+// CreateWorkspaceUser provides a mock function with given fields: orgUser
+func (_m *Database) CreateWorkspaceUser(orgUser db.OrganizationUsers) db.OrganizationUsers {
+	ret := _m.Called(orgUser)
+
+	if len(ret) == 0 {
+		panic("no return value specified for CreateWorkspaceUser")
+	}
+
+	var r0 db.OrganizationUsers
+	if rf, ok := ret.Get(0).(func(db.OrganizationUsers) db.OrganizationUsers); ok {
+		r0 = rf(orgUser)
+	} else {
+		r0 = ret.Get(0).(db.OrganizationUsers)
+	}
+
+	return r0
+}
+
+// Database_CreateWorkspaceUser_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'CreateWorkspaceUser'
+type Database_CreateWorkspaceUser_Call struct {
+	*mock.Call
+}
+
+// CreateWorkspaceUser is a helper method to define mock.On call
+//   - orgUser db.OrganizationUsers
+func (_e *Database_Expecter) CreateWorkspaceUser(orgUser interface{}) *Database_CreateWorkspaceUser_Call {
+	return &Database_CreateWorkspaceUser_Call{Call: _e.mock.On("CreateWorkspaceUser", orgUser)}
+}
+
+func (_c *Database_CreateWorkspaceUser_Call) Run(run func(orgUser db.OrganizationUsers)) *Database_CreateWorkspaceUser_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(db.OrganizationUsers))
+	})
+	return _c
+}
+
+func (_c *Database_CreateWorkspaceUser_Call) Return(_a0 db.OrganizationUsers) *Database_CreateWorkspaceUser_Call {
+	_c.Call.Return(_a0)
+	return _c
+}
+
+func (_c *Database_CreateWorkspaceUser_Call) RunAndReturn(run func(db.OrganizationUsers) db.OrganizationUsers) *Database_CreateWorkspaceUser_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
+// DeleteAllUsersFromWorkspace provides a mock function with given fields: uuid
+func (_m *Database) DeleteAllUsersFromWorkspace(uuid string) error {
 	ret := _m.Called(uuid)
 
 	if len(ret) == 0 {
-		panic("no return value specified for DeleteAllUsersFromOrganization")
+		panic("no return value specified for DeleteAllUsersFromWorkspace")
 	}
 
 	var r0 error
@@ -1255,30 +1255,30 @@ func (_m *Database) DeleteAllUsersFromOrganization(uuid string) error {
 	return r0
 }
 
-// Database_DeleteAllUsersFromOrganization_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'DeleteAllUsersFromOrganization'
-type Database_DeleteAllUsersFromOrganization_Call struct {
+// Database_DeleteAllUsersFromWorkspace_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'DeleteAllUsersFromWorkspace'
+type Database_DeleteAllUsersFromWorkspace_Call struct {
 	*mock.Call
 }
 
-// DeleteAllUsersFromOrganization is a helper method to define mock.On call
+// DeleteAllUsersFromWorkspace is a helper method to define mock.On call
 //   - uuid string
-func (_e *Database_Expecter) DeleteAllUsersFromOrganization(uuid interface{}) *Database_DeleteAllUsersFromOrganization_Call {
-	return &Database_DeleteAllUsersFromOrganization_Call{Call: _e.mock.On("DeleteAllUsersFromOrganization", uuid)}
+func (_e *Database_Expecter) DeleteAllUsersFromWorkspace(uuid interface{}) *Database_DeleteAllUsersFromWorkspace_Call {
+	return &Database_DeleteAllUsersFromWorkspace_Call{Call: _e.mock.On("DeleteAllUsersFromWorkspace", uuid)}
 }
 
-func (_c *Database_DeleteAllUsersFromOrganization_Call) Run(run func(uuid string)) *Database_DeleteAllUsersFromOrganization_Call {
+func (_c *Database_DeleteAllUsersFromWorkspace_Call) Run(run func(uuid string)) *Database_DeleteAllUsersFromWorkspace_Call {
 	_c.Call.Run(func(args mock.Arguments) {
 		run(args[0].(string))
 	})
 	return _c
 }
 
-func (_c *Database_DeleteAllUsersFromOrganization_Call) Return(_a0 error) *Database_DeleteAllUsersFromOrganization_Call {
+func (_c *Database_DeleteAllUsersFromWorkspace_Call) Return(_a0 error) *Database_DeleteAllUsersFromWorkspace_Call {
 	_c.Call.Return(_a0)
 	return _c
 }
 
-func (_c *Database_DeleteAllUsersFromOrganization_Call) RunAndReturn(run func(string) error) *Database_DeleteAllUsersFromOrganization_Call {
+func (_c *Database_DeleteAllUsersFromWorkspace_Call) RunAndReturn(run func(string) error) *Database_DeleteAllUsersFromWorkspace_Call {
 	_c.Call.Return(run)
 	return _c
 }
@@ -1340,53 +1340,6 @@ func (_c *Database_DeleteBounty_Call) RunAndReturn(run func(string, string) (db.
 	return _c
 }
 
-// DeleteOrganizationUser provides a mock function with given fields: orgUser, org
-func (_m *Database) DeleteOrganizationUser(orgUser db.OrganizationUsersData, org string) db.OrganizationUsersData {
-	ret := _m.Called(orgUser, org)
-
-	if len(ret) == 0 {
-		panic("no return value specified for DeleteOrganizationUser")
-	}
-
-	var r0 db.OrganizationUsersData
-	if rf, ok := ret.Get(0).(func(db.OrganizationUsersData, string) db.OrganizationUsersData); ok {
-		r0 = rf(orgUser, org)
-	} else {
-		r0 = ret.Get(0).(db.OrganizationUsersData)
-	}
-
-	return r0
-}
-
-// Database_DeleteOrganizationUser_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'DeleteOrganizationUser'
-type Database_DeleteOrganizationUser_Call struct {
-	*mock.Call
-}
-
-// DeleteOrganizationUser is a helper method to define mock.On call
-//   - orgUser db.OrganizationUsersData
-//   - org string
-func (_e *Database_Expecter) DeleteOrganizationUser(orgUser interface{}, org interface{}) *Database_DeleteOrganizationUser_Call {
-	return &Database_DeleteOrganizationUser_Call{Call: _e.mock.On("DeleteOrganizationUser", orgUser, org)}
-}
-
-func (_c *Database_DeleteOrganizationUser_Call) Run(run func(orgUser db.OrganizationUsersData, org string)) *Database_DeleteOrganizationUser_Call {
-	_c.Call.Run(func(args mock.Arguments) {
-		run(args[0].(db.OrganizationUsersData), args[1].(string))
-	})
-	return _c
-}
-
-func (_c *Database_DeleteOrganizationUser_Call) Return(_a0 db.OrganizationUsersData) *Database_DeleteOrganizationUser_Call {
-	_c.Call.Return(_a0)
-	return _c
-}
-
-func (_c *Database_DeleteOrganizationUser_Call) RunAndReturn(run func(db.OrganizationUsersData, string) db.OrganizationUsersData) *Database_DeleteOrganizationUser_Call {
-	_c.Call.Return(run)
-	return _c
-}
-
 // DeleteUserInvoiceData provides a mock function with given fields: payment_request
 func (_m *Database) DeleteUserInvoiceData(payment_request string) db.UserInvoiceData {
 	ret := _m.Called(payment_request)
@@ -1429,6 +1382,53 @@ func (_c *Database_DeleteUserInvoiceData_Call) Return(_a0 db.UserInvoiceData) *D
 }
 
 func (_c *Database_DeleteUserInvoiceData_Call) RunAndReturn(run func(string) db.UserInvoiceData) *Database_DeleteUserInvoiceData_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
+// DeleteWorkspaceUser provides a mock function with given fields: orgUser, org
+func (_m *Database) DeleteWorkspaceUser(orgUser db.OrganizationUsersData, org string) db.OrganizationUsersData {
+	ret := _m.Called(orgUser, org)
+
+	if len(ret) == 0 {
+		panic("no return value specified for DeleteWorkspaceUser")
+	}
+
+	var r0 db.OrganizationUsersData
+	if rf, ok := ret.Get(0).(func(db.OrganizationUsersData, string) db.OrganizationUsersData); ok {
+		r0 = rf(orgUser, org)
+	} else {
+		r0 = ret.Get(0).(db.OrganizationUsersData)
+	}
+
+	return r0
+}
+
+// Database_DeleteWorkspaceUser_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'DeleteWorkspaceUser'
+type Database_DeleteWorkspaceUser_Call struct {
+	*mock.Call
+}
+
+// DeleteWorkspaceUser is a helper method to define mock.On call
+//   - orgUser db.OrganizationUsersData
+//   - org string
+func (_e *Database_Expecter) DeleteWorkspaceUser(orgUser interface{}, org interface{}) *Database_DeleteWorkspaceUser_Call {
+	return &Database_DeleteWorkspaceUser_Call{Call: _e.mock.On("DeleteWorkspaceUser", orgUser, org)}
+}
+
+func (_c *Database_DeleteWorkspaceUser_Call) Run(run func(orgUser db.OrganizationUsersData, org string)) *Database_DeleteWorkspaceUser_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(db.OrganizationUsersData), args[1].(string))
+	})
+	return _c
+}
+
+func (_c *Database_DeleteWorkspaceUser_Call) Return(_a0 db.OrganizationUsersData) *Database_DeleteWorkspaceUser_Call {
+	_c.Call.Return(_a0)
+	return _c
+}
+
+func (_c *Database_DeleteWorkspaceUser_Call) RunAndReturn(run func(db.OrganizationUsersData, string) db.OrganizationUsersData) *Database_DeleteWorkspaceUser_Call {
 	_c.Call.Return(run)
 	return _c
 }
@@ -3114,12 +3114,12 @@ func (_c *Database_GetNextBountyByCreated_Call) RunAndReturn(run func(*http.Requ
 	return _c
 }
 
-// GetNextOrganizationBountyByCreated provides a mock function with given fields: r
-func (_m *Database) GetNextOrganizationBountyByCreated(r *http.Request) (uint, error) {
+// GetNextWorkspaceBountyByCreated provides a mock function with given fields: r
+func (_m *Database) GetNextWorkspaceBountyByCreated(r *http.Request) (uint, error) {
 	ret := _m.Called(r)
 
 	if len(ret) == 0 {
-		panic("no return value specified for GetNextOrganizationBountyByCreated")
+		panic("no return value specified for GetNextWorkspaceBountyByCreated")
 	}
 
 	var r0 uint
@@ -3142,30 +3142,30 @@ func (_m *Database) GetNextOrganizationBountyByCreated(r *http.Request) (uint, e
 	return r0, r1
 }
 
-// Database_GetNextOrganizationBountyByCreated_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'GetNextOrganizationBountyByCreated'
-type Database_GetNextOrganizationBountyByCreated_Call struct {
+// Database_GetNextWorkspaceBountyByCreated_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'GetNextWorkspaceBountyByCreated'
+type Database_GetNextWorkspaceBountyByCreated_Call struct {
 	*mock.Call
 }
 
-// GetNextOrganizationBountyByCreated is a helper method to define mock.On call
+// GetNextWorkspaceBountyByCreated is a helper method to define mock.On call
 //   - r *http.Request
-func (_e *Database_Expecter) GetNextOrganizationBountyByCreated(r interface{}) *Database_GetNextOrganizationBountyByCreated_Call {
-	return &Database_GetNextOrganizationBountyByCreated_Call{Call: _e.mock.On("GetNextOrganizationBountyByCreated", r)}
+func (_e *Database_Expecter) GetNextWorkspaceBountyByCreated(r interface{}) *Database_GetNextWorkspaceBountyByCreated_Call {
+	return &Database_GetNextWorkspaceBountyByCreated_Call{Call: _e.mock.On("GetNextWorkspaceBountyByCreated", r)}
 }
 
-func (_c *Database_GetNextOrganizationBountyByCreated_Call) Run(run func(r *http.Request)) *Database_GetNextOrganizationBountyByCreated_Call {
+func (_c *Database_GetNextWorkspaceBountyByCreated_Call) Run(run func(r *http.Request)) *Database_GetNextWorkspaceBountyByCreated_Call {
 	_c.Call.Run(func(args mock.Arguments) {
 		run(args[0].(*http.Request))
 	})
 	return _c
 }
 
-func (_c *Database_GetNextOrganizationBountyByCreated_Call) Return(_a0 uint, _a1 error) *Database_GetNextOrganizationBountyByCreated_Call {
+func (_c *Database_GetNextWorkspaceBountyByCreated_Call) Return(_a0 uint, _a1 error) *Database_GetNextWorkspaceBountyByCreated_Call {
 	_c.Call.Return(_a0, _a1)
 	return _c
 }
 
-func (_c *Database_GetNextOrganizationBountyByCreated_Call) RunAndReturn(run func(*http.Request) (uint, error)) *Database_GetNextOrganizationBountyByCreated_Call {
+func (_c *Database_GetNextWorkspaceBountyByCreated_Call) RunAndReturn(run func(*http.Request) (uint, error)) *Database_GetNextWorkspaceBountyByCreated_Call {
 	_c.Call.Return(run)
 	return _c
 }
@@ -3222,718 +3222,6 @@ func (_c *Database_GetOpenGithubIssues_Call) Return(_a0 int64, _a1 error) *Datab
 }
 
 func (_c *Database_GetOpenGithubIssues_Call) RunAndReturn(run func(*http.Request) (int64, error)) *Database_GetOpenGithubIssues_Call {
-	_c.Call.Return(run)
-	return _c
-}
-
-// GetOrganizationBounties provides a mock function with given fields: r, org_uuid
-func (_m *Database) GetOrganizationBounties(r *http.Request, org_uuid string) []db.Bounty {
-	ret := _m.Called(r, org_uuid)
-
-	if len(ret) == 0 {
-		panic("no return value specified for GetOrganizationBounties")
-	}
-
-	var r0 []db.Bounty
-	if rf, ok := ret.Get(0).(func(*http.Request, string) []db.Bounty); ok {
-		r0 = rf(r, org_uuid)
-	} else {
-		if ret.Get(0) != nil {
-			r0 = ret.Get(0).([]db.Bounty)
-		}
-	}
-
-	return r0
-}
-
-// Database_GetOrganizationBounties_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'GetOrganizationBounties'
-type Database_GetOrganizationBounties_Call struct {
-	*mock.Call
-}
-
-// GetOrganizationBounties is a helper method to define mock.On call
-//   - r *http.Request
-//   - org_uuid string
-func (_e *Database_Expecter) GetOrganizationBounties(r interface{}, org_uuid interface{}) *Database_GetOrganizationBounties_Call {
-	return &Database_GetOrganizationBounties_Call{Call: _e.mock.On("GetOrganizationBounties", r, org_uuid)}
-}
-
-func (_c *Database_GetOrganizationBounties_Call) Run(run func(r *http.Request, org_uuid string)) *Database_GetOrganizationBounties_Call {
-	_c.Call.Run(func(args mock.Arguments) {
-		run(args[0].(*http.Request), args[1].(string))
-	})
-	return _c
-}
-
-func (_c *Database_GetOrganizationBounties_Call) Return(_a0 []db.Bounty) *Database_GetOrganizationBounties_Call {
-	_c.Call.Return(_a0)
-	return _c
-}
-
-func (_c *Database_GetOrganizationBounties_Call) RunAndReturn(run func(*http.Request, string) []db.Bounty) *Database_GetOrganizationBounties_Call {
-	_c.Call.Return(run)
-	return _c
-}
-
-// GetOrganizationBountiesCount provides a mock function with given fields: r, org_uuid
-func (_m *Database) GetOrganizationBountiesCount(r *http.Request, org_uuid string) int64 {
-	ret := _m.Called(r, org_uuid)
-
-	if len(ret) == 0 {
-		panic("no return value specified for GetOrganizationBountiesCount")
-	}
-
-	var r0 int64
-	if rf, ok := ret.Get(0).(func(*http.Request, string) int64); ok {
-		r0 = rf(r, org_uuid)
-	} else {
-		r0 = ret.Get(0).(int64)
-	}
-
-	return r0
-}
-
-// Database_GetOrganizationBountiesCount_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'GetOrganizationBountiesCount'
-type Database_GetOrganizationBountiesCount_Call struct {
-	*mock.Call
-}
-
-// GetOrganizationBountiesCount is a helper method to define mock.On call
-//   - r *http.Request
-//   - org_uuid string
-func (_e *Database_Expecter) GetOrganizationBountiesCount(r interface{}, org_uuid interface{}) *Database_GetOrganizationBountiesCount_Call {
-	return &Database_GetOrganizationBountiesCount_Call{Call: _e.mock.On("GetOrganizationBountiesCount", r, org_uuid)}
-}
-
-func (_c *Database_GetOrganizationBountiesCount_Call) Run(run func(r *http.Request, org_uuid string)) *Database_GetOrganizationBountiesCount_Call {
-	_c.Call.Run(func(args mock.Arguments) {
-		run(args[0].(*http.Request), args[1].(string))
-	})
-	return _c
-}
-
-func (_c *Database_GetOrganizationBountiesCount_Call) Return(_a0 int64) *Database_GetOrganizationBountiesCount_Call {
-	_c.Call.Return(_a0)
-	return _c
-}
-
-func (_c *Database_GetOrganizationBountiesCount_Call) RunAndReturn(run func(*http.Request, string) int64) *Database_GetOrganizationBountiesCount_Call {
-	_c.Call.Return(run)
-	return _c
-}
-
-// GetOrganizationBountyCount provides a mock function with given fields: uuid
-func (_m *Database) GetOrganizationBountyCount(uuid string) int64 {
-	ret := _m.Called(uuid)
-
-	if len(ret) == 0 {
-		panic("no return value specified for GetOrganizationBountyCount")
-	}
-
-	var r0 int64
-	if rf, ok := ret.Get(0).(func(string) int64); ok {
-		r0 = rf(uuid)
-	} else {
-		r0 = ret.Get(0).(int64)
-	}
-
-	return r0
-}
-
-// Database_GetOrganizationBountyCount_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'GetOrganizationBountyCount'
-type Database_GetOrganizationBountyCount_Call struct {
-	*mock.Call
-}
-
-// GetOrganizationBountyCount is a helper method to define mock.On call
-//   - uuid string
-func (_e *Database_Expecter) GetOrganizationBountyCount(uuid interface{}) *Database_GetOrganizationBountyCount_Call {
-	return &Database_GetOrganizationBountyCount_Call{Call: _e.mock.On("GetOrganizationBountyCount", uuid)}
-}
-
-func (_c *Database_GetOrganizationBountyCount_Call) Run(run func(uuid string)) *Database_GetOrganizationBountyCount_Call {
-	_c.Call.Run(func(args mock.Arguments) {
-		run(args[0].(string))
-	})
-	return _c
-}
-
-func (_c *Database_GetOrganizationBountyCount_Call) Return(_a0 int64) *Database_GetOrganizationBountyCount_Call {
-	_c.Call.Return(_a0)
-	return _c
-}
-
-func (_c *Database_GetOrganizationBountyCount_Call) RunAndReturn(run func(string) int64) *Database_GetOrganizationBountyCount_Call {
-	_c.Call.Return(run)
-	return _c
-}
-
-// GetOrganizationBudget provides a mock function with given fields: org_uuid
-func (_m *Database) GetOrganizationBudget(org_uuid string) db.BountyBudget {
-	ret := _m.Called(org_uuid)
-
-	if len(ret) == 0 {
-		panic("no return value specified for GetOrganizationBudget")
-	}
-
-	var r0 db.BountyBudget
-	if rf, ok := ret.Get(0).(func(string) db.BountyBudget); ok {
-		r0 = rf(org_uuid)
-	} else {
-		r0 = ret.Get(0).(db.BountyBudget)
-	}
-
-	return r0
-}
-
-// Database_GetOrganizationBudget_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'GetOrganizationBudget'
-type Database_GetOrganizationBudget_Call struct {
-	*mock.Call
-}
-
-// GetOrganizationBudget is a helper method to define mock.On call
-//   - org_uuid string
-func (_e *Database_Expecter) GetOrganizationBudget(org_uuid interface{}) *Database_GetOrganizationBudget_Call {
-	return &Database_GetOrganizationBudget_Call{Call: _e.mock.On("GetOrganizationBudget", org_uuid)}
-}
-
-func (_c *Database_GetOrganizationBudget_Call) Run(run func(org_uuid string)) *Database_GetOrganizationBudget_Call {
-	_c.Call.Run(func(args mock.Arguments) {
-		run(args[0].(string))
-	})
-	return _c
-}
-
-func (_c *Database_GetOrganizationBudget_Call) Return(_a0 db.BountyBudget) *Database_GetOrganizationBudget_Call {
-	_c.Call.Return(_a0)
-	return _c
-}
-
-func (_c *Database_GetOrganizationBudget_Call) RunAndReturn(run func(string) db.BountyBudget) *Database_GetOrganizationBudget_Call {
-	_c.Call.Return(run)
-	return _c
-}
-
-// GetOrganizationBudgetHistory provides a mock function with given fields: org_uuid
-func (_m *Database) GetOrganizationBudgetHistory(org_uuid string) []db.BudgetHistoryData {
-	ret := _m.Called(org_uuid)
-
-	if len(ret) == 0 {
-		panic("no return value specified for GetOrganizationBudgetHistory")
-	}
-
-	var r0 []db.BudgetHistoryData
-	if rf, ok := ret.Get(0).(func(string) []db.BudgetHistoryData); ok {
-		r0 = rf(org_uuid)
-	} else {
-		if ret.Get(0) != nil {
-			r0 = ret.Get(0).([]db.BudgetHistoryData)
-		}
-	}
-
-	return r0
-}
-
-// Database_GetOrganizationBudgetHistory_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'GetOrganizationBudgetHistory'
-type Database_GetOrganizationBudgetHistory_Call struct {
-	*mock.Call
-}
-
-// GetOrganizationBudgetHistory is a helper method to define mock.On call
-//   - org_uuid string
-func (_e *Database_Expecter) GetOrganizationBudgetHistory(org_uuid interface{}) *Database_GetOrganizationBudgetHistory_Call {
-	return &Database_GetOrganizationBudgetHistory_Call{Call: _e.mock.On("GetOrganizationBudgetHistory", org_uuid)}
-}
-
-func (_c *Database_GetOrganizationBudgetHistory_Call) Run(run func(org_uuid string)) *Database_GetOrganizationBudgetHistory_Call {
-	_c.Call.Run(func(args mock.Arguments) {
-		run(args[0].(string))
-	})
-	return _c
-}
-
-func (_c *Database_GetOrganizationBudgetHistory_Call) Return(_a0 []db.BudgetHistoryData) *Database_GetOrganizationBudgetHistory_Call {
-	_c.Call.Return(_a0)
-	return _c
-}
-
-func (_c *Database_GetOrganizationBudgetHistory_Call) RunAndReturn(run func(string) []db.BudgetHistoryData) *Database_GetOrganizationBudgetHistory_Call {
-	_c.Call.Return(run)
-	return _c
-}
-
-// GetOrganizationByName provides a mock function with given fields: name
-func (_m *Database) GetOrganizationByName(name string) db.Organization {
-	ret := _m.Called(name)
-
-	if len(ret) == 0 {
-		panic("no return value specified for GetOrganizationByName")
-	}
-
-	var r0 db.Organization
-	if rf, ok := ret.Get(0).(func(string) db.Organization); ok {
-		r0 = rf(name)
-	} else {
-		r0 = ret.Get(0).(db.Organization)
-	}
-
-	return r0
-}
-
-// Database_GetOrganizationByName_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'GetOrganizationByName'
-type Database_GetOrganizationByName_Call struct {
-	*mock.Call
-}
-
-// GetOrganizationByName is a helper method to define mock.On call
-//   - name string
-func (_e *Database_Expecter) GetOrganizationByName(name interface{}) *Database_GetOrganizationByName_Call {
-	return &Database_GetOrganizationByName_Call{Call: _e.mock.On("GetOrganizationByName", name)}
-}
-
-func (_c *Database_GetOrganizationByName_Call) Run(run func(name string)) *Database_GetOrganizationByName_Call {
-	_c.Call.Run(func(args mock.Arguments) {
-		run(args[0].(string))
-	})
-	return _c
-}
-
-func (_c *Database_GetOrganizationByName_Call) Return(_a0 db.Organization) *Database_GetOrganizationByName_Call {
-	_c.Call.Return(_a0)
-	return _c
-}
-
-func (_c *Database_GetOrganizationByName_Call) RunAndReturn(run func(string) db.Organization) *Database_GetOrganizationByName_Call {
-	_c.Call.Return(run)
-	return _c
-}
-
-// GetOrganizationByUuid provides a mock function with given fields: uuid
-func (_m *Database) GetOrganizationByUuid(uuid string) db.Organization {
-	ret := _m.Called(uuid)
-
-	if len(ret) == 0 {
-		panic("no return value specified for GetOrganizationByUuid")
-	}
-
-	var r0 db.Organization
-	if rf, ok := ret.Get(0).(func(string) db.Organization); ok {
-		r0 = rf(uuid)
-	} else {
-		r0 = ret.Get(0).(db.Organization)
-	}
-
-	return r0
-}
-
-// Database_GetOrganizationByUuid_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'GetOrganizationByUuid'
-type Database_GetOrganizationByUuid_Call struct {
-	*mock.Call
-}
-
-// GetOrganizationByUuid is a helper method to define mock.On call
-//   - uuid string
-func (_e *Database_Expecter) GetOrganizationByUuid(uuid interface{}) *Database_GetOrganizationByUuid_Call {
-	return &Database_GetOrganizationByUuid_Call{Call: _e.mock.On("GetOrganizationByUuid", uuid)}
-}
-
-func (_c *Database_GetOrganizationByUuid_Call) Run(run func(uuid string)) *Database_GetOrganizationByUuid_Call {
-	_c.Call.Run(func(args mock.Arguments) {
-		run(args[0].(string))
-	})
-	return _c
-}
-
-func (_c *Database_GetOrganizationByUuid_Call) Return(_a0 db.Organization) *Database_GetOrganizationByUuid_Call {
-	_c.Call.Return(_a0)
-	return _c
-}
-
-func (_c *Database_GetOrganizationByUuid_Call) RunAndReturn(run func(string) db.Organization) *Database_GetOrganizationByUuid_Call {
-	_c.Call.Return(run)
-	return _c
-}
-
-// GetOrganizationInvoices provides a mock function with given fields: org_uuid
-func (_m *Database) GetOrganizationInvoices(org_uuid string) []db.InvoiceList {
-	ret := _m.Called(org_uuid)
-
-	if len(ret) == 0 {
-		panic("no return value specified for GetOrganizationInvoices")
-	}
-
-	var r0 []db.InvoiceList
-	if rf, ok := ret.Get(0).(func(string) []db.InvoiceList); ok {
-		r0 = rf(org_uuid)
-	} else {
-		if ret.Get(0) != nil {
-			r0 = ret.Get(0).([]db.InvoiceList)
-		}
-	}
-
-	return r0
-}
-
-// Database_GetOrganizationInvoices_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'GetOrganizationInvoices'
-type Database_GetOrganizationInvoices_Call struct {
-	*mock.Call
-}
-
-// GetOrganizationInvoices is a helper method to define mock.On call
-//   - org_uuid string
-func (_e *Database_Expecter) GetOrganizationInvoices(org_uuid interface{}) *Database_GetOrganizationInvoices_Call {
-	return &Database_GetOrganizationInvoices_Call{Call: _e.mock.On("GetOrganizationInvoices", org_uuid)}
-}
-
-func (_c *Database_GetOrganizationInvoices_Call) Run(run func(org_uuid string)) *Database_GetOrganizationInvoices_Call {
-	_c.Call.Run(func(args mock.Arguments) {
-		run(args[0].(string))
-	})
-	return _c
-}
-
-func (_c *Database_GetOrganizationInvoices_Call) Return(_a0 []db.InvoiceList) *Database_GetOrganizationInvoices_Call {
-	_c.Call.Return(_a0)
-	return _c
-}
-
-func (_c *Database_GetOrganizationInvoices_Call) RunAndReturn(run func(string) []db.InvoiceList) *Database_GetOrganizationInvoices_Call {
-	_c.Call.Return(run)
-	return _c
-}
-
-// GetOrganizationInvoicesCount provides a mock function with given fields: org_uuid
-func (_m *Database) GetOrganizationInvoicesCount(org_uuid string) int64 {
-	ret := _m.Called(org_uuid)
-
-	if len(ret) == 0 {
-		panic("no return value specified for GetOrganizationInvoicesCount")
-	}
-
-	var r0 int64
-	if rf, ok := ret.Get(0).(func(string) int64); ok {
-		r0 = rf(org_uuid)
-	} else {
-		r0 = ret.Get(0).(int64)
-	}
-
-	return r0
-}
-
-// Database_GetOrganizationInvoicesCount_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'GetOrganizationInvoicesCount'
-type Database_GetOrganizationInvoicesCount_Call struct {
-	*mock.Call
-}
-
-// GetOrganizationInvoicesCount is a helper method to define mock.On call
-//   - org_uuid string
-func (_e *Database_Expecter) GetOrganizationInvoicesCount(org_uuid interface{}) *Database_GetOrganizationInvoicesCount_Call {
-	return &Database_GetOrganizationInvoicesCount_Call{Call: _e.mock.On("GetOrganizationInvoicesCount", org_uuid)}
-}
-
-func (_c *Database_GetOrganizationInvoicesCount_Call) Run(run func(org_uuid string)) *Database_GetOrganizationInvoicesCount_Call {
-	_c.Call.Run(func(args mock.Arguments) {
-		run(args[0].(string))
-	})
-	return _c
-}
-
-func (_c *Database_GetOrganizationInvoicesCount_Call) Return(_a0 int64) *Database_GetOrganizationInvoicesCount_Call {
-	_c.Call.Return(_a0)
-	return _c
-}
-
-func (_c *Database_GetOrganizationInvoicesCount_Call) RunAndReturn(run func(string) int64) *Database_GetOrganizationInvoicesCount_Call {
-	_c.Call.Return(run)
-	return _c
-}
-
-// GetOrganizationStatusBudget provides a mock function with given fields: org_uuid
-func (_m *Database) GetOrganizationStatusBudget(org_uuid string) db.StatusBudget {
-	ret := _m.Called(org_uuid)
-
-	if len(ret) == 0 {
-		panic("no return value specified for GetOrganizationStatusBudget")
-	}
-
-	var r0 db.StatusBudget
-	if rf, ok := ret.Get(0).(func(string) db.StatusBudget); ok {
-		r0 = rf(org_uuid)
-	} else {
-		r0 = ret.Get(0).(db.StatusBudget)
-	}
-
-	return r0
-}
-
-// Database_GetOrganizationStatusBudget_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'GetOrganizationStatusBudget'
-type Database_GetOrganizationStatusBudget_Call struct {
-	*mock.Call
-}
-
-// GetOrganizationStatusBudget is a helper method to define mock.On call
-//   - org_uuid string
-func (_e *Database_Expecter) GetOrganizationStatusBudget(org_uuid interface{}) *Database_GetOrganizationStatusBudget_Call {
-	return &Database_GetOrganizationStatusBudget_Call{Call: _e.mock.On("GetOrganizationStatusBudget", org_uuid)}
-}
-
-func (_c *Database_GetOrganizationStatusBudget_Call) Run(run func(org_uuid string)) *Database_GetOrganizationStatusBudget_Call {
-	_c.Call.Run(func(args mock.Arguments) {
-		run(args[0].(string))
-	})
-	return _c
-}
-
-func (_c *Database_GetOrganizationStatusBudget_Call) Return(_a0 db.StatusBudget) *Database_GetOrganizationStatusBudget_Call {
-	_c.Call.Return(_a0)
-	return _c
-}
-
-func (_c *Database_GetOrganizationStatusBudget_Call) RunAndReturn(run func(string) db.StatusBudget) *Database_GetOrganizationStatusBudget_Call {
-	_c.Call.Return(run)
-	return _c
-}
-
-// GetOrganizationUser provides a mock function with given fields: pubkey, org_uuid
-func (_m *Database) GetOrganizationUser(pubkey string, org_uuid string) db.OrganizationUsers {
-	ret := _m.Called(pubkey, org_uuid)
-
-	if len(ret) == 0 {
-		panic("no return value specified for GetOrganizationUser")
-	}
-
-	var r0 db.OrganizationUsers
-	if rf, ok := ret.Get(0).(func(string, string) db.OrganizationUsers); ok {
-		r0 = rf(pubkey, org_uuid)
-	} else {
-		r0 = ret.Get(0).(db.OrganizationUsers)
-	}
-
-	return r0
-}
-
-// Database_GetOrganizationUser_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'GetOrganizationUser'
-type Database_GetOrganizationUser_Call struct {
-	*mock.Call
-}
-
-// GetOrganizationUser is a helper method to define mock.On call
-//   - pubkey string
-//   - org_uuid string
-func (_e *Database_Expecter) GetOrganizationUser(pubkey interface{}, org_uuid interface{}) *Database_GetOrganizationUser_Call {
-	return &Database_GetOrganizationUser_Call{Call: _e.mock.On("GetOrganizationUser", pubkey, org_uuid)}
-}
-
-func (_c *Database_GetOrganizationUser_Call) Run(run func(pubkey string, org_uuid string)) *Database_GetOrganizationUser_Call {
-	_c.Call.Run(func(args mock.Arguments) {
-		run(args[0].(string), args[1].(string))
-	})
-	return _c
-}
-
-func (_c *Database_GetOrganizationUser_Call) Return(_a0 db.OrganizationUsers) *Database_GetOrganizationUser_Call {
-	_c.Call.Return(_a0)
-	return _c
-}
-
-func (_c *Database_GetOrganizationUser_Call) RunAndReturn(run func(string, string) db.OrganizationUsers) *Database_GetOrganizationUser_Call {
-	_c.Call.Return(run)
-	return _c
-}
-
-// GetOrganizationUsers provides a mock function with given fields: uuid
-func (_m *Database) GetOrganizationUsers(uuid string) ([]db.OrganizationUsersData, error) {
-	ret := _m.Called(uuid)
-
-	if len(ret) == 0 {
-		panic("no return value specified for GetOrganizationUsers")
-	}
-
-	var r0 []db.OrganizationUsersData
-	var r1 error
-	if rf, ok := ret.Get(0).(func(string) ([]db.OrganizationUsersData, error)); ok {
-		return rf(uuid)
-	}
-	if rf, ok := ret.Get(0).(func(string) []db.OrganizationUsersData); ok {
-		r0 = rf(uuid)
-	} else {
-		if ret.Get(0) != nil {
-			r0 = ret.Get(0).([]db.OrganizationUsersData)
-		}
-	}
-
-	if rf, ok := ret.Get(1).(func(string) error); ok {
-		r1 = rf(uuid)
-	} else {
-		r1 = ret.Error(1)
-	}
-
-	return r0, r1
-}
-
-// Database_GetOrganizationUsers_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'GetOrganizationUsers'
-type Database_GetOrganizationUsers_Call struct {
-	*mock.Call
-}
-
-// GetOrganizationUsers is a helper method to define mock.On call
-//   - uuid string
-func (_e *Database_Expecter) GetOrganizationUsers(uuid interface{}) *Database_GetOrganizationUsers_Call {
-	return &Database_GetOrganizationUsers_Call{Call: _e.mock.On("GetOrganizationUsers", uuid)}
-}
-
-func (_c *Database_GetOrganizationUsers_Call) Run(run func(uuid string)) *Database_GetOrganizationUsers_Call {
-	_c.Call.Run(func(args mock.Arguments) {
-		run(args[0].(string))
-	})
-	return _c
-}
-
-func (_c *Database_GetOrganizationUsers_Call) Return(_a0 []db.OrganizationUsersData, _a1 error) *Database_GetOrganizationUsers_Call {
-	_c.Call.Return(_a0, _a1)
-	return _c
-}
-
-func (_c *Database_GetOrganizationUsers_Call) RunAndReturn(run func(string) ([]db.OrganizationUsersData, error)) *Database_GetOrganizationUsers_Call {
-	_c.Call.Return(run)
-	return _c
-}
-
-// GetOrganizationUsersCount provides a mock function with given fields: uuid
-func (_m *Database) GetOrganizationUsersCount(uuid string) int64 {
-	ret := _m.Called(uuid)
-
-	if len(ret) == 0 {
-		panic("no return value specified for GetOrganizationUsersCount")
-	}
-
-	var r0 int64
-	if rf, ok := ret.Get(0).(func(string) int64); ok {
-		r0 = rf(uuid)
-	} else {
-		r0 = ret.Get(0).(int64)
-	}
-
-	return r0
-}
-
-// Database_GetOrganizationUsersCount_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'GetOrganizationUsersCount'
-type Database_GetOrganizationUsersCount_Call struct {
-	*mock.Call
-}
-
-// GetOrganizationUsersCount is a helper method to define mock.On call
-//   - uuid string
-func (_e *Database_Expecter) GetOrganizationUsersCount(uuid interface{}) *Database_GetOrganizationUsersCount_Call {
-	return &Database_GetOrganizationUsersCount_Call{Call: _e.mock.On("GetOrganizationUsersCount", uuid)}
-}
-
-func (_c *Database_GetOrganizationUsersCount_Call) Run(run func(uuid string)) *Database_GetOrganizationUsersCount_Call {
-	_c.Call.Run(func(args mock.Arguments) {
-		run(args[0].(string))
-	})
-	return _c
-}
-
-func (_c *Database_GetOrganizationUsersCount_Call) Return(_a0 int64) *Database_GetOrganizationUsersCount_Call {
-	_c.Call.Return(_a0)
-	return _c
-}
-
-func (_c *Database_GetOrganizationUsersCount_Call) RunAndReturn(run func(string) int64) *Database_GetOrganizationUsersCount_Call {
-	_c.Call.Return(run)
-	return _c
-}
-
-// GetOrganizations provides a mock function with given fields: r
-func (_m *Database) GetOrganizations(r *http.Request) []db.Organization {
-	ret := _m.Called(r)
-
-	if len(ret) == 0 {
-		panic("no return value specified for GetOrganizations")
-	}
-
-	var r0 []db.Organization
-	if rf, ok := ret.Get(0).(func(*http.Request) []db.Organization); ok {
-		r0 = rf(r)
-	} else {
-		if ret.Get(0) != nil {
-			r0 = ret.Get(0).([]db.Organization)
-		}
-	}
-
-	return r0
-}
-
-// Database_GetOrganizations_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'GetOrganizations'
-type Database_GetOrganizations_Call struct {
-	*mock.Call
-}
-
-// GetOrganizations is a helper method to define mock.On call
-//   - r *http.Request
-func (_e *Database_Expecter) GetOrganizations(r interface{}) *Database_GetOrganizations_Call {
-	return &Database_GetOrganizations_Call{Call: _e.mock.On("GetOrganizations", r)}
-}
-
-func (_c *Database_GetOrganizations_Call) Run(run func(r *http.Request)) *Database_GetOrganizations_Call {
-	_c.Call.Run(func(args mock.Arguments) {
-		run(args[0].(*http.Request))
-	})
-	return _c
-}
-
-func (_c *Database_GetOrganizations_Call) Return(_a0 []db.Organization) *Database_GetOrganizations_Call {
-	_c.Call.Return(_a0)
-	return _c
-}
-
-func (_c *Database_GetOrganizations_Call) RunAndReturn(run func(*http.Request) []db.Organization) *Database_GetOrganizations_Call {
-	_c.Call.Return(run)
-	return _c
-}
-
-// GetOrganizationsCount provides a mock function with given fields:
-func (_m *Database) GetOrganizationsCount() int64 {
-	ret := _m.Called()
-
-	if len(ret) == 0 {
-		panic("no return value specified for GetOrganizationsCount")
-	}
-
-	var r0 int64
-	if rf, ok := ret.Get(0).(func() int64); ok {
-		r0 = rf()
-	} else {
-		r0 = ret.Get(0).(int64)
-	}
-
-	return r0
-}
-
-// Database_GetOrganizationsCount_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'GetOrganizationsCount'
-type Database_GetOrganizationsCount_Call struct {
-	*mock.Call
-}
-
-// GetOrganizationsCount is a helper method to define mock.On call
-func (_e *Database_Expecter) GetOrganizationsCount() *Database_GetOrganizationsCount_Call {
-	return &Database_GetOrganizationsCount_Call{Call: _e.mock.On("GetOrganizationsCount")}
-}
-
-func (_c *Database_GetOrganizationsCount_Call) Run(run func()) *Database_GetOrganizationsCount_Call {
-	_c.Call.Run(func(args mock.Arguments) {
-		run()
-	})
-	return _c
-}
-
-func (_c *Database_GetOrganizationsCount_Call) Return(_a0 int64) *Database_GetOrganizationsCount_Call {
-	_c.Call.Return(_a0)
-	return _c
-}
-
-func (_c *Database_GetOrganizationsCount_Call) RunAndReturn(run func() int64) *Database_GetOrganizationsCount_Call {
 	_c.Call.Return(run)
 	return _c
 }
@@ -4416,12 +3704,12 @@ func (_c *Database_GetPreviousBountyByCreated_Call) RunAndReturn(run func(*http.
 	return _c
 }
 
-// GetPreviousOrganizationBountyByCreated provides a mock function with given fields: r
-func (_m *Database) GetPreviousOrganizationBountyByCreated(r *http.Request) (uint, error) {
+// GetPreviousWorkspaceBountyByCreated provides a mock function with given fields: r
+func (_m *Database) GetPreviousWorkspaceBountyByCreated(r *http.Request) (uint, error) {
 	ret := _m.Called(r)
 
 	if len(ret) == 0 {
-		panic("no return value specified for GetPreviousOrganizationBountyByCreated")
+		panic("no return value specified for GetPreviousWorkspaceBountyByCreated")
 	}
 
 	var r0 uint
@@ -4444,30 +3732,30 @@ func (_m *Database) GetPreviousOrganizationBountyByCreated(r *http.Request) (uin
 	return r0, r1
 }
 
-// Database_GetPreviousOrganizationBountyByCreated_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'GetPreviousOrganizationBountyByCreated'
-type Database_GetPreviousOrganizationBountyByCreated_Call struct {
+// Database_GetPreviousWorkspaceBountyByCreated_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'GetPreviousWorkspaceBountyByCreated'
+type Database_GetPreviousWorkspaceBountyByCreated_Call struct {
 	*mock.Call
 }
 
-// GetPreviousOrganizationBountyByCreated is a helper method to define mock.On call
+// GetPreviousWorkspaceBountyByCreated is a helper method to define mock.On call
 //   - r *http.Request
-func (_e *Database_Expecter) GetPreviousOrganizationBountyByCreated(r interface{}) *Database_GetPreviousOrganizationBountyByCreated_Call {
-	return &Database_GetPreviousOrganizationBountyByCreated_Call{Call: _e.mock.On("GetPreviousOrganizationBountyByCreated", r)}
+func (_e *Database_Expecter) GetPreviousWorkspaceBountyByCreated(r interface{}) *Database_GetPreviousWorkspaceBountyByCreated_Call {
+	return &Database_GetPreviousWorkspaceBountyByCreated_Call{Call: _e.mock.On("GetPreviousWorkspaceBountyByCreated", r)}
 }
 
-func (_c *Database_GetPreviousOrganizationBountyByCreated_Call) Run(run func(r *http.Request)) *Database_GetPreviousOrganizationBountyByCreated_Call {
+func (_c *Database_GetPreviousWorkspaceBountyByCreated_Call) Run(run func(r *http.Request)) *Database_GetPreviousWorkspaceBountyByCreated_Call {
 	_c.Call.Run(func(args mock.Arguments) {
 		run(args[0].(*http.Request))
 	})
 	return _c
 }
 
-func (_c *Database_GetPreviousOrganizationBountyByCreated_Call) Return(_a0 uint, _a1 error) *Database_GetPreviousOrganizationBountyByCreated_Call {
+func (_c *Database_GetPreviousWorkspaceBountyByCreated_Call) Return(_a0 uint, _a1 error) *Database_GetPreviousWorkspaceBountyByCreated_Call {
 	_c.Call.Return(_a0, _a1)
 	return _c
 }
 
-func (_c *Database_GetPreviousOrganizationBountyByCreated_Call) RunAndReturn(run func(*http.Request) (uint, error)) *Database_GetPreviousOrganizationBountyByCreated_Call {
+func (_c *Database_GetPreviousWorkspaceBountyByCreated_Call) RunAndReturn(run func(*http.Request) (uint, error)) *Database_GetPreviousWorkspaceBountyByCreated_Call {
 	_c.Call.Return(run)
 	return _c
 }
@@ -4846,12 +4134,12 @@ func (_c *Database_GetUnconfirmedTwitter_Call) RunAndReturn(run func() []db.Pers
 	return _c
 }
 
-// GetUserAssignedOrganizations provides a mock function with given fields: pubkey
-func (_m *Database) GetUserAssignedOrganizations(pubkey string) []db.OrganizationUsers {
+// GetUserAssignedWorkspaces provides a mock function with given fields: pubkey
+func (_m *Database) GetUserAssignedWorkspaces(pubkey string) []db.OrganizationUsers {
 	ret := _m.Called(pubkey)
 
 	if len(ret) == 0 {
-		panic("no return value specified for GetUserAssignedOrganizations")
+		panic("no return value specified for GetUserAssignedWorkspaces")
 	}
 
 	var r0 []db.OrganizationUsers
@@ -4866,30 +4154,30 @@ func (_m *Database) GetUserAssignedOrganizations(pubkey string) []db.Organizatio
 	return r0
 }
 
-// Database_GetUserAssignedOrganizations_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'GetUserAssignedOrganizations'
-type Database_GetUserAssignedOrganizations_Call struct {
+// Database_GetUserAssignedWorkspaces_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'GetUserAssignedWorkspaces'
+type Database_GetUserAssignedWorkspaces_Call struct {
 	*mock.Call
 }
 
-// GetUserAssignedOrganizations is a helper method to define mock.On call
+// GetUserAssignedWorkspaces is a helper method to define mock.On call
 //   - pubkey string
-func (_e *Database_Expecter) GetUserAssignedOrganizations(pubkey interface{}) *Database_GetUserAssignedOrganizations_Call {
-	return &Database_GetUserAssignedOrganizations_Call{Call: _e.mock.On("GetUserAssignedOrganizations", pubkey)}
+func (_e *Database_Expecter) GetUserAssignedWorkspaces(pubkey interface{}) *Database_GetUserAssignedWorkspaces_Call {
+	return &Database_GetUserAssignedWorkspaces_Call{Call: _e.mock.On("GetUserAssignedWorkspaces", pubkey)}
 }
 
-func (_c *Database_GetUserAssignedOrganizations_Call) Run(run func(pubkey string)) *Database_GetUserAssignedOrganizations_Call {
+func (_c *Database_GetUserAssignedWorkspaces_Call) Run(run func(pubkey string)) *Database_GetUserAssignedWorkspaces_Call {
 	_c.Call.Run(func(args mock.Arguments) {
 		run(args[0].(string))
 	})
 	return _c
 }
 
-func (_c *Database_GetUserAssignedOrganizations_Call) Return(_a0 []db.OrganizationUsers) *Database_GetUserAssignedOrganizations_Call {
+func (_c *Database_GetUserAssignedWorkspaces_Call) Return(_a0 []db.OrganizationUsers) *Database_GetUserAssignedWorkspaces_Call {
 	_c.Call.Return(_a0)
 	return _c
 }
 
-func (_c *Database_GetUserAssignedOrganizations_Call) RunAndReturn(run func(string) []db.OrganizationUsers) *Database_GetUserAssignedOrganizations_Call {
+func (_c *Database_GetUserAssignedWorkspaces_Call) RunAndReturn(run func(string) []db.OrganizationUsers) *Database_GetUserAssignedWorkspaces_Call {
 	_c.Call.Return(run)
 	return _c
 }
@@ -4941,12 +4229,12 @@ func (_c *Database_GetUserBountiesCount_Call) RunAndReturn(run func(string, stri
 	return _c
 }
 
-// GetUserCreatedOrganizations provides a mock function with given fields: pubkey
-func (_m *Database) GetUserCreatedOrganizations(pubkey string) []db.Organization {
+// GetUserCreatedWorkspaces provides a mock function with given fields: pubkey
+func (_m *Database) GetUserCreatedWorkspaces(pubkey string) []db.Organization {
 	ret := _m.Called(pubkey)
 
 	if len(ret) == 0 {
-		panic("no return value specified for GetUserCreatedOrganizations")
+		panic("no return value specified for GetUserCreatedWorkspaces")
 	}
 
 	var r0 []db.Organization
@@ -4961,30 +4249,30 @@ func (_m *Database) GetUserCreatedOrganizations(pubkey string) []db.Organization
 	return r0
 }
 
-// Database_GetUserCreatedOrganizations_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'GetUserCreatedOrganizations'
-type Database_GetUserCreatedOrganizations_Call struct {
+// Database_GetUserCreatedWorkspaces_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'GetUserCreatedWorkspaces'
+type Database_GetUserCreatedWorkspaces_Call struct {
 	*mock.Call
 }
 
-// GetUserCreatedOrganizations is a helper method to define mock.On call
+// GetUserCreatedWorkspaces is a helper method to define mock.On call
 //   - pubkey string
-func (_e *Database_Expecter) GetUserCreatedOrganizations(pubkey interface{}) *Database_GetUserCreatedOrganizations_Call {
-	return &Database_GetUserCreatedOrganizations_Call{Call: _e.mock.On("GetUserCreatedOrganizations", pubkey)}
+func (_e *Database_Expecter) GetUserCreatedWorkspaces(pubkey interface{}) *Database_GetUserCreatedWorkspaces_Call {
+	return &Database_GetUserCreatedWorkspaces_Call{Call: _e.mock.On("GetUserCreatedWorkspaces", pubkey)}
 }
 
-func (_c *Database_GetUserCreatedOrganizations_Call) Run(run func(pubkey string)) *Database_GetUserCreatedOrganizations_Call {
+func (_c *Database_GetUserCreatedWorkspaces_Call) Run(run func(pubkey string)) *Database_GetUserCreatedWorkspaces_Call {
 	_c.Call.Run(func(args mock.Arguments) {
 		run(args[0].(string))
 	})
 	return _c
 }
 
-func (_c *Database_GetUserCreatedOrganizations_Call) Return(_a0 []db.Organization) *Database_GetUserCreatedOrganizations_Call {
+func (_c *Database_GetUserCreatedWorkspaces_Call) Return(_a0 []db.Organization) *Database_GetUserCreatedWorkspaces_Call {
 	_c.Call.Return(_a0)
 	return _c
 }
 
-func (_c *Database_GetUserCreatedOrganizations_Call) RunAndReturn(run func(string) []db.Organization) *Database_GetUserCreatedOrganizations_Call {
+func (_c *Database_GetUserCreatedWorkspaces_Call) RunAndReturn(run func(string) []db.Organization) *Database_GetUserCreatedWorkspaces_Call {
 	_c.Call.Return(run)
 	return _c
 }
@@ -5031,6 +4319,718 @@ func (_c *Database_GetUserInvoiceData_Call) Return(_a0 db.UserInvoiceData) *Data
 }
 
 func (_c *Database_GetUserInvoiceData_Call) RunAndReturn(run func(string) db.UserInvoiceData) *Database_GetUserInvoiceData_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
+// GetWorkspaceBounties provides a mock function with given fields: r, org_uuid
+func (_m *Database) GetWorkspaceBounties(r *http.Request, org_uuid string) []db.Bounty {
+	ret := _m.Called(r, org_uuid)
+
+	if len(ret) == 0 {
+		panic("no return value specified for GetWorkspaceBounties")
+	}
+
+	var r0 []db.Bounty
+	if rf, ok := ret.Get(0).(func(*http.Request, string) []db.Bounty); ok {
+		r0 = rf(r, org_uuid)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).([]db.Bounty)
+		}
+	}
+
+	return r0
+}
+
+// Database_GetWorkspaceBounties_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'GetWorkspaceBounties'
+type Database_GetWorkspaceBounties_Call struct {
+	*mock.Call
+}
+
+// GetWorkspaceBounties is a helper method to define mock.On call
+//   - r *http.Request
+//   - org_uuid string
+func (_e *Database_Expecter) GetWorkspaceBounties(r interface{}, org_uuid interface{}) *Database_GetWorkspaceBounties_Call {
+	return &Database_GetWorkspaceBounties_Call{Call: _e.mock.On("GetWorkspaceBounties", r, org_uuid)}
+}
+
+func (_c *Database_GetWorkspaceBounties_Call) Run(run func(r *http.Request, org_uuid string)) *Database_GetWorkspaceBounties_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(*http.Request), args[1].(string))
+	})
+	return _c
+}
+
+func (_c *Database_GetWorkspaceBounties_Call) Return(_a0 []db.Bounty) *Database_GetWorkspaceBounties_Call {
+	_c.Call.Return(_a0)
+	return _c
+}
+
+func (_c *Database_GetWorkspaceBounties_Call) RunAndReturn(run func(*http.Request, string) []db.Bounty) *Database_GetWorkspaceBounties_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
+// GetWorkspaceBountiesCount provides a mock function with given fields: r, org_uuid
+func (_m *Database) GetWorkspaceBountiesCount(r *http.Request, org_uuid string) int64 {
+	ret := _m.Called(r, org_uuid)
+
+	if len(ret) == 0 {
+		panic("no return value specified for GetWorkspaceBountiesCount")
+	}
+
+	var r0 int64
+	if rf, ok := ret.Get(0).(func(*http.Request, string) int64); ok {
+		r0 = rf(r, org_uuid)
+	} else {
+		r0 = ret.Get(0).(int64)
+	}
+
+	return r0
+}
+
+// Database_GetWorkspaceBountiesCount_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'GetWorkspaceBountiesCount'
+type Database_GetWorkspaceBountiesCount_Call struct {
+	*mock.Call
+}
+
+// GetWorkspaceBountiesCount is a helper method to define mock.On call
+//   - r *http.Request
+//   - org_uuid string
+func (_e *Database_Expecter) GetWorkspaceBountiesCount(r interface{}, org_uuid interface{}) *Database_GetWorkspaceBountiesCount_Call {
+	return &Database_GetWorkspaceBountiesCount_Call{Call: _e.mock.On("GetWorkspaceBountiesCount", r, org_uuid)}
+}
+
+func (_c *Database_GetWorkspaceBountiesCount_Call) Run(run func(r *http.Request, org_uuid string)) *Database_GetWorkspaceBountiesCount_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(*http.Request), args[1].(string))
+	})
+	return _c
+}
+
+func (_c *Database_GetWorkspaceBountiesCount_Call) Return(_a0 int64) *Database_GetWorkspaceBountiesCount_Call {
+	_c.Call.Return(_a0)
+	return _c
+}
+
+func (_c *Database_GetWorkspaceBountiesCount_Call) RunAndReturn(run func(*http.Request, string) int64) *Database_GetWorkspaceBountiesCount_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
+// GetWorkspaceBountyCount provides a mock function with given fields: uuid
+func (_m *Database) GetWorkspaceBountyCount(uuid string) int64 {
+	ret := _m.Called(uuid)
+
+	if len(ret) == 0 {
+		panic("no return value specified for GetWorkspaceBountyCount")
+	}
+
+	var r0 int64
+	if rf, ok := ret.Get(0).(func(string) int64); ok {
+		r0 = rf(uuid)
+	} else {
+		r0 = ret.Get(0).(int64)
+	}
+
+	return r0
+}
+
+// Database_GetWorkspaceBountyCount_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'GetWorkspaceBountyCount'
+type Database_GetWorkspaceBountyCount_Call struct {
+	*mock.Call
+}
+
+// GetWorkspaceBountyCount is a helper method to define mock.On call
+//   - uuid string
+func (_e *Database_Expecter) GetWorkspaceBountyCount(uuid interface{}) *Database_GetWorkspaceBountyCount_Call {
+	return &Database_GetWorkspaceBountyCount_Call{Call: _e.mock.On("GetWorkspaceBountyCount", uuid)}
+}
+
+func (_c *Database_GetWorkspaceBountyCount_Call) Run(run func(uuid string)) *Database_GetWorkspaceBountyCount_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(string))
+	})
+	return _c
+}
+
+func (_c *Database_GetWorkspaceBountyCount_Call) Return(_a0 int64) *Database_GetWorkspaceBountyCount_Call {
+	_c.Call.Return(_a0)
+	return _c
+}
+
+func (_c *Database_GetWorkspaceBountyCount_Call) RunAndReturn(run func(string) int64) *Database_GetWorkspaceBountyCount_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
+// GetWorkspaceBudget provides a mock function with given fields: org_uuid
+func (_m *Database) GetWorkspaceBudget(org_uuid string) db.BountyBudget {
+	ret := _m.Called(org_uuid)
+
+	if len(ret) == 0 {
+		panic("no return value specified for GetWorkspaceBudget")
+	}
+
+	var r0 db.BountyBudget
+	if rf, ok := ret.Get(0).(func(string) db.BountyBudget); ok {
+		r0 = rf(org_uuid)
+	} else {
+		r0 = ret.Get(0).(db.BountyBudget)
+	}
+
+	return r0
+}
+
+// Database_GetWorkspaceBudget_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'GetWorkspaceBudget'
+type Database_GetWorkspaceBudget_Call struct {
+	*mock.Call
+}
+
+// GetWorkspaceBudget is a helper method to define mock.On call
+//   - org_uuid string
+func (_e *Database_Expecter) GetWorkspaceBudget(org_uuid interface{}) *Database_GetWorkspaceBudget_Call {
+	return &Database_GetWorkspaceBudget_Call{Call: _e.mock.On("GetWorkspaceBudget", org_uuid)}
+}
+
+func (_c *Database_GetWorkspaceBudget_Call) Run(run func(org_uuid string)) *Database_GetWorkspaceBudget_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(string))
+	})
+	return _c
+}
+
+func (_c *Database_GetWorkspaceBudget_Call) Return(_a0 db.BountyBudget) *Database_GetWorkspaceBudget_Call {
+	_c.Call.Return(_a0)
+	return _c
+}
+
+func (_c *Database_GetWorkspaceBudget_Call) RunAndReturn(run func(string) db.BountyBudget) *Database_GetWorkspaceBudget_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
+// GetWorkspaceBudgetHistory provides a mock function with given fields: org_uuid
+func (_m *Database) GetWorkspaceBudgetHistory(org_uuid string) []db.BudgetHistoryData {
+	ret := _m.Called(org_uuid)
+
+	if len(ret) == 0 {
+		panic("no return value specified for GetWorkspaceBudgetHistory")
+	}
+
+	var r0 []db.BudgetHistoryData
+	if rf, ok := ret.Get(0).(func(string) []db.BudgetHistoryData); ok {
+		r0 = rf(org_uuid)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).([]db.BudgetHistoryData)
+		}
+	}
+
+	return r0
+}
+
+// Database_GetWorkspaceBudgetHistory_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'GetWorkspaceBudgetHistory'
+type Database_GetWorkspaceBudgetHistory_Call struct {
+	*mock.Call
+}
+
+// GetWorkspaceBudgetHistory is a helper method to define mock.On call
+//   - org_uuid string
+func (_e *Database_Expecter) GetWorkspaceBudgetHistory(org_uuid interface{}) *Database_GetWorkspaceBudgetHistory_Call {
+	return &Database_GetWorkspaceBudgetHistory_Call{Call: _e.mock.On("GetWorkspaceBudgetHistory", org_uuid)}
+}
+
+func (_c *Database_GetWorkspaceBudgetHistory_Call) Run(run func(org_uuid string)) *Database_GetWorkspaceBudgetHistory_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(string))
+	})
+	return _c
+}
+
+func (_c *Database_GetWorkspaceBudgetHistory_Call) Return(_a0 []db.BudgetHistoryData) *Database_GetWorkspaceBudgetHistory_Call {
+	_c.Call.Return(_a0)
+	return _c
+}
+
+func (_c *Database_GetWorkspaceBudgetHistory_Call) RunAndReturn(run func(string) []db.BudgetHistoryData) *Database_GetWorkspaceBudgetHistory_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
+// GetWorkspaceByName provides a mock function with given fields: name
+func (_m *Database) GetWorkspaceByName(name string) db.Organization {
+	ret := _m.Called(name)
+
+	if len(ret) == 0 {
+		panic("no return value specified for GetWorkspaceByName")
+	}
+
+	var r0 db.Organization
+	if rf, ok := ret.Get(0).(func(string) db.Organization); ok {
+		r0 = rf(name)
+	} else {
+		r0 = ret.Get(0).(db.Organization)
+	}
+
+	return r0
+}
+
+// Database_GetWorkspaceByName_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'GetWorkspaceByName'
+type Database_GetWorkspaceByName_Call struct {
+	*mock.Call
+}
+
+// GetWorkspaceByName is a helper method to define mock.On call
+//   - name string
+func (_e *Database_Expecter) GetWorkspaceByName(name interface{}) *Database_GetWorkspaceByName_Call {
+	return &Database_GetWorkspaceByName_Call{Call: _e.mock.On("GetWorkspaceByName", name)}
+}
+
+func (_c *Database_GetWorkspaceByName_Call) Run(run func(name string)) *Database_GetWorkspaceByName_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(string))
+	})
+	return _c
+}
+
+func (_c *Database_GetWorkspaceByName_Call) Return(_a0 db.Organization) *Database_GetWorkspaceByName_Call {
+	_c.Call.Return(_a0)
+	return _c
+}
+
+func (_c *Database_GetWorkspaceByName_Call) RunAndReturn(run func(string) db.Organization) *Database_GetWorkspaceByName_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
+// GetWorkspaceByUuid provides a mock function with given fields: uuid
+func (_m *Database) GetWorkspaceByUuid(uuid string) db.Organization {
+	ret := _m.Called(uuid)
+
+	if len(ret) == 0 {
+		panic("no return value specified for GetWorkspaceByUuid")
+	}
+
+	var r0 db.Organization
+	if rf, ok := ret.Get(0).(func(string) db.Organization); ok {
+		r0 = rf(uuid)
+	} else {
+		r0 = ret.Get(0).(db.Organization)
+	}
+
+	return r0
+}
+
+// Database_GetWorkspaceByUuid_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'GetWorkspaceByUuid'
+type Database_GetWorkspaceByUuid_Call struct {
+	*mock.Call
+}
+
+// GetWorkspaceByUuid is a helper method to define mock.On call
+//   - uuid string
+func (_e *Database_Expecter) GetWorkspaceByUuid(uuid interface{}) *Database_GetWorkspaceByUuid_Call {
+	return &Database_GetWorkspaceByUuid_Call{Call: _e.mock.On("GetWorkspaceByUuid", uuid)}
+}
+
+func (_c *Database_GetWorkspaceByUuid_Call) Run(run func(uuid string)) *Database_GetWorkspaceByUuid_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(string))
+	})
+	return _c
+}
+
+func (_c *Database_GetWorkspaceByUuid_Call) Return(_a0 db.Organization) *Database_GetWorkspaceByUuid_Call {
+	_c.Call.Return(_a0)
+	return _c
+}
+
+func (_c *Database_GetWorkspaceByUuid_Call) RunAndReturn(run func(string) db.Organization) *Database_GetWorkspaceByUuid_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
+// GetWorkspaceInvoices provides a mock function with given fields: org_uuid
+func (_m *Database) GetWorkspaceInvoices(org_uuid string) []db.InvoiceList {
+	ret := _m.Called(org_uuid)
+
+	if len(ret) == 0 {
+		panic("no return value specified for GetWorkspaceInvoices")
+	}
+
+	var r0 []db.InvoiceList
+	if rf, ok := ret.Get(0).(func(string) []db.InvoiceList); ok {
+		r0 = rf(org_uuid)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).([]db.InvoiceList)
+		}
+	}
+
+	return r0
+}
+
+// Database_GetWorkspaceInvoices_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'GetWorkspaceInvoices'
+type Database_GetWorkspaceInvoices_Call struct {
+	*mock.Call
+}
+
+// GetWorkspaceInvoices is a helper method to define mock.On call
+//   - org_uuid string
+func (_e *Database_Expecter) GetWorkspaceInvoices(org_uuid interface{}) *Database_GetWorkspaceInvoices_Call {
+	return &Database_GetWorkspaceInvoices_Call{Call: _e.mock.On("GetWorkspaceInvoices", org_uuid)}
+}
+
+func (_c *Database_GetWorkspaceInvoices_Call) Run(run func(org_uuid string)) *Database_GetWorkspaceInvoices_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(string))
+	})
+	return _c
+}
+
+func (_c *Database_GetWorkspaceInvoices_Call) Return(_a0 []db.InvoiceList) *Database_GetWorkspaceInvoices_Call {
+	_c.Call.Return(_a0)
+	return _c
+}
+
+func (_c *Database_GetWorkspaceInvoices_Call) RunAndReturn(run func(string) []db.InvoiceList) *Database_GetWorkspaceInvoices_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
+// GetWorkspaceInvoicesCount provides a mock function with given fields: org_uuid
+func (_m *Database) GetWorkspaceInvoicesCount(org_uuid string) int64 {
+	ret := _m.Called(org_uuid)
+
+	if len(ret) == 0 {
+		panic("no return value specified for GetWorkspaceInvoicesCount")
+	}
+
+	var r0 int64
+	if rf, ok := ret.Get(0).(func(string) int64); ok {
+		r0 = rf(org_uuid)
+	} else {
+		r0 = ret.Get(0).(int64)
+	}
+
+	return r0
+}
+
+// Database_GetWorkspaceInvoicesCount_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'GetWorkspaceInvoicesCount'
+type Database_GetWorkspaceInvoicesCount_Call struct {
+	*mock.Call
+}
+
+// GetWorkspaceInvoicesCount is a helper method to define mock.On call
+//   - org_uuid string
+func (_e *Database_Expecter) GetWorkspaceInvoicesCount(org_uuid interface{}) *Database_GetWorkspaceInvoicesCount_Call {
+	return &Database_GetWorkspaceInvoicesCount_Call{Call: _e.mock.On("GetWorkspaceInvoicesCount", org_uuid)}
+}
+
+func (_c *Database_GetWorkspaceInvoicesCount_Call) Run(run func(org_uuid string)) *Database_GetWorkspaceInvoicesCount_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(string))
+	})
+	return _c
+}
+
+func (_c *Database_GetWorkspaceInvoicesCount_Call) Return(_a0 int64) *Database_GetWorkspaceInvoicesCount_Call {
+	_c.Call.Return(_a0)
+	return _c
+}
+
+func (_c *Database_GetWorkspaceInvoicesCount_Call) RunAndReturn(run func(string) int64) *Database_GetWorkspaceInvoicesCount_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
+// GetWorkspaceStatusBudget provides a mock function with given fields: org_uuid
+func (_m *Database) GetWorkspaceStatusBudget(org_uuid string) db.StatusBudget {
+	ret := _m.Called(org_uuid)
+
+	if len(ret) == 0 {
+		panic("no return value specified for GetWorkspaceStatusBudget")
+	}
+
+	var r0 db.StatusBudget
+	if rf, ok := ret.Get(0).(func(string) db.StatusBudget); ok {
+		r0 = rf(org_uuid)
+	} else {
+		r0 = ret.Get(0).(db.StatusBudget)
+	}
+
+	return r0
+}
+
+// Database_GetWorkspaceStatusBudget_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'GetWorkspaceStatusBudget'
+type Database_GetWorkspaceStatusBudget_Call struct {
+	*mock.Call
+}
+
+// GetWorkspaceStatusBudget is a helper method to define mock.On call
+//   - org_uuid string
+func (_e *Database_Expecter) GetWorkspaceStatusBudget(org_uuid interface{}) *Database_GetWorkspaceStatusBudget_Call {
+	return &Database_GetWorkspaceStatusBudget_Call{Call: _e.mock.On("GetWorkspaceStatusBudget", org_uuid)}
+}
+
+func (_c *Database_GetWorkspaceStatusBudget_Call) Run(run func(org_uuid string)) *Database_GetWorkspaceStatusBudget_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(string))
+	})
+	return _c
+}
+
+func (_c *Database_GetWorkspaceStatusBudget_Call) Return(_a0 db.StatusBudget) *Database_GetWorkspaceStatusBudget_Call {
+	_c.Call.Return(_a0)
+	return _c
+}
+
+func (_c *Database_GetWorkspaceStatusBudget_Call) RunAndReturn(run func(string) db.StatusBudget) *Database_GetWorkspaceStatusBudget_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
+// GetWorkspaceUser provides a mock function with given fields: pubkey, org_uuid
+func (_m *Database) GetWorkspaceUser(pubkey string, org_uuid string) db.OrganizationUsers {
+	ret := _m.Called(pubkey, org_uuid)
+
+	if len(ret) == 0 {
+		panic("no return value specified for GetWorkspaceUser")
+	}
+
+	var r0 db.OrganizationUsers
+	if rf, ok := ret.Get(0).(func(string, string) db.OrganizationUsers); ok {
+		r0 = rf(pubkey, org_uuid)
+	} else {
+		r0 = ret.Get(0).(db.OrganizationUsers)
+	}
+
+	return r0
+}
+
+// Database_GetWorkspaceUser_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'GetWorkspaceUser'
+type Database_GetWorkspaceUser_Call struct {
+	*mock.Call
+}
+
+// GetWorkspaceUser is a helper method to define mock.On call
+//   - pubkey string
+//   - org_uuid string
+func (_e *Database_Expecter) GetWorkspaceUser(pubkey interface{}, org_uuid interface{}) *Database_GetWorkspaceUser_Call {
+	return &Database_GetWorkspaceUser_Call{Call: _e.mock.On("GetWorkspaceUser", pubkey, org_uuid)}
+}
+
+func (_c *Database_GetWorkspaceUser_Call) Run(run func(pubkey string, org_uuid string)) *Database_GetWorkspaceUser_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(string), args[1].(string))
+	})
+	return _c
+}
+
+func (_c *Database_GetWorkspaceUser_Call) Return(_a0 db.OrganizationUsers) *Database_GetWorkspaceUser_Call {
+	_c.Call.Return(_a0)
+	return _c
+}
+
+func (_c *Database_GetWorkspaceUser_Call) RunAndReturn(run func(string, string) db.OrganizationUsers) *Database_GetWorkspaceUser_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
+// GetWorkspaceUsers provides a mock function with given fields: uuid
+func (_m *Database) GetWorkspaceUsers(uuid string) ([]db.OrganizationUsersData, error) {
+	ret := _m.Called(uuid)
+
+	if len(ret) == 0 {
+		panic("no return value specified for GetWorkspaceUsers")
+	}
+
+	var r0 []db.OrganizationUsersData
+	var r1 error
+	if rf, ok := ret.Get(0).(func(string) ([]db.OrganizationUsersData, error)); ok {
+		return rf(uuid)
+	}
+	if rf, ok := ret.Get(0).(func(string) []db.OrganizationUsersData); ok {
+		r0 = rf(uuid)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).([]db.OrganizationUsersData)
+		}
+	}
+
+	if rf, ok := ret.Get(1).(func(string) error); ok {
+		r1 = rf(uuid)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
+// Database_GetWorkspaceUsers_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'GetWorkspaceUsers'
+type Database_GetWorkspaceUsers_Call struct {
+	*mock.Call
+}
+
+// GetWorkspaceUsers is a helper method to define mock.On call
+//   - uuid string
+func (_e *Database_Expecter) GetWorkspaceUsers(uuid interface{}) *Database_GetWorkspaceUsers_Call {
+	return &Database_GetWorkspaceUsers_Call{Call: _e.mock.On("GetWorkspaceUsers", uuid)}
+}
+
+func (_c *Database_GetWorkspaceUsers_Call) Run(run func(uuid string)) *Database_GetWorkspaceUsers_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(string))
+	})
+	return _c
+}
+
+func (_c *Database_GetWorkspaceUsers_Call) Return(_a0 []db.OrganizationUsersData, _a1 error) *Database_GetWorkspaceUsers_Call {
+	_c.Call.Return(_a0, _a1)
+	return _c
+}
+
+func (_c *Database_GetWorkspaceUsers_Call) RunAndReturn(run func(string) ([]db.OrganizationUsersData, error)) *Database_GetWorkspaceUsers_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
+// GetWorkspaceUsersCount provides a mock function with given fields: uuid
+func (_m *Database) GetWorkspaceUsersCount(uuid string) int64 {
+	ret := _m.Called(uuid)
+
+	if len(ret) == 0 {
+		panic("no return value specified for GetWorkspaceUsersCount")
+	}
+
+	var r0 int64
+	if rf, ok := ret.Get(0).(func(string) int64); ok {
+		r0 = rf(uuid)
+	} else {
+		r0 = ret.Get(0).(int64)
+	}
+
+	return r0
+}
+
+// Database_GetWorkspaceUsersCount_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'GetWorkspaceUsersCount'
+type Database_GetWorkspaceUsersCount_Call struct {
+	*mock.Call
+}
+
+// GetWorkspaceUsersCount is a helper method to define mock.On call
+//   - uuid string
+func (_e *Database_Expecter) GetWorkspaceUsersCount(uuid interface{}) *Database_GetWorkspaceUsersCount_Call {
+	return &Database_GetWorkspaceUsersCount_Call{Call: _e.mock.On("GetWorkspaceUsersCount", uuid)}
+}
+
+func (_c *Database_GetWorkspaceUsersCount_Call) Run(run func(uuid string)) *Database_GetWorkspaceUsersCount_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(string))
+	})
+	return _c
+}
+
+func (_c *Database_GetWorkspaceUsersCount_Call) Return(_a0 int64) *Database_GetWorkspaceUsersCount_Call {
+	_c.Call.Return(_a0)
+	return _c
+}
+
+func (_c *Database_GetWorkspaceUsersCount_Call) RunAndReturn(run func(string) int64) *Database_GetWorkspaceUsersCount_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
+// GetWorkspaces provides a mock function with given fields: r
+func (_m *Database) GetWorkspaces(r *http.Request) []db.Organization {
+	ret := _m.Called(r)
+
+	if len(ret) == 0 {
+		panic("no return value specified for GetWorkspaces")
+	}
+
+	var r0 []db.Organization
+	if rf, ok := ret.Get(0).(func(*http.Request) []db.Organization); ok {
+		r0 = rf(r)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).([]db.Organization)
+		}
+	}
+
+	return r0
+}
+
+// Database_GetWorkspaces_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'GetWorkspaces'
+type Database_GetWorkspaces_Call struct {
+	*mock.Call
+}
+
+// GetWorkspaces is a helper method to define mock.On call
+//   - r *http.Request
+func (_e *Database_Expecter) GetWorkspaces(r interface{}) *Database_GetWorkspaces_Call {
+	return &Database_GetWorkspaces_Call{Call: _e.mock.On("GetWorkspaces", r)}
+}
+
+func (_c *Database_GetWorkspaces_Call) Run(run func(r *http.Request)) *Database_GetWorkspaces_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(*http.Request))
+	})
+	return _c
+}
+
+func (_c *Database_GetWorkspaces_Call) Return(_a0 []db.Organization) *Database_GetWorkspaces_Call {
+	_c.Call.Return(_a0)
+	return _c
+}
+
+func (_c *Database_GetWorkspaces_Call) RunAndReturn(run func(*http.Request) []db.Organization) *Database_GetWorkspaces_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
+// GetWorkspacesCount provides a mock function with given fields:
+func (_m *Database) GetWorkspacesCount() int64 {
+	ret := _m.Called()
+
+	if len(ret) == 0 {
+		panic("no return value specified for GetWorkspacesCount")
+	}
+
+	var r0 int64
+	if rf, ok := ret.Get(0).(func() int64); ok {
+		r0 = rf()
+	} else {
+		r0 = ret.Get(0).(int64)
+	}
+
+	return r0
+}
+
+// Database_GetWorkspacesCount_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'GetWorkspacesCount'
+type Database_GetWorkspacesCount_Call struct {
+	*mock.Call
+}
+
+// GetWorkspacesCount is a helper method to define mock.On call
+func (_e *Database_Expecter) GetWorkspacesCount() *Database_GetWorkspacesCount_Call {
+	return &Database_GetWorkspacesCount_Call{Call: _e.mock.On("GetWorkspacesCount")}
+}
+
+func (_c *Database_GetWorkspacesCount_Call) Run(run func()) *Database_GetWorkspacesCount_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run()
+	})
+	return _c
+}
+
+func (_c *Database_GetWorkspacesCount_Call) Return(_a0 int64) *Database_GetWorkspacesCount_Call {
+	_c.Call.Return(_a0)
+	return _c
+}
+
+func (_c *Database_GetWorkspacesCount_Call) RunAndReturn(run func() int64) *Database_GetWorkspacesCount_Call {
 	_c.Call.Return(run)
 	return _c
 }
@@ -6056,98 +6056,6 @@ func (_c *Database_UpdateLeaderBoard_Call) RunAndReturn(run func(string, string,
 	return _c
 }
 
-// UpdateOrganizationBudget provides a mock function with given fields: budget
-func (_m *Database) UpdateOrganizationBudget(budget db.BountyBudget) db.BountyBudget {
-	ret := _m.Called(budget)
-
-	if len(ret) == 0 {
-		panic("no return value specified for UpdateOrganizationBudget")
-	}
-
-	var r0 db.BountyBudget
-	if rf, ok := ret.Get(0).(func(db.BountyBudget) db.BountyBudget); ok {
-		r0 = rf(budget)
-	} else {
-		r0 = ret.Get(0).(db.BountyBudget)
-	}
-
-	return r0
-}
-
-// Database_UpdateOrganizationBudget_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'UpdateOrganizationBudget'
-type Database_UpdateOrganizationBudget_Call struct {
-	*mock.Call
-}
-
-// UpdateOrganizationBudget is a helper method to define mock.On call
-//   - budget db.BountyBudget
-func (_e *Database_Expecter) UpdateOrganizationBudget(budget interface{}) *Database_UpdateOrganizationBudget_Call {
-	return &Database_UpdateOrganizationBudget_Call{Call: _e.mock.On("UpdateOrganizationBudget", budget)}
-}
-
-func (_c *Database_UpdateOrganizationBudget_Call) Run(run func(budget db.BountyBudget)) *Database_UpdateOrganizationBudget_Call {
-	_c.Call.Run(func(args mock.Arguments) {
-		run(args[0].(db.BountyBudget))
-	})
-	return _c
-}
-
-func (_c *Database_UpdateOrganizationBudget_Call) Return(_a0 db.BountyBudget) *Database_UpdateOrganizationBudget_Call {
-	_c.Call.Return(_a0)
-	return _c
-}
-
-func (_c *Database_UpdateOrganizationBudget_Call) RunAndReturn(run func(db.BountyBudget) db.BountyBudget) *Database_UpdateOrganizationBudget_Call {
-	_c.Call.Return(run)
-	return _c
-}
-
-// UpdateOrganizationForDeletion provides a mock function with given fields: uuid
-func (_m *Database) UpdateOrganizationForDeletion(uuid string) error {
-	ret := _m.Called(uuid)
-
-	if len(ret) == 0 {
-		panic("no return value specified for UpdateOrganizationForDeletion")
-	}
-
-	var r0 error
-	if rf, ok := ret.Get(0).(func(string) error); ok {
-		r0 = rf(uuid)
-	} else {
-		r0 = ret.Error(0)
-	}
-
-	return r0
-}
-
-// Database_UpdateOrganizationForDeletion_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'UpdateOrganizationForDeletion'
-type Database_UpdateOrganizationForDeletion_Call struct {
-	*mock.Call
-}
-
-// UpdateOrganizationForDeletion is a helper method to define mock.On call
-//   - uuid string
-func (_e *Database_Expecter) UpdateOrganizationForDeletion(uuid interface{}) *Database_UpdateOrganizationForDeletion_Call {
-	return &Database_UpdateOrganizationForDeletion_Call{Call: _e.mock.On("UpdateOrganizationForDeletion", uuid)}
-}
-
-func (_c *Database_UpdateOrganizationForDeletion_Call) Run(run func(uuid string)) *Database_UpdateOrganizationForDeletion_Call {
-	_c.Call.Run(func(args mock.Arguments) {
-		run(args[0].(string))
-	})
-	return _c
-}
-
-func (_c *Database_UpdateOrganizationForDeletion_Call) Return(_a0 error) *Database_UpdateOrganizationForDeletion_Call {
-	_c.Call.Return(_a0)
-	return _c
-}
-
-func (_c *Database_UpdateOrganizationForDeletion_Call) RunAndReturn(run func(string) error) *Database_UpdateOrganizationForDeletion_Call {
-	_c.Call.Return(run)
-	return _c
-}
-
 // UpdatePerson provides a mock function with given fields: id, u
 func (_m *Database) UpdatePerson(id uint, u map[string]interface{}) bool {
 	ret := _m.Called(id, u)
@@ -6306,6 +6214,98 @@ func (_c *Database_UpdateTwitterConfirmed_Call) Return() *Database_UpdateTwitter
 }
 
 func (_c *Database_UpdateTwitterConfirmed_Call) RunAndReturn(run func(uint, bool)) *Database_UpdateTwitterConfirmed_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
+// UpdateWorkspaceBudget provides a mock function with given fields: budget
+func (_m *Database) UpdateWorkspaceBudget(budget db.BountyBudget) db.BountyBudget {
+	ret := _m.Called(budget)
+
+	if len(ret) == 0 {
+		panic("no return value specified for UpdateWorkspaceBudget")
+	}
+
+	var r0 db.BountyBudget
+	if rf, ok := ret.Get(0).(func(db.BountyBudget) db.BountyBudget); ok {
+		r0 = rf(budget)
+	} else {
+		r0 = ret.Get(0).(db.BountyBudget)
+	}
+
+	return r0
+}
+
+// Database_UpdateWorkspaceBudget_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'UpdateWorkspaceBudget'
+type Database_UpdateWorkspaceBudget_Call struct {
+	*mock.Call
+}
+
+// UpdateWorkspaceBudget is a helper method to define mock.On call
+//   - budget db.BountyBudget
+func (_e *Database_Expecter) UpdateWorkspaceBudget(budget interface{}) *Database_UpdateWorkspaceBudget_Call {
+	return &Database_UpdateWorkspaceBudget_Call{Call: _e.mock.On("UpdateWorkspaceBudget", budget)}
+}
+
+func (_c *Database_UpdateWorkspaceBudget_Call) Run(run func(budget db.BountyBudget)) *Database_UpdateWorkspaceBudget_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(db.BountyBudget))
+	})
+	return _c
+}
+
+func (_c *Database_UpdateWorkspaceBudget_Call) Return(_a0 db.BountyBudget) *Database_UpdateWorkspaceBudget_Call {
+	_c.Call.Return(_a0)
+	return _c
+}
+
+func (_c *Database_UpdateWorkspaceBudget_Call) RunAndReturn(run func(db.BountyBudget) db.BountyBudget) *Database_UpdateWorkspaceBudget_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
+// UpdateWorkspaceForDeletion provides a mock function with given fields: uuid
+func (_m *Database) UpdateWorkspaceForDeletion(uuid string) error {
+	ret := _m.Called(uuid)
+
+	if len(ret) == 0 {
+		panic("no return value specified for UpdateWorkspaceForDeletion")
+	}
+
+	var r0 error
+	if rf, ok := ret.Get(0).(func(string) error); ok {
+		r0 = rf(uuid)
+	} else {
+		r0 = ret.Error(0)
+	}
+
+	return r0
+}
+
+// Database_UpdateWorkspaceForDeletion_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'UpdateWorkspaceForDeletion'
+type Database_UpdateWorkspaceForDeletion_Call struct {
+	*mock.Call
+}
+
+// UpdateWorkspaceForDeletion is a helper method to define mock.On call
+//   - uuid string
+func (_e *Database_Expecter) UpdateWorkspaceForDeletion(uuid interface{}) *Database_UpdateWorkspaceForDeletion_Call {
+	return &Database_UpdateWorkspaceForDeletion_Call{Call: _e.mock.On("UpdateWorkspaceForDeletion", uuid)}
+}
+
+func (_c *Database_UpdateWorkspaceForDeletion_Call) Run(run func(uuid string)) *Database_UpdateWorkspaceForDeletion_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(string))
+	})
+	return _c
+}
+
+func (_c *Database_UpdateWorkspaceForDeletion_Call) Return(_a0 error) *Database_UpdateWorkspaceForDeletion_Call {
+	_c.Call.Return(_a0)
+	return _c
+}
+
+func (_c *Database_UpdateWorkspaceForDeletion_Call) RunAndReturn(run func(string) error) *Database_UpdateWorkspaceForDeletion_Call {
 	_c.Call.Return(run)
 	return _c
 }
