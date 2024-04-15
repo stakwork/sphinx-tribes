@@ -148,7 +148,7 @@ var Updatables = []string{
 	"unlisted", "private", "deleted",
 	"app_url", "bots", "feed_url", "feed_type",
 	"owner_route_hint", "updated", "pin",
-	"profile_filters",
+	"profile_filters", "second_brain_url",
 }
 var Botupdatables = []string{
 	"name", "description", "tags", "img",
