@@ -86,8 +86,8 @@ func (h *bountyHandler) GetPreviousBountyByCreated(w http.ResponseWriter, r *htt
 	}
 }
 
-func (h *bountyHandler) GetOrganizationNextBountyByCreated(w http.ResponseWriter, r *http.Request) {
-	bounties, err := h.db.GetNextOrganizationBountyByCreated(r)
+func (h *bountyHandler) GetWorkspaceNextBountyByCreated(w http.ResponseWriter, r *http.Request) {
+	bounties, err := h.db.GetNextWorkspaceBountyByCreated(r)
 	if err != nil {
 		w.WriteHeader(http.StatusBadRequest)
 		fmt.Println("Error", err)
@@ -97,8 +97,8 @@ func (h *bountyHandler) GetOrganizationNextBountyByCreated(w http.ResponseWriter
 	}
 }
 
-func (h *bountyHandler) GetOrganizationPreviousBountyByCreated(w http.ResponseWriter, r *http.Request) {
-	bounties, err := h.db.GetPreviousOrganizationBountyByCreated(r)
+func (h *bountyHandler) GetWorkspacePreviousBountyByCreated(w http.ResponseWriter, r *http.Request) {
+	bounties, err := h.db.GetPreviousWorkspaceBountyByCreated(r)
 	if err != nil {
 		w.WriteHeader(http.StatusBadRequest)
 		fmt.Println("Error", err)
@@ -359,7 +359,7 @@ func (h *bountyHandler) GenerateBountyResponse(bounties []db.Bounty) []db.Bounty
 
 		owner := h.db.GetPersonByPubkey(bounty.OwnerID)
 		assignee := h.db.GetPersonByPubkey(bounty.Assignee)
-		organization := h.db.GetOrganizationByUuid(bounty.OrgUuid)
+		organization := h.db.GetWorkspaceByUuid(bounty.OrgUuid)
 
 		b := db.BountyResponse{
 			Bounty: db.Bounty{
@@ -483,7 +483,7 @@ func (h *bountyHandler) MakeBountyPayment(w http.ResponseWriter, r *http.Request
 
 	// check if the organization bounty balance
 	// is greater than the amount
-	orgBudget := h.db.GetOrganizationBudget(bounty.OrgUuid)
+	orgBudget := h.db.GetWorkspaceBudget(bounty.OrgUuid)
 	if orgBudget.TotalBudget < amount {
 		w.WriteHeader(http.StatusForbidden)
 		json.NewEncoder(w).Encode("organization budget is not enough to pay the amount")
@@ -523,7 +523,7 @@ func (h *bountyHandler) MakeBountyPayment(w http.ResponseWriter, r *http.Request
 	msg := make(map[string]interface{})
 
 	// payment is successful add to payment history
-	// and reduce organizations budget
+	// and reduce workspaces budget
 	if res.StatusCode == 200 {
 		// Unmarshal result
 		keysendRes := db.KeysendSuccess{}
@@ -607,10 +607,10 @@ func (h *bountyHandler) BountyBudgetWithdraw(w http.ResponseWriter, r *http.Requ
 	if err == nil && amount > 0 {
 		// check if the organization bounty balance
 		// is greater than the amount
-		orgBudget := h.db.GetOrganizationBudget(request.OrgUuid)
+		orgBudget := h.db.GetWorkspaceBudget(request.OrgUuid)
 		if amount > orgBudget.TotalBudget {
 			w.WriteHeader(http.StatusForbidden)
-			errMsg := formatPayError("Organization budget is not enough to withdraw the amount")
+			errMsg := formatPayError("Workspace budget is not enough to withdraw the amount")
 			json.NewEncoder(w).Encode(errMsg)
 			return
 		}

@@ -55,7 +55,7 @@ func TestCheckUser(t *testing.T) {
 }
 
 func TestUserHasAccess(t *testing.T) {
-	mockGetOrganizationByUuid := func(uuid string) Organization {
+	mockGetWorkspaceByUuid := func(uuid string) Organization {
 		return Organization{
 			Uuid:        uuid,
 			OwnerPubKey: "org_admin",
@@ -71,7 +71,7 @@ func TestUserHasAccess(t *testing.T) {
 	mockDB := &gorm.DB{}
 
 	databaseConfig := NewDatabaseConfig(mockDB)
-	databaseConfig.getOrganizationByUuid = mockGetOrganizationByUuid
+	databaseConfig.getWorkspaceByUuid = mockGetWorkspaceByUuid
 	databaseConfig.getUserRoles = mockGetUserRoles
 
 	t.Run("Should test that if the user is the admin of an organization returns true", func(t *testing.T) {
@@ -103,7 +103,7 @@ func TestUserHasAccess(t *testing.T) {
 }
 
 func TestUserHasManageBountyRoles(t *testing.T) {
-	mockGetOrganizationByUuid := func(uuid string) Organization {
+	mockGetWorkspaceByUuid := func(uuid string) Organization {
 		return Organization{
 			Uuid:        uuid,
 			OwnerPubKey: "org_admin",
@@ -128,7 +128,7 @@ func TestUserHasManageBountyRoles(t *testing.T) {
 	mockDB := &gorm.DB{}
 
 	databaseConfig := NewDatabaseConfig(mockDB)
-	databaseConfig.getOrganizationByUuid = mockGetOrganizationByUuid
+	databaseConfig.getWorkspaceByUuid = mockGetWorkspaceByUuid
 	databaseConfig.getUserRoles = mockGetUserRoles
 
 	t.Run("Should test that if the user is the organization admin return true", func(t *testing.T) {

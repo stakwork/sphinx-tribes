@@ -540,7 +540,7 @@ func TestGetBountyByCreated(t *testing.T) {
 		mockDb.On("GetBountyDataByCreated", createdStr).Return([]db.Bounty{bounty}, nil).Once()
 		mockDb.On("GetPersonByPubkey", "owner-1").Return(db.Person{}).Once()
 		mockDb.On("GetPersonByPubkey", "user1").Return(db.Person{}).Once()
-		mockDb.On("GetOrganizationByUuid", "org-1").Return(db.Organization{}).Once()
+		mockDb.On("GetWorkspaceByUuid", "org-1").Return(db.Organization{}).Once()
 		handler.ServeHTTP(rr, req)
 
 		var returnedBounty []db.BountyResponse
@@ -598,7 +598,7 @@ func TestGetPersonAssignedBounties(t *testing.T) {
 		mockDb.On("GetAssignedBounties", req).Return([]db.Bounty{bounty}, nil).Once()
 		mockDb.On("GetPersonByPubkey", "owner-1").Return(db.Person{}, nil).Once()
 		mockDb.On("GetPersonByPubkey", "user1").Return(db.Person{}, nil).Once()
-		mockDb.On("GetOrganizationByUuid", "org-1").Return(db.Organization{}, nil).Once()
+		mockDb.On("GetWorkspaceByUuid", "org-1").Return(db.Organization{}, nil).Once()
 		handler.ServeHTTP(rr, req)
 
 		var returnedBounty []db.BountyResponse
@@ -650,7 +650,7 @@ func TestGetPersonCreatedBounties(t *testing.T) {
 
 		mockDb.On("GetCreatedBounties", mock.Anything).Return(expectedBounties, nil).Once()
 		mockDb.On("GetPersonByPubkey", mock.Anything).Return(db.Person{}, nil)
-		mockDb.On("GetOrganizationByUuid", mock.Anything).Return(db.Organization{}, nil)
+		mockDb.On("GetWorkspaceByUuid", mock.Anything).Return(db.Organization{}, nil)
 		rr := httptest.NewRecorder()
 		req, err := http.NewRequest("GET", "/people/wanteds/created/uuid", nil)
 		req = req.WithContext(ctx)
@@ -742,7 +742,7 @@ func TestGetPersonCreatedBounties(t *testing.T) {
 
 		mockDb.On("GetCreatedBounties", mock.Anything).Return(expectedBounties, nil).Once()
 		mockDb.On("GetPersonByPubkey", mock.Anything).Return(db.Person{}, nil)
-		mockDb.On("GetOrganizationByUuid", mock.Anything).Return(db.Organization{}, nil)
+		mockDb.On("GetWorkspaceByUuid", mock.Anything).Return(db.Organization{}, nil)
 
 		rr := httptest.NewRecorder()
 		req, err := http.NewRequest("GET", "/people/wanteds/created/uuid?Open=true&Assigned=true&Paid=true&offset=0&limit=2", nil)
@@ -810,38 +810,38 @@ func TestGetPreviousBountyByCreated(t *testing.T) {
 	})
 }
 
-func TestGetOrganizationNextBountyByCreated(t *testing.T) {
+func TestGetWorkspaceNextBountyByCreated(t *testing.T) {
 	ctx := context.Background()
 	mockDb := dbMocks.NewDatabase(t)
 	mockHttpClient := mocks.NewHttpClient(t)
 	bHandler := NewBountyHandler(mockHttpClient, mockDb)
 
 	t.Run("Should test that the next bounty on the organization bounties homepage can be gotten by its created value and the selected filters", func(t *testing.T) {
-		mockDb.On("GetNextOrganizationBountyByCreated", mock.AnythingOfType("*http.Request")).Return(uint(1), nil).Once()
+		mockDb.On("GetNextWorkspaceBountyByCreated", mock.AnythingOfType("*http.Request")).Return(uint(1), nil).Once()
 
 		rr := httptest.NewRecorder()
 		req, _ := http.NewRequest("GET", "/org/next/org-uuid/123456789", nil)
 
-		bHandler.GetOrganizationNextBountyByCreated(rr, req.WithContext(ctx))
+		bHandler.GetWorkspaceNextBountyByCreated(rr, req.WithContext(ctx))
 
 		assert.Equal(t, http.StatusOK, rr.Code)
 		mockDb.AssertExpectations(t)
 	})
 }
 
-func TestGetOrganizationPreviousBountyByCreated(t *testing.T) {
+func TestGetWorkspacePreviousBountyByCreated(t *testing.T) {
 	ctx := context.Background()
 	mockDb := dbMocks.NewDatabase(t)
 	mockHttpClient := mocks.NewHttpClient(t)
 	bHandler := NewBountyHandler(mockHttpClient, mockDb)
 
 	t.Run("Should test that the previous bounty on the organization bounties homepage can be gotten by its created value and the selected filters", func(t *testing.T) {
-		mockDb.On("GetPreviousOrganizationBountyByCreated", mock.AnythingOfType("*http.Request")).Return(uint(1), nil).Once()
+		mockDb.On("GetPreviousWorkspaceBountyByCreated", mock.AnythingOfType("*http.Request")).Return(uint(1), nil).Once()
 
 		rr := httptest.NewRecorder()
 		req, _ := http.NewRequest("GET", "/org/previous/org-uuid/123456789", nil)
 
-		bHandler.GetOrganizationPreviousBountyByCreated(rr, req.WithContext(ctx))
+		bHandler.GetWorkspacePreviousBountyByCreated(rr, req.WithContext(ctx))
 
 		assert.Equal(t, http.StatusOK, rr.Code)
 
@@ -899,7 +899,7 @@ func TestGetBountyById(t *testing.T) {
 		mockDb.On("GetBountyById", mock.Anything).Return([]db.Bounty{bounty}, nil).Once()
 		mockDb.On("GetPersonByPubkey", "owner123").Return(db.Person{}).Once()
 		mockDb.On("GetPersonByPubkey", "user1").Return(db.Person{}).Once()
-		mockDb.On("GetOrganizationByUuid", "org-789").Return(db.Organization{}).Once()
+		mockDb.On("GetWorkspaceByUuid", "org-789").Return(db.Organization{}).Once()
 
 		handler.ServeHTTP(rr, req)
 
@@ -969,7 +969,7 @@ func GetPersonAssigned(t *testing.T) {
 
 		mockDb.On("GetAssignedBounties", mock.Anything).Return(expectedBounties, nil).Once()
 		mockDb.On("GetPersonByPubkey", mock.Anything).Return(db.Person{}, nil)
-		mockDb.On("GetOrganizationByUuid", mock.Anything).Return(db.Organization{}, nil)
+		mockDb.On("GetWorkspaceByUuid", mock.Anything).Return(db.Organization{}, nil)
 		rr := httptest.NewRecorder()
 		req, err := http.NewRequest("GET", "/wanteds/assigned/uuid?Assigned=true&Paid=true&offset=0&limit=4", nil)
 		req = req.WithContext(ctx)
@@ -1101,7 +1101,7 @@ func TestGetAllBounties(t *testing.T) {
 
 		mockDb.On("GetAllBounties", req).Return(bounties)
 		mockDb.On("GetPersonByPubkey", mock.Anything).Return(db.Person{}, nil)
-		mockDb.On("GetOrganizationByUuid", mock.Anything).Return(db.Organization{}, nil)
+		mockDb.On("GetWorkspaceByUuid", mock.Anything).Return(db.Organization{}, nil)
 		handler.ServeHTTP(rr, req)
 
 		var returnedBounty []db.BountyResponse
@@ -1287,7 +1287,7 @@ func TestMakeBountyPayment(t *testing.T) {
 			Assignee: "assignee-1",
 			Paid:     false,
 		}, nil)
-		mockDb.On("GetOrganizationBudget", "org-1").Return(db.BountyBudget{
+		mockDb.On("GetWorkspaceBudget", "org-1").Return(db.BountyBudget{
 			TotalBudget: 500,
 		}, nil)
 
@@ -1323,7 +1323,7 @@ func TestMakeBountyPayment(t *testing.T) {
 		}
 
 		mockDb.On("GetBounty", bountyID).Return(bounty, nil)
-		mockDb.On("GetOrganizationBudget", bounty.OrgUuid).Return(db.BountyBudget{TotalBudget: 2000}, nil)
+		mockDb.On("GetWorkspaceBudget", bounty.OrgUuid).Return(db.BountyBudget{TotalBudget: 2000}, nil)
 		mockDb.On("GetPersonByPubkey", bounty.Assignee).Return(db.Person{OwnerPubKey: "assignee-1", OwnerRouteHint: "OwnerRouteHint"}, nil)
 		mockDb.On("AddPaymentHistory", mock.AnythingOfType("db.PaymentHistory")).Return(db.PaymentHistory{ID: 1})
 		mockDb.On("UpdateBounty", mock.AnythingOfType("db.Bounty")).Run(func(args mock.Arguments) {
@@ -1372,7 +1372,7 @@ func TestMakeBountyPayment(t *testing.T) {
 		bHandler2.userHasAccess = mockUserHasAccessTrue
 
 		mockDb2.On("GetBounty", bountyID).Return(bounty, nil)
-		mockDb2.On("GetOrganizationBudget", bounty.OrgUuid).Return(db.BountyBudget{TotalBudget: 2000}, nil)
+		mockDb2.On("GetWorkspaceBudget", bounty.OrgUuid).Return(db.BountyBudget{TotalBudget: 2000}, nil)
 		mockDb2.On("GetPersonByPubkey", bounty.Assignee).Return(db.Person{OwnerPubKey: "assignee-1", OwnerRouteHint: "OwnerRouteHint"}, nil)
 
 		expectedUrl := fmt.Sprintf("%s/payment", config.RelayUrl)
@@ -1472,7 +1472,7 @@ func TestBountyBudgetWithdraw(t *testing.T) {
 		bHandler := NewBountyHandler(mockHttpClient, mockDb)
 		bHandler.userHasAccess = mockUserHasAccessTrue
 
-		mockDb.On("GetOrganizationBudget", "org-1").Return(db.BountyBudget{
+		mockDb.On("GetWorkspaceBudget", "org-1").Return(db.BountyBudget{
 			TotalBudget: 500,
 		}, nil)
 		invoice := "lnbc15u1p3xnhl2pp5jptserfk3zk4qy42tlucycrfwxhydvlemu9pqr93tuzlv9cc7g3sdqsvfhkcap3xyhx7un8cqzpgxqzjcsp5f8c52y2stc300gl6s4xswtjpc37hrnnr3c9wvtgjfuvqmpm35evq9qyyssqy4lgd8tj637qcjp05rdpxxykjenthxftej7a2zzmwrmrl70fyj9hvj0rewhzj7jfyuwkwcg9g2jpwtk3wkjtwnkdks84hsnu8xps5vsq4gj5hs"
@@ -1492,7 +1492,7 @@ func TestBountyBudgetWithdraw(t *testing.T) {
 		bHandler.BountyBudgetWithdraw(rr, req)
 
 		assert.Equal(t, http.StatusForbidden, rr.Code, "Expected 403 Forbidden when the payment exceeds the organization's budget")
-		assert.Contains(t, rr.Body.String(), "Organization budget is not enough to withdraw the amount", "Expected specific error message")
+		assert.Contains(t, rr.Body.String(), "Workspace budget is not enough to withdraw the amount", "Expected specific error message")
 	})
 
 	t.Run("budget invoices get paid if amount is lesser than organization's budget", func(t *testing.T) {
@@ -1504,7 +1504,7 @@ func TestBountyBudgetWithdraw(t *testing.T) {
 
 		paymentAmount := uint(1500)
 
-		mockDb.On("GetOrganizationBudget", "org-1").Return(db.BountyBudget{
+		mockDb.On("GetWorkspaceBudget", "org-1").Return(db.BountyBudget{
 			TotalBudget: 5000,
 		}, nil)
 		mockDb.On("WithdrawBudget", "valid-key", "org-1", paymentAmount).Return(nil)
@@ -1541,7 +1541,7 @@ func TestBountyBudgetWithdraw(t *testing.T) {
 		bHandler := NewBountyHandler(mockHttpClient, mockDb)
 		bHandler.userHasAccess = mockUserHasAccessTrue
 
-		mockDb.On("GetOrganizationBudget", "org-1").Return(db.BountyBudget{
+		mockDb.On("GetWorkspaceBudget", "org-1").Return(db.BountyBudget{
 			TotalBudget: 5000,
 		}, nil)
 		mockHttpClient.On("Do", mock.AnythingOfType("*http.Request")).Return(&http.Response{
@@ -1571,7 +1571,7 @@ func TestBountyBudgetWithdraw(t *testing.T) {
 		mockHttpClient.AssertCalled(t, "Do", mock.AnythingOfType("*http.Request"))
 	})
 
-	t.Run("Should test that an Organization's Budget Total Amount is accurate after three (3) successful 'Budget Withdrawal Requests'", func(t *testing.T) {
+	t.Run("Should test that an Workspace's Budget Total Amount is accurate after three (3) successful 'Budget Withdrawal Requests'", func(t *testing.T) {
 		ctxs := context.WithValue(context.Background(), auth.ContextKey, "valid-key")
 		mockDb := dbMocks.NewDatabase(t)
 		mockHttpClient := mocks.NewHttpClient(t)
@@ -1590,7 +1590,7 @@ func TestBountyBudgetWithdraw(t *testing.T) {
 			mockHttpClient.ExpectedCalls = nil
 			mockHttpClient.Calls = nil
 
-			mockDb.On("GetOrganizationBudget", "org-1").Return(db.BountyBudget{
+			mockDb.On("GetWorkspaceBudget", "org-1").Return(db.BountyBudget{
 				TotalBudget: expectedFinalBudget,
 			}, nil)
 			mockDb.On("WithdrawBudget", "valid-key", "org-1", paymentAmount).Return(nil)
@@ -1614,7 +1614,7 @@ func TestBountyBudgetWithdraw(t *testing.T) {
 			err := json.Unmarshal(rr.Body.Bytes(), &response)
 			assert.NoError(t, err)
 			assert.True(t, response.Success, "Expected invoice payment to succeed")
-			finalBudget := mockDb.GetOrganizationBudget("org-1")
+			finalBudget := mockDb.GetWorkspaceBudget("org-1")
 			assert.Equal(t, expectedFinalBudget, finalBudget.TotalBudget, "The organization's final budget should reflect the deductions from the successful withdrawals")
 
 		}

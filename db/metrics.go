@@ -17,7 +17,7 @@ func (db database) TotalPeopleByDateRange(r PaymentDateRange) int64 {
 	return count
 }
 
-func (db database) TotalOrganizationsByDateRange(r PaymentDateRange) int64 {
+func (db database) TotalWorkspacesByDateRange(r PaymentDateRange) int64 {
 	var count int64
 	db.db.Model(&Organization{}).Where("created >= ?", r.StartDate).Where("created <= ?", r.EndDate).Count(&count)
 	return count

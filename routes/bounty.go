@@ -19,8 +19,8 @@ func BountyRoutes() chi.Router {
 		r.Get("/index/{bountyId}", bountyHandler.GetBountyIndexById)
 		r.Get("/next/{created}", bountyHandler.GetNextBountyByCreated)
 		r.Get("/previous/{created}", bountyHandler.GetPreviousBountyByCreated)
-		r.Get("/org/next/{uuid}/{created}", bountyHandler.GetOrganizationNextBountyByCreated)
-		r.Get("/org/previous/{uuid}/{created}", bountyHandler.GetOrganizationPreviousBountyByCreated)
+		r.Get("/org/next/{uuid}/{created}", bountyHandler.GetWorkspaceNextBountyByCreated)
+		r.Get("/org/previous/{uuid}/{created}", bountyHandler.GetWorkspacePreviousBountyByCreated)
 
 		r.Get("/created/{created}", bountyHandler.GetBountyByCreated)
 		r.Get("/count/{personKey}/{tabType}", handlers.GetUserBountyCount)

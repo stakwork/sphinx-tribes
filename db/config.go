@@ -11,16 +11,16 @@ import (
 )
 
 type database struct {
-	db                    *gorm.DB
-	getOrganizationByUuid func(uuid string) Organization
-	getUserRoles          func(uuid string, pubkey string) []UserRoles
+	db                 *gorm.DB
+	getWorkspaceByUuid func(uuid string) Organization
+	getUserRoles       func(uuid string, pubkey string) []UserRoles
 }
 
 func NewDatabaseConfig(db *gorm.DB) *database {
 	return &database{
-		db:                    db,
-		getOrganizationByUuid: DB.GetOrganizationByUuid,
-		getUserRoles:          DB.GetUserRoles,
+		db:                 db,
+		getWorkspaceByUuid: DB.GetWorkspaceByUuid,
+		getUserRoles:       DB.GetUserRoles,
 	}
 }
 
@@ -219,7 +219,7 @@ func (db database) ConvertMetricsBountiesToMap(metricsCsv []MetricsBountyCsv) []
 		metricMap := make(map[string]interface{})
 
 		metricMap["DatePosted"] = m.DatePosted
-		metricMap["Organization"] = m.Organization
+		metricMap["Workspace"] = m.Organization
 		metricMap["BountyAmount"] = m.BountyAmount
 		metricMap["Provider"] = m.Provider
 		metricMap["Hunter"] = m.Hunter
@@ -263,7 +263,7 @@ func CheckUser(userRoles []UserRoles, pubkey string) bool {
 }
 
 func UserHasAccess(pubKeyFromAuth string, uuid string, role string) bool {
-	org := DB.GetOrganizationByUuid(uuid)
+	org := DB.GetWorkspaceByUuid(uuid)
 	var hasRole bool = false
 	if pubKeyFromAuth != org.OwnerPubKey {
 		userRoles := DB.GetUserRoles(uuid, pubKeyFromAuth)
@@ -274,7 +274,7 @@ func UserHasAccess(pubKeyFromAuth string, uuid string, role string) bool {
 }
 
 func (db database) UserHasAccess(pubKeyFromAuth string, uuid string, role string) bool {
-	org := db.getOrganizationByUuid(uuid)
+	org := db.getWorkspaceByUuid(uuid)
 	var hasRole bool = false
 	if pubKeyFromAuth != org.OwnerPubKey {
 		userRoles := db.getUserRoles(uuid, pubKeyFromAuth)
@@ -286,7 +286,7 @@ func (db database) UserHasAccess(pubKeyFromAuth string, uuid string, role string
 
 func (db database) UserHasManageBountyRoles(pubKeyFromAuth string, uuid string) bool {
 	var manageRolesCount = len(ManageBountiesGroup)
-	org := db.getOrganizationByUuid(uuid)
+	org := db.getWorkspaceByUuid(uuid)
 	if pubKeyFromAuth != org.OwnerPubKey {
 		userRoles := db.getUserRoles(uuid, pubKeyFromAuth)
 

@@ -19,14 +19,14 @@ import (
 	"github.com/stretchr/testify/mock"
 )
 
-func TestUnitCreateOrEditOrganization(t *testing.T) {
+func TestUnitCreateOrEditWorkspace(t *testing.T) {
 	ctx := context.WithValue(context.Background(), auth.ContextKey, "test-key")
 	mockDb := mocks.NewDatabase(t)
-	oHandler := NewOrganizationHandler(mockDb)
+	oHandler := NewWorkspaceHandler(mockDb)
 
 	t.Run("should return error if body is not a valid json", func(t *testing.T) {
 		rr := httptest.NewRecorder()
-		handler := http.HandlerFunc(oHandler.CreateOrEditOrganization)
+		handler := http.HandlerFunc(oHandler.CreateOrEditWorkspace)
 
 		invalidJson := []byte(`{"key": "value"`)
 
@@ -43,7 +43,7 @@ func TestUnitCreateOrEditOrganization(t *testing.T) {
 
 	t.Run("should return error if public key not present", func(t *testing.T) { //passed
 		rr := httptest.NewRecorder()
-		handler := http.HandlerFunc(oHandler.CreateOrEditOrganization)
+		handler := http.HandlerFunc(oHandler.CreateOrEditWorkspace)
 
 		invalidJson := []byte(`{"key": "value"}`)
 		req, err := http.NewRequestWithContext(context.Background(), http.MethodPost, "/", bytes.NewReader(invalidJson))
@@ -58,7 +58,7 @@ func TestUnitCreateOrEditOrganization(t *testing.T) {
 
 	t.Run("should return error org name is empty", func(t *testing.T) {
 		rr := httptest.NewRecorder()
-		handler := http.HandlerFunc(oHandler.CreateOrEditOrganization)
+		handler := http.HandlerFunc(oHandler.CreateOrEditWorkspace)
 
 		invalidJson := []byte(`{"name": ""}`)
 		req, err := http.NewRequestWithContext(ctx, http.MethodPost, "/", bytes.NewReader(invalidJson))
@@ -73,9 +73,9 @@ func TestUnitCreateOrEditOrganization(t *testing.T) {
 
 	t.Run("should return error org name is more than 20", func(t *testing.T) {
 		rr := httptest.NewRecorder()
-		handler := http.HandlerFunc(oHandler.CreateOrEditOrganization)
+		handler := http.HandlerFunc(oHandler.CreateOrEditWorkspace)
 
-		invalidJson := []byte(`{"name": "DemoTestingOrganization"}`)
+		invalidJson := []byte(`{"name": "DemoTestingNewWorkspace"}`)
 		req, err := http.NewRequestWithContext(ctx, http.MethodPost, "/", bytes.NewReader(invalidJson))
 		if err != nil {
 			t.Fatal(err)
@@ -88,7 +88,7 @@ func TestUnitCreateOrEditOrganization(t *testing.T) {
 
 	t.Run("should return error if org name contains only spaces", func(t *testing.T) {
 		rr := httptest.NewRecorder()
-		handler := http.HandlerFunc(oHandler.CreateOrEditOrganization)
+		handler := http.HandlerFunc(oHandler.CreateOrEditWorkspace)
 
 		invalidJson := []byte(`{"name": "   "}`)
 		req, err := http.NewRequestWithContext(ctx, http.MethodPost, "/", bytes.NewReader(invalidJson))
@@ -103,11 +103,11 @@ func TestUnitCreateOrEditOrganization(t *testing.T) {
 
 	t.Run("should trim spaces from organization name", func(t *testing.T) {
 		rr := httptest.NewRecorder()
-		handler := http.HandlerFunc(oHandler.CreateOrEditOrganization)
+		handler := http.HandlerFunc(oHandler.CreateOrEditWorkspace)
 
-		mockDb.On("GetOrganizationByUuid", mock.AnythingOfType("string")).Return(db.Organization{}).Once()
-		mockDb.On("GetOrganizationByName", "Abdul").Return(db.Organization{}).Once()
-		mockDb.On("CreateOrEditOrganization", mock.MatchedBy(func(org db.Organization) bool {
+		mockDb.On("GetWorkspaceByUuid", mock.AnythingOfType("string")).Return(db.Organization{}).Once()
+		mockDb.On("GetWorkspaceByName", "Abdul").Return(db.Organization{}).Once()
+		mockDb.On("CreateOrEditWorkspace", mock.MatchedBy(func(org db.Organization) bool {
 			return org.Name == "Abdul" && org.Uuid != "" && org.Updated != nil && org.Created != nil
 		})).Return(db.Organization{Name: "Abdul"}, nil).Once()
 
@@ -132,15 +132,15 @@ func TestUnitCreateOrEditOrganization(t *testing.T) {
 
 	t.Run("should successfully add organization if request is valid", func(t *testing.T) {
 		rr := httptest.NewRecorder()
-		handler := http.HandlerFunc(oHandler.CreateOrEditOrganization)
+		handler := http.HandlerFunc(oHandler.CreateOrEditWorkspace)
 
-		mockDb.On("GetOrganizationByUuid", mock.AnythingOfType("string")).Return(db.Organization{}).Once()
-		mockDb.On("GetOrganizationByName", "TestOrganization").Return(db.Organization{}).Once()
-		mockDb.On("CreateOrEditOrganization", mock.MatchedBy(func(org db.Organization) bool {
-			return org.Name == "TestOrganization" && org.Uuid != "" && org.Updated != nil && org.Created != nil
+		mockDb.On("GetWorkspaceByUuid", mock.AnythingOfType("string")).Return(db.Organization{}).Once()
+		mockDb.On("GetWorkspaceByName", "TestWorkspace").Return(db.Organization{}).Once()
+		mockDb.On("CreateOrEditWorkspace", mock.MatchedBy(func(org db.Organization) bool {
+			return org.Name == "TestWorkspace" && org.Uuid != "" && org.Updated != nil && org.Created != nil
 		})).Return(db.Organization{}, nil).Once()
 
-		invalidJson := []byte(`{"name": "TestOrganization", "owner_pubkey": "test-key" ,"description": "Test"}`)
+		invalidJson := []byte(`{"name": "TestWorkspace", "owner_pubkey": "test-key" ,"description": "Test"}`)
 		req, err := http.NewRequestWithContext(ctx, http.MethodPost, "/", bytes.NewReader(invalidJson))
 		if err != nil {
 			t.Fatal(err)
@@ -162,8 +162,8 @@ func TestUnitCreateOrEditOrganization(t *testing.T) {
 		for _, tc := range tests {
 			t.Run(tc.description, func(t *testing.T) {
 				rr := httptest.NewRecorder()
-				handler := http.HandlerFunc(oHandler.CreateOrEditOrganization)
-				invalidJson := []byte(fmt.Sprintf(`{"name": "TestOrganization", "owner_pubkey": "test-key", "description": "%s"}`, tc.description))
+				handler := http.HandlerFunc(oHandler.CreateOrEditWorkspace)
+				invalidJson := []byte(fmt.Sprintf(`{"name": "TestWorkspace", "owner_pubkey": "test-key", "description": "%s"}`, tc.description))
 
 				req, err := http.NewRequestWithContext(ctx, http.MethodPost, "/", bytes.NewReader(invalidJson))
 				if err != nil {
@@ -178,15 +178,15 @@ func TestUnitCreateOrEditOrganization(t *testing.T) {
 	})
 }
 
-func TestDeleteOrganization(t *testing.T) {
+func TestDeleteWorkspace(t *testing.T) {
 	ctx := context.WithValue(context.Background(), auth.ContextKey, "test-key")
 	mockDb := mocks.NewDatabase(t)
-	oHandler := NewOrganizationHandler(mockDb)
+	oHandler := NewWorkspaceHandler(mockDb)
 
 	t.Run("should return error if not authorized", func(t *testing.T) {
 		orgUUID := "org-uuid"
 		rr := httptest.NewRecorder()
-		handler := http.HandlerFunc(oHandler.DeleteOrganization)
+		handler := http.HandlerFunc(oHandler.DeleteWorkspace)
 
 		rctx := chi.NewRouteContext()
 		rctx.URLParams.Add("uuid", orgUUID)
@@ -204,13 +204,13 @@ func TestDeleteOrganization(t *testing.T) {
 		orgUUID := "org-uuid"
 
 		// Mock expected database interactions
-		mockDb.On("GetOrganizationByUuid", orgUUID).Return(db.Organization{OwnerPubKey: "test-key"}).Once()
-		mockDb.On("UpdateOrganizationForDeletion", orgUUID).Return(nil).Once()
-		mockDb.On("DeleteAllUsersFromOrganization", orgUUID).Return(nil).Once()
-		mockDb.On("ChangeOrganizationDeleteStatus", orgUUID, true).Return(db.Organization{Uuid: orgUUID, Deleted: true}).Once()
+		mockDb.On("GetWorkspaceByUuid", orgUUID).Return(db.Organization{OwnerPubKey: "test-key"}).Once()
+		mockDb.On("UpdateWorkspaceForDeletion", orgUUID).Return(nil).Once()
+		mockDb.On("DeleteAllUsersFromWorkspace", orgUUID).Return(nil).Once()
+		mockDb.On("ChangeWorkspaceDeleteStatus", orgUUID, true).Return(db.Organization{Uuid: orgUUID, Deleted: true}).Once()
 
 		rr := httptest.NewRecorder()
-		handler := http.HandlerFunc(oHandler.DeleteOrganization)
+		handler := http.HandlerFunc(oHandler.DeleteWorkspace)
 
 		rctx := chi.NewRouteContext()
 		rctx.URLParams.Add("uuid", orgUUID)
@@ -229,11 +229,11 @@ func TestDeleteOrganization(t *testing.T) {
 		orgUUID := "org-uuid"
 
 		// Mock database interactions with error
-		mockDb.On("GetOrganizationByUuid", orgUUID).Return(db.Organization{OwnerPubKey: "test-key"}).Once()
-		mockDb.On("UpdateOrganizationForDeletion", orgUUID).Return(errors.New("update error")).Once()
+		mockDb.On("GetWorkspaceByUuid", orgUUID).Return(db.Organization{OwnerPubKey: "test-key"}).Once()
+		mockDb.On("UpdateWorkspaceForDeletion", orgUUID).Return(errors.New("update error")).Once()
 
 		rr := httptest.NewRecorder()
-		handler := http.HandlerFunc(oHandler.DeleteOrganization)
+		handler := http.HandlerFunc(oHandler.DeleteWorkspace)
 
 		rctx := chi.NewRouteContext()
 		rctx.URLParams.Add("uuid", orgUUID)
@@ -252,13 +252,13 @@ func TestDeleteOrganization(t *testing.T) {
 		orgUUID := "org-uuid"
 
 		// Mock the database interactions
-		mockDb.On("GetOrganizationByUuid", orgUUID).Return(db.Organization{OwnerPubKey: "test-key"}).Once()
-		mockDb.On("UpdateOrganizationForDeletion", orgUUID).Return(nil).Once()
-		mockDb.On("DeleteAllUsersFromOrganization", orgUUID).Return(nil).Once()
-		mockDb.On("ChangeOrganizationDeleteStatus", orgUUID, true).Return(db.Organization{Uuid: orgUUID, Deleted: true}).Once()
+		mockDb.On("GetWorkspaceByUuid", orgUUID).Return(db.Organization{OwnerPubKey: "test-key"}).Once()
+		mockDb.On("UpdateWorkspaceForDeletion", orgUUID).Return(nil).Once()
+		mockDb.On("DeleteAllUsersFromWorkspace", orgUUID).Return(nil).Once()
+		mockDb.On("ChangeWorkspaceDeleteStatus", orgUUID, true).Return(db.Organization{Uuid: orgUUID, Deleted: true}).Once()
 
 		rr := httptest.NewRecorder()
-		handler := http.HandlerFunc(oHandler.DeleteOrganization)
+		handler := http.HandlerFunc(oHandler.DeleteWorkspace)
 
 		rctx := chi.NewRouteContext()
 		rctx.URLParams.Add("uuid", orgUUID)
@@ -294,13 +294,13 @@ func TestDeleteOrganization(t *testing.T) {
 			Description: "",
 		}
 
-		mockDb.On("GetOrganizationByUuid", orgUUID).Return(db.Organization{OwnerPubKey: "test-key"}).Once()
-		mockDb.On("UpdateOrganizationForDeletion", orgUUID).Return(nil).Once()
-		mockDb.On("DeleteAllUsersFromOrganization", orgUUID).Return(nil).Once()
-		mockDb.On("ChangeOrganizationDeleteStatus", orgUUID, true).Return(updatedOrg).Once()
+		mockDb.On("GetWorkspaceByUuid", orgUUID).Return(db.Organization{OwnerPubKey: "test-key"}).Once()
+		mockDb.On("UpdateWorkspaceForDeletion", orgUUID).Return(nil).Once()
+		mockDb.On("DeleteAllUsersFromWorkspace", orgUUID).Return(nil).Once()
+		mockDb.On("ChangeWorkspaceDeleteStatus", orgUUID, true).Return(updatedOrg).Once()
 
 		rr := httptest.NewRecorder()
-		handler := http.HandlerFunc(oHandler.DeleteOrganization)
+		handler := http.HandlerFunc(oHandler.DeleteWorkspace)
 
 		rctx := chi.NewRouteContext()
 		rctx.URLParams.Add("uuid", orgUUID)
@@ -328,13 +328,13 @@ func TestDeleteOrganization(t *testing.T) {
 		orgUUID := "org-uuid"
 
 		// Setting up the expected behavior of the mock database
-		mockDb.On("GetOrganizationByUuid", orgUUID).Return(db.Organization{OwnerPubKey: "test-key"}).Once()
-		mockDb.On("UpdateOrganizationForDeletion", orgUUID).Return(nil).Once()
-		mockDb.On("DeleteAllUsersFromOrganization", orgUUID).Return(nil).Run(func(args mock.Arguments) {}).Once()
-		mockDb.On("ChangeOrganizationDeleteStatus", orgUUID, true).Return(db.Organization{Uuid: orgUUID, Deleted: true}).Once()
+		mockDb.On("GetWorkspaceByUuid", orgUUID).Return(db.Organization{OwnerPubKey: "test-key"}).Once()
+		mockDb.On("UpdateWorkspaceForDeletion", orgUUID).Return(nil).Once()
+		mockDb.On("DeleteAllUsersFromWorkspace", orgUUID).Return(nil).Run(func(args mock.Arguments) {}).Once()
+		mockDb.On("ChangeWorkspaceDeleteStatus", orgUUID, true).Return(db.Organization{Uuid: orgUUID, Deleted: true}).Once()
 
 		rr := httptest.NewRecorder()
-		handler := http.HandlerFunc(oHandler.DeleteOrganization)
+		handler := http.HandlerFunc(oHandler.DeleteWorkspace)
 
 		rctx := chi.NewRouteContext()
 		rctx.URLParams.Add("uuid", orgUUID)
@@ -351,23 +351,23 @@ func TestDeleteOrganization(t *testing.T) {
 	})
 }
 
-func TestGetOrganizationBounties(t *testing.T) {
+func TestGetWorkspaceBounties(t *testing.T) {
 	ctx := context.WithValue(context.Background(), auth.ContextKey, "test-key")
 	mockDb := mocks.NewDatabase(t)
 	mockGenerateBountyHandler := func(bounties []db.Bounty) []db.BountyResponse {
 		return []db.BountyResponse{} // Mocked response
 	}
-	oHandler := NewOrganizationHandler(mockDb)
+	oHandler := NewWorkspaceHandler(mockDb)
 
 	t.Run("Should test that an organization's bounties can be listed without authentication", func(t *testing.T) {
 		orgUUID := "valid-uuid"
 		oHandler.generateBountyHandler = mockGenerateBountyHandler
 
 		expectedBounties := []db.Bounty{{}, {}} // Mocked response
-		mockDb.On("GetOrganizationBounties", mock.AnythingOfType("*http.Request"), orgUUID).Return(expectedBounties).Once()
+		mockDb.On("GetWorkspaceBounties", mock.AnythingOfType("*http.Request"), orgUUID).Return(expectedBounties).Once()
 
 		rr := httptest.NewRecorder()
-		handler := http.HandlerFunc(oHandler.GetOrganizationBounties)
+		handler := http.HandlerFunc(oHandler.GetWorkspaceBounties)
 
 		rctx := chi.NewRouteContext()
 		rctx.URLParams.Add("uuid", orgUUID)
@@ -384,10 +384,10 @@ func TestGetOrganizationBounties(t *testing.T) {
 	t.Run("should return empty array when wrong organization UUID is passed", func(t *testing.T) {
 		orgUUID := "wrong-uuid"
 
-		mockDb.On("GetOrganizationBounties", mock.AnythingOfType("*http.Request"), orgUUID).Return([]db.Bounty{}).Once()
+		mockDb.On("GetWorkspaceBounties", mock.AnythingOfType("*http.Request"), orgUUID).Return([]db.Bounty{}).Once()
 
 		rr := httptest.NewRecorder()
-		handler := http.HandlerFunc(oHandler.GetOrganizationBounties)
+		handler := http.HandlerFunc(oHandler.GetWorkspaceBounties)
 
 		rctx := chi.NewRouteContext()
 		rctx.URLParams.Add("uuid", orgUUID)
@@ -406,13 +406,13 @@ func TestGetOrganizationBounties(t *testing.T) {
 	})
 }
 
-func TestGetOrganizationBudget(t *testing.T) {
+func TestGetWorkspaceBudget(t *testing.T) {
 	ctx := context.WithValue(context.Background(), auth.ContextKey, "test-key")
 	mockDb := mocks.NewDatabase(t)
 	mockUserHasAccess := func(pubKeyFromAuth string, uuid string, role string) bool {
 		return true
 	}
-	oHandler := NewOrganizationHandler(mockDb)
+	oHandler := NewWorkspaceHandler(mockDb)
 
 	t.Run("Should test that a 401 is returned when trying to view an organization's budget without a token", func(t *testing.T) {
 		orgUUID := "valid-uuid"
@@ -425,12 +425,12 @@ func TestGetOrganizationBudget(t *testing.T) {
 		}
 
 		rr := httptest.NewRecorder()
-		http.HandlerFunc(oHandler.GetOrganizationBudget).ServeHTTP(rr, req)
+		http.HandlerFunc(oHandler.GetWorkspaceBudget).ServeHTTP(rr, req)
 
 		assert.Equal(t, http.StatusUnauthorized, rr.Code)
 	})
 
-	t.Run("Should test that the right organization budget is returned, if the user is the organization admin or has the ViewReport role", func(t *testing.T) {
+	t.Run("Should test that the right workspace budget is returned, if the user is the organization admin or has the ViewReport role", func(t *testing.T) {
 		orgUUID := "valid-uuid"
 		statusBudget := db.StatusBudget{
 			OrgUuid:         orgUUID,
@@ -441,7 +441,7 @@ func TestGetOrganizationBudget(t *testing.T) {
 		}
 
 		oHandler.userHasAccess = mockUserHasAccess
-		mockDb.On("GetOrganizationStatusBudget", orgUUID).Return(statusBudget).Once()
+		mockDb.On("GetWorkspaceStatusBudget", orgUUID).Return(statusBudget).Once()
 
 		rctx := chi.NewRouteContext()
 		rctx.URLParams.Add("uuid", orgUUID)
@@ -451,7 +451,7 @@ func TestGetOrganizationBudget(t *testing.T) {
 		}
 
 		rr := httptest.NewRecorder()
-		http.HandlerFunc(oHandler.GetOrganizationBudget).ServeHTTP(rr, req)
+		http.HandlerFunc(oHandler.GetWorkspaceBudget).ServeHTTP(rr, req)
 
 		assert.Equal(t, http.StatusOK, rr.Code)
 
@@ -465,10 +465,10 @@ func TestGetOrganizationBudget(t *testing.T) {
 	})
 }
 
-func TestGetOrganizationBudgetHistory(t *testing.T) {
+func TestGetWorkspaceBudgetHistory(t *testing.T) {
 	ctx := context.WithValue(context.Background(), auth.ContextKey, "test-key")
 	mockDb := mocks.NewDatabase(t)
-	oHandler := NewOrganizationHandler(mockDb)
+	oHandler := NewWorkspaceHandler(mockDb)
 
 	t.Run("Should test that a 401 is returned when trying to view an organization's budget history without a token", func(t *testing.T) {
 		orgUUID := "valid-uuid"
@@ -486,7 +486,7 @@ func TestGetOrganizationBudgetHistory(t *testing.T) {
 		}
 
 		rr := httptest.NewRecorder()
-		http.HandlerFunc(oHandler.GetOrganizationBudgetHistory).ServeHTTP(rr, req)
+		http.HandlerFunc(oHandler.GetWorkspaceBudgetHistory).ServeHTTP(rr, req)
 
 		assert.Equal(t, http.StatusUnauthorized, rr.Code)
 	})
@@ -503,7 +503,7 @@ func TestGetOrganizationBudgetHistory(t *testing.T) {
 		}
 		oHandler.userHasAccess = mockUserHasAccess
 
-		mockDb.On("GetOrganizationBudgetHistory", orgUUID).Return(expectedBudgetHistory).Once()
+		mockDb.On("GetWorkspaceBudgetHistory", orgUUID).Return(expectedBudgetHistory).Once()
 
 		rctx := chi.NewRouteContext()
 		rctx.URLParams.Add("uuid", orgUUID)
@@ -513,7 +513,7 @@ func TestGetOrganizationBudgetHistory(t *testing.T) {
 		}
 
 		rr := httptest.NewRecorder()
-		http.HandlerFunc(oHandler.GetOrganizationBudgetHistory).ServeHTTP(rr, req)
+		http.HandlerFunc(oHandler.GetWorkspaceBudgetHistory).ServeHTTP(rr, req)
 
 		assert.Equal(t, http.StatusOK, rr.Code)
 
@@ -527,16 +527,16 @@ func TestGetOrganizationBudgetHistory(t *testing.T) {
 	})
 }
 
-func TestGetOrganizationBountiesCount(t *testing.T) {
+func TestGetWorkspaceBountiesCount(t *testing.T) {
 	ctx := context.WithValue(context.Background(), auth.ContextKey, "test-key")
 	mockDb := mocks.NewDatabase(t)
-	oHandler := NewOrganizationHandler(mockDb)
+	oHandler := NewWorkspaceHandler(mockDb)
 
 	t.Run("should return the count of organization bounties", func(t *testing.T) {
 		orgUUID := "valid-uuid"
 		expectedCount := int64(5)
 
-		mockDb.On("GetOrganizationBountiesCount", mock.AnythingOfType("*http.Request"), orgUUID).Return(expectedCount).Once()
+		mockDb.On("GetWorkspaceBountiesCount", mock.AnythingOfType("*http.Request"), orgUUID).Return(expectedCount).Once()
 
 		rctx := chi.NewRouteContext()
 		rctx.URLParams.Add("uuid", orgUUID)
@@ -546,7 +546,7 @@ func TestGetOrganizationBountiesCount(t *testing.T) {
 		}
 
 		rr := httptest.NewRecorder()
-		http.HandlerFunc(oHandler.GetOrganizationBountiesCount).ServeHTTP(rr, req)
+		http.HandlerFunc(oHandler.GetWorkspaceBountiesCount).ServeHTTP(rr, req)
 
 		assert.Equal(t, http.StatusOK, rr.Code)
 
