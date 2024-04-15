@@ -161,7 +161,7 @@ func TestMetricsBounties(t *testing.T) {
 		mockDb.On("GetBountiesByDateRange", dateRange, req).Return(bounties).Once()
 		mockDb.On("GetPersonByPubkey", "owner-1").Return(db.Person{ID: 1}).Once()
 		mockDb.On("GetPersonByPubkey", "").Return(db.Person{}).Once()
-		mockDb.On("GetOrganizationByUuid", "").Return(db.Organization{}).Once()
+		mockDb.On("GetWorkspaceByUuid", "").Return(db.Organization{}).Once()
 		handler.ServeHTTP(rr, req)
 
 		var res []db.BountyData
@@ -216,10 +216,10 @@ func TestMetricsBounties(t *testing.T) {
 		mockDb.On("GetBountiesByDateRange", dateRange, req).Return(bounties).Once()
 		mockDb.On("GetPersonByPubkey", "provider1").Return(db.Person{ID: 1}).Once()
 		mockDb.On("GetPersonByPubkey", "").Return(db.Person{}).Once()
-		mockDb.On("GetOrganizationByUuid", "").Return(db.Organization{}).Once()
+		mockDb.On("GetWorkspaceByUuid", "").Return(db.Organization{}).Once()
 		mockDb.On("GetPersonByPubkey", "provider2").Return(db.Person{ID: 2}).Once()
 		mockDb.On("GetPersonByPubkey", "").Return(db.Person{}).Once()
-		mockDb.On("GetOrganizationByUuid", "").Return(db.Organization{}).Once()
+		mockDb.On("GetWorkspaceByUuid", "").Return(db.Organization{}).Once()
 
 		handler.ServeHTTP(rr, req)
 
@@ -338,7 +338,7 @@ func TestConvertMetricsToCSV(t *testing.T) {
 			DatePaid:     &now,
 			DateAssigned: &now,
 		}}
-		expectedHeaders := []string{"DatePosted", "Organization", "BountyAmount", "Provider", "Hunter", "BountyTitle", "BountyLink", "BountyStatus", "DateAssigned", "DatePaid"}
+		expectedHeaders := []string{"DatePosted", "Workspace", "BountyAmount", "Provider", "Hunter", "BountyTitle", "BountyLink", "BountyStatus", "DateAssigned", "DatePaid"}
 		results := ConvertMetricsToCSV(bounties)
 
 		assert.Equal(t, 2, len(results))

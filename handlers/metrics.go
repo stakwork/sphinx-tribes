@@ -57,7 +57,7 @@ func PaymentMetrics(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(sumAmount)
 }
 
-func OrganizationtMetrics(w http.ResponseWriter, r *http.Request) {
+func WorkspacetMetrics(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 	pubKeyFromAuth, _ := ctx.Value(auth.ContextKey).(string)
 
@@ -78,7 +78,7 @@ func OrganizationtMetrics(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	sumAmount := db.DB.TotalOrganizationsByDateRange(request)
+	sumAmount := db.DB.TotalWorkspacesByDateRange(request)
 
 	w.WriteHeader(http.StatusOK)
 	json.NewEncoder(w).Encode(sumAmount)
@@ -105,7 +105,7 @@ func PeopleMetrics(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	sumAmount := db.DB.TotalOrganizationsByDateRange(request)
+	sumAmount := db.DB.TotalWorkspacesByDateRange(request)
 
 	w.WriteHeader(http.StatusOK)
 	json.NewEncoder(w).Encode(sumAmount)
@@ -305,29 +305,29 @@ func (mh *metricHandler) GetMetricsBountiesData(metricBounties []db.Bounty) []db
 	for _, bounty := range metricBounties {
 		bountyOwner := mh.db.GetPersonByPubkey(bounty.OwnerID)
 		bountyAssignee := mh.db.GetPersonByPubkey(bounty.Assignee)
-		organization := mh.db.GetOrganizationByUuid(bounty.OrgUuid)
+		organization := mh.db.GetWorkspaceByUuid(bounty.OrgUuid)
 
 		bountyData := db.BountyData{
-			Bounty:                  bounty,
-			BountyId:                bounty.ID,
-			Person:                  bountyOwner,
-			BountyCreated:           bounty.Created,
-			BountyDescription:       bounty.Description,
-			BountyUpdated:           bounty.Updated,
-			AssigneeId:              bountyAssignee.ID,
-			AssigneeImg:             bountyAssignee.Img,
-			AssigneeAlias:           bountyAssignee.OwnerAlias,
-			AssigneeDescription:     bountyAssignee.Description,
-			AssigneeRouteHint:       bountyAssignee.OwnerRouteHint,
-			BountyOwnerId:           bountyOwner.ID,
-			OwnerUuid:               bountyOwner.Uuid,
-			OwnerDescription:        bountyOwner.Description,
-			OwnerUniqueName:         bountyOwner.UniqueName,
-			OwnerImg:                bountyOwner.Img,
-			OrganizationName:        organization.Name,
-			OrganizationImg:         organization.Img,
-			OrganizationUuid:        organization.Uuid,
-			OrganizationDescription: organization.Description,
+			Bounty:               bounty,
+			BountyId:             bounty.ID,
+			Person:               bountyOwner,
+			BountyCreated:        bounty.Created,
+			BountyDescription:    bounty.Description,
+			BountyUpdated:        bounty.Updated,
+			AssigneeId:           bountyAssignee.ID,
+			AssigneeImg:          bountyAssignee.Img,
+			AssigneeAlias:        bountyAssignee.OwnerAlias,
+			AssigneeDescription:  bountyAssignee.Description,
+			AssigneeRouteHint:    bountyAssignee.OwnerRouteHint,
+			BountyOwnerId:        bountyOwner.ID,
+			OwnerUuid:            bountyOwner.Uuid,
+			OwnerDescription:     bountyOwner.Description,
+			OwnerUniqueName:      bountyOwner.UniqueName,
+			OwnerImg:             bountyOwner.Img,
+			OrganizationName:     organization.Name,
+			OrganizationImg:      organization.Img,
+			WorkspaceUuid:        organization.Uuid,
+			WorkspaceDescription: organization.Description,
 		}
 		metricBountiesData = append(metricBountiesData, bountyData)
 	}
@@ -339,7 +339,7 @@ func getMetricsBountyCsv(metricBounties []db.Bounty) []db.MetricsBountyCsv {
 	for _, bounty := range metricBounties {
 		bountyOwner := db.DB.GetPersonByPubkey(bounty.OwnerID)
 		bountyAssignee := db.DB.GetPersonByPubkey(bounty.Assignee)
-		organization := db.DB.GetOrganizationByUuid(bounty.OrgUuid)
+		organization := db.DB.GetWorkspaceByUuid(bounty.OrgUuid)
 
 		bountyLink := fmt.Sprintf("https://community.sphinx.chat/bounty/%d", bounty.ID)
 		bountyStatus := "Open"
@@ -372,7 +372,7 @@ func getMetricsBountyCsv(metricBounties []db.Bounty) []db.MetricsBountyCsv {
 func ConvertMetricsToCSV(metricBountiesData []db.MetricsBountyCsv) [][]string {
 	metricsData := db.DB.ConvertMetricsBountiesToMap(metricBountiesData)
 	opts := &jsonconv.ToCsvOption{
-		BaseHeaders: []string{"DatePosted", "Organization", "BountyAmount", "Provider", "Hunter", "BountyTitle", "BountyLink", "BountyStatus", "DateAssigned", "DatePaid"},
+		BaseHeaders: []string{"DatePosted", "Workspace", "BountyAmount", "Provider", "Hunter", "BountyTitle", "BountyLink", "BountyStatus", "DateAssigned", "DatePaid"},
 	}
 	result := jsonconv.ToCsv(metricsData, opts)
 	return result
