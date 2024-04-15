@@ -15,7 +15,7 @@ func MetricsRoutes() chi.Router {
 
 		r.Post("/payment", handlers.PaymentMetrics)
 		r.Post("/people", handlers.PeopleMetrics)
-		r.Post("/organization", handlers.OrganizationtMetrics)
+		r.Post("/organization", handlers.WorkspacetMetrics)
 		r.Post("/bounty_stats", mh.BountyMetrics)
 		r.Post("/bounties", mh.MetricsBounties)
 		r.Post("/bounties/count", mh.MetricsBountiesCount)

@@ -175,7 +175,7 @@ packages:
 We are currently using `gopkg.in/go-playground/validator.v9` for validation, to validate a struct add the `validate` property to it
 
 ```golang
-type Organization struct {
+type Workspace struct {
   Name        string     `gorm:"unique;not null" json:"name" validate:"required"`
   Website     string     `json:"website" validate:"omitempty,uri"`
   Github      string     `json:"github" validate:"omitempty,uri"`

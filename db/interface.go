@@ -31,15 +31,15 @@ type Database interface {
 	GetListedPosts(r *http.Request) ([]PeopleExtra, error)
 	GetUserBountiesCount(personKey string, tabType string) int64
 	GetBountiesCount(r *http.Request) int64
-	GetOrganizationBounties(r *http.Request, org_uuid string) []Bounty
-	GetOrganizationBountiesCount(r *http.Request, org_uuid string) int64
+	GetWorkspaceBounties(r *http.Request, org_uuid string) []Bounty
+	GetWorkspaceBountiesCount(r *http.Request, org_uuid string) int64
 	GetAssignedBounties(r *http.Request) ([]Bounty, error)
 	GetCreatedBounties(r *http.Request) ([]Bounty, error)
 	GetBountyById(id string) ([]Bounty, error)
 	GetNextBountyByCreated(r *http.Request) (uint, error)
 	GetPreviousBountyByCreated(r *http.Request) (uint, error)
-	GetNextOrganizationBountyByCreated(r *http.Request) (uint, error)
-	GetPreviousOrganizationBountyByCreated(r *http.Request) (uint, error)
+	GetNextWorkspaceBountyByCreated(r *http.Request) (uint, error)
+	GetPreviousWorkspaceBountyByCreated(r *http.Request) (uint, error)
 	GetBountyIndexById(id string) int64
 	GetBountyDataByCreated(created string) ([]Bounty, error)
 	AddBounty(b Bounty) (Bounty, error)
@@ -83,43 +83,43 @@ type Database interface {
 	GetLnUser(lnKey string) int64
 	CreateLnUser(lnKey string) (Person, error)
 	GetBountiesLeaderboard() []LeaderData
-	GetOrganizations(r *http.Request) []Organization
-	GetOrganizationsCount() int64
-	GetOrganizationByUuid(uuid string) Organization
-	GetOrganizationByName(name string) Organization
-	CreateOrEditOrganization(m Organization) (Organization, error)
-	GetOrganizationUsers(uuid string) ([]OrganizationUsersData, error)
-	GetOrganizationUsersCount(uuid string) int64
-	GetOrganizationBountyCount(uuid string) int64
-	GetOrganizationUser(pubkey string, org_uuid string) OrganizationUsers
-	CreateOrganizationUser(orgUser OrganizationUsers) OrganizationUsers
-	DeleteOrganizationUser(orgUser OrganizationUsersData, org string) OrganizationUsersData
+	GetWorkspaces(r *http.Request) []Organization
+	GetWorkspacesCount() int64
+	GetWorkspaceByUuid(uuid string) Organization
+	GetWorkspaceByName(name string) Organization
+	CreateOrEditWorkspace(m Organization) (Organization, error)
+	GetWorkspaceUsers(uuid string) ([]OrganizationUsersData, error)
+	GetWorkspaceUsersCount(uuid string) int64
+	GetWorkspaceBountyCount(uuid string) int64
+	GetWorkspaceUser(pubkey string, org_uuid string) OrganizationUsers
+	CreateWorkspaceUser(orgUser OrganizationUsers) OrganizationUsers
+	DeleteWorkspaceUser(orgUser OrganizationUsersData, org string) OrganizationUsersData
 	GetBountyRoles() []BountyRoles
 	CreateUserRoles(roles []UserRoles, uuid string, pubkey string) []UserRoles
-	GetUserCreatedOrganizations(pubkey string) []Organization
-	GetUserAssignedOrganizations(pubkey string) []OrganizationUsers
+	GetUserCreatedWorkspaces(pubkey string) []Organization
+	GetUserAssignedWorkspaces(pubkey string) []OrganizationUsers
 	AddBudgetHistory(budget BudgetHistory) BudgetHistory
-	CreateOrganizationBudget(budget BountyBudget) BountyBudget
-	UpdateOrganizationBudget(budget BountyBudget) BountyBudget
+	CreateWorkspaceBudget(budget BountyBudget) BountyBudget
+	UpdateWorkspaceBudget(budget BountyBudget) BountyBudget
 	GetPaymentHistoryByCreated(created *time.Time, org_uuid string) PaymentHistory
-	GetOrganizationBudget(org_uuid string) BountyBudget
-	GetOrganizationStatusBudget(org_uuid string) StatusBudget
-	GetOrganizationBudgetHistory(org_uuid string) []BudgetHistoryData
+	GetWorkspaceBudget(org_uuid string) BountyBudget
+	GetWorkspaceStatusBudget(org_uuid string) StatusBudget
+	GetWorkspaceBudgetHistory(org_uuid string) []BudgetHistoryData
 	AddAndUpdateBudget(invoice InvoiceList) PaymentHistory
 	WithdrawBudget(sender_pubkey string, org_uuid string, amount uint)
 	AddPaymentHistory(payment PaymentHistory) PaymentHistory
 	GetPaymentHistory(org_uuid string, r *http.Request) []PaymentHistory
 	GetInvoice(payment_request string) InvoiceList
-	GetOrganizationInvoices(org_uuid string) []InvoiceList
-	GetOrganizationInvoicesCount(org_uuid string) int64
+	GetWorkspaceInvoices(org_uuid string) []InvoiceList
+	GetWorkspaceInvoicesCount(org_uuid string) int64
 	UpdateInvoice(payment_request string) InvoiceList
 	AddInvoice(invoice InvoiceList) InvoiceList
 	AddUserInvoiceData(userData UserInvoiceData) UserInvoiceData
 	GetUserInvoiceData(payment_request string) UserInvoiceData
 	DeleteUserInvoiceData(payment_request string) UserInvoiceData
-	ChangeOrganizationDeleteStatus(org_uuid string, status bool) Organization
-	UpdateOrganizationForDeletion(uuid string) error
-	DeleteAllUsersFromOrganization(uuid string) error
+	ChangeWorkspaceDeleteStatus(org_uuid string, status bool) Organization
+	UpdateWorkspaceForDeletion(uuid string) error
+	DeleteAllUsersFromWorkspace(uuid string) error
 	GetFilterStatusCount() FilterStattuCount
 	UserHasManageBountyRoles(pubKeyFromAuth string, uuid string) bool
 	BountiesPaidPercentage(r PaymentDateRange) uint
