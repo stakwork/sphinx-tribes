@@ -436,8 +436,11 @@ func TestGetWorkspaceBudget(t *testing.T) {
 			OrgUuid:         orgUUID,
 			CurrentBudget:   10000,
 			OpenBudget:      1000,
+			OpenCount:       10,
 			AssignedBudget:  2000,
+			AssignedCount:   15,
 			CompletedBudget: 3000,
+			CompletedCount:  5,
 		}
 
 		oHandler.userHasAccess = mockUserHasAccess
