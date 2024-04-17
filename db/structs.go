@@ -698,9 +698,10 @@ type MetricsBountyCsv struct {
 }
 
 type FilterStattuCount struct {
-	Open     int64 `json:"open"`
-	Assigned int64 `json:"assigned"`
-	Paid     int64 `json:"paid"`
+	Open      int64 `json:"open"`
+	Assigned  int64 `json:"assigned"`
+	Completed int64 `json:"completed"`
+	Paid      int64 `json:"paid"`
 }
 
 func (Person) TableName() string {
