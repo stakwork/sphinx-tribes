@@ -21,6 +21,8 @@ func BountyRoutes() chi.Router {
 		r.Get("/previous/{created}", bountyHandler.GetPreviousBountyByCreated)
 		r.Get("/org/next/{uuid}/{created}", bountyHandler.GetWorkspaceNextBountyByCreated)
 		r.Get("/org/previous/{uuid}/{created}", bountyHandler.GetWorkspacePreviousBountyByCreated)
+		r.Get("/workspace/next/{uuid}/{created}", bountyHandler.GetWorkspaceNextBountyByCreated)
+		r.Get("/workspace/previous/{uuid}/{created}", bountyHandler.GetWorkspacePreviousBountyByCreated)
 
 		r.Get("/created/{created}", bountyHandler.GetBountyByCreated)
 		r.Get("/count/{personKey}/{tabType}", handlers.GetUserBountyCount)
