@@ -159,18 +159,30 @@ func (db database) GetWorkspaceStatusBudget(org_uuid string) StatusBudget {
 	var openBudget uint
 	db.db.Model(&Bounty{}).Where("assignee = '' ").Where("paid != true").Select("SUM(price)").Row().Scan(&openBudget)
 
+	var openCount int64
+	db.db.Model(&Bounty{}).Where("assignee = '' ").Where("paid != true").Count(&openCount)
+
 	var assignedBudget uint
 	db.db.Model(&Bounty{}).Where("assignee != '' ").Where("paid != true").Select("SUM(price)").Row().Scan(&assignedBudget)
 
+	var assignedCount int64
+	db.db.Model(&Bounty{}).Where("assignee != '' ").Where("paid != true").Count(&assignedCount)
+
 	var completedBudget uint
 	db.db.Model(&Bounty{}).Where("completed = true ").Where("paid != true").Select("SUM(price)").Row().Scan(&completedBudget)
+
+	var completedCount int64
+	db.db.Model(&Bounty{}).Where("completed = true ").Where("paid != true").Count(&completedCount)
 
 	statusBudget := StatusBudget{
 		OrgUuid:         org_uuid,
 		CurrentBudget:   orgBudget.TotalBudget,
 		OpenBudget:      openBudget,
+		OpenCount:       openCount,
 		AssignedBudget:  assignedBudget,
+		AssignedCount:   assignedCount,
 		CompletedBudget: completedBudget,
+		CompletedCount:  completedCount,
 	}
 
 	return statusBudget

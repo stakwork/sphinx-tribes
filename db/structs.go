@@ -501,8 +501,11 @@ type StatusBudget struct {
 	OrgUuid         string `json:"org_uuid"`
 	CurrentBudget   uint   `json:"current_budget"`
 	OpenBudget      uint   `json:"open_budget"`
+	OpenCount       int64  `json:"open_count"`
 	AssignedBudget  uint   `json:"assigned_budget"`
+	AssignedCount   int64  `json:"assigned_count"`
 	CompletedBudget uint   `json:"completed_budget"`
+	CompletedCount  int64  `json:"completed_count"`
 }
 
 type BudgetInvoiceRequest struct {
@@ -695,9 +698,10 @@ type MetricsBountyCsv struct {
 }
 
 type FilterStattuCount struct {
-	Open     int64 `json:"open"`
-	Assigned int64 `json:"assigned"`
-	Paid     int64 `json:"paid"`
+	Open      int64 `json:"open"`
+	Assigned  int64 `json:"assigned"`
+	Completed int64 `json:"completed"`
+	Paid      int64 `json:"paid"`
 }
 
 func (Person) TableName() string {
