@@ -105,11 +105,11 @@ func TestUnitCreateOrEditWorkspace(t *testing.T) {
 		rr := httptest.NewRecorder()
 		handler := http.HandlerFunc(oHandler.CreateOrEditWorkspace)
 
-		mockDb.On("GetWorkspaceByUuid", mock.AnythingOfType("string")).Return(db.Organization{}).Once()
-		mockDb.On("GetWorkspaceByName", "Abdul").Return(db.Organization{}).Once()
-		mockDb.On("CreateOrEditWorkspace", mock.MatchedBy(func(org db.Organization) bool {
+		mockDb.On("GetWorkspaceByUuid", mock.AnythingOfType("string")).Return(db.Workspace{}).Once()
+		mockDb.On("GetWorkspaceByName", "Abdul").Return(db.Workspace{}).Once()
+		mockDb.On("CreateOrEditWorkspace", mock.MatchedBy(func(org db.Workspace) bool {
 			return org.Name == "Abdul" && org.Uuid != "" && org.Updated != nil && org.Created != nil
-		})).Return(db.Organization{Name: "Abdul"}, nil).Once()
+		})).Return(db.Workspace{Name: "Abdul"}, nil).Once()
 
 		jsonInput := []byte(`{"name": " Abdul ", "owner_pubkey": "test-key" ,"description": "Test"}`)
 		req, err := http.NewRequestWithContext(ctx, http.MethodPost, "/", bytes.NewReader(jsonInput))
@@ -121,7 +121,7 @@ func TestUnitCreateOrEditWorkspace(t *testing.T) {
 
 		assert.Equal(t, http.StatusOK, rr.Code)
 
-		var responseOrg db.Organization
+		var responseOrg db.Workspace
 		err = json.Unmarshal(rr.Body.Bytes(), &responseOrg)
 		if err != nil {
 			t.Fatal(err)
@@ -134,11 +134,11 @@ func TestUnitCreateOrEditWorkspace(t *testing.T) {
 		rr := httptest.NewRecorder()
 		handler := http.HandlerFunc(oHandler.CreateOrEditWorkspace)
 
-		mockDb.On("GetWorkspaceByUuid", mock.AnythingOfType("string")).Return(db.Organization{}).Once()
-		mockDb.On("GetWorkspaceByName", "TestWorkspace").Return(db.Organization{}).Once()
-		mockDb.On("CreateOrEditWorkspace", mock.MatchedBy(func(org db.Organization) bool {
+		mockDb.On("GetWorkspaceByUuid", mock.AnythingOfType("string")).Return(db.Workspace{}).Once()
+		mockDb.On("GetWorkspaceByName", "TestWorkspace").Return(db.Workspace{}).Once()
+		mockDb.On("CreateOrEditWorkspace", mock.MatchedBy(func(org db.Workspace) bool {
 			return org.Name == "TestWorkspace" && org.Uuid != "" && org.Updated != nil && org.Created != nil
-		})).Return(db.Organization{}, nil).Once()
+		})).Return(db.Workspace{}, nil).Once()
 
 		invalidJson := []byte(`{"name": "TestWorkspace", "owner_pubkey": "test-key" ,"description": "Test"}`)
 		req, err := http.NewRequestWithContext(ctx, http.MethodPost, "/", bytes.NewReader(invalidJson))
@@ -204,10 +204,10 @@ func TestDeleteWorkspace(t *testing.T) {
 		orgUUID := "org-uuid"
 
 		// Mock expected database interactions
-		mockDb.On("GetWorkspaceByUuid", orgUUID).Return(db.Organization{OwnerPubKey: "test-key"}).Once()
+		mockDb.On("GetWorkspaceByUuid", orgUUID).Return(db.Workspace{OwnerPubKey: "test-key"}).Once()
 		mockDb.On("UpdateWorkspaceForDeletion", orgUUID).Return(nil).Once()
 		mockDb.On("DeleteAllUsersFromWorkspace", orgUUID).Return(nil).Once()
-		mockDb.On("ChangeWorkspaceDeleteStatus", orgUUID, true).Return(db.Organization{Uuid: orgUUID, Deleted: true}).Once()
+		mockDb.On("ChangeWorkspaceDeleteStatus", orgUUID, true).Return(db.Workspace{Uuid: orgUUID, Deleted: true}).Once()
 
 		rr := httptest.NewRecorder()
 		handler := http.HandlerFunc(oHandler.DeleteWorkspace)
@@ -229,7 +229,7 @@ func TestDeleteWorkspace(t *testing.T) {
 		orgUUID := "org-uuid"
 
 		// Mock database interactions with error
-		mockDb.On("GetWorkspaceByUuid", orgUUID).Return(db.Organization{OwnerPubKey: "test-key"}).Once()
+		mockDb.On("GetWorkspaceByUuid", orgUUID).Return(db.Workspace{OwnerPubKey: "test-key"}).Once()
 		mockDb.On("UpdateWorkspaceForDeletion", orgUUID).Return(errors.New("update error")).Once()
 
 		rr := httptest.NewRecorder()
@@ -252,10 +252,10 @@ func TestDeleteWorkspace(t *testing.T) {
 		orgUUID := "org-uuid"
 
 		// Mock the database interactions
-		mockDb.On("GetWorkspaceByUuid", orgUUID).Return(db.Organization{OwnerPubKey: "test-key"}).Once()
+		mockDb.On("GetWorkspaceByUuid", orgUUID).Return(db.Workspace{OwnerPubKey: "test-key"}).Once()
 		mockDb.On("UpdateWorkspaceForDeletion", orgUUID).Return(nil).Once()
 		mockDb.On("DeleteAllUsersFromWorkspace", orgUUID).Return(nil).Once()
-		mockDb.On("ChangeWorkspaceDeleteStatus", orgUUID, true).Return(db.Organization{Uuid: orgUUID, Deleted: true}).Once()
+		mockDb.On("ChangeWorkspaceDeleteStatus", orgUUID, true).Return(db.Workspace{Uuid: orgUUID, Deleted: true}).Once()
 
 		rr := httptest.NewRecorder()
 		handler := http.HandlerFunc(oHandler.DeleteWorkspace)
@@ -273,7 +273,7 @@ func TestDeleteWorkspace(t *testing.T) {
 		assert.Equal(t, http.StatusOK, rr.Code)
 
 		// Decoding the response to check if Deleted field is true
-		var updatedOrg db.Organization
+		var updatedOrg db.Workspace
 		err = json.Unmarshal(rr.Body.Bytes(), &updatedOrg)
 		if err != nil {
 			t.Fatal(err)
@@ -286,7 +286,7 @@ func TestDeleteWorkspace(t *testing.T) {
 	t.Run("should set Website, Github, and Description to empty strings", func(t *testing.T) {
 		orgUUID := "org-uuid"
 
-		updatedOrg := db.Organization{
+		updatedOrg := db.Workspace{
 			Uuid:        orgUUID,
 			OwnerPubKey: "test-key",
 			Website:     "",
@@ -294,7 +294,7 @@ func TestDeleteWorkspace(t *testing.T) {
 			Description: "",
 		}
 
-		mockDb.On("GetWorkspaceByUuid", orgUUID).Return(db.Organization{OwnerPubKey: "test-key"}).Once()
+		mockDb.On("GetWorkspaceByUuid", orgUUID).Return(db.Workspace{OwnerPubKey: "test-key"}).Once()
 		mockDb.On("UpdateWorkspaceForDeletion", orgUUID).Return(nil).Once()
 		mockDb.On("DeleteAllUsersFromWorkspace", orgUUID).Return(nil).Once()
 		mockDb.On("ChangeWorkspaceDeleteStatus", orgUUID, true).Return(updatedOrg).Once()
@@ -312,7 +312,7 @@ func TestDeleteWorkspace(t *testing.T) {
 		handler.ServeHTTP(rr, req)
 
 		assert.Equal(t, http.StatusOK, rr.Code)
-		var returnedOrg db.Organization
+		var returnedOrg db.Workspace
 		err = json.Unmarshal(rr.Body.Bytes(), &returnedOrg)
 		if err != nil {
 			t.Fatal(err)
@@ -328,10 +328,10 @@ func TestDeleteWorkspace(t *testing.T) {
 		orgUUID := "org-uuid"
 
 		// Setting up the expected behavior of the mock database
-		mockDb.On("GetWorkspaceByUuid", orgUUID).Return(db.Organization{OwnerPubKey: "test-key"}).Once()
+		mockDb.On("GetWorkspaceByUuid", orgUUID).Return(db.Workspace{OwnerPubKey: "test-key"}).Once()
 		mockDb.On("UpdateWorkspaceForDeletion", orgUUID).Return(nil).Once()
 		mockDb.On("DeleteAllUsersFromWorkspace", orgUUID).Return(nil).Run(func(args mock.Arguments) {}).Once()
-		mockDb.On("ChangeWorkspaceDeleteStatus", orgUUID, true).Return(db.Organization{Uuid: orgUUID, Deleted: true}).Once()
+		mockDb.On("ChangeWorkspaceDeleteStatus", orgUUID, true).Return(db.Workspace{Uuid: orgUUID, Deleted: true}).Once()
 
 		rr := httptest.NewRecorder()
 		handler := http.HandlerFunc(oHandler.DeleteWorkspace)

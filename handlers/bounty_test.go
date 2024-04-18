@@ -503,7 +503,7 @@ func TestGetBountyByCreated(t *testing.T) {
 				assignee := db.Person{
 					ID: 1,
 				}
-				organization := db.OrganizationShort{
+				workspace := db.WorkspaceShort{
 					Uuid: "uuid",
 				}
 
@@ -511,7 +511,8 @@ func TestGetBountyByCreated(t *testing.T) {
 					Bounty:       bounty,
 					Assignee:     assignee,
 					Owner:        owner,
-					Organization: organization,
+					Organization: workspace,
+					Workspace:    workspace,
 				}
 				bountyResponses = append(bountyResponses, bountyResponse)
 			}
@@ -540,7 +541,7 @@ func TestGetBountyByCreated(t *testing.T) {
 		mockDb.On("GetBountyDataByCreated", createdStr).Return([]db.Bounty{bounty}, nil).Once()
 		mockDb.On("GetPersonByPubkey", "owner-1").Return(db.Person{}).Once()
 		mockDb.On("GetPersonByPubkey", "user1").Return(db.Person{}).Once()
-		mockDb.On("GetWorkspaceByUuid", "org-1").Return(db.Organization{}).Once()
+		mockDb.On("GetWorkspaceByUuid", "org-1").Return(db.Workspace{}).Once()
 		handler.ServeHTTP(rr, req)
 
 		var returnedBounty []db.BountyResponse
@@ -598,7 +599,7 @@ func TestGetPersonAssignedBounties(t *testing.T) {
 		mockDb.On("GetAssignedBounties", req).Return([]db.Bounty{bounty}, nil).Once()
 		mockDb.On("GetPersonByPubkey", "owner-1").Return(db.Person{}, nil).Once()
 		mockDb.On("GetPersonByPubkey", "user1").Return(db.Person{}, nil).Once()
-		mockDb.On("GetWorkspaceByUuid", "org-1").Return(db.Organization{}, nil).Once()
+		mockDb.On("GetWorkspaceByUuid", "org-1").Return(db.Workspace{}, nil).Once()
 		handler.ServeHTTP(rr, req)
 
 		var returnedBounty []db.BountyResponse
@@ -626,7 +627,7 @@ func TestGetPersonCreatedBounties(t *testing.T) {
 				assignee := db.Person{
 					ID: 1,
 				}
-				organization := db.OrganizationShort{
+				workspace := db.WorkspaceShort{
 					Uuid: "uuid",
 				}
 
@@ -634,7 +635,8 @@ func TestGetPersonCreatedBounties(t *testing.T) {
 					Bounty:       bounty,
 					Assignee:     assignee,
 					Owner:        owner,
-					Organization: organization,
+					Organization: workspace,
+					Workspace:    workspace,
 				}
 				bountyResponses = append(bountyResponses, bountyResponse)
 			}
@@ -650,7 +652,7 @@ func TestGetPersonCreatedBounties(t *testing.T) {
 
 		mockDb.On("GetCreatedBounties", mock.Anything).Return(expectedBounties, nil).Once()
 		mockDb.On("GetPersonByPubkey", mock.Anything).Return(db.Person{}, nil)
-		mockDb.On("GetWorkspaceByUuid", mock.Anything).Return(db.Organization{}, nil)
+		mockDb.On("GetWorkspaceByUuid", mock.Anything).Return(db.Workspace{}, nil)
 		rr := httptest.NewRecorder()
 		req, err := http.NewRequest("GET", "/people/wanteds/created/uuid", nil)
 		req = req.WithContext(ctx)
@@ -717,7 +719,7 @@ func TestGetPersonCreatedBounties(t *testing.T) {
 				assignee := db.Person{
 					ID: 1,
 				}
-				organization := db.OrganizationShort{
+				workspace := db.WorkspaceShort{
 					Uuid: "uuid",
 				}
 
@@ -725,7 +727,8 @@ func TestGetPersonCreatedBounties(t *testing.T) {
 					Bounty:       bounty,
 					Assignee:     assignee,
 					Owner:        owner,
-					Organization: organization,
+					Organization: workspace,
+					Workspace:    workspace,
 				}
 				bountyResponses = append(bountyResponses, bountyResponse)
 			}
@@ -742,7 +745,7 @@ func TestGetPersonCreatedBounties(t *testing.T) {
 
 		mockDb.On("GetCreatedBounties", mock.Anything).Return(expectedBounties, nil).Once()
 		mockDb.On("GetPersonByPubkey", mock.Anything).Return(db.Person{}, nil)
-		mockDb.On("GetWorkspaceByUuid", mock.Anything).Return(db.Organization{}, nil)
+		mockDb.On("GetWorkspaceByUuid", mock.Anything).Return(db.Workspace{}, nil)
 
 		rr := httptest.NewRecorder()
 		req, err := http.NewRequest("GET", "/people/wanteds/created/uuid?Open=true&Assigned=true&Paid=true&offset=0&limit=2", nil)
@@ -816,7 +819,7 @@ func TestGetWorkspaceNextBountyByCreated(t *testing.T) {
 	mockHttpClient := mocks.NewHttpClient(t)
 	bHandler := NewBountyHandler(mockHttpClient, mockDb)
 
-	t.Run("Should test that the next bounty on the organization bounties homepage can be gotten by its created value and the selected filters", func(t *testing.T) {
+	t.Run("Should test that the next bounty on the workspace bounties homepage can be gotten by its created value and the selected filters", func(t *testing.T) {
 		mockDb.On("GetNextWorkspaceBountyByCreated", mock.AnythingOfType("*http.Request")).Return(uint(1), nil).Once()
 
 		rr := httptest.NewRecorder()
@@ -835,7 +838,7 @@ func TestGetWorkspacePreviousBountyByCreated(t *testing.T) {
 	mockHttpClient := mocks.NewHttpClient(t)
 	bHandler := NewBountyHandler(mockHttpClient, mockDb)
 
-	t.Run("Should test that the previous bounty on the organization bounties homepage can be gotten by its created value and the selected filters", func(t *testing.T) {
+	t.Run("Should test that the previous bounty on the workspace bounties homepage can be gotten by its created value and the selected filters", func(t *testing.T) {
 		mockDb.On("GetPreviousWorkspaceBountyByCreated", mock.AnythingOfType("*http.Request")).Return(uint(1), nil).Once()
 
 		rr := httptest.NewRecorder()
@@ -899,7 +902,7 @@ func TestGetBountyById(t *testing.T) {
 		mockDb.On("GetBountyById", mock.Anything).Return([]db.Bounty{bounty}, nil).Once()
 		mockDb.On("GetPersonByPubkey", "owner123").Return(db.Person{}).Once()
 		mockDb.On("GetPersonByPubkey", "user1").Return(db.Person{}).Once()
-		mockDb.On("GetWorkspaceByUuid", "org-789").Return(db.Organization{}).Once()
+		mockDb.On("GetWorkspaceByUuid", "org-789").Return(db.Workspace{}).Once()
 
 		handler.ServeHTTP(rr, req)
 
@@ -943,7 +946,7 @@ func GetPersonAssigned(t *testing.T) {
 				assignee := db.Person{
 					ID: 1,
 				}
-				organization := db.OrganizationShort{
+				workspace := db.WorkspaceShort{
 					Uuid: "uuid",
 				}
 
@@ -951,7 +954,8 @@ func GetPersonAssigned(t *testing.T) {
 					Bounty:       bounty,
 					Assignee:     assignee,
 					Owner:        owner,
-					Organization: organization,
+					Organization: workspace,
+					Workspace:    workspace,
 				}
 				bountyResponses = append(bountyResponses, bountyResponse)
 			}
@@ -969,7 +973,7 @@ func GetPersonAssigned(t *testing.T) {
 
 		mockDb.On("GetAssignedBounties", mock.Anything).Return(expectedBounties, nil).Once()
 		mockDb.On("GetPersonByPubkey", mock.Anything).Return(db.Person{}, nil)
-		mockDb.On("GetWorkspaceByUuid", mock.Anything).Return(db.Organization{}, nil)
+		mockDb.On("GetWorkspaceByUuid", mock.Anything).Return(db.Workspace{}, nil)
 		rr := httptest.NewRecorder()
 		req, err := http.NewRequest("GET", "/wanteds/assigned/uuid?Assigned=true&Paid=true&offset=0&limit=4", nil)
 		req = req.WithContext(ctx)
@@ -1101,7 +1105,7 @@ func TestGetAllBounties(t *testing.T) {
 
 		mockDb.On("GetAllBounties", req).Return(bounties)
 		mockDb.On("GetPersonByPubkey", mock.Anything).Return(db.Person{}, nil)
-		mockDb.On("GetWorkspaceByUuid", mock.Anything).Return(db.Organization{}, nil)
+		mockDb.On("GetWorkspaceByUuid", mock.Anything).Return(db.Workspace{}, nil)
 		handler.ServeHTTP(rr, req)
 
 		var returnedBounty []db.BountyResponse
@@ -1247,7 +1251,7 @@ func TestMakeBountyPayment(t *testing.T) {
 		mockDb.AssertExpectations(t)
 	})
 
-	t.Run("401 error if user not organization admin or does not have PAY BOUNTY role", func(t *testing.T) {
+	t.Run("401 error if user not workspace admin or does not have PAY BOUNTY role", func(t *testing.T) {
 		bHandler.userHasAccess = mockUserHasAccessFalse
 
 		mockDb.On("GetBounty", mock.AnythingOfType("uint")).Return(db.Bounty{
@@ -1273,7 +1277,7 @@ func TestMakeBountyPayment(t *testing.T) {
 
 	})
 
-	t.Run("403 error when amount exceeds organization's budget balance", func(t *testing.T) {
+	t.Run("403 error when amount exceeds workspace's budget balance", func(t *testing.T) {
 		ctx := context.WithValue(context.Background(), auth.ContextKey, "valid-key")
 
 		mockDb := dbMocks.NewDatabase(t)
@@ -1302,7 +1306,7 @@ func TestMakeBountyPayment(t *testing.T) {
 
 		r.ServeHTTP(rr, req)
 
-		assert.Equal(t, http.StatusForbidden, rr.Code, "Expected 403 Forbidden when the payment exceeds the organization's budget")
+		assert.Equal(t, http.StatusForbidden, rr.Code, "Expected 403 Forbidden when the payment exceeds the workspace's budget")
 
 	})
 
@@ -1447,7 +1451,7 @@ func TestBountyBudgetWithdraw(t *testing.T) {
 		assert.Equal(t, http.StatusNotAcceptable, rr.Code)
 	})
 
-	t.Run("401 error if user is not the organization admin or does not have WithdrawBudget role", func(t *testing.T) {
+	t.Run("401 error if user is not the workspace admin or does not have WithdrawBudget role", func(t *testing.T) {
 		bHandler.userHasAccess = mockUserHasAccessFalse
 
 		rr := httptest.NewRecorder()
@@ -1465,7 +1469,7 @@ func TestBountyBudgetWithdraw(t *testing.T) {
 		assert.Contains(t, rr.Body.String(), "You don't have appropriate permissions to withdraw bounty budget")
 	})
 
-	t.Run("403 error when amount exceeds organization's budget", func(t *testing.T) {
+	t.Run("403 error when amount exceeds workspace's budget", func(t *testing.T) {
 		ctxs := context.WithValue(context.Background(), auth.ContextKey, "valid-key")
 		mockDb := dbMocks.NewDatabase(t)
 		mockHttpClient := mocks.NewHttpClient(t)
@@ -1491,11 +1495,11 @@ func TestBountyBudgetWithdraw(t *testing.T) {
 
 		bHandler.BountyBudgetWithdraw(rr, req)
 
-		assert.Equal(t, http.StatusForbidden, rr.Code, "Expected 403 Forbidden when the payment exceeds the organization's budget")
+		assert.Equal(t, http.StatusForbidden, rr.Code, "Expected 403 Forbidden when the payment exceeds the workspace's budget")
 		assert.Contains(t, rr.Body.String(), "Workspace budget is not enough to withdraw the amount", "Expected specific error message")
 	})
 
-	t.Run("budget invoices get paid if amount is lesser than organization's budget", func(t *testing.T) {
+	t.Run("budget invoices get paid if amount is lesser than workspace's budget", func(t *testing.T) {
 		ctxs := context.WithValue(context.Background(), auth.ContextKey, "valid-key")
 		mockDb := dbMocks.NewDatabase(t)
 		mockHttpClient := mocks.NewHttpClient(t)
@@ -1615,7 +1619,7 @@ func TestBountyBudgetWithdraw(t *testing.T) {
 			assert.NoError(t, err)
 			assert.True(t, response.Success, "Expected invoice payment to succeed")
 			finalBudget := mockDb.GetWorkspaceBudget("org-1")
-			assert.Equal(t, expectedFinalBudget, finalBudget.TotalBudget, "The organization's final budget should reflect the deductions from the successful withdrawals")
+			assert.Equal(t, expectedFinalBudget, finalBudget.TotalBudget, "The workspace's final budget should reflect the deductions from the successful withdrawals")
 
 		}
 	})
@@ -1776,7 +1780,7 @@ func TestPollInvoice(t *testing.T) {
 		mockHttpClient.AssertExpectations(t)
 	})
 
-	t.Run("If the invoice is settled and the invoice.Type is equal to BUDGET the invoice amount should be added to the organization budget and the payment status of the related invoice should be sent to true on the payment history table", func(t *testing.T) {
+	t.Run("If the invoice is settled and the invoice.Type is equal to BUDGET the invoice amount should be added to the workspace budget and the payment status of the related invoice should be sent to true on the payment history table", func(t *testing.T) {
 		ctx := context.Background()
 		mockDb := &dbMocks.Database{}
 		mockHttpClient := &mocks.HttpClient{}

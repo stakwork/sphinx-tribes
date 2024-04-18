@@ -31,8 +31,8 @@ type Database interface {
 	GetListedPosts(r *http.Request) ([]PeopleExtra, error)
 	GetUserBountiesCount(personKey string, tabType string) int64
 	GetBountiesCount(r *http.Request) int64
-	GetWorkspaceBounties(r *http.Request, org_uuid string) []Bounty
-	GetWorkspaceBountiesCount(r *http.Request, org_uuid string) int64
+	GetWorkspaceBounties(r *http.Request, workspace_uuid string) []Bounty
+	GetWorkspaceBountiesCount(r *http.Request, workspace_uuid string) int64
 	GetAssignedBounties(r *http.Request) ([]Bounty, error)
 	GetCreatedBounties(r *http.Request) ([]Bounty, error)
 	GetBountyById(id string) ([]Bounty, error)
@@ -83,41 +83,41 @@ type Database interface {
 	GetLnUser(lnKey string) int64
 	CreateLnUser(lnKey string) (Person, error)
 	GetBountiesLeaderboard() []LeaderData
-	GetWorkspaces(r *http.Request) []Organization
+	GetWorkspaces(r *http.Request) []Workspace
 	GetWorkspacesCount() int64
-	GetWorkspaceByUuid(uuid string) Organization
-	GetWorkspaceByName(name string) Organization
-	CreateOrEditWorkspace(m Organization) (Organization, error)
-	GetWorkspaceUsers(uuid string) ([]OrganizationUsersData, error)
+	GetWorkspaceByUuid(uuid string) Workspace
+	GetWorkspaceByName(name string) Workspace
+	CreateOrEditWorkspace(m Workspace) (Workspace, error)
+	GetWorkspaceUsers(uuid string) ([]WorkspaceUsersData, error)
 	GetWorkspaceUsersCount(uuid string) int64
 	GetWorkspaceBountyCount(uuid string) int64
-	GetWorkspaceUser(pubkey string, org_uuid string) OrganizationUsers
-	CreateWorkspaceUser(orgUser OrganizationUsers) OrganizationUsers
-	DeleteWorkspaceUser(orgUser OrganizationUsersData, org string) OrganizationUsersData
+	GetWorkspaceUser(pubkey string, workspace_uuid string) WorkspaceUsers
+	CreateWorkspaceUser(orgUser WorkspaceUsers) WorkspaceUsers
+	DeleteWorkspaceUser(orgUser WorkspaceUsersData, org string) WorkspaceUsersData
 	GetBountyRoles() []BountyRoles
 	CreateUserRoles(roles []UserRoles, uuid string, pubkey string) []UserRoles
-	GetUserCreatedWorkspaces(pubkey string) []Organization
-	GetUserAssignedWorkspaces(pubkey string) []OrganizationUsers
+	GetUserCreatedWorkspaces(pubkey string) []Workspace
+	GetUserAssignedWorkspaces(pubkey string) []WorkspaceUsers
 	AddBudgetHistory(budget BudgetHistory) BudgetHistory
 	CreateWorkspaceBudget(budget BountyBudget) BountyBudget
 	UpdateWorkspaceBudget(budget BountyBudget) BountyBudget
-	GetPaymentHistoryByCreated(created *time.Time, org_uuid string) PaymentHistory
-	GetWorkspaceBudget(org_uuid string) BountyBudget
-	GetWorkspaceStatusBudget(org_uuid string) StatusBudget
-	GetWorkspaceBudgetHistory(org_uuid string) []BudgetHistoryData
+	GetPaymentHistoryByCreated(created *time.Time, workspace_uuid string) PaymentHistory
+	GetWorkspaceBudget(workspace_uuid string) BountyBudget
+	GetWorkspaceStatusBudget(workspace_uuid string) StatusBudget
+	GetWorkspaceBudgetHistory(workspace_uuid string) []BudgetHistoryData
 	AddAndUpdateBudget(invoice InvoiceList) PaymentHistory
-	WithdrawBudget(sender_pubkey string, org_uuid string, amount uint)
+	WithdrawBudget(sender_pubkey string, workspace_uuid string, amount uint)
 	AddPaymentHistory(payment PaymentHistory) PaymentHistory
-	GetPaymentHistory(org_uuid string, r *http.Request) []PaymentHistory
+	GetPaymentHistory(workspace_uuid string, r *http.Request) []PaymentHistory
 	GetInvoice(payment_request string) InvoiceList
-	GetWorkspaceInvoices(org_uuid string) []InvoiceList
-	GetWorkspaceInvoicesCount(org_uuid string) int64
+	GetWorkspaceInvoices(workspace_uuid string) []InvoiceList
+	GetWorkspaceInvoicesCount(workspace_uuid string) int64
 	UpdateInvoice(payment_request string) InvoiceList
 	AddInvoice(invoice InvoiceList) InvoiceList
 	AddUserInvoiceData(userData UserInvoiceData) UserInvoiceData
 	GetUserInvoiceData(payment_request string) UserInvoiceData
 	DeleteUserInvoiceData(payment_request string) UserInvoiceData
-	ChangeWorkspaceDeleteStatus(org_uuid string, status bool) Organization
+	ChangeWorkspaceDeleteStatus(workspace_uuid string, status bool) Workspace
 	UpdateWorkspaceForDeletion(uuid string) error
 	DeleteAllUsersFromWorkspace(uuid string) error
 	GetFilterStatusCount() FilterStattuCount

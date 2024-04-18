@@ -46,7 +46,7 @@ func (oh *workspaceHandler) CreateOrEditWorkspace(w http.ResponseWriter, r *http
 	}
 	now := time.Now()
 
-	workspace := db.Organization{}
+	workspace := db.Workspace{}
 	body, _ := io.ReadAll(r.Body)
 	r.Body.Close()
 	err := json.Unmarshal(body, &workspace)
@@ -60,16 +60,16 @@ func (oh *workspaceHandler) CreateOrEditWorkspace(w http.ResponseWriter, r *http
 	workspace.Name = strings.TrimSpace(workspace.Name)
 
 	if len(workspace.Name) == 0 || len(workspace.Name) > 20 {
-		fmt.Printf("invalid organization name %s\n", workspace.Name)
+		fmt.Printf("invalid workspace name %s\n", workspace.Name)
 		w.WriteHeader(http.StatusBadRequest)
-		json.NewEncoder(w).Encode("Error: organization name must be present and should not exceed 20 character")
+		json.NewEncoder(w).Encode("Error: workspace name must be present and should not exceed 20 character")
 		return
 	}
 
 	if len(workspace.Description) > 120 {
-		fmt.Printf("invalid organization name %s\n", workspace.Description)
+		fmt.Printf("invalid workspace name %s\n", workspace.Description)
 		w.WriteHeader(http.StatusBadRequest)
-		json.NewEncoder(w).Encode("Error: organization description should not exceed 120 character")
+		json.NewEncoder(w).Encode("Error: workspace description should not exceed 120 character")
 		return
 	}
 
@@ -111,7 +111,7 @@ func (oh *workspaceHandler) CreateOrEditWorkspace(w http.ResponseWriter, r *http
 
 		name := workspace.Name
 
-		// check if the organization name already exists
+		// check if the workspace name already exists
 		orgName := oh.db.GetWorkspaceByName(name)
 
 		if orgName.Name == name {
@@ -127,13 +127,13 @@ func (oh *workspaceHandler) CreateOrEditWorkspace(w http.ResponseWriter, r *http
 	} else {
 		if workspace.ID == 0 {
 			// can't create that already exists
-			fmt.Println("can't create existing organization")
+			fmt.Println("can't create existing workspace")
 			w.WriteHeader(http.StatusUnauthorized)
 			return
 		}
 
 		if workspace.ID != existing.ID { // can't edit someone else's
-			fmt.Println("cant edit another organization")
+			fmt.Println("cant edit another workspace")
 			w.WriteHeader(http.StatusUnauthorized)
 			return
 		}
@@ -176,13 +176,13 @@ func CreateWorkspaceUser(w http.ResponseWriter, r *http.Request) {
 	pubKeyFromAuth, _ := ctx.Value(auth.ContextKey).(string)
 	now := time.Now()
 
-	orgUser := db.OrganizationUsers{}
+	workspaceUser := db.WorkspaceUsers{}
 	body, err := io.ReadAll(r.Body)
 	r.Body.Close()
-	err = json.Unmarshal(body, &orgUser)
+	err = json.Unmarshal(body, &workspaceUser)
 
 	// get orgnanization
-	workspace := db.DB.GetWorkspaceByUuid(orgUser.OrgUuid)
+	workspace := db.DB.GetWorkspaceByUuid(workspaceUser.WorkspaceUuid)
 
 	if err != nil {
 		fmt.Println(err)
@@ -196,22 +196,22 @@ func CreateWorkspaceUser(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// check if the user is the organization admin
-	if orgUser.OwnerPubKey == workspace.OwnerPubKey {
+	// check if the user is the workspace admin
+	if workspaceUser.OwnerPubKey == workspace.OwnerPubKey {
 		w.WriteHeader(http.StatusUnauthorized)
-		json.NewEncoder(w).Encode("Cannot add organization admin as a user")
+		json.NewEncoder(w).Encode("Cannot add workspace admin as a user")
 		return
 	}
 
 	// check if the user tries to add their self
-	if pubKeyFromAuth == orgUser.OwnerPubKey {
+	if pubKeyFromAuth == workspaceUser.OwnerPubKey {
 		w.WriteHeader(http.StatusUnauthorized)
 		json.NewEncoder(w).Encode("Cannot add userself as a user")
 		return
 	}
 
 	// if not the orgnization admin
-	hasRole := db.UserHasAccess(pubKeyFromAuth, orgUser.OrgUuid, db.AddUser)
+	hasRole := db.UserHasAccess(pubKeyFromAuth, workspaceUser.WorkspaceUuid, db.AddUser)
 	if !hasRole {
 		w.WriteHeader(http.StatusUnauthorized)
 		json.NewEncoder(w).Encode("Don't have access to add user")
@@ -219,15 +219,15 @@ func CreateWorkspaceUser(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// check if the user exists on peoples table
-	isUser := db.DB.GetPersonByPubkey(orgUser.OwnerPubKey)
-	if isUser.OwnerPubKey != orgUser.OwnerPubKey {
+	isUser := db.DB.GetPersonByPubkey(workspaceUser.OwnerPubKey)
+	if isUser.OwnerPubKey != workspaceUser.OwnerPubKey {
 		w.WriteHeader(http.StatusUnauthorized)
 		json.NewEncoder(w).Encode("User doesn't exists in people")
 		return
 	}
 
 	// check if user already exists
-	userExists := db.DB.GetWorkspaceUser(orgUser.OwnerPubKey, orgUser.OrgUuid)
+	userExists := db.DB.GetWorkspaceUser(workspaceUser.OwnerPubKey, workspaceUser.WorkspaceUuid)
 
 	if userExists.ID != 0 {
 		w.WriteHeader(http.StatusUnauthorized)
@@ -235,21 +235,21 @@ func CreateWorkspaceUser(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	orgUser.Created = &now
-	orgUser.Updated = &now
+	workspaceUser.Created = &now
+	workspaceUser.Updated = &now
 
 	// create user
-	user := db.DB.CreateWorkspaceUser(orgUser)
+	user := db.DB.CreateWorkspaceUser(workspaceUser)
 	w.WriteHeader(http.StatusOK)
 	json.NewEncoder(w).Encode(user)
 }
 
 func GetWorkspaceUsers(w http.ResponseWriter, r *http.Request) {
 	uuid := chi.URLParam(r, "uuid")
-	orgUsers, _ := db.DB.GetWorkspaceUsers(uuid)
+	workspaceUsers, _ := db.DB.GetWorkspaceUsers(uuid)
 
 	w.WriteHeader(http.StatusOK)
-	json.NewEncoder(w).Encode(orgUsers)
+	json.NewEncoder(w).Encode(workspaceUsers)
 }
 
 func GetWorkspaceUser(w http.ResponseWriter, r *http.Request) {
@@ -263,10 +263,10 @@ func GetWorkspaceUser(w http.ResponseWriter, r *http.Request) {
 	}
 
 	uuid := chi.URLParam(r, "uuid")
-	orgUser := db.DB.GetWorkspaceUser(pubKeyFromAuth, uuid)
+	workspaceUser := db.DB.GetWorkspaceUser(pubKeyFromAuth, uuid)
 
 	w.WriteHeader(http.StatusOK)
-	json.NewEncoder(w).Encode(orgUser)
+	json.NewEncoder(w).Encode(workspaceUser)
 }
 
 func GetWorkspaceUsersCount(w http.ResponseWriter, r *http.Request) {
@@ -281,10 +281,10 @@ func DeleteWorkspaceUser(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 	pubKeyFromAuth, _ := ctx.Value(auth.ContextKey).(string)
 
-	orgUser := db.OrganizationUsersData{}
+	workspaceUser := db.WorkspaceUsersData{}
 	body, err := io.ReadAll(r.Body)
 	r.Body.Close()
-	err = json.Unmarshal(body, &orgUser)
+	err = json.Unmarshal(body, &workspaceUser)
 
 	if err != nil {
 		fmt.Println(err)
@@ -298,25 +298,25 @@ func DeleteWorkspaceUser(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	workspace := db.DB.GetWorkspaceByUuid(orgUser.OrgUuid)
+	workspace := db.DB.GetWorkspaceByUuid(workspaceUser.WorkspaceUuid)
 
-	if orgUser.OwnerPubKey == workspace.OwnerPubKey {
+	if workspaceUser.OwnerPubKey == workspace.OwnerPubKey {
 		w.WriteHeader(http.StatusUnauthorized)
-		json.NewEncoder(w).Encode("Cannot delete organization admin")
+		json.NewEncoder(w).Encode("Cannot delete workspace admin")
 		return
 	}
 
-	hasRole := db.UserHasAccess(pubKeyFromAuth, orgUser.OrgUuid, db.DeleteUser)
+	hasRole := db.UserHasAccess(pubKeyFromAuth, workspaceUser.WorkspaceUuid, db.DeleteUser)
 	if !hasRole {
 		w.WriteHeader(http.StatusUnauthorized)
 		json.NewEncoder(w).Encode("Don't have access to delete user")
 		return
 	}
 
-	db.DB.DeleteWorkspaceUser(orgUser, orgUser.OrgUuid)
+	db.DB.DeleteWorkspaceUser(workspaceUser, workspaceUser.WorkspaceUuid)
 
 	w.WriteHeader(http.StatusOK)
-	json.NewEncoder(w).Encode(orgUser)
+	json.NewEncoder(w).Encode(workspaceUser)
 }
 
 func GetBountyRoles(w http.ResponseWriter, r *http.Request) {
@@ -407,10 +407,10 @@ func AddUserRoles(w http.ResponseWriter, r *http.Request) {
 	// check if user already exists
 	userExists := db.DB.GetWorkspaceUser(user, uuid)
 
-	// if not the organization admin
-	if userExists.OwnerPubKey != user || userExists.OrgUuid != uuid {
+	// if not the workspace admin
+	if userExists.OwnerPubKey != user || userExists.WorkspaceUuid != uuid {
 		w.WriteHeader(http.StatusUnauthorized)
-		json.NewEncoder(w).Encode("User does not exists in the organization")
+		json.NewEncoder(w).Encode("User does not exists in the workspace")
 		return
 	}
 
@@ -443,27 +443,27 @@ func GetUserWorkspaces(w http.ResponseWriter, r *http.Request) {
 	user := db.DB.GetPerson(userId)
 
 	// get the workspaces created by the user, then get all the workspaces
-	// the user has been added to, loop through to get the organization
+	// the user has been added to, loop through to get the workspace
 	workspaces := GetCreatedWorkspaces(user.OwnerPubKey)
 
 	assignedWorkspaces := db.DB.GetUserAssignedWorkspaces(user.OwnerPubKey)
 	for _, value := range assignedWorkspaces {
-		uuid := value.OrgUuid
-		organization := db.DB.GetWorkspaceByUuid(uuid)
+		uuid := value.WorkspaceUuid
+		workspace := db.DB.GetWorkspaceByUuid(uuid)
 		bountyCount := db.DB.GetWorkspaceBountyCount(uuid)
 		hasRole := db.UserHasAccess(user.OwnerPubKey, uuid, db.ViewReport)
 
 		// don't add deleted workspaces to the list
-		if !organization.Deleted {
+		if !workspace.Deleted {
 			if hasRole {
 				budget := db.DB.GetWorkspaceBudget(uuid)
-				organization.Budget = budget.TotalBudget
+				workspace.Budget = budget.TotalBudget
 			} else {
-				organization.Budget = 0
+				workspace.Budget = 0
 			}
-			organization.BountyCount = bountyCount
+			workspace.BountyCount = bountyCount
 
-			workspaces = append(workspaces, organization)
+			workspaces = append(workspaces, workspace)
 		}
 	}
 
@@ -484,28 +484,28 @@ func (oh *workspaceHandler) GetUserDropdownWorkspaces(w http.ResponseWriter, r *
 	user := db.DB.GetPerson(userId)
 
 	// get the workspaces created by the user, then get all the workspaces
-	// the user has been added to, loop through to get the organization
+	// the user has been added to, loop through to get the workspace
 	workspaces := GetCreatedWorkspaces(user.OwnerPubKey)
 
 	assignedWorkspaces := db.DB.GetUserAssignedWorkspaces(user.OwnerPubKey)
 	for _, value := range assignedWorkspaces {
-		uuid := value.OrgUuid
-		organization := db.DB.GetWorkspaceByUuid(uuid)
+		uuid := value.WorkspaceUuid
+		workspace := db.DB.GetWorkspaceByUuid(uuid)
 		bountyCount := db.DB.GetWorkspaceBountyCount(uuid)
 		hasRole := db.UserHasAccess(user.OwnerPubKey, uuid, db.ViewReport)
 		hasBountyRoles := oh.userHasManageBountyRoles(user.OwnerPubKey, uuid)
 
 		// don't add deleted workspaces to the list
-		if !organization.Deleted && hasBountyRoles {
+		if !workspace.Deleted && hasBountyRoles {
 			if hasRole {
 				budget := db.DB.GetWorkspaceBudget(uuid)
-				organization.Budget = budget.TotalBudget
+				workspace.Budget = budget.TotalBudget
 			} else {
-				organization.Budget = 0
+				workspace.Budget = 0
 			}
-			organization.BountyCount = bountyCount
+			workspace.BountyCount = bountyCount
 
-			workspaces = append(workspaces, organization)
+			workspaces = append(workspaces, workspace)
 		}
 	}
 
@@ -513,9 +513,9 @@ func (oh *workspaceHandler) GetUserDropdownWorkspaces(w http.ResponseWriter, r *
 	json.NewEncoder(w).Encode(workspaces)
 }
 
-func GetCreatedWorkspaces(pubkey string) []db.Organization {
+func GetCreatedWorkspaces(pubkey string) []db.Workspace {
 	workspaces := db.DB.GetUserCreatedWorkspaces(pubkey)
-	// add bounty count to the organization
+	// add bounty count to the workspace
 	for index, value := range workspaces {
 		uuid := value.Uuid
 		bountyCount := db.DB.GetWorkspaceBountyCount(uuid)
@@ -535,10 +535,10 @@ func GetCreatedWorkspaces(pubkey string) []db.Organization {
 func (oh *workspaceHandler) GetWorkspaceBounties(w http.ResponseWriter, r *http.Request) {
 	uuid := chi.URLParam(r, "uuid")
 
-	// get the organization bounties
-	organizationBounties := oh.db.GetWorkspaceBounties(r, uuid)
+	// get the workspace bounties
+	workspaceBounties := oh.db.GetWorkspaceBounties(r, uuid)
 
-	var bountyResponse []db.BountyResponse = oh.generateBountyHandler(organizationBounties)
+	var bountyResponse []db.BountyResponse = oh.generateBountyHandler(workspaceBounties)
 	w.WriteHeader(http.StatusOK)
 	json.NewEncoder(w).Encode(bountyResponse)
 }
@@ -546,10 +546,10 @@ func (oh *workspaceHandler) GetWorkspaceBounties(w http.ResponseWriter, r *http.
 func (oh *workspaceHandler) GetWorkspaceBountiesCount(w http.ResponseWriter, r *http.Request) {
 	uuid := chi.URLParam(r, "uuid")
 
-	organizationBountiesCount := oh.db.GetWorkspaceBountiesCount(r, uuid)
+	workspaceBountiesCount := oh.db.GetWorkspaceBountiesCount(r, uuid)
 
 	w.WriteHeader(http.StatusOK)
-	json.NewEncoder(w).Encode(organizationBountiesCount)
+	json.NewEncoder(w).Encode(workspaceBountiesCount)
 }
 
 func (oh *workspaceHandler) GetWorkspaceBudget(w http.ResponseWriter, r *http.Request) {
@@ -563,7 +563,7 @@ func (oh *workspaceHandler) GetWorkspaceBudget(w http.ResponseWriter, r *http.Re
 		return
 	}
 
-	// if not the organization admin
+	// if not the workspace admin
 	hasRole := oh.userHasAccess(pubKeyFromAuth, uuid, db.ViewReport)
 	if !hasRole {
 		w.WriteHeader(http.StatusUnauthorized)
@@ -571,11 +571,11 @@ func (oh *workspaceHandler) GetWorkspaceBudget(w http.ResponseWriter, r *http.Re
 		return
 	}
 
-	// get the organization budget
-	organizationBudget := oh.db.GetWorkspaceStatusBudget(uuid)
+	// get the workspace budget
+	workspaceBudget := oh.db.GetWorkspaceStatusBudget(uuid)
 
 	w.WriteHeader(http.StatusOK)
-	json.NewEncoder(w).Encode(organizationBudget)
+	json.NewEncoder(w).Encode(workspaceBudget)
 }
 
 func (oh *workspaceHandler) GetWorkspaceBudgetHistory(w http.ResponseWriter, r *http.Request) {
@@ -583,7 +583,7 @@ func (oh *workspaceHandler) GetWorkspaceBudgetHistory(w http.ResponseWriter, r *
 	pubKeyFromAuth, _ := ctx.Value(auth.ContextKey).(string)
 	uuid := chi.URLParam(r, "uuid")
 
-	// if not the organization admin
+	// if not the workspace admin
 	hasRole := oh.userHasAccess(pubKeyFromAuth, uuid, db.ViewReport)
 	if !hasRole {
 		w.WriteHeader(http.StatusUnauthorized)
@@ -591,11 +591,11 @@ func (oh *workspaceHandler) GetWorkspaceBudgetHistory(w http.ResponseWriter, r *
 		return
 	}
 
-	// get the organization budget
-	organizationBudget := oh.db.GetWorkspaceBudgetHistory(uuid)
+	// get the workspace budget
+	workspaceBudget := oh.db.GetWorkspaceBudgetHistory(uuid)
 
 	w.WriteHeader(http.StatusOK)
-	json.NewEncoder(w).Encode(organizationBudget)
+	json.NewEncoder(w).Encode(workspaceBudget)
 }
 
 func GetPaymentHistory(w http.ResponseWriter, r *http.Request) {
@@ -609,7 +609,7 @@ func GetPaymentHistory(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// if not the organization admin
+	// if not the workspace admin
 	hasRole := db.UserHasAccess(pubKeyFromAuth, uuid, db.ViewReport)
 	if !hasRole {
 		w.WriteHeader(http.StatusUnauthorized)
@@ -617,7 +617,7 @@ func GetPaymentHistory(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// get the organization payment history
+	// get the workspace payment history
 	paymentHistory := db.DB.GetPaymentHistory(uuid, r)
 	paymentHistoryData := []db.PaymentHistoryData{}
 
@@ -700,32 +700,32 @@ func (oh *workspaceHandler) DeleteWorkspace(w http.ResponseWriter, r *http.Reque
 		return
 	}
 
-	organization := oh.db.GetWorkspaceByUuid(uuid)
+	workspace := oh.db.GetWorkspaceByUuid(uuid)
 
-	if pubKeyFromAuth != organization.OwnerPubKey {
-		msg := "only workspace admin can delete an organization"
+	if pubKeyFromAuth != workspace.OwnerPubKey {
+		msg := "only workspace admin can delete an workspace"
 		fmt.Println(msg)
 		w.WriteHeader(http.StatusUnauthorized)
 		json.NewEncoder(w).Encode(msg)
 		return
 	}
 
-	// Update organization to hide and clear certain fields
+	// Update workspace to hide and clear certain fields
 	if err := oh.db.UpdateWorkspaceForDeletion(uuid); err != nil {
-		fmt.Println("Error updating organization:", err)
+		fmt.Println("Error updating workspace:", err)
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
 
-	// Delete all users from the organization
+	// Delete all users from the workspace
 	if err := oh.db.DeleteAllUsersFromWorkspace(uuid); err != nil {
-		fmt.Println("Error removing users from organization:", err)
+		fmt.Println("Error removing users from workspace:", err)
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
 
-	// soft delete organization
-	workspace := oh.db.ChangeWorkspaceDeleteStatus(uuid, true)
+	// soft delete workspace
+	workspace = oh.db.ChangeWorkspaceDeleteStatus(uuid, true)
 	w.WriteHeader(http.StatusOK)
 	json.NewEncoder(w).Encode(workspace)
 }
