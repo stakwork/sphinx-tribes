@@ -429,10 +429,11 @@ type BountyData struct {
 }
 
 type BountyResponse struct {
-	Bounty       Bounty            `json:"bounty"`
-	Assignee     Person            `json:"assignee"`
-	Owner        Person            `json:"owner"`
-	Organization OrganizationShort `json:"organization"`
+	Bounty       Bounty         `json:"bounty"`
+	Assignee     Person         `json:"assignee"`
+	Owner        Person         `json:"owner"`
+	Organization WorkspaceShort `json:"organization"`
+	Workspace    WorkspaceShort `json:"workspace"`
 }
 
 type BountyCountResponse struct {
@@ -458,7 +459,24 @@ type Organization struct {
 	Description string     `json:"description" validate:"omitempty,lte=120"`
 }
 
-type OrganizationShort struct {
+type Workspace struct {
+	ID          uint       `json:"id"`
+	Uuid        string     `json:"uuid"`
+	Name        string     `gorm:"unique;not null" json:"name"`
+	OwnerPubKey string     `json:"owner_pubkey"`
+	Img         string     `json:"img"`
+	Created     *time.Time `json:"created"`
+	Updated     *time.Time `json:"updated"`
+	Show        bool       `json:"show"`
+	Deleted     bool       `gorm:"default:false" json:"deleted"`
+	BountyCount int64      `json:"bounty_count,omitempty"`
+	Budget      uint       `json:"budget,omitempty"`
+	Website     string     `json:"website" validate:"omitempty,uri"`
+	Github      string     `json:"github" validate:"omitempty,uri"`
+	Description string     `json:"description" validate:"omitempty,lte=120"`
+}
+
+type WorkspaceShort struct {
 	Uuid string `json:"uuid"`
 	Name string `gorm:"unique;not null" json:"name"`
 	Img  string `json:"img"`
@@ -472,9 +490,17 @@ type OrganizationUsers struct {
 	Updated     *time.Time `json:"updated"`
 }
 
-type OrganizationUsersData struct {
-	OrgUuid     string     `json:"org_uuid"`
-	UserCreated *time.Time `json:"user_created"`
+type WorkspaceUsers struct {
+	ID            uint       `json:"id"`
+	OwnerPubKey   string     `json:"owner_pubkey"`
+	WorkspaceUuid string     `json:"workspace_uuid"`
+	Created       *time.Time `json:"created"`
+	Updated       *time.Time `json:"updated"`
+}
+
+type WorkspaceUsersData struct {
+	WorkspaceUuid string     `json:"workspace_uuid"`
+	UserCreated   *time.Time `json:"user_created"`
 	Person
 }
 

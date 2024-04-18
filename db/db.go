@@ -586,7 +586,7 @@ func (db database) GetFilterStatusCount() FilterStattuCount {
 	return ms
 }
 
-func (db database) GetWorkspaceBounties(r *http.Request, org_uuid string) []Bounty {
+func (db database) GetWorkspaceBounties(r *http.Request, workspace_uuid string) []Bounty {
 	keys := r.URL.Query()
 	tags := keys.Get("tags") // this is a string of tags separated by commas
 	offset, limit, sortBy, direction, search := utils.GetPaginationParams(r)
@@ -656,7 +656,7 @@ func (db database) GetWorkspaceBounties(r *http.Request, org_uuid string) []Boun
 		}
 	}
 
-	query := `SELECT * FROM bounty WHERE org_uuid = '` + org_uuid + `'`
+	query := `SELECT * FROM bounty WHERE workspace_uuid = '` + workspace_uuid + `'`
 	allQuery := query + " " + statusQuery + " " + searchQuery + " " + languageQuery + " " + orderQuery + " " + limitQuery
 	theQuery := db.db.Raw(allQuery)
 
@@ -673,7 +673,7 @@ func (db database) GetWorkspaceBounties(r *http.Request, org_uuid string) []Boun
 	return ms
 }
 
-func (db database) GetWorkspaceBountiesCount(r *http.Request, org_uuid string) int64 {
+func (db database) GetWorkspaceBountiesCount(r *http.Request, workspace_uuid string) int64 {
 	keys := r.URL.Query()
 	tags := keys.Get("tags") // this is a string of tags separated by commas
 	search := keys.Get("search")
@@ -730,7 +730,7 @@ func (db database) GetWorkspaceBountiesCount(r *http.Request, org_uuid string) i
 
 	var count int64
 
-	query := `SELECT COUNT(*) FROM bounty WHERE org_uuid = '` + org_uuid + `'`
+	query := `SELECT COUNT(*) FROM bounty WHERE workspace_uuid = '` + workspace_uuid + `'`
 	allQuery := query + " " + statusQuery + " " + searchQuery + " " + languageQuery
 	theQuery := db.db.Raw(allQuery)
 
@@ -1036,7 +1036,7 @@ func (db database) GetNextWorkspaceBountyByCreated(r *http.Request) (uint, error
 		}
 	}
 
-	query := `SELECT id FROM public.bounty WHERE org_uuid = '` + uuid + `' AND created > '` + created + `' AND show = true`
+	query := `SELECT id FROM public.bounty WHERE workspace_uuid = '` + uuid + `' AND created > '` + created + `' AND show = true`
 	orderQuery := "ORDER BY created ASC LIMIT 1"
 
 	allQuery := query + " " + searchQuery + " " + statusQuery + " " + languageQuery + " " + orderQuery
@@ -1102,7 +1102,7 @@ func (db database) GetPreviousWorkspaceBountyByCreated(r *http.Request) (uint, e
 		}
 	}
 
-	query := `SELECT id FROM public.bounty WHERE org_uuid = '` + uuid + `' AND created < '` + created + `' AND show = true`
+	query := `SELECT id FROM public.bounty WHERE workspace_uuid = '` + uuid + `' AND created < '` + created + `' AND show = true`
 	orderQuery := "ORDER BY created DESC LIMIT 1"
 
 	allQuery := query + " " + searchQuery + " " + statusQuery + " " + languageQuery + " " + orderQuery
@@ -1184,7 +1184,7 @@ func (db database) GetAllBounties(r *http.Request) []Bounty {
 	}
 
 	if orgUuid != "" {
-		orgQuery = "AND org_uuid = '" + orgUuid + "'"
+		orgQuery = "AND workspace_uuid = '" + orgUuid + "'"
 	}
 	if languageLength > 0 {
 		langs := ""

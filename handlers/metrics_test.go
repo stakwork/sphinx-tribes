@@ -161,7 +161,7 @@ func TestMetricsBounties(t *testing.T) {
 		mockDb.On("GetBountiesByDateRange", dateRange, req).Return(bounties).Once()
 		mockDb.On("GetPersonByPubkey", "owner-1").Return(db.Person{ID: 1}).Once()
 		mockDb.On("GetPersonByPubkey", "").Return(db.Person{}).Once()
-		mockDb.On("GetWorkspaceByUuid", "").Return(db.Organization{}).Once()
+		mockDb.On("GetWorkspaceByUuid", "").Return(db.Workspace{}).Once()
 		handler.ServeHTTP(rr, req)
 
 		var res []db.BountyData
@@ -216,10 +216,10 @@ func TestMetricsBounties(t *testing.T) {
 		mockDb.On("GetBountiesByDateRange", dateRange, req).Return(bounties).Once()
 		mockDb.On("GetPersonByPubkey", "provider1").Return(db.Person{ID: 1}).Once()
 		mockDb.On("GetPersonByPubkey", "").Return(db.Person{}).Once()
-		mockDb.On("GetWorkspaceByUuid", "").Return(db.Organization{}).Once()
+		mockDb.On("GetWorkspaceByUuid", "").Return(db.Workspace{}).Once()
 		mockDb.On("GetPersonByPubkey", "provider2").Return(db.Person{ID: 2}).Once()
 		mockDb.On("GetPersonByPubkey", "").Return(db.Person{}).Once()
-		mockDb.On("GetWorkspaceByUuid", "").Return(db.Organization{}).Once()
+		mockDb.On("GetWorkspaceByUuid", "").Return(db.Workspace{}).Once()
 
 		handler.ServeHTTP(rr, req)
 

@@ -359,7 +359,7 @@ func (h *bountyHandler) GenerateBountyResponse(bounties []db.Bounty) []db.Bounty
 
 		owner := h.db.GetPersonByPubkey(bounty.OwnerID)
 		assignee := h.db.GetPersonByPubkey(bounty.Assignee)
-		organization := h.db.GetWorkspaceByUuid(bounty.OrgUuid)
+		workspace := h.db.GetWorkspaceByUuid(bounty.OrgUuid)
 
 		b := db.BountyResponse{
 			Bounty: db.Bounty{
@@ -424,10 +424,15 @@ func (h *bountyHandler) GenerateBountyResponse(bounties []db.Bounty) []db.Bounty
 				PriceToMeet:      owner.PriceToMeet,
 				TwitterConfirmed: owner.TwitterConfirmed,
 			},
-			Organization: db.OrganizationShort{
-				Name: organization.Name,
-				Uuid: organization.Uuid,
-				Img:  organization.Img,
+			Organization: db.WorkspaceShort{
+				Name: workspace.Name,
+				Uuid: workspace.Uuid,
+				Img:  workspace.Img,
+			},
+			Workspace: db.WorkspaceShort{
+				Name: workspace.Name,
+				Uuid: workspace.Uuid,
+				Img:  workspace.Img,
 			},
 		}
 		bountyResponse = append(bountyResponse, b)
@@ -472,7 +477,7 @@ func (h *bountyHandler) MakeBountyPayment(w http.ResponseWriter, r *http.Request
 		return
 	}
 
-	// check if user is the admin of the organization
+	// check if user is the admin of the workspace
 	// or has a pay bounty role
 	hasRole := h.userHasAccess(pubKeyFromAuth, bounty.OrgUuid, db.PayBounty)
 	if !hasRole {
@@ -481,12 +486,12 @@ func (h *bountyHandler) MakeBountyPayment(w http.ResponseWriter, r *http.Request
 		return
 	}
 
-	// check if the organization bounty balance
+	// check if the workspace bounty balance
 	// is greater than the amount
 	orgBudget := h.db.GetWorkspaceBudget(bounty.OrgUuid)
 	if orgBudget.TotalBudget < amount {
 		w.WriteHeader(http.StatusForbidden)
-		json.NewEncoder(w).Encode("organization budget is not enough to pay the amount")
+		json.NewEncoder(w).Encode("workspace budget is not enough to pay the amount")
 		return
 	}
 
@@ -592,7 +597,7 @@ func (h *bountyHandler) BountyBudgetWithdraw(w http.ResponseWriter, r *http.Requ
 		return
 	}
 
-	// check if user is the admin of the organization
+	// check if user is the admin of the workspace
 	// or has a withdraw bounty budget role
 	hasRole := h.userHasAccess(pubKeyFromAuth, request.OrgUuid, db.WithdrawBudget)
 	if !hasRole {
@@ -605,7 +610,7 @@ func (h *bountyHandler) BountyBudgetWithdraw(w http.ResponseWriter, r *http.Requ
 	amount := utils.GetInvoiceAmount(request.PaymentRequest)
 
 	if err == nil && amount > 0 {
-		// check if the organization bounty balance
+		// check if the workspace bounty balance
 		// is greater than the amount
 		orgBudget := h.db.GetWorkspaceBudget(request.OrgUuid)
 		if amount > orgBudget.TotalBudget {
@@ -616,7 +621,7 @@ func (h *bountyHandler) BountyBudgetWithdraw(w http.ResponseWriter, r *http.Requ
 		}
 		paymentSuccess, paymentError := h.PayLightningInvoice(request.PaymentRequest)
 		if paymentSuccess.Success {
-			// withdraw amount from organization budget
+			// withdraw amount from workspace budget
 			h.db.WithdrawBudget(pubKeyFromAuth, request.OrgUuid, amount)
 			w.WriteHeader(http.StatusOK)
 			json.NewEncoder(w).Encode(paymentSuccess)

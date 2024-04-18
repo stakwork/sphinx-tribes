@@ -12,7 +12,7 @@ import (
 
 type database struct {
 	db                 *gorm.DB
-	getWorkspaceByUuid func(uuid string) Organization
+	getWorkspaceByUuid func(uuid string) Workspace
 	getUserRoles       func(uuid string, pubkey string) []UserRoles
 }
 
@@ -75,6 +75,8 @@ func InitDB() {
 	db.AutoMigrate(&PaymentHistory{})
 	db.AutoMigrate(&InvoiceList{})
 	db.AutoMigrate(&UserInvoiceData{})
+
+	DB.MigrateOrganizationToWorkspace()
 
 	people := DB.GetAllPeople()
 	for _, p := range people {
@@ -176,6 +178,55 @@ func (db database) GetRolesCount() int64 {
 
 	query.Count(&count)
 	return count
+}
+
+func (db database) MigrateOrganizationToWorkspace() {
+	if (db.db.Migrator().HasTable(&Organization{}) && !db.db.Migrator().HasTable("workspaces")) {
+		db.db.Migrator().RenameTable(&Organization{}, "workspaces")
+	}
+
+	if (db.db.Migrator().HasTable(&OrganizationUsers{}) && !db.db.Migrator().HasTable("workspace_users")) {
+		if !db.db.Migrator().HasColumn(&OrganizationUsers{}, "workspace_uuid") {
+			db.db.Migrator().RenameColumn(&OrganizationUsers{}, "org_uuid", "workspace_uuid")
+		}
+		db.db.Migrator().RenameTable(&OrganizationUsers{}, "workspace_users")
+	}
+
+	if (db.db.Migrator().HasTable(&UserRoles{})) {
+		if !db.db.Migrator().HasColumn(&UserRoles{}, "workspace_uuid") {
+			db.db.Migrator().RenameColumn(&UserRoles{}, "org_uuid", "workspace_uuid")
+		}
+	}
+
+	if (db.db.Migrator().HasTable(&Bounty{})) {
+		if !db.db.Migrator().HasColumn(&Bounty{}, "workspace_uuid") {
+			db.db.Migrator().RenameColumn(&Bounty{}, "org_uuid", "workspace_uuid")
+		}
+	}
+
+	if (db.db.Migrator().HasTable(&BountyBudget{})) {
+		if !db.db.Migrator().HasColumn(&BountyBudget{}, "workspace_uuid") {
+			db.db.Migrator().RenameColumn(&BountyBudget{}, "org_uuid", "workspace_uuid")
+		}
+	}
+
+	if (db.db.Migrator().HasTable(&BudgetHistory{})) {
+		if !db.db.Migrator().HasColumn(&BudgetHistory{}, "workspace_uuid") {
+			db.db.Migrator().RenameColumn(&BudgetHistory{}, "org_uuid", "workspace_uuid")
+		}
+	}
+
+	if (db.db.Migrator().HasTable(&PaymentHistory{})) {
+		if !db.db.Migrator().HasColumn(&PaymentHistory{}, "workspace_uuid") {
+			db.db.Migrator().RenameColumn(&PaymentHistory{}, "org_uuid", "workspace_uuid")
+		}
+	}
+
+	if (db.db.Migrator().HasTable(&InvoiceList{})) {
+		if !db.db.Migrator().HasColumn(&InvoiceList{}, "workspace_uuid") {
+			db.db.Migrator().RenameColumn(&InvoiceList{}, "org_uuid", "workspace_uuid")
+		}
+	}
 }
 
 func (db database) CreateRoles() {
