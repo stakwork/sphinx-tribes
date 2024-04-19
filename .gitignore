@@ -11,5 +11,7 @@ notes.md
 frontend/packrd/packed-packr.go
 .idea/
 node_modules/
+node_modules
+yarn.lock
 
 frontend/app/coverage

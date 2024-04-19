@@ -17,6 +17,11 @@ func PersonRoutes() chi.Router {
 		r.Get("/uuid/{uuid}/assets", handlers.GetPersonAssetsByUuid)
 		r.Get("/githubname/{github}", handlers.GetPersonByGithubName)
 	})
+
+	r.Group(func(r chi.Router) {
+		r.Post("/test", peopleHandler.CreateOrEditPersonForTest)
+	})
+
 	r.Group(func(r chi.Router) {
 		r.Use(auth.PubKeyContext)
 
