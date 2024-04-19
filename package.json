@@ -1,0 +1,23 @@
+{
+  "name": "sphinx-tribes",
+  "version": "1.0.0",
+  "description": "![Tribes](https://github.com/stakwork/sphinx-tribes/raw/master/img/sphinx-tribes.png)",
+  "main": "cypress.config.js",
+  "directories": {
+    "doc": "docs"
+  },
+  "scripts": {
+    "cypress:run": "npx cypress run"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "cypress": "^13.8.0",
+    "typescript": "^5.4.5"
+  },
+  "dependencies": {
+    "@types/dotenv": "^8.2.0",
+    "dotenv": "^16.4.5"
+  }
+}

@@ -117,6 +117,88 @@ func (ph *peopleHandler) CreateOrEditPerson(w http.ResponseWriter, r *http.Reque
 	json.NewEncoder(w).Encode(p)
 }
 
+func (ph *peopleHandler) CreateOrEditPersonForTest(w http.ResponseWriter, r *http.Request) {
+	person := db.Person{}
+	body, err := io.ReadAll(r.Body)
+	r.Body.Close()
+	err = json.Unmarshal(body, &person)
+	if err != nil {
+		fmt.Println(err)
+		w.WriteHeader(http.StatusNotAcceptable)
+		return
+	}
+
+	now := time.Now()
+
+	pubKeyFromAuth := person.OwnerPubKey
+
+	if pubKeyFromAuth != person.OwnerPubKey {
+		fmt.Println(pubKeyFromAuth)
+		fmt.Println(person.OwnerPubKey)
+		fmt.Println("mismatched pubkey")
+		w.WriteHeader(http.StatusUnauthorized)
+		return
+	}
+
+	existing := ph.db.GetPersonByPubkey(pubKeyFromAuth)
+	if existing.ID == 0 {
+		if person.ID != 0 {
+			// cant try to "edit" if not exists already
+			fmt.Println("cant edit non existing")
+			w.WriteHeader(http.StatusUnauthorized)
+			return
+		}
+		person.UniqueName, _ = ph.db.PersonUniqueNameFromName(person.OwnerAlias)
+		person.Created = &now
+		person.Uuid = xid.New().String()
+
+	} else { // editing! needs ID
+		if person.ID == 0 { // can't create if already exists
+			fmt.Println("can't create, already existing")
+			w.WriteHeader(http.StatusUnauthorized)
+			return
+		}
+		if person.ID != existing.ID { // can't edit someone else's
+			fmt.Println("cant edit someone else")
+			w.WriteHeader(http.StatusUnauthorized)
+			return
+		}
+	}
+
+	person.OwnerPubKey = pubKeyFromAuth
+	person.Updated = &now
+
+	if person.NewTicketTime != 0 {
+		go ph.db.ProcessAlerts(person)
+	}
+
+	b := new(bytes.Buffer)
+	decodeErr := json.NewEncoder(b).Encode(person.Extras)
+
+	if decodeErr != nil {
+		log.Printf("Could not encode extras json data")
+	}
+
+	p, err := ph.db.CreateOrEditPerson(person)
+	if err != nil {
+		w.WriteHeader(http.StatusBadRequest)
+		return
+	}
+
+	responseData := make(map[string]interface{})
+	tokenString, err := auth.EncodeJwt(person.OwnerPubKey)
+
+	if err != nil {
+		fmt.Println("Cannot generate jwt token")
+	}
+
+	responseData["jwt"] = tokenString
+	responseData["user"] = p
+
+	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode(responseData)
+}
+
 func PersonIsAdmin(pk string) bool {
 	adminPubkeys := os.Getenv("ADMIN_PUBKEYS")
 	if adminPubkeys == "" {
