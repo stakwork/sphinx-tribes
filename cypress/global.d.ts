@@ -1,13 +1,13 @@
 declare namespace Cypress {
     interface Chainable {
-        create_person(person: Person): CreatePersonResponse;
+        upsertlogin(person: Person): Promise<string>;
     }
 
     type RandomObject = { [key: string]: string };
 
-    type CreatePersonResponse = {
+    type LoginResponse = {
         jwt: string;
-        user: Person;
+        //user: Person;
     }
 
     type Person = {

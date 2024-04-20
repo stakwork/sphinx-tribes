@@ -117,7 +117,7 @@ func (ph *peopleHandler) CreateOrEditPerson(w http.ResponseWriter, r *http.Reque
 	json.NewEncoder(w).Encode(p)
 }
 
-func (ph *peopleHandler) CreateOrEditPersonForTest(w http.ResponseWriter, r *http.Request) {
+func (ph *peopleHandler) UpsertLogin(w http.ResponseWriter, r *http.Request) {
 	person := db.Person{}
 	body, err := io.ReadAll(r.Body)
 	r.Body.Close()
@@ -153,13 +153,11 @@ func (ph *peopleHandler) CreateOrEditPersonForTest(w http.ResponseWriter, r *htt
 		person.Uuid = xid.New().String()
 
 	} else { // editing! needs ID
-		if person.ID == 0 { // can't create if already exists
-			fmt.Println("can't create, already existing")
-			w.WriteHeader(http.StatusUnauthorized)
-			return
+		if person.ID == 0 {
+			person.ID = existing.ID
 		}
 		if person.ID != existing.ID { // can't edit someone else's
-			fmt.Println("cant edit someone else")
+			fmt.Println("can't edit someone else")
 			w.WriteHeader(http.StatusUnauthorized)
 			return
 		}
@@ -180,6 +178,8 @@ func (ph *peopleHandler) CreateOrEditPersonForTest(w http.ResponseWriter, r *htt
 	}
 
 	p, err := ph.db.CreateOrEditPerson(person)
+	_ = p
+
 	if err != nil {
 		w.WriteHeader(http.StatusBadRequest)
 		return
@@ -193,10 +193,11 @@ func (ph *peopleHandler) CreateOrEditPersonForTest(w http.ResponseWriter, r *htt
 	}
 
 	responseData["jwt"] = tokenString
-	responseData["user"] = p
+	//responseData["user"] = p
 
 	w.WriteHeader(http.StatusOK)
-	json.NewEncoder(w).Encode(responseData)
+	w.Write([]byte(tokenString))
+	//json.NewEncoder(w).Encode(responseData)
 }
 
 func PersonIsAdmin(pk string) bool {
