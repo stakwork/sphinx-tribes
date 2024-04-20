@@ -112,31 +112,33 @@ func (oh *workspaceHandler) CreateOrEditWorkspace(w http.ResponseWriter, r *http
 		name := workspace.Name
 
 		// check if the organization name already exists
-		orgName := oh.db.GetWorkspaceByName(name)
+		workspace_same_name := oh.db.GetWorkspaceByName(name)
 
-		if orgName.Name == name {
+		if workspace_same_name.Name == name && workspace_same_name.Uuid != workspace.Uuid {
 			w.WriteHeader(http.StatusUnauthorized)
-			json.NewEncoder(w).Encode("Workspace name already exists")
+			json.NewEncoder(w).Encode("Workspace name already exists - " + name + " " + workspace.Uuid + " | " + workspace_same_name.Uuid)
 			return
 		} else {
 			workspace.Created = &now
 			workspace.Updated = &now
-			workspace.Uuid = xid.New().String()
+			if len(workspace.Uuid) == 0 {
+				workspace.Uuid = xid.New().String()
+			}
 			workspace.Name = name
 		}
 	} else {
-		if workspace.ID == 0 {
-			// can't create that already exists
-			fmt.Println("can't create existing organization")
-			w.WriteHeader(http.StatusUnauthorized)
-			return
-		}
+		// if workspace.ID == 0 {
+		// 	// can't create that already exists
+		// 	fmt.Println("can't create existing organization")
+		// 	w.WriteHeader(http.StatusUnauthorized)
+		// 	return
+		// }
 
-		if workspace.ID != existing.ID { // can't edit someone else's
-			fmt.Println("cant edit another organization")
-			w.WriteHeader(http.StatusUnauthorized)
-			return
-		}
+		// if workspace.ID != existing.ID { // can't edit someone else's
+		// 	fmt.Println("cant edit another organization")
+		// 	w.WriteHeader(http.StatusUnauthorized)
+		// 	return
+		// }
 	}
 
 	p, err := oh.db.CreateOrEditWorkspace(workspace)

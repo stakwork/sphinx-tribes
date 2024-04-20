@@ -1,17 +1,31 @@
 
-export const HostName = 'localhost:13000';
+export const HostName = 'localhost:5005';
 
-export const User = {
-    pubkey: '',
-    authToken: '',
-    name: 'Alice'
-};
+
+export var User: Cypress.Person = {
+    owner_pubkey: "test_pubkey",
+    owner_alias: "Alice",
+    unique_name: "Alice",
+    description: "this is a test",
+    tags: [],
+    img: "",
+    unlisted: false,
+    deleted: false,
+    owner_route_hint: "",
+    owner_contact_key: "",
+    price_to_meet: 0,
+    twitter_confirmed: false,
+    referred_by: 0,
+    extras: {},
+    github_issues: {}
+}
 
 export const Workspaces = [
     {
-        id: '29a999fc-0424-46d2-ac04-ffc3e0635928',
-        name: 'Sample Workspace 1',
-        owner_pub_key: User.pubkey,
+        id: 0,
+        uuid: 'cohob00n1e4808utqel0',
+        name: ' Sample Workspace 1 ',
+        owner_pubkey: User.owner_pubkey,
         img: 'IqQnBnAdrteW_QCeq_3Ss1_78_yBAz_rckG5F3NE9ms=',
         mission: 'Access the largest pool of human cognition',
         tactics: 'Create a marketplace for providers and bounty hunters',
@@ -19,9 +33,10 @@ export const Workspaces = [
         schematic_img: '1b281867-2c0e-481e-b508-1aab0e33ab50.jpg'
     },
     {
-        id: 'e3e7396a-3308-48f4-acba-b3d3120b65f6',
+        id: 0,
+        uuid: 'cohob3on1e4808utqelg',
         name: 'Sample Workspace 2',
-        owner_pub_key: User.pubkey,
+        owner_pubkey: User.owner_pubkey,
         img: 'IqQnBnAdrteW_QCeq_3Ss1_78_yBAz_rckG5F3NE9ms=',
         mission: 'Access the largest pool of human cognition',
         tactics: 'Create a marketplace for providers and bounty hunters',
@@ -29,9 +44,10 @@ export const Workspaces = [
         schematic_img: '1b281867-2c0e-481e-b508-1aab0e33ab50.jpg'
     },
     {
-        id: '18616ed4-2fda-4670-9550-dfa9356a3beb',
+        id: 0,
+        uuid: 'cohob80n1e4808utqem0',
         name: 'Sample Workspace 3',
-        owner_pub_key: User.pubkey,
+        owner_pubkey: User.owner_pubkey,
         img: 'IqQnBnAdrteW_QCeq_3Ss1_78_yBAz_rckG5F3NE9ms=',
         mission: 'Access the largest pool of human cognition',
         tactics: 'Create a marketplace for providers and bounty hunters',
