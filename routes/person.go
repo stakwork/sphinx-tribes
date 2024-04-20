@@ -19,7 +19,7 @@ func PersonRoutes() chi.Router {
 	})
 
 	r.Group(func(r chi.Router) {
-		r.Post("/test", peopleHandler.CreateOrEditPersonForTest)
+		r.Post("/upsertlogin", peopleHandler.UpsertLogin)
 	})
 
 	r.Group(func(r chi.Router) {
