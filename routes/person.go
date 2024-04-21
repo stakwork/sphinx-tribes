@@ -20,7 +20,7 @@ func PersonRoutes() chi.Router {
 
 	r.Group(func(r chi.Router) {
 		r.Use(auth.CypressContext)
-		r.Post("/test", peopleHandler.UpsertLogin)
+		r.Post("/upsertlogin", peopleHandler.UpsertLogin)
 	})
 
 	r.Group(func(r chi.Router) {
