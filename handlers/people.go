@@ -132,14 +132,6 @@ func (ph *peopleHandler) UpsertLogin(w http.ResponseWriter, r *http.Request) {
 
 	pubKeyFromAuth := person.OwnerPubKey
 
-	if pubKeyFromAuth != person.OwnerPubKey {
-		fmt.Println(pubKeyFromAuth)
-		fmt.Println(person.OwnerPubKey)
-		fmt.Println("mismatched pubkey")
-		w.WriteHeader(http.StatusUnauthorized)
-		return
-	}
-
 	existing := ph.db.GetPersonByPubkey(pubKeyFromAuth)
 	if existing.ID == 0 {
 		if person.ID != 0 {
@@ -153,11 +145,8 @@ func (ph *peopleHandler) UpsertLogin(w http.ResponseWriter, r *http.Request) {
 		person.Uuid = xid.New().String()
 
 	} else { // editing! needs ID
-		if person.ID == 0 {
-			person.ID = existing.ID
-		}
-		if person.ID != existing.ID { // can't edit someone else's
-			fmt.Println("can't edit someone else")
+		if person.ID != 0 && person.ID != existing.ID { // can't edit someone else's
+			fmt.Println("cant edit someone else")
 			w.WriteHeader(http.StatusUnauthorized)
 			return
 		}
@@ -193,11 +182,9 @@ func (ph *peopleHandler) UpsertLogin(w http.ResponseWriter, r *http.Request) {
 	}
 
 	responseData["jwt"] = tokenString
-	//responseData["user"] = p
 
 	w.WriteHeader(http.StatusOK)
 	w.Write([]byte(tokenString))
-	//json.NewEncoder(w).Encode(responseData)
 }
 
 func PersonIsAdmin(pk string) bool {

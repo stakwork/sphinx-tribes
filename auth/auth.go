@@ -167,6 +167,22 @@ func ConnectionCodeContext(next http.Handler) http.Handler {
 	})
 }
 
+// CypressContext allows testing for cypress
+func CypressContext(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		token := r.Header.Get("token")
+
+		if IsFreePass() {
+			ctx := context.WithValue(r.Context(), ContextKey, token)
+			next.ServeHTTP(w, r.WithContext(ctx))
+		} else {
+			fmt.Println("Endpoint is for testing only : test endpoint")
+			http.Error(w, http.StatusText(401), 401)
+			return
+		}
+	})
+}
+
 func AdminCheck(pubkey string) bool {
 	for _, val := range config.SuperAdmins {
 		if val == pubkey {
