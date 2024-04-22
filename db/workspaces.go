@@ -96,16 +96,16 @@ func (db database) GetBountyRoles() []BountyRoles {
 	return ms
 }
 
-func (db database) CreateUserRoles(roles []UserRoles, uuid string, pubkey string) []UserRoles {
+func (db database) CreateUserRoles(roles []WorkspaceUserRoles, uuid string, pubkey string) []WorkspaceUserRoles {
 	// delete roles and create new ones
-	db.db.Where("workspace_uuid = ?", uuid).Where("owner_pub_key = ?", pubkey).Delete(&UserRoles{})
+	db.db.Where("workspace_uuid = ?", uuid).Where("owner_pub_key = ?", pubkey).Delete(&WorkspaceUserRoles{})
 	db.db.Create(&roles)
 
 	return roles
 }
 
-func (db database) GetUserRoles(uuid string, pubkey string) []UserRoles {
-	ms := []UserRoles{}
+func (db database) GetUserRoles(uuid string, pubkey string) []WorkspaceUserRoles {
+	ms := []WorkspaceUserRoles{}
 	db.db.Where("workspace_uuid = ?", uuid).Where("owner_pub_key = ?", pubkey).Find(&ms)
 	return ms
 }
