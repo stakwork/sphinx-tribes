@@ -65,24 +65,10 @@ func InitDB() {
 	db.AutoMigrate(&Channel{})
 	db.AutoMigrate(&LeaderBoard{})
 	db.AutoMigrate(&ConnectionCodes{})
-	db.AutoMigrate(&Bounty{})
 	db.AutoMigrate(&BountyRoles{})
-	db.AutoMigrate(&BountyBudget{})
-	db.AutoMigrate(&BudgetHistory{})
-	db.AutoMigrate(&PaymentHistory{})
-	db.AutoMigrate(&InvoiceList{})
 	db.AutoMigrate(&UserInvoiceData{})
 
-	if !db.Migrator().HasTable("workspace_user_roles") {
-		db.AutoMigrate(&UserRoles{})
-	}
-	if !db.Migrator().HasTable("workspaces") {
-		db.AutoMigrate(&Organization{})
-	}
-	if !db.Migrator().HasTable("workspace_users") {
-		db.AutoMigrate(&OrganizationUsers{})
-	}
-
+	DB.MigrateTablesWithOrgUuid()
 	DB.MigrateOrganizationToWorkspace()
 
 	people := DB.GetAllPeople()
@@ -185,6 +171,43 @@ func (db database) GetRolesCount() int64 {
 
 	query.Count(&count)
 	return count
+}
+
+func (db database) MigrateTablesWithOrgUuid() {
+	if !db.db.Migrator().HasTable("bounty") {
+		if !db.db.Migrator().HasColumn(Bounty{}, "workspace_uuid") {
+			db.db.AutoMigrate(&Bounty{})
+		}
+	}
+	if !db.db.Migrator().HasTable("budget_histories") {
+		if !db.db.Migrator().HasColumn(BudgetHistory{}, "workspace_uuid") {
+			db.db.AutoMigrate(&BudgetHistory{})
+		}
+	}
+	if !db.db.Migrator().HasTable("payment_histories") {
+		if !db.db.Migrator().HasColumn(PaymentHistory{}, "workspace_uuid") {
+			db.db.AutoMigrate(&PaymentHistory{})
+		}
+	}
+	if !db.db.Migrator().HasTable("invoice_list") {
+		if !db.db.Migrator().HasColumn(InvoiceList{}, "workspace_uuid") {
+			db.db.AutoMigrate(&InvoiceList{})
+		}
+	}
+	if !db.db.Migrator().HasTable("bounty_budgets") {
+		if !db.db.Migrator().HasColumn(BountyBudget{}, "workspace_uuid") {
+			db.db.AutoMigrate(&BountyBudget{})
+		}
+	}
+	if !db.db.Migrator().HasTable("workspace_user_roles") {
+		db.db.AutoMigrate(&UserRoles{})
+	}
+	if !db.db.Migrator().HasTable("workspaces") {
+		db.db.AutoMigrate(&Organization{})
+	}
+	if !db.db.Migrator().HasTable("workspace_users") {
+		db.db.AutoMigrate(&OrganizationUsers{})
+	}
 }
 
 func (db database) MigrateOrganizationToWorkspace() {
