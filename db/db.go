@@ -1136,7 +1136,7 @@ func (db database) GetAllBounties(r *http.Request) []Bounty {
 	assingned := keys.Get("Assigned")
 	completed := keys.Get("Completed")
 	paid := keys.Get("Paid")
-	orgUuid := keys.Get("org_uuid")
+	orgUuid := keys.Get("workspace_uuid")
 	languages := keys.Get("languages")
 	languageArray := strings.Split(languages, ",")
 	languageLength := len(languageArray)
