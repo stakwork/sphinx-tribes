@@ -66,8 +66,6 @@ func InitDB() {
 	db.AutoMigrate(&LeaderBoard{})
 	db.AutoMigrate(&ConnectionCodes{})
 	db.AutoMigrate(&Bounty{})
-	db.AutoMigrate(&Organization{})
-	db.AutoMigrate(&OrganizationUsers{})
 	db.AutoMigrate(&BountyRoles{})
 	db.AutoMigrate(&UserRoles{})
 	db.AutoMigrate(&BountyBudget{})
@@ -75,6 +73,13 @@ func InitDB() {
 	db.AutoMigrate(&PaymentHistory{})
 	db.AutoMigrate(&InvoiceList{})
 	db.AutoMigrate(&UserInvoiceData{})
+
+	if !db.Migrator().HasTable("workspaces") {
+		db.AutoMigrate(&Organization{})
+	}
+	if !db.Migrator().HasTable("workspace_users") {
+		db.AutoMigrate(&OrganizationUsers{})
+	}
 
 	DB.MigrateOrganizationToWorkspace()
 
@@ -186,44 +191,44 @@ func (db database) MigrateOrganizationToWorkspace() {
 	}
 
 	if (db.db.Migrator().HasTable(&OrganizationUsers{}) && !db.db.Migrator().HasTable("workspace_users")) {
-		if !db.db.Migrator().HasColumn(&OrganizationUsers{}, "workspace_uuid") {
+		if db.db.Migrator().HasColumn(&OrganizationUsers{}, "org_uuid") {
 			db.db.Migrator().RenameColumn(&OrganizationUsers{}, "org_uuid", "workspace_uuid")
 		}
 		db.db.Migrator().RenameTable(&OrganizationUsers{}, "workspace_users")
 	}
 
 	if (db.db.Migrator().HasTable(&UserRoles{})) {
-		if !db.db.Migrator().HasColumn(&UserRoles{}, "workspace_uuid") {
+		if db.db.Migrator().HasColumn(&UserRoles{}, "org_uuid") {
 			db.db.Migrator().RenameColumn(&UserRoles{}, "org_uuid", "workspace_uuid")
 		}
 	}
 
 	if (db.db.Migrator().HasTable(&Bounty{})) {
-		if !db.db.Migrator().HasColumn(&Bounty{}, "workspace_uuid") {
+		if db.db.Migrator().HasColumn(&Bounty{}, "org_uuid") {
 			db.db.Migrator().RenameColumn(&Bounty{}, "org_uuid", "workspace_uuid")
 		}
 	}
 
 	if (db.db.Migrator().HasTable(&BountyBudget{})) {
-		if !db.db.Migrator().HasColumn(&BountyBudget{}, "workspace_uuid") {
+		if db.db.Migrator().HasColumn(&BountyBudget{}, "org_uuid") {
 			db.db.Migrator().RenameColumn(&BountyBudget{}, "org_uuid", "workspace_uuid")
 		}
 	}
 
 	if (db.db.Migrator().HasTable(&BudgetHistory{})) {
-		if !db.db.Migrator().HasColumn(&BudgetHistory{}, "workspace_uuid") {
+		if db.db.Migrator().HasColumn(&BudgetHistory{}, "org_uuid") {
 			db.db.Migrator().RenameColumn(&BudgetHistory{}, "org_uuid", "workspace_uuid")
 		}
 	}
 
 	if (db.db.Migrator().HasTable(&PaymentHistory{})) {
-		if !db.db.Migrator().HasColumn(&PaymentHistory{}, "workspace_uuid") {
+		if db.db.Migrator().HasColumn(&PaymentHistory{}, "org_uuid") {
 			db.db.Migrator().RenameColumn(&PaymentHistory{}, "org_uuid", "workspace_uuid")
 		}
 	}
 
 	if (db.db.Migrator().HasTable(&InvoiceList{})) {
-		if !db.db.Migrator().HasColumn(&InvoiceList{}, "workspace_uuid") {
+		if db.db.Migrator().HasColumn(&InvoiceList{}, "org_uuid") {
 			db.db.Migrator().RenameColumn(&InvoiceList{}, "org_uuid", "workspace_uuid")
 		}
 	}
