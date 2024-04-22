@@ -200,7 +200,9 @@ func (db database) MigrateTablesWithOrgUuid() {
 		}
 	}
 	if !db.db.Migrator().HasTable("workspace_user_roles") {
-		db.db.AutoMigrate(&UserRoles{})
+		if !db.db.Migrator().HasColumn(UserRoles{}, "workspace_uuid") {
+			db.db.AutoMigrate(&UserRoles{})
+		}
 	}
 	if !db.db.Migrator().HasTable("workspaces") {
 		db.db.AutoMigrate(&Organization{})
