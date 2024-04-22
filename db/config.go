@@ -67,13 +67,15 @@ func InitDB() {
 	db.AutoMigrate(&ConnectionCodes{})
 	db.AutoMigrate(&Bounty{})
 	db.AutoMigrate(&BountyRoles{})
-	db.AutoMigrate(&UserRoles{})
 	db.AutoMigrate(&BountyBudget{})
 	db.AutoMigrate(&BudgetHistory{})
 	db.AutoMigrate(&PaymentHistory{})
 	db.AutoMigrate(&InvoiceList{})
 	db.AutoMigrate(&UserInvoiceData{})
 
+	if !db.Migrator().HasTable("workspace_user_roles") {
+		db.AutoMigrate(&UserRoles{})
+	}
 	if !db.Migrator().HasTable("workspaces") {
 		db.AutoMigrate(&Organization{})
 	}
