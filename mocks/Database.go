@@ -1096,19 +1096,19 @@ func (_c *Database_CreateOrEditWorkspace_Call) RunAndReturn(run func(db.Workspac
 }
 
 // CreateUserRoles provides a mock function with given fields: roles, uuid, pubkey
-func (_m *Database) CreateUserRoles(roles []db.UserRoles, uuid string, pubkey string) []db.UserRoles {
+func (_m *Database) CreateUserRoles(roles []db.WorkspaceUserRoles, uuid string, pubkey string) []db.WorkspaceUserRoles {
 	ret := _m.Called(roles, uuid, pubkey)
 
 	if len(ret) == 0 {
 		panic("no return value specified for CreateUserRoles")
 	}
 
-	var r0 []db.UserRoles
-	if rf, ok := ret.Get(0).(func([]db.UserRoles, string, string) []db.UserRoles); ok {
+	var r0 []db.WorkspaceUserRoles
+	if rf, ok := ret.Get(0).(func([]db.WorkspaceUserRoles, string, string) []db.WorkspaceUserRoles); ok {
 		r0 = rf(roles, uuid, pubkey)
 	} else {
 		if ret.Get(0) != nil {
-			r0 = ret.Get(0).([]db.UserRoles)
+			r0 = ret.Get(0).([]db.WorkspaceUserRoles)
 		}
 	}
 
@@ -1121,26 +1121,26 @@ type Database_CreateUserRoles_Call struct {
 }
 
 // CreateUserRoles is a helper method to define mock.On call
-//   - roles []db.UserRoles
+//   - roles []db.WorkspaceUserRoles
 //   - uuid string
 //   - pubkey string
 func (_e *Database_Expecter) CreateUserRoles(roles interface{}, uuid interface{}, pubkey interface{}) *Database_CreateUserRoles_Call {
 	return &Database_CreateUserRoles_Call{Call: _e.mock.On("CreateUserRoles", roles, uuid, pubkey)}
 }
 
-func (_c *Database_CreateUserRoles_Call) Run(run func(roles []db.UserRoles, uuid string, pubkey string)) *Database_CreateUserRoles_Call {
+func (_c *Database_CreateUserRoles_Call) Run(run func(roles []db.WorkspaceUserRoles, uuid string, pubkey string)) *Database_CreateUserRoles_Call {
 	_c.Call.Run(func(args mock.Arguments) {
-		run(args[0].([]db.UserRoles), args[1].(string), args[2].(string))
+		run(args[0].([]db.WorkspaceUserRoles), args[1].(string), args[2].(string))
 	})
 	return _c
 }
 
-func (_c *Database_CreateUserRoles_Call) Return(_a0 []db.UserRoles) *Database_CreateUserRoles_Call {
+func (_c *Database_CreateUserRoles_Call) Return(_a0 []db.WorkspaceUserRoles) *Database_CreateUserRoles_Call {
 	_c.Call.Return(_a0)
 	return _c
 }
 
-func (_c *Database_CreateUserRoles_Call) RunAndReturn(run func([]db.UserRoles, string, string) []db.UserRoles) *Database_CreateUserRoles_Call {
+func (_c *Database_CreateUserRoles_Call) RunAndReturn(run func([]db.WorkspaceUserRoles, string, string) []db.WorkspaceUserRoles) *Database_CreateUserRoles_Call {
 	_c.Call.Return(run)
 	return _c
 }

@@ -515,6 +515,14 @@ type UserRoles struct {
 	Created     *time.Time `json:"created"`
 }
 
+// change back to UserRoles after migration
+type WorkspaceUserRoles struct {
+	Role          string     `json:"role"`
+	OwnerPubKey   string     `json:"owner_pubkey"`
+	WorkspaceUuid string     `json:"workspace_uuid"`
+	Created       *time.Time `json:"created"`
+}
+
 type BountyBudget struct {
 	ID          uint       `json:"id"`
 	OrgUuid     string     `json:"org_uuid"`

@@ -10,8 +10,8 @@ import (
 
 func TestRolesCheck_UserHasRole(t *testing.T) {
 	// Mock user roles
-	userRoles := []UserRoles{
-		{Role: "ADD BOUNTY", OwnerPubKey: "user1", OrgUuid: "org1", Created: &time.Time{}},
+	userRoles := []WorkspaceUserRoles{
+		{Role: "ADD BOUNTY", OwnerPubKey: "user1", WorkspaceUuid: "org1", Created: &time.Time{}},
 	}
 
 	// Role to check
@@ -28,8 +28,8 @@ func TestRolesCheck_UserHasRole(t *testing.T) {
 
 func TestRolesCheck_UserDoesNotHaveRole(t *testing.T) {
 	// Mock user roles
-	userRoles := []UserRoles{
-		{Role: "DELETE BOUNTY", OwnerPubKey: "user2", OrgUuid: "org1", Created: &time.Time{}},
+	userRoles := []WorkspaceUserRoles{
+		{Role: "DELETE BOUNTY", OwnerPubKey: "user2", WorkspaceUuid: "org1", Created: &time.Time{}},
 	}
 
 	// Role to check
@@ -45,7 +45,7 @@ func TestRolesCheck_UserDoesNotHaveRole(t *testing.T) {
 }
 
 func TestCheckUser(t *testing.T) {
-	userRoles := []UserRoles{
+	userRoles := []WorkspaceUserRoles{
 		{OwnerPubKey: "userPublicKey"},
 	}
 
@@ -62,9 +62,9 @@ func TestUserHasAccess(t *testing.T) {
 		}
 	}
 
-	mockGetUserRoles := func(uuid string, pubkey string) []UserRoles {
-		return []UserRoles{
-			{Role: "ADD BOUNTY", OwnerPubKey: pubkey, OrgUuid: uuid, Created: &time.Time{}},
+	mockGetUserRoles := func(uuid string, pubkey string) []WorkspaceUserRoles {
+		return []WorkspaceUserRoles{
+			{Role: "ADD BOUNTY", OwnerPubKey: pubkey, WorkspaceUuid: uuid, Created: &time.Time{}},
 		}
 	}
 
@@ -110,17 +110,17 @@ func TestUserHasManageBountyRoles(t *testing.T) {
 		}
 	}
 
-	mockGetUserRoles := func(uuid string, pubkey string) []UserRoles {
+	mockGetUserRoles := func(uuid string, pubkey string) []WorkspaceUserRoles {
 		if uuid == "workspace_uuid" {
-			return []UserRoles{
-				{Role: "ADD BOUNTY", OwnerPubKey: pubkey, OrgUuid: uuid, Created: &time.Time{}},
+			return []WorkspaceUserRoles{
+				{Role: "ADD BOUNTY", OwnerPubKey: pubkey, WorkspaceUuid: uuid, Created: &time.Time{}},
 			}
 		} else {
-			return []UserRoles{
-				{Role: "ADD BOUNTY", OwnerPubKey: pubkey, OrgUuid: uuid, Created: &time.Time{}},
-				{Role: "UPDATE BOUNTY", OwnerPubKey: pubkey, OrgUuid: uuid, Created: &time.Time{}},
-				{Role: "DELETE BOUNTY", OwnerPubKey: pubkey, OrgUuid: uuid, Created: &time.Time{}},
-				{Role: "PAY BOUNTY", OwnerPubKey: pubkey, OrgUuid: uuid, Created: &time.Time{}},
+			return []WorkspaceUserRoles{
+				{Role: "ADD BOUNTY", OwnerPubKey: pubkey, WorkspaceUuid: uuid, Created: &time.Time{}},
+				{Role: "UPDATE BOUNTY", OwnerPubKey: pubkey, WorkspaceUuid: uuid, Created: &time.Time{}},
+				{Role: "DELETE BOUNTY", OwnerPubKey: pubkey, WorkspaceUuid: uuid, Created: &time.Time{}},
+				{Role: "PAY BOUNTY", OwnerPubKey: pubkey, WorkspaceUuid: uuid, Created: &time.Time{}},
 			}
 		}
 	}

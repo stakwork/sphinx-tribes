@@ -13,7 +13,7 @@ import (
 type database struct {
 	db                 *gorm.DB
 	getWorkspaceByUuid func(uuid string) Workspace
-	getUserRoles       func(uuid string, pubkey string) []UserRoles
+	getUserRoles       func(uuid string, pubkey string) []WorkspaceUserRoles
 }
 
 func NewDatabaseConfig(db *gorm.DB) *database {
@@ -197,10 +197,12 @@ func (db database) MigrateOrganizationToWorkspace() {
 		db.db.Migrator().RenameTable(&OrganizationUsers{}, "workspace_users")
 	}
 
-	if (db.db.Migrator().HasTable(&UserRoles{})) {
+	if (db.db.Migrator().HasTable(&UserRoles{}) && !db.db.Migrator().HasTable("workspace_user_roles")) {
 		if db.db.Migrator().HasColumn(&UserRoles{}, "org_uuid") {
 			db.db.Migrator().RenameColumn(&UserRoles{}, "org_uuid", "workspace_uuid")
 		}
+
+		db.db.Migrator().RenameTable(&UserRoles{}, "workspace_user_roles")
 	}
 
 	if (db.db.Migrator().HasTable(&Bounty{})) {
@@ -261,7 +263,7 @@ func GetRolesMap() map[string]string {
 	return roles
 }
 
-func GetUserRolesMap(userRoles []UserRoles) map[string]string {
+func GetUserRolesMap(userRoles []WorkspaceUserRoles) map[string]string {
 	roles := map[string]string{}
 	for _, v := range userRoles {
 		roles[v.Role] = v.Role
@@ -291,7 +293,7 @@ func (db database) ConvertMetricsBountiesToMap(metricsCsv []MetricsBountyCsv) []
 	return metricsMap
 }
 
-func RolesCheck(userRoles []UserRoles, check string) bool {
+func RolesCheck(userRoles []WorkspaceUserRoles, check string) bool {
 	rolesMap := GetRolesMap()
 	userRolesMap := GetUserRolesMap(userRoles)
 
@@ -309,7 +311,7 @@ func RolesCheck(userRoles []UserRoles, check string) bool {
 	return true
 }
 
-func CheckUser(userRoles []UserRoles, pubkey string) bool {
+func CheckUser(userRoles []WorkspaceUserRoles, pubkey string) bool {
 	for _, role := range userRoles {
 		if role.OwnerPubKey == pubkey {
 			return true

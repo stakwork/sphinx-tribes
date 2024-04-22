@@ -339,7 +339,7 @@ func AddUserRoles(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	roles := []db.UserRoles{}
+	roles := []db.WorkspaceUserRoles{}
 	body, err := io.ReadAll(r.Body)
 	r.Body.Close()
 	err = json.Unmarshal(body, &roles)
@@ -380,7 +380,7 @@ func AddUserRoles(w http.ResponseWriter, r *http.Request) {
 	}
 
 	rolesMap := db.GetRolesMap()
-	insertRoles := []db.UserRoles{}
+	insertRoles := []db.WorkspaceUserRoles{}
 	for _, role := range roles {
 		_, ok := rolesMap[role.Role]
 		// if any of the roles does not exists return an error
