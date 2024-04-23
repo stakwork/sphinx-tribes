@@ -127,26 +127,26 @@ func (db database) AddBudgetHistory(budget BudgetHistory) BudgetHistory {
 	return budget
 }
 
-func (db database) CreateWorkspaceBudget(budget BountyBudget) BountyBudget {
+func (db database) CreateWorkspaceBudget(budget NewBountyBudget) NewBountyBudget {
 	db.db.Create(&budget)
 	return budget
 }
 
-func (db database) UpdateWorkspaceBudget(budget BountyBudget) BountyBudget {
-	db.db.Model(&BountyBudget{}).Where("workspace_uuid = ?", budget.OrgUuid).Updates(map[string]interface{}{
+func (db database) UpdateWorkspaceBudget(budget NewBountyBudget) NewBountyBudget {
+	db.db.Model(&NewBountyBudget{}).Where("workspace_uuid = ?", budget.OrgUuid).Updates(map[string]interface{}{
 		"total_budget": budget.TotalBudget,
 	})
 	return budget
 }
 
-func (db database) GetPaymentHistoryByCreated(created *time.Time, workspace_uuid string) PaymentHistory {
-	ms := PaymentHistory{}
+func (db database) GetPaymentHistoryByCreated(created *time.Time, workspace_uuid string) NewPaymentHistory {
+	ms := NewPaymentHistory{}
 	db.db.Where("created = ?", created).Where("workspace_uuid = ? ", workspace_uuid).Find(&ms)
 	return ms
 }
 
-func (db database) GetWorkspaceBudget(workspace_uuid string) BountyBudget {
-	ms := BountyBudget{}
+func (db database) GetWorkspaceBudget(workspace_uuid string) NewBountyBudget {
+	ms := NewBountyBudget{}
 	db.db.Where("workspace_uuid = ?", workspace_uuid).Find(&ms)
 
 	return ms
@@ -176,6 +176,7 @@ func (db database) GetWorkspaceStatusBudget(workspace_uuid string) StatusBudget 
 
 	statusBudget := StatusBudget{
 		OrgUuid:         workspace_uuid,
+		WorkspaceUuid:   workspace_uuid,
 		CurrentBudget:   orgBudget.TotalBudget,
 		OpenBudget:      openBudget,
 		OpenCount:       openCount,
@@ -195,13 +196,13 @@ func (db database) GetWorkspaceBudgetHistory(workspace_uuid string) []BudgetHist
 	return budgetHistory
 }
 
-func (db database) AddAndUpdateBudget(invoice InvoiceList) PaymentHistory {
+func (db database) AddAndUpdateBudget(invoice NewInvoiceList) NewPaymentHistory {
 	created := invoice.Created
-	workspace_uuid := invoice.OrgUuid
+	workspace_uuid := invoice.WorkspaceUuid
 
 	paymentHistory := db.GetPaymentHistoryByCreated(created, workspace_uuid)
 
-	if paymentHistory.OrgUuid != "" && paymentHistory.Amount != 0 {
+	if paymentHistory.WorkspaceUuid != "" && paymentHistory.Amount != 0 {
 		paymentHistory.Status = true
 		db.db.Where("created = ?", created).Where("workspace_uuid = ? ", workspace_uuid).Updates(paymentHistory)
 
@@ -210,11 +211,11 @@ func (db database) AddAndUpdateBudget(invoice InvoiceList) PaymentHistory {
 
 		if WorkspaceBudget.OrgUuid == "" {
 			now := time.Now()
-			orgBudget := BountyBudget{
-				OrgUuid:     workspace_uuid,
-				TotalBudget: paymentHistory.Amount,
-				Created:     &now,
-				Updated:     &now,
+			orgBudget := NewBountyBudget{
+				WorkspaceUuid: workspace_uuid,
+				TotalBudget:   paymentHistory.Amount,
+				Created:       &now,
+				Updated:       &now,
 			}
 			db.CreateWorkspaceBudget(orgBudget)
 		} else {
@@ -233,14 +234,14 @@ func (db database) WithdrawBudget(sender_pubkey string, workspace_uuid string, a
 	totalBudget := WorkspaceBudget.TotalBudget
 
 	newBudget := totalBudget - amount
-	db.db.Model(&BountyBudget{}).Where("workspace_uuid = ?", workspace_uuid).Updates(map[string]interface{}{
+	db.db.Model(&NewBountyBudget{}).Where("workspace_uuid = ?", workspace_uuid).Updates(map[string]interface{}{
 		"total_budget": newBudget,
 	})
 
 	now := time.Now()
 
-	budgetHistory := PaymentHistory{
-		OrgUuid:        workspace_uuid,
+	budgetHistory := NewPaymentHistory{
+		WorkspaceUuid:  workspace_uuid,
 		Amount:         amount,
 		Status:         true,
 		PaymentType:    "withdraw",
@@ -253,7 +254,7 @@ func (db database) WithdrawBudget(sender_pubkey string, workspace_uuid string, a
 	db.AddPaymentHistory(budgetHistory)
 }
 
-func (db database) AddPaymentHistory(payment PaymentHistory) PaymentHistory {
+func (db database) AddPaymentHistory(payment NewPaymentHistory) NewPaymentHistory {
 	db.db.Create(&payment)
 
 	// get Workspace budget and subtract payment from total budget
@@ -270,8 +271,8 @@ func (db database) AddPaymentHistory(payment PaymentHistory) PaymentHistory {
 	return payment
 }
 
-func (db database) GetPaymentHistory(workspace_uuid string, r *http.Request) []PaymentHistory {
-	payment := []PaymentHistory{}
+func (db database) GetPaymentHistory(workspace_uuid string, r *http.Request) []NewPaymentHistory {
+	payment := []NewPaymentHistory{}
 
 	offset, limit, _, _, _ := utils.GetPaginationParams(r)
 	limitQuery := ""
@@ -284,15 +285,15 @@ func (db database) GetPaymentHistory(workspace_uuid string, r *http.Request) []P
 	return payment
 }
 
-func (db database) GetWorkspaceInvoices(workspace_uuid string) []InvoiceList {
-	ms := []InvoiceList{}
+func (db database) GetWorkspaceInvoices(workspace_uuid string) []NewInvoiceList {
+	ms := []NewInvoiceList{}
 	db.db.Where("workspace_uuid = ?", workspace_uuid).Where("status", false).Find(&ms)
 	return ms
 }
 
 func (db database) GetWorkspaceInvoicesCount(workspace_uuid string) int64 {
 	var count int64
-	ms := InvoiceList{}
+	ms := NewInvoiceList{}
 
 	db.db.Model(&ms).Where("workspace_uuid = ?", workspace_uuid).Where("status", false).Count(&count)
 	return count

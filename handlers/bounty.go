@@ -23,7 +23,7 @@ type bountyHandler struct {
 	httpClient               HttpClient
 	db                       db.Database
 	getSocketConnections     func(host string) (db.Client, error)
-	generateBountyResponse   func(bounties []db.Bounty) []db.BountyResponse
+	generateBountyResponse   func(bounties []db.NewBounty) []db.BountyResponse
 	userHasAccess            func(pubKeyFromAuth string, uuid string, role string) bool
 	userHasManageBountyRoles func(pubKeyFromAuth string, uuid string) bool
 }
@@ -182,7 +182,7 @@ func (h *bountyHandler) CreateOrEditBounty(w http.ResponseWriter, r *http.Reques
 	ctx := r.Context()
 	pubKeyFromAuth, _ := ctx.Value(auth.ContextKey).(string)
 
-	bounty := db.Bounty{}
+	bounty := db.NewBounty{}
 	body, err := io.ReadAll(r.Body)
 
 	r.Body.Close()
@@ -194,6 +194,10 @@ func (h *bountyHandler) CreateOrEditBounty(w http.ResponseWriter, r *http.Reques
 	}
 
 	now := time.Now()
+
+	if bounty.WorkspaceUuid == "" && bounty.OrgUuid != "" {
+		bounty.WorkspaceUuid = bounty.OrgUuid
+	}
 
 	//Check if bounty exists
 	bounty.Updated = &now
@@ -244,8 +248,8 @@ func (h *bountyHandler) CreateOrEditBounty(w http.ResponseWriter, r *http.Reques
 		// trying to update
 		// check if bounty belongs to user
 		if pubKeyFromAuth != dbBounty.OwnerID {
-			if bounty.OrgUuid != "" {
-				hasBountyRoles := h.userHasManageBountyRoles(pubKeyFromAuth, bounty.OrgUuid)
+			if bounty.WorkspaceUuid != "" {
+				hasBountyRoles := h.userHasManageBountyRoles(pubKeyFromAuth, bounty.WorkspaceUuid)
 				if !hasBountyRoles {
 					msg := "You don't have a=the right permission ton update bounty"
 					fmt.Println(msg)
@@ -351,7 +355,7 @@ func UpdateCompletedStatus(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(bounty)
 }
 
-func (h *bountyHandler) GenerateBountyResponse(bounties []db.Bounty) []db.BountyResponse {
+func (h *bountyHandler) GenerateBountyResponse(bounties []db.NewBounty) []db.BountyResponse {
 	var bountyResponse []db.BountyResponse
 
 	for i := 0; i < len(bounties); i++ {
@@ -359,10 +363,10 @@ func (h *bountyHandler) GenerateBountyResponse(bounties []db.Bounty) []db.Bounty
 
 		owner := h.db.GetPersonByPubkey(bounty.OwnerID)
 		assignee := h.db.GetPersonByPubkey(bounty.Assignee)
-		workspace := h.db.GetWorkspaceByUuid(bounty.OrgUuid)
+		workspace := h.db.GetWorkspaceByUuid(bounty.WorkspaceUuid)
 
 		b := db.BountyResponse{
-			Bounty: db.Bounty{
+			Bounty: db.NewBounty{
 				ID:                      bounty.ID,
 				OwnerID:                 bounty.OwnerID,
 				Paid:                    bounty.Paid,
@@ -385,7 +389,8 @@ func (h *bountyHandler) GenerateBountyResponse(bounties []db.Bounty) []db.Bounty
 				OneSentenceSummary:      bounty.OneSentenceSummary,
 				EstimatedSessionLength:  bounty.EstimatedSessionLength,
 				EstimatedCompletionDate: bounty.EstimatedCompletionDate,
-				OrgUuid:                 bounty.OrgUuid,
+				OrgUuid:                 bounty.WorkspaceUuid,
+				WorkspaceUuid:           bounty.WorkspaceUuid,
 				Updated:                 bounty.Updated,
 				CodingLanguages:         bounty.CodingLanguages,
 				Completed:               bounty.Completed,
@@ -465,6 +470,10 @@ func (h *bountyHandler) MakeBountyPayment(w http.ResponseWriter, r *http.Request
 	bounty := h.db.GetBounty(id)
 	amount := bounty.Price
 
+	if bounty.WorkspaceUuid == "" && bounty.OrgUuid != "" {
+		bounty.WorkspaceUuid = bounty.OrgUuid
+	}
+
 	if bounty.ID != id {
 		w.WriteHeader(http.StatusNotFound)
 		return
@@ -479,7 +488,7 @@ func (h *bountyHandler) MakeBountyPayment(w http.ResponseWriter, r *http.Request
 
 	// check if user is the admin of the workspace
 	// or has a pay bounty role
-	hasRole := h.userHasAccess(pubKeyFromAuth, bounty.OrgUuid, db.PayBounty)
+	hasRole := h.userHasAccess(pubKeyFromAuth, bounty.WorkspaceUuid, db.PayBounty)
 	if !hasRole {
 		w.WriteHeader(http.StatusUnauthorized)
 		json.NewEncoder(w).Encode("You don't have appropriate permissions to pay bounties")
@@ -488,7 +497,7 @@ func (h *bountyHandler) MakeBountyPayment(w http.ResponseWriter, r *http.Request
 
 	// check if the workspace bounty balance
 	// is greater than the amount
-	orgBudget := h.db.GetWorkspaceBudget(bounty.OrgUuid)
+	orgBudget := h.db.GetWorkspaceBudget(bounty.WorkspaceUuid)
 	if orgBudget.TotalBudget < amount {
 		w.WriteHeader(http.StatusForbidden)
 		json.NewEncoder(w).Encode("workspace budget is not enough to pay the amount")
@@ -535,11 +544,11 @@ func (h *bountyHandler) MakeBountyPayment(w http.ResponseWriter, r *http.Request
 		err = json.Unmarshal(body, &keysendRes)
 
 		now := time.Now()
-		paymentHistory := db.PaymentHistory{
+		paymentHistory := db.NewPaymentHistory{
 			Amount:         amount,
 			SenderPubKey:   pubKeyFromAuth,
 			ReceiverPubKey: assignee.OwnerPubKey,
-			OrgUuid:        bounty.OrgUuid,
+			WorkspaceUuid:  bounty.WorkspaceUuid,
 			BountyId:       id,
 			Created:        &now,
 			Updated:        &now,
@@ -590,6 +599,8 @@ func (h *bountyHandler) BountyBudgetWithdraw(w http.ResponseWriter, r *http.Requ
 	request := db.WithdrawBudgetRequest{}
 	body, err := io.ReadAll(r.Body)
 	r.Body.Close()
+
+	fmt.Println("WithdraW Request ===", request)
 
 	err = json.Unmarshal(body, &request)
 	if err != nil {

@@ -354,7 +354,7 @@ func TestDeleteWorkspace(t *testing.T) {
 func TestGetWorkspaceBounties(t *testing.T) {
 	ctx := context.WithValue(context.Background(), auth.ContextKey, "test-key")
 	mockDb := mocks.NewDatabase(t)
-	mockGenerateBountyHandler := func(bounties []db.Bounty) []db.BountyResponse {
+	mockGenerateBountyHandler := func(bounties []db.NewBounty) []db.BountyResponse {
 		return []db.BountyResponse{} // Mocked response
 	}
 	oHandler := NewWorkspaceHandler(mockDb)

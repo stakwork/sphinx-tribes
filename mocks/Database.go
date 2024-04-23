@@ -26,18 +26,18 @@ func (_m *Database) EXPECT() *Database_Expecter {
 }
 
 // AddAndUpdateBudget provides a mock function with given fields: invoice
-func (_m *Database) AddAndUpdateBudget(invoice db.InvoiceList) db.PaymentHistory {
+func (_m *Database) AddAndUpdateBudget(invoice db.NewInvoiceList) db.NewPaymentHistory {
 	ret := _m.Called(invoice)
 
 	if len(ret) == 0 {
 		panic("no return value specified for AddAndUpdateBudget")
 	}
 
-	var r0 db.PaymentHistory
-	if rf, ok := ret.Get(0).(func(db.InvoiceList) db.PaymentHistory); ok {
+	var r0 db.NewPaymentHistory
+	if rf, ok := ret.Get(0).(func(db.NewInvoiceList) db.NewPaymentHistory); ok {
 		r0 = rf(invoice)
 	} else {
-		r0 = ret.Get(0).(db.PaymentHistory)
+		r0 = ret.Get(0).(db.NewPaymentHistory)
 	}
 
 	return r0
@@ -49,24 +49,24 @@ type Database_AddAndUpdateBudget_Call struct {
 }
 
 // AddAndUpdateBudget is a helper method to define mock.On call
-//   - invoice db.InvoiceList
+//   - invoice db.NewInvoiceList
 func (_e *Database_Expecter) AddAndUpdateBudget(invoice interface{}) *Database_AddAndUpdateBudget_Call {
 	return &Database_AddAndUpdateBudget_Call{Call: _e.mock.On("AddAndUpdateBudget", invoice)}
 }
 
-func (_c *Database_AddAndUpdateBudget_Call) Run(run func(invoice db.InvoiceList)) *Database_AddAndUpdateBudget_Call {
+func (_c *Database_AddAndUpdateBudget_Call) Run(run func(invoice db.NewInvoiceList)) *Database_AddAndUpdateBudget_Call {
 	_c.Call.Run(func(args mock.Arguments) {
-		run(args[0].(db.InvoiceList))
+		run(args[0].(db.NewInvoiceList))
 	})
 	return _c
 }
 
-func (_c *Database_AddAndUpdateBudget_Call) Return(_a0 db.PaymentHistory) *Database_AddAndUpdateBudget_Call {
+func (_c *Database_AddAndUpdateBudget_Call) Return(_a0 db.NewPaymentHistory) *Database_AddAndUpdateBudget_Call {
 	_c.Call.Return(_a0)
 	return _c
 }
 
-func (_c *Database_AddAndUpdateBudget_Call) RunAndReturn(run func(db.InvoiceList) db.PaymentHistory) *Database_AddAndUpdateBudget_Call {
+func (_c *Database_AddAndUpdateBudget_Call) RunAndReturn(run func(db.NewInvoiceList) db.NewPaymentHistory) *Database_AddAndUpdateBudget_Call {
 	_c.Call.Return(run)
 	return _c
 }
@@ -174,18 +174,18 @@ func (_c *Database_AddBudgetHistory_Call) RunAndReturn(run func(db.BudgetHistory
 }
 
 // AddInvoice provides a mock function with given fields: invoice
-func (_m *Database) AddInvoice(invoice db.InvoiceList) db.InvoiceList {
+func (_m *Database) AddInvoice(invoice db.NewInvoiceList) db.NewInvoiceList {
 	ret := _m.Called(invoice)
 
 	if len(ret) == 0 {
 		panic("no return value specified for AddInvoice")
 	}
 
-	var r0 db.InvoiceList
-	if rf, ok := ret.Get(0).(func(db.InvoiceList) db.InvoiceList); ok {
+	var r0 db.NewInvoiceList
+	if rf, ok := ret.Get(0).(func(db.NewInvoiceList) db.NewInvoiceList); ok {
 		r0 = rf(invoice)
 	} else {
-		r0 = ret.Get(0).(db.InvoiceList)
+		r0 = ret.Get(0).(db.NewInvoiceList)
 	}
 
 	return r0
@@ -197,41 +197,41 @@ type Database_AddInvoice_Call struct {
 }
 
 // AddInvoice is a helper method to define mock.On call
-//   - invoice db.InvoiceList
+//   - invoice db.NewInvoiceList
 func (_e *Database_Expecter) AddInvoice(invoice interface{}) *Database_AddInvoice_Call {
 	return &Database_AddInvoice_Call{Call: _e.mock.On("AddInvoice", invoice)}
 }
 
-func (_c *Database_AddInvoice_Call) Run(run func(invoice db.InvoiceList)) *Database_AddInvoice_Call {
+func (_c *Database_AddInvoice_Call) Run(run func(invoice db.NewInvoiceList)) *Database_AddInvoice_Call {
 	_c.Call.Run(func(args mock.Arguments) {
-		run(args[0].(db.InvoiceList))
+		run(args[0].(db.NewInvoiceList))
 	})
 	return _c
 }
 
-func (_c *Database_AddInvoice_Call) Return(_a0 db.InvoiceList) *Database_AddInvoice_Call {
+func (_c *Database_AddInvoice_Call) Return(_a0 db.NewInvoiceList) *Database_AddInvoice_Call {
 	_c.Call.Return(_a0)
 	return _c
 }
 
-func (_c *Database_AddInvoice_Call) RunAndReturn(run func(db.InvoiceList) db.InvoiceList) *Database_AddInvoice_Call {
+func (_c *Database_AddInvoice_Call) RunAndReturn(run func(db.NewInvoiceList) db.NewInvoiceList) *Database_AddInvoice_Call {
 	_c.Call.Return(run)
 	return _c
 }
 
 // AddPaymentHistory provides a mock function with given fields: payment
-func (_m *Database) AddPaymentHistory(payment db.PaymentHistory) db.PaymentHistory {
+func (_m *Database) AddPaymentHistory(payment db.NewPaymentHistory) db.NewPaymentHistory {
 	ret := _m.Called(payment)
 
 	if len(ret) == 0 {
 		panic("no return value specified for AddPaymentHistory")
 	}
 
-	var r0 db.PaymentHistory
-	if rf, ok := ret.Get(0).(func(db.PaymentHistory) db.PaymentHistory); ok {
+	var r0 db.NewPaymentHistory
+	if rf, ok := ret.Get(0).(func(db.NewPaymentHistory) db.NewPaymentHistory); ok {
 		r0 = rf(payment)
 	} else {
-		r0 = ret.Get(0).(db.PaymentHistory)
+		r0 = ret.Get(0).(db.NewPaymentHistory)
 	}
 
 	return r0
@@ -243,24 +243,24 @@ type Database_AddPaymentHistory_Call struct {
 }
 
 // AddPaymentHistory is a helper method to define mock.On call
-//   - payment db.PaymentHistory
+//   - payment db.NewPaymentHistory
 func (_e *Database_Expecter) AddPaymentHistory(payment interface{}) *Database_AddPaymentHistory_Call {
 	return &Database_AddPaymentHistory_Call{Call: _e.mock.On("AddPaymentHistory", payment)}
 }
 
-func (_c *Database_AddPaymentHistory_Call) Run(run func(payment db.PaymentHistory)) *Database_AddPaymentHistory_Call {
+func (_c *Database_AddPaymentHistory_Call) Run(run func(payment db.NewPaymentHistory)) *Database_AddPaymentHistory_Call {
 	_c.Call.Run(func(args mock.Arguments) {
-		run(args[0].(db.PaymentHistory))
+		run(args[0].(db.NewPaymentHistory))
 	})
 	return _c
 }
 
-func (_c *Database_AddPaymentHistory_Call) Return(_a0 db.PaymentHistory) *Database_AddPaymentHistory_Call {
+func (_c *Database_AddPaymentHistory_Call) Return(_a0 db.NewPaymentHistory) *Database_AddPaymentHistory_Call {
 	_c.Call.Return(_a0)
 	return _c
 }
 
-func (_c *Database_AddPaymentHistory_Call) RunAndReturn(run func(db.PaymentHistory) db.PaymentHistory) *Database_AddPaymentHistory_Call {
+func (_c *Database_AddPaymentHistory_Call) RunAndReturn(run func(db.NewPaymentHistory) db.NewPaymentHistory) *Database_AddPaymentHistory_Call {
 	_c.Call.Return(run)
 	return _c
 }
@@ -872,25 +872,25 @@ func (_c *Database_CreateOrEditBot_Call) RunAndReturn(run func(db.Bot) (db.Bot, 
 }
 
 // CreateOrEditBounty provides a mock function with given fields: b
-func (_m *Database) CreateOrEditBounty(b db.Bounty) (db.Bounty, error) {
+func (_m *Database) CreateOrEditBounty(b db.NewBounty) (db.NewBounty, error) {
 	ret := _m.Called(b)
 
 	if len(ret) == 0 {
 		panic("no return value specified for CreateOrEditBounty")
 	}
 
-	var r0 db.Bounty
+	var r0 db.NewBounty
 	var r1 error
-	if rf, ok := ret.Get(0).(func(db.Bounty) (db.Bounty, error)); ok {
+	if rf, ok := ret.Get(0).(func(db.NewBounty) (db.NewBounty, error)); ok {
 		return rf(b)
 	}
-	if rf, ok := ret.Get(0).(func(db.Bounty) db.Bounty); ok {
+	if rf, ok := ret.Get(0).(func(db.NewBounty) db.NewBounty); ok {
 		r0 = rf(b)
 	} else {
-		r0 = ret.Get(0).(db.Bounty)
+		r0 = ret.Get(0).(db.NewBounty)
 	}
 
-	if rf, ok := ret.Get(1).(func(db.Bounty) error); ok {
+	if rf, ok := ret.Get(1).(func(db.NewBounty) error); ok {
 		r1 = rf(b)
 	} else {
 		r1 = ret.Error(1)
@@ -905,24 +905,24 @@ type Database_CreateOrEditBounty_Call struct {
 }
 
 // CreateOrEditBounty is a helper method to define mock.On call
-//   - b db.Bounty
+//   - b db.NewBounty
 func (_e *Database_Expecter) CreateOrEditBounty(b interface{}) *Database_CreateOrEditBounty_Call {
 	return &Database_CreateOrEditBounty_Call{Call: _e.mock.On("CreateOrEditBounty", b)}
 }
 
-func (_c *Database_CreateOrEditBounty_Call) Run(run func(b db.Bounty)) *Database_CreateOrEditBounty_Call {
+func (_c *Database_CreateOrEditBounty_Call) Run(run func(b db.NewBounty)) *Database_CreateOrEditBounty_Call {
 	_c.Call.Run(func(args mock.Arguments) {
-		run(args[0].(db.Bounty))
+		run(args[0].(db.NewBounty))
 	})
 	return _c
 }
 
-func (_c *Database_CreateOrEditBounty_Call) Return(_a0 db.Bounty, _a1 error) *Database_CreateOrEditBounty_Call {
+func (_c *Database_CreateOrEditBounty_Call) Return(_a0 db.NewBounty, _a1 error) *Database_CreateOrEditBounty_Call {
 	_c.Call.Return(_a0, _a1)
 	return _c
 }
 
-func (_c *Database_CreateOrEditBounty_Call) RunAndReturn(run func(db.Bounty) (db.Bounty, error)) *Database_CreateOrEditBounty_Call {
+func (_c *Database_CreateOrEditBounty_Call) RunAndReturn(run func(db.NewBounty) (db.NewBounty, error)) *Database_CreateOrEditBounty_Call {
 	_c.Call.Return(run)
 	return _c
 }
@@ -1146,18 +1146,18 @@ func (_c *Database_CreateUserRoles_Call) RunAndReturn(run func([]db.WorkspaceUse
 }
 
 // CreateWorkspaceBudget provides a mock function with given fields: budget
-func (_m *Database) CreateWorkspaceBudget(budget db.BountyBudget) db.BountyBudget {
+func (_m *Database) CreateWorkspaceBudget(budget db.NewBountyBudget) db.NewBountyBudget {
 	ret := _m.Called(budget)
 
 	if len(ret) == 0 {
 		panic("no return value specified for CreateWorkspaceBudget")
 	}
 
-	var r0 db.BountyBudget
-	if rf, ok := ret.Get(0).(func(db.BountyBudget) db.BountyBudget); ok {
+	var r0 db.NewBountyBudget
+	if rf, ok := ret.Get(0).(func(db.NewBountyBudget) db.NewBountyBudget); ok {
 		r0 = rf(budget)
 	} else {
-		r0 = ret.Get(0).(db.BountyBudget)
+		r0 = ret.Get(0).(db.NewBountyBudget)
 	}
 
 	return r0
@@ -1169,24 +1169,24 @@ type Database_CreateWorkspaceBudget_Call struct {
 }
 
 // CreateWorkspaceBudget is a helper method to define mock.On call
-//   - budget db.BountyBudget
+//   - budget db.NewBountyBudget
 func (_e *Database_Expecter) CreateWorkspaceBudget(budget interface{}) *Database_CreateWorkspaceBudget_Call {
 	return &Database_CreateWorkspaceBudget_Call{Call: _e.mock.On("CreateWorkspaceBudget", budget)}
 }
 
-func (_c *Database_CreateWorkspaceBudget_Call) Run(run func(budget db.BountyBudget)) *Database_CreateWorkspaceBudget_Call {
+func (_c *Database_CreateWorkspaceBudget_Call) Run(run func(budget db.NewBountyBudget)) *Database_CreateWorkspaceBudget_Call {
 	_c.Call.Run(func(args mock.Arguments) {
-		run(args[0].(db.BountyBudget))
+		run(args[0].(db.NewBountyBudget))
 	})
 	return _c
 }
 
-func (_c *Database_CreateWorkspaceBudget_Call) Return(_a0 db.BountyBudget) *Database_CreateWorkspaceBudget_Call {
+func (_c *Database_CreateWorkspaceBudget_Call) Return(_a0 db.NewBountyBudget) *Database_CreateWorkspaceBudget_Call {
 	_c.Call.Return(_a0)
 	return _c
 }
 
-func (_c *Database_CreateWorkspaceBudget_Call) RunAndReturn(run func(db.BountyBudget) db.BountyBudget) *Database_CreateWorkspaceBudget_Call {
+func (_c *Database_CreateWorkspaceBudget_Call) RunAndReturn(run func(db.NewBountyBudget) db.NewBountyBudget) *Database_CreateWorkspaceBudget_Call {
 	_c.Call.Return(run)
 	return _c
 }
@@ -1434,19 +1434,19 @@ func (_c *Database_DeleteWorkspaceUser_Call) RunAndReturn(run func(db.WorkspaceU
 }
 
 // GetAllBounties provides a mock function with given fields: r
-func (_m *Database) GetAllBounties(r *http.Request) []db.Bounty {
+func (_m *Database) GetAllBounties(r *http.Request) []db.NewBounty {
 	ret := _m.Called(r)
 
 	if len(ret) == 0 {
 		panic("no return value specified for GetAllBounties")
 	}
 
-	var r0 []db.Bounty
-	if rf, ok := ret.Get(0).(func(*http.Request) []db.Bounty); ok {
+	var r0 []db.NewBounty
+	if rf, ok := ret.Get(0).(func(*http.Request) []db.NewBounty); ok {
 		r0 = rf(r)
 	} else {
 		if ret.Get(0) != nil {
-			r0 = ret.Get(0).([]db.Bounty)
+			r0 = ret.Get(0).([]db.NewBounty)
 		}
 	}
 
@@ -1471,12 +1471,12 @@ func (_c *Database_GetAllBounties_Call) Run(run func(r *http.Request)) *Database
 	return _c
 }
 
-func (_c *Database_GetAllBounties_Call) Return(_a0 []db.Bounty) *Database_GetAllBounties_Call {
+func (_c *Database_GetAllBounties_Call) Return(_a0 []db.NewBounty) *Database_GetAllBounties_Call {
 	_c.Call.Return(_a0)
 	return _c
 }
 
-func (_c *Database_GetAllBounties_Call) RunAndReturn(run func(*http.Request) []db.Bounty) *Database_GetAllBounties_Call {
+func (_c *Database_GetAllBounties_Call) RunAndReturn(run func(*http.Request) []db.NewBounty) *Database_GetAllBounties_Call {
 	_c.Call.Return(run)
 	return _c
 }
@@ -1577,23 +1577,23 @@ func (_c *Database_GetAllTribesByOwner_Call) RunAndReturn(run func(string) []db.
 }
 
 // GetAssignedBounties provides a mock function with given fields: r
-func (_m *Database) GetAssignedBounties(r *http.Request) ([]db.Bounty, error) {
+func (_m *Database) GetAssignedBounties(r *http.Request) ([]db.NewBounty, error) {
 	ret := _m.Called(r)
 
 	if len(ret) == 0 {
 		panic("no return value specified for GetAssignedBounties")
 	}
 
-	var r0 []db.Bounty
+	var r0 []db.NewBounty
 	var r1 error
-	if rf, ok := ret.Get(0).(func(*http.Request) ([]db.Bounty, error)); ok {
+	if rf, ok := ret.Get(0).(func(*http.Request) ([]db.NewBounty, error)); ok {
 		return rf(r)
 	}
-	if rf, ok := ret.Get(0).(func(*http.Request) []db.Bounty); ok {
+	if rf, ok := ret.Get(0).(func(*http.Request) []db.NewBounty); ok {
 		r0 = rf(r)
 	} else {
 		if ret.Get(0) != nil {
-			r0 = ret.Get(0).([]db.Bounty)
+			r0 = ret.Get(0).([]db.NewBounty)
 		}
 	}
 
@@ -1624,12 +1624,12 @@ func (_c *Database_GetAssignedBounties_Call) Run(run func(r *http.Request)) *Dat
 	return _c
 }
 
-func (_c *Database_GetAssignedBounties_Call) Return(_a0 []db.Bounty, _a1 error) *Database_GetAssignedBounties_Call {
+func (_c *Database_GetAssignedBounties_Call) Return(_a0 []db.NewBounty, _a1 error) *Database_GetAssignedBounties_Call {
 	_c.Call.Return(_a0, _a1)
 	return _c
 }
 
-func (_c *Database_GetAssignedBounties_Call) RunAndReturn(run func(*http.Request) ([]db.Bounty, error)) *Database_GetAssignedBounties_Call {
+func (_c *Database_GetAssignedBounties_Call) RunAndReturn(run func(*http.Request) ([]db.NewBounty, error)) *Database_GetAssignedBounties_Call {
 	_c.Call.Return(run)
 	return _c
 }
@@ -2013,18 +2013,18 @@ func (_c *Database_GetBountiesProviders_Call) RunAndReturn(run func(db.PaymentDa
 }
 
 // GetBounty provides a mock function with given fields: id
-func (_m *Database) GetBounty(id uint) db.Bounty {
+func (_m *Database) GetBounty(id uint) db.NewBounty {
 	ret := _m.Called(id)
 
 	if len(ret) == 0 {
 		panic("no return value specified for GetBounty")
 	}
 
-	var r0 db.Bounty
-	if rf, ok := ret.Get(0).(func(uint) db.Bounty); ok {
+	var r0 db.NewBounty
+	if rf, ok := ret.Get(0).(func(uint) db.NewBounty); ok {
 		r0 = rf(id)
 	} else {
-		r0 = ret.Get(0).(db.Bounty)
+		r0 = ret.Get(0).(db.NewBounty)
 	}
 
 	return r0
@@ -2048,33 +2048,33 @@ func (_c *Database_GetBounty_Call) Run(run func(id uint)) *Database_GetBounty_Ca
 	return _c
 }
 
-func (_c *Database_GetBounty_Call) Return(_a0 db.Bounty) *Database_GetBounty_Call {
+func (_c *Database_GetBounty_Call) Return(_a0 db.NewBounty) *Database_GetBounty_Call {
 	_c.Call.Return(_a0)
 	return _c
 }
 
-func (_c *Database_GetBounty_Call) RunAndReturn(run func(uint) db.Bounty) *Database_GetBounty_Call {
+func (_c *Database_GetBounty_Call) RunAndReturn(run func(uint) db.NewBounty) *Database_GetBounty_Call {
 	_c.Call.Return(run)
 	return _c
 }
 
 // GetBountyByCreated provides a mock function with given fields: created
-func (_m *Database) GetBountyByCreated(created uint) (db.Bounty, error) {
+func (_m *Database) GetBountyByCreated(created uint) (db.NewBounty, error) {
 	ret := _m.Called(created)
 
 	if len(ret) == 0 {
 		panic("no return value specified for GetBountyByCreated")
 	}
 
-	var r0 db.Bounty
+	var r0 db.NewBounty
 	var r1 error
-	if rf, ok := ret.Get(0).(func(uint) (db.Bounty, error)); ok {
+	if rf, ok := ret.Get(0).(func(uint) (db.NewBounty, error)); ok {
 		return rf(created)
 	}
-	if rf, ok := ret.Get(0).(func(uint) db.Bounty); ok {
+	if rf, ok := ret.Get(0).(func(uint) db.NewBounty); ok {
 		r0 = rf(created)
 	} else {
-		r0 = ret.Get(0).(db.Bounty)
+		r0 = ret.Get(0).(db.NewBounty)
 	}
 
 	if rf, ok := ret.Get(1).(func(uint) error); ok {
@@ -2104,34 +2104,34 @@ func (_c *Database_GetBountyByCreated_Call) Run(run func(created uint)) *Databas
 	return _c
 }
 
-func (_c *Database_GetBountyByCreated_Call) Return(_a0 db.Bounty, _a1 error) *Database_GetBountyByCreated_Call {
+func (_c *Database_GetBountyByCreated_Call) Return(_a0 db.NewBounty, _a1 error) *Database_GetBountyByCreated_Call {
 	_c.Call.Return(_a0, _a1)
 	return _c
 }
 
-func (_c *Database_GetBountyByCreated_Call) RunAndReturn(run func(uint) (db.Bounty, error)) *Database_GetBountyByCreated_Call {
+func (_c *Database_GetBountyByCreated_Call) RunAndReturn(run func(uint) (db.NewBounty, error)) *Database_GetBountyByCreated_Call {
 	_c.Call.Return(run)
 	return _c
 }
 
 // GetBountyById provides a mock function with given fields: id
-func (_m *Database) GetBountyById(id string) ([]db.Bounty, error) {
+func (_m *Database) GetBountyById(id string) ([]db.NewBounty, error) {
 	ret := _m.Called(id)
 
 	if len(ret) == 0 {
 		panic("no return value specified for GetBountyById")
 	}
 
-	var r0 []db.Bounty
+	var r0 []db.NewBounty
 	var r1 error
-	if rf, ok := ret.Get(0).(func(string) ([]db.Bounty, error)); ok {
+	if rf, ok := ret.Get(0).(func(string) ([]db.NewBounty, error)); ok {
 		return rf(id)
 	}
-	if rf, ok := ret.Get(0).(func(string) []db.Bounty); ok {
+	if rf, ok := ret.Get(0).(func(string) []db.NewBounty); ok {
 		r0 = rf(id)
 	} else {
 		if ret.Get(0) != nil {
-			r0 = ret.Get(0).([]db.Bounty)
+			r0 = ret.Get(0).([]db.NewBounty)
 		}
 	}
 
@@ -2162,34 +2162,34 @@ func (_c *Database_GetBountyById_Call) Run(run func(id string)) *Database_GetBou
 	return _c
 }
 
-func (_c *Database_GetBountyById_Call) Return(_a0 []db.Bounty, _a1 error) *Database_GetBountyById_Call {
+func (_c *Database_GetBountyById_Call) Return(_a0 []db.NewBounty, _a1 error) *Database_GetBountyById_Call {
 	_c.Call.Return(_a0, _a1)
 	return _c
 }
 
-func (_c *Database_GetBountyById_Call) RunAndReturn(run func(string) ([]db.Bounty, error)) *Database_GetBountyById_Call {
+func (_c *Database_GetBountyById_Call) RunAndReturn(run func(string) ([]db.NewBounty, error)) *Database_GetBountyById_Call {
 	_c.Call.Return(run)
 	return _c
 }
 
 // GetBountyDataByCreated provides a mock function with given fields: created
-func (_m *Database) GetBountyDataByCreated(created string) ([]db.Bounty, error) {
+func (_m *Database) GetBountyDataByCreated(created string) ([]db.NewBounty, error) {
 	ret := _m.Called(created)
 
 	if len(ret) == 0 {
 		panic("no return value specified for GetBountyDataByCreated")
 	}
 
-	var r0 []db.Bounty
+	var r0 []db.NewBounty
 	var r1 error
-	if rf, ok := ret.Get(0).(func(string) ([]db.Bounty, error)); ok {
+	if rf, ok := ret.Get(0).(func(string) ([]db.NewBounty, error)); ok {
 		return rf(created)
 	}
-	if rf, ok := ret.Get(0).(func(string) []db.Bounty); ok {
+	if rf, ok := ret.Get(0).(func(string) []db.NewBounty); ok {
 		r0 = rf(created)
 	} else {
 		if ret.Get(0) != nil {
-			r0 = ret.Get(0).([]db.Bounty)
+			r0 = ret.Get(0).([]db.NewBounty)
 		}
 	}
 
@@ -2220,12 +2220,12 @@ func (_c *Database_GetBountyDataByCreated_Call) Run(run func(created string)) *D
 	return _c
 }
 
-func (_c *Database_GetBountyDataByCreated_Call) Return(_a0 []db.Bounty, _a1 error) *Database_GetBountyDataByCreated_Call {
+func (_c *Database_GetBountyDataByCreated_Call) Return(_a0 []db.NewBounty, _a1 error) *Database_GetBountyDataByCreated_Call {
 	_c.Call.Return(_a0, _a1)
 	return _c
 }
 
-func (_c *Database_GetBountyDataByCreated_Call) RunAndReturn(run func(string) ([]db.Bounty, error)) *Database_GetBountyDataByCreated_Call {
+func (_c *Database_GetBountyDataByCreated_Call) RunAndReturn(run func(string) ([]db.NewBounty, error)) *Database_GetBountyDataByCreated_Call {
 	_c.Call.Return(run)
 	return _c
 }
@@ -2463,23 +2463,23 @@ func (_c *Database_GetConnectionCode_Call) RunAndReturn(run func() db.Connection
 }
 
 // GetCreatedBounties provides a mock function with given fields: r
-func (_m *Database) GetCreatedBounties(r *http.Request) ([]db.Bounty, error) {
+func (_m *Database) GetCreatedBounties(r *http.Request) ([]db.NewBounty, error) {
 	ret := _m.Called(r)
 
 	if len(ret) == 0 {
 		panic("no return value specified for GetCreatedBounties")
 	}
 
-	var r0 []db.Bounty
+	var r0 []db.NewBounty
 	var r1 error
-	if rf, ok := ret.Get(0).(func(*http.Request) ([]db.Bounty, error)); ok {
+	if rf, ok := ret.Get(0).(func(*http.Request) ([]db.NewBounty, error)); ok {
 		return rf(r)
 	}
-	if rf, ok := ret.Get(0).(func(*http.Request) []db.Bounty); ok {
+	if rf, ok := ret.Get(0).(func(*http.Request) []db.NewBounty); ok {
 		r0 = rf(r)
 	} else {
 		if ret.Get(0) != nil {
-			r0 = ret.Get(0).([]db.Bounty)
+			r0 = ret.Get(0).([]db.NewBounty)
 		}
 	}
 
@@ -2510,12 +2510,12 @@ func (_c *Database_GetCreatedBounties_Call) Run(run func(r *http.Request)) *Data
 	return _c
 }
 
-func (_c *Database_GetCreatedBounties_Call) Return(_a0 []db.Bounty, _a1 error) *Database_GetCreatedBounties_Call {
+func (_c *Database_GetCreatedBounties_Call) Return(_a0 []db.NewBounty, _a1 error) *Database_GetCreatedBounties_Call {
 	_c.Call.Return(_a0, _a1)
 	return _c
 }
 
-func (_c *Database_GetCreatedBounties_Call) RunAndReturn(run func(*http.Request) ([]db.Bounty, error)) *Database_GetCreatedBounties_Call {
+func (_c *Database_GetCreatedBounties_Call) RunAndReturn(run func(*http.Request) ([]db.NewBounty, error)) *Database_GetCreatedBounties_Call {
 	_c.Call.Return(run)
 	return _c
 }
@@ -2612,18 +2612,18 @@ func (_c *Database_GetFirstTribeByFeedURL_Call) RunAndReturn(run func(string) db
 }
 
 // GetInvoice provides a mock function with given fields: payment_request
-func (_m *Database) GetInvoice(payment_request string) db.InvoiceList {
+func (_m *Database) GetInvoice(payment_request string) db.NewInvoiceList {
 	ret := _m.Called(payment_request)
 
 	if len(ret) == 0 {
 		panic("no return value specified for GetInvoice")
 	}
 
-	var r0 db.InvoiceList
-	if rf, ok := ret.Get(0).(func(string) db.InvoiceList); ok {
+	var r0 db.NewInvoiceList
+	if rf, ok := ret.Get(0).(func(string) db.NewInvoiceList); ok {
 		r0 = rf(payment_request)
 	} else {
-		r0 = ret.Get(0).(db.InvoiceList)
+		r0 = ret.Get(0).(db.NewInvoiceList)
 	}
 
 	return r0
@@ -2647,12 +2647,12 @@ func (_c *Database_GetInvoice_Call) Run(run func(payment_request string)) *Datab
 	return _c
 }
 
-func (_c *Database_GetInvoice_Call) Return(_a0 db.InvoiceList) *Database_GetInvoice_Call {
+func (_c *Database_GetInvoice_Call) Return(_a0 db.NewInvoiceList) *Database_GetInvoice_Call {
 	_c.Call.Return(_a0)
 	return _c
 }
 
-func (_c *Database_GetInvoice_Call) RunAndReturn(run func(string) db.InvoiceList) *Database_GetInvoice_Call {
+func (_c *Database_GetInvoice_Call) RunAndReturn(run func(string) db.NewInvoiceList) *Database_GetInvoice_Call {
 	_c.Call.Return(run)
 	return _c
 }
@@ -3227,19 +3227,19 @@ func (_c *Database_GetOpenGithubIssues_Call) RunAndReturn(run func(*http.Request
 }
 
 // GetPaymentHistory provides a mock function with given fields: workspace_uuid, r
-func (_m *Database) GetPaymentHistory(workspace_uuid string, r *http.Request) []db.PaymentHistory {
+func (_m *Database) GetPaymentHistory(workspace_uuid string, r *http.Request) []db.NewPaymentHistory {
 	ret := _m.Called(workspace_uuid, r)
 
 	if len(ret) == 0 {
 		panic("no return value specified for GetPaymentHistory")
 	}
 
-	var r0 []db.PaymentHistory
-	if rf, ok := ret.Get(0).(func(string, *http.Request) []db.PaymentHistory); ok {
+	var r0 []db.NewPaymentHistory
+	if rf, ok := ret.Get(0).(func(string, *http.Request) []db.NewPaymentHistory); ok {
 		r0 = rf(workspace_uuid, r)
 	} else {
 		if ret.Get(0) != nil {
-			r0 = ret.Get(0).([]db.PaymentHistory)
+			r0 = ret.Get(0).([]db.NewPaymentHistory)
 		}
 	}
 
@@ -3265,29 +3265,29 @@ func (_c *Database_GetPaymentHistory_Call) Run(run func(workspace_uuid string, r
 	return _c
 }
 
-func (_c *Database_GetPaymentHistory_Call) Return(_a0 []db.PaymentHistory) *Database_GetPaymentHistory_Call {
+func (_c *Database_GetPaymentHistory_Call) Return(_a0 []db.NewPaymentHistory) *Database_GetPaymentHistory_Call {
 	_c.Call.Return(_a0)
 	return _c
 }
 
-func (_c *Database_GetPaymentHistory_Call) RunAndReturn(run func(string, *http.Request) []db.PaymentHistory) *Database_GetPaymentHistory_Call {
+func (_c *Database_GetPaymentHistory_Call) RunAndReturn(run func(string, *http.Request) []db.NewPaymentHistory) *Database_GetPaymentHistory_Call {
 	_c.Call.Return(run)
 	return _c
 }
 
 // GetPaymentHistoryByCreated provides a mock function with given fields: created, workspace_uuid
-func (_m *Database) GetPaymentHistoryByCreated(created *time.Time, workspace_uuid string) db.PaymentHistory {
+func (_m *Database) GetPaymentHistoryByCreated(created *time.Time, workspace_uuid string) db.NewPaymentHistory {
 	ret := _m.Called(created, workspace_uuid)
 
 	if len(ret) == 0 {
 		panic("no return value specified for GetPaymentHistoryByCreated")
 	}
 
-	var r0 db.PaymentHistory
-	if rf, ok := ret.Get(0).(func(*time.Time, string) db.PaymentHistory); ok {
+	var r0 db.NewPaymentHistory
+	if rf, ok := ret.Get(0).(func(*time.Time, string) db.NewPaymentHistory); ok {
 		r0 = rf(created, workspace_uuid)
 	} else {
-		r0 = ret.Get(0).(db.PaymentHistory)
+		r0 = ret.Get(0).(db.NewPaymentHistory)
 	}
 
 	return r0
@@ -3312,12 +3312,12 @@ func (_c *Database_GetPaymentHistoryByCreated_Call) Run(run func(created *time.T
 	return _c
 }
 
-func (_c *Database_GetPaymentHistoryByCreated_Call) Return(_a0 db.PaymentHistory) *Database_GetPaymentHistoryByCreated_Call {
+func (_c *Database_GetPaymentHistoryByCreated_Call) Return(_a0 db.NewPaymentHistory) *Database_GetPaymentHistoryByCreated_Call {
 	_c.Call.Return(_a0)
 	return _c
 }
 
-func (_c *Database_GetPaymentHistoryByCreated_Call) RunAndReturn(run func(*time.Time, string) db.PaymentHistory) *Database_GetPaymentHistoryByCreated_Call {
+func (_c *Database_GetPaymentHistoryByCreated_Call) RunAndReturn(run func(*time.Time, string) db.NewPaymentHistory) *Database_GetPaymentHistoryByCreated_Call {
 	_c.Call.Return(run)
 	return _c
 }
@@ -4324,19 +4324,19 @@ func (_c *Database_GetUserInvoiceData_Call) RunAndReturn(run func(string) db.Use
 }
 
 // GetWorkspaceBounties provides a mock function with given fields: r, workspace_uuid
-func (_m *Database) GetWorkspaceBounties(r *http.Request, workspace_uuid string) []db.Bounty {
+func (_m *Database) GetWorkspaceBounties(r *http.Request, workspace_uuid string) []db.NewBounty {
 	ret := _m.Called(r, workspace_uuid)
 
 	if len(ret) == 0 {
 		panic("no return value specified for GetWorkspaceBounties")
 	}
 
-	var r0 []db.Bounty
-	if rf, ok := ret.Get(0).(func(*http.Request, string) []db.Bounty); ok {
+	var r0 []db.NewBounty
+	if rf, ok := ret.Get(0).(func(*http.Request, string) []db.NewBounty); ok {
 		r0 = rf(r, workspace_uuid)
 	} else {
 		if ret.Get(0) != nil {
-			r0 = ret.Get(0).([]db.Bounty)
+			r0 = ret.Get(0).([]db.NewBounty)
 		}
 	}
 
@@ -4362,12 +4362,12 @@ func (_c *Database_GetWorkspaceBounties_Call) Run(run func(r *http.Request, work
 	return _c
 }
 
-func (_c *Database_GetWorkspaceBounties_Call) Return(_a0 []db.Bounty) *Database_GetWorkspaceBounties_Call {
+func (_c *Database_GetWorkspaceBounties_Call) Return(_a0 []db.NewBounty) *Database_GetWorkspaceBounties_Call {
 	_c.Call.Return(_a0)
 	return _c
 }
 
-func (_c *Database_GetWorkspaceBounties_Call) RunAndReturn(run func(*http.Request, string) []db.Bounty) *Database_GetWorkspaceBounties_Call {
+func (_c *Database_GetWorkspaceBounties_Call) RunAndReturn(run func(*http.Request, string) []db.NewBounty) *Database_GetWorkspaceBounties_Call {
 	_c.Call.Return(run)
 	return _c
 }
@@ -4466,18 +4466,18 @@ func (_c *Database_GetWorkspaceBountyCount_Call) RunAndReturn(run func(string) i
 }
 
 // GetWorkspaceBudget provides a mock function with given fields: workspace_uuid
-func (_m *Database) GetWorkspaceBudget(workspace_uuid string) db.BountyBudget {
+func (_m *Database) GetWorkspaceBudget(workspace_uuid string) db.NewBountyBudget {
 	ret := _m.Called(workspace_uuid)
 
 	if len(ret) == 0 {
 		panic("no return value specified for GetWorkspaceBudget")
 	}
 
-	var r0 db.BountyBudget
-	if rf, ok := ret.Get(0).(func(string) db.BountyBudget); ok {
+	var r0 db.NewBountyBudget
+	if rf, ok := ret.Get(0).(func(string) db.NewBountyBudget); ok {
 		r0 = rf(workspace_uuid)
 	} else {
-		r0 = ret.Get(0).(db.BountyBudget)
+		r0 = ret.Get(0).(db.NewBountyBudget)
 	}
 
 	return r0
@@ -4501,12 +4501,12 @@ func (_c *Database_GetWorkspaceBudget_Call) Run(run func(workspace_uuid string))
 	return _c
 }
 
-func (_c *Database_GetWorkspaceBudget_Call) Return(_a0 db.BountyBudget) *Database_GetWorkspaceBudget_Call {
+func (_c *Database_GetWorkspaceBudget_Call) Return(_a0 db.NewBountyBudget) *Database_GetWorkspaceBudget_Call {
 	_c.Call.Return(_a0)
 	return _c
 }
 
-func (_c *Database_GetWorkspaceBudget_Call) RunAndReturn(run func(string) db.BountyBudget) *Database_GetWorkspaceBudget_Call {
+func (_c *Database_GetWorkspaceBudget_Call) RunAndReturn(run func(string) db.NewBountyBudget) *Database_GetWorkspaceBudget_Call {
 	_c.Call.Return(run)
 	return _c
 }
@@ -4652,19 +4652,19 @@ func (_c *Database_GetWorkspaceByUuid_Call) RunAndReturn(run func(string) db.Wor
 }
 
 // GetWorkspaceInvoices provides a mock function with given fields: workspace_uuid
-func (_m *Database) GetWorkspaceInvoices(workspace_uuid string) []db.InvoiceList {
+func (_m *Database) GetWorkspaceInvoices(workspace_uuid string) []db.NewInvoiceList {
 	ret := _m.Called(workspace_uuid)
 
 	if len(ret) == 0 {
 		panic("no return value specified for GetWorkspaceInvoices")
 	}
 
-	var r0 []db.InvoiceList
-	if rf, ok := ret.Get(0).(func(string) []db.InvoiceList); ok {
+	var r0 []db.NewInvoiceList
+	if rf, ok := ret.Get(0).(func(string) []db.NewInvoiceList); ok {
 		r0 = rf(workspace_uuid)
 	} else {
 		if ret.Get(0) != nil {
-			r0 = ret.Get(0).([]db.InvoiceList)
+			r0 = ret.Get(0).([]db.NewInvoiceList)
 		}
 	}
 
@@ -4689,12 +4689,12 @@ func (_c *Database_GetWorkspaceInvoices_Call) Run(run func(workspace_uuid string
 	return _c
 }
 
-func (_c *Database_GetWorkspaceInvoices_Call) Return(_a0 []db.InvoiceList) *Database_GetWorkspaceInvoices_Call {
+func (_c *Database_GetWorkspaceInvoices_Call) Return(_a0 []db.NewInvoiceList) *Database_GetWorkspaceInvoices_Call {
 	_c.Call.Return(_a0)
 	return _c
 }
 
-func (_c *Database_GetWorkspaceInvoices_Call) RunAndReturn(run func(string) []db.InvoiceList) *Database_GetWorkspaceInvoices_Call {
+func (_c *Database_GetWorkspaceInvoices_Call) RunAndReturn(run func(string) []db.NewInvoiceList) *Database_GetWorkspaceInvoices_Call {
 	_c.Call.Return(run)
 	return _c
 }
@@ -5642,25 +5642,25 @@ func (_c *Database_UpdateBot_Call) RunAndReturn(run func(string, map[string]inte
 }
 
 // UpdateBounty provides a mock function with given fields: b
-func (_m *Database) UpdateBounty(b db.Bounty) (db.Bounty, error) {
+func (_m *Database) UpdateBounty(b db.NewBounty) (db.NewBounty, error) {
 	ret := _m.Called(b)
 
 	if len(ret) == 0 {
 		panic("no return value specified for UpdateBounty")
 	}
 
-	var r0 db.Bounty
+	var r0 db.NewBounty
 	var r1 error
-	if rf, ok := ret.Get(0).(func(db.Bounty) (db.Bounty, error)); ok {
+	if rf, ok := ret.Get(0).(func(db.NewBounty) (db.NewBounty, error)); ok {
 		return rf(b)
 	}
-	if rf, ok := ret.Get(0).(func(db.Bounty) db.Bounty); ok {
+	if rf, ok := ret.Get(0).(func(db.NewBounty) db.NewBounty); ok {
 		r0 = rf(b)
 	} else {
-		r0 = ret.Get(0).(db.Bounty)
+		r0 = ret.Get(0).(db.NewBounty)
 	}
 
-	if rf, ok := ret.Get(1).(func(db.Bounty) error); ok {
+	if rf, ok := ret.Get(1).(func(db.NewBounty) error); ok {
 		r1 = rf(b)
 	} else {
 		r1 = ret.Error(1)
@@ -5675,41 +5675,41 @@ type Database_UpdateBounty_Call struct {
 }
 
 // UpdateBounty is a helper method to define mock.On call
-//   - b db.Bounty
+//   - b db.NewBounty
 func (_e *Database_Expecter) UpdateBounty(b interface{}) *Database_UpdateBounty_Call {
 	return &Database_UpdateBounty_Call{Call: _e.mock.On("UpdateBounty", b)}
 }
 
-func (_c *Database_UpdateBounty_Call) Run(run func(b db.Bounty)) *Database_UpdateBounty_Call {
+func (_c *Database_UpdateBounty_Call) Run(run func(b db.NewBounty)) *Database_UpdateBounty_Call {
 	_c.Call.Run(func(args mock.Arguments) {
-		run(args[0].(db.Bounty))
+		run(args[0].(db.NewBounty))
 	})
 	return _c
 }
 
-func (_c *Database_UpdateBounty_Call) Return(_a0 db.Bounty, _a1 error) *Database_UpdateBounty_Call {
+func (_c *Database_UpdateBounty_Call) Return(_a0 db.NewBounty, _a1 error) *Database_UpdateBounty_Call {
 	_c.Call.Return(_a0, _a1)
 	return _c
 }
 
-func (_c *Database_UpdateBounty_Call) RunAndReturn(run func(db.Bounty) (db.Bounty, error)) *Database_UpdateBounty_Call {
+func (_c *Database_UpdateBounty_Call) RunAndReturn(run func(db.NewBounty) (db.NewBounty, error)) *Database_UpdateBounty_Call {
 	_c.Call.Return(run)
 	return _c
 }
 
 // UpdateBountyBoolColumn provides a mock function with given fields: b, column
-func (_m *Database) UpdateBountyBoolColumn(b db.Bounty, column string) db.Bounty {
+func (_m *Database) UpdateBountyBoolColumn(b db.NewBounty, column string) db.NewBounty {
 	ret := _m.Called(b, column)
 
 	if len(ret) == 0 {
 		panic("no return value specified for UpdateBountyBoolColumn")
 	}
 
-	var r0 db.Bounty
-	if rf, ok := ret.Get(0).(func(db.Bounty, string) db.Bounty); ok {
+	var r0 db.NewBounty
+	if rf, ok := ret.Get(0).(func(db.NewBounty, string) db.NewBounty); ok {
 		r0 = rf(b, column)
 	} else {
-		r0 = ret.Get(0).(db.Bounty)
+		r0 = ret.Get(0).(db.NewBounty)
 	}
 
 	return r0
@@ -5721,42 +5721,42 @@ type Database_UpdateBountyBoolColumn_Call struct {
 }
 
 // UpdateBountyBoolColumn is a helper method to define mock.On call
-//   - b db.Bounty
+//   - b db.NewBounty
 //   - column string
 func (_e *Database_Expecter) UpdateBountyBoolColumn(b interface{}, column interface{}) *Database_UpdateBountyBoolColumn_Call {
 	return &Database_UpdateBountyBoolColumn_Call{Call: _e.mock.On("UpdateBountyBoolColumn", b, column)}
 }
 
-func (_c *Database_UpdateBountyBoolColumn_Call) Run(run func(b db.Bounty, column string)) *Database_UpdateBountyBoolColumn_Call {
+func (_c *Database_UpdateBountyBoolColumn_Call) Run(run func(b db.NewBounty, column string)) *Database_UpdateBountyBoolColumn_Call {
 	_c.Call.Run(func(args mock.Arguments) {
-		run(args[0].(db.Bounty), args[1].(string))
+		run(args[0].(db.NewBounty), args[1].(string))
 	})
 	return _c
 }
 
-func (_c *Database_UpdateBountyBoolColumn_Call) Return(_a0 db.Bounty) *Database_UpdateBountyBoolColumn_Call {
+func (_c *Database_UpdateBountyBoolColumn_Call) Return(_a0 db.NewBounty) *Database_UpdateBountyBoolColumn_Call {
 	_c.Call.Return(_a0)
 	return _c
 }
 
-func (_c *Database_UpdateBountyBoolColumn_Call) RunAndReturn(run func(db.Bounty, string) db.Bounty) *Database_UpdateBountyBoolColumn_Call {
+func (_c *Database_UpdateBountyBoolColumn_Call) RunAndReturn(run func(db.NewBounty, string) db.NewBounty) *Database_UpdateBountyBoolColumn_Call {
 	_c.Call.Return(run)
 	return _c
 }
 
 // UpdateBountyNullColumn provides a mock function with given fields: b, column
-func (_m *Database) UpdateBountyNullColumn(b db.Bounty, column string) db.Bounty {
+func (_m *Database) UpdateBountyNullColumn(b db.NewBounty, column string) db.NewBounty {
 	ret := _m.Called(b, column)
 
 	if len(ret) == 0 {
 		panic("no return value specified for UpdateBountyNullColumn")
 	}
 
-	var r0 db.Bounty
-	if rf, ok := ret.Get(0).(func(db.Bounty, string) db.Bounty); ok {
+	var r0 db.NewBounty
+	if rf, ok := ret.Get(0).(func(db.NewBounty, string) db.NewBounty); ok {
 		r0 = rf(b, column)
 	} else {
-		r0 = ret.Get(0).(db.Bounty)
+		r0 = ret.Get(0).(db.NewBounty)
 	}
 
 	return r0
@@ -5768,49 +5768,49 @@ type Database_UpdateBountyNullColumn_Call struct {
 }
 
 // UpdateBountyNullColumn is a helper method to define mock.On call
-//   - b db.Bounty
+//   - b db.NewBounty
 //   - column string
 func (_e *Database_Expecter) UpdateBountyNullColumn(b interface{}, column interface{}) *Database_UpdateBountyNullColumn_Call {
 	return &Database_UpdateBountyNullColumn_Call{Call: _e.mock.On("UpdateBountyNullColumn", b, column)}
 }
 
-func (_c *Database_UpdateBountyNullColumn_Call) Run(run func(b db.Bounty, column string)) *Database_UpdateBountyNullColumn_Call {
+func (_c *Database_UpdateBountyNullColumn_Call) Run(run func(b db.NewBounty, column string)) *Database_UpdateBountyNullColumn_Call {
 	_c.Call.Run(func(args mock.Arguments) {
-		run(args[0].(db.Bounty), args[1].(string))
+		run(args[0].(db.NewBounty), args[1].(string))
 	})
 	return _c
 }
 
-func (_c *Database_UpdateBountyNullColumn_Call) Return(_a0 db.Bounty) *Database_UpdateBountyNullColumn_Call {
+func (_c *Database_UpdateBountyNullColumn_Call) Return(_a0 db.NewBounty) *Database_UpdateBountyNullColumn_Call {
 	_c.Call.Return(_a0)
 	return _c
 }
 
-func (_c *Database_UpdateBountyNullColumn_Call) RunAndReturn(run func(db.Bounty, string) db.Bounty) *Database_UpdateBountyNullColumn_Call {
+func (_c *Database_UpdateBountyNullColumn_Call) RunAndReturn(run func(db.NewBounty, string) db.NewBounty) *Database_UpdateBountyNullColumn_Call {
 	_c.Call.Return(run)
 	return _c
 }
 
 // UpdateBountyPayment provides a mock function with given fields: b
-func (_m *Database) UpdateBountyPayment(b db.Bounty) (db.Bounty, error) {
+func (_m *Database) UpdateBountyPayment(b db.NewBounty) (db.NewBounty, error) {
 	ret := _m.Called(b)
 
 	if len(ret) == 0 {
 		panic("no return value specified for UpdateBountyPayment")
 	}
 
-	var r0 db.Bounty
+	var r0 db.NewBounty
 	var r1 error
-	if rf, ok := ret.Get(0).(func(db.Bounty) (db.Bounty, error)); ok {
+	if rf, ok := ret.Get(0).(func(db.NewBounty) (db.NewBounty, error)); ok {
 		return rf(b)
 	}
-	if rf, ok := ret.Get(0).(func(db.Bounty) db.Bounty); ok {
+	if rf, ok := ret.Get(0).(func(db.NewBounty) db.NewBounty); ok {
 		r0 = rf(b)
 	} else {
-		r0 = ret.Get(0).(db.Bounty)
+		r0 = ret.Get(0).(db.NewBounty)
 	}
 
-	if rf, ok := ret.Get(1).(func(db.Bounty) error); ok {
+	if rf, ok := ret.Get(1).(func(db.NewBounty) error); ok {
 		r1 = rf(b)
 	} else {
 		r1 = ret.Error(1)
@@ -5825,24 +5825,24 @@ type Database_UpdateBountyPayment_Call struct {
 }
 
 // UpdateBountyPayment is a helper method to define mock.On call
-//   - b db.Bounty
+//   - b db.NewBounty
 func (_e *Database_Expecter) UpdateBountyPayment(b interface{}) *Database_UpdateBountyPayment_Call {
 	return &Database_UpdateBountyPayment_Call{Call: _e.mock.On("UpdateBountyPayment", b)}
 }
 
-func (_c *Database_UpdateBountyPayment_Call) Run(run func(b db.Bounty)) *Database_UpdateBountyPayment_Call {
+func (_c *Database_UpdateBountyPayment_Call) Run(run func(b db.NewBounty)) *Database_UpdateBountyPayment_Call {
 	_c.Call.Run(func(args mock.Arguments) {
-		run(args[0].(db.Bounty))
+		run(args[0].(db.NewBounty))
 	})
 	return _c
 }
 
-func (_c *Database_UpdateBountyPayment_Call) Return(_a0 db.Bounty, _a1 error) *Database_UpdateBountyPayment_Call {
+func (_c *Database_UpdateBountyPayment_Call) Return(_a0 db.NewBounty, _a1 error) *Database_UpdateBountyPayment_Call {
 	_c.Call.Return(_a0, _a1)
 	return _c
 }
 
-func (_c *Database_UpdateBountyPayment_Call) RunAndReturn(run func(db.Bounty) (db.Bounty, error)) *Database_UpdateBountyPayment_Call {
+func (_c *Database_UpdateBountyPayment_Call) RunAndReturn(run func(db.NewBounty) (db.NewBounty, error)) *Database_UpdateBountyPayment_Call {
 	_c.Call.Return(run)
 	return _c
 }
@@ -5963,18 +5963,18 @@ func (_c *Database_UpdateGithubIssues_Call) RunAndReturn(run func(uint, map[stri
 }
 
 // UpdateInvoice provides a mock function with given fields: payment_request
-func (_m *Database) UpdateInvoice(payment_request string) db.InvoiceList {
+func (_m *Database) UpdateInvoice(payment_request string) db.NewInvoiceList {
 	ret := _m.Called(payment_request)
 
 	if len(ret) == 0 {
 		panic("no return value specified for UpdateInvoice")
 	}
 
-	var r0 db.InvoiceList
-	if rf, ok := ret.Get(0).(func(string) db.InvoiceList); ok {
+	var r0 db.NewInvoiceList
+	if rf, ok := ret.Get(0).(func(string) db.NewInvoiceList); ok {
 		r0 = rf(payment_request)
 	} else {
-		r0 = ret.Get(0).(db.InvoiceList)
+		r0 = ret.Get(0).(db.NewInvoiceList)
 	}
 
 	return r0
@@ -5998,12 +5998,12 @@ func (_c *Database_UpdateInvoice_Call) Run(run func(payment_request string)) *Da
 	return _c
 }
 
-func (_c *Database_UpdateInvoice_Call) Return(_a0 db.InvoiceList) *Database_UpdateInvoice_Call {
+func (_c *Database_UpdateInvoice_Call) Return(_a0 db.NewInvoiceList) *Database_UpdateInvoice_Call {
 	_c.Call.Return(_a0)
 	return _c
 }
 
-func (_c *Database_UpdateInvoice_Call) RunAndReturn(run func(string) db.InvoiceList) *Database_UpdateInvoice_Call {
+func (_c *Database_UpdateInvoice_Call) RunAndReturn(run func(string) db.NewInvoiceList) *Database_UpdateInvoice_Call {
 	_c.Call.Return(run)
 	return _c
 }
@@ -6219,18 +6219,18 @@ func (_c *Database_UpdateTwitterConfirmed_Call) RunAndReturn(run func(uint, bool
 }
 
 // UpdateWorkspaceBudget provides a mock function with given fields: budget
-func (_m *Database) UpdateWorkspaceBudget(budget db.BountyBudget) db.BountyBudget {
+func (_m *Database) UpdateWorkspaceBudget(budget db.NewBountyBudget) db.NewBountyBudget {
 	ret := _m.Called(budget)
 
 	if len(ret) == 0 {
 		panic("no return value specified for UpdateWorkspaceBudget")
 	}
 
-	var r0 db.BountyBudget
-	if rf, ok := ret.Get(0).(func(db.BountyBudget) db.BountyBudget); ok {
+	var r0 db.NewBountyBudget
+	if rf, ok := ret.Get(0).(func(db.NewBountyBudget) db.NewBountyBudget); ok {
 		r0 = rf(budget)
 	} else {
-		r0 = ret.Get(0).(db.BountyBudget)
+		r0 = ret.Get(0).(db.NewBountyBudget)
 	}
 
 	return r0
@@ -6242,24 +6242,24 @@ type Database_UpdateWorkspaceBudget_Call struct {
 }
 
 // UpdateWorkspaceBudget is a helper method to define mock.On call
-//   - budget db.BountyBudget
+//   - budget db.NewBountyBudget
 func (_e *Database_Expecter) UpdateWorkspaceBudget(budget interface{}) *Database_UpdateWorkspaceBudget_Call {
 	return &Database_UpdateWorkspaceBudget_Call{Call: _e.mock.On("UpdateWorkspaceBudget", budget)}
 }
 
-func (_c *Database_UpdateWorkspaceBudget_Call) Run(run func(budget db.BountyBudget)) *Database_UpdateWorkspaceBudget_Call {
+func (_c *Database_UpdateWorkspaceBudget_Call) Run(run func(budget db.NewBountyBudget)) *Database_UpdateWorkspaceBudget_Call {
 	_c.Call.Run(func(args mock.Arguments) {
-		run(args[0].(db.BountyBudget))
+		run(args[0].(db.NewBountyBudget))
 	})
 	return _c
 }
 
-func (_c *Database_UpdateWorkspaceBudget_Call) Return(_a0 db.BountyBudget) *Database_UpdateWorkspaceBudget_Call {
+func (_c *Database_UpdateWorkspaceBudget_Call) Return(_a0 db.NewBountyBudget) *Database_UpdateWorkspaceBudget_Call {
 	_c.Call.Return(_a0)
 	return _c
 }
 
-func (_c *Database_UpdateWorkspaceBudget_Call) RunAndReturn(run func(db.BountyBudget) db.BountyBudget) *Database_UpdateWorkspaceBudget_Call {
+func (_c *Database_UpdateWorkspaceBudget_Call) RunAndReturn(run func(db.NewBountyBudget) db.NewBountyBudget) *Database_UpdateWorkspaceBudget_Call {
 	_c.Call.Return(run)
 	return _c
 }
