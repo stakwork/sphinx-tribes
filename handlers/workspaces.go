@@ -18,7 +18,7 @@ import (
 
 type workspaceHandler struct {
 	db                       db.Database
-	generateBountyHandler    func(bounties []db.Bounty) []db.BountyResponse
+	generateBountyHandler    func(bounties []db.NewBounty) []db.BountyResponse
 	getLightningInvoice      func(payment_request string) (db.InvoiceResult, db.InvoiceError)
 	userHasAccess            func(pubKeyFromAuth string, uuid string, role string) bool
 	userHasManageBountyRoles func(pubKeyFromAuth string, uuid string) bool
@@ -181,6 +181,10 @@ func CreateWorkspaceUser(w http.ResponseWriter, r *http.Request) {
 	r.Body.Close()
 	err = json.Unmarshal(body, &workspaceUser)
 
+	if workspaceUser.WorkspaceUuid == "" && workspaceUser.OrgUuid != "" {
+		workspaceUser.WorkspaceUuid = workspaceUser.OrgUuid
+	}
+
 	// get orgnanization
 	workspace := db.DB.GetWorkspaceByUuid(workspaceUser.WorkspaceUuid)
 
@@ -286,6 +290,10 @@ func DeleteWorkspaceUser(w http.ResponseWriter, r *http.Request) {
 	r.Body.Close()
 	err = json.Unmarshal(body, &workspaceUser)
 
+	if workspaceUser.WorkspaceUuid == "" && workspaceUser.OrgUuid != "" {
+		workspaceUser.WorkspaceUuid = workspaceUser.OrgUuid
+	}
+
 	if err != nil {
 		fmt.Println(err)
 		w.WriteHeader(http.StatusNotAcceptable)
@@ -382,6 +390,11 @@ func AddUserRoles(w http.ResponseWriter, r *http.Request) {
 	rolesMap := db.GetRolesMap()
 	insertRoles := []db.WorkspaceUserRoles{}
 	for _, role := range roles {
+
+		if role.WorkspaceUuid == "" && role.OrgUuid != "" {
+			role.WorkspaceUuid = role.OrgUuid
+		}
+
 		_, ok := rolesMap[role.Role]
 		// if any of the roles does not exists return an error
 		if !ok {

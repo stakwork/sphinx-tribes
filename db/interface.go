@@ -31,27 +31,27 @@ type Database interface {
 	GetListedPosts(r *http.Request) ([]PeopleExtra, error)
 	GetUserBountiesCount(personKey string, tabType string) int64
 	GetBountiesCount(r *http.Request) int64
-	GetWorkspaceBounties(r *http.Request, workspace_uuid string) []Bounty
+	GetWorkspaceBounties(r *http.Request, workspace_uuid string) []NewBounty
 	GetWorkspaceBountiesCount(r *http.Request, workspace_uuid string) int64
-	GetAssignedBounties(r *http.Request) ([]Bounty, error)
-	GetCreatedBounties(r *http.Request) ([]Bounty, error)
-	GetBountyById(id string) ([]Bounty, error)
+	GetAssignedBounties(r *http.Request) ([]NewBounty, error)
+	GetCreatedBounties(r *http.Request) ([]NewBounty, error)
+	GetBountyById(id string) ([]NewBounty, error)
 	GetNextBountyByCreated(r *http.Request) (uint, error)
 	GetPreviousBountyByCreated(r *http.Request) (uint, error)
 	GetNextWorkspaceBountyByCreated(r *http.Request) (uint, error)
 	GetPreviousWorkspaceBountyByCreated(r *http.Request) (uint, error)
 	GetBountyIndexById(id string) int64
-	GetBountyDataByCreated(created string) ([]Bounty, error)
+	GetBountyDataByCreated(created string) ([]NewBounty, error)
 	AddBounty(b Bounty) (Bounty, error)
-	GetAllBounties(r *http.Request) []Bounty
-	CreateOrEditBounty(b Bounty) (Bounty, error)
-	UpdateBountyNullColumn(b Bounty, column string) Bounty
-	UpdateBountyBoolColumn(b Bounty, column string) Bounty
+	GetAllBounties(r *http.Request) []NewBounty
+	CreateOrEditBounty(b NewBounty) (NewBounty, error)
+	UpdateBountyNullColumn(b NewBounty, column string) NewBounty
+	UpdateBountyBoolColumn(b NewBounty, column string) NewBounty
 	DeleteBounty(pubkey string, created string) (Bounty, error)
-	GetBountyByCreated(created uint) (Bounty, error)
-	GetBounty(id uint) Bounty
-	UpdateBounty(b Bounty) (Bounty, error)
-	UpdateBountyPayment(b Bounty) (Bounty, error)
+	GetBountyByCreated(created uint) (NewBounty, error)
+	GetBounty(id uint) NewBounty
+	UpdateBounty(b NewBounty) (NewBounty, error)
+	UpdateBountyPayment(b NewBounty) (NewBounty, error)
 	GetListedOffers(r *http.Request) ([]PeopleExtra, error)
 	UpdateBot(uuid string, u map[string]interface{}) bool
 	GetAllTribes() []Tribe
@@ -99,21 +99,21 @@ type Database interface {
 	GetUserCreatedWorkspaces(pubkey string) []Workspace
 	GetUserAssignedWorkspaces(pubkey string) []WorkspaceUsers
 	AddBudgetHistory(budget BudgetHistory) BudgetHistory
-	CreateWorkspaceBudget(budget BountyBudget) BountyBudget
-	UpdateWorkspaceBudget(budget BountyBudget) BountyBudget
-	GetPaymentHistoryByCreated(created *time.Time, workspace_uuid string) PaymentHistory
-	GetWorkspaceBudget(workspace_uuid string) BountyBudget
+	CreateWorkspaceBudget(budget NewBountyBudget) NewBountyBudget
+	UpdateWorkspaceBudget(budget NewBountyBudget) NewBountyBudget
+	GetPaymentHistoryByCreated(created *time.Time, workspace_uuid string) NewPaymentHistory
+	GetWorkspaceBudget(workspace_uuid string) NewBountyBudget
 	GetWorkspaceStatusBudget(workspace_uuid string) StatusBudget
 	GetWorkspaceBudgetHistory(workspace_uuid string) []BudgetHistoryData
-	AddAndUpdateBudget(invoice InvoiceList) PaymentHistory
+	AddAndUpdateBudget(invoice NewInvoiceList) NewPaymentHistory
 	WithdrawBudget(sender_pubkey string, workspace_uuid string, amount uint)
-	AddPaymentHistory(payment PaymentHistory) PaymentHistory
-	GetPaymentHistory(workspace_uuid string, r *http.Request) []PaymentHistory
-	GetInvoice(payment_request string) InvoiceList
-	GetWorkspaceInvoices(workspace_uuid string) []InvoiceList
+	AddPaymentHistory(payment NewPaymentHistory) NewPaymentHistory
+	GetPaymentHistory(workspace_uuid string, r *http.Request) []NewPaymentHistory
+	GetInvoice(payment_request string) NewInvoiceList
+	GetWorkspaceInvoices(workspace_uuid string) []NewInvoiceList
 	GetWorkspaceInvoicesCount(workspace_uuid string) int64
-	UpdateInvoice(payment_request string) InvoiceList
-	AddInvoice(invoice InvoiceList) InvoiceList
+	UpdateInvoice(payment_request string) NewInvoiceList
+	AddInvoice(invoice NewInvoiceList) NewInvoiceList
 	AddUserInvoiceData(userData UserInvoiceData) UserInvoiceData
 	GetUserInvoiceData(payment_request string) UserInvoiceData
 	DeleteUserInvoiceData(payment_request string) UserInvoiceData
