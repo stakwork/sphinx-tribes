@@ -101,15 +101,15 @@ func TestUnitCreateOrEditWorkspace(t *testing.T) {
 		assert.Equal(t, http.StatusBadRequest, rr.Code)
 	})
 
-	t.Run("should trim spaces from organization name", func(t *testing.T) {
+	t.Run("should trim spaces from workspace name", func(t *testing.T) {
 		rr := httptest.NewRecorder()
 		handler := http.HandlerFunc(oHandler.CreateOrEditWorkspace)
 
-		mockDb.On("GetWorkspaceByUuid", mock.AnythingOfType("string")).Return(db.Organization{}).Once()
-		mockDb.On("GetWorkspaceByName", "Abdul").Return(db.Organization{}).Once()
-		mockDb.On("CreateOrEditWorkspace", mock.MatchedBy(func(org db.Organization) bool {
+		mockDb.On("GetWorkspaceByUuid", mock.AnythingOfType("string")).Return(db.Workspace{}).Once()
+		mockDb.On("GetWorkspaceByName", "Abdul").Return(db.Workspace{}).Once()
+		mockDb.On("CreateOrEditWorkspace", mock.MatchedBy(func(org db.Workspace) bool {
 			return org.Name == "Abdul" && org.Uuid != "" && org.Updated != nil && org.Created != nil
-		})).Return(db.Organization{Name: "Abdul"}, nil).Once()
+		})).Return(db.Workspace{Name: "Abdul"}, nil).Once()
 
 		jsonInput := []byte(`{"name": " Abdul ", "owner_pubkey": "test-key" ,"description": "Test"}`)
 		req, err := http.NewRequestWithContext(ctx, http.MethodPost, "/", bytes.NewReader(jsonInput))
@@ -121,7 +121,7 @@ func TestUnitCreateOrEditWorkspace(t *testing.T) {
 
 		assert.Equal(t, http.StatusOK, rr.Code)
 
-		var responseOrg db.Organization
+		var responseOrg db.Workspace
 		err = json.Unmarshal(rr.Body.Bytes(), &responseOrg)
 		if err != nil {
 			t.Fatal(err)
@@ -130,15 +130,15 @@ func TestUnitCreateOrEditWorkspace(t *testing.T) {
 		assert.Equal(t, "Abdul", responseOrg.Name)
 	})
 
-	t.Run("should successfully add organization if request is valid", func(t *testing.T) {
+	t.Run("should successfully add workspace if request is valid", func(t *testing.T) {
 		rr := httptest.NewRecorder()
 		handler := http.HandlerFunc(oHandler.CreateOrEditWorkspace)
 
-		mockDb.On("GetWorkspaceByUuid", mock.AnythingOfType("string")).Return(db.Organization{}).Once()
-		mockDb.On("GetWorkspaceByName", "TestWorkspace").Return(db.Organization{}).Once()
-		mockDb.On("CreateOrEditWorkspace", mock.MatchedBy(func(org db.Organization) bool {
+		mockDb.On("GetWorkspaceByUuid", mock.AnythingOfType("string")).Return(db.Workspace{}).Once()
+		mockDb.On("GetWorkspaceByName", "TestWorkspace").Return(db.Workspace{}).Once()
+		mockDb.On("CreateOrEditWorkspace", mock.MatchedBy(func(org db.Workspace) bool {
 			return org.Name == "TestWorkspace" && org.Uuid != "" && org.Updated != nil && org.Created != nil
-		})).Return(db.Organization{}, nil).Once()
+		})).Return(db.Workspace{}, nil).Once()
 
 		invalidJson := []byte(`{"name": "TestWorkspace", "owner_pubkey": "test-key" ,"description": "Test"}`)
 		req, err := http.NewRequestWithContext(ctx, http.MethodPost, "/", bytes.NewReader(invalidJson))
@@ -184,13 +184,13 @@ func TestDeleteWorkspace(t *testing.T) {
 	oHandler := NewWorkspaceHandler(mockDb)
 
 	t.Run("should return error if not authorized", func(t *testing.T) {
-		orgUUID := "org-uuid"
+		workspaceUUID := "org-uuid"
 		rr := httptest.NewRecorder()
 		handler := http.HandlerFunc(oHandler.DeleteWorkspace)
 
 		rctx := chi.NewRouteContext()
-		rctx.URLParams.Add("uuid", orgUUID)
-		req, err := http.NewRequestWithContext(context.WithValue(context.Background(), chi.RouteCtxKey, rctx), http.MethodDelete, "/delete/"+orgUUID, nil)
+		rctx.URLParams.Add("uuid", workspaceUUID)
+		req, err := http.NewRequestWithContext(context.WithValue(context.Background(), chi.RouteCtxKey, rctx), http.MethodDelete, "/delete/"+workspaceUUID, nil)
 		if err != nil {
 			t.Fatal(err)
 		}
@@ -200,21 +200,21 @@ func TestDeleteWorkspace(t *testing.T) {
 		assert.Equal(t, http.StatusUnauthorized, rr.Code)
 	})
 
-	t.Run("should set organization fields to null and delete users on successful delete", func(t *testing.T) {
-		orgUUID := "org-uuid"
+	t.Run("should set workspace fields to null and delete users on successful delete", func(t *testing.T) {
+		workspaceUUID := "org-uuid"
 
 		// Mock expected database interactions
-		mockDb.On("GetWorkspaceByUuid", orgUUID).Return(db.Organization{OwnerPubKey: "test-key"}).Once()
-		mockDb.On("UpdateWorkspaceForDeletion", orgUUID).Return(nil).Once()
-		mockDb.On("DeleteAllUsersFromWorkspace", orgUUID).Return(nil).Once()
-		mockDb.On("ChangeWorkspaceDeleteStatus", orgUUID, true).Return(db.Organization{Uuid: orgUUID, Deleted: true}).Once()
+		mockDb.On("GetWorkspaceByUuid", workspaceUUID).Return(db.Workspace{OwnerPubKey: "test-key"}).Once()
+		mockDb.On("UpdateWorkspaceForDeletion", workspaceUUID).Return(nil).Once()
+		mockDb.On("DeleteAllUsersFromWorkspace", workspaceUUID).Return(nil).Once()
+		mockDb.On("ChangeWorkspaceDeleteStatus", workspaceUUID, true).Return(db.Workspace{Uuid: workspaceUUID, Deleted: true}).Once()
 
 		rr := httptest.NewRecorder()
 		handler := http.HandlerFunc(oHandler.DeleteWorkspace)
 
 		rctx := chi.NewRouteContext()
-		rctx.URLParams.Add("uuid", orgUUID)
-		req, err := http.NewRequestWithContext(context.WithValue(ctx, chi.RouteCtxKey, rctx), http.MethodDelete, "/delete/"+orgUUID, nil)
+		rctx.URLParams.Add("uuid", workspaceUUID)
+		req, err := http.NewRequestWithContext(context.WithValue(ctx, chi.RouteCtxKey, rctx), http.MethodDelete, "/delete/"+workspaceUUID, nil)
 		if err != nil {
 			t.Fatal(err)
 		}
@@ -226,18 +226,18 @@ func TestDeleteWorkspace(t *testing.T) {
 	})
 
 	t.Run("should handle failures in database updates", func(t *testing.T) {
-		orgUUID := "org-uuid"
+		workspaceUUID := "org-uuid"
 
 		// Mock database interactions with error
-		mockDb.On("GetWorkspaceByUuid", orgUUID).Return(db.Organization{OwnerPubKey: "test-key"}).Once()
-		mockDb.On("UpdateWorkspaceForDeletion", orgUUID).Return(errors.New("update error")).Once()
+		mockDb.On("GetWorkspaceByUuid", workspaceUUID).Return(db.Workspace{OwnerPubKey: "test-key"}).Once()
+		mockDb.On("UpdateWorkspaceForDeletion", workspaceUUID).Return(errors.New("update error")).Once()
 
 		rr := httptest.NewRecorder()
 		handler := http.HandlerFunc(oHandler.DeleteWorkspace)
 
 		rctx := chi.NewRouteContext()
-		rctx.URLParams.Add("uuid", orgUUID)
-		req, err := http.NewRequestWithContext(context.WithValue(ctx, chi.RouteCtxKey, rctx), http.MethodDelete, "/delete/"+orgUUID, nil)
+		rctx.URLParams.Add("uuid", workspaceUUID)
+		req, err := http.NewRequestWithContext(context.WithValue(ctx, chi.RouteCtxKey, rctx), http.MethodDelete, "/delete/"+workspaceUUID, nil)
 		if err != nil {
 			t.Fatal(err)
 		}
@@ -248,21 +248,21 @@ func TestDeleteWorkspace(t *testing.T) {
 		mockDb.AssertExpectations(t)
 	})
 
-	t.Run("should set organization's deleted column to true", func(t *testing.T) {
-		orgUUID := "org-uuid"
+	t.Run("should set workspace's deleted column to true", func(t *testing.T) {
+		workspaceUUID := "org-uuid"
 
 		// Mock the database interactions
-		mockDb.On("GetWorkspaceByUuid", orgUUID).Return(db.Organization{OwnerPubKey: "test-key"}).Once()
-		mockDb.On("UpdateWorkspaceForDeletion", orgUUID).Return(nil).Once()
-		mockDb.On("DeleteAllUsersFromWorkspace", orgUUID).Return(nil).Once()
-		mockDb.On("ChangeWorkspaceDeleteStatus", orgUUID, true).Return(db.Organization{Uuid: orgUUID, Deleted: true}).Once()
+		mockDb.On("GetWorkspaceByUuid", workspaceUUID).Return(db.Workspace{OwnerPubKey: "test-key"}).Once()
+		mockDb.On("UpdateWorkspaceForDeletion", workspaceUUID).Return(nil).Once()
+		mockDb.On("DeleteAllUsersFromWorkspace", workspaceUUID).Return(nil).Once()
+		mockDb.On("ChangeWorkspaceDeleteStatus", workspaceUUID, true).Return(db.Workspace{Uuid: workspaceUUID, Deleted: true}).Once()
 
 		rr := httptest.NewRecorder()
 		handler := http.HandlerFunc(oHandler.DeleteWorkspace)
 
 		rctx := chi.NewRouteContext()
-		rctx.URLParams.Add("uuid", orgUUID)
-		req, err := http.NewRequestWithContext(context.WithValue(ctx, chi.RouteCtxKey, rctx), http.MethodDelete, "/delete/"+orgUUID, nil)
+		rctx.URLParams.Add("uuid", workspaceUUID)
+		req, err := http.NewRequestWithContext(context.WithValue(ctx, chi.RouteCtxKey, rctx), http.MethodDelete, "/delete/"+workspaceUUID, nil)
 		if err != nil {
 			t.Fatal(err)
 		}
@@ -273,7 +273,7 @@ func TestDeleteWorkspace(t *testing.T) {
 		assert.Equal(t, http.StatusOK, rr.Code)
 
 		// Decoding the response to check if Deleted field is true
-		var updatedOrg db.Organization
+		var updatedOrg db.Workspace
 		err = json.Unmarshal(rr.Body.Bytes(), &updatedOrg)
 		if err != nil {
 			t.Fatal(err)
@@ -284,27 +284,27 @@ func TestDeleteWorkspace(t *testing.T) {
 	})
 
 	t.Run("should set Website, Github, and Description to empty strings", func(t *testing.T) {
-		orgUUID := "org-uuid"
+		workspaceUUID := "org-uuid"
 
-		updatedOrg := db.Organization{
-			Uuid:        orgUUID,
+		updatedOrg := db.Workspace{
+			Uuid:        workspaceUUID,
 			OwnerPubKey: "test-key",
 			Website:     "",
 			Github:      "",
 			Description: "",
 		}
 
-		mockDb.On("GetWorkspaceByUuid", orgUUID).Return(db.Organization{OwnerPubKey: "test-key"}).Once()
-		mockDb.On("UpdateWorkspaceForDeletion", orgUUID).Return(nil).Once()
-		mockDb.On("DeleteAllUsersFromWorkspace", orgUUID).Return(nil).Once()
-		mockDb.On("ChangeWorkspaceDeleteStatus", orgUUID, true).Return(updatedOrg).Once()
+		mockDb.On("GetWorkspaceByUuid", workspaceUUID).Return(db.Workspace{OwnerPubKey: "test-key"}).Once()
+		mockDb.On("UpdateWorkspaceForDeletion", workspaceUUID).Return(nil).Once()
+		mockDb.On("DeleteAllUsersFromWorkspace", workspaceUUID).Return(nil).Once()
+		mockDb.On("ChangeWorkspaceDeleteStatus", workspaceUUID, true).Return(updatedOrg).Once()
 
 		rr := httptest.NewRecorder()
 		handler := http.HandlerFunc(oHandler.DeleteWorkspace)
 
 		rctx := chi.NewRouteContext()
-		rctx.URLParams.Add("uuid", orgUUID)
-		req, err := http.NewRequestWithContext(context.WithValue(ctx, chi.RouteCtxKey, rctx), http.MethodDelete, "/delete/"+orgUUID, nil)
+		rctx.URLParams.Add("uuid", workspaceUUID)
+		req, err := http.NewRequestWithContext(context.WithValue(ctx, chi.RouteCtxKey, rctx), http.MethodDelete, "/delete/"+workspaceUUID, nil)
 		if err != nil {
 			t.Fatal(err)
 		}
@@ -312,7 +312,7 @@ func TestDeleteWorkspace(t *testing.T) {
 		handler.ServeHTTP(rr, req)
 
 		assert.Equal(t, http.StatusOK, rr.Code)
-		var returnedOrg db.Organization
+		var returnedOrg db.Workspace
 		err = json.Unmarshal(rr.Body.Bytes(), &returnedOrg)
 		if err != nil {
 			t.Fatal(err)
@@ -324,21 +324,21 @@ func TestDeleteWorkspace(t *testing.T) {
 		mockDb.AssertExpectations(t)
 	})
 
-	t.Run("should delete all users from the organization", func(t *testing.T) {
-		orgUUID := "org-uuid"
+	t.Run("should delete all users from the workspace", func(t *testing.T) {
+		workspaceUUID := "org-uuid"
 
 		// Setting up the expected behavior of the mock database
-		mockDb.On("GetWorkspaceByUuid", orgUUID).Return(db.Organization{OwnerPubKey: "test-key"}).Once()
-		mockDb.On("UpdateWorkspaceForDeletion", orgUUID).Return(nil).Once()
-		mockDb.On("DeleteAllUsersFromWorkspace", orgUUID).Return(nil).Run(func(args mock.Arguments) {}).Once()
-		mockDb.On("ChangeWorkspaceDeleteStatus", orgUUID, true).Return(db.Organization{Uuid: orgUUID, Deleted: true}).Once()
+		mockDb.On("GetWorkspaceByUuid", workspaceUUID).Return(db.Workspace{OwnerPubKey: "test-key"}).Once()
+		mockDb.On("UpdateWorkspaceForDeletion", workspaceUUID).Return(nil).Once()
+		mockDb.On("DeleteAllUsersFromWorkspace", workspaceUUID).Return(nil).Run(func(args mock.Arguments) {}).Once()
+		mockDb.On("ChangeWorkspaceDeleteStatus", workspaceUUID, true).Return(db.Workspace{Uuid: workspaceUUID, Deleted: true}).Once()
 
 		rr := httptest.NewRecorder()
 		handler := http.HandlerFunc(oHandler.DeleteWorkspace)
 
 		rctx := chi.NewRouteContext()
-		rctx.URLParams.Add("uuid", orgUUID)
-		req, err := http.NewRequestWithContext(context.WithValue(ctx, chi.RouteCtxKey, rctx), http.MethodDelete, "/delete/"+orgUUID, nil)
+		rctx.URLParams.Add("uuid", workspaceUUID)
+		req, err := http.NewRequestWithContext(context.WithValue(ctx, chi.RouteCtxKey, rctx), http.MethodDelete, "/delete/"+workspaceUUID, nil)
 		if err != nil {
 			t.Fatal(err)
 		}
@@ -354,24 +354,24 @@ func TestDeleteWorkspace(t *testing.T) {
 func TestGetWorkspaceBounties(t *testing.T) {
 	ctx := context.WithValue(context.Background(), auth.ContextKey, "test-key")
 	mockDb := mocks.NewDatabase(t)
-	mockGenerateBountyHandler := func(bounties []db.Bounty) []db.BountyResponse {
+	mockGenerateBountyHandler := func(bounties []db.NewBounty) []db.BountyResponse {
 		return []db.BountyResponse{} // Mocked response
 	}
 	oHandler := NewWorkspaceHandler(mockDb)
 
-	t.Run("Should test that an organization's bounties can be listed without authentication", func(t *testing.T) {
-		orgUUID := "valid-uuid"
+	t.Run("Should test that a workspace's bounties can be listed without authentication", func(t *testing.T) {
+		workspaceUUID := "valid-uuid"
 		oHandler.generateBountyHandler = mockGenerateBountyHandler
 
-		expectedBounties := []db.Bounty{{}, {}} // Mocked response
-		mockDb.On("GetWorkspaceBounties", mock.AnythingOfType("*http.Request"), orgUUID).Return(expectedBounties).Once()
+		expectedBounties := []db.NewBounty{{}, {}} // Mocked response
+		mockDb.On("GetWorkspaceBounties", mock.AnythingOfType("*http.Request"), workspaceUUID).Return(expectedBounties).Once()
 
 		rr := httptest.NewRecorder()
 		handler := http.HandlerFunc(oHandler.GetWorkspaceBounties)
 
 		rctx := chi.NewRouteContext()
-		rctx.URLParams.Add("uuid", orgUUID)
-		req, err := http.NewRequestWithContext(context.WithValue(context.Background(), chi.RouteCtxKey, rctx), http.MethodGet, "/bounties/"+orgUUID, nil)
+		rctx.URLParams.Add("uuid", workspaceUUID)
+		req, err := http.NewRequestWithContext(context.WithValue(context.Background(), chi.RouteCtxKey, rctx), http.MethodGet, "/bounties/"+workspaceUUID, nil)
 		if err != nil {
 			t.Fatal(err)
 		}
@@ -381,17 +381,17 @@ func TestGetWorkspaceBounties(t *testing.T) {
 		assert.Equal(t, http.StatusOK, rr.Code)
 	})
 
-	t.Run("should return empty array when wrong organization UUID is passed", func(t *testing.T) {
-		orgUUID := "wrong-uuid"
+	t.Run("should return empty array when wrong workspace UUID is passed", func(t *testing.T) {
+		workspaceUUID := "wrong-uuid"
 
-		mockDb.On("GetWorkspaceBounties", mock.AnythingOfType("*http.Request"), orgUUID).Return([]db.Bounty{}).Once()
+		mockDb.On("GetWorkspaceBounties", mock.AnythingOfType("*http.Request"), workspaceUUID).Return([]db.NewBounty{}).Once()
 
 		rr := httptest.NewRecorder()
 		handler := http.HandlerFunc(oHandler.GetWorkspaceBounties)
 
 		rctx := chi.NewRouteContext()
-		rctx.URLParams.Add("uuid", orgUUID)
-		req, err := http.NewRequestWithContext(context.WithValue(ctx, chi.RouteCtxKey, rctx), http.MethodGet, "/bounties/"+orgUUID+"?limit=10&sortBy=created&search=test&page=1&resetPage=true", nil)
+		rctx.URLParams.Add("uuid", workspaceUUID)
+		req, err := http.NewRequestWithContext(context.WithValue(ctx, chi.RouteCtxKey, rctx), http.MethodGet, "/bounties/"+workspaceUUID+"?limit=10&sortBy=created&search=test&page=1&resetPage=true", nil)
 		if err != nil {
 			t.Fatal(err)
 		}
@@ -414,12 +414,12 @@ func TestGetWorkspaceBudget(t *testing.T) {
 	}
 	oHandler := NewWorkspaceHandler(mockDb)
 
-	t.Run("Should test that a 401 is returned when trying to view an organization's budget without a token", func(t *testing.T) {
-		orgUUID := "valid-uuid"
+	t.Run("Should test that a 401 is returned when trying to view an workspace's budget without a token", func(t *testing.T) {
+		workspaceUUID := "valid-uuid"
 
 		rctx := chi.NewRouteContext()
-		rctx.URLParams.Add("uuid", orgUUID)
-		req, err := http.NewRequestWithContext(context.WithValue(context.Background(), chi.RouteCtxKey, rctx), http.MethodGet, "/budget/"+orgUUID, nil)
+		rctx.URLParams.Add("uuid", workspaceUUID)
+		req, err := http.NewRequestWithContext(context.WithValue(context.Background(), chi.RouteCtxKey, rctx), http.MethodGet, "/budget/"+workspaceUUID, nil)
 		if err != nil {
 			t.Fatal(err)
 		}
@@ -430,10 +430,10 @@ func TestGetWorkspaceBudget(t *testing.T) {
 		assert.Equal(t, http.StatusUnauthorized, rr.Code)
 	})
 
-	t.Run("Should test that the right workspace budget is returned, if the user is the organization admin or has the ViewReport role", func(t *testing.T) {
-		orgUUID := "valid-uuid"
+	t.Run("Should test that the right workspace budget is returned, if the user is the workspace admin or has the ViewReport role", func(t *testing.T) {
+		workspaceUUID := "valid-uuid"
 		statusBudget := db.StatusBudget{
-			OrgUuid:         orgUUID,
+			OrgUuid:         workspaceUUID,
 			CurrentBudget:   10000,
 			OpenBudget:      1000,
 			OpenCount:       10,
@@ -444,11 +444,11 @@ func TestGetWorkspaceBudget(t *testing.T) {
 		}
 
 		oHandler.userHasAccess = mockUserHasAccess
-		mockDb.On("GetWorkspaceStatusBudget", orgUUID).Return(statusBudget).Once()
+		mockDb.On("GetWorkspaceStatusBudget", workspaceUUID).Return(statusBudget).Once()
 
 		rctx := chi.NewRouteContext()
-		rctx.URLParams.Add("uuid", orgUUID)
-		req, err := http.NewRequestWithContext(context.WithValue(ctx, chi.RouteCtxKey, rctx), http.MethodGet, "/budget/"+orgUUID, nil)
+		rctx.URLParams.Add("uuid", workspaceUUID)
+		req, err := http.NewRequestWithContext(context.WithValue(ctx, chi.RouteCtxKey, rctx), http.MethodGet, "/budget/"+workspaceUUID, nil)
 		if err != nil {
 			t.Fatal(err)
 		}
@@ -473,8 +473,8 @@ func TestGetWorkspaceBudgetHistory(t *testing.T) {
 	mockDb := mocks.NewDatabase(t)
 	oHandler := NewWorkspaceHandler(mockDb)
 
-	t.Run("Should test that a 401 is returned when trying to view an organization's budget history without a token", func(t *testing.T) {
-		orgUUID := "valid-uuid"
+	t.Run("Should test that a 401 is returned when trying to view an workspace's budget history without a token", func(t *testing.T) {
+		workspaceUUID := "valid-uuid"
 
 		mockUserHasAccess := func(pubKeyFromAuth string, uuid string, role string) bool {
 			return false
@@ -482,8 +482,8 @@ func TestGetWorkspaceBudgetHistory(t *testing.T) {
 		oHandler.userHasAccess = mockUserHasAccess
 
 		rctx := chi.NewRouteContext()
-		rctx.URLParams.Add("uuid", orgUUID)
-		req, err := http.NewRequestWithContext(context.WithValue(context.Background(), chi.RouteCtxKey, rctx), http.MethodGet, "/budget/history/"+orgUUID, nil)
+		rctx.URLParams.Add("uuid", workspaceUUID)
+		req, err := http.NewRequestWithContext(context.WithValue(context.Background(), chi.RouteCtxKey, rctx), http.MethodGet, "/budget/history/"+workspaceUUID, nil)
 		if err != nil {
 			t.Fatal(err)
 		}
@@ -494,11 +494,11 @@ func TestGetWorkspaceBudgetHistory(t *testing.T) {
 		assert.Equal(t, http.StatusUnauthorized, rr.Code)
 	})
 
-	t.Run("Should test that the right budget history is returned, if the user is the organization admin or has the ViewReport role", func(t *testing.T) {
-		orgUUID := "valid-uuid"
+	t.Run("Should test that the right budget history is returned, if the user is the workspace admin or has the ViewReport role", func(t *testing.T) {
+		workspaceUUID := "valid-uuid"
 		expectedBudgetHistory := []db.BudgetHistoryData{
-			{BudgetHistory: db.BudgetHistory{ID: 1, OrgUuid: orgUUID, Created: nil, Updated: nil}, SenderName: "Sender1"},
-			{BudgetHistory: db.BudgetHistory{ID: 2, OrgUuid: orgUUID, Created: nil, Updated: nil}, SenderName: "Sender2"},
+			{BudgetHistory: db.BudgetHistory{ID: 1, OrgUuid: workspaceUUID, Created: nil, Updated: nil}, SenderName: "Sender1"},
+			{BudgetHistory: db.BudgetHistory{ID: 2, OrgUuid: workspaceUUID, Created: nil, Updated: nil}, SenderName: "Sender2"},
 		}
 
 		mockUserHasAccess := func(pubKeyFromAuth string, uuid string, role string) bool {
@@ -506,11 +506,11 @@ func TestGetWorkspaceBudgetHistory(t *testing.T) {
 		}
 		oHandler.userHasAccess = mockUserHasAccess
 
-		mockDb.On("GetWorkspaceBudgetHistory", orgUUID).Return(expectedBudgetHistory).Once()
+		mockDb.On("GetWorkspaceBudgetHistory", workspaceUUID).Return(expectedBudgetHistory).Once()
 
 		rctx := chi.NewRouteContext()
-		rctx.URLParams.Add("uuid", orgUUID)
-		req, err := http.NewRequestWithContext(context.WithValue(ctx, chi.RouteCtxKey, rctx), http.MethodGet, "/budget/history/"+orgUUID, nil)
+		rctx.URLParams.Add("uuid", workspaceUUID)
+		req, err := http.NewRequestWithContext(context.WithValue(ctx, chi.RouteCtxKey, rctx), http.MethodGet, "/budget/history/"+workspaceUUID, nil)
 		if err != nil {
 			t.Fatal(err)
 		}
@@ -535,15 +535,15 @@ func TestGetWorkspaceBountiesCount(t *testing.T) {
 	mockDb := mocks.NewDatabase(t)
 	oHandler := NewWorkspaceHandler(mockDb)
 
-	t.Run("should return the count of organization bounties", func(t *testing.T) {
-		orgUUID := "valid-uuid"
+	t.Run("should return the count of workspace bounties", func(t *testing.T) {
+		workspaceUUID := "valid-uuid"
 		expectedCount := int64(5)
 
-		mockDb.On("GetWorkspaceBountiesCount", mock.AnythingOfType("*http.Request"), orgUUID).Return(expectedCount).Once()
+		mockDb.On("GetWorkspaceBountiesCount", mock.AnythingOfType("*http.Request"), workspaceUUID).Return(expectedCount).Once()
 
 		rctx := chi.NewRouteContext()
-		rctx.URLParams.Add("uuid", orgUUID)
-		req, err := http.NewRequestWithContext(context.WithValue(ctx, chi.RouteCtxKey, rctx), http.MethodGet, "/bounties/"+orgUUID+"/count/", nil)
+		rctx.URLParams.Add("uuid", workspaceUUID)
+		req, err := http.NewRequestWithContext(context.WithValue(ctx, chi.RouteCtxKey, rctx), http.MethodGet, "/bounties/"+workspaceUUID+"/count/", nil)
 		if err != nil {
 			t.Fatal(err)
 		}
