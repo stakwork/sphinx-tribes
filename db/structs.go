@@ -389,6 +389,41 @@ type Bounty struct {
 	CodingLanguages         pq.StringArray `gorm:"type:text[];not null default:'[]'" json:"coding_languages"`
 }
 
+// Todo: Change back to Bounty
+type NewBounty struct {
+	ID                      uint           `json:"id"`
+	OwnerID                 string         `json:"owner_id"`
+	Paid                    bool           `json:"paid"`
+	Show                    bool           `gorm:"default:false" json:"show"`
+	Completed               bool           `gorm:"default:false" json:"completed"`
+	Type                    string         `json:"type"`
+	Award                   string         `json:"award"`
+	AssignedHours           uint8          `json:"assigned_hours"`
+	BountyExpires           string         `json:"bounty_expires"`
+	CommitmentFee           uint64         `json:"commitment_fee"`
+	Price                   uint           `json:"price"`
+	Title                   string         `json:"title"`
+	Tribe                   string         `json:"tribe"`
+	Assignee                string         `json:"assignee"`
+	TicketUrl               string         `json:"ticket_url"`
+	OrgUuid                 string         `gorm:"-" json:"org_uuid"`
+	WorkspaceUuid           string         `json:"workspace_uuid"`
+	Description             string         `json:"description"`
+	WantedType              string         `json:"wanted_type"`
+	Deliverables            string         `json:"deliverables"`
+	GithubDescription       bool           `json:"github_description"`
+	OneSentenceSummary      string         `json:"one_sentence_summary"`
+	EstimatedSessionLength  string         `json:"estimated_session_length"`
+	EstimatedCompletionDate string         `json:"estimated_completion_date"`
+	Created                 int64          `json:"created"`
+	Updated                 *time.Time     `json:"updated"`
+	AssignedDate            *time.Time     `json:"assigned_date,omitempty"`
+	CompletionDate          *time.Time     `json:"completion_date,omitempty"`
+	MarkAsPaidDate          *time.Time     `json:"mark_as_paid_date,omitempty"`
+	PaidDate                *time.Time     `json:"paid_date,omitempty"`
+	CodingLanguages         pq.StringArray `gorm:"type:text[];not null default:'[]'" json:"coding_languages"`
+}
+
 type BountyOwners struct {
 	OwnerID string `json:"owner_id"`
 }
@@ -429,10 +464,11 @@ type BountyData struct {
 }
 
 type BountyResponse struct {
-	Bounty       Bounty            `json:"bounty"`
-	Assignee     Person            `json:"assignee"`
-	Owner        Person            `json:"owner"`
-	Organization OrganizationShort `json:"organization"`
+	Bounty       NewBounty      `json:"bounty"`
+	Assignee     Person         `json:"assignee"`
+	Owner        Person         `json:"owner"`
+	Organization WorkspaceShort `json:"organization"`
+	Workspace    WorkspaceShort `json:"workspace"`
 }
 
 type BountyCountResponse struct {
@@ -458,7 +494,24 @@ type Organization struct {
 	Description string     `json:"description" validate:"omitempty,lte=120"`
 }
 
-type OrganizationShort struct {
+type Workspace struct {
+	ID          uint       `json:"id"`
+	Uuid        string     `json:"uuid"`
+	Name        string     `gorm:"unique;not null" json:"name"`
+	OwnerPubKey string     `json:"owner_pubkey"`
+	Img         string     `json:"img"`
+	Created     *time.Time `json:"created"`
+	Updated     *time.Time `json:"updated"`
+	Show        bool       `json:"show"`
+	Deleted     bool       `gorm:"default:false" json:"deleted"`
+	BountyCount int64      `json:"bounty_count,omitempty"`
+	Budget      uint       `json:"budget,omitempty"`
+	Website     string     `json:"website" validate:"omitempty,uri"`
+	Github      string     `json:"github" validate:"omitempty,uri"`
+	Description string     `json:"description" validate:"omitempty,lte=120"`
+}
+
+type WorkspaceShort struct {
 	Uuid string `json:"uuid"`
 	Name string `gorm:"unique;not null" json:"name"`
 	Img  string `json:"img"`
@@ -472,9 +525,19 @@ type OrganizationUsers struct {
 	Updated     *time.Time `json:"updated"`
 }
 
-type OrganizationUsersData struct {
-	OrgUuid     string     `json:"org_uuid"`
-	UserCreated *time.Time `json:"user_created"`
+type WorkspaceUsers struct {
+	ID            uint       `json:"id"`
+	OwnerPubKey   string     `json:"owner_pubkey"`
+	OrgUuid       string     `gorm:"-" json:"org_uuid"`
+	WorkspaceUuid string     `json:"workspace_uuid,omitempty"`
+	Created       *time.Time `json:"created"`
+	Updated       *time.Time `json:"updated"`
+}
+
+type WorkspaceUsersData struct {
+	OrgUuid       string     `gorm:"-" json:"org_uuid"`
+	WorkspaceUuid string     `json:"workspace_uuid,omitempty"`
+	UserCreated   *time.Time `json:"user_created"`
 	Person
 }
 
@@ -489,16 +552,37 @@ type UserRoles struct {
 	Created     *time.Time `json:"created"`
 }
 
+// change back to UserRoles after migration
+type WorkspaceUserRoles struct {
+	Role          string     `json:"role"`
+	OwnerPubKey   string     `json:"owner_pubkey"`
+	OrgUuid       string     `gorm:"-" json:"org_uuid"`
+	WorkspaceUuid string     `json:"workspace_uuid,omitempty"`
+	Created       *time.Time `json:"created"`
+}
+
 type BountyBudget struct {
-	ID          uint       `json:"id"`
-	OrgUuid     string     `json:"org_uuid"`
-	TotalBudget uint       `json:"total_budget"`
-	Created     *time.Time `json:"created"`
-	Updated     *time.Time `json:"updated"`
+	ID            uint       `json:"id"`
+	OrgUuid       string     `json:"org_uuid"`
+	WorkspaceUuid string     `gorm:"-" json:"workspace_uuid,omitempty"`
+	TotalBudget   uint       `json:"total_budget"`
+	Created       *time.Time `json:"created"`
+	Updated       *time.Time `json:"updated"`
+}
+
+// Rename back to BountyBudget
+type NewBountyBudget struct {
+	ID            uint       `json:"id"`
+	OrgUuid       string     `gorm:"-" json:"org_uuid"`
+	WorkspaceUuid string     `json:"workspace_uuid"`
+	TotalBudget   uint       `json:"total_budget"`
+	Created       *time.Time `json:"created"`
+	Updated       *time.Time `json:"updated"`
 }
 
 type StatusBudget struct {
 	OrgUuid         string `json:"org_uuid"`
+	WorkspaceUuid   string `json:"workspace_uuid"`
 	CurrentBudget   uint   `json:"current_budget"`
 	OpenBudget      uint   `json:"open_budget"`
 	OpenCount       int64  `json:"open_count"`
@@ -511,7 +595,8 @@ type StatusBudget struct {
 type BudgetInvoiceRequest struct {
 	Amount          uint        `json:"amount"`
 	SenderPubKey    string      `json:"sender_pubkey"`
-	OrgUuid         string      `json:"org_uuid"`
+	OrgUuid         string      `json:"org_uuid,omitempty"`
+	WorkspaceUuid   string      `json:"workspace_uuid,omitempty"`
 	PaymentType     PaymentType `json:"payment_type,omitempty"`
 	Websocket_token string      `json:"websocket_token,omitempty"`
 }
@@ -562,12 +647,26 @@ type PaymentHistory struct {
 	Status         bool        `json:"status"`
 }
 
+type NewPaymentHistory struct {
+	ID             uint        `json:"id"`
+	Amount         uint        `json:"amount"`
+	BountyId       uint        `json:"bounty_id"`
+	PaymentType    PaymentType `json:"payment_type"`
+	OrgUuid        string      `gorm:"-" json:"org_uuid"`
+	WorkspaceUuid  string      `json:"workspace_uuid,omitempty"`
+	SenderPubKey   string      `json:"sender_pubkey"`
+	ReceiverPubKey string      `json:"receiver_pubkey"`
+	Created        *time.Time  `json:"created"`
+	Updated        *time.Time  `json:"updated"`
+	Status         bool        `json:"status"`
+}
+
 type PaymentHistoryData struct {
-	PaymentHistory
-	SenderName   string `json:"sender_name"`
-	ReceiverName string `json:"receiver_name"`
-	SenderImg    string `json:"sender_img"`
-	ReceiverImg  string `json:"receiver_img"`
+	PaymentHistory NewPaymentHistory
+	SenderName     string `json:"sender_name"`
+	ReceiverName   string `json:"receiver_name"`
+	SenderImg      string `json:"sender_img"`
+	ReceiverImg    string `json:"receiver_img"`
 }
 
 type PaymentData struct {
@@ -606,6 +705,19 @@ type InvoiceList struct {
 	Updated        *time.Time  `json:"updated"`
 }
 
+// Todo: Rename back to InvoiceList
+type NewInvoiceList struct {
+	ID             uint        `json:"id"`
+	PaymentRequest string      `json:"payment_request"`
+	Status         bool        `json:"status"`
+	Type           InvoiceType `json:"type"`
+	OwnerPubkey    string      `json:"owner_pubkey"`
+	OrgUuid        string      `gorm:"-" json:"org_uuid"`
+	WorkspaceUuid  string      `json:"workspace_uuid"`
+	Created        *time.Time  `json:"created"`
+	Updated        *time.Time  `json:"updated"`
+}
+
 type UserInvoiceData struct {
 	ID             uint   `json:"id"`
 	Amount         uint   `json:"amount"`
@@ -622,6 +734,13 @@ type WithdrawBudgetRequest struct {
 	PaymentRequest  string `json:"payment_request"`
 	Websocket_token string `json:"websocket_token,omitempty"`
 	OrgUuid         string `json:"org_uuid"`
+}
+
+// change back to WithdrawBudgetReques
+type NewWithdrawBudgetRequest struct {
+	PaymentRequest  string `json:"payment_request"`
+	Websocket_token string `json:"websocket_token,omitempty"`
+	WorkspaceUuid   string `json:"workspace_uuid"`
 }
 
 type PaymentDateRange struct {
@@ -714,6 +833,22 @@ func (PersonInShort) TableName() string {
 
 func (Bounty) TableName() string {
 	return "bounty"
+}
+
+func (NewBounty) TableName() string {
+	return "bounty"
+}
+
+func (NewBountyBudget) TableName() string {
+	return "bounty_budgets"
+}
+
+func (NewInvoiceList) TableName() string {
+	return "invoice_lists"
+}
+
+func (NewPaymentHistory) TableName() string {
+	return "payment_histories"
 }
 
 func (ConnectionCodes) TableName() string {
