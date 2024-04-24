@@ -1284,22 +1284,22 @@ func (_c *Database_DeleteAllUsersFromWorkspace_Call) RunAndReturn(run func(strin
 }
 
 // DeleteBounty provides a mock function with given fields: pubkey, created
-func (_m *Database) DeleteBounty(pubkey string, created string) (db.Bounty, error) {
+func (_m *Database) DeleteBounty(pubkey string, created string) (db.NewBounty, error) {
 	ret := _m.Called(pubkey, created)
 
 	if len(ret) == 0 {
 		panic("no return value specified for DeleteBounty")
 	}
 
-	var r0 db.Bounty
+	var r0 db.NewBounty
 	var r1 error
-	if rf, ok := ret.Get(0).(func(string, string) (db.Bounty, error)); ok {
+	if rf, ok := ret.Get(0).(func(string, string) (db.NewBounty, error)); ok {
 		return rf(pubkey, created)
 	}
-	if rf, ok := ret.Get(0).(func(string, string) db.Bounty); ok {
+	if rf, ok := ret.Get(0).(func(string, string) db.NewBounty); ok {
 		r0 = rf(pubkey, created)
 	} else {
-		r0 = ret.Get(0).(db.Bounty)
+		r0 = ret.Get(0).(db.NewBounty)
 	}
 
 	if rf, ok := ret.Get(1).(func(string, string) error); ok {
@@ -1330,12 +1330,12 @@ func (_c *Database_DeleteBounty_Call) Run(run func(pubkey string, created string
 	return _c
 }
 
-func (_c *Database_DeleteBounty_Call) Return(_a0 db.Bounty, _a1 error) *Database_DeleteBounty_Call {
+func (_c *Database_DeleteBounty_Call) Return(_a0 db.NewBounty, _a1 error) *Database_DeleteBounty_Call {
 	_c.Call.Return(_a0, _a1)
 	return _c
 }
 
-func (_c *Database_DeleteBounty_Call) RunAndReturn(run func(string, string) (db.Bounty, error)) *Database_DeleteBounty_Call {
+func (_c *Database_DeleteBounty_Call) RunAndReturn(run func(string, string) (db.NewBounty, error)) *Database_DeleteBounty_Call {
 	_c.Call.Return(run)
 	return _c
 }

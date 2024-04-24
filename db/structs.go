@@ -736,6 +736,13 @@ type WithdrawBudgetRequest struct {
 	OrgUuid         string `json:"org_uuid"`
 }
 
+// change back to WithdrawBudgetReques
+type NewWithdrawBudgetRequest struct {
+	PaymentRequest  string `json:"payment_request"`
+	Websocket_token string `json:"websocket_token,omitempty"`
+	WorkspaceUuid   string `json:"workspace_uuid"`
+}
+
 type PaymentDateRange struct {
 	StartDate   string      `json:"start_date"`
 	EndDate     string      `json:"end_date"`

@@ -1249,8 +1249,8 @@ func (db database) UpdateBountyBoolColumn(b NewBounty, column string) NewBounty 
 	return b
 }
 
-func (db database) DeleteBounty(pubkey string, created string) (Bounty, error) {
-	m := Bounty{}
+func (db database) DeleteBounty(pubkey string, created string) (NewBounty, error) {
+	m := NewBounty{}
 	db.db.Where("owner_id", pubkey).Where("created", created).Delete(&m)
 	return m, nil
 }

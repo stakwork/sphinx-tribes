@@ -600,8 +600,6 @@ func (h *bountyHandler) BountyBudgetWithdraw(w http.ResponseWriter, r *http.Requ
 	body, err := io.ReadAll(r.Body)
 	r.Body.Close()
 
-	fmt.Println("WithdraW Request ===", request)
-
 	err = json.Unmarshal(body, &request)
 	if err != nil {
 		w.WriteHeader(http.StatusNotAcceptable)
@@ -634,6 +632,71 @@ func (h *bountyHandler) BountyBudgetWithdraw(w http.ResponseWriter, r *http.Requ
 		if paymentSuccess.Success {
 			// withdraw amount from workspace budget
 			h.db.WithdrawBudget(pubKeyFromAuth, request.OrgUuid, amount)
+			w.WriteHeader(http.StatusOK)
+			json.NewEncoder(w).Encode(paymentSuccess)
+		} else {
+			w.WriteHeader(http.StatusBadRequest)
+			json.NewEncoder(w).Encode(paymentError)
+		}
+	} else {
+		w.WriteHeader(http.StatusForbidden)
+		errMsg := formatPayError("Could not pay lightning invoice")
+		json.NewEncoder(w).Encode(errMsg)
+	}
+
+	m.Unlock()
+}
+
+// Todo: change back to NewBountyBudgetWithdraw
+func (h *bountyHandler) NewBountyBudgetWithdraw(w http.ResponseWriter, r *http.Request) {
+	var m sync.Mutex
+	m.Lock()
+
+	ctx := r.Context()
+	pubKeyFromAuth, _ := ctx.Value(auth.ContextKey).(string)
+
+	if pubKeyFromAuth == "" {
+		fmt.Println("no pubkey from auth")
+		w.WriteHeader(http.StatusUnauthorized)
+		return
+	}
+
+	request := db.NewWithdrawBudgetRequest{}
+	body, err := io.ReadAll(r.Body)
+	r.Body.Close()
+
+	err = json.Unmarshal(body, &request)
+	if err != nil {
+		w.WriteHeader(http.StatusNotAcceptable)
+		return
+	}
+
+	// check if user is the admin of the workspace
+	// or has a withdraw bounty budget role
+	hasRole := h.userHasAccess(pubKeyFromAuth, request.WorkspaceUuid, db.WithdrawBudget)
+	if !hasRole {
+		w.WriteHeader(http.StatusUnauthorized)
+		errMsg := formatPayError("You don't have appropriate permissions to withdraw bounty budget")
+		json.NewEncoder(w).Encode(errMsg)
+		return
+	}
+
+	amount := utils.GetInvoiceAmount(request.PaymentRequest)
+
+	if err == nil && amount > 0 {
+		// check if the workspace bounty balance
+		// is greater than the amount
+		orgBudget := h.db.GetWorkspaceBudget(request.WorkspaceUuid)
+		if amount > orgBudget.TotalBudget {
+			w.WriteHeader(http.StatusForbidden)
+			errMsg := formatPayError("Workspace budget is not enough to withdraw the amount")
+			json.NewEncoder(w).Encode(errMsg)
+			return
+		}
+		paymentSuccess, paymentError := h.PayLightningInvoice(request.PaymentRequest)
+		if paymentSuccess.Success {
+			// withdraw amount from workspace budget
+			h.db.WithdrawBudget(pubKeyFromAuth, request.WorkspaceUuid, amount)
 			w.WriteHeader(http.StatusOK)
 			json.NewEncoder(w).Encode(paymentSuccess)
 		} else {
