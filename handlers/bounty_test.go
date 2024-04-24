@@ -261,6 +261,7 @@ func TestCreateOrEditBounty(t *testing.T) {
 			Title:         "first bounty",
 			Description:   "first bounty description",
 			WorkspaceUuid: "work-1",
+			OrgUuid:       "org-1",
 			OwnerID:       "test-key",
 		}
 		mockDb.On("UpdateBountyNullColumn", mock.AnythingOfType("db.NewBounty"), "assignee").Return(db.Bounty{Assignee: "test-key"})
@@ -446,7 +447,7 @@ func TestDeleteBounty(t *testing.T) {
 	t.Run("should return error if failed to delete from db", func(t *testing.T) {
 		rr := httptest.NewRecorder()
 		handler := http.HandlerFunc(bHandler.DeleteBounty)
-		mockDb.On("DeleteBounty", "pub-key", "1111").Return(db.Bounty{}, errors.New("some-error")).Once()
+		mockDb.On("DeleteBounty", "pub-key", "1111").Return(db.NewBounty{}, errors.New("some-error")).Once()
 
 		rctx := chi.NewRouteContext()
 		rctx.URLParams.Add("pubkey", "pub-key")
@@ -464,7 +465,7 @@ func TestDeleteBounty(t *testing.T) {
 	t.Run("should successfully delete bounty from db", func(t *testing.T) {
 		rr := httptest.NewRecorder()
 		handler := http.HandlerFunc(bHandler.DeleteBounty)
-		existingBounty := db.Bounty{
+		existingBounty := db.NewBounty{
 			OwnerID: "pub-key",
 			Created: 1111,
 		}
@@ -479,7 +480,7 @@ func TestDeleteBounty(t *testing.T) {
 		}
 		handler.ServeHTTP(rr, req)
 
-		var returnedBounty db.Bounty
+		var returnedBounty db.NewBounty
 		_ = json.Unmarshal(rr.Body.Bytes(), &returnedBounty)
 		assert.Equal(t, http.StatusOK, rr.Code)
 		assert.EqualValues(t, existingBounty, returnedBounty)
@@ -879,6 +880,7 @@ func TestGetBountyById(t *testing.T) {
 			Tribe:                   "development",
 			Assignee:                "user1",
 			TicketUrl:               "http://example.com/issues/1",
+			OrgUuid:                 "org-789",
 			WorkspaceUuid:           "work-789",
 			Description:             "This bounty is for fixing a critical bug in the payment system that causes transactions to fail under certain conditions.",
 			WantedType:              "immediate",
@@ -904,7 +906,7 @@ func TestGetBountyById(t *testing.T) {
 		mockDb.On("GetBountyById", mock.Anything).Return([]db.NewBounty{bounty}, nil).Once()
 		mockDb.On("GetPersonByPubkey", "owner123").Return(db.Person{}).Once()
 		mockDb.On("GetPersonByPubkey", "user1").Return(db.Person{}).Once()
-		mockDb.On("GetWorkspaceByUuid", "org-789").Return(db.Workspace{}).Once()
+		mockDb.On("GetWorkspaceByUuid", "work-789").Return(db.Workspace{}).Once()
 
 		handler.ServeHTTP(rr, req)
 
@@ -1298,7 +1300,7 @@ func TestMakeBountyPayment(t *testing.T) {
 			Assignee:      "assignee-1",
 			Paid:          false,
 		}, nil)
-		mockDb.On("GetWorkspaceBudget", "org-1").Return(db.BountyBudget{
+		mockDb.On("GetWorkspaceBudget", "work-1").Return(db.NewBountyBudget{
 			TotalBudget: 500,
 		}, nil)
 
@@ -1335,9 +1337,9 @@ func TestMakeBountyPayment(t *testing.T) {
 		}
 
 		mockDb.On("GetBounty", bountyID).Return(bounty, nil)
-		mockDb.On("GetWorkspaceBudget", bounty.OrgUuid).Return(db.BountyBudget{TotalBudget: 2000}, nil)
+		mockDb.On("GetWorkspaceBudget", bounty.WorkspaceUuid).Return(db.NewBountyBudget{TotalBudget: 2000}, nil)
 		mockDb.On("GetPersonByPubkey", bounty.Assignee).Return(db.Person{OwnerPubKey: "assignee-1", OwnerRouteHint: "OwnerRouteHint"}, nil)
-		mockDb.On("AddPaymentHistory", mock.AnythingOfType("db.PaymentHistory")).Return(db.PaymentHistory{ID: 1})
+		mockDb.On("AddPaymentHistory", mock.AnythingOfType("db.NewPaymentHistory")).Return(db.NewPaymentHistory{ID: 1})
 		mockDb.On("UpdateBounty", mock.AnythingOfType("db.NewBounty")).Run(func(args mock.Arguments) {
 			updatedBounty := args.Get(0).(db.NewBounty)
 			assert.True(t, updatedBounty.Paid)
@@ -1384,7 +1386,7 @@ func TestMakeBountyPayment(t *testing.T) {
 		bHandler2.userHasAccess = mockUserHasAccessTrue
 
 		mockDb2.On("GetBounty", bountyID).Return(bounty, nil)
-		mockDb2.On("GetWorkspaceBudget", bounty.OrgUuid).Return(db.BountyBudget{TotalBudget: 2000}, nil)
+		mockDb2.On("GetWorkspaceBudget", bounty.WorkspaceUuid).Return(db.NewBountyBudget{TotalBudget: 2000}, nil)
 		mockDb2.On("GetPersonByPubkey", bounty.Assignee).Return(db.Person{OwnerPubKey: "assignee-1", OwnerRouteHint: "OwnerRouteHint"}, nil)
 
 		expectedUrl := fmt.Sprintf("%s/payment", config.RelayUrl)
@@ -1484,7 +1486,7 @@ func TestBountyBudgetWithdraw(t *testing.T) {
 		bHandler := NewBountyHandler(mockHttpClient, mockDb)
 		bHandler.userHasAccess = mockUserHasAccessTrue
 
-		mockDb.On("GetWorkspaceBudget", "org-1").Return(db.BountyBudget{
+		mockDb.On("GetWorkspaceBudget", "org-1").Return(db.NewBountyBudget{
 			TotalBudget: 500,
 		}, nil)
 		invoice := "lnbc15u1p3xnhl2pp5jptserfk3zk4qy42tlucycrfwxhydvlemu9pqr93tuzlv9cc7g3sdqsvfhkcap3xyhx7un8cqzpgxqzjcsp5f8c52y2stc300gl6s4xswtjpc37hrnnr3c9wvtgjfuvqmpm35evq9qyyssqy4lgd8tj637qcjp05rdpxxykjenthxftej7a2zzmwrmrl70fyj9hvj0rewhzj7jfyuwkwcg9g2jpwtk3wkjtwnkdks84hsnu8xps5vsq4gj5hs"
@@ -1516,7 +1518,7 @@ func TestBountyBudgetWithdraw(t *testing.T) {
 
 		paymentAmount := uint(1500)
 
-		mockDb.On("GetWorkspaceBudget", "org-1").Return(db.BountyBudget{
+		mockDb.On("GetWorkspaceBudget", "org-1").Return(db.NewBountyBudget{
 			TotalBudget: 5000,
 		}, nil)
 		mockDb.On("WithdrawBudget", "valid-key", "org-1", paymentAmount).Return(nil)
@@ -1553,7 +1555,7 @@ func TestBountyBudgetWithdraw(t *testing.T) {
 		bHandler := NewBountyHandler(mockHttpClient, mockDb)
 		bHandler.userHasAccess = mockUserHasAccessTrue
 
-		mockDb.On("GetWorkspaceBudget", "org-1").Return(db.BountyBudget{
+		mockDb.On("GetWorkspaceBudget", "org-1").Return(db.NewBountyBudget{
 			TotalBudget: 5000,
 		}, nil)
 		mockHttpClient.On("Do", mock.AnythingOfType("*http.Request")).Return(&http.Response{
@@ -1602,7 +1604,7 @@ func TestBountyBudgetWithdraw(t *testing.T) {
 			mockHttpClient.ExpectedCalls = nil
 			mockHttpClient.Calls = nil
 
-			mockDb.On("GetWorkspaceBudget", "org-1").Return(db.BountyBudget{
+			mockDb.On("GetWorkspaceBudget", "org-1").Return(db.NewBountyBudget{
 				TotalBudget: expectedFinalBudget,
 			}, nil)
 			mockDb.On("WithdrawBudget", "valid-key", "org-1", paymentAmount).Return(nil)
@@ -1733,16 +1735,18 @@ func TestPollInvoice(t *testing.T) {
 		}, nil).Once()
 
 		bountyID := uint(1)
-		bounty := db.Bounty{
-			ID:       bountyID,
-			OrgUuid:  "org-1",
-			Assignee: "assignee-1",
-			Price:    uint(1000),
+		bounty := db.NewBounty{
+			ID:            bountyID,
+			WorkspaceUuid: "work-1",
+			OrgUuid:       "org-1",
+			Assignee:      "assignee-1",
+			Price:         uint(1000),
 		}
 
 		now := time.Now()
-		expectedBounty := db.Bounty{
+		expectedBounty := db.NewBounty{
 			ID:             bountyID,
+			WorkspaceUuid:  "work-1",
 			OrgUuid:        "org-1",
 			Assignee:       "assignee-1",
 			Price:          uint(1000),
@@ -1751,15 +1755,15 @@ func TestPollInvoice(t *testing.T) {
 			CompletionDate: &now,
 		}
 
-		mockDb.On("GetInvoice", "1").Return(db.InvoiceList{Type: "KEYSEND"})
+		mockDb.On("GetInvoice", "1").Return(db.NewInvoiceList{Type: "KEYSEND"})
 		mockDb.On("GetUserInvoiceData", "1").Return(db.UserInvoiceData{Amount: 1000, UserPubkey: "UserPubkey", RouteHint: "RouteHint", Created: 1234})
-		mockDb.On("GetInvoice", "1").Return(db.InvoiceList{Status: false})
+		mockDb.On("GetInvoice", "1").Return(db.NewInvoiceList{Status: false})
 		mockDb.On("GetBountyByCreated", uint(1234)).Return(bounty, nil)
 		mockDb.On("UpdateBounty", mock.AnythingOfType("db.NewBounty")).Run(func(args mock.Arguments) {
-			updatedBounty := args.Get(0).(db.Bounty)
+			updatedBounty := args.Get(0).(db.NewBounty)
 			assert.True(t, updatedBounty.Paid)
 		}).Return(expectedBounty, nil).Once()
-		mockDb.On("UpdateInvoice", "1").Return(db.InvoiceList{}).Once()
+		mockDb.On("UpdateInvoice", "1").Return(db.NewInvoiceList{}).Once()
 
 		expectedPaymentUrl := fmt.Sprintf("%s/payment", config.RelayUrl)
 		expectedPaymentBody := `{"amount": 1000, "destination_key": "UserPubkey", "route_hint": "RouteHint", "text": "memotext added for notification"}`
@@ -1804,11 +1808,11 @@ func TestPollInvoice(t *testing.T) {
 			Body:       r,
 		}, nil).Once()
 
-		mockDb.On("GetInvoice", "1").Return(db.InvoiceList{Type: "BUDGET"})
+		mockDb.On("GetInvoice", "1").Return(db.NewInvoiceList{Type: "BUDGET"})
 		mockDb.On("GetUserInvoiceData", "1").Return(db.UserInvoiceData{Amount: 1000, UserPubkey: "UserPubkey", RouteHint: "RouteHint", Created: 1234})
-		mockDb.On("GetInvoice", "1").Return(db.InvoiceList{Status: false})
-		mockDb.On("AddAndUpdateBudget", mock.Anything).Return(db.PaymentHistory{})
-		mockDb.On("UpdateInvoice", "1").Return(db.InvoiceList{}).Once()
+		mockDb.On("GetInvoice", "1").Return(db.NewInvoiceList{Status: false})
+		mockDb.On("AddAndUpdateBudget", mock.Anything).Return(db.NewPaymentHistory{})
+		mockDb.On("UpdateInvoice", "1").Return(db.NewInvoiceList{}).Once()
 
 		ro := chi.NewRouter()
 		ro.Post("/poll/invoice/{paymentRequest}", bHandler.PollInvoice)

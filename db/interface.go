@@ -47,7 +47,7 @@ type Database interface {
 	CreateOrEditBounty(b NewBounty) (NewBounty, error)
 	UpdateBountyNullColumn(b NewBounty, column string) NewBounty
 	UpdateBountyBoolColumn(b NewBounty, column string) NewBounty
-	DeleteBounty(pubkey string, created string) (Bounty, error)
+	DeleteBounty(pubkey string, created string) (NewBounty, error)
 	GetBountyByCreated(created uint) (NewBounty, error)
 	GetBounty(id uint) NewBounty
 	UpdateBounty(b NewBounty) (NewBounty, error)
