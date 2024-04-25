@@ -10,8 +10,8 @@ import (
 
 func TestRolesCheck_UserHasRole(t *testing.T) {
 	// Mock user roles
-	userRoles := []UserRoles{
-		{Role: "ADD BOUNTY", OwnerPubKey: "user1", OrgUuid: "org1", Created: &time.Time{}},
+	userRoles := []WorkspaceUserRoles{
+		{Role: "ADD BOUNTY", OwnerPubKey: "user1", WorkspaceUuid: "org1", Created: &time.Time{}},
 	}
 
 	// Role to check
@@ -28,8 +28,8 @@ func TestRolesCheck_UserHasRole(t *testing.T) {
 
 func TestRolesCheck_UserDoesNotHaveRole(t *testing.T) {
 	// Mock user roles
-	userRoles := []UserRoles{
-		{Role: "DELETE BOUNTY", OwnerPubKey: "user2", OrgUuid: "org1", Created: &time.Time{}},
+	userRoles := []WorkspaceUserRoles{
+		{Role: "DELETE BOUNTY", OwnerPubKey: "user2", WorkspaceUuid: "org1", Created: &time.Time{}},
 	}
 
 	// Role to check
@@ -45,7 +45,7 @@ func TestRolesCheck_UserDoesNotHaveRole(t *testing.T) {
 }
 
 func TestCheckUser(t *testing.T) {
-	userRoles := []UserRoles{
+	userRoles := []WorkspaceUserRoles{
 		{OwnerPubKey: "userPublicKey"},
 	}
 
@@ -55,16 +55,16 @@ func TestCheckUser(t *testing.T) {
 }
 
 func TestUserHasAccess(t *testing.T) {
-	mockGetWorkspaceByUuid := func(uuid string) Organization {
-		return Organization{
+	mockGetWorkspaceByUuid := func(uuid string) Workspace {
+		return Workspace{
 			Uuid:        uuid,
 			OwnerPubKey: "org_admin",
 		}
 	}
 
-	mockGetUserRoles := func(uuid string, pubkey string) []UserRoles {
-		return []UserRoles{
-			{Role: "ADD BOUNTY", OwnerPubKey: pubkey, OrgUuid: uuid, Created: &time.Time{}},
+	mockGetUserRoles := func(uuid string, pubkey string) []WorkspaceUserRoles {
+		return []WorkspaceUserRoles{
+			{Role: "ADD BOUNTY", OwnerPubKey: pubkey, WorkspaceUuid: uuid, Created: &time.Time{}},
 		}
 	}
 
@@ -74,17 +74,17 @@ func TestUserHasAccess(t *testing.T) {
 	databaseConfig.getWorkspaceByUuid = mockGetWorkspaceByUuid
 	databaseConfig.getUserRoles = mockGetUserRoles
 
-	t.Run("Should test that if the user is the admin of an organization returns true", func(t *testing.T) {
-		result := databaseConfig.UserHasAccess("org_admin", "org_uuid", "ADD BOUNTY")
+	t.Run("Should test that if the user is the admin of an workspace returns true", func(t *testing.T) {
+		result := databaseConfig.UserHasAccess("org_admin", "workspace_uuid", "ADD BOUNTY")
 
 		// Assert that it returns true since the user is the org admin
 		if !result {
-			t.Errorf("Expected UserHasAccess to return true for organization admin, got false")
+			t.Errorf("Expected UserHasAccess to return true for workspace admin, got false")
 		}
 	})
 
-	t.Run("Should test that if the user is not the organization admin, and the user has the required role it should return true", func(t *testing.T) {
-		result := databaseConfig.UserHasAccess("user_pubkey", "org_uuid", "ADD BOUNTY")
+	t.Run("Should test that if the user is not the workspace admin, and the user has the required role it should return true", func(t *testing.T) {
+		result := databaseConfig.UserHasAccess("user_pubkey", "workspace_uuid", "ADD BOUNTY")
 
 		// Assert that it returns true since the user has the required role
 		if !result {
@@ -92,8 +92,8 @@ func TestUserHasAccess(t *testing.T) {
 		}
 	})
 
-	t.Run("Should test that if the user is not the organization admin, and the user has not the required role it should return false", func(t *testing.T) {
-		result := databaseConfig.UserHasAccess("user_pubkey", "org_uuid", "DELETE BOUNTY")
+	t.Run("Should test that if the user is not the workspace admin, and the user has not the required role it should return false", func(t *testing.T) {
+		result := databaseConfig.UserHasAccess("user_pubkey", "workspace_uuid", "DELETE BOUNTY")
 
 		// Assert that it returns false since the user does not have the required role
 		if result {
@@ -103,24 +103,24 @@ func TestUserHasAccess(t *testing.T) {
 }
 
 func TestUserHasManageBountyRoles(t *testing.T) {
-	mockGetWorkspaceByUuid := func(uuid string) Organization {
-		return Organization{
+	mockGetWorkspaceByUuid := func(uuid string) Workspace {
+		return Workspace{
 			Uuid:        uuid,
 			OwnerPubKey: "org_admin",
 		}
 	}
 
-	mockGetUserRoles := func(uuid string, pubkey string) []UserRoles {
-		if uuid == "org_uuid" {
-			return []UserRoles{
-				{Role: "ADD BOUNTY", OwnerPubKey: pubkey, OrgUuid: uuid, Created: &time.Time{}},
+	mockGetUserRoles := func(uuid string, pubkey string) []WorkspaceUserRoles {
+		if uuid == "workspace_uuid" {
+			return []WorkspaceUserRoles{
+				{Role: "ADD BOUNTY", OwnerPubKey: pubkey, WorkspaceUuid: uuid, Created: &time.Time{}},
 			}
 		} else {
-			return []UserRoles{
-				{Role: "ADD BOUNTY", OwnerPubKey: pubkey, OrgUuid: uuid, Created: &time.Time{}},
-				{Role: "UPDATE BOUNTY", OwnerPubKey: pubkey, OrgUuid: uuid, Created: &time.Time{}},
-				{Role: "DELETE BOUNTY", OwnerPubKey: pubkey, OrgUuid: uuid, Created: &time.Time{}},
-				{Role: "PAY BOUNTY", OwnerPubKey: pubkey, OrgUuid: uuid, Created: &time.Time{}},
+			return []WorkspaceUserRoles{
+				{Role: "ADD BOUNTY", OwnerPubKey: pubkey, WorkspaceUuid: uuid, Created: &time.Time{}},
+				{Role: "UPDATE BOUNTY", OwnerPubKey: pubkey, WorkspaceUuid: uuid, Created: &time.Time{}},
+				{Role: "DELETE BOUNTY", OwnerPubKey: pubkey, WorkspaceUuid: uuid, Created: &time.Time{}},
+				{Role: "PAY BOUNTY", OwnerPubKey: pubkey, WorkspaceUuid: uuid, Created: &time.Time{}},
 			}
 		}
 	}
@@ -131,22 +131,22 @@ func TestUserHasManageBountyRoles(t *testing.T) {
 	databaseConfig.getWorkspaceByUuid = mockGetWorkspaceByUuid
 	databaseConfig.getUserRoles = mockGetUserRoles
 
-	t.Run("Should test that if the user is the organization admin return true", func(t *testing.T) {
-		result := databaseConfig.UserHasManageBountyRoles("org_admin", "org_uuid")
+	t.Run("Should test that if the user is the workspace admin return true", func(t *testing.T) {
+		result := databaseConfig.UserHasManageBountyRoles("org_admin", "workspace_uuid")
 
 		// Assert that it returns true since the user is the org admin
-		assert.True(t, result, "Expected UserHasManageBountyRoles to return true for organization admin")
+		assert.True(t, result, "Expected UserHasManageBountyRoles to return true for workspace admin")
 	})
 
 	t.Run("Should test that if the user has all bounty roles return true", func(t *testing.T) {
-		result := databaseConfig.UserHasManageBountyRoles("user_pubkey", "org_uuid2")
+		result := databaseConfig.UserHasManageBountyRoles("user_pubkey", "workspace_uuid2")
 
 		// Assert that it returns true since the user has all bounty roles
 		assert.True(t, result, "Expected UserHasManageBountyRoles to return true for user with all bounty roles")
 	})
 
 	t.Run("Should test that if the user don't have all bounty roles return false.", func(t *testing.T) {
-		result := databaseConfig.UserHasManageBountyRoles("user_pubkey", "org_uuid")
+		result := databaseConfig.UserHasManageBountyRoles("user_pubkey", "workspace_uuid")
 
 		// Assert that it returns false since the user does not have all bounty roles
 		assert.False(t, result, "Expected UserHasManageBountyRoles to return false for user without all bounty roles")
