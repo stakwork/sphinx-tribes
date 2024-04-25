@@ -746,9 +746,6 @@ func (oh *workspaceHandler) UpdateWorkspaceMission(w http.ResponseWriter, r *htt
 	r.Body.Close()
 	err := json.Unmarshal(body, &workspace)
 
-	fmt.Println("workspace: ", workspace)
-	fmt.Println("body: ", body)
-
 	if err != nil {
 		fmt.Println(err)
 		w.WriteHeader(http.StatusNotAcceptable)
