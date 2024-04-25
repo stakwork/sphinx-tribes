@@ -522,9 +522,12 @@ func (db database) GetBountiesCount(r *http.Request) int64 {
 	open := keys.Get("Open")
 	assingned := keys.Get("Assigned")
 	paid := keys.Get("Paid")
+	completed := keys.Get("Completed")
+
 	openQuery := ""
 	assignedQuery := ""
 	paidQuery := ""
+	completedQuery := ""
 
 	if open != "" && open == "true" {
 		openQuery = "AND assignee = '' AND paid != true"
@@ -535,6 +538,13 @@ func (db database) GetBountiesCount(r *http.Request) int64 {
 			assignedQuery = "OR assignee != '' AND paid = false"
 		} else {
 			assignedQuery = "AND assignee != '' AND paid = false"
+		}
+	}
+	if completed != "" && completed == "true" {
+		if open != "" && open == "true" {
+			completedQuery = "OR assignee != '' AND completed = true AND paid = false"
+		} else {
+			completedQuery = "AND assignee != '' AND completed = true AND paid = false"
 		}
 	}
 	if paid != "" && paid == "true" {
@@ -550,7 +560,7 @@ func (db database) GetBountiesCount(r *http.Request) int64 {
 	var count int64
 
 	query := "SELECT COUNT(*) FROM bounty WHERE show != false"
-	allQuery := query + " " + openQuery + " " + assignedQuery + " " + paidQuery
+	allQuery := query + " " + openQuery + " " + assignedQuery + " " + completedQuery + " " + paidQuery
 	db.db.Raw(allQuery).Scan(&count)
 	return count
 }
@@ -558,33 +568,37 @@ func (db database) GetBountiesCount(r *http.Request) int64 {
 func (db database) GetFilterStatusCount() FilterStattuCount {
 	var openCount int64
 	var assignedCount int64
+	var completedCount int64
 	var paidCount int64
 
 	db.db.Model(&Bounty{}).Where("show != false").Where("assignee = ''").Where("paid != true").Count(&openCount)
 	db.db.Model(&Bounty{}).Where("show != false").Where("assignee != ''").Where("paid != true").Count(&assignedCount)
+	db.db.Model(&Bounty{}).Where("show != false").Where("assignee != ''").Where("completed = true").Where("paid != true").Count(&completedCount)
 	db.db.Model(&Bounty{}).Where("show != false").Where("assignee != ''").Where("paid = true").Count(&paidCount)
 
 	ms := FilterStattuCount{
-		Open:     openCount,
-		Assigned: assignedCount,
-		Paid:     paidCount,
+		Open:      openCount,
+		Assigned:  assignedCount,
+		Completed: completedCount,
+		Paid:      paidCount,
 	}
 
 	return ms
 }
 
-func (db database) GetWorkspaceBounties(r *http.Request, org_uuid string) []Bounty {
+func (db database) GetWorkspaceBounties(r *http.Request, workspace_uuid string) []NewBounty {
 	keys := r.URL.Query()
 	tags := keys.Get("tags") // this is a string of tags separated by commas
 	offset, limit, sortBy, direction, search := utils.GetPaginationParams(r)
 	open := keys.Get("Open")
 	assingned := keys.Get("Assigned")
+	completed := keys.Get("Completed")
 	paid := keys.Get("Paid")
 	languages := keys.Get("languages")
 	languageArray := strings.Split(languages, ",")
 	languageLength := len(languageArray)
 
-	ms := []Bounty{}
+	ms := []NewBounty{}
 
 	orderQuery := ""
 	limitQuery := ""
@@ -614,6 +628,9 @@ func (db database) GetWorkspaceBounties(r *http.Request, org_uuid string) []Boun
 	if assingned == "true" {
 		statusConditions = append(statusConditions, "assignee != '' AND paid = false")
 	}
+	if completed == "true" {
+		statusConditions = append(statusConditions, "assignee != '' AND completed = true AND paid = false")
+	}
 	if paid == "true" {
 		statusConditions = append(statusConditions, "paid = true")
 	}
@@ -639,7 +656,7 @@ func (db database) GetWorkspaceBounties(r *http.Request, org_uuid string) []Boun
 		}
 	}
 
-	query := `SELECT * FROM bounty WHERE org_uuid = '` + org_uuid + `'`
+	query := `SELECT * FROM bounty WHERE workspace_uuid = '` + workspace_uuid + `'`
 	allQuery := query + " " + statusQuery + " " + searchQuery + " " + languageQuery + " " + orderQuery + " " + limitQuery
 	theQuery := db.db.Raw(allQuery)
 
@@ -656,12 +673,13 @@ func (db database) GetWorkspaceBounties(r *http.Request, org_uuid string) []Boun
 	return ms
 }
 
-func (db database) GetWorkspaceBountiesCount(r *http.Request, org_uuid string) int64 {
+func (db database) GetWorkspaceBountiesCount(r *http.Request, workspace_uuid string) int64 {
 	keys := r.URL.Query()
 	tags := keys.Get("tags") // this is a string of tags separated by commas
 	search := keys.Get("search")
 	open := keys.Get("Open")
 	assingned := keys.Get("Assigned")
+	completed := keys.Get("Completed")
 	paid := keys.Get("Paid")
 	languages := keys.Get("languages")
 	languageArray := strings.Split(languages, ",")
@@ -681,6 +699,9 @@ func (db database) GetWorkspaceBountiesCount(r *http.Request, org_uuid string) i
 	}
 	if assingned == "true" {
 		statusConditions = append(statusConditions, "assignee != '' AND paid = false")
+	}
+	if completed == "true" {
+		statusConditions = append(statusConditions, "assignee != '' AND completed = true AND paid = false")
 	}
 	if paid == "true" {
 		statusConditions = append(statusConditions, "paid = true")
@@ -709,7 +730,7 @@ func (db database) GetWorkspaceBountiesCount(r *http.Request, org_uuid string) i
 
 	var count int64
 
-	query := `SELECT COUNT(*) FROM bounty WHERE org_uuid = '` + org_uuid + `'`
+	query := `SELECT COUNT(*) FROM bounty WHERE workspace_uuid = '` + workspace_uuid + `'`
 	allQuery := query + " " + statusQuery + " " + searchQuery + " " + languageQuery
 	theQuery := db.db.Raw(allQuery)
 
@@ -726,7 +747,7 @@ func (db database) GetWorkspaceBountiesCount(r *http.Request, org_uuid string) i
 	return count
 }
 
-func (db database) GetAssignedBounties(r *http.Request) ([]Bounty, error) {
+func (db database) GetAssignedBounties(r *http.Request) ([]NewBounty, error) {
 	offset, limit, sortBy, direction, _ := utils.GetPaginationParams(r)
 	uuid := chi.URLParam(r, "uuid")
 	person := db.GetPersonByUuid(uuid)
@@ -767,7 +788,7 @@ func (db database) GetAssignedBounties(r *http.Request) ([]Bounty, error) {
 		limitQuery = fmt.Sprintf("LIMIT %d  OFFSET %d", limit, offset)
 	}
 
-	ms := []Bounty{}
+	ms := []NewBounty{}
 
 	query := `SELECT * FROM public.bounty WHERE assignee = '` + pubkey + `' AND show != false`
 	allQuery := query + " " + statusQuery + " " + orderQuery + " " + limitQuery
@@ -775,7 +796,7 @@ func (db database) GetAssignedBounties(r *http.Request) ([]Bounty, error) {
 	return ms, err
 }
 
-func (db database) GetCreatedBounties(r *http.Request) ([]Bounty, error) {
+func (db database) GetCreatedBounties(r *http.Request) ([]NewBounty, error) {
 	offset, limit, sortBy, direction, _ := utils.GetPaginationParams(r)
 	uuid := chi.URLParam(r, "uuid")
 	person := db.GetPersonByUuid(uuid)
@@ -817,7 +838,7 @@ func (db database) GetCreatedBounties(r *http.Request) ([]Bounty, error) {
 		limitQuery = fmt.Sprintf("LIMIT %d  OFFSET %d", limit, offset)
 	}
 
-	ms := []Bounty{}
+	ms := []NewBounty{}
 
 	query := `SELECT * FROM public.bounty WHERE owner_id = '` + pubkey + `'`
 	allQuery := query + " " + statusQuery + " " + orderQuery + " " + limitQuery
@@ -826,8 +847,8 @@ func (db database) GetCreatedBounties(r *http.Request) ([]Bounty, error) {
 	return ms, err
 }
 
-func (db database) GetBountyById(id string) ([]Bounty, error) {
-	ms := []Bounty{}
+func (db database) GetBountyById(id string) ([]NewBounty, error) {
+	ms := []NewBounty{}
 	err := db.db.Raw(`SELECT * FROM public.bounty WHERE id = '` + id + `'`).Find(&ms).Error
 	return ms, err
 }
@@ -901,6 +922,7 @@ func (db database) GetPreviousBountyByCreated(r *http.Request) (uint, error) {
 
 	open := keys.Get("Open")
 	assingned := keys.Get("Assigned")
+	completed := keys.Get("Completed")
 	paid := keys.Get("Paid")
 	languages := keys.Get("languages")
 	languageArray := strings.Split(languages, ",")
@@ -920,6 +942,9 @@ func (db database) GetPreviousBountyByCreated(r *http.Request) (uint, error) {
 	}
 	if assingned == "true" {
 		statusConditions = append(statusConditions, "assignee != '' AND paid = false")
+	}
+	if completed == "true" {
+		statusConditions = append(statusConditions, "assignee != '' AND completed = true AND paid = false")
 	}
 	if paid == "true" {
 		statusConditions = append(statusConditions, "paid = true")
@@ -963,6 +988,7 @@ func (db database) GetNextWorkspaceBountyByCreated(r *http.Request) (uint, error
 
 	open := keys.Get("Open")
 	assingned := keys.Get("Assigned")
+	completed := keys.Get("Completed")
 	paid := keys.Get("Paid")
 	languages := keys.Get("languages")
 	languageArray := strings.Split(languages, ",")
@@ -982,6 +1008,9 @@ func (db database) GetNextWorkspaceBountyByCreated(r *http.Request) (uint, error
 	}
 	if assingned == "true" {
 		statusConditions = append(statusConditions, "assignee != '' AND paid = false")
+	}
+	if completed == "true" {
+		statusConditions = append(statusConditions, "assignee != '' AND completed = true AND paid = false")
 	}
 	if paid == "true" {
 		statusConditions = append(statusConditions, "paid = true")
@@ -1007,7 +1036,7 @@ func (db database) GetNextWorkspaceBountyByCreated(r *http.Request) (uint, error
 		}
 	}
 
-	query := `SELECT id FROM public.bounty WHERE org_uuid = '` + uuid + `' AND created > '` + created + `' AND show = true`
+	query := `SELECT id FROM public.bounty WHERE workspace_uuid = '` + uuid + `' AND created > '` + created + `' AND show = true`
 	orderQuery := "ORDER BY created ASC LIMIT 1"
 
 	allQuery := query + " " + searchQuery + " " + statusQuery + " " + languageQuery + " " + orderQuery
@@ -1025,6 +1054,7 @@ func (db database) GetPreviousWorkspaceBountyByCreated(r *http.Request) (uint, e
 
 	open := keys.Get("Open")
 	assingned := keys.Get("Assigned")
+	completed := keys.Get("Completed")
 	paid := keys.Get("Paid")
 	languages := keys.Get("languages")
 	languageArray := strings.Split(languages, ",")
@@ -1044,6 +1074,9 @@ func (db database) GetPreviousWorkspaceBountyByCreated(r *http.Request) (uint, e
 	}
 	if assingned == "true" {
 		statusConditions = append(statusConditions, "assignee != '' AND paid = false")
+	}
+	if completed == "true" {
+		statusConditions = append(statusConditions, "assignee != '' AND completed = true AND paid = false")
 	}
 	if paid == "true" {
 		statusConditions = append(statusConditions, "paid = true")
@@ -1069,7 +1102,7 @@ func (db database) GetPreviousWorkspaceBountyByCreated(r *http.Request) (uint, e
 		}
 	}
 
-	query := `SELECT id FROM public.bounty WHERE org_uuid = '` + uuid + `' AND created < '` + created + `' AND show = true`
+	query := `SELECT id FROM public.bounty WHERE workspace_uuid = '` + uuid + `' AND created < '` + created + `' AND show = true`
 	orderQuery := "ORDER BY created DESC LIMIT 1"
 
 	allQuery := query + " " + searchQuery + " " + statusQuery + " " + languageQuery + " " + orderQuery
@@ -1084,8 +1117,8 @@ func (db database) GetBountyIndexById(id string) int64 {
 	return index
 }
 
-func (db database) GetBountyDataByCreated(created string) ([]Bounty, error) {
-	ms := []Bounty{}
+func (db database) GetBountyDataByCreated(created string) ([]NewBounty, error) {
+	ms := []NewBounty{}
 	err := db.db.Raw(`SELECT * FROM public.bounty WHERE created = '` + created + `'`).Find(&ms).Error
 	return ms, err
 }
@@ -1095,24 +1128,30 @@ func (db database) AddBounty(b Bounty) (Bounty, error) {
 	return b, nil
 }
 
-func (db database) GetAllBounties(r *http.Request) []Bounty {
+func (db database) GetAllBounties(r *http.Request) []NewBounty {
 	keys := r.URL.Query()
 	tags := keys.Get("tags") // this is a string of tags separated by commas
 	offset, limit, sortBy, direction, search := utils.GetPaginationParams(r)
 	open := keys.Get("Open")
 	assingned := keys.Get("Assigned")
+	completed := keys.Get("Completed")
 	paid := keys.Get("Paid")
 	orgUuid := keys.Get("org_uuid")
+	workspaceUuid := keys.Get("workspace_uuid")
 	languages := keys.Get("languages")
 	languageArray := strings.Split(languages, ",")
 	languageLength := len(languageArray)
 
-	ms := []Bounty{}
+	if workspaceUuid != "" && orgUuid != "" {
+		workspaceUuid = orgUuid
+	}
+
+	ms := []NewBounty{}
 
 	orderQuery := ""
 	limitQuery := ""
 	searchQuery := ""
-	orgQuery := ""
+	workspaceQuery := ""
 	languageQuery := ""
 
 	if sortBy != "" && direction != "" {
@@ -1135,6 +1174,9 @@ func (db database) GetAllBounties(r *http.Request) []Bounty {
 	if assingned == "true" {
 		statusConditions = append(statusConditions, "assignee != '' AND paid = false")
 	}
+	if completed == "true" {
+		statusConditions = append(statusConditions, "assignee != '' AND completed = true AND paid = false")
+	}
 	if paid == "true" {
 		statusConditions = append(statusConditions, "paid = true")
 	}
@@ -1146,8 +1188,8 @@ func (db database) GetAllBounties(r *http.Request) []Bounty {
 		statusQuery = ""
 	}
 
-	if orgUuid != "" {
-		orgQuery = "AND org_uuid = '" + orgUuid + "'"
+	if workspaceUuid != "" {
+		workspaceQuery = "AND workspace_uuid = '" + workspaceUuid + "'"
 	}
 	if languageLength > 0 {
 		langs := ""
@@ -1165,7 +1207,7 @@ func (db database) GetAllBounties(r *http.Request) []Bounty {
 
 	query := "SELECT * FROM public.bounty WHERE show != false"
 
-	allQuery := query + " " + statusQuery + " " + searchQuery + " " + orgQuery + " " + languageQuery + " " + orderQuery + " " + limitQuery
+	allQuery := query + " " + statusQuery + " " + searchQuery + " " + workspaceQuery + " " + languageQuery + " " + orderQuery + " " + limitQuery
 
 	theQuery := db.db.Raw(allQuery)
 
@@ -1182,9 +1224,9 @@ func (db database) GetAllBounties(r *http.Request) []Bounty {
 	return ms
 }
 
-func (db database) CreateOrEditBounty(b Bounty) (Bounty, error) {
+func (db database) CreateOrEditBounty(b NewBounty) (NewBounty, error) {
 	if b.OwnerID == "" {
-		return Bounty{}, errors.New("no pub key")
+		return NewBounty{}, errors.New("no pub key")
 	}
 
 	if db.db.Model(&b).Where("id = ? OR owner_id = ? AND created = ?", b.ID, b.OwnerID, b.Created).Updates(&b).RowsAffected == 0 {
@@ -1193,44 +1235,44 @@ func (db database) CreateOrEditBounty(b Bounty) (Bounty, error) {
 	return b, nil
 }
 
-func (db database) UpdateBountyNullColumn(b Bounty, column string) Bounty {
+func (db database) UpdateBountyNullColumn(b NewBounty, column string) NewBounty {
 	columnMap := make(map[string]interface{})
 	columnMap[column] = ""
 	db.db.Model(&b).Where("created = ?", b.Created).UpdateColumns(&columnMap)
 	return b
 }
 
-func (db database) UpdateBountyBoolColumn(b Bounty, column string) Bounty {
+func (db database) UpdateBountyBoolColumn(b NewBounty, column string) NewBounty {
 	columnMap := make(map[string]interface{})
 	columnMap[column] = false
 	db.db.Model(&b).Select(column).UpdateColumns(columnMap)
 	return b
 }
 
-func (db database) DeleteBounty(pubkey string, created string) (Bounty, error) {
-	m := Bounty{}
+func (db database) DeleteBounty(pubkey string, created string) (NewBounty, error) {
+	m := NewBounty{}
 	db.db.Where("owner_id", pubkey).Where("created", created).Delete(&m)
 	return m, nil
 }
 
-func (db database) GetBountyByCreated(created uint) (Bounty, error) {
-	b := Bounty{}
+func (db database) GetBountyByCreated(created uint) (NewBounty, error) {
+	b := NewBounty{}
 	err := db.db.Where("created", created).Find(&b).Error
 	return b, err
 }
 
-func (db database) GetBounty(id uint) Bounty {
-	b := Bounty{}
+func (db database) GetBounty(id uint) NewBounty {
+	b := NewBounty{}
 	db.db.Where("id", id).Find(&b)
 	return b
 }
 
-func (db database) UpdateBounty(b Bounty) (Bounty, error) {
+func (db database) UpdateBounty(b NewBounty) (NewBounty, error) {
 	db.db.Where("created", b.Created).Updates(&b)
 	return b, nil
 }
 
-func (db database) UpdateBountyPayment(b Bounty) (Bounty, error) {
+func (db database) UpdateBountyPayment(b NewBounty) (NewBounty, error) {
 	db.db.Model(&b).Where("created", b.Created).Updates(map[string]interface{}{
 		"paid": b.Paid,
 	})
@@ -1238,7 +1280,7 @@ func (db database) UpdateBountyPayment(b Bounty) (Bounty, error) {
 	return b, nil
 }
 
-func (db database) UpdateBountyCompleted(b Bounty) (Bounty, error) {
+func (db database) UpdateBountyCompleted(b NewBounty) (NewBounty, error) {
 	db.db.Model(&b).Where("created", b.Created).Updates(map[string]interface{}{
 		"completed": b.Completed,
 	})
@@ -1639,20 +1681,20 @@ func GetLeaderData(arr []LeaderData, key string) (int, int) {
 	return found, index
 }
 
-func (db database) GetInvoice(payment_request string) InvoiceList {
-	ms := InvoiceList{}
+func (db database) GetInvoice(payment_request string) NewInvoiceList {
+	ms := NewInvoiceList{}
 	db.db.Where("payment_request = ?", payment_request).Find(&ms)
 	return ms
 }
 
-func (db database) UpdateInvoice(payment_request string) InvoiceList {
-	ms := InvoiceList{}
-	db.db.Model(&InvoiceList{}).Where("payment_request = ?", payment_request).Update("status", true)
+func (db database) UpdateInvoice(payment_request string) NewInvoiceList {
+	ms := NewInvoiceList{}
+	db.db.Model(&NewInvoiceList{}).Where("payment_request = ?", payment_request).Update("status", true)
 	ms.Status = true
 	return ms
 }
 
-func (db database) AddInvoice(invoice InvoiceList) InvoiceList {
+func (db database) AddInvoice(invoice NewInvoiceList) NewInvoiceList {
 	db.db.Create(&invoice)
 	return invoice
 }

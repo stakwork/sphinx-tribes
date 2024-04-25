@@ -518,7 +518,7 @@ func GenerateInvoice(w http.ResponseWriter, r *http.Request) {
 	paymentRequest := invoiceRes.Response.Invoice
 	now := time.Now()
 
-	newInvoice := db.InvoiceList{
+	newInvoice := db.NewInvoiceList{
 		PaymentRequest: paymentRequest,
 		Type:           db.InvoiceType(invoiceType),
 		OwnerPubkey:    owner_key,
@@ -557,6 +557,10 @@ func (th *tribeHandler) GenerateBudgetInvoice(w http.ResponseWriter, r *http.Req
 		return
 	}
 
+	if invoice.WorkspaceUuid == "" && invoice.OrgUuid != "" {
+		invoice.WorkspaceUuid = invoice.OrgUuid
+	}
+
 	url := fmt.Sprintf("%s/invoices", config.RelayUrl)
 
 	bodyData := fmt.Sprintf(`{"amount": %d, "memo": "%s"}`, invoice.Amount, "Budget Invoice")
@@ -590,9 +594,9 @@ func (th *tribeHandler) GenerateBudgetInvoice(w http.ResponseWriter, r *http.Req
 	}
 
 	now := time.Now()
-	var paymentHistory = db.PaymentHistory{
+	var paymentHistory = db.NewPaymentHistory{
 		Amount:         invoice.Amount,
-		OrgUuid:        invoice.OrgUuid,
+		WorkspaceUuid:  invoice.WorkspaceUuid,
 		PaymentType:    invoice.PaymentType,
 		SenderPubKey:   invoice.SenderPubKey,
 		ReceiverPubKey: "",
@@ -602,11 +606,11 @@ func (th *tribeHandler) GenerateBudgetInvoice(w http.ResponseWriter, r *http.Req
 		BountyId:       0,
 	}
 
-	newInvoice := db.InvoiceList{
+	newInvoice := db.NewInvoiceList{
 		PaymentRequest: invoiceRes.Response.Invoice,
 		Type:           db.InvoiceType("BUDGET"),
 		OwnerPubkey:    invoice.SenderPubKey,
-		OrgUuid:        invoice.OrgUuid,
+		WorkspaceUuid:  invoice.WorkspaceUuid,
 		Created:        &now,
 		Updated:        &now,
 		Status:         false,
