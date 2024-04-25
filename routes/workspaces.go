@@ -38,6 +38,10 @@ func WorkspaceRoutes() chi.Router {
 		r.Get("/poll/invoices/{uuid}", organizationHandlers.PollBudgetInvoices)
 		r.Get("/invoices/count/{uuid}", handlers.GetInvoicesCount)
 		r.Delete("/delete/{uuid}", organizationHandlers.DeleteWorkspace)
+
+		r.Post("/mission", organizationHandlers.UpdateWorkspaceMission)
+		r.Post("/tactics", organizationHandlers.UpdateWorkspaceTactics)
+		r.Post("/schematicurl", organizationHandlers.UpdateWorkspaceSchematicUrl)
 	})
 	return r
 }
