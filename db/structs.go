@@ -495,20 +495,23 @@ type Organization struct {
 }
 
 type Workspace struct {
-	ID          uint       `json:"id"`
-	Uuid        string     `json:"uuid"`
-	Name        string     `gorm:"unique;not null" json:"name"`
-	OwnerPubKey string     `json:"owner_pubkey"`
-	Img         string     `json:"img"`
-	Created     *time.Time `json:"created"`
-	Updated     *time.Time `json:"updated"`
-	Show        bool       `json:"show"`
-	Deleted     bool       `gorm:"default:false" json:"deleted"`
-	BountyCount int64      `json:"bounty_count,omitempty"`
-	Budget      uint       `json:"budget,omitempty"`
-	Website     string     `json:"website" validate:"omitempty,uri"`
-	Github      string     `json:"github" validate:"omitempty,uri"`
-	Description string     `json:"description" validate:"omitempty,lte=120"`
+	ID           uint       `json:"id"`
+	Uuid         string     `json:"uuid"`
+	Name         string     `gorm:"unique;not null" json:"name"`
+	OwnerPubKey  string     `json:"owner_pubkey"`
+	Img          string     `json:"img"`
+	Created      *time.Time `json:"created"`
+	Updated      *time.Time `json:"updated"`
+	Show         bool       `json:"show"`
+	Deleted      bool       `gorm:"default:false" json:"deleted"`
+	BountyCount  int64      `json:"bounty_count,omitempty"`
+	Budget       uint       `json:"budget,omitempty"`
+	Website      string     `json:"website" validate:"omitempty,uri"`
+	Github       string     `json:"github" validate:"omitempty,uri"`
+	Description  string     `json:"description" validate:"omitempty,lte=120"`
+	Mission      string     `json:"mission"`
+    Tactics      string     `json:"tactics"`
+    SchematicUrl string     `json:"schematic_url"`
 }
 
 type WorkspaceShort struct {
