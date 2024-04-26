@@ -2,7 +2,7 @@ name: Cypress Frontend E2E tests
 on:
   pull_request:
     branches:
-      - master
+      - "*"
 
 jobs:
   cypress-run:
