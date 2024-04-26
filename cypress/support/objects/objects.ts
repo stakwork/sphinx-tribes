@@ -38,9 +38,9 @@ export const Workspaces = [
         name: 'Sample Workspace 2',
         owner_pubkey: User.owner_pubkey,
         img: 'IqQnBnAdrteW_QCeq_3Ss1_78_yBAz_rckG5F3NE9ms=',
-        mission: 'Access the largest pool of human cognition',
-        tactics: 'Create a marketplace for providers and bounty hunters',
-        schematic_url: 'https://miro.com/app/board/uXjVNQOK7Zc=',
+        mission: 'Sample mission for worspace 2',
+        tactics: 'Sample tactics for workspace 2',
+        schematic_url: 'https://miro.com/app/board/sampleworkspace2',
         schematic_img: '1b281867-2c0e-481e-b508-1aab0e33ab50.jpg'
     },
     {
@@ -49,9 +49,9 @@ export const Workspaces = [
         name: 'Sample Workspace 3',
         owner_pubkey: User.owner_pubkey,
         img: 'IqQnBnAdrteW_QCeq_3Ss1_78_yBAz_rckG5F3NE9ms=',
-        mission: 'Access the largest pool of human cognition',
-        tactics: 'Create a marketplace for providers and bounty hunters',
-        schematic_url: 'https://miro.com/app/board/uXjVNQOK7Zc=',
+        mission: 'Sample mission for workspaces 3',
+        tactics: 'Sample tactics for workspace 3',
+        schematic_url: 'https://miro.com/app/board/sampleworkspace3',
         schematic_img: '1b281867-2c0e-481e-b508-1aab0e33ab50.jpg'
     }];
 
