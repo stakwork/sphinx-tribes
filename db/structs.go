@@ -492,6 +492,9 @@ type Organization struct {
 	Website     string     `json:"website" validate:"omitempty,uri"`
 	Github      string     `json:"github" validate:"omitempty,uri"`
 	Description string     `json:"description" validate:"omitempty,lte=120"`
+	Mission string         `json:"mission"`
+    Tactics string         `json:"tactics"`
+    SchematicUrl string    `json:"schematic_url"`
 }
 
 type Workspace struct {
