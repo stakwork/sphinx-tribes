@@ -2,7 +2,7 @@ name: Cypress Frontend E2E tests
 on:
   pull_request:
     branches:
-      - master
+      - "*"
 
 jobs:
   cypress-run:
@@ -39,10 +39,10 @@ jobs:
           chmod 777 -R ./lnd;
           chmod 777 -R ./proxy;
           chmod 777 -R ./cln;
-      
+
       - name: Check for NODES
         uses: nick-fields/retry@v2
-        with: 
+        with:
           timeout_minutes: 10
           max_attempts: 3
           command: |
@@ -53,12 +53,12 @@ jobs:
             docker logs dave.sphinx
             docker wait stack_relaysetup_1
             cat stack/relay/NODES.json;
-      
+
       - name: Copy Node.json
         uses: canastro/copy-file-action@master
         with:
-          source: 'stack/relay/NODES.json'
-          target: 'tribes-frontend/cypress/fixtures/nodes.json'
+          source: "stack/relay/NODES.json"
+          target: "tribes-frontend/cypress/fixtures/nodes.json"
 
       - name: Install Frontend Dependencies
         working-directory: ./tribes-frontend
@@ -73,14 +73,14 @@ jobs:
         run: |
           sleep 20
           yarn run cypress:run
-      
+
       - name: Upload Cypress logs
         if: failure()
         uses: actions/upload-artifact@v2
         with:
           name: cypress-logs
           path: tribes-frontend/cypress/videos
-      
+
       - name: Stop Stack
         working-directory: ./stack
         run: docker-compose down
