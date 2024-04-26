@@ -4,27 +4,14 @@ import { User, HostName, Workspaces } from '../support/objects/objects';
 describe('Create Workspaces', () => {
     it('passes', () => {
         cy.upsertlogin(User).then(value => {
-            //Create 3 Workspaces
-            cy.request({
-                method: 'POST',
-                url: `${HostName}/workspaces/`,
-                headers: { 'x-jwt': `${value}` },
-                body: Workspaces[0]
-            }).its('body').should('have.property', 'name', Workspaces[0].name.trim());
-
-            cy.request({
-                method: 'POST',
-                url: `${HostName}/workspaces/`,
-                headers: { 'x-jwt': `${value}` },
-                body: Workspaces[1]
-            });
-
-            cy.request({
-                method: 'POST',
-                url: `${HostName}/workspaces/`,
-                headers: { 'x-jwt': `${value}` },
-                body: Workspaces[2]
-            });
+            for(let i = 0; i <= 2; i++) {
+                cy.request({
+                    method: 'POST',
+                    url: `${HostName}/workspaces/`,
+                    headers: { 'x-jwt': `${value}` },
+                    body: Workspaces[i]
+                }).its('body').should('have.property', 'name', Workspaces[i].name.trim());
+            }
         })
     })
 })
@@ -32,20 +19,20 @@ describe('Create Workspaces', () => {
 describe('Edit Mission', () => {
     it('passes', () => {
         cy.upsertlogin(User).then(value => {
-            //Create 3 Workspaces
-            cy.request({
-                method: 'POST',
-                url: `${HostName}/workspaces/mission`,
-                headers: { 'x-jwt': `${value}` },
-                body: {
-                    uuid: Workspaces[0].uuid,
-                    owner_pubkey: Workspaces[0].owner_pubkey,
-                    mission: 'This is a sample mission for workspace'
-                }
-            }).then((resp) => {
-                expect(resp.status).to.eq(200)
-            })
-
+            for(let i = 0; i <= 2; i++) {
+                cy.request({
+                    method: 'POST',
+                    url: `${HostName}/workspaces/mission`,
+                    headers: { 'x-jwt': `${value}` },
+                    body: {
+                        uuid: Workspaces[i].uuid,
+                        owner_pubkey: Workspaces[i].owner_pubkey,
+                        mission: Workspaces[i].mission + '_addedtext'
+                    }
+                }).then((resp) => {
+                    expect(resp.status).to.eq(200)
+                })
+            }
         })
     })
 })
@@ -53,20 +40,20 @@ describe('Edit Mission', () => {
 describe('Edit Tactics', () => {
     it('passes', () => {
         cy.upsertlogin(User).then(value => {
-            //Create 3 Workspaces
-            cy.request({
-                method: 'POST',
-                url: `${HostName}/workspaces/tactics`,
-                headers: { 'x-jwt': `${value}` },
-                body: {
-                    uuid: Workspaces[0].uuid,
-                    owner_pubkey: Workspaces[0].owner_pubkey,
-                    mission: 'This is a sample tactics and objectives for workspace'
-                }
-            }).then((resp) => {
-                expect(resp.status).to.eq(200)
-            })
-
+            for(let i = 0; i <= 2; i++) {
+                cy.request({
+                    method: 'POST',
+                    url: `${HostName}/workspaces/tactics`,
+                    headers: { 'x-jwt': `${value}` },
+                    body: {
+                        uuid: Workspaces[i].uuid,
+                        owner_pubkey: Workspaces[i].owner_pubkey,
+                        tactics: Workspaces[i].tactics + '_addedtext'
+                    }
+                }).then((resp) => {
+                    expect(resp.status).to.eq(200)
+                })
+            }
         })
     })
 })
@@ -74,20 +61,41 @@ describe('Edit Tactics', () => {
 describe('Edit Schematics Url', () => {
     it('passes', () => {
         cy.upsertlogin(User).then(value => {
-            //Create 3 Workspaces
-            cy.request({
-                method: 'POST',
-                url: `${HostName}/workspaces/schematicurl`,
-                headers: { 'x-jwt': `${value}` },
-                body: {
-                    uuid: Workspaces[0].uuid,
-                    owner_pubkey: Workspaces[0].owner_pubkey,
-                    mission: 'This is a sample schematic url for workspaces'
-                }
-            }).then((resp) => {
-                expect(resp.status).to.eq(200)
-            })
+            for(let i = 0; i <= 2; i++) {
+                cy.request({
+                    method: 'POST',
+                    url: `${HostName}/workspaces/schematicurl`,
+                    headers: { 'x-jwt': `${value}` },
+                    body: {
+                        uuid: Workspaces[i].uuid,
+                        owner_pubkey: Workspaces[i].owner_pubkey,
+                        schematic_url: Workspaces[i].schematic_url + '_addedtext'
+                    }
+                }).then((resp) => {
+                    expect(resp.status).to.eq(200)
+                })
+            }
+        })
+    })
+})
 
+
+describe('Check Workspace Values', () => {
+    it('passes', () => {
+        cy.upsertlogin(User).then(value => {
+            for(let i = 0; i <= 2; i++) {
+                cy.request({
+                    method: 'GET',
+                    url: `${HostName}/workspaces/` + Workspaces[i].uuid,
+                    headers: { 'x-jwt': `${ value }` },
+                    body: {} 
+                }).then((resp) => {
+                    expect(resp.status).to.eq(200)
+                    expect(resp.body).to.have.property('mission', Workspaces[i].mission.trim() + '_addedtext')
+                    expect(resp.body).to.have.property('tactics', Workspaces[i].tactics.trim() + '_addedtext')
+                    expect(resp.body).to.have.property('schematic_url', Workspaces[i].schematic_url.trim() + '_addedtext')
+                })
+            }
         })
     })
 })
