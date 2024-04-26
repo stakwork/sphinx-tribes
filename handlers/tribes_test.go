@@ -4,11 +4,12 @@ import (
 	"bytes"
 	"context"
 	"encoding/json"
-	"github.com/stakwork/sphinx-tribes/config"
 	"net/http"
 	"net/http/httptest"
 	"strings"
 	"testing"
+
+	"github.com/stakwork/sphinx-tribes/config"
 
 	"github.com/go-chi/chi"
 	"github.com/lib/pq"
@@ -636,8 +637,8 @@ func TestGenerateBudgetInvoice(t *testing.T) {
 
 	t.Run("Should mock a call to relay /invoices with the correct body", func(t *testing.T) {
 
-		mockDb.On("AddPaymentHistory", mock.AnythingOfType("db.PaymentHistory")).Return(db.PaymentHistory{}, nil)
-		mockDb.On("AddInvoice", mock.AnythingOfType("db.InvoiceList")).Return(db.InvoiceList{}, nil)
+		mockDb.On("AddPaymentHistory", mock.AnythingOfType("db.NewPaymentHistory")).Return(db.NewPaymentHistory{}, nil)
+		mockDb.On("AddInvoice", mock.AnythingOfType("db.NewInvoiceList")).Return(db.NewInvoiceList{}, nil)
 
 		ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 
@@ -672,8 +673,8 @@ func TestGenerateBudgetInvoice(t *testing.T) {
 
 		userAmount := float64(1000)
 
-		mockDb.On("AddPaymentHistory", mock.AnythingOfType("db.PaymentHistory")).Return(db.PaymentHistory{}, nil)
-		mockDb.On("AddInvoice", mock.AnythingOfType("db.InvoiceList")).Return(db.InvoiceList{}, nil)
+		mockDb.On("AddPaymentHistory", mock.AnythingOfType("db.NewPaymentHistory")).Return(db.NewPaymentHistory{}, nil)
+		mockDb.On("AddInvoice", mock.AnythingOfType("db.NewInvoiceList")).Return(db.NewInvoiceList{}, nil)
 
 		ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 			var body map[string]interface{}
@@ -703,11 +704,11 @@ func TestGenerateBudgetInvoice(t *testing.T) {
 	})
 
 	t.Run("Should add payments to the payment history and invoice to the invoice list upon successful relay call", func(t *testing.T) {
-		expectedPaymentHistory := db.PaymentHistory{Amount: userAmount}
-		expectedInvoice := db.InvoiceList{PaymentRequest: invoiceResponse.Response.Invoice}
+		expectedPaymentHistory := db.NewPaymentHistory{Amount: userAmount}
+		expectedInvoice := db.NewInvoiceList{PaymentRequest: invoiceResponse.Response.Invoice}
 
-		mockDb.On("AddPaymentHistory", mock.AnythingOfType("db.PaymentHistory")).Return(expectedPaymentHistory, nil)
-		mockDb.On("AddInvoice", mock.AnythingOfType("db.InvoiceList")).Return(expectedInvoice, nil)
+		mockDb.On("AddPaymentHistory", mock.AnythingOfType("db.NewPaymentHistory")).Return(expectedPaymentHistory, nil)
+		mockDb.On("AddInvoice", mock.AnythingOfType("db.NewInvoiceList")).Return(expectedInvoice, nil)
 
 		ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 			w.WriteHeader(http.StatusOK)
@@ -734,7 +735,7 @@ func TestGenerateBudgetInvoice(t *testing.T) {
 		assert.True(t, response.Succcess, "Invoice generation should be successful")
 		assert.Equal(t, "example_invoice", response.Response.Invoice, "The invoice in the response should match the mock")
 
-		mockDb.AssertCalled(t, "AddPaymentHistory", mock.AnythingOfType("db.PaymentHistory"))
-		mockDb.AssertCalled(t, "AddInvoice", mock.AnythingOfType("db.InvoiceList"))
+		mockDb.AssertCalled(t, "AddPaymentHistory", mock.AnythingOfType("db.NewPaymentHistory"))
+		mockDb.AssertCalled(t, "AddInvoice", mock.AnythingOfType("db.NewInvoiceList"))
 	})
 }

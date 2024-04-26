@@ -12,8 +12,8 @@ import (
 
 type database struct {
 	db                 *gorm.DB
-	getWorkspaceByUuid func(uuid string) Organization
-	getUserRoles       func(uuid string, pubkey string) []UserRoles
+	getWorkspaceByUuid func(uuid string) Workspace
+	getUserRoles       func(uuid string, pubkey string) []WorkspaceUserRoles
 }
 
 func NewDatabaseConfig(db *gorm.DB) *database {
@@ -65,16 +65,11 @@ func InitDB() {
 	db.AutoMigrate(&Channel{})
 	db.AutoMigrate(&LeaderBoard{})
 	db.AutoMigrate(&ConnectionCodes{})
-	db.AutoMigrate(&Bounty{})
-	db.AutoMigrate(&Organization{})
-	db.AutoMigrate(&OrganizationUsers{})
 	db.AutoMigrate(&BountyRoles{})
-	db.AutoMigrate(&UserRoles{})
-	db.AutoMigrate(&BountyBudget{})
-	db.AutoMigrate(&BudgetHistory{})
-	db.AutoMigrate(&PaymentHistory{})
-	db.AutoMigrate(&InvoiceList{})
 	db.AutoMigrate(&UserInvoiceData{})
+
+	DB.MigrateTablesWithOrgUuid()
+	DB.MigrateOrganizationToWorkspace()
 
 	people := DB.GetAllPeople()
 	for _, p := range people {
@@ -178,6 +173,102 @@ func (db database) GetRolesCount() int64 {
 	return count
 }
 
+func (db database) MigrateTablesWithOrgUuid() {
+	if !db.db.Migrator().HasTable("bounty") {
+		if !db.db.Migrator().HasColumn(Bounty{}, "workspace_uuid") {
+			db.db.AutoMigrate(&Bounty{})
+		}
+	}
+	if !db.db.Migrator().HasTable("budget_histories") {
+		if !db.db.Migrator().HasColumn(BudgetHistory{}, "workspace_uuid") {
+			db.db.AutoMigrate(&BudgetHistory{})
+		}
+	}
+	if !db.db.Migrator().HasTable("payment_histories") {
+		if !db.db.Migrator().HasColumn(PaymentHistory{}, "workspace_uuid") {
+			db.db.AutoMigrate(&PaymentHistory{})
+		}
+	}
+	if !db.db.Migrator().HasTable("invoice_list") {
+		if !db.db.Migrator().HasColumn(InvoiceList{}, "workspace_uuid") {
+			db.db.AutoMigrate(&InvoiceList{})
+		}
+	}
+	if !db.db.Migrator().HasTable("bounty_budgets") {
+		if !db.db.Migrator().HasColumn(BountyBudget{}, "workspace_uuid") {
+			db.db.AutoMigrate(&BountyBudget{})
+		}
+	}
+	if !db.db.Migrator().HasTable("workspace_user_roles") {
+		if !db.db.Migrator().HasColumn(UserRoles{}, "workspace_uuid") {
+			db.db.AutoMigrate(&UserRoles{})
+		}
+	} else {
+		db.db.AutoMigrate(&WorkspaceUserRoles{})
+	}
+	if !db.db.Migrator().HasTable("workspaces") {
+		db.db.AutoMigrate(&Organization{})
+	} else {
+		db.db.AutoMigrate(&Workspace{})
+	}
+	if !db.db.Migrator().HasTable("workspace_users") {
+		db.db.AutoMigrate(&OrganizationUsers{})
+	} else {
+		db.db.AutoMigrate(&WorkspaceUsers{})
+	}
+}
+
+func (db database) MigrateOrganizationToWorkspace() {
+	if (db.db.Migrator().HasTable(&Organization{}) && !db.db.Migrator().HasTable("workspaces")) {
+		db.db.Migrator().RenameTable(&Organization{}, "workspaces")
+	}
+
+	if (db.db.Migrator().HasTable(&OrganizationUsers{}) && !db.db.Migrator().HasTable("workspace_users")) {
+		if db.db.Migrator().HasColumn(&OrganizationUsers{}, "org_uuid") {
+			db.db.Migrator().RenameColumn(&OrganizationUsers{}, "org_uuid", "workspace_uuid")
+		}
+		db.db.Migrator().RenameTable(&OrganizationUsers{}, "workspace_users")
+	}
+
+	if (db.db.Migrator().HasTable(&UserRoles{}) && !db.db.Migrator().HasTable("workspace_user_roles")) {
+		if db.db.Migrator().HasColumn(&UserRoles{}, "org_uuid") {
+			db.db.Migrator().RenameColumn(&UserRoles{}, "org_uuid", "workspace_uuid")
+		}
+
+		db.db.Migrator().RenameTable(&UserRoles{}, "workspace_user_roles")
+	}
+
+	if (db.db.Migrator().HasTable(&Bounty{})) {
+		if db.db.Migrator().HasColumn(&Bounty{}, "org_uuid") {
+			db.db.Migrator().RenameColumn(&Bounty{}, "org_uuid", "workspace_uuid")
+		}
+	}
+
+	if (db.db.Migrator().HasTable(&BountyBudget{})) {
+		if db.db.Migrator().HasColumn(&BountyBudget{}, "org_uuid") {
+			db.db.Migrator().RenameColumn(&BountyBudget{}, "org_uuid", "workspace_uuid")
+		}
+	}
+
+	if (db.db.Migrator().HasTable(&BudgetHistory{})) {
+		if db.db.Migrator().HasColumn(&BudgetHistory{}, "org_uuid") {
+			db.db.Migrator().RenameColumn(&BudgetHistory{}, "org_uuid", "workspace_uuid")
+		}
+	}
+
+	if (db.db.Migrator().HasTable(&PaymentHistory{})) {
+		if db.db.Migrator().HasColumn(&PaymentHistory{}, "org_uuid") {
+			db.db.Migrator().RenameColumn(&PaymentHistory{}, "org_uuid", "workspace_uuid")
+		}
+	}
+
+	if (db.db.Migrator().HasTable(&InvoiceList{})) {
+		if db.db.Migrator().HasColumn(&InvoiceList{}, "org_uuid") {
+			db.db.Migrator().RenameColumn(&InvoiceList{}, "org_uuid", "workspace_uuid")
+		}
+	}
+}
+
 func (db database) CreateRoles() {
 	db.db.Create(&ConfigBountyRoles)
 }
@@ -205,7 +296,7 @@ func GetRolesMap() map[string]string {
 	return roles
 }
 
-func GetUserRolesMap(userRoles []UserRoles) map[string]string {
+func GetUserRolesMap(userRoles []WorkspaceUserRoles) map[string]string {
 	roles := map[string]string{}
 	for _, v := range userRoles {
 		roles[v.Role] = v.Role
@@ -235,7 +326,7 @@ func (db database) ConvertMetricsBountiesToMap(metricsCsv []MetricsBountyCsv) []
 	return metricsMap
 }
 
-func RolesCheck(userRoles []UserRoles, check string) bool {
+func RolesCheck(userRoles []WorkspaceUserRoles, check string) bool {
 	rolesMap := GetRolesMap()
 	userRolesMap := GetUserRolesMap(userRoles)
 
@@ -253,7 +344,7 @@ func RolesCheck(userRoles []UserRoles, check string) bool {
 	return true
 }
 
-func CheckUser(userRoles []UserRoles, pubkey string) bool {
+func CheckUser(userRoles []WorkspaceUserRoles, pubkey string) bool {
 	for _, role := range userRoles {
 		if role.OwnerPubKey == pubkey {
 			return true

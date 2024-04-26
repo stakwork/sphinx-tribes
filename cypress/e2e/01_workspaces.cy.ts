@@ -39,6 +39,7 @@ describe('Edit Mission', () => {
                 headers: { 'x-jwt': `${value}` },
                 body: {
                     uuid: Workspaces[0].uuid,
+                    owner_pubkey: Workspaces[0].owner_pubkey,
                     mission: 'This is a sample mission for workspace'
                 }
             }).then((resp) => {
@@ -59,6 +60,7 @@ describe('Edit Tactics', () => {
                 headers: { 'x-jwt': `${value}` },
                 body: {
                     uuid: Workspaces[0].uuid,
+                    owner_pubkey: Workspaces[0].owner_pubkey,
                     mission: 'This is a sample tactics and objectives for workspace'
                 }
             }).then((resp) => {
@@ -79,6 +81,7 @@ describe('Edit Schematics Url', () => {
                 headers: { 'x-jwt': `${value}` },
                 body: {
                     uuid: Workspaces[0].uuid,
+                    owner_pubkey: Workspaces[0].owner_pubkey,
                     mission: 'This is a sample schematic url for workspaces'
                 }
             }).then((resp) => {
