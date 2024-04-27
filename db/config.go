@@ -177,6 +177,8 @@ func (db database) MigrateTablesWithOrgUuid() {
 	if !db.db.Migrator().HasTable("bounty") {
 		if !db.db.Migrator().HasColumn(Bounty{}, "workspace_uuid") {
 			db.db.AutoMigrate(&Bounty{})
+		} else {
+			db.db.AutoMigrate(&NewBounty{})
 		}
 	}
 	if !db.db.Migrator().HasTable("budget_histories") {
@@ -187,28 +189,40 @@ func (db database) MigrateTablesWithOrgUuid() {
 	if !db.db.Migrator().HasTable("payment_histories") {
 		if !db.db.Migrator().HasColumn(PaymentHistory{}, "workspace_uuid") {
 			db.db.AutoMigrate(&PaymentHistory{})
+		} else {
+			db.db.AutoMigrate(&NewPaymentHistory{})
 		}
 	}
 	if !db.db.Migrator().HasTable("invoice_list") {
 		if !db.db.Migrator().HasColumn(InvoiceList{}, "workspace_uuid") {
 			db.db.AutoMigrate(&InvoiceList{})
+		} else {
+			db.db.AutoMigrate(&NewInvoiceList{})
 		}
 	}
 	if !db.db.Migrator().HasTable("bounty_budgets") {
 		if !db.db.Migrator().HasColumn(BountyBudget{}, "workspace_uuid") {
 			db.db.AutoMigrate(&BountyBudget{})
+		} else {
+			db.db.AutoMigrate(&NewBountyBudget{})
 		}
 	}
 	if !db.db.Migrator().HasTable("workspace_user_roles") {
 		if !db.db.Migrator().HasColumn(UserRoles{}, "workspace_uuid") {
 			db.db.AutoMigrate(&UserRoles{})
 		}
+	} else {
+		db.db.AutoMigrate(&WorkspaceUserRoles{})
 	}
 	if !db.db.Migrator().HasTable("workspaces") {
 		db.db.AutoMigrate(&Organization{})
+	} else {
+		db.db.AutoMigrate(&Workspace{})
 	}
 	if !db.db.Migrator().HasTable("workspace_users") {
 		db.db.AutoMigrate(&OrganizationUsers{})
+	} else {
+		db.db.AutoMigrate(&WorkspaceUsers{})
 	}
 }
 

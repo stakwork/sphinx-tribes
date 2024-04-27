@@ -581,15 +581,18 @@ type NewBountyBudget struct {
 }
 
 type StatusBudget struct {
-	OrgUuid         string `json:"org_uuid"`
-	WorkspaceUuid   string `json:"workspace_uuid"`
-	CurrentBudget   uint   `json:"current_budget"`
-	OpenBudget      uint   `json:"open_budget"`
-	OpenCount       int64  `json:"open_count"`
-	AssignedBudget  uint   `json:"assigned_budget"`
-	AssignedCount   int64  `json:"assigned_count"`
-	CompletedBudget uint   `json:"completed_budget"`
-	CompletedCount  int64  `json:"completed_count"`
+	OrgUuid             string `json:"org_uuid"`
+	WorkspaceUuid       string `json:"workspace_uuid"`
+	CurrentBudget       uint   `json:"current_budget"`
+	OpenBudget          uint   `json:"open_budget"`
+	OpenCount           int64  `json:"open_count"`
+	OpenDifference      int    `json:"open_difference"`
+	AssignedBudget      uint   `json:"assigned_budget"`
+	AssignedCount       int64  `json:"assigned_count"`
+	AssignedDifference  int    `json:"assigned_difference"`
+	CompletedBudget     uint   `json:"completed_budget"`
+	CompletedCount      int64  `json:"completed_count"`
+	CompletedDifference int    `json:"completed_difference"`
 }
 
 type BudgetInvoiceRequest struct {
