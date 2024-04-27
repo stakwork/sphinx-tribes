@@ -162,11 +162,15 @@ func (db database) GetWorkspaceStatusBudget(workspace_uuid string) StatusBudget 
 	var openCount int64
 	db.db.Model(&Bounty{}).Where("assignee = '' ").Where("paid != true").Count(&openCount)
 
+	var openDifference int = int(orgBudget.TotalBudget - openBudget)
+
 	var assignedBudget uint
 	db.db.Model(&Bounty{}).Where("assignee != '' ").Where("paid != true").Select("SUM(price)").Row().Scan(&assignedBudget)
 
 	var assignedCount int64
 	db.db.Model(&Bounty{}).Where("assignee != '' ").Where("paid != true").Count(&assignedCount)
+
+	var assignedDifference int = int(orgBudget.TotalBudget - assignedBudget)
 
 	var completedBudget uint
 	db.db.Model(&Bounty{}).Where("completed = true ").Where("paid != true").Select("SUM(price)").Row().Scan(&completedBudget)
@@ -174,16 +178,21 @@ func (db database) GetWorkspaceStatusBudget(workspace_uuid string) StatusBudget 
 	var completedCount int64
 	db.db.Model(&Bounty{}).Where("completed = true ").Where("paid != true").Count(&completedCount)
 
+	var completedDifference int = int(orgBudget.TotalBudget - completedBudget)
+
 	statusBudget := StatusBudget{
-		OrgUuid:         workspace_uuid,
-		WorkspaceUuid:   workspace_uuid,
-		CurrentBudget:   orgBudget.TotalBudget,
-		OpenBudget:      openBudget,
-		OpenCount:       openCount,
-		AssignedBudget:  assignedBudget,
-		AssignedCount:   assignedCount,
-		CompletedBudget: completedBudget,
-		CompletedCount:  completedCount,
+		OrgUuid:             workspace_uuid,
+		WorkspaceUuid:       workspace_uuid,
+		CurrentBudget:       orgBudget.TotalBudget,
+		OpenBudget:          openBudget,
+		OpenCount:           openCount,
+		OpenDifference:      openDifference,
+		AssignedBudget:      assignedBudget,
+		AssignedCount:       assignedCount,
+		AssignedDifference:  assignedDifference,
+		CompletedBudget:     completedBudget,
+		CompletedCount:      completedCount,
+		CompletedDifference: completedDifference,
 	}
 
 	return statusBudget
