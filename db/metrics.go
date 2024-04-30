@@ -155,7 +155,7 @@ func CalculateAverageDays(paidCount int64, paidSum uint) uint {
 	return 0
 }
 
-func (db database) GetBountiesByDateRange(r PaymentDateRange, re *http.Request) []Bounty {
+func (db database) GetBountiesByDateRange(r PaymentDateRange, re *http.Request) []NewBounty {
 	offset, limit, sortBy, direction, _ := utils.GetPaginationParams(re)
 	keys := re.URL.Query()
 	open := keys.Get("Open")
@@ -203,7 +203,7 @@ func (db database) GetBountiesByDateRange(r PaymentDateRange, re *http.Request) 
 	query := `SELECT * FROM public.bounty WHERE created >= '` + r.StartDate + `'  AND created <= '` + r.EndDate + `'` + providerCondition
 	allQuery := query + " " + statusQuery + " " + orderQuery + " " + limitQuery
 
-	b := []Bounty{}
+	b := []NewBounty{}
 	db.db.Raw(allQuery).Find(&b)
 	return b
 }

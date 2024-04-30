@@ -1775,19 +1775,19 @@ func (_c *Database_GetBotsByOwner_Call) RunAndReturn(run func(string) []db.Bot) 
 }
 
 // GetBountiesByDateRange provides a mock function with given fields: r, re
-func (_m *Database) GetBountiesByDateRange(r db.PaymentDateRange, re *http.Request) []db.Bounty {
+func (_m *Database) GetBountiesByDateRange(r db.PaymentDateRange, re *http.Request) []db.NewBounty {
 	ret := _m.Called(r, re)
 
 	if len(ret) == 0 {
 		panic("no return value specified for GetBountiesByDateRange")
 	}
 
-	var r0 []db.Bounty
-	if rf, ok := ret.Get(0).(func(db.PaymentDateRange, *http.Request) []db.Bounty); ok {
+	var r0 []db.NewBounty
+	if rf, ok := ret.Get(0).(func(db.PaymentDateRange, *http.Request) []db.NewBounty); ok {
 		r0 = rf(r, re)
 	} else {
 		if ret.Get(0) != nil {
-			r0 = ret.Get(0).([]db.Bounty)
+			r0 = ret.Get(0).([]db.NewBounty)
 		}
 	}
 
@@ -1813,12 +1813,12 @@ func (_c *Database_GetBountiesByDateRange_Call) Run(run func(r db.PaymentDateRan
 	return _c
 }
 
-func (_c *Database_GetBountiesByDateRange_Call) Return(_a0 []db.Bounty) *Database_GetBountiesByDateRange_Call {
+func (_c *Database_GetBountiesByDateRange_Call) Return(_a0 []db.NewBounty) *Database_GetBountiesByDateRange_Call {
 	_c.Call.Return(_a0)
 	return _c
 }
 
-func (_c *Database_GetBountiesByDateRange_Call) RunAndReturn(run func(db.PaymentDateRange, *http.Request) []db.Bounty) *Database_GetBountiesByDateRange_Call {
+func (_c *Database_GetBountiesByDateRange_Call) RunAndReturn(run func(db.PaymentDateRange, *http.Request) []db.NewBounty) *Database_GetBountiesByDateRange_Call {
 	_c.Call.Return(run)
 	return _c
 }
