@@ -53,7 +53,7 @@ describe('Modify brief for Feature', () => {
                         uuid: Features[i].uuid,
                         brief: Features[i].brief + "_addtext"
                     }
-                }).its('body').should('have.property', 'name', Features[i].name.trim())
+                }).its('body').should('have.property', 'name', Features[i].name.trim() + "_addtext")
                 .its('body').should('have.property', 'brief', Features[i].brief.trim() + "_addtext")
                 .its('body').should('have.property', 'requirements', Features[i].requirements.trim())
                 .its('body').should('have.property', 'architecture', Features[i].architecture.trim())
@@ -74,8 +74,8 @@ describe('Modify requirements for Feature', () => {
                         uuid: Features[i].uuid,
                         requirements: Features[i].requirements + "_addtext"
                     }
-                }).its('body').should('have.property', 'name', Features[i].name.trim())
-                .its('body').should('have.property', 'brief', Features[i].brief.trim())
+                }).its('body').should('have.property', 'name', Features[i].name.trim() + "_addtext")
+                .its('body').should('have.property', 'brief', Features[i].brief.trim() + "_addtext")
                 .its('body').should('have.property', 'requirements', Features[i].requirements.trim() + "_addtext")
                 .its('body').should('have.property', 'architecture', Features[i].architecture.trim())
             }
@@ -95,9 +95,9 @@ describe('Modify architecture for Feature', () => {
                         uuid: Features[i].uuid,
                         architecture: Features[i].architecture + "_addtext"
                     }
-                }).its('body').should('have.property', 'name', Features[i].name.trim())
-                .its('body').should('have.property', 'brief', Features[i].brief.trim())
-                .its('body').should('have.property', 'requirements', Features[i].requirements.trim())
+                }).its('body').should('have.property', 'name', Features[i].name.trim() + "_addtext")
+                .its('body').should('have.property', 'brief', Features[i].brief.trim() + "_addtext")
+                .its('body').should('have.property', 'requirements', Features[i].requirements.trim() + "_addtext")
                 .its('body').should('have.property', 'architecture', Features[i].architecture.trim() + "_addtext")
             }
         })
