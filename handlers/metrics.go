@@ -300,46 +300,50 @@ func MetricsCsv(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func (mh *metricHandler) GetMetricsBountiesData(metricBounties []db.Bounty) []db.BountyData {
+func (mh *metricHandler) GetMetricsBountiesData(metricBounties []db.NewBounty) []db.BountyData {
 	var metricBountiesData []db.BountyData
 	for _, bounty := range metricBounties {
 		bountyOwner := mh.db.GetPersonByPubkey(bounty.OwnerID)
 		bountyAssignee := mh.db.GetPersonByPubkey(bounty.Assignee)
-		organization := mh.db.GetWorkspaceByUuid(bounty.OrgUuid)
+		workspace := mh.db.GetWorkspaceByUuid(bounty.WorkspaceUuid)
 
 		bountyData := db.BountyData{
-			Bounty:               bounty,
-			BountyId:             bounty.ID,
-			Person:               bountyOwner,
-			BountyCreated:        bounty.Created,
-			BountyDescription:    bounty.Description,
-			BountyUpdated:        bounty.Updated,
-			AssigneeId:           bountyAssignee.ID,
-			AssigneeImg:          bountyAssignee.Img,
-			AssigneeAlias:        bountyAssignee.OwnerAlias,
-			AssigneeDescription:  bountyAssignee.Description,
-			AssigneeRouteHint:    bountyAssignee.OwnerRouteHint,
-			BountyOwnerId:        bountyOwner.ID,
-			OwnerUuid:            bountyOwner.Uuid,
-			OwnerDescription:     bountyOwner.Description,
-			OwnerUniqueName:      bountyOwner.UniqueName,
-			OwnerImg:             bountyOwner.Img,
-			OrganizationName:     organization.Name,
-			OrganizationImg:      organization.Img,
-			WorkspaceUuid:        organization.Uuid,
-			WorkspaceDescription: organization.Description,
+			Bounty:                  bounty,
+			BountyId:                bounty.ID,
+			Person:                  bountyOwner,
+			BountyCreated:           bounty.Created,
+			BountyDescription:       bounty.Description,
+			BountyUpdated:           bounty.Updated,
+			AssigneeId:              bountyAssignee.ID,
+			AssigneeImg:             bountyAssignee.Img,
+			AssigneeAlias:           bountyAssignee.OwnerAlias,
+			AssigneeDescription:     bountyAssignee.Description,
+			AssigneeRouteHint:       bountyAssignee.OwnerRouteHint,
+			BountyOwnerId:           bountyOwner.ID,
+			OwnerUuid:               bountyOwner.Uuid,
+			OwnerDescription:        bountyOwner.Description,
+			OwnerUniqueName:         bountyOwner.UniqueName,
+			OwnerImg:                bountyOwner.Img,
+			OrganizationName:        workspace.Name,
+			OrganizationImg:         workspace.Img,
+			OrganizationUuid:        workspace.Uuid,
+			OrganizationDescription: workspace.Description,
+			WorkspaceName:           workspace.Name,
+			WorkspaceImg:            workspace.Img,
+			WorkspaceUuid:           workspace.Uuid,
+			WorkspaceDescription:    workspace.Description,
 		}
 		metricBountiesData = append(metricBountiesData, bountyData)
 	}
 	return metricBountiesData
 }
 
-func getMetricsBountyCsv(metricBounties []db.Bounty) []db.MetricsBountyCsv {
+func getMetricsBountyCsv(metricBounties []db.NewBounty) []db.MetricsBountyCsv {
 	var metricBountiesCsv []db.MetricsBountyCsv
 	for _, bounty := range metricBounties {
 		bountyOwner := db.DB.GetPersonByPubkey(bounty.OwnerID)
 		bountyAssignee := db.DB.GetPersonByPubkey(bounty.Assignee)
-		organization := db.DB.GetWorkspaceByUuid(bounty.OrgUuid)
+		workspace := db.DB.GetWorkspaceByUuid(bounty.WorkspaceUuid)
 
 		bountyLink := fmt.Sprintf("https://community.sphinx.chat/bounty/%d", bounty.ID)
 		bountyStatus := "Open"
@@ -353,7 +357,7 @@ func getMetricsBountyCsv(metricBounties []db.Bounty) []db.MetricsBountyCsv {
 		tm := time.Unix(bounty.Created, 0)
 		bountyCsv := db.MetricsBountyCsv{
 			DatePosted:   &tm,
-			Organization: organization.Name,
+			Organization: workspace.Name,
 			BountyAmount: bounty.Price,
 			Provider:     bountyOwner.OwnerAlias,
 			Hunter:       bountyAssignee.OwnerAlias,
