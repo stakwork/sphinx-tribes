@@ -308,7 +308,7 @@ func (mh *metricHandler) GetMetricsBountiesData(metricBounties []db.NewBounty) [
 		workspace := mh.db.GetWorkspaceByUuid(bounty.WorkspaceUuid)
 
 		bountyData := db.BountyData{
-			Bounty:                  bounty,
+			NewBounty:               bounty,
 			BountyId:                bounty.ID,
 			Person:                  bountyOwner,
 			BountyCreated:           bounty.Created,

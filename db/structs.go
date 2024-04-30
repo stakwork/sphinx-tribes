@@ -429,7 +429,7 @@ type BountyOwners struct {
 }
 
 type BountyData struct {
-	Bounty            NewBounty
+	NewBounty
 	BountyId          uint       `json:"bounty_id"`
 	BountyCreated     int64      `json:"bounty_created"`
 	BountyUpdated     *time.Time `json:"bounty_updated"`

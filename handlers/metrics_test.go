@@ -169,9 +169,9 @@ func TestMetricsBounties(t *testing.T) {
 
 		assert.Equal(t, http.StatusOK, rr.Code)
 		assert.Equal(t, res[0].BountyId, uint(1))
-		assert.Equal(t, res[0].Bounty.OwnerID, "owner-1")
-		assert.Equal(t, res[0].Bounty.Price, uint(100))
-		assert.Equal(t, res[0].Bounty.Title, "bounty 1")
+		assert.Equal(t, res[0].OwnerID, "owner-1")
+		assert.Equal(t, res[0].Price, uint(100))
+		assert.Equal(t, res[0].Title, "bounty 1")
 		assert.Equal(t, res[0].BountyDescription, "test bounty")
 		assert.Equal(t, res[0].BountyCreated, int64(1112))
 	})
@@ -230,7 +230,7 @@ func TestMetricsBounties(t *testing.T) {
 
 		// Assert that the response contains bounties only from the selected providers
 		for _, bounty := range res {
-			assert.Contains(t, []string{"provider1", "provider2"}, bounty.Bounty.OwnerID)
+			assert.Contains(t, []string{"provider1", "provider2"}, bounty.OwnerID)
 		}
 	})
 }
