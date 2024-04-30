@@ -133,7 +133,7 @@ type Database interface {
 	NewHuntersPaid(r PaymentDateRange) int64
 	TotalHuntersPaid(r PaymentDateRange) int64
 	GetPersonByPubkey(pubkey string) Person
-	GetBountiesByDateRange(r PaymentDateRange, re *http.Request) []Bounty
+	GetBountiesByDateRange(r PaymentDateRange, re *http.Request) []NewBounty
 	GetBountiesByDateRangeCount(r PaymentDateRange, re *http.Request) int64
 	GetBountiesProviders(r PaymentDateRange, re *http.Request) []Person
 	PersonUniqueNameFromName(name string) (string, error)

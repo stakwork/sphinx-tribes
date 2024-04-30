@@ -148,7 +148,7 @@ func TestMetricsBounties(t *testing.T) {
 			t.Fatal(err)
 		}
 
-		bounties := []db.Bounty{
+		bounties := []db.NewBounty{
 			{
 				ID:          1,
 				OwnerID:     "owner-1",
@@ -194,7 +194,7 @@ func TestMetricsBounties(t *testing.T) {
 		req.URL.RawQuery = "provider=provider1,provider2"
 
 		// Mock bounties data for multiple providers
-		bounties := []db.Bounty{
+		bounties := []db.NewBounty{
 			{
 				ID:          1,
 				OwnerID:     "provider1",
