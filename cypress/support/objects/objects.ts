@@ -57,34 +57,42 @@ export const Workspaces = [
 
 export const Repositories = [
     {
-        name: 'frontend',
-        url: 'https://github.com/stakwork/sphinx-tribes-frontend'
+        uuid: 'com1t3gn1e4a4qu3tnlg',
+        workspace_uuid: 'cohob00n1e4808utqel0',
+        name: ' frontend ',
+        url: ' https://github.com/stakwork/sphinx-tribes-frontend '
     },
     {
-        name: 'backend',
-        url: 'https://github.com/stakwork/sphinx-tribes'
+        uuid: 'com1t3gn1e4a4qu3tnlg',
+        workspace_uuid: 'cohob00n1e4808utqel0',
+        name: ' backend ',
+        url: ' https://github.com/stakwork/sphinx-tribes '
     }
 ];
 
 export const Features = [
     {
+        uuid: 'com1kson1e49th88dbg0',
+        workspace_uuid: 'cohob00n1e4808utqel0',
         name: 'Hive Process',
         priority: 1,
-        brief: 'To follow a set of best practices in product development.</br>' +
+        brief: ' To follow a set of best practices in product development.</br>' +
             'Dividing complex features into small<br>steps makes it easier to ' +
             'track and the timing more certain.<br/>A guided process would help ' +
             'a PM new to the hive process get the best results with the least mental ' +
             'load.<br/>This feature is for a not se technical Product Manager.<br/>' +
-            'The hive process lets you get features out to production faster and with less risk.',
-        requirements: 'Modify workspaces endpoint to accomodate new fields.<br/>' +
-            'Create end points for features, user stories and phases',
-        architecture: 'Describe the architecture of the feature with the following sections:' +
+            'The hive process lets you get features out to production faster and with less risk. ',
+        requirements: ' Modify workspaces endpoint to accomodate new fields.<br/>' +
+            'Create end points for features, user stories and phases ',
+        architecture: ' Describe the architecture of the feature with the following sections:' +
             '<br/><br/>Wireframes<br/><br/>Visual Schematics<br/><br/>Object Definition<br/><br/>' +
             'DB Schema Changes<br/><br/>UX<br/><br/>CI/CD<br/><br/>Changes<br/><br/>Endpoints<br/><br/>' +
-            'Front<br/><br/>',
+            'Front<br/><br/> ',
     },
     {
-        name: 'AI Assited text fields',
+        uuid: 'com1l5on1e49tucv350g',
+        workspace_uuid: 'cohob00n1e4808utqel0',
+        name: ' AI Assited text fields ',
         priority: 2,
         brief: 'An important struggle of a technical product manager is to find ' +
             'the right words to describe a business goal. The definition of ' +
@@ -93,18 +101,20 @@ export const Features = [
             'We are going to leverage AI to help the PM write better definitions.<br/>' +
             'The fields that would benefit form AI assistance are: mission, tactics, ' +
             'feature brief and feature user stories',
-        requirements: 'Create a new page for a conversation format between the PM and the LLM<br/>' +
+        requirements: ' Create a new page for a conversation format between the PM and the LLM<br/>' +
             'Rely as much as possible on stakwork workflows<br/>' +
-            'Have history of previous definitions',
-        architecture: 'Describe the architecture of the feature with the following sections:' +
+            'Have history of previous definitions ',
+        architecture: ' Describe the architecture of the feature with the following sections:' +
             '<br/><br/>Wireframes<br/><br/>Visual Schematics<br/><br/>Object Definition<br/><br/>' +
             'DB Schema Changes<br/><br/>UX<br/><br/>CI/CD<br/><br/>Changes<br/><br/>Endpoints<br/><br/>' +
-            'Front<br/><br/>',
+            'Front<br/><br/> ',
     },
     {
-        name: 'AI Assited relation between text fields',
+        uuid: 'com1l5on1e49tucv350g',
+        workspace_uuid: 'cohob00n1e4808utqel0',
+        name: ' AI Assited relation between text fields ',
         priority: 2,
-        brief: 'A product and feature\'s various definition fields: mission, tactics, ' +
+        brief: ' A product and feature\'s various definition fields: mission, tactics, ' +
             'feature brief, user stories, requirements and architecture should have some ' +
             'relation between each other.<br/>' + 'One way to do that is to leverage an LLM ' +
             'to discern the parts of the defintion that have a connection to other definitions.<br/>' +
@@ -114,21 +124,21 @@ export const Features = [
         architecture: 'Describe the architecture of the feature with the following sections:' +
             '<br/><br/>Wireframes<br/><br/>Visual Schematics<br/><br/>Object Definition<br/><br/>' +
             'DB Schema Changes<br/><br/>UX<br/><br/>CI/CD<br/><br/>Changes<br/><br/>Endpoints<br/><br/>' +
-            'Front<br/><br/>',
+            'Front<br/><br/> ',
     },
 ];
 
 export const UserStories = [
-    { id: 'f4c4c4b4-7a90-4a3a-b3e2-151d0feca9bf', description: ' As a {PM} I want to {make providers \"hive ready\"}, so I can {leverage the hive process ' },
-    { id: '78f4b326-1841-449b-809a-a0947622db3e', description: ' As a {PM} I want to {CRUD Features}, so I can {use the system to manage my features} ' },
-    { id: '5d353d23-3d27-4aa8-a9f7-04dcd5f4843c', description: ' As a {PM} I want to {follow best practices}, so I can {make more valuable features} ' },
-    { id: '1a4e00f4-0e58-4e08-a1df-b623bc10f08d', description: ' As a {PM} I want to {save the architecture of the feature}, so I can {share it with people} ' },
-    { id: 'eb6e4138-37e5-465d-934e-18e335abaa47', description: ' As a {PM} I want to {create phases}, so I can {divide the work in several deliverable stages} ' },
-    { id: '35a5d8dd-240d-4ff0-a699-aa2fa2cfa32c', description: ' As a {PM} I want to {assign bounties to features}, so I can {group bounties together} ' },
+    { uuid: 'com1lh0n1e49ug76noig', feature_uuid: 'com1kson1e49th88dbg0', description: ' As a {PM} I want to {make providers \"hive ready\"}, so I can {leverage the hive process ' },
+    { uuid: 'com1lk8n1e49uqfe3l40', feature_uuid: 'com1kson1e49th88dbg0', description: ' As a {PM} I want to {CRUD Features}, so I can {use the system to manage my features} ' },
+    { uuid: 'com1ln8n1e49v4159gug', feature_uuid: 'com1kson1e49th88dbg0', description: ' As a {PM} I want to {follow best practices}, so I can {make more valuable features} ' },
+    { uuid: 'com1lqgn1e49vevhs9k0', feature_uuid: 'com1kson1e49th88dbg0', description: ' As a {PM} I want to {save the architecture of the feature}, so I can {share it with people} ' },
+    { uuid: 'com1lt8n1e49voquoq90', feature_uuid: 'com1kson1e49th88dbg0', description: ' As a {PM} I want to {create phases}, so I can {divide the work in several deliverable stages} ' },
+    { uuid: 'com1m08n1e4a02r6j0pg', feature_uuid: 'com1kson1e49th88dbg0', description: ' As a {PM} I want to {assign bounties to features}, so I can {group bounties together} ' },
 ];
 
 export const Phases = [
-    { id: 'a96e3bff-e5c8-429e-bd65-911d619761aa', name: ' MVP ' },
-    { id: '6de147ab-695c-45b1-81e7-2d1a5ba482ab', name: ' MVP ' },
-    { id: '28541c4a-41de-447e-86d8-293583d1abc2', name: ' MVP ' },
+    { uuid: 'com1msgn1e4a0ts5kls0', feature_uuid: 'com1kson1e49th88dbg0', name: ' MVP ' },
+    { uuid: 'com1mvgn1e4a1879uiv0', feature_uuid: 'com1kson1e49th88dbg0', name: ' Phase 2 ' },
+    { uuid: 'com1n2gn1e4a1i8p60p0', feature_uuid: 'com1kson1e49th88dbg0', name: ' Phase 3 ' },
 ];
