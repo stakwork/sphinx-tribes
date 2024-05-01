@@ -17,6 +17,12 @@ func PersonRoutes() chi.Router {
 		r.Get("/uuid/{uuid}/assets", handlers.GetPersonAssetsByUuid)
 		r.Get("/githubname/{github}", handlers.GetPersonByGithubName)
 	})
+
+	r.Group(func(r chi.Router) {
+		r.Use(auth.CypressContext)
+		r.Post("/upsertlogin", peopleHandler.UpsertLogin)
+	})
+
 	r.Group(func(r chi.Router) {
 		r.Use(auth.PubKeyContext)
 

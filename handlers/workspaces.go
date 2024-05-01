@@ -111,32 +111,34 @@ func (oh *workspaceHandler) CreateOrEditWorkspace(w http.ResponseWriter, r *http
 
 		name := workspace.Name
 
-		// check if the workspace name already exists
-		orgName := oh.db.GetWorkspaceByName(name)
+		// check if the organization name already exists
+		workspace_same_name := oh.db.GetWorkspaceByName(name)
 
-		if orgName.Name == name {
+		if workspace_same_name.Name == name && workspace_same_name.Uuid != workspace.Uuid {
 			w.WriteHeader(http.StatusUnauthorized)
-			json.NewEncoder(w).Encode("Workspace name already exists")
+			json.NewEncoder(w).Encode("Workspace name already exists - " + name + " " + workspace.Uuid + " | " + workspace_same_name.Uuid)
 			return
 		} else {
 			workspace.Created = &now
 			workspace.Updated = &now
-			workspace.Uuid = xid.New().String()
+			if len(workspace.Uuid) == 0 {
+				workspace.Uuid = xid.New().String()
+			}
 			workspace.Name = name
 		}
 	} else {
-		if workspace.ID == 0 {
-			// can't create that already exists
-			fmt.Println("can't create existing workspace")
-			w.WriteHeader(http.StatusUnauthorized)
-			return
-		}
+		// if workspace.ID == 0 {
+		// 	// can't create that already exists
+		// 	fmt.Println("can't create existing organization")
+		// 	w.WriteHeader(http.StatusUnauthorized)
+		// 	return
+		// }
 
-		if workspace.ID != existing.ID { // can't edit someone else's
-			fmt.Println("cant edit another workspace")
-			w.WriteHeader(http.StatusUnauthorized)
-			return
-		}
+		// if workspace.ID != existing.ID { // can't edit someone else's
+		// 	fmt.Println("cant edit another organization")
+		// 	w.WriteHeader(http.StatusUnauthorized)
+		// 	return
+		// }
 	}
 
 	p, err := oh.db.CreateOrEditWorkspace(workspace)
@@ -741,4 +743,55 @@ func (oh *workspaceHandler) DeleteWorkspace(w http.ResponseWriter, r *http.Reque
 	workspace = oh.db.ChangeWorkspaceDeleteStatus(uuid, true)
 	w.WriteHeader(http.StatusOK)
 	json.NewEncoder(w).Encode(workspace)
+}
+
+func (oh *workspaceHandler) UpdateWorkspace(w http.ResponseWriter, r *http.Request) {
+	ctx := r.Context()
+	pubKeyFromAuth, _ := ctx.Value(auth.ContextKey).(string)
+	if pubKeyFromAuth == "" {
+		fmt.Println("no pubkey from auth")
+		w.WriteHeader(http.StatusUnauthorized)
+		return
+	}
+
+	workspace := db.Workspace{}
+	body, _ := io.ReadAll(r.Body)
+	r.Body.Close()
+	err := json.Unmarshal(body, &workspace)
+
+	if err != nil {
+		fmt.Println(err)
+		w.WriteHeader(http.StatusNotAcceptable)
+		return
+	}
+
+	if pubKeyFromAuth != workspace.OwnerPubKey {
+		hasRole := db.UserHasAccess(pubKeyFromAuth, workspace.Uuid, db.EditOrg)
+		if !hasRole {
+			fmt.Println(pubKeyFromAuth)
+			fmt.Println(workspace.OwnerPubKey)
+			fmt.Println("mismatched pubkey")
+			w.WriteHeader(http.StatusUnauthorized)
+			json.NewEncoder(w).Encode("Don't have access to Edit workspace")
+			return
+		}
+	}
+
+	// Validate struct data
+	err = db.Validate.Struct(workspace)
+	if err != nil {
+		w.WriteHeader(http.StatusBadRequest)
+		msg := fmt.Sprintf("Error: did not pass validation test : %s", err)
+		json.NewEncoder(w).Encode(msg)
+		return
+	}
+
+	p, err := oh.db.CreateOrEditWorkspace(workspace)
+	if err != nil {
+		w.WriteHeader(http.StatusBadRequest)
+		return
+	}
+
+	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode(p)
 }
