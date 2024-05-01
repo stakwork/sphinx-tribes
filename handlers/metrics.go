@@ -33,6 +33,8 @@ func NewMetricHandler(db db.Database) *metricHandler {
 func PaymentMetrics(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 	pubKeyFromAuth, _ := ctx.Value(auth.ContextKey).(string)
+	keys := r.URL.Query()
+	workspace := keys.Get("workspace")
 
 	if pubKeyFromAuth == "" {
 		fmt.Println("no pubkey from auth")
@@ -51,7 +53,7 @@ func PaymentMetrics(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	sumAmount := db.DB.TotalPaymentsByDateRange(request)
+	sumAmount := db.DB.TotalPaymentsByDateRange(request, workspace)
 
 	w.WriteHeader(http.StatusOK)
 	json.NewEncoder(w).Encode(sumAmount)
@@ -114,6 +116,8 @@ func PeopleMetrics(w http.ResponseWriter, r *http.Request) {
 func (mh *metricHandler) BountyMetrics(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 	pubKeyFromAuth, _ := ctx.Value(auth.ContextKey).(string)
+	keys := r.URL.Query()
+	workspace := keys.Get("workspace")
 
 	if pubKeyFromAuth == "" {
 		fmt.Println("no pubkey from auth")
@@ -146,16 +150,16 @@ func (mh *metricHandler) BountyMetrics(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
-	totalBountiesPosted := mh.db.TotalBountiesPosted(request)
-	totalBountiesPaid := mh.db.TotalPaidBounties(request)
-	bountiesPaidPercentage := mh.db.BountiesPaidPercentage(request)
-	totalSatsPosted := mh.db.TotalSatsPosted(request)
-	totalSatsPaid := mh.db.TotalSatsPaid(request)
-	satsPaidPercentage := mh.db.SatsPaidPercentage(request)
-	avgPaidDays := mh.db.AveragePaidTime(request)
-	avgCompletedDays := mh.db.AverageCompletedTime(request)
-	uniqueHuntersPaid := mh.db.TotalHuntersPaid(request)
-	newHuntersPaid := mh.db.NewHuntersPaid(request)
+	totalBountiesPosted := mh.db.TotalBountiesPosted(request, workspace)
+	totalBountiesPaid := mh.db.TotalPaidBounties(request, workspace)
+	bountiesPaidPercentage := mh.db.BountiesPaidPercentage(request, workspace)
+	totalSatsPosted := mh.db.TotalSatsPosted(request, workspace)
+	totalSatsPaid := mh.db.TotalSatsPaid(request, workspace)
+	satsPaidPercentage := mh.db.SatsPaidPercentage(request, workspace)
+	avgPaidDays := mh.db.AveragePaidTime(request, workspace)
+	avgCompletedDays := mh.db.AverageCompletedTime(request, workspace)
+	uniqueHuntersPaid := mh.db.TotalHuntersPaid(request, workspace)
+	newHuntersPaid := mh.db.NewHuntersPaid(request, workspace)
 
 	bountyMetrics := db.BountyMetrics{
 		BountiesPosted:         totalBountiesPosted,

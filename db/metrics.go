@@ -23,27 +23,45 @@ func (db database) TotalWorkspacesByDateRange(r PaymentDateRange) int64 {
 	return count
 }
 
-func (db database) TotalPaymentsByDateRange(r PaymentDateRange) uint {
+func (db database) TotalPaymentsByDateRange(r PaymentDateRange, workspace string) uint {
 	var sum uint
-	db.db.Model(&PaymentHistory{}).Where("payment_type = ?", r.PaymentType).Where("created >= ?", r.StartDate).Where("created <= ?", r.EndDate).Select("SUM(amount)").Row().Scan(&sum)
+	query := db.db.Model(&NewPaymentHistory{}).Where("payment_type = ?", r.PaymentType).Where("created >= ?", r.StartDate).Where("created <= ?", r.EndDate)
+
+	if workspace != "" {
+		query.Where("workspace_uuid", workspace)
+	}
+
+	query.Select("SUM(amount)").Row().Scan(&sum)
 	return sum
 }
 
-func (db database) TotalSatsPosted(r PaymentDateRange) uint {
+func (db database) TotalSatsPosted(r PaymentDateRange, workspace string) uint {
 	var sum uint
-	db.db.Model(&Bounty{}).Where("created >= ?", r.StartDate).Where("created <= ?", r.EndDate).Select("SUM(price)").Row().Scan(&sum)
+	query := db.db.Model(&NewBounty{}).Where("created >= ?", r.StartDate).Where("created <= ?", r.EndDate)
+
+	if workspace != "" {
+		query.Where("workspace_uuid", workspace)
+	}
+
+	query.Select("SUM(price)").Row().Scan(&sum)
 	return sum
 }
 
-func (db database) TotalSatsPaid(r PaymentDateRange) uint {
+func (db database) TotalSatsPaid(r PaymentDateRange, workspace string) uint {
 	var sum uint
-	db.db.Model(&Bounty{}).Where("paid = ?", true).Where("created >= ?", r.StartDate).Where("created <= ?", r.EndDate).Select("SUM(price)").Row().Scan(&sum)
+	query := db.db.Model(&NewBounty{}).Where("paid = ?", true).Where("created >= ?", r.StartDate).Where("created <= ?", r.EndDate)
+
+	if workspace != "" {
+		query.Where("workspace_uuid", workspace)
+	}
+
+	query.Select("SUM(price)").Row().Scan(&sum)
 	return sum
 }
 
-func (db database) SatsPaidPercentage(r PaymentDateRange) uint {
-	satsPosted := DB.TotalSatsPosted(r)
-	satsPaid := DB.TotalSatsPaid(r)
+func (db database) SatsPaidPercentage(r PaymentDateRange, workspace string) uint {
+	satsPosted := DB.TotalSatsPosted(r, workspace)
+	satsPaid := DB.TotalSatsPaid(r, workspace)
 	if satsPaid != 0 && satsPosted != 0 {
 		value := (satsPaid * 100) / satsPosted
 		paidPercentage := math.Round(float64(value))
@@ -52,43 +70,69 @@ func (db database) SatsPaidPercentage(r PaymentDateRange) uint {
 	return 0
 }
 
-func (db database) TotalPaidBounties(r PaymentDateRange) int64 {
+func (db database) TotalPaidBounties(r PaymentDateRange, workspace string) int64 {
 	var count int64
-	db.db.Model(&Bounty{}).Where("paid = ?", true).Where("created >= ?", r.StartDate).Where("created <= ?", r.EndDate).Count(&count)
+	query := db.db.Model(&NewBounty{}).Where("paid = ?", true).Where("created >= ?", r.StartDate).Where("created <= ?", r.EndDate)
+
+	if workspace != "" {
+		query.Where("workspace_uuid", workspace)
+	}
+
+	query.Count(&count)
 	return count
 }
 
-func (db database) TotalHuntersPaid(r PaymentDateRange) int64 {
+func (db database) TotalHuntersPaid(r PaymentDateRange, workspace string) int64 {
 	var count int64
 	query := fmt.Sprintf(`SELECT COUNT(DISTINCT assignee) FROM bounty WHERE assignee !='' AND paid=true AND created >= %s AND created <= %s`, r.StartDate, r.EndDate)
 
-	db.db.Raw(query).Count(&count)
+	var workspaceQuery string
+	if workspace != "" {
+		workspaceQuery = fmt.Sprintf("AND workspace_uuid = %s", workspace)
+	}
+
+	allQuery := query + " " + workspaceQuery
+	db.db.Raw(allQuery).Count(&count)
 	return count
 }
 
-func (db database) NewHuntersPaid(r PaymentDateRange) int64 {
+func (db database) NewHuntersPaid(r PaymentDateRange, workspace string) int64 {
 	var count int64
-	db.db.Model(&Bounty{}).
+
+	query := db.db.Model(&NewBounty{}).
 		Select("DISTINCT assignee").
 		Where("paid = true").
-		Where("created >= ?", r.StartDate).Where("created <= ?", r.EndDate).
-		Not("assignee IN (?)", db.db.Model(&Bounty{}).
-			Select("assignee").
-			Where("paid = true").
-			Where("created < ?", r.StartDate),
-		).Count(&count)
+		Where("created >= ?", r.StartDate).Where("created <= ?", r.EndDate)
+
+	if workspace != "" {
+		query.Where("workspace_uuid", workspace)
+	}
+
+	query.Not("assignee IN (?)", db.db.Model(&NewBounty{}).
+		Select("assignee").
+		Where("paid = true").
+		Where("created < ?", r.StartDate),
+	)
+
+	query.Count(&count)
 	return count
 }
 
-func (db database) TotalBountiesPosted(r PaymentDateRange) int64 {
+func (db database) TotalBountiesPosted(r PaymentDateRange, workspace string) int64 {
 	var count int64
-	db.db.Model(&Bounty{}).Where("created >= ?", r.StartDate).Where("created <= ?", r.EndDate).Count(&count)
+	query := db.db.Model(&Bounty{}).Where("created >= ?", r.StartDate).Where("created <= ?", r.EndDate)
+
+	if workspace != "" {
+		query.Where("workspace_uuid", workspace)
+	}
+
+	query.Count(&count)
 	return count
 }
 
-func (db database) BountiesPaidPercentage(r PaymentDateRange) uint {
-	bountiesPosted := DB.TotalBountiesPosted(r)
-	bountiesPaid := DB.TotalPaidBounties(r)
+func (db database) BountiesPaidPercentage(r PaymentDateRange, workspace string) uint {
+	bountiesPosted := DB.TotalBountiesPosted(r, workspace)
+	bountiesPaid := DB.TotalPaidBounties(r, workspace)
 	if bountiesPaid != 0 && bountiesPosted != 0 {
 		value := bountiesPaid * 100 / bountiesPosted
 		paidPercentage := math.Round(float64(value))
@@ -97,23 +141,31 @@ func (db database) BountiesPaidPercentage(r PaymentDateRange) uint {
 	return 0
 }
 
-func (db database) PaidDifference(r PaymentDateRange) []DateDifference {
+func (db database) PaidDifference(r PaymentDateRange, workspace string) []DateDifference {
 	ms := []DateDifference{}
 
-	db.db.Raw(`SELECT EXTRACT(EPOCH FROM (paid_date - TO_TIMESTAMP(created))) as diff FROM public.bounty WHERE paid_date IS NOT NULL AND created >= '` + r.StartDate + `' AND created <= '` + r.EndDate + `' `).Find(&ms)
+	query := fmt.Sprintf("SELECT EXTRACT(EPOCH FROM (paid_date - TO_TIMESTAMP(created))) as diff FROM public.bounty WHERE paid_date IS NOT NULL AND created >= %s AND created <= %s", "`"+r.StartDate+"`", "`"+r.EndDate+"`")
+
+	var workspaceQuery string
+	if workspace != "" {
+		workspaceQuery = fmt.Sprintf("AND workspace_uuid = %s", workspace)
+	}
+
+	allQuery := query + " " + workspaceQuery
+	db.db.Raw(allQuery).Find(&ms)
 	return ms
 }
 
-func (db database) PaidDifferenceCount(r PaymentDateRange) int64 {
+func (db database) PaidDifferenceCount(r PaymentDateRange, workspace string) int64 {
 	var count int64
-	list := db.PaidDifference(r)
+	list := db.PaidDifference(r, workspace)
 	count = int64(len(list))
 	return count
 }
 
-func (db database) AveragePaidTime(r PaymentDateRange) uint {
-	paidList := DB.PaidDifference(r)
-	paidCount := DB.PaidDifferenceCount(r)
+func (db database) AveragePaidTime(r PaymentDateRange, workspace string) uint {
+	paidList := DB.PaidDifference(r, workspace)
+	paidCount := DB.PaidDifferenceCount(r, workspace)
 	var paidSum uint
 	for _, diff := range paidList {
 		paidSum = uint(math.Round(diff.Diff))
@@ -121,23 +173,31 @@ func (db database) AveragePaidTime(r PaymentDateRange) uint {
 	return CalculateAverageDays(paidCount, paidSum)
 }
 
-func (db database) CompletedDifference(r PaymentDateRange) []DateDifference {
+func (db database) CompletedDifference(r PaymentDateRange, workspace string) []DateDifference {
 	ms := []DateDifference{}
 
-	db.db.Raw(`SELECT EXTRACT(EPOCH FROM (completion_date - TO_TIMESTAMP(created))) as diff FROM public.bounty WHERE completion_date IS NOT NULL AND created >= '` + r.StartDate + `' AND created <= '` + r.EndDate + `' `).Find(&ms)
+	query := fmt.Sprintf("SELECT EXTRACT(EPOCH FROM (completion_date - TO_TIMESTAMP(created))) as diff FROM public.bounty WHERE completion_date IS NOT NULL AND created >= %s AND created <= %s ", "`"+r.StartDate+"`", "`"+r.EndDate+"`")
+
+	var workspaceQuery string
+	if workspace != "" {
+		workspaceQuery = fmt.Sprintf("AND workspace_uuid = %s", workspace)
+	}
+
+	allQuery := query + " " + workspaceQuery
+	db.db.Raw(allQuery).Find(&ms)
 	return ms
 }
 
-func (db database) CompletedDifferenceCount(r PaymentDateRange) int64 {
+func (db database) CompletedDifferenceCount(r PaymentDateRange, workspace string) int64 {
 	var count int64
-	list := db.CompletedDifference(r)
+	list := db.CompletedDifference(r, workspace)
 	count = int64(len(list))
 	return count
 }
 
-func (db database) AverageCompletedTime(r PaymentDateRange) uint {
-	paidList := DB.CompletedDifference(r)
-	paidCount := DB.CompletedDifferenceCount(r)
+func (db database) AverageCompletedTime(r PaymentDateRange, workspace string) uint {
+	paidList := DB.CompletedDifference(r, workspace)
+	paidCount := DB.CompletedDifferenceCount(r, workspace)
 	var paidSum uint
 	for _, diff := range paidList {
 		paidSum = uint(math.Round(diff.Diff))
@@ -162,7 +222,7 @@ func (db database) GetBountiesByDateRange(r PaymentDateRange, re *http.Request) 
 	assingned := keys.Get("Assigned")
 	paid := keys.Get("Paid")
 	providers := keys.Get("provider")
-	workspace := keys.Get("workspace_uuid")
+	workspace := keys.Get("workspace")
 
 	orderQuery := ""
 	limitQuery := ""
@@ -219,7 +279,7 @@ func (db database) GetBountiesByDateRangeCount(r PaymentDateRange, re *http.Requ
 	assingned := keys.Get("Assigned")
 	paid := keys.Get("Paid")
 	providers := keys.Get("provider")
-	workspace := keys.Get("workspace_uuid")
+	workspace := keys.Get("workspace")
 
 	var statusConditions []string
 

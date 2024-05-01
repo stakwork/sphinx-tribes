@@ -58,25 +58,27 @@ func TestBountyMetrics(t *testing.T) {
 		db.RedisError = errors.New("redis not initialized")
 		rr := httptest.NewRecorder()
 		handler := http.HandlerFunc(mh.BountyMetrics)
+		workspace := "test-workspace"
+
 		dateRange := db.PaymentDateRange{
 			StartDate: "1111",
 			EndDate:   "2222",
 		}
 		body, _ := json.Marshal(dateRange)
-		req, err := http.NewRequestWithContext(ctx, http.MethodPost, "/bounty_stats", bytes.NewReader(body))
+		req, err := http.NewRequestWithContext(ctx, http.MethodPost, "/bounty_stats?workspace="+workspace, bytes.NewReader(body))
 		if err != nil {
 			t.Fatal(err)
 		}
-		mockDb.On("TotalBountiesPosted", dateRange).Return(int64(1)).Once()
-		mockDb.On("TotalPaidBounties", dateRange).Return(int64(1)).Once()
-		mockDb.On("BountiesPaidPercentage", dateRange).Return(uint(1)).Once()
-		mockDb.On("TotalSatsPosted", dateRange).Return(uint(1)).Once()
-		mockDb.On("TotalSatsPaid", dateRange).Return(uint(1)).Once()
-		mockDb.On("SatsPaidPercentage", dateRange).Return(uint(1)).Once()
-		mockDb.On("AveragePaidTime", dateRange).Return(uint(1)).Once()
-		mockDb.On("AverageCompletedTime", dateRange).Return(uint(1)).Once()
-		mockDb.On("TotalHuntersPaid", dateRange).Return(int64(1)).Once()
-		mockDb.On("NewHuntersPaid", dateRange).Return(int64(1)).Once()
+		mockDb.On("TotalBountiesPosted", dateRange, workspace).Return(int64(1)).Once()
+		mockDb.On("TotalPaidBounties", dateRange, workspace).Return(int64(1)).Once()
+		mockDb.On("BountiesPaidPercentage", dateRange, workspace).Return(uint(1)).Once()
+		mockDb.On("TotalSatsPosted", dateRange, workspace).Return(uint(1)).Once()
+		mockDb.On("TotalSatsPaid", dateRange, workspace).Return(uint(1)).Once()
+		mockDb.On("SatsPaidPercentage", dateRange, workspace).Return(uint(1)).Once()
+		mockDb.On("AveragePaidTime", dateRange, workspace).Return(uint(1)).Once()
+		mockDb.On("AverageCompletedTime", dateRange, workspace).Return(uint(1)).Once()
+		mockDb.On("TotalHuntersPaid", dateRange, workspace).Return(int64(1)).Once()
+		mockDb.On("NewHuntersPaid", dateRange, workspace).Return(int64(1)).Once()
 		handler.ServeHTTP(rr, req)
 
 		expectedMetricRes := db.BountyMetrics{
