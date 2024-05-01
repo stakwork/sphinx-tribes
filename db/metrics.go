@@ -162,9 +162,11 @@ func (db database) GetBountiesByDateRange(r PaymentDateRange, re *http.Request) 
 	assingned := keys.Get("Assigned")
 	paid := keys.Get("Paid")
 	providers := keys.Get("provider")
+	workspace := keys.Get("workspace_uuid")
 
 	orderQuery := ""
 	limitQuery := ""
+	workspaceQuery := ""
 
 	var statusConditions []string
 
@@ -193,6 +195,9 @@ func (db database) GetBountiesByDateRange(r PaymentDateRange, re *http.Request) 
 	if limit > 1 {
 		limitQuery = fmt.Sprintf("LIMIT %d  OFFSET %d", limit, offset)
 	}
+	if workspace != "" {
+		workspaceQuery = fmt.Sprintf("AND workspace_uuid = %s", workspace)
+	}
 
 	providerCondition := ""
 	if len(providers) > 0 {
@@ -201,7 +206,7 @@ func (db database) GetBountiesByDateRange(r PaymentDateRange, re *http.Request) 
 	}
 
 	query := `SELECT * FROM public.bounty WHERE created >= '` + r.StartDate + `'  AND created <= '` + r.EndDate + `'` + providerCondition
-	allQuery := query + " " + statusQuery + " " + orderQuery + " " + limitQuery
+	allQuery := query + " " + workspaceQuery + " " + statusQuery + " " + orderQuery + " " + limitQuery
 
 	b := []NewBounty{}
 	db.db.Raw(allQuery).Find(&b)
@@ -214,6 +219,7 @@ func (db database) GetBountiesByDateRangeCount(r PaymentDateRange, re *http.Requ
 	assingned := keys.Get("Assigned")
 	paid := keys.Get("Paid")
 	providers := keys.Get("provider")
+	workspace := keys.Get("workspace_uuid")
 
 	var statusConditions []string
 
@@ -239,11 +245,15 @@ func (db database) GetBountiesByDateRangeCount(r PaymentDateRange, re *http.Requ
 		providerSlice := strings.Split(providers, ",")
 		providerCondition = " AND owner_id IN ('" + strings.Join(providerSlice, "','") + "')"
 	}
+	var workspaceQuery string
+	if workspace != "" {
+		workspaceQuery = fmt.Sprintf("AND workspace_uuid = %s", workspace)
+	}
 
 	var count int64
 
 	query := `SELECT COUNT(*) FROM public.bounty WHERE created >= '` + r.StartDate + `'  AND created <= '` + r.EndDate + `'` + providerCondition
-	allQuery := query + " " + statusQuery
+	allQuery := query + " " + workspaceQuery + " " + statusQuery
 	db.db.Raw(allQuery).Scan(&count)
 	return count
 }
