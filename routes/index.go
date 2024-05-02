@@ -36,6 +36,7 @@ func NewRouter() *http.Server {
 	r.Mount("/gobounties", BountyRoutes())
 	r.Mount("/workspaces", WorkspaceRoutes())
 	r.Mount("/metrics", MetricsRoutes())
+	r.Mount("/features", FeatureRoutes())
 
 	r.Group(func(r chi.Router) {
 		r.Get("/tribe_by_feed", tribeHandlers.GetFirstTribeByFeed)
