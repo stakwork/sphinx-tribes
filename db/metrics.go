@@ -88,7 +88,7 @@ func (db database) TotalHuntersPaid(r PaymentDateRange, workspace string) int64 
 
 	var workspaceQuery string
 	if workspace != "" {
-		workspaceQuery = fmt.Sprintf("AND workspace_uuid = %s", workspace)
+		workspaceQuery = fmt.Sprintf("AND workspace_uuid = '%s'", workspace)
 	}
 
 	allQuery := query + " " + workspaceQuery
@@ -148,7 +148,7 @@ func (db database) PaidDifference(r PaymentDateRange, workspace string) []DateDi
 
 	var workspaceQuery string
 	if workspace != "" {
-		workspaceQuery = fmt.Sprintf("AND workspace_uuid = %s", workspace)
+		workspaceQuery = fmt.Sprintf("AND workspace_uuid = `%s`", workspace)
 	}
 
 	allQuery := query + " " + workspaceQuery
@@ -180,7 +180,7 @@ func (db database) CompletedDifference(r PaymentDateRange, workspace string) []D
 
 	var workspaceQuery string
 	if workspace != "" {
-		workspaceQuery = fmt.Sprintf("AND workspace_uuid = %s", workspace)
+		workspaceQuery = fmt.Sprintf("AND workspace_uuid = `%s`", workspace)
 	}
 
 	allQuery := query + " " + workspaceQuery
@@ -224,6 +224,8 @@ func (db database) GetBountiesByDateRange(r PaymentDateRange, re *http.Request) 
 	providers := keys.Get("provider")
 	workspace := keys.Get("workspace")
 
+	fmt.Println("WORSKPACE === workspace", workspace)
+
 	orderQuery := ""
 	limitQuery := ""
 	workspaceQuery := ""
@@ -256,7 +258,7 @@ func (db database) GetBountiesByDateRange(r PaymentDateRange, re *http.Request) 
 		limitQuery = fmt.Sprintf("LIMIT %d  OFFSET %d", limit, offset)
 	}
 	if workspace != "" {
-		workspaceQuery = fmt.Sprintf("AND workspace_uuid = %s", workspace)
+		workspaceQuery = fmt.Sprintf("AND workspace_uuid = '%s'", workspace)
 	}
 
 	providerCondition := ""
@@ -270,6 +272,11 @@ func (db database) GetBountiesByDateRange(r PaymentDateRange, re *http.Request) 
 
 	b := []NewBounty{}
 	db.db.Raw(allQuery).Find(&b)
+
+	if workspace != "" {
+		fmt.Println("Bounties1  ===", b)
+		fmt.Println("Query1 ===", allQuery)
+	}
 	return b
 }
 
@@ -307,7 +314,7 @@ func (db database) GetBountiesByDateRangeCount(r PaymentDateRange, re *http.Requ
 	}
 	var workspaceQuery string
 	if workspace != "" {
-		workspaceQuery = fmt.Sprintf("AND workspace_uuid = %s", workspace)
+		workspaceQuery = fmt.Sprintf("AND workspace_uuid = '%s'", workspace)
 	}
 
 	var count int64
