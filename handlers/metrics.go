@@ -304,6 +304,21 @@ func MetricsCsv(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+func GetAdminWorkspaces(w http.ResponseWriter, r *http.Request) {
+	ctx := r.Context()
+	pubKeyFromAuth, _ := ctx.Value(auth.ContextKey).(string)
+
+	if pubKeyFromAuth == "" {
+		fmt.Println("no pubkey from auth")
+		w.WriteHeader(http.StatusUnauthorized)
+		return
+	}
+
+	workspaces := db.DB.GetWorkspaces(r)
+	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode(workspaces)
+}
+
 func (mh *metricHandler) GetMetricsBountiesData(metricBounties []db.NewBounty) []db.BountyData {
 	var metricBountiesData []db.BountyData
 	for _, bounty := range metricBounties {

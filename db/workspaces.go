@@ -13,8 +13,13 @@ func (db database) GetWorkspaces(r *http.Request) []Workspace {
 	ms := []Workspace{}
 	offset, limit, sortBy, direction, search := utils.GetPaginationParams(r)
 
-	// return if like owner_alias, unique_name, or equals pubkey
-	db.db.Offset(offset).Limit(limit).Order(sortBy+" "+direction+" ").Where("LOWER(name) LIKE ?", "%"+search+"%").Where("deleted != ?", false).Find(&ms)
+	query := db.db.Model(&ms).Where("LOWER(name) LIKE ?", "%"+search+"%").Where("deleted != ?", true)
+
+	if limit > 1 {
+		query.Offset(offset).Limit(limit).Order(sortBy + " " + direction + " ")
+	}
+
+	query.Find(&ms)
 	return ms
 }
 
