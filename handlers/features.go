@@ -41,6 +41,8 @@ func (oh *featureHandler) CreateOrEditFeatures(w http.ResponseWriter, r *http.Re
 		return
 	}
 
+	features.CreatedBy = pubKeyFromAuth
+
 	// Validate struct data
 	err = db.Validate.Struct(features)
 	if err != nil {
