@@ -139,4 +139,7 @@ type Database interface {
 	PersonUniqueNameFromName(name string) (string, error)
 	ProcessAlerts(p Person)
 	UserHasAccess(pubKeyFromAuth string, uuid string, role string) bool
+	CreateOrEditFeature(m WorkspaceFeatures) (WorkspaceFeatures, error)
+	GetFeaturesByWorkspaceUuid(uuid string) []WorkspaceFeatures
+	GetFeatureByUuid(uuid string) WorkspaceFeatures
 }
