@@ -71,6 +71,7 @@ func TestBountyMetrics(t *testing.T) {
 		}
 		mockDb.On("TotalBountiesPosted", dateRange, workspace).Return(int64(1)).Once()
 		mockDb.On("TotalPaidBounties", dateRange, workspace).Return(int64(1)).Once()
+		mockDb.On("TotalAssignedBounties", dateRange, workspace).Return(int64(2)).Once()
 		mockDb.On("BountiesPaidPercentage", dateRange, workspace).Return(uint(1)).Once()
 		mockDb.On("TotalSatsPosted", dateRange, workspace).Return(uint(1)).Once()
 		mockDb.On("TotalSatsPaid", dateRange, workspace).Return(uint(1)).Once()
@@ -84,6 +85,7 @@ func TestBountyMetrics(t *testing.T) {
 		expectedMetricRes := db.BountyMetrics{
 			BountiesPosted:         1,
 			BountiesPaid:           1,
+			BountiesAssigned:       2,
 			BountiesPaidPercentage: 1,
 			SatsPosted:             1,
 			SatsPaid:               1,
