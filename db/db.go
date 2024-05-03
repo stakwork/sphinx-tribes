@@ -1142,7 +1142,7 @@ func (db database) GetAllBounties(r *http.Request) []NewBounty {
 	languageArray := strings.Split(languages, ",")
 	languageLength := len(languageArray)
 
-	if workspaceUuid != "" && orgUuid != "" {
+	if workspaceUuid == "" && orgUuid != "" {
 		workspaceUuid = orgUuid
 	}
 

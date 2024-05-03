@@ -311,17 +311,17 @@ func (_c *Database_AddUserInvoiceData_Call) RunAndReturn(run func(db.UserInvoice
 	return _c
 }
 
-// AverageCompletedTime provides a mock function with given fields: r
-func (_m *Database) AverageCompletedTime(r db.PaymentDateRange) uint {
-	ret := _m.Called(r)
+// AverageCompletedTime provides a mock function with given fields: r, workspace
+func (_m *Database) AverageCompletedTime(r db.PaymentDateRange, workspace string) uint {
+	ret := _m.Called(r, workspace)
 
 	if len(ret) == 0 {
 		panic("no return value specified for AverageCompletedTime")
 	}
 
 	var r0 uint
-	if rf, ok := ret.Get(0).(func(db.PaymentDateRange) uint); ok {
-		r0 = rf(r)
+	if rf, ok := ret.Get(0).(func(db.PaymentDateRange, string) uint); ok {
+		r0 = rf(r, workspace)
 	} else {
 		r0 = ret.Get(0).(uint)
 	}
@@ -336,13 +336,14 @@ type Database_AverageCompletedTime_Call struct {
 
 // AverageCompletedTime is a helper method to define mock.On call
 //   - r db.PaymentDateRange
-func (_e *Database_Expecter) AverageCompletedTime(r interface{}) *Database_AverageCompletedTime_Call {
-	return &Database_AverageCompletedTime_Call{Call: _e.mock.On("AverageCompletedTime", r)}
+//   - workspace string
+func (_e *Database_Expecter) AverageCompletedTime(r interface{}, workspace interface{}) *Database_AverageCompletedTime_Call {
+	return &Database_AverageCompletedTime_Call{Call: _e.mock.On("AverageCompletedTime", r, workspace)}
 }
 
-func (_c *Database_AverageCompletedTime_Call) Run(run func(r db.PaymentDateRange)) *Database_AverageCompletedTime_Call {
+func (_c *Database_AverageCompletedTime_Call) Run(run func(r db.PaymentDateRange, workspace string)) *Database_AverageCompletedTime_Call {
 	_c.Call.Run(func(args mock.Arguments) {
-		run(args[0].(db.PaymentDateRange))
+		run(args[0].(db.PaymentDateRange), args[1].(string))
 	})
 	return _c
 }
@@ -352,22 +353,22 @@ func (_c *Database_AverageCompletedTime_Call) Return(_a0 uint) *Database_Average
 	return _c
 }
 
-func (_c *Database_AverageCompletedTime_Call) RunAndReturn(run func(db.PaymentDateRange) uint) *Database_AverageCompletedTime_Call {
+func (_c *Database_AverageCompletedTime_Call) RunAndReturn(run func(db.PaymentDateRange, string) uint) *Database_AverageCompletedTime_Call {
 	_c.Call.Return(run)
 	return _c
 }
 
-// AveragePaidTime provides a mock function with given fields: r
-func (_m *Database) AveragePaidTime(r db.PaymentDateRange) uint {
-	ret := _m.Called(r)
+// AveragePaidTime provides a mock function with given fields: r, workspace
+func (_m *Database) AveragePaidTime(r db.PaymentDateRange, workspace string) uint {
+	ret := _m.Called(r, workspace)
 
 	if len(ret) == 0 {
 		panic("no return value specified for AveragePaidTime")
 	}
 
 	var r0 uint
-	if rf, ok := ret.Get(0).(func(db.PaymentDateRange) uint); ok {
-		r0 = rf(r)
+	if rf, ok := ret.Get(0).(func(db.PaymentDateRange, string) uint); ok {
+		r0 = rf(r, workspace)
 	} else {
 		r0 = ret.Get(0).(uint)
 	}
@@ -382,13 +383,14 @@ type Database_AveragePaidTime_Call struct {
 
 // AveragePaidTime is a helper method to define mock.On call
 //   - r db.PaymentDateRange
-func (_e *Database_Expecter) AveragePaidTime(r interface{}) *Database_AveragePaidTime_Call {
-	return &Database_AveragePaidTime_Call{Call: _e.mock.On("AveragePaidTime", r)}
+//   - workspace string
+func (_e *Database_Expecter) AveragePaidTime(r interface{}, workspace interface{}) *Database_AveragePaidTime_Call {
+	return &Database_AveragePaidTime_Call{Call: _e.mock.On("AveragePaidTime", r, workspace)}
 }
 
-func (_c *Database_AveragePaidTime_Call) Run(run func(r db.PaymentDateRange)) *Database_AveragePaidTime_Call {
+func (_c *Database_AveragePaidTime_Call) Run(run func(r db.PaymentDateRange, workspace string)) *Database_AveragePaidTime_Call {
 	_c.Call.Run(func(args mock.Arguments) {
-		run(args[0].(db.PaymentDateRange))
+		run(args[0].(db.PaymentDateRange), args[1].(string))
 	})
 	return _c
 }
@@ -398,22 +400,22 @@ func (_c *Database_AveragePaidTime_Call) Return(_a0 uint) *Database_AveragePaidT
 	return _c
 }
 
-func (_c *Database_AveragePaidTime_Call) RunAndReturn(run func(db.PaymentDateRange) uint) *Database_AveragePaidTime_Call {
+func (_c *Database_AveragePaidTime_Call) RunAndReturn(run func(db.PaymentDateRange, string) uint) *Database_AveragePaidTime_Call {
 	_c.Call.Return(run)
 	return _c
 }
 
-// BountiesPaidPercentage provides a mock function with given fields: r
-func (_m *Database) BountiesPaidPercentage(r db.PaymentDateRange) uint {
-	ret := _m.Called(r)
+// BountiesPaidPercentage provides a mock function with given fields: r, workspace
+func (_m *Database) BountiesPaidPercentage(r db.PaymentDateRange, workspace string) uint {
+	ret := _m.Called(r, workspace)
 
 	if len(ret) == 0 {
 		panic("no return value specified for BountiesPaidPercentage")
 	}
 
 	var r0 uint
-	if rf, ok := ret.Get(0).(func(db.PaymentDateRange) uint); ok {
-		r0 = rf(r)
+	if rf, ok := ret.Get(0).(func(db.PaymentDateRange, string) uint); ok {
+		r0 = rf(r, workspace)
 	} else {
 		r0 = ret.Get(0).(uint)
 	}
@@ -428,13 +430,14 @@ type Database_BountiesPaidPercentage_Call struct {
 
 // BountiesPaidPercentage is a helper method to define mock.On call
 //   - r db.PaymentDateRange
-func (_e *Database_Expecter) BountiesPaidPercentage(r interface{}) *Database_BountiesPaidPercentage_Call {
-	return &Database_BountiesPaidPercentage_Call{Call: _e.mock.On("BountiesPaidPercentage", r)}
+//   - workspace string
+func (_e *Database_Expecter) BountiesPaidPercentage(r interface{}, workspace interface{}) *Database_BountiesPaidPercentage_Call {
+	return &Database_BountiesPaidPercentage_Call{Call: _e.mock.On("BountiesPaidPercentage", r, workspace)}
 }
 
-func (_c *Database_BountiesPaidPercentage_Call) Run(run func(r db.PaymentDateRange)) *Database_BountiesPaidPercentage_Call {
+func (_c *Database_BountiesPaidPercentage_Call) Run(run func(r db.PaymentDateRange, workspace string)) *Database_BountiesPaidPercentage_Call {
 	_c.Call.Run(func(args mock.Arguments) {
-		run(args[0].(db.PaymentDateRange))
+		run(args[0].(db.PaymentDateRange), args[1].(string))
 	})
 	return _c
 }
@@ -444,7 +447,7 @@ func (_c *Database_BountiesPaidPercentage_Call) Return(_a0 uint) *Database_Bount
 	return _c
 }
 
-func (_c *Database_BountiesPaidPercentage_Call) RunAndReturn(run func(db.PaymentDateRange) uint) *Database_BountiesPaidPercentage_Call {
+func (_c *Database_BountiesPaidPercentage_Call) RunAndReturn(run func(db.PaymentDateRange, string) uint) *Database_BountiesPaidPercentage_Call {
 	_c.Call.Return(run)
 	return _c
 }
@@ -923,6 +926,62 @@ func (_c *Database_CreateOrEditBounty_Call) Return(_a0 db.NewBounty, _a1 error) 
 }
 
 func (_c *Database_CreateOrEditBounty_Call) RunAndReturn(run func(db.NewBounty) (db.NewBounty, error)) *Database_CreateOrEditBounty_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
+// CreateOrEditFeature provides a mock function with given fields: m
+func (_m *Database) CreateOrEditFeature(m db.WorkspaceFeatures) (db.WorkspaceFeatures, error) {
+	ret := _m.Called(m)
+
+	if len(ret) == 0 {
+		panic("no return value specified for CreateOrEditFeature")
+	}
+
+	var r0 db.WorkspaceFeatures
+	var r1 error
+	if rf, ok := ret.Get(0).(func(db.WorkspaceFeatures) (db.WorkspaceFeatures, error)); ok {
+		return rf(m)
+	}
+	if rf, ok := ret.Get(0).(func(db.WorkspaceFeatures) db.WorkspaceFeatures); ok {
+		r0 = rf(m)
+	} else {
+		r0 = ret.Get(0).(db.WorkspaceFeatures)
+	}
+
+	if rf, ok := ret.Get(1).(func(db.WorkspaceFeatures) error); ok {
+		r1 = rf(m)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
+// Database_CreateOrEditFeature_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'CreateOrEditFeature'
+type Database_CreateOrEditFeature_Call struct {
+	*mock.Call
+}
+
+// CreateOrEditFeature is a helper method to define mock.On call
+//   - m db.WorkspaceFeatures
+func (_e *Database_Expecter) CreateOrEditFeature(m interface{}) *Database_CreateOrEditFeature_Call {
+	return &Database_CreateOrEditFeature_Call{Call: _e.mock.On("CreateOrEditFeature", m)}
+}
+
+func (_c *Database_CreateOrEditFeature_Call) Run(run func(m db.WorkspaceFeatures)) *Database_CreateOrEditFeature_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(db.WorkspaceFeatures))
+	})
+	return _c
+}
+
+func (_c *Database_CreateOrEditFeature_Call) Return(_a0 db.WorkspaceFeatures, _a1 error) *Database_CreateOrEditFeature_Call {
+	_c.Call.Return(_a0, _a1)
+	return _c
+}
+
+func (_c *Database_CreateOrEditFeature_Call) RunAndReturn(run func(db.WorkspaceFeatures) (db.WorkspaceFeatures, error)) *Database_CreateOrEditFeature_Call {
 	_c.Call.Return(run)
 	return _c
 }
@@ -1831,19 +1890,19 @@ func (_c *Database_GetBotsByOwner_Call) RunAndReturn(run func(string) []db.Bot) 
 }
 
 // GetBountiesByDateRange provides a mock function with given fields: r, re
-func (_m *Database) GetBountiesByDateRange(r db.PaymentDateRange, re *http.Request) []db.Bounty {
+func (_m *Database) GetBountiesByDateRange(r db.PaymentDateRange, re *http.Request) []db.NewBounty {
 	ret := _m.Called(r, re)
 
 	if len(ret) == 0 {
 		panic("no return value specified for GetBountiesByDateRange")
 	}
 
-	var r0 []db.Bounty
-	if rf, ok := ret.Get(0).(func(db.PaymentDateRange, *http.Request) []db.Bounty); ok {
+	var r0 []db.NewBounty
+	if rf, ok := ret.Get(0).(func(db.PaymentDateRange, *http.Request) []db.NewBounty); ok {
 		r0 = rf(r, re)
 	} else {
 		if ret.Get(0) != nil {
-			r0 = ret.Get(0).([]db.Bounty)
+			r0 = ret.Get(0).([]db.NewBounty)
 		}
 	}
 
@@ -1869,12 +1928,12 @@ func (_c *Database_GetBountiesByDateRange_Call) Run(run func(r db.PaymentDateRan
 	return _c
 }
 
-func (_c *Database_GetBountiesByDateRange_Call) Return(_a0 []db.Bounty) *Database_GetBountiesByDateRange_Call {
+func (_c *Database_GetBountiesByDateRange_Call) Return(_a0 []db.NewBounty) *Database_GetBountiesByDateRange_Call {
 	_c.Call.Return(_a0)
 	return _c
 }
 
-func (_c *Database_GetBountiesByDateRange_Call) RunAndReturn(run func(db.PaymentDateRange, *http.Request) []db.Bounty) *Database_GetBountiesByDateRange_Call {
+func (_c *Database_GetBountiesByDateRange_Call) RunAndReturn(run func(db.PaymentDateRange, *http.Request) []db.NewBounty) *Database_GetBountiesByDateRange_Call {
 	_c.Call.Return(run)
 	return _c
 }
@@ -2572,6 +2631,100 @@ func (_c *Database_GetCreatedBounties_Call) Return(_a0 []db.NewBounty, _a1 error
 }
 
 func (_c *Database_GetCreatedBounties_Call) RunAndReturn(run func(*http.Request) ([]db.NewBounty, error)) *Database_GetCreatedBounties_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
+// GetFeatureByUuid provides a mock function with given fields: uuid
+func (_m *Database) GetFeatureByUuid(uuid string) db.WorkspaceFeatures {
+	ret := _m.Called(uuid)
+
+	if len(ret) == 0 {
+		panic("no return value specified for GetFeatureByUuid")
+	}
+
+	var r0 db.WorkspaceFeatures
+	if rf, ok := ret.Get(0).(func(string) db.WorkspaceFeatures); ok {
+		r0 = rf(uuid)
+	} else {
+		r0 = ret.Get(0).(db.WorkspaceFeatures)
+	}
+
+	return r0
+}
+
+// Database_GetFeatureByUuid_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'GetFeatureByUuid'
+type Database_GetFeatureByUuid_Call struct {
+	*mock.Call
+}
+
+// GetFeatureByUuid is a helper method to define mock.On call
+//   - uuid string
+func (_e *Database_Expecter) GetFeatureByUuid(uuid interface{}) *Database_GetFeatureByUuid_Call {
+	return &Database_GetFeatureByUuid_Call{Call: _e.mock.On("GetFeatureByUuid", uuid)}
+}
+
+func (_c *Database_GetFeatureByUuid_Call) Run(run func(uuid string)) *Database_GetFeatureByUuid_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(string))
+	})
+	return _c
+}
+
+func (_c *Database_GetFeatureByUuid_Call) Return(_a0 db.WorkspaceFeatures) *Database_GetFeatureByUuid_Call {
+	_c.Call.Return(_a0)
+	return _c
+}
+
+func (_c *Database_GetFeatureByUuid_Call) RunAndReturn(run func(string) db.WorkspaceFeatures) *Database_GetFeatureByUuid_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
+// GetFeaturesByWorkspaceUuid provides a mock function with given fields: uuid
+func (_m *Database) GetFeaturesByWorkspaceUuid(uuid string) []db.WorkspaceFeatures {
+	ret := _m.Called(uuid)
+
+	if len(ret) == 0 {
+		panic("no return value specified for GetFeaturesByWorkspaceUuid")
+	}
+
+	var r0 []db.WorkspaceFeatures
+	if rf, ok := ret.Get(0).(func(string) []db.WorkspaceFeatures); ok {
+		r0 = rf(uuid)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).([]db.WorkspaceFeatures)
+		}
+	}
+
+	return r0
+}
+
+// Database_GetFeaturesByWorkspaceUuid_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'GetFeaturesByWorkspaceUuid'
+type Database_GetFeaturesByWorkspaceUuid_Call struct {
+	*mock.Call
+}
+
+// GetFeaturesByWorkspaceUuid is a helper method to define mock.On call
+//   - uuid string
+func (_e *Database_Expecter) GetFeaturesByWorkspaceUuid(uuid interface{}) *Database_GetFeaturesByWorkspaceUuid_Call {
+	return &Database_GetFeaturesByWorkspaceUuid_Call{Call: _e.mock.On("GetFeaturesByWorkspaceUuid", uuid)}
+}
+
+func (_c *Database_GetFeaturesByWorkspaceUuid_Call) Run(run func(uuid string)) *Database_GetFeaturesByWorkspaceUuid_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(string))
+	})
+	return _c
+}
+
+func (_c *Database_GetFeaturesByWorkspaceUuid_Call) Return(_a0 []db.WorkspaceFeatures) *Database_GetFeaturesByWorkspaceUuid_Call {
+	_c.Call.Return(_a0)
+	return _c
+}
+
+func (_c *Database_GetFeaturesByWorkspaceUuid_Call) RunAndReturn(run func(string) []db.WorkspaceFeatures) *Database_GetFeaturesByWorkspaceUuid_Call {
 	_c.Call.Return(run)
 	return _c
 }
@@ -5139,17 +5292,17 @@ func (_c *Database_GetWorkspacesCount_Call) RunAndReturn(run func() int64) *Data
 	return _c
 }
 
-// NewHuntersPaid provides a mock function with given fields: r
-func (_m *Database) NewHuntersPaid(r db.PaymentDateRange) int64 {
-	ret := _m.Called(r)
+// NewHuntersPaid provides a mock function with given fields: r, workspace
+func (_m *Database) NewHuntersPaid(r db.PaymentDateRange, workspace string) int64 {
+	ret := _m.Called(r, workspace)
 
 	if len(ret) == 0 {
 		panic("no return value specified for NewHuntersPaid")
 	}
 
 	var r0 int64
-	if rf, ok := ret.Get(0).(func(db.PaymentDateRange) int64); ok {
-		r0 = rf(r)
+	if rf, ok := ret.Get(0).(func(db.PaymentDateRange, string) int64); ok {
+		r0 = rf(r, workspace)
 	} else {
 		r0 = ret.Get(0).(int64)
 	}
@@ -5164,13 +5317,14 @@ type Database_NewHuntersPaid_Call struct {
 
 // NewHuntersPaid is a helper method to define mock.On call
 //   - r db.PaymentDateRange
-func (_e *Database_Expecter) NewHuntersPaid(r interface{}) *Database_NewHuntersPaid_Call {
-	return &Database_NewHuntersPaid_Call{Call: _e.mock.On("NewHuntersPaid", r)}
+//   - workspace string
+func (_e *Database_Expecter) NewHuntersPaid(r interface{}, workspace interface{}) *Database_NewHuntersPaid_Call {
+	return &Database_NewHuntersPaid_Call{Call: _e.mock.On("NewHuntersPaid", r, workspace)}
 }
 
-func (_c *Database_NewHuntersPaid_Call) Run(run func(r db.PaymentDateRange)) *Database_NewHuntersPaid_Call {
+func (_c *Database_NewHuntersPaid_Call) Run(run func(r db.PaymentDateRange, workspace string)) *Database_NewHuntersPaid_Call {
 	_c.Call.Run(func(args mock.Arguments) {
-		run(args[0].(db.PaymentDateRange))
+		run(args[0].(db.PaymentDateRange), args[1].(string))
 	})
 	return _c
 }
@@ -5180,7 +5334,7 @@ func (_c *Database_NewHuntersPaid_Call) Return(_a0 int64) *Database_NewHuntersPa
 	return _c
 }
 
-func (_c *Database_NewHuntersPaid_Call) RunAndReturn(run func(db.PaymentDateRange) int64) *Database_NewHuntersPaid_Call {
+func (_c *Database_NewHuntersPaid_Call) RunAndReturn(run func(db.PaymentDateRange, string) int64) *Database_NewHuntersPaid_Call {
 	_c.Call.Return(run)
 	return _c
 }
@@ -5274,17 +5428,17 @@ func (_c *Database_ProcessAlerts_Call) RunAndReturn(run func(db.Person)) *Databa
 	return _c
 }
 
-// SatsPaidPercentage provides a mock function with given fields: r
-func (_m *Database) SatsPaidPercentage(r db.PaymentDateRange) uint {
-	ret := _m.Called(r)
+// SatsPaidPercentage provides a mock function with given fields: r, workspace
+func (_m *Database) SatsPaidPercentage(r db.PaymentDateRange, workspace string) uint {
+	ret := _m.Called(r, workspace)
 
 	if len(ret) == 0 {
 		panic("no return value specified for SatsPaidPercentage")
 	}
 
 	var r0 uint
-	if rf, ok := ret.Get(0).(func(db.PaymentDateRange) uint); ok {
-		r0 = rf(r)
+	if rf, ok := ret.Get(0).(func(db.PaymentDateRange, string) uint); ok {
+		r0 = rf(r, workspace)
 	} else {
 		r0 = ret.Get(0).(uint)
 	}
@@ -5299,13 +5453,14 @@ type Database_SatsPaidPercentage_Call struct {
 
 // SatsPaidPercentage is a helper method to define mock.On call
 //   - r db.PaymentDateRange
-func (_e *Database_Expecter) SatsPaidPercentage(r interface{}) *Database_SatsPaidPercentage_Call {
-	return &Database_SatsPaidPercentage_Call{Call: _e.mock.On("SatsPaidPercentage", r)}
+//   - workspace string
+func (_e *Database_Expecter) SatsPaidPercentage(r interface{}, workspace interface{}) *Database_SatsPaidPercentage_Call {
+	return &Database_SatsPaidPercentage_Call{Call: _e.mock.On("SatsPaidPercentage", r, workspace)}
 }
 
-func (_c *Database_SatsPaidPercentage_Call) Run(run func(r db.PaymentDateRange)) *Database_SatsPaidPercentage_Call {
+func (_c *Database_SatsPaidPercentage_Call) Run(run func(r db.PaymentDateRange, workspace string)) *Database_SatsPaidPercentage_Call {
 	_c.Call.Run(func(args mock.Arguments) {
-		run(args[0].(db.PaymentDateRange))
+		run(args[0].(db.PaymentDateRange), args[1].(string))
 	})
 	return _c
 }
@@ -5315,7 +5470,7 @@ func (_c *Database_SatsPaidPercentage_Call) Return(_a0 uint) *Database_SatsPaidP
 	return _c
 }
 
-func (_c *Database_SatsPaidPercentage_Call) RunAndReturn(run func(db.PaymentDateRange) uint) *Database_SatsPaidPercentage_Call {
+func (_c *Database_SatsPaidPercentage_Call) RunAndReturn(run func(db.PaymentDateRange, string) uint) *Database_SatsPaidPercentage_Call {
 	_c.Call.Return(run)
 	return _c
 }
@@ -5468,17 +5623,64 @@ func (_c *Database_SearchTribes_Call) RunAndReturn(run func(string) []db.Tribe) 
 	return _c
 }
 
-// TotalBountiesPosted provides a mock function with given fields: r
-func (_m *Database) TotalBountiesPosted(r db.PaymentDateRange) int64 {
-	ret := _m.Called(r)
+// TotalAssignedBounties provides a mock function with given fields: r, workspace
+func (_m *Database) TotalAssignedBounties(r db.PaymentDateRange, workspace string) int64 {
+	ret := _m.Called(r, workspace)
+
+	if len(ret) == 0 {
+		panic("no return value specified for TotalAssignedBounties")
+	}
+
+	var r0 int64
+	if rf, ok := ret.Get(0).(func(db.PaymentDateRange, string) int64); ok {
+		r0 = rf(r, workspace)
+	} else {
+		r0 = ret.Get(0).(int64)
+	}
+
+	return r0
+}
+
+// Database_TotalAssignedBounties_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'TotalAssignedBounties'
+type Database_TotalAssignedBounties_Call struct {
+	*mock.Call
+}
+
+// TotalAssignedBounties is a helper method to define mock.On call
+//   - r db.PaymentDateRange
+//   - workspace string
+func (_e *Database_Expecter) TotalAssignedBounties(r interface{}, workspace interface{}) *Database_TotalAssignedBounties_Call {
+	return &Database_TotalAssignedBounties_Call{Call: _e.mock.On("TotalAssignedBounties", r, workspace)}
+}
+
+func (_c *Database_TotalAssignedBounties_Call) Run(run func(r db.PaymentDateRange, workspace string)) *Database_TotalAssignedBounties_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(db.PaymentDateRange), args[1].(string))
+	})
+	return _c
+}
+
+func (_c *Database_TotalAssignedBounties_Call) Return(_a0 int64) *Database_TotalAssignedBounties_Call {
+	_c.Call.Return(_a0)
+	return _c
+}
+
+func (_c *Database_TotalAssignedBounties_Call) RunAndReturn(run func(db.PaymentDateRange, string) int64) *Database_TotalAssignedBounties_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
+// TotalBountiesPosted provides a mock function with given fields: r, workspace
+func (_m *Database) TotalBountiesPosted(r db.PaymentDateRange, workspace string) int64 {
+	ret := _m.Called(r, workspace)
 
 	if len(ret) == 0 {
 		panic("no return value specified for TotalBountiesPosted")
 	}
 
 	var r0 int64
-	if rf, ok := ret.Get(0).(func(db.PaymentDateRange) int64); ok {
-		r0 = rf(r)
+	if rf, ok := ret.Get(0).(func(db.PaymentDateRange, string) int64); ok {
+		r0 = rf(r, workspace)
 	} else {
 		r0 = ret.Get(0).(int64)
 	}
@@ -5493,13 +5695,14 @@ type Database_TotalBountiesPosted_Call struct {
 
 // TotalBountiesPosted is a helper method to define mock.On call
 //   - r db.PaymentDateRange
-func (_e *Database_Expecter) TotalBountiesPosted(r interface{}) *Database_TotalBountiesPosted_Call {
-	return &Database_TotalBountiesPosted_Call{Call: _e.mock.On("TotalBountiesPosted", r)}
+//   - workspace string
+func (_e *Database_Expecter) TotalBountiesPosted(r interface{}, workspace interface{}) *Database_TotalBountiesPosted_Call {
+	return &Database_TotalBountiesPosted_Call{Call: _e.mock.On("TotalBountiesPosted", r, workspace)}
 }
 
-func (_c *Database_TotalBountiesPosted_Call) Run(run func(r db.PaymentDateRange)) *Database_TotalBountiesPosted_Call {
+func (_c *Database_TotalBountiesPosted_Call) Run(run func(r db.PaymentDateRange, workspace string)) *Database_TotalBountiesPosted_Call {
 	_c.Call.Run(func(args mock.Arguments) {
-		run(args[0].(db.PaymentDateRange))
+		run(args[0].(db.PaymentDateRange), args[1].(string))
 	})
 	return _c
 }
@@ -5509,22 +5712,22 @@ func (_c *Database_TotalBountiesPosted_Call) Return(_a0 int64) *Database_TotalBo
 	return _c
 }
 
-func (_c *Database_TotalBountiesPosted_Call) RunAndReturn(run func(db.PaymentDateRange) int64) *Database_TotalBountiesPosted_Call {
+func (_c *Database_TotalBountiesPosted_Call) RunAndReturn(run func(db.PaymentDateRange, string) int64) *Database_TotalBountiesPosted_Call {
 	_c.Call.Return(run)
 	return _c
 }
 
-// TotalHuntersPaid provides a mock function with given fields: r
-func (_m *Database) TotalHuntersPaid(r db.PaymentDateRange) int64 {
-	ret := _m.Called(r)
+// TotalHuntersPaid provides a mock function with given fields: r, workspace
+func (_m *Database) TotalHuntersPaid(r db.PaymentDateRange, workspace string) int64 {
+	ret := _m.Called(r, workspace)
 
 	if len(ret) == 0 {
 		panic("no return value specified for TotalHuntersPaid")
 	}
 
 	var r0 int64
-	if rf, ok := ret.Get(0).(func(db.PaymentDateRange) int64); ok {
-		r0 = rf(r)
+	if rf, ok := ret.Get(0).(func(db.PaymentDateRange, string) int64); ok {
+		r0 = rf(r, workspace)
 	} else {
 		r0 = ret.Get(0).(int64)
 	}
@@ -5539,13 +5742,14 @@ type Database_TotalHuntersPaid_Call struct {
 
 // TotalHuntersPaid is a helper method to define mock.On call
 //   - r db.PaymentDateRange
-func (_e *Database_Expecter) TotalHuntersPaid(r interface{}) *Database_TotalHuntersPaid_Call {
-	return &Database_TotalHuntersPaid_Call{Call: _e.mock.On("TotalHuntersPaid", r)}
+//   - workspace string
+func (_e *Database_Expecter) TotalHuntersPaid(r interface{}, workspace interface{}) *Database_TotalHuntersPaid_Call {
+	return &Database_TotalHuntersPaid_Call{Call: _e.mock.On("TotalHuntersPaid", r, workspace)}
 }
 
-func (_c *Database_TotalHuntersPaid_Call) Run(run func(r db.PaymentDateRange)) *Database_TotalHuntersPaid_Call {
+func (_c *Database_TotalHuntersPaid_Call) Run(run func(r db.PaymentDateRange, workspace string)) *Database_TotalHuntersPaid_Call {
 	_c.Call.Run(func(args mock.Arguments) {
-		run(args[0].(db.PaymentDateRange))
+		run(args[0].(db.PaymentDateRange), args[1].(string))
 	})
 	return _c
 }
@@ -5555,22 +5759,22 @@ func (_c *Database_TotalHuntersPaid_Call) Return(_a0 int64) *Database_TotalHunte
 	return _c
 }
 
-func (_c *Database_TotalHuntersPaid_Call) RunAndReturn(run func(db.PaymentDateRange) int64) *Database_TotalHuntersPaid_Call {
+func (_c *Database_TotalHuntersPaid_Call) RunAndReturn(run func(db.PaymentDateRange, string) int64) *Database_TotalHuntersPaid_Call {
 	_c.Call.Return(run)
 	return _c
 }
 
-// TotalPaidBounties provides a mock function with given fields: r
-func (_m *Database) TotalPaidBounties(r db.PaymentDateRange) int64 {
-	ret := _m.Called(r)
+// TotalPaidBounties provides a mock function with given fields: r, workspace
+func (_m *Database) TotalPaidBounties(r db.PaymentDateRange, workspace string) int64 {
+	ret := _m.Called(r, workspace)
 
 	if len(ret) == 0 {
 		panic("no return value specified for TotalPaidBounties")
 	}
 
 	var r0 int64
-	if rf, ok := ret.Get(0).(func(db.PaymentDateRange) int64); ok {
-		r0 = rf(r)
+	if rf, ok := ret.Get(0).(func(db.PaymentDateRange, string) int64); ok {
+		r0 = rf(r, workspace)
 	} else {
 		r0 = ret.Get(0).(int64)
 	}
@@ -5585,13 +5789,14 @@ type Database_TotalPaidBounties_Call struct {
 
 // TotalPaidBounties is a helper method to define mock.On call
 //   - r db.PaymentDateRange
-func (_e *Database_Expecter) TotalPaidBounties(r interface{}) *Database_TotalPaidBounties_Call {
-	return &Database_TotalPaidBounties_Call{Call: _e.mock.On("TotalPaidBounties", r)}
+//   - workspace string
+func (_e *Database_Expecter) TotalPaidBounties(r interface{}, workspace interface{}) *Database_TotalPaidBounties_Call {
+	return &Database_TotalPaidBounties_Call{Call: _e.mock.On("TotalPaidBounties", r, workspace)}
 }
 
-func (_c *Database_TotalPaidBounties_Call) Run(run func(r db.PaymentDateRange)) *Database_TotalPaidBounties_Call {
+func (_c *Database_TotalPaidBounties_Call) Run(run func(r db.PaymentDateRange, workspace string)) *Database_TotalPaidBounties_Call {
 	_c.Call.Run(func(args mock.Arguments) {
-		run(args[0].(db.PaymentDateRange))
+		run(args[0].(db.PaymentDateRange), args[1].(string))
 	})
 	return _c
 }
@@ -5601,22 +5806,22 @@ func (_c *Database_TotalPaidBounties_Call) Return(_a0 int64) *Database_TotalPaid
 	return _c
 }
 
-func (_c *Database_TotalPaidBounties_Call) RunAndReturn(run func(db.PaymentDateRange) int64) *Database_TotalPaidBounties_Call {
+func (_c *Database_TotalPaidBounties_Call) RunAndReturn(run func(db.PaymentDateRange, string) int64) *Database_TotalPaidBounties_Call {
 	_c.Call.Return(run)
 	return _c
 }
 
-// TotalSatsPaid provides a mock function with given fields: r
-func (_m *Database) TotalSatsPaid(r db.PaymentDateRange) uint {
-	ret := _m.Called(r)
+// TotalSatsPaid provides a mock function with given fields: r, workspace
+func (_m *Database) TotalSatsPaid(r db.PaymentDateRange, workspace string) uint {
+	ret := _m.Called(r, workspace)
 
 	if len(ret) == 0 {
 		panic("no return value specified for TotalSatsPaid")
 	}
 
 	var r0 uint
-	if rf, ok := ret.Get(0).(func(db.PaymentDateRange) uint); ok {
-		r0 = rf(r)
+	if rf, ok := ret.Get(0).(func(db.PaymentDateRange, string) uint); ok {
+		r0 = rf(r, workspace)
 	} else {
 		r0 = ret.Get(0).(uint)
 	}
@@ -5631,13 +5836,14 @@ type Database_TotalSatsPaid_Call struct {
 
 // TotalSatsPaid is a helper method to define mock.On call
 //   - r db.PaymentDateRange
-func (_e *Database_Expecter) TotalSatsPaid(r interface{}) *Database_TotalSatsPaid_Call {
-	return &Database_TotalSatsPaid_Call{Call: _e.mock.On("TotalSatsPaid", r)}
+//   - workspace string
+func (_e *Database_Expecter) TotalSatsPaid(r interface{}, workspace interface{}) *Database_TotalSatsPaid_Call {
+	return &Database_TotalSatsPaid_Call{Call: _e.mock.On("TotalSatsPaid", r, workspace)}
 }
 
-func (_c *Database_TotalSatsPaid_Call) Run(run func(r db.PaymentDateRange)) *Database_TotalSatsPaid_Call {
+func (_c *Database_TotalSatsPaid_Call) Run(run func(r db.PaymentDateRange, workspace string)) *Database_TotalSatsPaid_Call {
 	_c.Call.Run(func(args mock.Arguments) {
-		run(args[0].(db.PaymentDateRange))
+		run(args[0].(db.PaymentDateRange), args[1].(string))
 	})
 	return _c
 }
@@ -5647,22 +5853,22 @@ func (_c *Database_TotalSatsPaid_Call) Return(_a0 uint) *Database_TotalSatsPaid_
 	return _c
 }
 
-func (_c *Database_TotalSatsPaid_Call) RunAndReturn(run func(db.PaymentDateRange) uint) *Database_TotalSatsPaid_Call {
+func (_c *Database_TotalSatsPaid_Call) RunAndReturn(run func(db.PaymentDateRange, string) uint) *Database_TotalSatsPaid_Call {
 	_c.Call.Return(run)
 	return _c
 }
 
-// TotalSatsPosted provides a mock function with given fields: r
-func (_m *Database) TotalSatsPosted(r db.PaymentDateRange) uint {
-	ret := _m.Called(r)
+// TotalSatsPosted provides a mock function with given fields: r, workspace
+func (_m *Database) TotalSatsPosted(r db.PaymentDateRange, workspace string) uint {
+	ret := _m.Called(r, workspace)
 
 	if len(ret) == 0 {
 		panic("no return value specified for TotalSatsPosted")
 	}
 
 	var r0 uint
-	if rf, ok := ret.Get(0).(func(db.PaymentDateRange) uint); ok {
-		r0 = rf(r)
+	if rf, ok := ret.Get(0).(func(db.PaymentDateRange, string) uint); ok {
+		r0 = rf(r, workspace)
 	} else {
 		r0 = ret.Get(0).(uint)
 	}
@@ -5677,13 +5883,14 @@ type Database_TotalSatsPosted_Call struct {
 
 // TotalSatsPosted is a helper method to define mock.On call
 //   - r db.PaymentDateRange
-func (_e *Database_Expecter) TotalSatsPosted(r interface{}) *Database_TotalSatsPosted_Call {
-	return &Database_TotalSatsPosted_Call{Call: _e.mock.On("TotalSatsPosted", r)}
+//   - workspace string
+func (_e *Database_Expecter) TotalSatsPosted(r interface{}, workspace interface{}) *Database_TotalSatsPosted_Call {
+	return &Database_TotalSatsPosted_Call{Call: _e.mock.On("TotalSatsPosted", r, workspace)}
 }
 
-func (_c *Database_TotalSatsPosted_Call) Run(run func(r db.PaymentDateRange)) *Database_TotalSatsPosted_Call {
+func (_c *Database_TotalSatsPosted_Call) Run(run func(r db.PaymentDateRange, workspace string)) *Database_TotalSatsPosted_Call {
 	_c.Call.Run(func(args mock.Arguments) {
-		run(args[0].(db.PaymentDateRange))
+		run(args[0].(db.PaymentDateRange), args[1].(string))
 	})
 	return _c
 }
@@ -5693,7 +5900,7 @@ func (_c *Database_TotalSatsPosted_Call) Return(_a0 uint) *Database_TotalSatsPos
 	return _c
 }
 
-func (_c *Database_TotalSatsPosted_Call) RunAndReturn(run func(db.PaymentDateRange) uint) *Database_TotalSatsPosted_Call {
+func (_c *Database_TotalSatsPosted_Call) RunAndReturn(run func(db.PaymentDateRange, string) uint) *Database_TotalSatsPosted_Call {
 	_c.Call.Return(run)
 	return _c
 }
