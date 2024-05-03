@@ -130,6 +130,7 @@ type Database interface {
 	AverageCompletedTime(r PaymentDateRange, workspace string) uint
 	TotalBountiesPosted(r PaymentDateRange, workspace string) int64
 	TotalPaidBounties(r PaymentDateRange, workspace string) int64
+	TotalAssignedBounties(r PaymentDateRange, workspace string) int64
 	NewHuntersPaid(r PaymentDateRange, workspace string) int64
 	TotalHuntersPaid(r PaymentDateRange, workspace string) int64
 	GetPersonByPubkey(pubkey string) Person

@@ -82,6 +82,18 @@ func (db database) TotalPaidBounties(r PaymentDateRange, workspace string) int64
 	return count
 }
 
+func (db database) TotalAssignedBounties(r PaymentDateRange, workspace string) int64 {
+	var count int64
+	query := db.db.Model(&NewBounty{}).Where("assignee != ''").Where("paid = ?", false).Where("created >= ?", r.StartDate).Where("created <= ?", r.EndDate)
+
+	if workspace != "" {
+		query.Where("workspace_uuid", workspace)
+	}
+
+	query.Count(&count)
+	return count
+}
+
 func (db database) TotalHuntersPaid(r PaymentDateRange, workspace string) int64 {
 	var count int64
 	query := fmt.Sprintf(`SELECT COUNT(DISTINCT assignee) FROM bounty WHERE assignee !='' AND paid=true AND created >= %s AND created <= %s`, r.StartDate, r.EndDate)
@@ -144,11 +156,11 @@ func (db database) BountiesPaidPercentage(r PaymentDateRange, workspace string) 
 func (db database) PaidDifference(r PaymentDateRange, workspace string) []DateDifference {
 	ms := []DateDifference{}
 
-	query := fmt.Sprintf("SELECT EXTRACT(EPOCH FROM (paid_date - TO_TIMESTAMP(created))) as diff FROM public.bounty WHERE paid_date IS NOT NULL AND created >= %s AND created <= %s", "`"+r.StartDate+"`", "`"+r.EndDate+"`")
+	query := fmt.Sprintf("SELECT EXTRACT(EPOCH FROM (paid_date - TO_TIMESTAMP(created))) as diff FROM public.bounty WHERE paid_date IS NOT NULL AND created >= %s AND created <= %s", r.StartDate, r.EndDate)
 
 	var workspaceQuery string
 	if workspace != "" {
-		workspaceQuery = fmt.Sprintf("AND workspace_uuid = `%s`", workspace)
+		workspaceQuery = fmt.Sprintf("AND workspace_uuid = '%s'", workspace)
 	}
 
 	allQuery := query + " " + workspaceQuery
@@ -176,11 +188,11 @@ func (db database) AveragePaidTime(r PaymentDateRange, workspace string) uint {
 func (db database) CompletedDifference(r PaymentDateRange, workspace string) []DateDifference {
 	ms := []DateDifference{}
 
-	query := fmt.Sprintf("SELECT EXTRACT(EPOCH FROM (completion_date - TO_TIMESTAMP(created))) as diff FROM public.bounty WHERE completion_date IS NOT NULL AND created >= %s AND created <= %s ", "`"+r.StartDate+"`", "`"+r.EndDate+"`")
+	query := fmt.Sprintf("SELECT EXTRACT(EPOCH FROM (completion_date - TO_TIMESTAMP(created))) as diff FROM public.bounty WHERE completion_date IS NOT NULL AND created >= %s AND created <= %s", r.StartDate, r.EndDate)
 
 	var workspaceQuery string
 	if workspace != "" {
-		workspaceQuery = fmt.Sprintf("AND workspace_uuid = `%s`", workspace)
+		workspaceQuery = fmt.Sprintf("AND workspace_uuid = '%s'", workspace)
 	}
 
 	allQuery := query + " " + workspaceQuery
@@ -223,8 +235,6 @@ func (db database) GetBountiesByDateRange(r PaymentDateRange, re *http.Request) 
 	paid := keys.Get("Paid")
 	providers := keys.Get("provider")
 	workspace := keys.Get("workspace")
-
-	fmt.Println("WORSKPACE === workspace", workspace)
 
 	orderQuery := ""
 	limitQuery := ""
@@ -273,10 +283,6 @@ func (db database) GetBountiesByDateRange(r PaymentDateRange, re *http.Request) 
 	b := []NewBounty{}
 	db.db.Raw(allQuery).Find(&b)
 
-	if workspace != "" {
-		fmt.Println("Bounties1  ===", b)
-		fmt.Println("Query1 ===", allQuery)
-	}
 	return b
 }
 
