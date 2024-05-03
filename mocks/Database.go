@@ -930,6 +930,62 @@ func (_c *Database_CreateOrEditBounty_Call) RunAndReturn(run func(db.NewBounty) 
 	return _c
 }
 
+// CreateOrEditFeature provides a mock function with given fields: m
+func (_m *Database) CreateOrEditFeature(m db.WorkspaceFeatures) (db.WorkspaceFeatures, error) {
+	ret := _m.Called(m)
+
+	if len(ret) == 0 {
+		panic("no return value specified for CreateOrEditFeature")
+	}
+
+	var r0 db.WorkspaceFeatures
+	var r1 error
+	if rf, ok := ret.Get(0).(func(db.WorkspaceFeatures) (db.WorkspaceFeatures, error)); ok {
+		return rf(m)
+	}
+	if rf, ok := ret.Get(0).(func(db.WorkspaceFeatures) db.WorkspaceFeatures); ok {
+		r0 = rf(m)
+	} else {
+		r0 = ret.Get(0).(db.WorkspaceFeatures)
+	}
+
+	if rf, ok := ret.Get(1).(func(db.WorkspaceFeatures) error); ok {
+		r1 = rf(m)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
+// Database_CreateOrEditFeature_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'CreateOrEditFeature'
+type Database_CreateOrEditFeature_Call struct {
+	*mock.Call
+}
+
+// CreateOrEditFeature is a helper method to define mock.On call
+//   - m db.WorkspaceFeatures
+func (_e *Database_Expecter) CreateOrEditFeature(m interface{}) *Database_CreateOrEditFeature_Call {
+	return &Database_CreateOrEditFeature_Call{Call: _e.mock.On("CreateOrEditFeature", m)}
+}
+
+func (_c *Database_CreateOrEditFeature_Call) Run(run func(m db.WorkspaceFeatures)) *Database_CreateOrEditFeature_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(db.WorkspaceFeatures))
+	})
+	return _c
+}
+
+func (_c *Database_CreateOrEditFeature_Call) Return(_a0 db.WorkspaceFeatures, _a1 error) *Database_CreateOrEditFeature_Call {
+	_c.Call.Return(_a0, _a1)
+	return _c
+}
+
+func (_c *Database_CreateOrEditFeature_Call) RunAndReturn(run func(db.WorkspaceFeatures) (db.WorkspaceFeatures, error)) *Database_CreateOrEditFeature_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
 // CreateOrEditPerson provides a mock function with given fields: m
 func (_m *Database) CreateOrEditPerson(m db.Person) (db.Person, error) {
 	ret := _m.Called(m)
@@ -2519,6 +2575,100 @@ func (_c *Database_GetCreatedBounties_Call) Return(_a0 []db.NewBounty, _a1 error
 }
 
 func (_c *Database_GetCreatedBounties_Call) RunAndReturn(run func(*http.Request) ([]db.NewBounty, error)) *Database_GetCreatedBounties_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
+// GetFeatureByUuid provides a mock function with given fields: uuid
+func (_m *Database) GetFeatureByUuid(uuid string) db.WorkspaceFeatures {
+	ret := _m.Called(uuid)
+
+	if len(ret) == 0 {
+		panic("no return value specified for GetFeatureByUuid")
+	}
+
+	var r0 db.WorkspaceFeatures
+	if rf, ok := ret.Get(0).(func(string) db.WorkspaceFeatures); ok {
+		r0 = rf(uuid)
+	} else {
+		r0 = ret.Get(0).(db.WorkspaceFeatures)
+	}
+
+	return r0
+}
+
+// Database_GetFeatureByUuid_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'GetFeatureByUuid'
+type Database_GetFeatureByUuid_Call struct {
+	*mock.Call
+}
+
+// GetFeatureByUuid is a helper method to define mock.On call
+//   - uuid string
+func (_e *Database_Expecter) GetFeatureByUuid(uuid interface{}) *Database_GetFeatureByUuid_Call {
+	return &Database_GetFeatureByUuid_Call{Call: _e.mock.On("GetFeatureByUuid", uuid)}
+}
+
+func (_c *Database_GetFeatureByUuid_Call) Run(run func(uuid string)) *Database_GetFeatureByUuid_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(string))
+	})
+	return _c
+}
+
+func (_c *Database_GetFeatureByUuid_Call) Return(_a0 db.WorkspaceFeatures) *Database_GetFeatureByUuid_Call {
+	_c.Call.Return(_a0)
+	return _c
+}
+
+func (_c *Database_GetFeatureByUuid_Call) RunAndReturn(run func(string) db.WorkspaceFeatures) *Database_GetFeatureByUuid_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
+// GetFeaturesByWorkspaceUuid provides a mock function with given fields: uuid
+func (_m *Database) GetFeaturesByWorkspaceUuid(uuid string) []db.WorkspaceFeatures {
+	ret := _m.Called(uuid)
+
+	if len(ret) == 0 {
+		panic("no return value specified for GetFeaturesByWorkspaceUuid")
+	}
+
+	var r0 []db.WorkspaceFeatures
+	if rf, ok := ret.Get(0).(func(string) []db.WorkspaceFeatures); ok {
+		r0 = rf(uuid)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).([]db.WorkspaceFeatures)
+		}
+	}
+
+	return r0
+}
+
+// Database_GetFeaturesByWorkspaceUuid_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'GetFeaturesByWorkspaceUuid'
+type Database_GetFeaturesByWorkspaceUuid_Call struct {
+	*mock.Call
+}
+
+// GetFeaturesByWorkspaceUuid is a helper method to define mock.On call
+//   - uuid string
+func (_e *Database_Expecter) GetFeaturesByWorkspaceUuid(uuid interface{}) *Database_GetFeaturesByWorkspaceUuid_Call {
+	return &Database_GetFeaturesByWorkspaceUuid_Call{Call: _e.mock.On("GetFeaturesByWorkspaceUuid", uuid)}
+}
+
+func (_c *Database_GetFeaturesByWorkspaceUuid_Call) Run(run func(uuid string)) *Database_GetFeaturesByWorkspaceUuid_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(string))
+	})
+	return _c
+}
+
+func (_c *Database_GetFeaturesByWorkspaceUuid_Call) Return(_a0 []db.WorkspaceFeatures) *Database_GetFeaturesByWorkspaceUuid_Call {
+	_c.Call.Return(_a0)
+	return _c
+}
+
+func (_c *Database_GetFeaturesByWorkspaceUuid_Call) RunAndReturn(run func(string) []db.WorkspaceFeatures) *Database_GetFeaturesByWorkspaceUuid_Call {
 	_c.Call.Return(run)
 	return _c
 }
