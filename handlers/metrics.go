@@ -152,6 +152,7 @@ func (mh *metricHandler) BountyMetrics(w http.ResponseWriter, r *http.Request) {
 
 	totalBountiesPosted := mh.db.TotalBountiesPosted(request, workspace)
 	totalBountiesPaid := mh.db.TotalPaidBounties(request, workspace)
+	totalBountiesAssigned := mh.db.TotalAssignedBounties(request, workspace)
 	bountiesPaidPercentage := mh.db.BountiesPaidPercentage(request, workspace)
 	totalSatsPosted := mh.db.TotalSatsPosted(request, workspace)
 	totalSatsPaid := mh.db.TotalSatsPaid(request, workspace)
@@ -164,6 +165,7 @@ func (mh *metricHandler) BountyMetrics(w http.ResponseWriter, r *http.Request) {
 	bountyMetrics := db.BountyMetrics{
 		BountiesPosted:         totalBountiesPosted,
 		BountiesPaid:           totalBountiesPaid,
+		BountiesAssigned:       totalBountiesAssigned,
 		BountiesPaidPercentage: bountiesPaidPercentage,
 		SatsPosted:             totalSatsPosted,
 		SatsPaid:               totalSatsPaid,

@@ -5369,6 +5369,53 @@ func (_c *Database_SearchTribes_Call) RunAndReturn(run func(string) []db.Tribe) 
 	return _c
 }
 
+// TotalAssignedBounties provides a mock function with given fields: r, workspace
+func (_m *Database) TotalAssignedBounties(r db.PaymentDateRange, workspace string) int64 {
+	ret := _m.Called(r, workspace)
+
+	if len(ret) == 0 {
+		panic("no return value specified for TotalAssignedBounties")
+	}
+
+	var r0 int64
+	if rf, ok := ret.Get(0).(func(db.PaymentDateRange, string) int64); ok {
+		r0 = rf(r, workspace)
+	} else {
+		r0 = ret.Get(0).(int64)
+	}
+
+	return r0
+}
+
+// Database_TotalAssignedBounties_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'TotalAssignedBounties'
+type Database_TotalAssignedBounties_Call struct {
+	*mock.Call
+}
+
+// TotalAssignedBounties is a helper method to define mock.On call
+//   - r db.PaymentDateRange
+//   - workspace string
+func (_e *Database_Expecter) TotalAssignedBounties(r interface{}, workspace interface{}) *Database_TotalAssignedBounties_Call {
+	return &Database_TotalAssignedBounties_Call{Call: _e.mock.On("TotalAssignedBounties", r, workspace)}
+}
+
+func (_c *Database_TotalAssignedBounties_Call) Run(run func(r db.PaymentDateRange, workspace string)) *Database_TotalAssignedBounties_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(db.PaymentDateRange), args[1].(string))
+	})
+	return _c
+}
+
+func (_c *Database_TotalAssignedBounties_Call) Return(_a0 int64) *Database_TotalAssignedBounties_Call {
+	_c.Call.Return(_a0)
+	return _c
+}
+
+func (_c *Database_TotalAssignedBounties_Call) RunAndReturn(run func(db.PaymentDateRange, string) int64) *Database_TotalAssignedBounties_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
 // TotalBountiesPosted provides a mock function with given fields: r, workspace
 func (_m *Database) TotalBountiesPosted(r db.PaymentDateRange, workspace string) int64 {
 	ret := _m.Called(r, workspace)
