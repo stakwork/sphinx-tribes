@@ -139,4 +139,6 @@ type Database interface {
 	PersonUniqueNameFromName(name string) (string, error)
 	ProcessAlerts(p Person)
 	UserHasAccess(pubKeyFromAuth string, uuid string, role string) bool
+	CreateWorkspaceRepository(m WorkspaceRepositories) (WorkspaceRepositories, error)
+	GetWorkspaceRepositorByWorkspaceUuid(uuid string) []WorkspaceRepositories
 }

@@ -4,6 +4,7 @@ import (
 	"errors"
 	"fmt"
 	"net/http"
+	"strings"
 	"time"
 
 	"github.com/stakwork/sphinx-tribes/utils"
@@ -50,6 +51,29 @@ func (db database) CreateOrEditWorkspace(m Workspace) (Workspace, error) {
 	}
 
 	return m, nil
+}
+
+func (db database) CreateWorkspaceRepository(m WorkspaceRepositories) (WorkspaceRepositories, error) {
+	m.Name = strings.TrimSpace(m.Name)
+	m.Url = strings.TrimSpace(m.Url)
+
+	now := time.Now()
+	m.Updated = &now
+
+	if db.db.Model(&m).Where("uuid = ?", m.Uuid).Updates(&m).RowsAffected == 0 {
+		m.Created = &now
+		db.db.Create(&m)
+	}
+
+	return m, nil
+}
+
+func (db database) GetWorkspaceRepositorByWorkspaceUuid(uuid string) []WorkspaceRepositories {
+	ms := []WorkspaceRepositories{}
+
+	db.db.Model(&WorkspaceRepositories{}).Where("workspace_uuid = ?", uuid).Order("Created").Find(&ms)
+
+	return ms
 }
 
 func (db database) GetWorkspaceUsers(uuid string) ([]WorkspaceUsersData, error) {
