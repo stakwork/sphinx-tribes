@@ -806,6 +806,7 @@ type DateDifference struct {
 type BountyMetrics struct {
 	BountiesPosted         int64 `json:"bounties_posted"`
 	BountiesPaid           int64 `json:"bounties_paid"`
+	BountiesAssigned       int64 `json:"bounties_assigned"`
 	BountiesPaidPercentage uint  `json:"bounties_paid_average"`
 	SatsPosted             uint  `json:"sats_posted"`
 	SatsPaid               uint  `json:"sats_paid"`

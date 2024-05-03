@@ -13,6 +13,8 @@ func MetricsRoutes() chi.Router {
 	r.Group(func(r chi.Router) {
 		r.Use(auth.PubKeyContextSuperAdmin)
 
+		r.Get("/workspaces", handlers.GetAdminWorkspaces)
+
 		r.Post("/payment", handlers.PaymentMetrics)
 		r.Post("/people", handlers.PeopleMetrics)
 		r.Post("/organization", handlers.WorkspacetMetrics)
