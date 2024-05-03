@@ -10,8 +10,10 @@ describe('Create Repositories for Workspace', () => {
                     url: `${HostName}/workspaces/repositories`,
                     headers: { 'x-jwt': `${value}` },
                     body: Repositories[i]
-                }).its('body').should('have.property', 'name', Repositories[i].name.trim())
-                .its('body').should('have.property', 'url', Repositories[i].url.trim());
+                }).its('body').then(body => {
+                    expect(body).to.have.property('name').and.equal(Repositories[i].name.trim());
+                    expect(body).to.have.property('url').and.equal(Repositories[i].url.trim());
+                });                
             }
         })
     })

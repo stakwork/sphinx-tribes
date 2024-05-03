@@ -547,6 +547,18 @@ type WorkspaceUsersData struct {
 	Person
 }
 
+type WorkspaceRepositories struct {
+	ID            uint       `json:"id"`
+	Uuid          string     `json:"uuid"`
+	WorkspaceUuid string     `json:"workspace_uuid"`
+	Name          string     `json:"name"`
+	Url           string     `json:"url"`
+	Created       *time.Time `json:"created"`
+	Updated       *time.Time `json:"updated"`
+	CreatedBy     string     `json:"created_by"`
+	UpdatedBy     string     `json:"updated_by"`
+}
+
 type BountyRoles struct {
 	Name string `json:"name"`
 }
