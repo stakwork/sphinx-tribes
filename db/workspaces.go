@@ -14,8 +14,13 @@ func (db database) GetWorkspaces(r *http.Request) []Workspace {
 	ms := []Workspace{}
 	offset, limit, sortBy, direction, search := utils.GetPaginationParams(r)
 
-	// return if like owner_alias, unique_name, or equals pubkey
-	db.db.Offset(offset).Limit(limit).Order(sortBy+" "+direction+" ").Where("LOWER(name) LIKE ?", "%"+search+"%").Where("deleted != ?", false).Find(&ms)
+	query := db.db.Model(&ms).Where("LOWER(name) LIKE ?", "%"+search+"%").Where("deleted != ?", true)
+
+	if limit > 1 {
+		query.Offset(offset).Limit(limit).Order(sortBy + " " + direction + " ")
+	}
+
+	query.Find(&ms)
 	return ms
 }
 
@@ -186,11 +191,15 @@ func (db database) GetWorkspaceStatusBudget(workspace_uuid string) StatusBudget 
 	var openCount int64
 	db.db.Model(&Bounty{}).Where("assignee = '' ").Where("paid != true").Count(&openCount)
 
+	var openDifference int = int(orgBudget.TotalBudget - openBudget)
+
 	var assignedBudget uint
 	db.db.Model(&Bounty{}).Where("assignee != '' ").Where("paid != true").Select("SUM(price)").Row().Scan(&assignedBudget)
 
 	var assignedCount int64
 	db.db.Model(&Bounty{}).Where("assignee != '' ").Where("paid != true").Count(&assignedCount)
+
+	var assignedDifference int = int(orgBudget.TotalBudget - assignedBudget)
 
 	var completedBudget uint
 	db.db.Model(&Bounty{}).Where("completed = true ").Where("paid != true").Select("SUM(price)").Row().Scan(&completedBudget)
@@ -198,16 +207,21 @@ func (db database) GetWorkspaceStatusBudget(workspace_uuid string) StatusBudget 
 	var completedCount int64
 	db.db.Model(&Bounty{}).Where("completed = true ").Where("paid != true").Count(&completedCount)
 
+	var completedDifference int = int(orgBudget.TotalBudget - completedBudget)
+
 	statusBudget := StatusBudget{
-		OrgUuid:         workspace_uuid,
-		WorkspaceUuid:   workspace_uuid,
-		CurrentBudget:   orgBudget.TotalBudget,
-		OpenBudget:      openBudget,
-		OpenCount:       openCount,
-		AssignedBudget:  assignedBudget,
-		AssignedCount:   assignedCount,
-		CompletedBudget: completedBudget,
-		CompletedCount:  completedCount,
+		OrgUuid:             workspace_uuid,
+		WorkspaceUuid:       workspace_uuid,
+		CurrentBudget:       orgBudget.TotalBudget,
+		OpenBudget:          openBudget,
+		OpenCount:           openCount,
+		OpenDifference:      openDifference,
+		AssignedBudget:      assignedBudget,
+		AssignedCount:       assignedCount,
+		AssignedDifference:  assignedDifference,
+		CompletedBudget:     completedBudget,
+		CompletedCount:      completedCount,
+		CompletedDifference: completedDifference,
 	}
 
 	return statusBudget

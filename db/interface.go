@@ -122,18 +122,19 @@ type Database interface {
 	DeleteAllUsersFromWorkspace(uuid string) error
 	GetFilterStatusCount() FilterStattuCount
 	UserHasManageBountyRoles(pubKeyFromAuth string, uuid string) bool
-	BountiesPaidPercentage(r PaymentDateRange) uint
-	TotalSatsPosted(r PaymentDateRange) uint
-	TotalSatsPaid(r PaymentDateRange) uint
-	SatsPaidPercentage(r PaymentDateRange) uint
-	AveragePaidTime(r PaymentDateRange) uint
-	AverageCompletedTime(r PaymentDateRange) uint
-	TotalBountiesPosted(r PaymentDateRange) int64
-	TotalPaidBounties(r PaymentDateRange) int64
-	NewHuntersPaid(r PaymentDateRange) int64
-	TotalHuntersPaid(r PaymentDateRange) int64
+	BountiesPaidPercentage(r PaymentDateRange, workspace string) uint
+	TotalSatsPosted(r PaymentDateRange, workspace string) uint
+	TotalSatsPaid(r PaymentDateRange, workspace string) uint
+	SatsPaidPercentage(r PaymentDateRange, workspace string) uint
+	AveragePaidTime(r PaymentDateRange, workspace string) uint
+	AverageCompletedTime(r PaymentDateRange, workspace string) uint
+	TotalBountiesPosted(r PaymentDateRange, workspace string) int64
+	TotalPaidBounties(r PaymentDateRange, workspace string) int64
+	TotalAssignedBounties(r PaymentDateRange, workspace string) int64
+	NewHuntersPaid(r PaymentDateRange, workspace string) int64
+	TotalHuntersPaid(r PaymentDateRange, workspace string) int64
 	GetPersonByPubkey(pubkey string) Person
-	GetBountiesByDateRange(r PaymentDateRange, re *http.Request) []Bounty
+	GetBountiesByDateRange(r PaymentDateRange, re *http.Request) []NewBounty
 	GetBountiesByDateRangeCount(r PaymentDateRange, re *http.Request) int64
 	GetBountiesProviders(r PaymentDateRange, re *http.Request) []Person
 	PersonUniqueNameFromName(name string) (string, error)
@@ -141,4 +142,7 @@ type Database interface {
 	UserHasAccess(pubKeyFromAuth string, uuid string, role string) bool
 	CreateWorkspaceRepository(m WorkspaceRepositories) (WorkspaceRepositories, error)
 	GetWorkspaceRepositorByWorkspaceUuid(uuid string) []WorkspaceRepositories
+	CreateOrEditFeature(m WorkspaceFeatures) (WorkspaceFeatures, error)
+	GetFeaturesByWorkspaceUuid(uuid string) []WorkspaceFeatures
+	GetFeatureByUuid(uuid string) WorkspaceFeatures
 }
