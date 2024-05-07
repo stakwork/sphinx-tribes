@@ -552,17 +552,17 @@ type WorkspaceUsersData struct {
 }
 
 type WorkspaceFeatures struct {
-	ID             uint       `json:"id"`
-	Uuid           string     `json:"uuid"`
-	WorkspaceUuid  string     `json:"workspace_uuid"`
-	Name           string     `json:"name"`
-	Brief          string     `json:"brief"`
-	Requirements   string     `json:"requirements"`
-	Architecture   string     `json:"architecture"`
-	Created        *time.Time `json:"created"`
-	Updated        *time.Time `json:"updated"`
-	CreatedBy      string     `json:"created_by"`
-	UpdatedBy      string     `json:"updated_by"`
+	ID            uint       `json:"id"`
+	Uuid          string     `json:"uuid"`
+	WorkspaceUuid string     `json:"workspace_uuid"`
+	Name          string     `json:"name"`
+	Brief         string     `json:"brief"`
+	Requirements  string     `json:"requirements"`
+	Architecture  string     `json:"architecture"`
+	Created       *time.Time `json:"created"`
+	Updated       *time.Time `json:"updated"`
+	CreatedBy     string     `json:"created_by"`
+	UpdatedBy     string     `json:"updated_by"`
 }
 
 type BountyRoles struct {
@@ -689,11 +689,11 @@ type NewPaymentHistory struct {
 }
 
 type PaymentHistoryData struct {
-	PaymentHistory NewPaymentHistory
-	SenderName     string `json:"sender_name"`
-	ReceiverName   string `json:"receiver_name"`
-	SenderImg      string `json:"sender_img"`
-	ReceiverImg    string `json:"receiver_img"`
+	NewPaymentHistory
+	SenderName   string `json:"sender_name"`
+	ReceiverName string `json:"receiver_name"`
+	SenderImg    string `json:"sender_img"`
+	ReceiverImg  string `json:"receiver_img"`
 }
 
 type PaymentData struct {
