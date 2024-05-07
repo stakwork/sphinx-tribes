@@ -146,42 +146,41 @@ func (db database) UpdateWorkspaceBudget(budget NewBountyBudget) NewBountyBudget
 
 func (db database) GetPaymentHistoryByCreated(created *time.Time, workspace_uuid string) NewPaymentHistory {
 	ms := NewPaymentHistory{}
-	db.db.Where("created = ?", created).Where("workspace_uuid = ? ", workspace_uuid).Find(&ms)
+	db.db.Model(&NewPaymentHistory{}).Where("created = ?", created).Where("workspace_uuid = ? ", workspace_uuid).Find(&ms)
 	return ms
 }
 
 func (db database) GetWorkspaceBudget(workspace_uuid string) NewBountyBudget {
 	ms := NewBountyBudget{}
-	db.db.Where("workspace_uuid = ?", workspace_uuid).Find(&ms)
+	db.db.Model(&NewBountyBudget{}).Where("workspace_uuid = ?", workspace_uuid).Find(&ms)
 
 	return ms
 }
 
 func (db database) GetWorkspaceStatusBudget(workspace_uuid string) StatusBudget {
-
 	orgBudget := db.GetWorkspaceBudget(workspace_uuid)
 
 	var openBudget uint
-	db.db.Model(&Bounty{}).Where("assignee = '' ").Where("paid != true").Select("SUM(price)").Row().Scan(&openBudget)
+	db.db.Model(&NewBounty{}).Where("assignee = '' ").Where("paid != true").Select("SUM(price)").Row().Scan(&openBudget)
 
 	var openCount int64
-	db.db.Model(&Bounty{}).Where("assignee = '' ").Where("paid != true").Count(&openCount)
+	db.db.Model(&NewBounty{}).Where("assignee = '' ").Where("paid != true").Count(&openCount)
 
 	var openDifference int = int(orgBudget.TotalBudget - openBudget)
 
 	var assignedBudget uint
-	db.db.Model(&Bounty{}).Where("assignee != '' ").Where("paid != true").Select("SUM(price)").Row().Scan(&assignedBudget)
+	db.db.Model(&NewBounty{}).Where("assignee != '' ").Where("paid != true").Select("SUM(price)").Row().Scan(&assignedBudget)
 
 	var assignedCount int64
-	db.db.Model(&Bounty{}).Where("assignee != '' ").Where("paid != true").Count(&assignedCount)
+	db.db.Model(&NewBounty{}).Where("assignee != '' ").Where("paid != true").Count(&assignedCount)
 
 	var assignedDifference int = int(orgBudget.TotalBudget - assignedBudget)
 
 	var completedBudget uint
-	db.db.Model(&Bounty{}).Where("completed = true ").Where("paid != true").Select("SUM(price)").Row().Scan(&completedBudget)
+	db.db.Model(&NewBounty{}).Where("completed = true ").Where("paid != true").Select("SUM(price)").Row().Scan(&completedBudget)
 
 	var completedCount int64
-	db.db.Model(&Bounty{}).Where("completed = true ").Where("paid != true").Count(&completedCount)
+	db.db.Model(&NewBounty{}).Where("completed = true ").Where("paid != true").Count(&completedCount)
 
 	var completedDifference int = int(orgBudget.TotalBudget - completedBudget)
 
@@ -223,7 +222,7 @@ func (db database) AddAndUpdateBudget(invoice NewInvoiceList) NewPaymentHistory 
 		// get Workspace budget and add payment to total budget
 		WorkspaceBudget := db.GetWorkspaceBudget(workspace_uuid)
 
-		if WorkspaceBudget.OrgUuid == "" {
+		if WorkspaceBudget.WorkspaceUuid == "" {
 			now := time.Now()
 			orgBudget := NewBountyBudget{
 				WorkspaceUuid: workspace_uuid,
