@@ -640,11 +640,11 @@ func GetPaymentHistory(w http.ResponseWriter, r *http.Request) {
 		sender := db.DB.GetPersonByPubkey(payment.SenderPubKey)
 		receiver := db.DB.GetPersonByPubkey(payment.ReceiverPubKey)
 		paymentData := db.PaymentHistoryData{
-			PaymentHistory: payment,
-			SenderName:     sender.UniqueName,
-			SenderImg:      sender.Img,
-			ReceiverName:   receiver.UniqueName,
-			ReceiverImg:    receiver.Img,
+			NewPaymentHistory: payment,
+			SenderName:        sender.UniqueName,
+			SenderImg:         sender.Img,
+			ReceiverName:      receiver.UniqueName,
+			ReceiverImg:       receiver.Img,
 		}
 		paymentHistoryData = append(paymentHistoryData, paymentData)
 	}
