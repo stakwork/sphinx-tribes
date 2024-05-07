@@ -224,13 +224,13 @@ func (db database) AddAndUpdateBudget(invoice NewInvoiceList) NewPaymentHistory 
 
 		if WorkspaceBudget.WorkspaceUuid == "" {
 			now := time.Now()
-			orgBudget := NewBountyBudget{
+			workBudget := NewBountyBudget{
 				WorkspaceUuid: workspace_uuid,
 				TotalBudget:   paymentHistory.Amount,
 				Created:       &now,
 				Updated:       &now,
 			}
-			db.CreateWorkspaceBudget(orgBudget)
+			db.CreateWorkspaceBudget(workBudget)
 		} else {
 			totalBudget := WorkspaceBudget.TotalBudget
 			WorkspaceBudget.TotalBudget = totalBudget + paymentHistory.Amount
