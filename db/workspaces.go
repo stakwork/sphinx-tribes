@@ -138,7 +138,7 @@ func (db database) CreateWorkspaceBudget(budget NewBountyBudget) NewBountyBudget
 }
 
 func (db database) UpdateWorkspaceBudget(budget NewBountyBudget) NewBountyBudget {
-	db.db.Model(&NewBountyBudget{}).Where("workspace_uuid = ?", budget.OrgUuid).Updates(map[string]interface{}{
+	db.db.Model(&NewBountyBudget{}).Where("workspace_uuid = ?", budget.WorkspaceUuid).Updates(map[string]interface{}{
 		"total_budget": budget.TotalBudget,
 	})
 	return budget
