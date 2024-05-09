@@ -271,7 +271,7 @@ func (db database) AddPaymentHistory(payment NewPaymentHistory) NewPaymentHistor
 	db.db.Create(&payment)
 
 	// get Workspace budget and subtract payment from total budget
-	WorkspaceBudget := db.GetWorkspaceBudget(payment.OrgUuid)
+	WorkspaceBudget := db.GetWorkspaceBudget(payment.WorkspaceUuid)
 	totalBudget := WorkspaceBudget.TotalBudget
 
 	// deduct amount if it's a bounty payment
