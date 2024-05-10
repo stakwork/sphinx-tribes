@@ -129,12 +129,12 @@ export const Features = [
 ];
 
 export const UserStories = [
-    { uuid: 'com1lh0n1e49ug76noig', feature_uuid: 'com1kson1e49th88dbg0', description: ' As a {PM} I want to {make providers \"hive ready\"}, so I can {leverage the hive process ' },
-    { uuid: 'com1lk8n1e49uqfe3l40', feature_uuid: 'com1kson1e49th88dbg0', description: ' As a {PM} I want to {CRUD Features}, so I can {use the system to manage my features} ' },
-    { uuid: 'com1ln8n1e49v4159gug', feature_uuid: 'com1kson1e49th88dbg0', description: ' As a {PM} I want to {follow best practices}, so I can {make more valuable features} ' },
-    { uuid: 'com1lqgn1e49vevhs9k0', feature_uuid: 'com1kson1e49th88dbg0', description: ' As a {PM} I want to {save the architecture of the feature}, so I can {share it with people} ' },
-    { uuid: 'com1lt8n1e49voquoq90', feature_uuid: 'com1kson1e49th88dbg0', description: ' As a {PM} I want to {create phases}, so I can {divide the work in several deliverable stages} ' },
-    { uuid: 'com1m08n1e4a02r6j0pg', feature_uuid: 'com1kson1e49th88dbg0', description: ' As a {PM} I want to {assign bounties to features}, so I can {group bounties together} ' },
+    { uuid: 'com1lh0n1e49ug76noig', feature_uuid: 'com1kson1e49th88dbg0', description: ' As a {PM} I want to {make providers \"hive ready\"}, so I can {leverage the hive process ', priority: 0 },
+    { uuid: 'com1lk8n1e49uqfe3l40', feature_uuid: 'com1kson1e49th88dbg0', description: ' As a {PM} I want to {CRUD Features}, so I can {use the system to manage my features} ', priority: 1 },
+    { uuid: 'com1ln8n1e49v4159gug', feature_uuid: 'com1kson1e49th88dbg0', description: ' As a {PM} I want to {follow best practices}, so I can {make more valuable features} ', priority: 2 },
+    { uuid: 'com1lqgn1e49vevhs9k0', feature_uuid: 'com1kson1e49th88dbg0', description: ' As a {PM} I want to {save the architecture of the feature}, so I can {share it with people} ', priority: 3 },
+    { uuid: 'com1lt8n1e49voquoq90', feature_uuid: 'com1kson1e49th88dbg0', description: ' As a {PM} I want to {create phases}, so I can {divide the work in several deliverable stages} ', priority: 4 },
+    { uuid: 'com1m08n1e4a02r6j0pg', feature_uuid: 'com1kson1e49th88dbg0', description: ' As a {PM} I want to {assign bounties to features}, so I can {group bounties together} ', priority: 5 },
 ];
 
 export const Phases = [
