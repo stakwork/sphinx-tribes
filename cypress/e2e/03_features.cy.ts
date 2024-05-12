@@ -120,9 +120,9 @@ describe('Get Features for Workspace', () => {
         cy.upsertlogin(User).then(value => {
             cy.request({
                 method: 'GET',
-                url: `${HostName}/features/forworkspace/` + Features[0].workspace_uuid,
-                headers: { 'x-jwt': `${value}` },
-                body: {}
+                url: `${HostName}/workspaces/${Features[0].workspace_uuid}/features`, //changed from url: `${HostName}/features/forworkspace/` + Features[0].workspace_uuid, please update the routes file and any other change needed.
+                headers: { 'x-jwt': `${ value }` },
+                body: {} 
             }).then((resp) => {
                 expect(resp.status).to.eq(200);
                 const body = resp.body.reverse();
@@ -154,6 +154,36 @@ describe('Get Feature by uuid', () => {
                     expect(resp.body).to.have.property('architecture', Features[i].architecture.trim() + " _addtext")
                 })
             }
+        })
+    })
+})
+
+describe('Delete Feature by uuid', () => {
+    it('passes', () => {
+        cy.upsertlogin(User).then(value => {
+            cy.request({
+                method: 'DELETE',
+                url: `${HostName}/features/${Features[0].uuid}`,
+                headers: { 'x-jwt': `${ value }` },
+                body: {}
+            }).then((resp) => {
+                expect(resp.status).to.eq(200)
+            })
+        })
+    })
+})
+
+describe('Check delete by uuid', () => {
+    it('passes', () => {
+        cy.upsertlogin(User).then(value => {
+            cy.request({
+                method: 'GET',
+                url: `${HostName}/features/${Features[0].uuid}`,
+                headers: { 'x-jwt': `${ value }` },
+                body: {}
+            }).then((resp) => {
+                expect(resp.status).to.eq(404);
+            })
         })
     })
 })
