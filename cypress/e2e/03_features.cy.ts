@@ -159,6 +159,7 @@ describe('Get Feature by uuid', () => {
 <<<<<<< HEAD
                     headers: { 'x-jwt': `${value}` },
 =======
+                    url: `${HostName}/features/`+ Features[i].uuid,
                     headers: { 'x-jwt': `${ value }` },
 >>>>>>> e1f721d5 (Modify Features endpoint and add delete feature)
                     body: {}
