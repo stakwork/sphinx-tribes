@@ -68,6 +68,7 @@ func InitDB() {
 	db.AutoMigrate(&BountyRoles{})
 	db.AutoMigrate(&UserInvoiceData{})
 	db.AutoMigrate(&WorkspaceFeatures{})
+	db.AutoMigrate(&FeatureStory{})
 
 	DB.MigrateTablesWithOrgUuid()
 	DB.MigrateOrganizationToWorkspace()

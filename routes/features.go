@@ -16,6 +16,10 @@ func FeatureRoutes() chi.Router {
 		r.Post("/", featureHandlers.CreateOrEditFeatures)
 		r.Get("/forworkspace/{uuid}", featureHandlers.GetFeaturesByWorkspaceUuid)
 		r.Get("/{uuid}", featureHandlers.GetFeatureByUuid)
+		r.Post("/story", featureHandlers.CreateOrEditStory)
+		r.Get("/{feature_uuid}/story", featureHandlers.GetStoriesByFeatureUuid)
+		r.Get("/{feature_uuid}/story/{story_uuid}", featureHandlers.GetStoryByUuid)
+		r.Delete("/{feature_uuid}/story/{story_uuid}", featureHandlers.DeleteStory)
 	})
 	return r
 }

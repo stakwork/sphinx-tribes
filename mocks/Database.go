@@ -6660,3 +6660,78 @@ func NewDatabase(t interface {
 
 	return mock
 }
+
+func (_m *Database) CreateOrEditFeatureStory(story db.FeatureStory) (db.FeatureStory, error) {
+	ret := _m.Called(story)
+
+	var r0 db.FeatureStory
+	var r1 error
+	if rf, ok := ret.Get(0).(func(db.FeatureStory) db.FeatureStory); ok {
+		r0 = rf(story)
+	} else {
+		r0 = ret.Get(0).(db.FeatureStory)
+	}
+
+	if rf, ok := ret.Get(1).(func(db.FeatureStory) error); ok {
+		r1 = rf(story)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
+func (_m *Database) GetFeatureStoriesByFeatureUuid(featureUuid string) ([]db.FeatureStory, error) {
+	ret := _m.Called(featureUuid)
+
+	var r0 []db.FeatureStory
+	var r1 error
+	if rf, ok := ret.Get(0).(func(string) []db.FeatureStory); ok {
+		r0 = rf(featureUuid)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).([]db.FeatureStory)
+		}
+	}
+
+	if rf, ok := ret.Get(1).(func(string) error); ok {
+		r1 = rf(featureUuid)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
+func (_m *Database) GetFeatureStoryByUuid(uuid string) (db.FeatureStory, error) {
+	ret := _m.Called(uuid)
+
+	var r0 db.FeatureStory
+	var r1 error
+	if rf, ok := ret.Get(0).(func(string) db.FeatureStory); ok {
+		r0 = rf(uuid)
+	} else {
+		r0 = ret.Get(0).(db.FeatureStory)
+	}
+
+	if rf, ok := ret.Get(1).(func(string) error); ok {
+		r1 = rf(uuid)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
+func (_m *Database) DeleteFeatureStoryByUuid(featureUuid string, storyUuid string) error {
+	ret := _m.Called(featureUuid, storyUuid)
+
+	var r0 error
+	if rf, ok := ret.Get(0).(func(string, string) error); ok {
+		r0 = rf(featureUuid, storyUuid)
+	} else {
+		r0 = ret.Error(0)
+	}
+
+	return r0
+}

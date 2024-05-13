@@ -1,6 +1,7 @@
 package db
 
 import (
+	"errors"
 	"strings"
 	"time"
 )
@@ -38,4 +39,59 @@ func (db database) CreateOrEditFeature(m WorkspaceFeatures) (WorkspaceFeatures, 
 	db.db.Model(&WorkspaceFeatures{}).Where("uuid = ?", m.Uuid).Find(&m)
 
 	return m, nil
+}
+
+func (db database) CreateOrEditFeatureStory(story FeatureStory) (FeatureStory, error) {
+	story.Description = strings.TrimSpace(story.Description)
+
+	now := time.Now()
+	story.Updated = &now
+
+	existingStory := FeatureStory{}
+	result := db.db.Model(&FeatureStory{}).Where("uuid = ?", story.Uuid).First(&existingStory)
+
+	if result.RowsAffected == 0 {
+
+		story.Created = &now
+		db.db.Create(&story)
+	} else {
+
+		db.db.Model(&FeatureStory{}).Where("uuid = ?", story.Uuid).Updates(story)
+	}
+
+	db.db.Model(&FeatureStory{}).Where("uuid = ?", story.Uuid).Find(&story)
+
+	return story, nil
+}
+
+func (db database) GetFeatureStoriesByFeatureUuid(featureUuid string) ([]FeatureStory, error) {
+	var stories []FeatureStory
+	result := db.db.Where("feature_uuid = ?", featureUuid).Find(&stories)
+	if result.Error != nil {
+		return nil, result.Error
+	}
+
+	for i := range stories {
+		stories[i].Description = strings.TrimSpace(stories[i].Description)
+	}
+	return stories, nil
+}
+
+func (db database) GetFeatureStoryByUuid(uuid string) (FeatureStory, error) {
+	var story FeatureStory
+	result := db.db.Where("uuid = ?", uuid).First(&story)
+	if result.Error != nil {
+		return FeatureStory{}, result.Error
+	}
+
+	story.Description = strings.TrimSpace(story.Description)
+	return story, nil
+}
+
+func (db database) DeleteFeatureStoryByUuid(featureUuid, storyUuid string) error {
+	result := db.db.Where("feature_uuid = ? AND uuid = ?", featureUuid, storyUuid).Delete(&FeatureStory{})
+	if result.RowsAffected == 0 {
+		return errors.New("no story found to delete")
+	}
+	return nil
 }
