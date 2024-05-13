@@ -148,18 +148,18 @@ func (oh *featureHandler) CreateOrEditFeaturePhase(w http.ResponseWriter, r *htt
 }
 
 func (oh *featureHandler) GetFeaturePhases(w http.ResponseWriter, r *http.Request) {
-	uuid := chi.URLParam(r, "feature_uuid")
-	phases := oh.db.GetPhasesByFeatureUuid(uuid)
+	featureUuid := chi.URLParam(r, "feature_uuid")
+	phases := oh.db.GetPhasesByFeatureUuid(featureUuid)
 
 	w.WriteHeader(http.StatusOK)
 	json.NewEncoder(w).Encode(phases)
 }
 
 func (oh *featureHandler) GetFeaturePhaseByUUID(w http.ResponseWriter, r *http.Request) {
-	featureUUID := chi.URLParam(r, "feature_uuid")
-	phaseUUID := chi.URLParam(r, "phase_uuid")
+	featureUuid := chi.URLParam(r, "feature_uuid")
+	phaseUuid := chi.URLParam(r, "phase_uuid")
 
-	phase, err := oh.db.GetFeaturePhaseByUuid(featureUUID, phaseUUID)
+	phase, err := oh.db.GetFeaturePhaseByUuid(featureUuid, phaseUuid)
 	if err != nil {
 		w.WriteHeader(http.StatusNotFound)
 		return
@@ -170,10 +170,10 @@ func (oh *featureHandler) GetFeaturePhaseByUUID(w http.ResponseWriter, r *http.R
 }
 
 func (oh *featureHandler) DeleteFeaturePhase(w http.ResponseWriter, r *http.Request) {
-	featureUUID := chi.URLParam(r, "feature_uuid")
-	phaseUUID := chi.URLParam(r, "phase_uuid")
+	featureUuid := chi.URLParam(r, "feature_uuid")
+	phaseUuid := chi.URLParam(r, "phase_uuid")
 
-	err := oh.db.DeleteFeaturePhase(featureUUID, phaseUUID)
+	err := oh.db.DeleteFeaturePhase(featureUuid, phaseUuid)
 	if err != nil {
 		w.WriteHeader(http.StatusNotFound)
 		json.NewEncoder(w).Encode(map[string]string{"error": err.Error()})
