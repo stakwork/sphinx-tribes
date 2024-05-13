@@ -147,7 +147,7 @@ type Database interface {
 	GetWorkspaceFeaturesCount(uuid string) int64
 	GetFeatureByUuid(uuid string) WorkspaceFeatures
 	CreateOrEditFeaturePhase(phase FeaturePhase) (FeaturePhase, error)
-	GetFeaturePhasesByFeatureUuid(featureUUID string) []FeaturePhase
+	GetPhasesByFeatureUuid(featureUUID string) []FeaturePhase
 	GetFeaturePhaseByUuid(featureUUID, phaseUUID string) (FeaturePhase, error)
 	DeleteFeaturePhase(featureUUID, phaseUUID string) error
 }

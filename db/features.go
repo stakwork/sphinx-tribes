@@ -96,7 +96,7 @@ func (db database) CreateOrEditFeaturePhase(phase FeaturePhase) (FeaturePhase, e
 	return phase, nil
 }
 
-func (db database) GetFeaturePhasesByFeatureUuid(featureUuid string) []FeaturePhase {
+func (db database) GetPhasesByFeatureUuid(featureUuid string) []FeaturePhase {
 	phases := []FeaturePhase{}
 	db.db.Model(&FeaturePhase{}).Where("feature_uuid = ?", featureUuid).Order("Created ASC").Find(&phases)
 	return phases
