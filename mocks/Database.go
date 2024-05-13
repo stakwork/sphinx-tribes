@@ -6811,3 +6811,75 @@ func NewDatabase(t interface {
 
 	return mock
 }
+
+// CreateOrEditFeaturePhase provides a mock function with given fields: phase
+func (_m *Database) CreateOrEditFeaturePhase(phase db.FeaturePhase) (db.FeaturePhase, error) {
+	ret := _m.Called(phase)
+
+	var r0 db.FeaturePhase
+	var r1 error
+	if rf, ok := ret.Get(0).(func(db.FeaturePhase) db.FeaturePhase); ok {
+		r0 = rf(phase)
+	} else {
+		r0 = ret.Get(0).(db.FeaturePhase)
+	}
+
+	if rf, ok := ret.Get(1).(func(db.FeaturePhase) error); ok {
+		r1 = rf(phase)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
+// GetPhasesByFeatureUuid provides a mock function with given fields: featureUuid
+func (_m *Database) GetPhasesByFeatureUuid(featureUuid string) []db.FeaturePhase {
+	ret := _m.Called(featureUuid)
+
+	var r0 []db.FeaturePhase
+	if rf, ok := ret.Get(0).(func(string) []db.FeaturePhase); ok {
+		r0 = rf(featureUuid)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).([]db.FeaturePhase)
+		}
+	}
+
+	return r0
+}
+
+// GetFeaturePhaseByUuid provides a mock function with given fields: featureUuid, phaseUuid
+func (_m *Database) GetFeaturePhaseByUuid(featureUuid, phaseUuid string) (db.FeaturePhase, error) {
+	ret := _m.Called(featureUuid, phaseUuid)
+
+	var r0 db.FeaturePhase
+	var r1 error
+	if rf, ok := ret.Get(0).(func(string, string) db.FeaturePhase); ok {
+		r0 = rf(featureUuid, phaseUuid)
+	} else {
+		r0 = ret.Get(0).(db.FeaturePhase)
+	}
+
+	if rf, ok := ret.Get(1).(func(string, string) error); ok {
+		r1 = rf(featureUuid, phaseUuid)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
+// DeleteFeaturePhase provides a mock function with given fields: featureUuid, phaseUuid
+func (_m *Database) DeleteFeaturePhase(featureUuid string, phaseUuid string) error {
+	ret := _m.Called(featureUuid, phaseUuid)
+
+	var r1 error
+	if rf, ok := ret.Get(0).(func(string, string) error); ok {
+		r1 = rf(featureUuid, phaseUuid)
+	} else {
+		r1 = ret.Error(0)
+	}
+
+	return r1
+}
