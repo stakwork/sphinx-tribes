@@ -568,6 +568,9 @@ type WorkspaceFeatures struct {
 	Uuid          string     `json:"uuid"`
 	WorkspaceUuid string     `json:"workspace_uuid"`
 	Name          string     `json:"name"`
+	Brief         string     `json:"brief"`
+	Requirements  string     `json:"requirements"`
+	Architecture  string     `json:"architecture"`
 	Url           string     `json:"url"`
 	Created       *time.Time `json:"created"`
 	Updated       *time.Time `json:"updated"`
