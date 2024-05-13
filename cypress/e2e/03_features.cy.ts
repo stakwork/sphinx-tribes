@@ -5,7 +5,7 @@ import { User, HostName, Workspaces, Repositories, Features } from '../support/o
 describe('Create Features for Workspace', () => {
     it('passes', () => {
         cy.upsertlogin(User).then(value => {
-            for(let i = 0; i <= 2; i++) {
+            for (let i = 0; i <= 2; i++) {
                 cy.request({
                     method: 'POST',
                     url: `${HostName}/features`,
@@ -25,7 +25,7 @@ describe('Create Features for Workspace', () => {
 describe('Modify name for Feature', () => {
     it('passes', () => {
         cy.upsertlogin(User).then(value => {
-            for(let i = 0; i <= 2; i++) {
+            for (let i = 0; i <= 2; i++) {
                 cy.request({
                     method: 'POST',
                     url: `${HostName}/features`,
@@ -48,7 +48,7 @@ describe('Modify name for Feature', () => {
 describe('Modify brief for Feature', () => {
     it('passes', () => {
         cy.upsertlogin(User).then(value => {
-            for(let i = 0; i <= 2; i++) {
+            for (let i = 0; i <= 2; i++) {
                 cy.request({
                     method: 'POST',
                     url: `${HostName}/features`,
@@ -71,7 +71,7 @@ describe('Modify brief for Feature', () => {
 describe('Modify requirements for Feature', () => {
     it('passes', () => {
         cy.upsertlogin(User).then(value => {
-            for(let i = 0; i <= 2; i++) {
+            for (let i = 0; i <= 2; i++) {
                 cy.request({
                     method: 'POST',
                     url: `${HostName}/features`,
@@ -94,7 +94,7 @@ describe('Modify requirements for Feature', () => {
 describe('Modify architecture for Feature', () => {
     it('passes', () => {
         cy.upsertlogin(User).then(value => {
-            for(let i = 0; i <= 2; i++) {
+            for (let i = 0; i <= 2; i++) {
                 cy.request({
                     method: 'POST',
                     url: `${HostName}/features`,
@@ -121,11 +121,11 @@ describe('Get Features for Workspace', () => {
             cy.request({
                 method: 'GET',
                 url: `${HostName}/features/forworkspace/` + Features[0].workspace_uuid,
-                headers: { 'x-jwt': `${ value }` },
-                body: {} 
+                headers: { 'x-jwt': `${value}` },
+                body: {}
             }).then((resp) => {
                 expect(resp.status).to.eq(200)
-                for(let i = 0; i <= 2; i++) {
+                for (let i = 0; i <= 2; i++) {
                     expect(resp.body[i]).to.have.property('name', Features[i].name.trim() + " _addtext")
                     expect(resp.body[i]).to.have.property('brief', Features[i].brief.trim() + " _addtext")
                     expect(resp.body[i]).to.have.property('requirements', Features[i].requirements.trim() + " _addtext")
@@ -139,12 +139,12 @@ describe('Get Features for Workspace', () => {
 describe('Get Feature by uuid', () => {
     it('passes', () => {
         cy.upsertlogin(User).then(value => {
-            for(let i = 0; i <= 2; i++) {
+            for (let i = 0; i <= 2; i++) {
                 cy.request({
                     method: 'GET',
                     url: `${HostName}/features/` + Features[i].uuid,
-                    headers: { 'x-jwt': `${ value }` },
-                    body: {} 
+                    headers: { 'x-jwt': `${value}` },
+                    body: {}
                 }).then((resp) => {
                     expect(resp.status).to.eq(200)
                     expect(resp.body).to.have.property('name', Features[i].name.trim() + " _addtext")
