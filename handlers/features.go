@@ -149,7 +149,7 @@ func (oh *featureHandler) CreateOrEditFeaturePhase(w http.ResponseWriter, r *htt
 
 func (oh *featureHandler) GetFeaturePhases(w http.ResponseWriter, r *http.Request) {
 	uuid := chi.URLParam(r, "feature_uuid")
-	phases := oh.db.GetFeaturePhasesByFeatureUuid(uuid)
+	phases := oh.db.GetPhasesByFeatureUuid(uuid)
 
 	w.WriteHeader(http.StatusOK)
 	json.NewEncoder(w).Encode(phases)
