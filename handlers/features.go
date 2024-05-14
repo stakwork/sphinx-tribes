@@ -138,11 +138,13 @@ func (oh *featureHandler) CreateOrEditFeaturePhase(w http.ResponseWriter, r *htt
 		newPhase.Uuid = xid.New().String()
 	}
 
-	if newPhase.CreatedBy != "" {
-		newPhase.UpdatedBy = pubKeyFromAuth
-	} else {
+	existingPhase, _ := oh.db.GetFeaturePhaseByUuid(newPhase.FeatureUuid, newPhase.Uuid)
+
+	if existingPhase.CreatedBy == "" {
 		newPhase.CreatedBy = pubKeyFromAuth
 	}
+
+	newPhase.UpdatedBy = pubKeyFromAuth
 
 	phase, err := oh.db.CreateOrEditFeaturePhase(newPhase)
 	if err != nil {
