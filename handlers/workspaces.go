@@ -126,19 +126,6 @@ func (oh *workspaceHandler) CreateOrEditWorkspace(w http.ResponseWriter, r *http
 			}
 			workspace.Name = name
 		}
-	} else {
-		// if workspace.ID == 0 {
-		// 	// can't create that already exists
-		// 	fmt.Println("can't create existing organization")
-		// 	w.WriteHeader(http.StatusUnauthorized)
-		// 	return
-		// }
-
-		// if workspace.ID != existing.ID { // can't edit someone else's
-		// 	fmt.Println("cant edit another organization")
-		// 	w.WriteHeader(http.StatusUnauthorized)
-		// 	return
-		// }
 	}
 
 	p, err := oh.db.CreateOrEditWorkspace(workspace)
@@ -817,6 +804,12 @@ func (oh *workspaceHandler) CreateWorkspaceRepository(w http.ResponseWriter, r *
 	}
 
 	workspaceRepo.CreatedBy = pubKeyFromAuth
+
+	if workspaceRepo.Uuid == "" {
+		workspaceRepo.Uuid = xid.New().String()
+	} else {
+		workspaceRepo.UpdatedBy = pubKeyFromAuth
+	}
 
 	// Validate struct data
 	err = db.Validate.Struct(workspaceRepo)
