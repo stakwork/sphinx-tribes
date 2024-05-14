@@ -143,6 +143,7 @@ type Database interface {
 	CreateWorkspaceRepository(m WorkspaceRepositories) (WorkspaceRepositories, error)
 	GetWorkspaceRepositorByWorkspaceUuid(uuid string) []WorkspaceRepositories
 	CreateOrEditFeature(m WorkspaceFeatures) (WorkspaceFeatures, error)
-	GetFeaturesByWorkspaceUuid(uuid string) []WorkspaceFeatures
+	GetFeaturesByWorkspaceUuid(uuid string, r *http.Request) []WorkspaceFeatures
+	GetWorkspaceFeaturesCount(uuid string) int64
 	GetFeatureByUuid(uuid string) WorkspaceFeatures
 }
