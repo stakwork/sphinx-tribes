@@ -1,12 +1,9 @@
 package db
 
 import (
-<<<<<<< HEAD
+	"errors"
 	"fmt"
 	"net/http"
-=======
-	"errors"
->>>>>>> b77bffb1 (tests for Add Phases to Features)
 	"strings"
 	"time"
 
