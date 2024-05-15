@@ -63,7 +63,7 @@ export const Repositories = [
         url: ' https://github.com/stakwork/sphinx-tribes-frontend '
     },
     {
-        uuid: 'com1t3gn1e4a4qu3tnlg',
+        uuid: 'com1t3gn1e4a4qu3thss',
         workspace_uuid: 'cohob00n1e4808utqel0',
         name: ' backend ',
         url: ' https://github.com/stakwork/sphinx-tribes '

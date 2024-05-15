@@ -140,7 +140,14 @@ type Database interface {
 	PersonUniqueNameFromName(name string) (string, error)
 	ProcessAlerts(p Person)
 	UserHasAccess(pubKeyFromAuth string, uuid string, role string) bool
+	CreateWorkspaceRepository(m WorkspaceRepositories) (WorkspaceRepositories, error)
+	GetWorkspaceRepositorByWorkspaceUuid(uuid string) []WorkspaceRepositories
 	CreateOrEditFeature(m WorkspaceFeatures) (WorkspaceFeatures, error)
-	GetFeaturesByWorkspaceUuid(uuid string) []WorkspaceFeatures
+	GetFeaturesByWorkspaceUuid(uuid string, r *http.Request) []WorkspaceFeatures
+	GetWorkspaceFeaturesCount(uuid string) int64
 	GetFeatureByUuid(uuid string) WorkspaceFeatures
+	CreateOrEditFeaturePhase(phase FeaturePhase) (FeaturePhase, error)
+	GetPhasesByFeatureUuid(featureUuid string) []FeaturePhase
+	GetFeaturePhaseByUuid(featureUuid, phaseUuid string) (FeaturePhase, error)
+	DeleteFeaturePhase(featureUuid, phaseUuid string) error
 }
