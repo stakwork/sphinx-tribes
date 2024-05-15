@@ -145,6 +145,6 @@ type Database interface {
 	GetFeatureByUuid(uuid string) WorkspaceFeatures
 	CreateOrEditFeatureStory(story FeatureStory) (FeatureStory, error)
 	GetFeatureStoriesByFeatureUuid(featureUuid string) ([]FeatureStory, error)
-	GetFeatureStoryByUuid(uuid string) (FeatureStory, error)
+	GetFeatureStoryByUuid(featureUuid, storyUuid string) (FeatureStory, error)
 	DeleteFeatureStoryByUuid(featureUuid, storyUuid string) error
 }

@@ -3,12 +3,12 @@ package handlers
 import (
 	"encoding/json"
 	"fmt"
-	"io"
-	"net/http"
-
 	"github.com/go-chi/chi"
+	"github.com/rs/xid"
 	"github.com/stakwork/sphinx-tribes/auth"
 	"github.com/stakwork/sphinx-tribes/db"
+	"io"
+	"net/http"
 )
 
 type featureHandler struct {
@@ -112,7 +112,17 @@ func (oh *featureHandler) CreateOrEditStory(w http.ResponseWriter, r *http.Reque
 		return
 	}
 
-	newStory.CreatedBy = pubKeyFromAuth
+	if newStory.Uuid == "" {
+		newStory.Uuid = xid.New().String()
+	}
+
+	existingStory, _ := oh.db.GetFeatureStoryByUuid(newStory.FeatureUuid, newStory.Uuid)
+
+	if existingStory.CreatedBy == "" {
+		newStory.CreatedBy = pubKeyFromAuth
+	}
+
+	newStory.UpdatedBy = pubKeyFromAuth
 
 	story, err := oh.db.CreateOrEditFeatureStory(newStory)
 	if err != nil {
@@ -138,17 +148,18 @@ func (oh *featureHandler) GetStoriesByFeatureUuid(w http.ResponseWriter, r *http
 }
 
 func (oh *featureHandler) GetStoryByUuid(w http.ResponseWriter, r *http.Request) {
+	featureUuid := chi.URLParam(r, "feature_uuid")
 	storyUuid := chi.URLParam(r, "story_uuid")
-	story, err := oh.db.GetFeatureStoryByUuid(storyUuid)
+
+	story, err := oh.db.GetFeatureStoryByUuid(featureUuid, storyUuid)
 	if err != nil {
-		w.WriteHeader(http.StatusInternalServerError)
+		w.WriteHeader(http.StatusNotFound)
 		return
 	}
 
 	w.WriteHeader(http.StatusOK)
 	json.NewEncoder(w).Encode(story)
 }
-
 func (oh *featureHandler) DeleteStory(w http.ResponseWriter, r *http.Request) {
 	featureUuid := chi.URLParam(r, "feature_uuid")
 	storyUuid := chi.URLParam(r, "story_uuid")

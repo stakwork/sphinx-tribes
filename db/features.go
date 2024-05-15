@@ -77,14 +77,12 @@ func (db database) GetFeatureStoriesByFeatureUuid(featureUuid string) ([]Feature
 	return stories, nil
 }
 
-func (db database) GetFeatureStoryByUuid(uuid string) (FeatureStory, error) {
-	var story FeatureStory
-	result := db.db.Where("uuid = ?", uuid).First(&story)
-	if result.Error != nil {
-		return FeatureStory{}, result.Error
+func (db database) GetFeatureStoryByUuid(featureUuid, storyUuid string) (FeatureStory, error) {
+	story := FeatureStory{}
+	result := db.db.Model(&FeatureStory{}).Where("feature_uuid = ? AND uuid = ?", featureUuid, storyUuid).First(&story)
+	if result.RowsAffected == 0 {
+		return story, errors.New("no story found")
 	}
-
-	story.Description = strings.TrimSpace(story.Description)
 	return story, nil
 }
 
