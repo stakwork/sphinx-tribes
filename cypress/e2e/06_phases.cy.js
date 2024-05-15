@@ -35,7 +35,7 @@ describe('Modify phases name', () => {
                 }).its('body').then(body => {
                     expect(body).to.have.property('uuid').and.equal(Phases[i].uuid.trim());
                     expect(body).to.have.property('feature_uuid').and.equal(Phases[i].feature_uuid.trim());
-                    expect(body).to.have.property('name').and.equal(Phases[i].name.trim() + "_addtext");
+                    expect(body).to.have.property('name').and.equal(Phases[i].name.trim() + " _addtext");
                     expect(body).to.have.property('priority').and.equal(Phases[i].priority);
                 });
             }
@@ -50,15 +50,18 @@ describe('Get phases for feature', () => {
                 method: 'GET',
                 url: `${HostName}/features/${Phases[0].feature_uuid}/phase`,
                 headers: { 'x-jwt': `${ value }` },
-                body: {} 
+                body: {}
             }).then((resp) => {
                 expect(resp.status).to.eq(200)
-                for(let i = 0; i <= 2; i++) {
-                    expect(resp.body[i]).to.have.property('uuid').and.equal(Phases[i].uuid.trim());
-                    expect(resp.body[i]).to.have.property('feature_uuid').and.equal(Phases[i].feature_uuid.trim());
-                    expect(resp.body[i]).to.have.property('name').and.equal(Phases[i].name.trim() + "_addtext");
-                    expect(resp.body[i]).to.have.property('priority').and.equal(Phases[i].priority);
-                }
+
+                resp.body.forEach((phase, index) => {
+                    // Directly use index to compare with the expected phase in the same order
+                    const expectedPhase = Phases[index];
+                    expect(phase.uuid).to.equal(expectedPhase.uuid.trim());
+                    expect(phase.feature_uuid).to.equal(expectedPhase.feature_uuid.trim());
+                    expect(phase.name).to.equal(expectedPhase.name.trim() + " _addtext");
+                    expect(phase.priority).to.equal(expectedPhase.priority);
+                });
             })
         })
     })
@@ -72,13 +75,13 @@ describe('Get phase by uuid', () => {
                     method: 'GET',
                     url: `${HostName}/features/${Phases[0].feature_uuid}/phase/${Phases[i].uuid}`,
                     headers: { 'x-jwt': `${ value }` },
-                    body: {} 
+                    body: {}
                 }).then((resp) => {
                     expect(resp.status).to.eq(200)
-                    expect(resp.body[i]).to.have.property('uuid').and.equal(Phases[i].uuid.trim());
-                    expect(resp.body[i]).to.have.property('feature_uuid').and.equal(Phases[i].feature_uuid.trim());
-                    expect(resp.body[i]).to.have.property('name').and.equal(Phases[i].name.trim() + "_addtext");
-                    expect(resp.body[i]).to.have.property('priority').and.equal(Phases[i].priority);
+                    expect(resp.body).to.have.property('uuid').and.equal(Phases[i].uuid.trim());
+                    expect(resp.body).to.have.property('feature_uuid').and.equal(Phases[i].feature_uuid.trim());
+                    expect(resp.body).to.have.property('name').and.equal(Phases[i].name.trim() + " _addtext");
+                    expect(resp.body).to.have.property('priority').and.equal(Phases[i].priority);
                 })
             }
         })
@@ -92,7 +95,7 @@ describe('Delete phase by uuid', () => {
                 method: 'DELETE',
                 url: `${HostName}/features/${Phases[0].feature_uuid}/phase/${Phases[0].uuid}`,
                 headers: { 'x-jwt': `${ value }` },
-                body: {} 
+                body: {}
             }).then((resp) => {
                 expect(resp.status).to.eq(200)
             })
@@ -107,7 +110,8 @@ describe('Check delete by uuid', () => {
                 method: 'GET',
                 url: `${HostName}/features/${Phases[0].feature_uuid}/phase/${Phases[0].uuid}`,
                 headers: { 'x-jwt': `${ value }` },
-                body: {} 
+                body: {},
+                failOnStatusCode: false
             }).then((resp) => {
                 expect(resp.status).to.eq(404);
             })

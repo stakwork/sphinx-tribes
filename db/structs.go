@@ -577,6 +577,17 @@ type WorkspaceFeatures struct {
 	UpdatedBy     string     `json:"updated_by"`
 }
 
+type FeaturePhase struct {
+	Uuid        string     `json:"uuid" gorm:"primary_key"`
+	FeatureUuid string     `json:"feature_uuid"`
+	Name        string     `json:"name"`
+	Priority    int        `json:"priority"`
+	Created     *time.Time `json:"created"`
+	Updated     *time.Time `json:"updated"`
+	CreatedBy   string     `json:"created_by"`
+	UpdatedBy   string     `json:"updated_by"`
+}
+
 type BountyRoles struct {
 	Name string `json:"name"`
 }
