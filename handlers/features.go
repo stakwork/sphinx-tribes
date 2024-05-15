@@ -3,13 +3,12 @@ package handlers
 import (
 	"encoding/json"
 	"fmt"
-	"io"
-	"net/http"
-
 	"github.com/go-chi/chi"
 	"github.com/rs/xid"
 	"github.com/stakwork/sphinx-tribes/auth"
 	"github.com/stakwork/sphinx-tribes/db"
+	"io"
+	"net/http"
 )
 
 type featureHandler struct {
@@ -261,7 +260,6 @@ func (oh *featureHandler) GetStoryByUuid(w http.ResponseWriter, r *http.Request)
 	w.WriteHeader(http.StatusOK)
 	json.NewEncoder(w).Encode(story)
 }
-
 func (oh *featureHandler) DeleteStory(w http.ResponseWriter, r *http.Request) {
 	featureUuid := chi.URLParam(r, "feature_uuid")
 	storyUuid := chi.URLParam(r, "story_uuid")
