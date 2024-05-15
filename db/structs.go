@@ -551,11 +551,23 @@ type WorkspaceUsersData struct {
 	Person
 }
 
+type WorkspaceRepositories struct {
+	ID            uint       `json:"id"`
+	Uuid          string     `gorm:"not null" json:"uuid"`
+	WorkspaceUuid string     `gorm:"not null" json:"workspace_uuid"`
+	Name          string     `gorm:"not null" json:"name"`
+	Url           string     `json:"url"`
+	Created       *time.Time `json:"created"`
+	Updated       *time.Time `json:"updated"`
+	CreatedBy     string     `json:"created_by"`
+	UpdatedBy     string     `json:"updated_by"`
+}
+
 type WorkspaceFeatures struct {
 	ID            uint       `json:"id"`
-	Uuid          string     `json:"uuid"`
-	WorkspaceUuid string     `json:"workspace_uuid"`
-	Name          string     `json:"name"`
+	Uuid          string     `gorm:"not null" json:"uuid"`
+	WorkspaceUuid string     `gorm:"not null" json:"workspace_uuid"`
+	Name          string     `gorm:"not null" json:"name"`
 	Brief         string     `json:"brief"`
 	Requirements  string     `json:"requirements"`
 	Architecture  string     `json:"architecture"`

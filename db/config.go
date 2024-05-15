@@ -67,6 +67,7 @@ func InitDB() {
 	db.AutoMigrate(&ConnectionCodes{})
 	db.AutoMigrate(&BountyRoles{})
 	db.AutoMigrate(&UserInvoiceData{})
+	db.AutoMigrate(&WorkspaceRepositories{})
 	db.AutoMigrate(&WorkspaceFeatures{})
 	db.AutoMigrate(&FeatureStory{})
 

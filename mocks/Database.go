@@ -1250,6 +1250,62 @@ func (_c *Database_CreateWorkspaceBudget_Call) RunAndReturn(run func(db.NewBount
 	return _c
 }
 
+// CreateWorkspaceRepository provides a mock function with given fields: m
+func (_m *Database) CreateWorkspaceRepository(m db.WorkspaceRepositories) (db.WorkspaceRepositories, error) {
+	ret := _m.Called(m)
+
+	if len(ret) == 0 {
+		panic("no return value specified for CreateWorkspaceRepository")
+	}
+
+	var r0 db.WorkspaceRepositories
+	var r1 error
+	if rf, ok := ret.Get(0).(func(db.WorkspaceRepositories) (db.WorkspaceRepositories, error)); ok {
+		return rf(m)
+	}
+	if rf, ok := ret.Get(0).(func(db.WorkspaceRepositories) db.WorkspaceRepositories); ok {
+		r0 = rf(m)
+	} else {
+		r0 = ret.Get(0).(db.WorkspaceRepositories)
+	}
+
+	if rf, ok := ret.Get(1).(func(db.WorkspaceRepositories) error); ok {
+		r1 = rf(m)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
+// Database_CreateWorkspaceRepository_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'CreateWorkspaceRepository'
+type Database_CreateWorkspaceRepository_Call struct {
+	*mock.Call
+}
+
+// CreateWorkspaceRepository is a helper method to define mock.On call
+//   - m db.WorkspaceRepositories
+func (_e *Database_Expecter) CreateWorkspaceRepository(m interface{}) *Database_CreateWorkspaceRepository_Call {
+	return &Database_CreateWorkspaceRepository_Call{Call: _e.mock.On("CreateWorkspaceRepository", m)}
+}
+
+func (_c *Database_CreateWorkspaceRepository_Call) Run(run func(m db.WorkspaceRepositories)) *Database_CreateWorkspaceRepository_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(db.WorkspaceRepositories))
+	})
+	return _c
+}
+
+func (_c *Database_CreateWorkspaceRepository_Call) Return(_a0 db.WorkspaceRepositories, _a1 error) *Database_CreateWorkspaceRepository_Call {
+	_c.Call.Return(_a0, _a1)
+	return _c
+}
+
+func (_c *Database_CreateWorkspaceRepository_Call) RunAndReturn(run func(db.WorkspaceRepositories) (db.WorkspaceRepositories, error)) *Database_CreateWorkspaceRepository_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
 // CreateWorkspaceUser provides a mock function with given fields: orgUser
 func (_m *Database) CreateWorkspaceUser(orgUser db.WorkspaceUsers) db.WorkspaceUsers {
 	ret := _m.Called(orgUser)
@@ -2625,17 +2681,17 @@ func (_c *Database_GetFeatureByUuid_Call) RunAndReturn(run func(string) db.Works
 	return _c
 }
 
-// GetFeaturesByWorkspaceUuid provides a mock function with given fields: uuid
-func (_m *Database) GetFeaturesByWorkspaceUuid(uuid string) []db.WorkspaceFeatures {
-	ret := _m.Called(uuid)
+// GetFeaturesByWorkspaceUuid provides a mock function with given fields: uuid, r
+func (_m *Database) GetFeaturesByWorkspaceUuid(uuid string, r *http.Request) []db.WorkspaceFeatures {
+	ret := _m.Called(uuid, r)
 
 	if len(ret) == 0 {
 		panic("no return value specified for GetFeaturesByWorkspaceUuid")
 	}
 
 	var r0 []db.WorkspaceFeatures
-	if rf, ok := ret.Get(0).(func(string) []db.WorkspaceFeatures); ok {
-		r0 = rf(uuid)
+	if rf, ok := ret.Get(0).(func(string, *http.Request) []db.WorkspaceFeatures); ok {
+		r0 = rf(uuid, r)
 	} else {
 		if ret.Get(0) != nil {
 			r0 = ret.Get(0).([]db.WorkspaceFeatures)
@@ -2652,13 +2708,14 @@ type Database_GetFeaturesByWorkspaceUuid_Call struct {
 
 // GetFeaturesByWorkspaceUuid is a helper method to define mock.On call
 //   - uuid string
-func (_e *Database_Expecter) GetFeaturesByWorkspaceUuid(uuid interface{}) *Database_GetFeaturesByWorkspaceUuid_Call {
-	return &Database_GetFeaturesByWorkspaceUuid_Call{Call: _e.mock.On("GetFeaturesByWorkspaceUuid", uuid)}
+//   - r *http.Request
+func (_e *Database_Expecter) GetFeaturesByWorkspaceUuid(uuid interface{}, r interface{}) *Database_GetFeaturesByWorkspaceUuid_Call {
+	return &Database_GetFeaturesByWorkspaceUuid_Call{Call: _e.mock.On("GetFeaturesByWorkspaceUuid", uuid, r)}
 }
 
-func (_c *Database_GetFeaturesByWorkspaceUuid_Call) Run(run func(uuid string)) *Database_GetFeaturesByWorkspaceUuid_Call {
+func (_c *Database_GetFeaturesByWorkspaceUuid_Call) Run(run func(uuid string, r *http.Request)) *Database_GetFeaturesByWorkspaceUuid_Call {
 	_c.Call.Run(func(args mock.Arguments) {
-		run(args[0].(string))
+		run(args[0].(string), args[1].(*http.Request))
 	})
 	return _c
 }
@@ -2668,7 +2725,7 @@ func (_c *Database_GetFeaturesByWorkspaceUuid_Call) Return(_a0 []db.WorkspaceFea
 	return _c
 }
 
-func (_c *Database_GetFeaturesByWorkspaceUuid_Call) RunAndReturn(run func(string) []db.WorkspaceFeatures) *Database_GetFeaturesByWorkspaceUuid_Call {
+func (_c *Database_GetFeaturesByWorkspaceUuid_Call) RunAndReturn(run func(string, *http.Request) []db.WorkspaceFeatures) *Database_GetFeaturesByWorkspaceUuid_Call {
 	_c.Call.Return(run)
 	return _c
 }
@@ -4804,6 +4861,52 @@ func (_c *Database_GetWorkspaceByUuid_Call) RunAndReturn(run func(string) db.Wor
 	return _c
 }
 
+// GetWorkspaceFeaturesCount provides a mock function with given fields: uuid
+func (_m *Database) GetWorkspaceFeaturesCount(uuid string) int64 {
+	ret := _m.Called(uuid)
+
+	if len(ret) == 0 {
+		panic("no return value specified for GetWorkspaceFeaturesCount")
+	}
+
+	var r0 int64
+	if rf, ok := ret.Get(0).(func(string) int64); ok {
+		r0 = rf(uuid)
+	} else {
+		r0 = ret.Get(0).(int64)
+	}
+
+	return r0
+}
+
+// Database_GetWorkspaceFeaturesCount_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'GetWorkspaceFeaturesCount'
+type Database_GetWorkspaceFeaturesCount_Call struct {
+	*mock.Call
+}
+
+// GetWorkspaceFeaturesCount is a helper method to define mock.On call
+//   - uuid string
+func (_e *Database_Expecter) GetWorkspaceFeaturesCount(uuid interface{}) *Database_GetWorkspaceFeaturesCount_Call {
+	return &Database_GetWorkspaceFeaturesCount_Call{Call: _e.mock.On("GetWorkspaceFeaturesCount", uuid)}
+}
+
+func (_c *Database_GetWorkspaceFeaturesCount_Call) Run(run func(uuid string)) *Database_GetWorkspaceFeaturesCount_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(string))
+	})
+	return _c
+}
+
+func (_c *Database_GetWorkspaceFeaturesCount_Call) Return(_a0 int64) *Database_GetWorkspaceFeaturesCount_Call {
+	_c.Call.Return(_a0)
+	return _c
+}
+
+func (_c *Database_GetWorkspaceFeaturesCount_Call) RunAndReturn(run func(string) int64) *Database_GetWorkspaceFeaturesCount_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
 // GetWorkspaceInvoices provides a mock function with given fields: workspace_uuid
 func (_m *Database) GetWorkspaceInvoices(workspace_uuid string) []db.NewInvoiceList {
 	ret := _m.Called(workspace_uuid)
@@ -4894,6 +4997,54 @@ func (_c *Database_GetWorkspaceInvoicesCount_Call) Return(_a0 int64) *Database_G
 }
 
 func (_c *Database_GetWorkspaceInvoicesCount_Call) RunAndReturn(run func(string) int64) *Database_GetWorkspaceInvoicesCount_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
+// GetWorkspaceRepositorByWorkspaceUuid provides a mock function with given fields: uuid
+func (_m *Database) GetWorkspaceRepositorByWorkspaceUuid(uuid string) []db.WorkspaceRepositories {
+	ret := _m.Called(uuid)
+
+	if len(ret) == 0 {
+		panic("no return value specified for GetWorkspaceRepositorByWorkspaceUuid")
+	}
+
+	var r0 []db.WorkspaceRepositories
+	if rf, ok := ret.Get(0).(func(string) []db.WorkspaceRepositories); ok {
+		r0 = rf(uuid)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).([]db.WorkspaceRepositories)
+		}
+	}
+
+	return r0
+}
+
+// Database_GetWorkspaceRepositorByWorkspaceUuid_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'GetWorkspaceRepositorByWorkspaceUuid'
+type Database_GetWorkspaceRepositorByWorkspaceUuid_Call struct {
+	*mock.Call
+}
+
+// GetWorkspaceRepositorByWorkspaceUuid is a helper method to define mock.On call
+//   - uuid string
+func (_e *Database_Expecter) GetWorkspaceRepositorByWorkspaceUuid(uuid interface{}) *Database_GetWorkspaceRepositorByWorkspaceUuid_Call {
+	return &Database_GetWorkspaceRepositorByWorkspaceUuid_Call{Call: _e.mock.On("GetWorkspaceRepositorByWorkspaceUuid", uuid)}
+}
+
+func (_c *Database_GetWorkspaceRepositorByWorkspaceUuid_Call) Run(run func(uuid string)) *Database_GetWorkspaceRepositorByWorkspaceUuid_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(string))
+	})
+	return _c
+}
+
+func (_c *Database_GetWorkspaceRepositorByWorkspaceUuid_Call) Return(_a0 []db.WorkspaceRepositories) *Database_GetWorkspaceRepositorByWorkspaceUuid_Call {
+	_c.Call.Return(_a0)
+	return _c
+}
+
+func (_c *Database_GetWorkspaceRepositorByWorkspaceUuid_Call) RunAndReturn(run func(string) []db.WorkspaceRepositories) *Database_GetWorkspaceRepositorByWorkspaceUuid_Call {
 	_c.Call.Return(run)
 	return _c
 }
