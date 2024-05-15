@@ -6854,19 +6854,19 @@ func (_m *Database) GetFeatureStoriesByFeatureUuid(featureUuid string) ([]db.Fea
 	return r0, r1
 }
 
-func (_m *Database) GetFeatureStoryByUuid(uuid string) (db.FeatureStory, error) {
-	ret := _m.Called(uuid)
+func (_m *Database) GetFeatureStoryByUuid(featureUuid, storyUuid string) (db.FeatureStory, error) {
+	ret := _m.Called(featureUuid, storyUuid)
 
 	var r0 db.FeatureStory
 	var r1 error
-	if rf, ok := ret.Get(0).(func(string) db.FeatureStory); ok {
-		r0 = rf(uuid)
+	if rf, ok := ret.Get(0).(func(string, string) db.FeatureStory); ok {
+		r0 = rf(featureUuid, storyUuid)
 	} else {
 		r0 = ret.Get(0).(db.FeatureStory)
 	}
 
-	if rf, ok := ret.Get(1).(func(string) error); ok {
-		r1 = rf(uuid)
+	if rf, ok := ret.Get(1).(func(string, string) error); ok {
+		r1 = rf(featureUuid, storyUuid)
 	} else {
 		r1 = ret.Error(1)
 	}
