@@ -143,7 +143,7 @@ describe('Get Feature by uuid', () => {
             for(let i = 0; i <= 2; i++) {
                 cy.request({
                     method: 'GET',
-                    url: `${HostName}/features/` + Features[i].uuid,
+                    url: `${HostName}/features/`+ Features[i].uuid,
                     headers: { 'x-jwt': `${ value }` },
                     body: {}
                 }).then((resp) => {
@@ -163,9 +163,9 @@ describe('Delete Feature by uuid', () => {
         cy.upsertlogin(User).then(value => {
             cy.request({
                 method: 'DELETE',
-                url: `${HostName}/features/${Features[2].uuid}`,
+                url: `${HostName}/features/${Features[0].uuid}`,
                 headers: { 'x-jwt': `${ value }` },
-                body: {}
+                body: {} 
             }).then((resp) => {
                 expect(resp.status).to.eq(200)
             })
@@ -177,14 +177,12 @@ describe('Check delete by uuid', () => {
     it('passes', () => {
         cy.upsertlogin(User).then(value => {
             cy.request({
-                method: 'DELETE',
-                url: `${HostName}/features/${Features[2].uuid}`,
+                method: 'GET',
+                url: `${HostName}/features/${Features[0].uuid}`,
                 headers: { 'x-jwt': `${ value }` },
-                body: {},
-                failOnStatusCode: false
+                body: {} 
             }).then((resp) => {
                 expect(resp.status).to.eq(404);
             })
         })
     })
-})
