@@ -67,10 +67,14 @@ func InitDB() {
 	db.AutoMigrate(&ConnectionCodes{})
 	db.AutoMigrate(&BountyRoles{})
 	db.AutoMigrate(&UserInvoiceData{})
+<<<<<<< HEAD
 	db.AutoMigrate(&WorkspaceRepositories{})
 	db.AutoMigrate(&WorkspaceFeatures{})
 	db.AutoMigrate(&FeaturePhase{})
 	db.AutoMigrate(&FeatureStory{})
+=======
+	db.AutoMigrate(&WorkspaceFeatures{})
+>>>>>>> e1f721d5 (Modify Features endpoint and add delete feature)
 
 	DB.MigrateTablesWithOrgUuid()
 	DB.MigrateOrganizationToWorkspace()
