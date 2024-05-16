@@ -146,4 +146,5 @@ type Database interface {
 	GetFeaturesByWorkspaceUuid(uuid string, r *http.Request) []WorkspaceFeatures
 	GetWorkspaceFeaturesCount(uuid string) int64
 	GetFeatureByUuid(uuid string) WorkspaceFeatures
+	DeleteFeatureByUuid(uuid string) error
 }
