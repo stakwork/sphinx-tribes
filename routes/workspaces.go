@@ -42,6 +42,7 @@ func WorkspaceRoutes() chi.Router {
 		r.Post("/mission", workspaceHandlers.UpdateWorkspace)
 		r.Post("/tactics", workspaceHandlers.UpdateWorkspace)
 		r.Post("/schematicurl", workspaceHandlers.UpdateWorkspace)
+		r.Get("/{workspace_uuid}/features", workspaceHandlers.GetFeaturesByWorkspaceUuid)
 	})
 	return r
 }

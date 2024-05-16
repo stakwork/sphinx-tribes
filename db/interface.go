@@ -139,4 +139,9 @@ type Database interface {
 	PersonUniqueNameFromName(name string) (string, error)
 	ProcessAlerts(p Person)
 	UserHasAccess(pubKeyFromAuth string, uuid string, role string) bool
+	CreateOrEditFeature(m WorkspaceFeatures) (WorkspaceFeatures, error)
+	GetFeaturesByWorkspaceUuid(uuid string, r *http.Request) []WorkspaceFeatures
+	GetWorkspaceFeaturesCount(uuid string) int64
+	GetFeatureByUuid(uuid string) WorkspaceFeatures
+	DeleteFeatureByUuid(uuid string) error
 }
