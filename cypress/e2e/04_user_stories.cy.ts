@@ -35,7 +35,7 @@ describe('Modify user story description', () => {
                 }).its('body').then(body => {
                     expect(body).to.have.property('uuid').and.equal(UserStories[i].uuid.trim());
                     expect(body).to.have.property('feature_uuid').and.equal(UserStories[i].feature_uuid.trim());
-                    expect(body).to.have.property('description').and.equal(UserStories[i].description.trim() + "_addtext");
+                    expect(body).to.have.property('description').and.equal(UserStories[i].description.trim() + " _addtext");
                     expect(body).to.have.property('priority').and.equal(UserStories[i].priority);
                 });
             }
@@ -56,7 +56,7 @@ describe('Get user stories for feature', () => {
                 for(let i = 0; i <= 5; i++) {
                     expect(resp.body[i]).to.have.property('uuid').and.equal(UserStories[i].uuid.trim());
                     expect(resp.body[i]).to.have.property('feature_uuid').and.equal(UserStories[i].feature_uuid.trim());
-                    expect(resp.body[i]).to.have.property('description').and.equal(UserStories[i].description.trim() + "_addtext");
+                    expect(resp.body[i]).to.have.property('description').and.equal(UserStories[i].description.trim() + " _addtext");
                     expect(resp.body[i]).to.have.property('priority').and.equal(UserStories[i].priority);
                 }
             })
@@ -71,19 +71,19 @@ describe('Get story by uuid', () => {
                 cy.request({
                     method: 'GET',
                     url: `${HostName}/features/${UserStories[0].feature_uuid}/story/${UserStories[i].uuid}`,
-                    headers: { 'x-jwt': `${ value }` },
-                    body: {} 
+                    headers: { 'x-jwt': `${value}` },
+                    body: {}
                 }).then((resp) => {
-                    expect(resp.status).to.eq(200)
-                    expect(resp.body[i]).to.have.property('uuid').and.equal(UserStories[i].uuid.trim());
-                    expect(resp.body[i]).to.have.property('feature_uuid').and.equal(UserStories[i].feature_uuid.trim());
-                    expect(resp.body[i]).to.have.property('description').and.equal(UserStories[i].description.trim() + "_addtext");
-                    expect(resp.body[i]).to.have.property('priority').and.equal(UserStories[i].priority);
-                })
+                    expect(resp.status).to.eq(200);
+                    expect(resp.body).to.have.property('uuid').and.equal(UserStories[i].uuid.trim());
+                    expect(resp.body).to.have.property('feature_uuid').and.equal(UserStories[i].feature_uuid.trim());
+                    expect(resp.body).to.have.property('description').and.equal(UserStories[i].description.trim() + " _addtext");
+                    expect(resp.body).to.have.property('priority').and.equal(UserStories[i].priority);
+                });
             }
-        })
-    })
-})
+        });
+    });
+});
 
 describe('Delete story by uuid', () => {
     it('passes', () => {
@@ -104,10 +104,11 @@ describe('Check delete by uuid', () => {
     it('passes', () => {
         cy.upsertlogin(User).then(value => {
             cy.request({
-                method: 'GET',
+                method: 'DELETE',
                 url: `${HostName}/features/${UserStories[0].feature_uuid}/story/${UserStories[0].uuid}`,
                 headers: { 'x-jwt': `${ value }` },
-                body: {} 
+                body: {},
+                failOnStatusCode: false
             }).then((resp) => {
                 expect(resp.status).to.eq(404);
             })

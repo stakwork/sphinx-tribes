@@ -986,6 +986,118 @@ func (_c *Database_CreateOrEditFeature_Call) RunAndReturn(run func(db.WorkspaceF
 	return _c
 }
 
+// CreateOrEditFeaturePhase provides a mock function with given fields: phase
+func (_m *Database) CreateOrEditFeaturePhase(phase db.FeaturePhase) (db.FeaturePhase, error) {
+	ret := _m.Called(phase)
+
+	if len(ret) == 0 {
+		panic("no return value specified for CreateOrEditFeaturePhase")
+	}
+
+	var r0 db.FeaturePhase
+	var r1 error
+	if rf, ok := ret.Get(0).(func(db.FeaturePhase) (db.FeaturePhase, error)); ok {
+		return rf(phase)
+	}
+	if rf, ok := ret.Get(0).(func(db.FeaturePhase) db.FeaturePhase); ok {
+		r0 = rf(phase)
+	} else {
+		r0 = ret.Get(0).(db.FeaturePhase)
+	}
+
+	if rf, ok := ret.Get(1).(func(db.FeaturePhase) error); ok {
+		r1 = rf(phase)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
+// Database_CreateOrEditFeaturePhase_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'CreateOrEditFeaturePhase'
+type Database_CreateOrEditFeaturePhase_Call struct {
+	*mock.Call
+}
+
+// CreateOrEditFeaturePhase is a helper method to define mock.On call
+//   - phase db.FeaturePhase
+func (_e *Database_Expecter) CreateOrEditFeaturePhase(phase interface{}) *Database_CreateOrEditFeaturePhase_Call {
+	return &Database_CreateOrEditFeaturePhase_Call{Call: _e.mock.On("CreateOrEditFeaturePhase", phase)}
+}
+
+func (_c *Database_CreateOrEditFeaturePhase_Call) Run(run func(phase db.FeaturePhase)) *Database_CreateOrEditFeaturePhase_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(db.FeaturePhase))
+	})
+	return _c
+}
+
+func (_c *Database_CreateOrEditFeaturePhase_Call) Return(_a0 db.FeaturePhase, _a1 error) *Database_CreateOrEditFeaturePhase_Call {
+	_c.Call.Return(_a0, _a1)
+	return _c
+}
+
+func (_c *Database_CreateOrEditFeaturePhase_Call) RunAndReturn(run func(db.FeaturePhase) (db.FeaturePhase, error)) *Database_CreateOrEditFeaturePhase_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
+// CreateOrEditFeatureStory provides a mock function with given fields: story
+func (_m *Database) CreateOrEditFeatureStory(story db.FeatureStory) (db.FeatureStory, error) {
+	ret := _m.Called(story)
+
+	if len(ret) == 0 {
+		panic("no return value specified for CreateOrEditFeatureStory")
+	}
+
+	var r0 db.FeatureStory
+	var r1 error
+	if rf, ok := ret.Get(0).(func(db.FeatureStory) (db.FeatureStory, error)); ok {
+		return rf(story)
+	}
+	if rf, ok := ret.Get(0).(func(db.FeatureStory) db.FeatureStory); ok {
+		r0 = rf(story)
+	} else {
+		r0 = ret.Get(0).(db.FeatureStory)
+	}
+
+	if rf, ok := ret.Get(1).(func(db.FeatureStory) error); ok {
+		r1 = rf(story)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
+// Database_CreateOrEditFeatureStory_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'CreateOrEditFeatureStory'
+type Database_CreateOrEditFeatureStory_Call struct {
+	*mock.Call
+}
+
+// CreateOrEditFeatureStory is a helper method to define mock.On call
+//   - story db.FeatureStory
+func (_e *Database_Expecter) CreateOrEditFeatureStory(story interface{}) *Database_CreateOrEditFeatureStory_Call {
+	return &Database_CreateOrEditFeatureStory_Call{Call: _e.mock.On("CreateOrEditFeatureStory", story)}
+}
+
+func (_c *Database_CreateOrEditFeatureStory_Call) Run(run func(story db.FeatureStory)) *Database_CreateOrEditFeatureStory_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(db.FeatureStory))
+	})
+	return _c
+}
+
+func (_c *Database_CreateOrEditFeatureStory_Call) Return(_a0 db.FeatureStory, _a1 error) *Database_CreateOrEditFeatureStory_Call {
+	_c.Call.Return(_a0, _a1)
+	return _c
+}
+
+func (_c *Database_CreateOrEditFeatureStory_Call) RunAndReturn(run func(db.FeatureStory) (db.FeatureStory, error)) *Database_CreateOrEditFeatureStory_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
 // CreateOrEditPerson provides a mock function with given fields: m
 func (_m *Database) CreateOrEditPerson(m db.Person) (db.Person, error) {
 	ret := _m.Called(m)
@@ -1451,6 +1563,100 @@ func (_c *Database_DeleteBounty_Call) Return(_a0 db.NewBounty, _a1 error) *Datab
 }
 
 func (_c *Database_DeleteBounty_Call) RunAndReturn(run func(string, string) (db.NewBounty, error)) *Database_DeleteBounty_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
+// DeleteFeaturePhase provides a mock function with given fields: featureUuid, phaseUuid
+func (_m *Database) DeleteFeaturePhase(featureUuid string, phaseUuid string) error {
+	ret := _m.Called(featureUuid, phaseUuid)
+
+	if len(ret) == 0 {
+		panic("no return value specified for DeleteFeaturePhase")
+	}
+
+	var r0 error
+	if rf, ok := ret.Get(0).(func(string, string) error); ok {
+		r0 = rf(featureUuid, phaseUuid)
+	} else {
+		r0 = ret.Error(0)
+	}
+
+	return r0
+}
+
+// Database_DeleteFeaturePhase_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'DeleteFeaturePhase'
+type Database_DeleteFeaturePhase_Call struct {
+	*mock.Call
+}
+
+// DeleteFeaturePhase is a helper method to define mock.On call
+//   - featureUuid string
+//   - phaseUuid string
+func (_e *Database_Expecter) DeleteFeaturePhase(featureUuid interface{}, phaseUuid interface{}) *Database_DeleteFeaturePhase_Call {
+	return &Database_DeleteFeaturePhase_Call{Call: _e.mock.On("DeleteFeaturePhase", featureUuid, phaseUuid)}
+}
+
+func (_c *Database_DeleteFeaturePhase_Call) Run(run func(featureUuid string, phaseUuid string)) *Database_DeleteFeaturePhase_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(string), args[1].(string))
+	})
+	return _c
+}
+
+func (_c *Database_DeleteFeaturePhase_Call) Return(_a0 error) *Database_DeleteFeaturePhase_Call {
+	_c.Call.Return(_a0)
+	return _c
+}
+
+func (_c *Database_DeleteFeaturePhase_Call) RunAndReturn(run func(string, string) error) *Database_DeleteFeaturePhase_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
+// DeleteFeatureStoryByUuid provides a mock function with given fields: featureUuid, storyUuid
+func (_m *Database) DeleteFeatureStoryByUuid(featureUuid string, storyUuid string) error {
+	ret := _m.Called(featureUuid, storyUuid)
+
+	if len(ret) == 0 {
+		panic("no return value specified for DeleteFeatureStoryByUuid")
+	}
+
+	var r0 error
+	if rf, ok := ret.Get(0).(func(string, string) error); ok {
+		r0 = rf(featureUuid, storyUuid)
+	} else {
+		r0 = ret.Error(0)
+	}
+
+	return r0
+}
+
+// Database_DeleteFeatureStoryByUuid_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'DeleteFeatureStoryByUuid'
+type Database_DeleteFeatureStoryByUuid_Call struct {
+	*mock.Call
+}
+
+// DeleteFeatureStoryByUuid is a helper method to define mock.On call
+//   - featureUuid string
+//   - storyUuid string
+func (_e *Database_Expecter) DeleteFeatureStoryByUuid(featureUuid interface{}, storyUuid interface{}) *Database_DeleteFeatureStoryByUuid_Call {
+	return &Database_DeleteFeatureStoryByUuid_Call{Call: _e.mock.On("DeleteFeatureStoryByUuid", featureUuid, storyUuid)}
+}
+
+func (_c *Database_DeleteFeatureStoryByUuid_Call) Run(run func(featureUuid string, storyUuid string)) *Database_DeleteFeatureStoryByUuid_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(string), args[1].(string))
+	})
+	return _c
+}
+
+func (_c *Database_DeleteFeatureStoryByUuid_Call) Return(_a0 error) *Database_DeleteFeatureStoryByUuid_Call {
+	_c.Call.Return(_a0)
+	return _c
+}
+
+func (_c *Database_DeleteFeatureStoryByUuid_Call) RunAndReturn(run func(string, string) error) *Database_DeleteFeatureStoryByUuid_Call {
 	_c.Call.Return(run)
 	return _c
 }
@@ -2681,6 +2887,178 @@ func (_c *Database_GetFeatureByUuid_Call) RunAndReturn(run func(string) db.Works
 	return _c
 }
 
+// GetFeaturePhaseByUuid provides a mock function with given fields: featureUuid, phaseUuid
+func (_m *Database) GetFeaturePhaseByUuid(featureUuid string, phaseUuid string) (db.FeaturePhase, error) {
+	ret := _m.Called(featureUuid, phaseUuid)
+
+	if len(ret) == 0 {
+		panic("no return value specified for GetFeaturePhaseByUuid")
+	}
+
+	var r0 db.FeaturePhase
+	var r1 error
+	if rf, ok := ret.Get(0).(func(string, string) (db.FeaturePhase, error)); ok {
+		return rf(featureUuid, phaseUuid)
+	}
+	if rf, ok := ret.Get(0).(func(string, string) db.FeaturePhase); ok {
+		r0 = rf(featureUuid, phaseUuid)
+	} else {
+		r0 = ret.Get(0).(db.FeaturePhase)
+	}
+
+	if rf, ok := ret.Get(1).(func(string, string) error); ok {
+		r1 = rf(featureUuid, phaseUuid)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
+// Database_GetFeaturePhaseByUuid_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'GetFeaturePhaseByUuid'
+type Database_GetFeaturePhaseByUuid_Call struct {
+	*mock.Call
+}
+
+// GetFeaturePhaseByUuid is a helper method to define mock.On call
+//   - featureUuid string
+//   - phaseUuid string
+func (_e *Database_Expecter) GetFeaturePhaseByUuid(featureUuid interface{}, phaseUuid interface{}) *Database_GetFeaturePhaseByUuid_Call {
+	return &Database_GetFeaturePhaseByUuid_Call{Call: _e.mock.On("GetFeaturePhaseByUuid", featureUuid, phaseUuid)}
+}
+
+func (_c *Database_GetFeaturePhaseByUuid_Call) Run(run func(featureUuid string, phaseUuid string)) *Database_GetFeaturePhaseByUuid_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(string), args[1].(string))
+	})
+	return _c
+}
+
+func (_c *Database_GetFeaturePhaseByUuid_Call) Return(_a0 db.FeaturePhase, _a1 error) *Database_GetFeaturePhaseByUuid_Call {
+	_c.Call.Return(_a0, _a1)
+	return _c
+}
+
+func (_c *Database_GetFeaturePhaseByUuid_Call) RunAndReturn(run func(string, string) (db.FeaturePhase, error)) *Database_GetFeaturePhaseByUuid_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
+// GetFeatureStoriesByFeatureUuid provides a mock function with given fields: featureUuid
+func (_m *Database) GetFeatureStoriesByFeatureUuid(featureUuid string) ([]db.FeatureStory, error) {
+	ret := _m.Called(featureUuid)
+
+	if len(ret) == 0 {
+		panic("no return value specified for GetFeatureStoriesByFeatureUuid")
+	}
+
+	var r0 []db.FeatureStory
+	var r1 error
+	if rf, ok := ret.Get(0).(func(string) ([]db.FeatureStory, error)); ok {
+		return rf(featureUuid)
+	}
+	if rf, ok := ret.Get(0).(func(string) []db.FeatureStory); ok {
+		r0 = rf(featureUuid)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).([]db.FeatureStory)
+		}
+	}
+
+	if rf, ok := ret.Get(1).(func(string) error); ok {
+		r1 = rf(featureUuid)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
+// Database_GetFeatureStoriesByFeatureUuid_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'GetFeatureStoriesByFeatureUuid'
+type Database_GetFeatureStoriesByFeatureUuid_Call struct {
+	*mock.Call
+}
+
+// GetFeatureStoriesByFeatureUuid is a helper method to define mock.On call
+//   - featureUuid string
+func (_e *Database_Expecter) GetFeatureStoriesByFeatureUuid(featureUuid interface{}) *Database_GetFeatureStoriesByFeatureUuid_Call {
+	return &Database_GetFeatureStoriesByFeatureUuid_Call{Call: _e.mock.On("GetFeatureStoriesByFeatureUuid", featureUuid)}
+}
+
+func (_c *Database_GetFeatureStoriesByFeatureUuid_Call) Run(run func(featureUuid string)) *Database_GetFeatureStoriesByFeatureUuid_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(string))
+	})
+	return _c
+}
+
+func (_c *Database_GetFeatureStoriesByFeatureUuid_Call) Return(_a0 []db.FeatureStory, _a1 error) *Database_GetFeatureStoriesByFeatureUuid_Call {
+	_c.Call.Return(_a0, _a1)
+	return _c
+}
+
+func (_c *Database_GetFeatureStoriesByFeatureUuid_Call) RunAndReturn(run func(string) ([]db.FeatureStory, error)) *Database_GetFeatureStoriesByFeatureUuid_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
+// GetFeatureStoryByUuid provides a mock function with given fields: featureUuid, storyUuid
+func (_m *Database) GetFeatureStoryByUuid(featureUuid string, storyUuid string) (db.FeatureStory, error) {
+	ret := _m.Called(featureUuid, storyUuid)
+
+	if len(ret) == 0 {
+		panic("no return value specified for GetFeatureStoryByUuid")
+	}
+
+	var r0 db.FeatureStory
+	var r1 error
+	if rf, ok := ret.Get(0).(func(string, string) (db.FeatureStory, error)); ok {
+		return rf(featureUuid, storyUuid)
+	}
+	if rf, ok := ret.Get(0).(func(string, string) db.FeatureStory); ok {
+		r0 = rf(featureUuid, storyUuid)
+	} else {
+		r0 = ret.Get(0).(db.FeatureStory)
+	}
+
+	if rf, ok := ret.Get(1).(func(string, string) error); ok {
+		r1 = rf(featureUuid, storyUuid)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
+// Database_GetFeatureStoryByUuid_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'GetFeatureStoryByUuid'
+type Database_GetFeatureStoryByUuid_Call struct {
+	*mock.Call
+}
+
+// GetFeatureStoryByUuid is a helper method to define mock.On call
+//   - featureUuid string
+//   - storyUuid string
+func (_e *Database_Expecter) GetFeatureStoryByUuid(featureUuid interface{}, storyUuid interface{}) *Database_GetFeatureStoryByUuid_Call {
+	return &Database_GetFeatureStoryByUuid_Call{Call: _e.mock.On("GetFeatureStoryByUuid", featureUuid, storyUuid)}
+}
+
+func (_c *Database_GetFeatureStoryByUuid_Call) Run(run func(featureUuid string, storyUuid string)) *Database_GetFeatureStoryByUuid_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(string), args[1].(string))
+	})
+	return _c
+}
+
+func (_c *Database_GetFeatureStoryByUuid_Call) Return(_a0 db.FeatureStory, _a1 error) *Database_GetFeatureStoryByUuid_Call {
+	_c.Call.Return(_a0, _a1)
+	return _c
+}
+
+func (_c *Database_GetFeatureStoryByUuid_Call) RunAndReturn(run func(string, string) (db.FeatureStory, error)) *Database_GetFeatureStoryByUuid_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
 // GetFeaturesByWorkspaceUuid provides a mock function with given fields: uuid, r
 func (_m *Database) GetFeaturesByWorkspaceUuid(uuid string, r *http.Request) []db.WorkspaceFeatures {
 	ret := _m.Called(uuid, r)
@@ -3854,6 +4232,54 @@ func (_c *Database_GetPersonByUuid_Call) Return(_a0 db.Person) *Database_GetPers
 }
 
 func (_c *Database_GetPersonByUuid_Call) RunAndReturn(run func(string) db.Person) *Database_GetPersonByUuid_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
+// GetPhasesByFeatureUuid provides a mock function with given fields: featureUuid
+func (_m *Database) GetPhasesByFeatureUuid(featureUuid string) []db.FeaturePhase {
+	ret := _m.Called(featureUuid)
+
+	if len(ret) == 0 {
+		panic("no return value specified for GetPhasesByFeatureUuid")
+	}
+
+	var r0 []db.FeaturePhase
+	if rf, ok := ret.Get(0).(func(string) []db.FeaturePhase); ok {
+		r0 = rf(featureUuid)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).([]db.FeaturePhase)
+		}
+	}
+
+	return r0
+}
+
+// Database_GetPhasesByFeatureUuid_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'GetPhasesByFeatureUuid'
+type Database_GetPhasesByFeatureUuid_Call struct {
+	*mock.Call
+}
+
+// GetPhasesByFeatureUuid is a helper method to define mock.On call
+//   - featureUuid string
+func (_e *Database_Expecter) GetPhasesByFeatureUuid(featureUuid interface{}) *Database_GetPhasesByFeatureUuid_Call {
+	return &Database_GetPhasesByFeatureUuid_Call{Call: _e.mock.On("GetPhasesByFeatureUuid", featureUuid)}
+}
+
+func (_c *Database_GetPhasesByFeatureUuid_Call) Run(run func(featureUuid string)) *Database_GetPhasesByFeatureUuid_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(string))
+	})
+	return _c
+}
+
+func (_c *Database_GetPhasesByFeatureUuid_Call) Return(_a0 []db.FeaturePhase) *Database_GetPhasesByFeatureUuid_Call {
+	_c.Call.Return(_a0)
+	return _c
+}
+
+func (_c *Database_GetPhasesByFeatureUuid_Call) RunAndReturn(run func(string) []db.FeaturePhase) *Database_GetPhasesByFeatureUuid_Call {
 	_c.Call.Return(run)
 	return _c
 }
@@ -6810,76 +7236,4 @@ func NewDatabase(t interface {
 	t.Cleanup(func() { mock.AssertExpectations(t) })
 
 	return mock
-}
-
-// CreateOrEditFeaturePhase provides a mock function with given fields: phase
-func (_m *Database) CreateOrEditFeaturePhase(phase db.FeaturePhase) (db.FeaturePhase, error) {
-	ret := _m.Called(phase)
-
-	var r0 db.FeaturePhase
-	var r1 error
-	if rf, ok := ret.Get(0).(func(db.FeaturePhase) db.FeaturePhase); ok {
-		r0 = rf(phase)
-	} else {
-		r0 = ret.Get(0).(db.FeaturePhase)
-	}
-
-	if rf, ok := ret.Get(1).(func(db.FeaturePhase) error); ok {
-		r1 = rf(phase)
-	} else {
-		r1 = ret.Error(1)
-	}
-
-	return r0, r1
-}
-
-// GetPhasesByFeatureUuid provides a mock function with given fields: featureUuid
-func (_m *Database) GetPhasesByFeatureUuid(featureUuid string) []db.FeaturePhase {
-	ret := _m.Called(featureUuid)
-
-	var r0 []db.FeaturePhase
-	if rf, ok := ret.Get(0).(func(string) []db.FeaturePhase); ok {
-		r0 = rf(featureUuid)
-	} else {
-		if ret.Get(0) != nil {
-			r0 = ret.Get(0).([]db.FeaturePhase)
-		}
-	}
-
-	return r0
-}
-
-// GetFeaturePhaseByUuid provides a mock function with given fields: featureUuid, phaseUuid
-func (_m *Database) GetFeaturePhaseByUuid(featureUuid, phaseUuid string) (db.FeaturePhase, error) {
-	ret := _m.Called(featureUuid, phaseUuid)
-
-	var r0 db.FeaturePhase
-	var r1 error
-	if rf, ok := ret.Get(0).(func(string, string) db.FeaturePhase); ok {
-		r0 = rf(featureUuid, phaseUuid)
-	} else {
-		r0 = ret.Get(0).(db.FeaturePhase)
-	}
-
-	if rf, ok := ret.Get(1).(func(string, string) error); ok {
-		r1 = rf(featureUuid, phaseUuid)
-	} else {
-		r1 = ret.Error(1)
-	}
-
-	return r0, r1
-}
-
-// DeleteFeaturePhase provides a mock function with given fields: featureUuid, phaseUuid
-func (_m *Database) DeleteFeaturePhase(featureUuid string, phaseUuid string) error {
-	ret := _m.Called(featureUuid, phaseUuid)
-
-	var r1 error
-	if rf, ok := ret.Get(0).(func(string, string) error); ok {
-		r1 = rf(featureUuid, phaseUuid)
-	} else {
-		r1 = ret.Error(0)
-	}
-
-	return r1
 }

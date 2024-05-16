@@ -679,6 +679,18 @@ type BudgetHistory struct {
 	PaymentType  PaymentType `json:"payment_type"`
 }
 
+type FeatureStory struct {
+	ID          uint       `json:"id"`
+	Uuid        string     `json:"uuid"`
+	FeatureUuid string     `json:"feature_uuid"`
+	Description string     `json:"description"`
+	Priority    int        `json:"priority"`
+	Created     *time.Time `json:"created"`
+	Updated     *time.Time `json:"updated"`
+	CreatedBy   string     `json:"created_by"`
+	UpdatedBy   string     `json:"updated_by"`
+}
+
 type BudgetHistoryData struct {
 	BudgetHistory
 	SenderName string `json:"sender_name"`
