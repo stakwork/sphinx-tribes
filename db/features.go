@@ -1,6 +1,7 @@
 package db
 
 import (
+	"errors"
 	"fmt"
 	"net/http"
 	"strings"
@@ -67,4 +68,50 @@ func (db database) CreateOrEditFeature(m WorkspaceFeatures) (WorkspaceFeatures, 
 	}
 
 	return m, nil
+}
+
+func (db database) CreateOrEditFeaturePhase(phase FeaturePhase) (FeaturePhase, error) {
+	phase.Name = strings.TrimSpace(phase.Name)
+
+	now := time.Now()
+	phase.Updated = &now
+
+	existingPhase := FeaturePhase{}
+	result := db.db.Model(&FeaturePhase{}).Where("uuid = ?", phase.Uuid).First(&existingPhase)
+
+	if result.RowsAffected == 0 {
+
+		phase.Created = &now
+		db.db.Create(&phase)
+	} else {
+
+		db.db.Model(&FeaturePhase{}).Where("uuid = ?", phase.Uuid).Updates(phase)
+	}
+
+	db.db.Model(&FeaturePhase{}).Where("uuid = ?", phase.Uuid).Find(&phase)
+
+	return phase, nil
+}
+
+func (db database) GetPhasesByFeatureUuid(featureUuid string) []FeaturePhase {
+	phases := []FeaturePhase{}
+	db.db.Model(&FeaturePhase{}).Where("feature_uuid = ?", featureUuid).Order("Created ASC").Find(&phases)
+	return phases
+}
+
+func (db database) GetFeaturePhaseByUuid(featureUuid, phaseUuid string) (FeaturePhase, error) {
+	phase := FeaturePhase{}
+	result := db.db.Model(&FeaturePhase{}).Where("feature_uuid = ? AND uuid = ?", featureUuid, phaseUuid).First(&phase)
+	if result.RowsAffected == 0 {
+		return phase, errors.New("no phase found")
+	}
+	return phase, nil
+}
+
+func (db database) DeleteFeaturePhase(featureUuid, phaseUuid string) error {
+	result := db.db.Where("feature_uuid = ? AND uuid = ?", featureUuid, phaseUuid).Delete(&FeaturePhase{})
+	if result.RowsAffected == 0 {
+		return errors.New("no phase found to delete")
+	}
+	return nil
 }
