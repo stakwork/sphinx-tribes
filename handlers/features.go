@@ -3,12 +3,13 @@ package handlers
 import (
 	"encoding/json"
 	"fmt"
+	"io"
+	"net/http"
+
 	"github.com/go-chi/chi"
 	"github.com/rs/xid"
 	"github.com/stakwork/sphinx-tribes/auth"
 	"github.com/stakwork/sphinx-tribes/db"
-	"io"
-	"net/http"
 )
 
 type featureHandler struct {
@@ -192,4 +193,85 @@ func (oh *featureHandler) DeleteFeaturePhase(w http.ResponseWriter, r *http.Requ
 
 	w.WriteHeader(http.StatusOK)
 	json.NewEncoder(w).Encode(map[string]string{"message": "Phase deleted successfully"})
+}
+
+func (oh *featureHandler) CreateOrEditStory(w http.ResponseWriter, r *http.Request) {
+	ctx := r.Context()
+	pubKeyFromAuth, _ := ctx.Value(auth.ContextKey).(string)
+	if pubKeyFromAuth == "" {
+		fmt.Println("no pubkey from auth")
+		w.WriteHeader(http.StatusUnauthorized)
+		return
+	}
+
+	newStory := db.FeatureStory{}
+	decoder := json.NewDecoder(r.Body)
+	err := decoder.Decode(&newStory)
+	if err != nil {
+		w.WriteHeader(http.StatusBadRequest)
+		fmt.Fprintf(w, "Error decoding request body: %v", err)
+		return
+	}
+
+	if newStory.Uuid == "" {
+		newStory.Uuid = xid.New().String()
+	}
+
+	existingStory, _ := oh.db.GetFeatureStoryByUuid(newStory.FeatureUuid, newStory.Uuid)
+
+	if existingStory.CreatedBy == "" {
+		newStory.CreatedBy = pubKeyFromAuth
+	}
+
+	newStory.UpdatedBy = pubKeyFromAuth
+
+	story, err := oh.db.CreateOrEditFeatureStory(newStory)
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		fmt.Fprintf(w, "Error creating feature story: %v", err)
+		return
+	}
+
+	w.WriteHeader(http.StatusCreated)
+	json.NewEncoder(w).Encode(story)
+}
+
+func (oh *featureHandler) GetStoriesByFeatureUuid(w http.ResponseWriter, r *http.Request) {
+	featureUuid := chi.URLParam(r, "feature_uuid")
+	stories, err := oh.db.GetFeatureStoriesByFeatureUuid(featureUuid)
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+
+	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode(stories)
+}
+
+func (oh *featureHandler) GetStoryByUuid(w http.ResponseWriter, r *http.Request) {
+	featureUuid := chi.URLParam(r, "feature_uuid")
+	storyUuid := chi.URLParam(r, "story_uuid")
+
+	story, err := oh.db.GetFeatureStoryByUuid(featureUuid, storyUuid)
+	if err != nil {
+		w.WriteHeader(http.StatusNotFound)
+		return
+	}
+
+	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode(story)
+}
+func (oh *featureHandler) DeleteStory(w http.ResponseWriter, r *http.Request) {
+	featureUuid := chi.URLParam(r, "feature_uuid")
+	storyUuid := chi.URLParam(r, "story_uuid")
+
+	err := oh.db.DeleteFeatureStoryByUuid(featureUuid, storyUuid)
+	if err != nil {
+		w.WriteHeader(http.StatusNotFound)
+		json.NewEncoder(w).Encode(map[string]string{"error": err.Error()})
+		return
+	}
+
+	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode(map[string]string{"message": "Story deleted successfully"})
 }
