@@ -3,7 +3,7 @@ import { User, HostName, UserStories } from '../support/objects/objects';
 describe('Create user stories for Feature', () => {
     it('passes', () => {
         cy.upsertlogin(User).then(value => {
-            for(let i = 0; i <= 5; i++) {
+            for (let i = 0; i <= 5; i++) {
                 cy.request({
                     method: 'POST',
                     url: `${HostName}/features/story`,
@@ -23,7 +23,7 @@ describe('Create user stories for Feature', () => {
 describe('Modify user story description', () => {
     it('passes', () => {
         cy.upsertlogin(User).then(value => {
-            for(let i = 0; i <= 5; i++) {
+            for (let i = 0; i <= 5; i++) {
                 cy.request({
                     method: 'POST',
                     url: `${HostName}/features/story`,
@@ -49,11 +49,11 @@ describe('Get user stories for feature', () => {
             cy.request({
                 method: 'GET',
                 url: `${HostName}/features/${UserStories[0].feature_uuid}/story`,
-                headers: { 'x-jwt': `${ value }` },
-                body: {} 
+                headers: { 'x-jwt': `${value}` },
+                body: {}
             }).then((resp) => {
                 expect(resp.status).to.eq(200)
-                for(let i = 0; i <= 5; i++) {
+                for (let i = 0; i <= 5; i++) {
                     expect(resp.body[i]).to.have.property('uuid').and.equal(UserStories[i].uuid.trim());
                     expect(resp.body[i]).to.have.property('feature_uuid').and.equal(UserStories[i].feature_uuid.trim());
                     expect(resp.body[i]).to.have.property('description').and.equal(UserStories[i].description.trim() + " _addtext");
@@ -67,7 +67,7 @@ describe('Get user stories for feature', () => {
 describe('Get story by uuid', () => {
     it('passes', () => {
         cy.upsertlogin(User).then(value => {
-            for(let i = 0; i <= 5; i++) {
+            for (let i = 0; i <= 5; i++) {
                 cy.request({
                     method: 'GET',
                     url: `${HostName}/features/${UserStories[0].feature_uuid}/story/${UserStories[i].uuid}`,
@@ -91,8 +91,8 @@ describe('Delete story by uuid', () => {
             cy.request({
                 method: 'DELETE',
                 url: `${HostName}/features/${UserStories[0].feature_uuid}/story/${UserStories[0].uuid}`,
-                headers: { 'x-jwt': `${ value }` },
-                body: {} 
+                headers: { 'x-jwt': `${value}` },
+                body: {}
             }).then((resp) => {
                 expect(resp.status).to.eq(200)
             })
@@ -106,7 +106,7 @@ describe('Check delete by uuid', () => {
             cy.request({
                 method: 'DELETE',
                 url: `${HostName}/features/${UserStories[0].feature_uuid}/story/${UserStories[0].uuid}`,
-                headers: { 'x-jwt': `${ value }` },
+                headers: { 'x-jwt': `${value}` },
                 body: {},
                 failOnStatusCode: false
             }).then((resp) => {

@@ -67,6 +67,8 @@ func (db database) CreateOrEditFeature(m WorkspaceFeatures) (WorkspaceFeatures, 
 		db.db.Create(&m)
 	}
 
+	db.db.Model(&WorkspaceFeatures{}).Where("uuid = ?", m.Uuid).Find(&m)
+
 	return m, nil
 }
 
