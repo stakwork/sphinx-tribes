@@ -551,6 +551,7 @@ type WorkspaceUsersData struct {
 	Person
 }
 
+<<<<<<< HEAD
 type WorkspaceRepositories struct {
 	ID            uint       `json:"id"`
 	Uuid          string     `gorm:"not null" json:"uuid"`
@@ -563,6 +564,8 @@ type WorkspaceRepositories struct {
 	UpdatedBy     string     `json:"updated_by"`
 }
 
+=======
+>>>>>>> e1f721d5 (Modify Features endpoint and add delete feature)
 type WorkspaceFeatures struct {
 	ID            uint       `json:"id"`
 	Uuid          string     `gorm:"not null" json:"uuid"`
@@ -577,6 +580,7 @@ type WorkspaceFeatures struct {
 	UpdatedBy     string     `json:"updated_by"`
 }
 
+<<<<<<< HEAD
 type FeaturePhase struct {
 	Uuid        string     `json:"uuid" gorm:"primary_key"`
 	FeatureUuid string     `json:"feature_uuid"`
@@ -588,6 +592,8 @@ type FeaturePhase struct {
 	UpdatedBy   string     `json:"updated_by"`
 }
 
+=======
+>>>>>>> e1f721d5 (Modify Features endpoint and add delete feature)
 type BountyRoles struct {
 	Name string `json:"name"`
 }

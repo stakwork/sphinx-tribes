@@ -3,13 +3,21 @@ package handlers
 import (
 	"encoding/json"
 	"fmt"
+<<<<<<< HEAD
 	"io"
 	"net/http"
 
+=======
+>>>>>>> e1f721d5 (Modify Features endpoint and add delete feature)
 	"github.com/go-chi/chi"
 	"github.com/rs/xid"
 	"github.com/stakwork/sphinx-tribes/auth"
 	"github.com/stakwork/sphinx-tribes/db"
+<<<<<<< HEAD
+=======
+	"io"
+	"net/http"
+>>>>>>> e1f721d5 (Modify Features endpoint and add delete feature)
 )
 
 type featureHandler struct {
@@ -69,6 +77,7 @@ func (oh *featureHandler) CreateOrEditFeatures(w http.ResponseWriter, r *http.Re
 	json.NewEncoder(w).Encode(p)
 }
 
+<<<<<<< HEAD
 func (oh *featureHandler) GetFeaturesByWorkspaceUuid(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 	pubKeyFromAuth, _ := ctx.Value(auth.ContextKey).(string)
@@ -85,6 +94,8 @@ func (oh *featureHandler) GetFeaturesByWorkspaceUuid(w http.ResponseWriter, r *h
 	json.NewEncoder(w).Encode(workspaceFeatures)
 }
 
+=======
+>>>>>>> e1f721d5 (Modify Features endpoint and add delete feature)
 func (oh *featureHandler) GetWorkspaceFeaturesCount(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 	pubKeyFromAuth, _ := ctx.Value(auth.ContextKey).(string)
@@ -117,7 +128,11 @@ func (oh *featureHandler) GetFeatureByUuid(w http.ResponseWriter, r *http.Reques
 	json.NewEncoder(w).Encode(workspaceFeature)
 }
 
+<<<<<<< HEAD
 func (oh *featureHandler) CreateOrEditFeaturePhase(w http.ResponseWriter, r *http.Request) {
+=======
+func (oh *featureHandler) DeleteFeature(w http.ResponseWriter, r *http.Request) {
+>>>>>>> e1f721d5 (Modify Features endpoint and add delete feature)
 	ctx := r.Context()
 	pubKeyFromAuth, _ := ctx.Value(auth.ContextKey).(string)
 	if pubKeyFromAuth == "" {
@@ -126,6 +141,7 @@ func (oh *featureHandler) CreateOrEditFeaturePhase(w http.ResponseWriter, r *htt
 		return
 	}
 
+<<<<<<< HEAD
 	newPhase := db.FeaturePhase{}
 	decoder := json.NewDecoder(r.Body)
 	err := decoder.Decode(&newPhase)
@@ -185,6 +201,10 @@ func (oh *featureHandler) DeleteFeaturePhase(w http.ResponseWriter, r *http.Requ
 	phaseUuid := chi.URLParam(r, "phase_uuid")
 
 	err := oh.db.DeleteFeaturePhase(featureUuid, phaseUuid)
+=======
+	uuid := chi.URLParam(r, "uuid")
+	err := oh.db.DeleteFeatureByUuid(uuid)
+>>>>>>> e1f721d5 (Modify Features endpoint and add delete feature)
 	if err != nil {
 		w.WriteHeader(http.StatusNotFound)
 		json.NewEncoder(w).Encode(map[string]string{"error": err.Error()})
@@ -192,6 +212,7 @@ func (oh *featureHandler) DeleteFeaturePhase(w http.ResponseWriter, r *http.Requ
 	}
 
 	w.WriteHeader(http.StatusOK)
+<<<<<<< HEAD
 	json.NewEncoder(w).Encode(map[string]string{"message": "Phase deleted successfully"})
 }
 
@@ -274,4 +295,7 @@ func (oh *featureHandler) DeleteStory(w http.ResponseWriter, r *http.Request) {
 
 	w.WriteHeader(http.StatusOK)
 	json.NewEncoder(w).Encode(map[string]string{"message": "Story deleted successfully"})
+=======
+	fmt.Fprint(w, "Feature deleted successfully")
+>>>>>>> e1f721d5 (Modify Features endpoint and add delete feature)
 }

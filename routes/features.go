@@ -14,6 +14,7 @@ func FeatureRoutes() chi.Router {
 		r.Use(auth.PubKeyContext)
 
 		r.Post("/", featureHandlers.CreateOrEditFeatures)
+<<<<<<< HEAD
 		r.Get("/forworkspace/{uuid}", featureHandlers.GetFeaturesByWorkspaceUuid)
 		r.Get("/{uuid}", featureHandlers.GetFeatureByUuid)
 		r.Get("/workspace/count/{uuid}", featureHandlers.GetWorkspaceFeaturesCount)
@@ -27,6 +28,12 @@ func FeatureRoutes() chi.Router {
 		r.Get("/{feature_uuid}/story", featureHandlers.GetStoriesByFeatureUuid)
 		r.Get("/{feature_uuid}/story/{story_uuid}", featureHandlers.GetStoryByUuid)
 		r.Delete("/{feature_uuid}/story/{story_uuid}", featureHandlers.DeleteStory)
+=======
+		r.Get("/{uuid}", featureHandlers.GetFeatureByUuid)
+		r.Get("/workspace/count/{uuid}", featureHandlers.GetWorkspaceFeaturesCount)
+		r.Delete("/{uuid}", featureHandlers.DeleteFeature)
+
+>>>>>>> e1f721d5 (Modify Features endpoint and add delete feature)
 	})
 	return r
 }
