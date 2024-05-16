@@ -640,11 +640,11 @@ func GetPaymentHistory(w http.ResponseWriter, r *http.Request) {
 		sender := db.DB.GetPersonByPubkey(payment.SenderPubKey)
 		receiver := db.DB.GetPersonByPubkey(payment.ReceiverPubKey)
 		paymentData := db.PaymentHistoryData{
-			PaymentHistory: payment,
-			SenderName:     sender.UniqueName,
-			SenderImg:      sender.Img,
-			ReceiverName:   receiver.UniqueName,
-			ReceiverImg:    receiver.Img,
+			NewPaymentHistory: payment,
+			SenderName:        sender.UniqueName,
+			SenderImg:         sender.Img,
+			ReceiverName:      receiver.UniqueName,
+			ReceiverImg:       receiver.Img,
 		}
 		paymentHistoryData = append(paymentHistoryData, paymentData)
 	}
@@ -794,4 +794,61 @@ func (oh *workspaceHandler) UpdateWorkspace(w http.ResponseWriter, r *http.Reque
 
 	w.WriteHeader(http.StatusOK)
 	json.NewEncoder(w).Encode(p)
+}
+
+func (oh *workspaceHandler) CreateWorkspaceRepository(w http.ResponseWriter, r *http.Request) {
+	ctx := r.Context()
+	pubKeyFromAuth, _ := ctx.Value(auth.ContextKey).(string)
+	if pubKeyFromAuth == "" {
+		fmt.Println("no pubkey from auth")
+		w.WriteHeader(http.StatusUnauthorized)
+		return
+	}
+
+	workspaceRepo := db.WorkspaceRepositories{}
+	body, _ := io.ReadAll(r.Body)
+	r.Body.Close()
+	err := json.Unmarshal(body, &workspaceRepo)
+
+	if err != nil {
+		fmt.Println(err)
+		w.WriteHeader(http.StatusNotAcceptable)
+		return
+	}
+
+	workspaceRepo.CreatedBy = pubKeyFromAuth
+
+	// Validate struct data
+	err = db.Validate.Struct(workspaceRepo)
+	if err != nil {
+		w.WriteHeader(http.StatusBadRequest)
+		msg := fmt.Sprintf("Error: did not pass validation test : %s", err)
+		json.NewEncoder(w).Encode(msg)
+		return
+	}
+
+	p, err := oh.db.CreateWorkspaceRepository(workspaceRepo)
+	if err != nil {
+		w.WriteHeader(http.StatusBadRequest)
+		return
+	}
+
+	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode(p)
+}
+
+func (oh *workspaceHandler) GetWorkspaceRepositorByWorkspaceUuid(w http.ResponseWriter, r *http.Request) {
+	ctx := r.Context()
+	pubKeyFromAuth, _ := ctx.Value(auth.ContextKey).(string)
+	if pubKeyFromAuth == "" {
+		fmt.Println("no pubkey from auth")
+		w.WriteHeader(http.StatusUnauthorized)
+		return
+	}
+
+	uuid := chi.URLParam(r, "uuid")
+	workspaceFeatures := oh.db.GetWorkspaceRepositorByWorkspaceUuid(uuid)
+
+	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode(workspaceFeatures)
 }

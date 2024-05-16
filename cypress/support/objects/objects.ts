@@ -63,7 +63,7 @@ export const Repositories = [
         url: ' https://github.com/stakwork/sphinx-tribes-frontend '
     },
     {
-        uuid: 'com1t3gn1e4a4qu3tnlg',
+        uuid: 'com1t3gn1e4a4qu3thss',
         workspace_uuid: 'cohob00n1e4808utqel0',
         name: ' backend ',
         url: ' https://github.com/stakwork/sphinx-tribes '
@@ -74,7 +74,7 @@ export const Features = [
     {
         uuid: 'com1kson1e49th88dbg0',
         workspace_uuid: 'cohob00n1e4808utqel0',
-        name: 'Hive Process',
+        name: ' Hive Process ',
         priority: 1,
         brief: ' To follow a set of best practices in product development.</br>' +
             'Dividing complex features into small<br>steps makes it easier to ' +
@@ -100,7 +100,7 @@ export const Features = [
             ' the base from which every technical decition relays on.<br/>' +
             'We are going to leverage AI to help the PM write better definitions.<br/>' +
             'The fields that would benefit form AI assistance are: mission, tactics, ' +
-            'feature brief and feature user stories',
+            'feature brief and feature user stories ',
         requirements: ' Create a new page for a conversation format between the PM and the LLM<br/>' +
             'Rely as much as possible on stakwork workflows<br/>' +
             'Have history of previous definitions ',
@@ -110,7 +110,7 @@ export const Features = [
             'Front<br/><br/> ',
     },
     {
-        uuid: 'com1l5on1e49tucv350g',
+        uuid: 'com1l5on1e49tucv350h',
         workspace_uuid: 'cohob00n1e4808utqel0',
         name: ' AI Assited relation between text fields ',
         priority: 2,
@@ -118,9 +118,9 @@ export const Features = [
             'feature brief, user stories, requirements and architecture should have some ' +
             'relation between each other.<br/>' + 'One way to do that is to leverage an LLM ' +
             'to discern the parts of the defintion that have a connection to other definitions.<br/>' +
-            'The UI will need to show the user how each definition is related to other defintions.',
+            'The UI will need to show the user how each definition is related to other defintions. ',
         requirements: 'Create a new process after a Feature text has changed. It should use the LLM to ' +
-            'determine de relationship between parts of the text.',
+            'determine de relationship between parts of the text. ',
         architecture: 'Describe the architecture of the feature with the following sections:' +
             '<br/><br/>Wireframes<br/><br/>Visual Schematics<br/><br/>Object Definition<br/><br/>' +
             'DB Schema Changes<br/><br/>UX<br/><br/>CI/CD<br/><br/>Changes<br/><br/>Endpoints<br/><br/>' +
