@@ -3,13 +3,12 @@ package handlers
 import (
 	"encoding/json"
 	"fmt"
-	"io"
-	"net/http"
-
 	"github.com/go-chi/chi"
 	"github.com/rs/xid"
 	"github.com/stakwork/sphinx-tribes/auth"
 	"github.com/stakwork/sphinx-tribes/db"
+	"io"
+	"net/http"
 )
 
 type featureHandler struct {
@@ -115,4 +114,82 @@ func (oh *featureHandler) GetFeatureByUuid(w http.ResponseWriter, r *http.Reques
 
 	w.WriteHeader(http.StatusOK)
 	json.NewEncoder(w).Encode(workspaceFeature)
+}
+
+func (oh *featureHandler) CreateOrEditFeaturePhase(w http.ResponseWriter, r *http.Request) {
+	ctx := r.Context()
+	pubKeyFromAuth, _ := ctx.Value(auth.ContextKey).(string)
+	if pubKeyFromAuth == "" {
+		fmt.Println("no pubkey from auth")
+		w.WriteHeader(http.StatusUnauthorized)
+		return
+	}
+
+	newPhase := db.FeaturePhase{}
+	decoder := json.NewDecoder(r.Body)
+	err := decoder.Decode(&newPhase)
+	if err != nil {
+		w.WriteHeader(http.StatusBadRequest)
+		fmt.Fprintf(w, "Error decoding request body: %v", err)
+		return
+	}
+
+	if newPhase.Uuid == "" {
+		newPhase.Uuid = xid.New().String()
+	}
+
+	existingPhase, _ := oh.db.GetFeaturePhaseByUuid(newPhase.FeatureUuid, newPhase.Uuid)
+
+	if existingPhase.CreatedBy == "" {
+		newPhase.CreatedBy = pubKeyFromAuth
+	}
+
+	newPhase.UpdatedBy = pubKeyFromAuth
+
+	phase, err := oh.db.CreateOrEditFeaturePhase(newPhase)
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		fmt.Fprintf(w, "Error creating feature phase: %v", err)
+		return
+	}
+
+	w.WriteHeader(http.StatusCreated)
+	json.NewEncoder(w).Encode(phase)
+}
+
+func (oh *featureHandler) GetFeaturePhases(w http.ResponseWriter, r *http.Request) {
+	featureUuid := chi.URLParam(r, "feature_uuid")
+	phases := oh.db.GetPhasesByFeatureUuid(featureUuid)
+
+	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode(phases)
+}
+
+func (oh *featureHandler) GetFeaturePhaseByUUID(w http.ResponseWriter, r *http.Request) {
+	featureUuid := chi.URLParam(r, "feature_uuid")
+	phaseUuid := chi.URLParam(r, "phase_uuid")
+
+	phase, err := oh.db.GetFeaturePhaseByUuid(featureUuid, phaseUuid)
+	if err != nil {
+		w.WriteHeader(http.StatusNotFound)
+		return
+	}
+
+	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode(phase)
+}
+
+func (oh *featureHandler) DeleteFeaturePhase(w http.ResponseWriter, r *http.Request) {
+	featureUuid := chi.URLParam(r, "feature_uuid")
+	phaseUuid := chi.URLParam(r, "phase_uuid")
+
+	err := oh.db.DeleteFeaturePhase(featureUuid, phaseUuid)
+	if err != nil {
+		w.WriteHeader(http.StatusNotFound)
+		json.NewEncoder(w).Encode(map[string]string{"error": err.Error()})
+		return
+	}
+
+	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode(map[string]string{"message": "Phase deleted successfully"})
 }
