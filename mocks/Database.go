@@ -452,6 +452,43 @@ func (_c *Database_BountiesPaidPercentage_Call) RunAndReturn(run func(db.Payment
 	return _c
 }
 
+// DeleteFeatureByUuid provides a mock function with given fields: uuid
+func (_m *Database) DeleteFeatureByUuid(uuid string) error {
+	ret := _m.Called(uuid)
+	if len(ret) == 0 {
+		panic("no return value specified for DeleteFeatureByUuid")
+	}
+	return ret.Error(0)
+}
+
+// Database_DeleteFeatureByUuid_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'DeleteFeatureByUuid'
+type Database_DeleteFeatureByUuid_Call struct {
+	*mock.Call
+}
+
+// DeleteFeatureByUuid is a helper method to define mock.On call
+//   - uuid string
+func (_e *Database_Expecter) DeleteFeatureByUuid(uuid interface{}) *Database_DeleteFeatureByUuid_Call {
+	return &Database_DeleteFeatureByUuid_Call{Call: _e.mock.On("DeleteFeatureByUuid", uuid)}
+}
+
+func (_c *Database_DeleteFeatureByUuid_Call) Run(run func(uuid string)) *Database_DeleteFeatureByUuid_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(string))
+	})
+	return _c
+}
+
+func (_c *Database_DeleteFeatureByUuid_Call) Return(_a0 error) *Database_DeleteFeatureByUuid_Call {
+	_c.Call.Return(_a0)
+	return _c
+}
+
+func (_c *Database_DeleteFeatureByUuid_Call) RunAndReturn(run func(string) error) *Database_DeleteFeatureByUuid_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
 // ChangeWorkspaceDeleteStatus provides a mock function with given fields: workspace_uuid, status
 func (_m *Database) ChangeWorkspaceDeleteStatus(workspace_uuid string, status bool) db.Workspace {
 	ret := _m.Called(workspace_uuid, status)

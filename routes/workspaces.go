@@ -42,13 +42,11 @@ func WorkspaceRoutes() chi.Router {
 		r.Post("/mission", workspaceHandlers.UpdateWorkspace)
 		r.Post("/tactics", workspaceHandlers.UpdateWorkspace)
 		r.Post("/schematicurl", workspaceHandlers.UpdateWorkspace)
-<<<<<<< HEAD
 
 		r.Post("/repositories", workspaceHandlers.CreateWorkspaceRepository)
 		r.Get("/repositories/{uuid}", workspaceHandlers.GetWorkspaceRepositorByWorkspaceUuid)
-=======
+
 		r.Get("/{workspace_uuid}/features", workspaceHandlers.GetFeaturesByWorkspaceUuid)
->>>>>>> e1f721d5 (Modify Features endpoint and add delete feature)
 	})
 	return r
 }

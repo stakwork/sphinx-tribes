@@ -3,18 +3,11 @@ package db
 import (
 	"errors"
 	"fmt"
-<<<<<<< HEAD
 	"net/http"
 	"strings"
 	"time"
 
 	"github.com/stakwork/sphinx-tribes/utils"
-=======
-	"github.com/stakwork/sphinx-tribes/utils"
-	"net/http"
-	"strings"
-	"time"
->>>>>>> e1f721d5 (Modify Features endpoint and add delete feature)
 )
 
 func (db database) GetFeaturesByWorkspaceUuid(uuid string, r *http.Request) []WorkspaceFeatures {
@@ -65,19 +58,32 @@ func (db database) CreateOrEditFeature(m WorkspaceFeatures) (WorkspaceFeatures, 
 	m.Brief = strings.TrimSpace(m.Brief)
 	m.Requirements = strings.TrimSpace(m.Requirements)
 	m.Architecture = strings.TrimSpace(m.Architecture)
-<<<<<<< HEAD
-
 	now := time.Now()
 	m.Updated = &now
 
-	if db.db.Model(&m).Where("uuid = ?", m.Uuid).Updates(&m).RowsAffected == 0 {
+	var existing WorkspaceFeatures
+	result := db.db.Model(&WorkspaceFeatures{}).Where("uuid = ?", m.Uuid).First(&existing)
+	if result.RowsAffected == 0 {
+
 		m.Created = &now
 		db.db.Create(&m)
+	} else {
+
+		db.db.Model(&WorkspaceFeatures{}).Where("uuid = ?", m.Uuid).Updates(m)
 	}
 
-	db.db.Model(&WorkspaceFeatures{}).Where("uuid = ?", m.Uuid).Find(&m)
-
+	db.db.Model(&WorkspaceFeatures{}).Where("uuid = ?", m.Uuid).First(&m)
 	return m, nil
+}
+
+func (db database) DeleteFeatureByUuid(uuid string) error {
+	result := db.db.Where("uuid = ?", uuid).Delete(&WorkspaceFeatures{})
+
+	if result.RowsAffected == 0 {
+		return errors.New("no feature found to delete")
+	}
+	return nil
+
 }
 
 func (db database) CreateOrEditFeaturePhase(phase FeaturePhase) (FeaturePhase, error) {
@@ -175,32 +181,4 @@ func (db database) DeleteFeatureStoryByUuid(featureUuid, storyUuid string) error
 		return errors.New("no story found to delete")
 	}
 	return nil
-=======
-	now := time.Now()
-	m.Updated = &now
-
-	var existing WorkspaceFeatures
-	result := db.db.Model(&WorkspaceFeatures{}).Where("uuid = ?", m.Uuid).First(&existing)
-	if result.RowsAffected == 0 {
-
-		m.Created = &now
-		db.db.Create(&m)
-	} else {
-
-		db.db.Model(&WorkspaceFeatures{}).Where("uuid = ?", m.Uuid).Updates(m)
-	}
-
-	db.db.Model(&WorkspaceFeatures{}).Where("uuid = ?", m.Uuid).First(&m)
-	return m, nil
-}
-
-func (db database) DeleteFeatureByUuid(uuid string) error {
-	result := db.db.Where("uuid = ?", uuid).Delete(&WorkspaceFeatures{})
-
-	if result.RowsAffected == 0 {
-		return errors.New("no feature found to delete")
-	}
-	return nil
-
->>>>>>> e1f721d5 (Modify Features endpoint and add delete feature)
 }
