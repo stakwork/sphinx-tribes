@@ -151,4 +151,8 @@ type Database interface {
 	GetPhasesByFeatureUuid(featureUuid string) []FeaturePhase
 	GetFeaturePhaseByUuid(featureUuid, phaseUuid string) (FeaturePhase, error)
 	DeleteFeaturePhase(featureUuid, phaseUuid string) error
+	CreateOrEditFeatureStory(story FeatureStory) (FeatureStory, error)
+	GetFeatureStoriesByFeatureUuid(featureUuid string) ([]FeatureStory, error)
+	GetFeatureStoryByUuid(featureUuid, storyUuid string) (FeatureStory, error)
+	DeleteFeatureStoryByUuid(featureUuid, storyUuid string) error
 }

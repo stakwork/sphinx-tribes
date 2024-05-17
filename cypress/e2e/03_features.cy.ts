@@ -1,11 +1,11 @@
-import { User, HostName, Workspaces, Repositories, Features } from '../support/objects/objects';
+import { User, HostName, Features } from '../support/objects/objects';
 
 
 
 describe('Create Features for Workspace', () => {
     it('passes', () => {
         cy.upsertlogin(User).then(value => {
-            for(let i = 0; i <= 2; i++) {
+            for (let i = 0; i <= 2; i++) {
                 cy.request({
                     method: 'POST',
                     url: `${HostName}/features`,
@@ -25,7 +25,7 @@ describe('Create Features for Workspace', () => {
 describe('Modify name for Feature', () => {
     it('passes', () => {
         cy.upsertlogin(User).then(value => {
-            for(let i = 0; i <= 2; i++) {
+            for (let i = 0; i <= 2; i++) {
                 cy.request({
                     method: 'POST',
                     url: `${HostName}/features`,
@@ -48,7 +48,7 @@ describe('Modify name for Feature', () => {
 describe('Modify brief for Feature', () => {
     it('passes', () => {
         cy.upsertlogin(User).then(value => {
-            for(let i = 0; i <= 2; i++) {
+            for (let i = 0; i <= 2; i++) {
                 cy.request({
                     method: 'POST',
                     url: `${HostName}/features`,
@@ -71,7 +71,7 @@ describe('Modify brief for Feature', () => {
 describe('Modify requirements for Feature', () => {
     it('passes', () => {
         cy.upsertlogin(User).then(value => {
-            for(let i = 0; i <= 2; i++) {
+            for (let i = 0; i <= 2; i++) {
                 cy.request({
                     method: 'POST',
                     url: `${HostName}/features`,
@@ -94,7 +94,7 @@ describe('Modify requirements for Feature', () => {
 describe('Modify architecture for Feature', () => {
     it('passes', () => {
         cy.upsertlogin(User).then(value => {
-            for(let i = 0; i <= 2; i++) {
+            for (let i = 0; i <= 2; i++) {
                 cy.request({
                     method: 'POST',
                     url: `${HostName}/features`,
@@ -120,7 +120,7 @@ describe('Get Features for Workspace', () => {
         cy.upsertlogin(User).then(value => {
             cy.request({
                 method: 'GET',
-                url: `${HostName}/workspaces/${Features[0].workspace_uuid}/features`, //changed from url: `${HostName}/features/forworkspace/` + Features[0].workspace_uuid, please update the routes file and any other change needed.
+                url: `${HostName}/workspaces/${Features[0].workspace_uuid}/features`,
                 headers: { 'x-jwt': `${ value }` },
                 body: {}
             }).then((resp) => {
@@ -140,11 +140,11 @@ describe('Get Features for Workspace', () => {
 describe('Get Feature by uuid', () => {
     it('passes', () => {
         cy.upsertlogin(User).then(value => {
-            for(let i = 0; i <= 2; i++) {
+            for (let i = 0; i <= 2; i++) {
                 cy.request({
                     method: 'GET',
                     url: `${HostName}/features/` + Features[i].uuid,
-                    headers: { 'x-jwt': `${ value }` },
+                    headers: { 'x-jwt': `${value}` },
                     body: {}
                 }).then((resp) => {
                     expect(resp.status).to.eq(200)
@@ -163,9 +163,9 @@ describe('Delete Feature by uuid', () => {
         cy.upsertlogin(User).then(value => {
             cy.request({
                 method: 'DELETE',
-                url: `${HostName}/features/` + Features[0].uuid,
+                url: `${HostName}/features/${Features[0].uuid}`,
                 headers: { 'x-jwt': `${ value }` },
-                body: {},
+                body: {}
             }).then((resp) => {
                 expect(resp.status).to.eq(200)
             })
@@ -178,10 +178,9 @@ describe('Check delete by uuid', () => {
         cy.upsertlogin(User).then(value => {
             cy.request({
                 method: 'GET',
-                url: `${HostName}/features/`+ Features[0].uuid,
+                url: `${HostName}/features/${Features[0].uuid}`,
                 headers: {'x-jwt': `${value}`},
-                body: {},
-                failOnStatusCode: false
+                body: {}
             }).then((resp) => {
                 expect(resp.status).to.eq(404);
             })

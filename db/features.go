@@ -76,6 +76,16 @@ func (db database) CreateOrEditFeature(m WorkspaceFeatures) (WorkspaceFeatures, 
 	return m, nil
 }
 
+func (db database) DeleteFeatureByUuid(uuid string) error {
+	result := db.db.Where("uuid = ?", uuid).Delete(&WorkspaceFeatures{})
+
+	if result.RowsAffected == 0 {
+		return errors.New("no feature found to delete")
+	}
+	return nil
+
+}
+
 func (db database) CreateOrEditFeaturePhase(phase FeaturePhase) (FeaturePhase, error) {
 	phase.Name = strings.TrimSpace(phase.Name)
 
@@ -122,12 +132,53 @@ func (db database) DeleteFeaturePhase(featureUuid, phaseUuid string) error {
 	return nil
 }
 
-func (db database) DeleteFeatureByUuid(uuid string) error {
-	result := db.db.Where("uuid = ?", uuid).Delete(&WorkspaceFeatures{})
+func (db database) CreateOrEditFeatureStory(story FeatureStory) (FeatureStory, error) {
+	story.Description = strings.TrimSpace(story.Description)
+
+	now := time.Now()
+	story.Updated = &now
+
+	existingStory := FeatureStory{}
+	result := db.db.Model(&FeatureStory{}).Where("uuid = ?", story.Uuid).First(&existingStory)
 
 	if result.RowsAffected == 0 {
-		return errors.New("no feature found to delete")
+		story.Created = &now
+		db.db.Create(&story)
+	} else {
+		db.db.Model(&FeatureStory{}).Where("uuid = ?", story.Uuid).Updates(story)
 	}
 
+	db.db.Model(&FeatureStory{}).Where("uuid = ?", story.Uuid).Find(&story)
+
+	return story, nil
+}
+
+func (db database) GetFeatureStoriesByFeatureUuid(featureUuid string) ([]FeatureStory, error) {
+	var stories []FeatureStory
+	result := db.db.Where("feature_uuid = ?", featureUuid).Find(&stories)
+	if result.Error != nil {
+		return nil, result.Error
+	}
+
+	for i := range stories {
+		stories[i].Description = strings.TrimSpace(stories[i].Description)
+	}
+	return stories, nil
+}
+
+func (db database) GetFeatureStoryByUuid(featureUuid, storyUuid string) (FeatureStory, error) {
+	story := FeatureStory{}
+	result := db.db.Model(&FeatureStory{}).Where("feature_uuid = ? AND uuid = ?", featureUuid, storyUuid).First(&story)
+	if result.RowsAffected == 0 {
+		return story, errors.New("no story found")
+	}
+	return story, nil
+}
+
+func (db database) DeleteFeatureStoryByUuid(featureUuid, storyUuid string) error {
+	result := db.db.Where("feature_uuid = ? AND uuid = ?", featureUuid, storyUuid).Delete(&FeatureStory{})
+	if result.RowsAffected == 0 {
+		return errors.New("no story found to delete")
+	}
 	return nil
 }
