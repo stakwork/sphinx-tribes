@@ -783,11 +783,7 @@ func (oh *workspaceHandler) UpdateWorkspace(w http.ResponseWriter, r *http.Reque
 	json.NewEncoder(w).Encode(p)
 }
 
-<<<<<<< HEAD
 func (oh *workspaceHandler) CreateWorkspaceRepository(w http.ResponseWriter, r *http.Request) {
-=======
-func (oh *workspaceHandler) GetFeaturesByWorkspaceUuid(w http.ResponseWriter, r *http.Request) {
->>>>>>> e1f721d5 (Modify Features endpoint and add delete feature)
 	ctx := r.Context()
 	pubKeyFromAuth, _ := ctx.Value(auth.ContextKey).(string)
 	if pubKeyFromAuth == "" {
@@ -796,7 +792,6 @@ func (oh *workspaceHandler) GetFeaturesByWorkspaceUuid(w http.ResponseWriter, r 
 		return
 	}
 
-<<<<<<< HEAD
 	workspaceRepo := db.WorkspaceRepositories{}
 	body, _ := io.ReadAll(r.Body)
 	r.Body.Close()
@@ -846,10 +841,22 @@ func (oh *workspaceHandler) GetWorkspaceRepositorByWorkspaceUuid(w http.Response
 
 	uuid := chi.URLParam(r, "uuid")
 	workspaceFeatures := oh.db.GetWorkspaceRepositorByWorkspaceUuid(uuid)
-=======
+
+	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode(workspaceFeatures)
+}
+
+func (oh *workspaceHandler) GetFeaturesByWorkspaceUuid(w http.ResponseWriter, r *http.Request) {
+	ctx := r.Context()
+	pubKeyFromAuth, _ := ctx.Value(auth.ContextKey).(string)
+	if pubKeyFromAuth == "" {
+		fmt.Println("no pubkey from auth")
+		w.WriteHeader(http.StatusUnauthorized)
+		return
+	}
+
 	uuid := chi.URLParam(r, "workspace_uuid")
 	workspaceFeatures := oh.db.GetFeaturesByWorkspaceUuid(uuid, r)
->>>>>>> e1f721d5 (Modify Features endpoint and add delete feature)
 
 	w.WriteHeader(http.StatusOK)
 	json.NewEncoder(w).Encode(workspaceFeatures)

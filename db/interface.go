@@ -140,16 +140,12 @@ type Database interface {
 	PersonUniqueNameFromName(name string) (string, error)
 	ProcessAlerts(p Person)
 	UserHasAccess(pubKeyFromAuth string, uuid string, role string) bool
-<<<<<<< HEAD
 	CreateWorkspaceRepository(m WorkspaceRepositories) (WorkspaceRepositories, error)
 	GetWorkspaceRepositorByWorkspaceUuid(uuid string) []WorkspaceRepositories
-=======
->>>>>>> e1f721d5 (Modify Features endpoint and add delete feature)
 	CreateOrEditFeature(m WorkspaceFeatures) (WorkspaceFeatures, error)
 	GetFeaturesByWorkspaceUuid(uuid string, r *http.Request) []WorkspaceFeatures
 	GetWorkspaceFeaturesCount(uuid string) int64
 	GetFeatureByUuid(uuid string) WorkspaceFeatures
-<<<<<<< HEAD
 	CreateOrEditFeaturePhase(phase FeaturePhase) (FeaturePhase, error)
 	GetPhasesByFeatureUuid(featureUuid string) []FeaturePhase
 	GetFeaturePhaseByUuid(featureUuid, phaseUuid string) (FeaturePhase, error)
@@ -158,7 +154,5 @@ type Database interface {
 	GetFeatureStoriesByFeatureUuid(featureUuid string) ([]FeatureStory, error)
 	GetFeatureStoryByUuid(featureUuid, storyUuid string) (FeatureStory, error)
 	DeleteFeatureStoryByUuid(featureUuid, storyUuid string) error
-=======
 	DeleteFeatureByUuid(uuid string) error
->>>>>>> e1f721d5 (Modify Features endpoint and add delete feature)
 }
