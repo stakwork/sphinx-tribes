@@ -820,6 +820,14 @@ func (oh *workspaceHandler) CreateWorkspaceRepository(w http.ResponseWriter, r *
 		return
 	}
 
+	// Check if workspace exists
+	workpace := oh.db.GetWorkspaceByUuid(workspaceRepo.WorkspaceUuid)
+	if workpace.Uuid != workspaceRepo.WorkspaceUuid {
+		w.WriteHeader(http.StatusUnauthorized)
+		json.NewEncoder(w).Encode("Workspace does not exists")
+		return
+	}
+
 	p, err := oh.db.CreateWorkspaceRepository(workspaceRepo)
 	if err != nil {
 		w.WriteHeader(http.StatusBadRequest)
