@@ -120,21 +120,10 @@ describe('Get Features for Workspace', () => {
         cy.upsertlogin(User).then(value => {
             cy.request({
                 method: 'GET',
-                url: `${HostName}/workspaces/${Features[0].workspace_uuid}/features`, //changed from url: `${HostName}/features/forworkspace/` + Features[0].workspace_uuid, please update the routes file and any other change needed.
+                url: `${HostName}/workspaces/${Features[0].workspace_uuid}/features`,
                 headers: { 'x-jwt': `${ value }` },
                 body: {}
             }).then((resp) => {
-<<<<<<< HEAD
-                expect(resp.status).to.eq(200);
-                const body = resp.body.reverse();
-                for (let i = 0; i <= 2; i++) {
-                    expect(body[i]).to.have.property('name', Features[i].name.trim() + " _addtext")
-                    expect(body[i]).to.have.property('brief', Features[i].brief.trim() + " _addtext")
-                    expect(body[i]).to.have.property('requirements', Features[i].requirements.trim() + " _addtext")
-                    expect(body[i]).to.have.property('architecture', Features[i].architecture.trim() + " _addtext")
-                }
-            });
-=======
                 expect(resp.status).to.eq(200)
                 resp.body.forEach((feature) => {
                     const expectedFeature = Features.find(f => f.uuid === feature.uuid);
@@ -144,7 +133,6 @@ describe('Get Features for Workspace', () => {
                     expect(feature).to.have.property('architecture', expectedFeature.architecture.trim() + " _addtext");
                 });
             })
->>>>>>> e1f721d5 (Modify Features endpoint and add delete feature)
         })
     })
 })
@@ -155,13 +143,8 @@ describe('Get Feature by uuid', () => {
             for (let i = 0; i <= 2; i++) {
                 cy.request({
                     method: 'GET',
-                    url: `${HostName}/features/` + Features[i].uuid,
-<<<<<<< HEAD
-                    headers: { 'x-jwt': `${value}` },
-=======
                     url: `${HostName}/features/`+ Features[i].uuid,
                     headers: { 'x-jwt': `${ value }` },
->>>>>>> e1f721d5 (Modify Features endpoint and add delete feature)
                     body: {}
                 }).then((resp) => {
                     expect(resp.status).to.eq(200)
@@ -180,7 +163,7 @@ describe('Delete Feature by uuid', () => {
         cy.upsertlogin(User).then(value => {
             cy.request({
                 method: 'DELETE',
-                url: `${HostName}/features/${Features[2].uuid}`,
+                url: `${HostName}/features/${Features[0].uuid}`,
                 headers: { 'x-jwt': `${ value }` },
                 body: {}
             }).then((resp) => {
@@ -195,14 +178,10 @@ describe('Check delete by uuid', () => {
         cy.upsertlogin(User).then(value => {
             cy.request({
                 method: 'DELETE',
-                url: `${HostName}/features/${Features[2].uuid}`,
+                url: `${HostName}/features/${Features[0].uuid}`,
                 headers: { 'x-jwt': `${ value }` },
-<<<<<<< HEAD
-                body: {}
-=======
                 body: {},
                 failOnStatusCode: false
->>>>>>> e1f721d5 (Modify Features endpoint and add delete feature)
             }).then((resp) => {
                 expect(resp.status).to.eq(404);
             })
