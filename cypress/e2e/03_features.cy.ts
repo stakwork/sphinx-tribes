@@ -177,10 +177,11 @@ describe('Check delete by uuid', () => {
     it('passes', () => {
         cy.upsertlogin(User).then(value => {
             cy.request({
-                method: 'GET',
+                method: 'DELETE',
                 url: `${HostName}/features/${Features[0].uuid}`,
                 headers: {'x-jwt': `${value}`},
-                body: {}
+                body: {},
+                failOnStatusCode: false
             }).then((resp) => {
                 expect(resp.status).to.eq(404);
             })
