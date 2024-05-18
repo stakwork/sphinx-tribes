@@ -45,6 +45,8 @@ func WorkspaceRoutes() chi.Router {
 
 		r.Post("/repositories", workspaceHandlers.CreateWorkspaceRepository)
 		r.Get("/repositories/{uuid}", workspaceHandlers.GetWorkspaceRepositorByWorkspaceUuid)
+
+		r.Get("/{workspace_uuid}/features", workspaceHandlers.GetFeaturesByWorkspaceUuid)
 	})
 	return r
 }

@@ -69,7 +69,7 @@ func (oh *featureHandler) CreateOrEditFeatures(w http.ResponseWriter, r *http.Re
 	json.NewEncoder(w).Encode(p)
 }
 
-func (oh *featureHandler) GetFeaturesByWorkspaceUuid(w http.ResponseWriter, r *http.Request) {
+func (oh *featureHandler) DeleteFeature(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 	pubKeyFromAuth, _ := ctx.Value(auth.ContextKey).(string)
 	if pubKeyFromAuth == "" {
@@ -79,10 +79,15 @@ func (oh *featureHandler) GetFeaturesByWorkspaceUuid(w http.ResponseWriter, r *h
 	}
 
 	uuid := chi.URLParam(r, "uuid")
-	workspaceFeatures := oh.db.GetFeaturesByWorkspaceUuid(uuid, r)
+	err := oh.db.DeleteFeatureByUuid(uuid)
+	if err != nil {
+		w.WriteHeader(http.StatusNotFound)
+		json.NewEncoder(w).Encode(map[string]string{"error": err.Error()})
+		return
+	}
 
 	w.WriteHeader(http.StatusOK)
-	json.NewEncoder(w).Encode(workspaceFeatures)
+	fmt.Fprint(w, "Feature deleted successfully")
 }
 
 func (oh *featureHandler) GetWorkspaceFeaturesCount(w http.ResponseWriter, r *http.Request) {
