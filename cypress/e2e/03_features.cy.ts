@@ -120,22 +120,23 @@ describe('Get Features for Workspace', () => {
         cy.upsertlogin(User).then(value => {
             cy.request({
                 method: 'GET',
-                url: `${HostName}/features/forworkspace/` + Features[0].workspace_uuid,
-                headers: { 'x-jwt': `${value}` },
+                url: `${HostName}/workspaces/${Features[0].workspace_uuid}/features`,
+                headers: { 'x-jwt': `${ value }` },
                 body: {}
             }).then((resp) => {
-                expect(resp.status).to.eq(200);
-                const body = resp.body.reverse();
-                for (let i = 0; i <= 2; i++) {
-                    expect(body[i]).to.have.property('name', Features[i].name.trim() + " _addtext")
-                    expect(body[i]).to.have.property('brief', Features[i].brief.trim() + " _addtext")
-                    expect(body[i]).to.have.property('requirements', Features[i].requirements.trim() + " _addtext")
-                    expect(body[i]).to.have.property('architecture', Features[i].architecture.trim() + " _addtext")
-                }
-            });
+                expect(resp.status).to.eq(200)
+                resp.body.forEach((feature) => {
+                    const expectedFeature = Features.find(f => f.uuid === feature.uuid);
+                    expect(feature).to.have.property('name', expectedFeature.name.trim() + " _addtext");
+                    expect(feature).to.have.property('brief', expectedFeature.brief.trim() + " _addtext");
+                    expect(feature).to.have.property('requirements', expectedFeature.requirements.trim() + " _addtext");
+                    expect(feature).to.have.property('architecture', expectedFeature.architecture.trim() + " _addtext");
+                });
+            })
         })
     })
 })
+
 
 describe('Get Feature by uuid', () => {
     it('passes', () => {
@@ -154,6 +155,37 @@ describe('Get Feature by uuid', () => {
                     expect(resp.body).to.have.property('architecture', Features[i].architecture.trim() + " _addtext")
                 })
             }
+        })
+    })
+})
+
+describe('Delete Feature by uuid', () => {
+    it('passes', () => {
+        cy.upsertlogin(User).then(value => {
+            cy.request({
+                method: 'DELETE',
+                url: `${HostName}/features/${Features[0].uuid}`,
+                headers: { 'x-jwt': `${ value }` },
+                body: {}
+            }).then((resp) => {
+                expect(resp.status).to.eq(200)
+            })
+        })
+    })
+})
+
+describe('Check delete by uuid', () => {
+    it('passes', () => {
+        cy.upsertlogin(User).then(value => {
+            cy.request({
+                method: 'DELETE',
+                url: `${HostName}/features/${Features[0].uuid}`,
+                headers: { 'x-jwt': `${ value }` },
+                body: {},
+                failOnStatusCode: false
+            }).then((resp) => {
+                expect(resp.status).to.eq(404);
+            })
         })
     })
 })
