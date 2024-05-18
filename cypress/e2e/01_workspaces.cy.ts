@@ -7,7 +7,7 @@ describe('Create Workspaces', () => {
             for(let i = 0; i <= 2; i++) {
                 cy.request({
                     method: 'POST',
-                    url: `${HostName}/workspaces/`,
+                    url: `${HostName}/workspaces`,
                     headers: { 'x-jwt': `${value}` },
                     body: Workspaces[i]
                 }).its('body').should('have.property', 'name', Workspaces[i].name.trim());
