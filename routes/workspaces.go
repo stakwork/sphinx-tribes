@@ -10,6 +10,7 @@ import (
 func WorkspaceRoutes() chi.Router {
 	r := chi.NewRouter()
 	workspaceHandlers := handlers.NewWorkspaceHandler(db.DB)
+	featureHandlers := handlers.NewFeatureHandler(&db.DB)
 	r.Group(func(r chi.Router) {
 		r.Get("/", handlers.GetWorkspaces)
 		r.Get("/count", handlers.GetWorkspacesCount)
@@ -45,6 +46,8 @@ func WorkspaceRoutes() chi.Router {
 
 		r.Post("/repositories", workspaceHandlers.CreateWorkspaceRepository)
 		r.Get("/repositories/{uuid}", workspaceHandlers.GetWorkspaceRepositorByWorkspaceUuid)
+
+		r.Get("/{uuid}/features", featureHandlers.GetFeaturesByWorkspaceUuid)
 	})
 	return r
 }

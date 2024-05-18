@@ -120,7 +120,7 @@ describe('Get Features for Workspace', () => {
         cy.upsertlogin(User).then(value => {
             cy.request({
                 method: 'GET',
-                url: `${HostName}/features/forworkspace/` + Features[0].workspace_uuid,
+                url: `${HostName}/workspaces/` + Features[0].workspace_uuid + `/features`,
                 headers: { 'x-jwt': `${value}` },
                 body: {}
             }).then((resp) => {
