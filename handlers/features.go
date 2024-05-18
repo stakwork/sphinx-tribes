@@ -115,7 +115,7 @@ func (oh *featureHandler) GetFeaturesByWorkspaceUuid(w http.ResponseWriter, r *h
 		return
 	}
 
-	uuid := chi.URLParam(r, "uuid")
+	uuid := chi.URLParam(r, "workspace_uuid")
 	workspaceFeatures := oh.db.GetFeaturesByWorkspaceUuid(uuid, r)
 
 	w.WriteHeader(http.StatusOK)

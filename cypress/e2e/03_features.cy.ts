@@ -68,6 +68,7 @@ describe('Modify brief for Feature', () => {
     })
 })
 
+
 describe('Modify requirements for Feature', () => {
     it('passes', () => {
         cy.upsertlogin(User).then(value => {
@@ -115,6 +116,31 @@ describe('Modify architecture for Feature', () => {
 })
 
 
+describe('Get Features for Workspace', () => {
+    it('passes', () => {
+        cy.upsertlogin(User).then(value => {
+            cy.request({
+                method: 'GET',
+                url: `${HostName}/features/` + Features[0].workspace_uuid + `/workspaces`,
+                headers: { 'x-jwt': `${value}` },
+                body: {}
+            }).then((resp) => {
+                expect(resp.status).to.eq(200);
+                if (resp.status === 200) {
+                    resp.body.forEach((feature) => {
+                        const expectedFeature = Features.find(f => f.uuid === feature.uuid);
+                        expect(feature).to.have.property('name', expectedFeature.name.trim() + " _addtext");
+                        expect(feature).to.have.property('brief', expectedFeature.brief.trim() + " _addtext");
+                        expect(feature).to.have.property('requirements', expectedFeature.requirements.trim() + " _addtext");
+                        expect(feature).to.have.property('architecture', expectedFeature.architecture.trim() + " _addtext");
+                    });
+                }
+            });
+        })
+    })
+})
+
+
 describe('Get Feature by uuid', () => {
     it('passes', () => {
         cy.upsertlogin(User).then(value => {
@@ -135,6 +161,7 @@ describe('Get Feature by uuid', () => {
         })
     })
 })
+
 
 describe('Delete Feature by uuid', () => {
     it('passes', () => {
