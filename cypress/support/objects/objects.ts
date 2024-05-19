@@ -138,9 +138,9 @@ export const UserStories = [
 ];
 
 export const Phases = [
-    { uuid: 'com1msgn1e4a0ts5kls0', feature_uuid: 'com1kson1e49th88dbg0', name: ' MVP ', priority: 0 },
-    { uuid: 'com1mvgn1e4a1879uiv0', feature_uuid: 'com1kson1e49th88dbg0', name: ' Phase 2 ', priority: 1 },
-    { uuid: 'com1n2gn1e4a1i8p60p0', feature_uuid: 'com1kson1e49th88dbg0', name: ' Phase 3 ', priority: 2 },
+    { uuid: 'com1msgn1e4a0ts5kls0', feature_uuid: 'com1kson1e49th88dbg0', name: ' MVP ' },
+    { uuid: 'com1mvgn1e4a1879uiv0', feature_uuid: 'com1kson1e49th88dbg0', name: ' Phase 2 ' },
+    { uuid: 'com1n2gn1e4a1i8p60p0', feature_uuid: 'com1kson1e49th88dbg0', name: ' Phase 3 ' },
 ];
 
 export const Bounties = [
