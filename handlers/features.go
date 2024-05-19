@@ -98,6 +98,24 @@ func (oh *featureHandler) DeleteFeature(w http.ResponseWriter, r *http.Request) 
 	fmt.Fprint(w, "Feature deleted successfully")
 }
 
+// Old Method for getting features for workspace uuid
+
+func (oh *featureHandler) GetFeaturesByWorkspaceUuid(w http.ResponseWriter, r *http.Request) {
+	ctx := r.Context()
+	pubKeyFromAuth, _ := ctx.Value(auth.ContextKey).(string)
+	if pubKeyFromAuth == "" {
+		fmt.Println("no pubkey from auth")
+		w.WriteHeader(http.StatusUnauthorized)
+		return
+	}
+
+	uuid := chi.URLParam(r, "workspace_uuid")
+	workspaceFeatures := oh.db.GetFeaturesByWorkspaceUuid(uuid, r)
+
+	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode(workspaceFeatures)
+}
+
 func (oh *featureHandler) GetWorkspaceFeaturesCount(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 	pubKeyFromAuth, _ := ctx.Value(auth.ContextKey).(string)

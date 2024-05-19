@@ -854,6 +854,8 @@ func (oh *workspaceHandler) GetWorkspaceRepositorByWorkspaceUuid(w http.Response
 	json.NewEncoder(w).Encode(workspaceFeatures)
 }
 
+// New method for getting features by workspace uuid
+
 func (oh *workspaceHandler) GetFeaturesByWorkspaceUuid(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 	pubKeyFromAuth, _ := ctx.Value(auth.ContextKey).(string)
