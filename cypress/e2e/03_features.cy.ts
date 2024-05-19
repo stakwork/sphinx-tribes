@@ -137,6 +137,30 @@ describe('Get Features for Workspace', () => {
     })
 })
 
+describe('Old Get Features for Workspace', () => {
+    it('passes', () => {
+        cy.upsertlogin(User).then(value => {
+            cy.request({
+                method: 'GET',
+                url: `${HostName}/features/forworkspace/` + Features[0].workspace_uuid,
+                headers: { 'x-jwt': `${value}` },
+                body: {}
+            }).then((resp) => {
+                expect(resp.status).to.eq(200);
+                if (resp.status === 200) {
+                    resp.body.forEach((feature) => {
+                        const expectedFeature = Features.find(f => f.uuid === feature.uuid);
+                        expect(feature).to.have.property('name', expectedFeature.name.trim() + " _addtext");
+                        expect(feature).to.have.property('brief', expectedFeature.brief.trim() + " _addtext");
+                        expect(feature).to.have.property('requirements', expectedFeature.requirements.trim() + " _addtext");
+                        expect(feature).to.have.property('architecture', expectedFeature.architecture.trim() + " _addtext");
+                    });
+                }
+            });
+        })
+    })
+})
+
 describe('Get Feature by uuid', () => {
     it('passes', () => {
         cy.upsertlogin(User).then(value => {
