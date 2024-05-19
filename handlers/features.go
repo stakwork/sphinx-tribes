@@ -59,6 +59,14 @@ func (oh *featureHandler) CreateOrEditFeatures(w http.ResponseWriter, r *http.Re
 		return
 	}
 
+	// Check if workspace exists
+	workpace := oh.db.GetWorkspaceByUuid(features.WorkspaceUuid)
+	if workpace.Uuid != features.WorkspaceUuid {
+		w.WriteHeader(http.StatusUnauthorized)
+		json.NewEncoder(w).Encode("Workspace does not exists")
+		return
+	}
+
 	p, err := oh.db.CreateOrEditFeature(features)
 	if err != nil {
 		w.WriteHeader(http.StatusBadRequest)
@@ -146,6 +154,14 @@ func (oh *featureHandler) CreateOrEditFeaturePhase(w http.ResponseWriter, r *htt
 	}
 
 	newPhase.UpdatedBy = pubKeyFromAuth
+
+	// Check if feature exists
+	feature := oh.db.GetFeatureByUuid(newPhase.FeatureUuid)
+	if feature.Uuid != newPhase.FeatureUuid {
+		w.WriteHeader(http.StatusUnauthorized)
+		json.NewEncoder(w).Encode("Feature does not exists")
+		return
+	}
 
 	phase, err := oh.db.CreateOrEditFeaturePhase(newPhase)
 	if err != nil {
