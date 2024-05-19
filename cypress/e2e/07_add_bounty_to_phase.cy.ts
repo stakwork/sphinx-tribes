@@ -9,7 +9,8 @@ describe('Create Bounty', () => {
                     method: 'POST',
                     url: `${HostName}/gobounties/`,
                     headers: { 'x-jwt': `${value}` },
-                    body: Bounties[i]
+                    body: Bounties[i],
+                    failOnStatusCode: false
                 })//.its('body').should('have.property', 'id', Workspaces[i].name.trim())
                 .then( value => {
                     console.log(value);

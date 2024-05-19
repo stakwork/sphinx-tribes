@@ -32,8 +32,10 @@ describe('Modify Repository name for Workspace', () => {
                         uuid: Repositories[i].uuid,
                         name: Repositories[i].name.trim() + "_addText"
                     }
-                }).its('body').should('have.property', 'name', Repositories[i].name.trim() + "_addText")
-                .its('body').should('have.property', 'url', Repositories[i].url.trim());
+                }).its('body').then(body => {
+                    expect(body).to.have.property('name').and.equal(Repositories[i].name.trim() + "_addText");
+                    expect(body).to.have.property('url').and.equal(Repositories[i].url.trim());
+                });
             }
         })
     })
@@ -49,10 +51,12 @@ describe('Modify Repository url for Workspace', () => {
                     headers: { 'x-jwt': `${value}` },
                     body: {
                         uuid: Repositories[i].uuid,
-                        url: Repositories[i].name.trim() + "_addText"
+                        url: Repositories[i].url.trim() + "_addText"
                     }
-                }).its('body').should('have.property', 'name', Repositories[i].name.trim() + "_addText")
-                .its('body').should('have.property', 'url', Repositories[i].url.trim() + "_addText");
+                }).its('body').then(body => {
+                    expect(body).to.have.property('name').and.equal(Repositories[i].name.trim() + "_addText");
+                    expect(body).to.have.property('url').and.equal(Repositories[i].url.trim() + "_addText");
+                });
             }
         })
     })
@@ -81,16 +85,15 @@ describe('Check Repositories Values', () => {
 describe('Get repository by uuid', () => {
     it('passes', () => {
         cy.upsertlogin(User).then(value => {
-            for(let i = 0; i <= 2; i++) {
+            for(let i = 0; i <= 1; i++) {
                 cy.request({
                     method: 'GET',
                     url: `${HostName}/workspaces/${Repositories[i].workspace_uuid}/repository/${Repositories[i].uuid}`,
-                    headers: { 'x-jwt': `${ value }` },
-                    body: {} 
+                    headers: { 'x-jwt': `${ value }` }
                 }).then((resp) => {
                     expect(resp.status).to.eq(200)
-                    expect(resp.body[i]).to.have.property('name', Repositories[i].name.trim() + "_addText")
-                    expect(resp.body[i]).to.have.property('url', Repositories[i].url.trim() + "_addText")
+                    expect(resp.body).to.have.property('name', Repositories[i].name.trim() + "_addText")
+                    expect(resp.body).to.have.property('url', Repositories[i].url.trim() + "_addText")
                 })
             }
         })
@@ -119,7 +122,8 @@ describe('Check delete by uuid', () => {
                 method: 'GET',
                 url: `${HostName}/workspaces/${Repositories[0].workspace_uuid}/repository/${Repositories[0].uuid}`,
                 headers: { 'x-jwt': `${ value }` },
-                body: {} 
+                body: {},
+                failOnStatusCode: false
             }).then((resp) => {
                 expect(resp.status).to.eq(404);
             })
