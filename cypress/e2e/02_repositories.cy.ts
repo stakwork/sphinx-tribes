@@ -100,6 +100,44 @@ describe('Modify Repository url for Workspace', () => {
     })
 })
 
+describe('Modify Repository name for Workspace', () => {
+    it('passes', () => {
+        cy.upsertlogin(User).then(value => {
+            for (let i = 0; i <= 1; i++) {
+                cy.request({
+                    method: 'POST',
+                    url: `${HostName}/workspaces/repositories`,
+                    headers: { 'x-jwt': `${value}` },
+                    body: {
+                        uuid: Repositories[i].uuid,
+                        name: Repositories[i].name.trim() + "_addText"
+                    }
+                }).its('body').should('have.property', 'name', Repositories[i].name.trim() + "_addText")
+                    .its('body').should('have.property', 'url', Repositories[i].url.trim());
+            }
+        })
+    })
+})
+
+describe('Modify Repository url for Workspace', () => {
+    it('passes', () => {
+        cy.upsertlogin(User).then(value => {
+            for (let i = 0; i <= 1; i++) {
+                cy.request({
+                    method: 'POST',
+                    url: `${HostName}/workspaces/repositories`,
+                    headers: { 'x-jwt': `${value}` },
+                    body: {
+                        uuid: Repositories[i].uuid,
+                        url: Repositories[i].name.trim() + "_addText"
+                    }
+                }).its('body').should('have.property', 'name', Repositories[i].name.trim() + "_addText")
+                    .its('body').should('have.property', 'url', Repositories[i].url.trim() + "_addText");
+            }
+        })
+    })
+})
+
 
 describe('Check Repositories Values', () => {
     it('passes', () => {
