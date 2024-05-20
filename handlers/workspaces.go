@@ -825,6 +825,14 @@ func (oh *workspaceHandler) CreateOrEditWorkspaceRepository(w http.ResponseWrite
 		return
 	}
 
+	// Check if workspace exists
+	workpace := oh.db.GetWorkspaceByUuid(workspaceRepo.WorkspaceUuid)
+	if workpace.Uuid != workspaceRepo.WorkspaceUuid {
+		w.WriteHeader(http.StatusUnauthorized)
+		json.NewEncoder(w).Encode("Workspace does not exists")
+		return
+	}
+
 	p, err := oh.db.CreateOrEditWorkspaceRepository(workspaceRepo)
 	if err != nil {
 		w.WriteHeader(http.StatusBadRequest)
@@ -891,4 +899,21 @@ func (oh *workspaceHandler) DeleteWorkspaceRepository(w http.ResponseWriter, r *
 	oh.db.DeleteWorkspaceRepository(workspace_uuid, uuid)
 
 	w.WriteHeader(http.StatusOK)
+}
+
+// New method for getting features by workspace uuid
+func (oh *workspaceHandler) GetFeaturesByWorkspaceUuid(w http.ResponseWriter, r *http.Request) {
+	ctx := r.Context()
+	pubKeyFromAuth, _ := ctx.Value(auth.ContextKey).(string)
+	if pubKeyFromAuth == "" {
+		fmt.Println("no pubkey from auth")
+		w.WriteHeader(http.StatusUnauthorized)
+		return
+	}
+
+	uuid := chi.URLParam(r, "workspace_uuid")
+	workspaceFeatures := oh.db.GetFeaturesByWorkspaceUuid(uuid, r)
+
+	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode(workspaceFeatures)
 }
