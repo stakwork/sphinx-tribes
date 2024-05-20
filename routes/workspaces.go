@@ -43,10 +43,12 @@ func WorkspaceRoutes() chi.Router {
 		r.Post("/tactics", workspaceHandlers.UpdateWorkspace)
 		r.Post("/schematicurl", workspaceHandlers.UpdateWorkspace)
 
-		r.Post("/repositories", workspaceHandlers.CreateWorkspaceRepository)
+		r.Post("/repositories", workspaceHandlers.CreateOrEditWorkspaceRepository)
 		r.Get("/repositories/{uuid}", workspaceHandlers.GetWorkspaceRepositorByWorkspaceUuid)
 		// New route for to getting features for workspace uuid
 		r.Get("/{workspace_uuid}/features", workspaceHandlers.GetFeaturesByWorkspaceUuid)
+		r.Get("/{workspace_uuid}/repository/{uuid}", workspaceHandlers.GetWorkspaceRepoByWorkspaceUuidAndRepoUuid)
+		r.Delete("/{workspace_uuid}/repository/{uuid}", workspaceHandlers.DeleteWorkspaceRepository)
 	})
 	return r
 }
