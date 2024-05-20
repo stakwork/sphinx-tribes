@@ -58,7 +58,7 @@ func (db database) CreateOrEditWorkspace(m Workspace) (Workspace, error) {
 	return m, nil
 }
 
-func (db database) CreateWorkspaceRepository(m WorkspaceRepositories) (WorkspaceRepositories, error) {
+func (db database) CreateOrEditWorkspaceRepository(m WorkspaceRepositories) (WorkspaceRepositories, error) {
 	m.Name = strings.TrimSpace(m.Name)
 	m.Url = strings.TrimSpace(m.Url)
 
@@ -70,6 +70,8 @@ func (db database) CreateWorkspaceRepository(m WorkspaceRepositories) (Workspace
 		db.db.Create(&m)
 	}
 
+	db.db.Model(&WorkspaceRepositories{}).Where("uuid = ?", m.Uuid).Find(&m)
+
 	return m, nil
 }
 
@@ -79,6 +81,22 @@ func (db database) GetWorkspaceRepositorByWorkspaceUuid(uuid string) []Workspace
 	db.db.Model(&WorkspaceRepositories{}).Where("workspace_uuid = ?", uuid).Order("Created").Find(&ms)
 
 	return ms
+}
+
+func (db database) GetWorkspaceRepoByWorkspaceUuidAndRepoUuid(workspace_uuid string, uuid string) (WorkspaceRepositories, error) {
+	var ms WorkspaceRepositories
+
+	result := db.db.Model(&WorkspaceRepositories{}).Where("workspace_uuid = ?", workspace_uuid).Where("uuid = ?", uuid).Find(&ms)
+	if result.RowsAffected == 0 {
+		return ms, fmt.Errorf("workspace repository not found")
+	}
+
+	return ms, nil
+}
+
+func (db database) DeleteWorkspaceRepository(workspace_uuid string, uuid string) bool {
+	db.db.Where("workspace_uuid = ?", workspace_uuid).Where("uuid = ?", uuid).Delete(&WorkspaceRepositories{})
+	return true
 }
 
 func (db database) GetWorkspaceUsers(uuid string) ([]WorkspaceUsersData, error) {
