@@ -142,3 +142,38 @@ export const Phases = [
     { uuid: 'com1mvgn1e4a1879uiv0', feature_uuid: 'com1kson1e49th88dbg0', name: ' Phase 2 ', priority: 1 },
     { uuid: 'com1n2gn1e4a1i8p60p0', feature_uuid: 'com1kson1e49th88dbg0', name: ' Phase 3 ', priority: 2 },
 ];
+
+export const Bounties = [
+    {
+        id: 0,
+        owner_id: '',
+        paid: false,
+        show: true,
+        completed: false,
+        type: '', //TODO find out more
+        award: '', //TODO find out more
+        assigned_hours: 2,
+        bounty_expires: '',
+        commitment_fee: 0, //TODO find out more
+        price: 21,
+        title: 'Add Features endpoints',
+        tribe: '',
+        assignee: '',
+        ticket_url: '',
+        workspace_id: Workspaces[0],
+        description: '',
+        wanted_type: '', //TODO find out more
+        deliverables: '', //TODO find out more
+        github_description: '',
+        one_sentence_summary: '',
+        estimated_session_length: '', //TODO find out more
+        estimated_completion_date: '2024-05-31',
+        created: '',
+        updated: '',
+        assigned_date: '',
+        completion_date: '',
+        mark_as_paid_date: '',
+        paid_date: '',
+        coding_languages: ['Golang'],
+    },
+]
