@@ -63,7 +63,7 @@ export const Repositories = [
         url: ' https://github.com/stakwork/sphinx-tribes-frontend '
     },
     {
-        uuid: 'com1t3gn1e4a4qu3tnlg',
+        uuid: 'com1t3gn1e4a4qu3thss',
         workspace_uuid: 'cohob00n1e4808utqel0',
         name: ' backend ',
         url: ' https://github.com/stakwork/sphinx-tribes '
@@ -74,7 +74,7 @@ export const Features = [
     {
         uuid: 'com1kson1e49th88dbg0',
         workspace_uuid: 'cohob00n1e4808utqel0',
-        name: 'Hive Process',
+        name: ' Hive Process ',
         priority: 1,
         brief: ' To follow a set of best practices in product development.</br>' +
             'Dividing complex features into small<br>steps makes it easier to ' +
@@ -100,7 +100,7 @@ export const Features = [
             ' the base from which every technical decition relays on.<br/>' +
             'We are going to leverage AI to help the PM write better definitions.<br/>' +
             'The fields that would benefit form AI assistance are: mission, tactics, ' +
-            'feature brief and feature user stories',
+            'feature brief and feature user stories ',
         requirements: ' Create a new page for a conversation format between the PM and the LLM<br/>' +
             'Rely as much as possible on stakwork workflows<br/>' +
             'Have history of previous definitions ',
@@ -110,7 +110,7 @@ export const Features = [
             'Front<br/><br/> ',
     },
     {
-        uuid: 'com1l5on1e49tucv350g',
+        uuid: 'com1l5on1e49tucv350h',
         workspace_uuid: 'cohob00n1e4808utqel0',
         name: ' AI Assited relation between text fields ',
         priority: 2,
@@ -118,9 +118,9 @@ export const Features = [
             'feature brief, user stories, requirements and architecture should have some ' +
             'relation between each other.<br/>' + 'One way to do that is to leverage an LLM ' +
             'to discern the parts of the defintion that have a connection to other definitions.<br/>' +
-            'The UI will need to show the user how each definition is related to other defintions.',
+            'The UI will need to show the user how each definition is related to other defintions. ',
         requirements: 'Create a new process after a Feature text has changed. It should use the LLM to ' +
-            'determine de relationship between parts of the text.',
+            'determine de relationship between parts of the text. ',
         architecture: 'Describe the architecture of the feature with the following sections:' +
             '<br/><br/>Wireframes<br/><br/>Visual Schematics<br/><br/>Object Definition<br/><br/>' +
             'DB Schema Changes<br/><br/>UX<br/><br/>CI/CD<br/><br/>Changes<br/><br/>Endpoints<br/><br/>' +
@@ -129,18 +129,18 @@ export const Features = [
 ];
 
 export const UserStories = [
-    { uuid: 'com1lh0n1e49ug76noig', feature_uuid: 'com1kson1e49th88dbg0', description: ' As a {PM} I want to {make providers \"hive ready\"}, so I can {leverage the hive process ' },
-    { uuid: 'com1lk8n1e49uqfe3l40', feature_uuid: 'com1kson1e49th88dbg0', description: ' As a {PM} I want to {CRUD Features}, so I can {use the system to manage my features} ' },
-    { uuid: 'com1ln8n1e49v4159gug', feature_uuid: 'com1kson1e49th88dbg0', description: ' As a {PM} I want to {follow best practices}, so I can {make more valuable features} ' },
-    { uuid: 'com1lqgn1e49vevhs9k0', feature_uuid: 'com1kson1e49th88dbg0', description: ' As a {PM} I want to {save the architecture of the feature}, so I can {share it with people} ' },
-    { uuid: 'com1lt8n1e49voquoq90', feature_uuid: 'com1kson1e49th88dbg0', description: ' As a {PM} I want to {create phases}, so I can {divide the work in several deliverable stages} ' },
-    { uuid: 'com1m08n1e4a02r6j0pg', feature_uuid: 'com1kson1e49th88dbg0', description: ' As a {PM} I want to {assign bounties to features}, so I can {group bounties together} ' },
+    { uuid: 'com1lh0n1e49ug76noig', feature_uuid: 'com1kson1e49th88dbg0', description: ' As a {PM} I want to {make providers \"hive ready\"}, so I can {leverage the hive process ', priority: 0 },
+    { uuid: 'com1lk8n1e49uqfe3l40', feature_uuid: 'com1kson1e49th88dbg0', description: ' As a {PM} I want to {CRUD Features}, so I can {use the system to manage my features} ', priority: 1 },
+    { uuid: 'com1ln8n1e49v4159gug', feature_uuid: 'com1kson1e49th88dbg0', description: ' As a {PM} I want to {follow best practices}, so I can {make more valuable features} ', priority: 2 },
+    { uuid: 'com1lqgn1e49vevhs9k0', feature_uuid: 'com1kson1e49th88dbg0', description: ' As a {PM} I want to {save the architecture of the feature}, so I can {share it with people} ', priority: 3 },
+    { uuid: 'com1lt8n1e49voquoq90', feature_uuid: 'com1kson1e49th88dbg0', description: ' As a {PM} I want to {create phases}, so I can {divide the work in several deliverable stages} ', priority: 4 },
+    { uuid: 'com1m08n1e4a02r6j0pg', feature_uuid: 'com1kson1e49th88dbg0', description: ' As a {PM} I want to {assign bounties to features}, so I can {group bounties together} ', priority: 5 },
 ];
 
 export const Phases = [
-    { uuid: 'com1msgn1e4a0ts5kls0', feature_uuid: 'com1kson1e49th88dbg0', name: ' MVP ' },
-    { uuid: 'com1mvgn1e4a1879uiv0', feature_uuid: 'com1kson1e49th88dbg0', name: ' Phase 2 ' },
-    { uuid: 'com1n2gn1e4a1i8p60p0', feature_uuid: 'com1kson1e49th88dbg0', name: ' Phase 3 ' },
+    { uuid: 'com1msgn1e4a0ts5kls0', feature_uuid: 'com1l5on1e49tucv350g', name: ' MVP ', priority: 0 },
+    { uuid: 'com1mvgn1e4a1879uiv0', feature_uuid: 'com1l5on1e49tucv350g', name: ' Phase 2 ', priority: 1 },
+    { uuid: 'com1n2gn1e4a1i8p60p0', feature_uuid: 'com1l5on1e49tucv350g', name: ' Phase 3 ', priority: 2 },
 ];
 
 export const Bounties = [

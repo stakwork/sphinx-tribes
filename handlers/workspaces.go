@@ -126,19 +126,6 @@ func (oh *workspaceHandler) CreateOrEditWorkspace(w http.ResponseWriter, r *http
 			}
 			workspace.Name = name
 		}
-	} else {
-		// if workspace.ID == 0 {
-		// 	// can't create that already exists
-		// 	fmt.Println("can't create existing organization")
-		// 	w.WriteHeader(http.StatusUnauthorized)
-		// 	return
-		// }
-
-		// if workspace.ID != existing.ID { // can't edit someone else's
-		// 	fmt.Println("cant edit another organization")
-		// 	w.WriteHeader(http.StatusUnauthorized)
-		// 	return
-		// }
 	}
 
 	p, err := oh.db.CreateOrEditWorkspace(workspace)
@@ -640,11 +627,11 @@ func GetPaymentHistory(w http.ResponseWriter, r *http.Request) {
 		sender := db.DB.GetPersonByPubkey(payment.SenderPubKey)
 		receiver := db.DB.GetPersonByPubkey(payment.ReceiverPubKey)
 		paymentData := db.PaymentHistoryData{
-			PaymentHistory: payment,
-			SenderName:     sender.UniqueName,
-			SenderImg:      sender.Img,
-			ReceiverName:   receiver.UniqueName,
-			ReceiverImg:    receiver.Img,
+			NewPaymentHistory: payment,
+			SenderName:        sender.UniqueName,
+			SenderImg:         sender.Img,
+			ReceiverName:      receiver.UniqueName,
+			ReceiverImg:       receiver.Img,
 		}
 		paymentHistoryData = append(paymentHistoryData, paymentData)
 	}
@@ -794,4 +781,139 @@ func (oh *workspaceHandler) UpdateWorkspace(w http.ResponseWriter, r *http.Reque
 
 	w.WriteHeader(http.StatusOK)
 	json.NewEncoder(w).Encode(p)
+}
+
+func (oh *workspaceHandler) CreateOrEditWorkspaceRepository(w http.ResponseWriter, r *http.Request) {
+	ctx := r.Context()
+	pubKeyFromAuth, _ := ctx.Value(auth.ContextKey).(string)
+	if pubKeyFromAuth == "" {
+		fmt.Println("no pubkey from auth")
+		w.WriteHeader(http.StatusUnauthorized)
+		return
+	}
+
+	workspaceRepo := db.WorkspaceRepositories{}
+	body, _ := io.ReadAll(r.Body)
+	r.Body.Close()
+	err := json.Unmarshal(body, &workspaceRepo)
+
+	if err != nil {
+		fmt.Println(err)
+		w.WriteHeader(http.StatusNotAcceptable)
+		return
+	}
+
+	if len(workspaceRepo.Uuid) == 0 {
+		workspaceRepo.Uuid = xid.New().String()
+		workspaceRepo.CreatedBy = pubKeyFromAuth
+	}
+
+	workspaceRepo.UpdatedBy = pubKeyFromAuth
+
+	if workspaceRepo.Uuid == "" {
+		workspaceRepo.Uuid = xid.New().String()
+	} else {
+		workspaceRepo.UpdatedBy = pubKeyFromAuth
+	}
+
+	// Validate struct data
+	err = db.Validate.Struct(workspaceRepo)
+	if err != nil {
+		w.WriteHeader(http.StatusBadRequest)
+		msg := fmt.Sprintf("Error: did not pass validation test : %s", err)
+		json.NewEncoder(w).Encode(msg)
+		return
+	}
+
+	// Check if workspace exists
+	workpace := oh.db.GetWorkspaceByUuid(workspaceRepo.WorkspaceUuid)
+	if workpace.Uuid != workspaceRepo.WorkspaceUuid {
+		w.WriteHeader(http.StatusUnauthorized)
+		json.NewEncoder(w).Encode("Workspace does not exists")
+		return
+	}
+
+	p, err := oh.db.CreateOrEditWorkspaceRepository(workspaceRepo)
+	if err != nil {
+		w.WriteHeader(http.StatusBadRequest)
+		return
+	}
+
+	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode(p)
+}
+
+func (oh *workspaceHandler) GetWorkspaceRepositorByWorkspaceUuid(w http.ResponseWriter, r *http.Request) {
+	ctx := r.Context()
+	pubKeyFromAuth, _ := ctx.Value(auth.ContextKey).(string)
+	if pubKeyFromAuth == "" {
+		fmt.Println("no pubkey from auth")
+		w.WriteHeader(http.StatusUnauthorized)
+		return
+	}
+
+	uuid := chi.URLParam(r, "uuid")
+	workspaceFeatures := oh.db.GetWorkspaceRepositorByWorkspaceUuid(uuid)
+
+	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode(workspaceFeatures)
+}
+
+func (oh *workspaceHandler) GetWorkspaceRepoByWorkspaceUuidAndRepoUuid(w http.ResponseWriter, r *http.Request) {
+	ctx := r.Context()
+	pubKeyFromAuth, _ := ctx.Value(auth.ContextKey).(string)
+	if pubKeyFromAuth == "" {
+		fmt.Println("no pubkey from auth")
+		w.WriteHeader(http.StatusUnauthorized)
+		return
+	}
+
+	workspace_uuid := chi.URLParam(r, "workspace_uuid")
+	uuid := chi.URLParam(r, "uuid")
+	WorkspaceRepository, err := oh.db.GetWorkspaceRepoByWorkspaceUuidAndRepoUuid(workspace_uuid, uuid)
+	if err != nil {
+		fmt.Println("workspace repository not found:", err)
+		w.WriteHeader(http.StatusNotFound)
+		json.NewEncoder(w).Encode(map[string]string{"error": "Repository not found"})
+		return
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode(WorkspaceRepository)
+}
+
+func (oh *workspaceHandler) DeleteWorkspaceRepository(w http.ResponseWriter, r *http.Request) {
+	ctx := r.Context()
+	pubKeyFromAuth, _ := ctx.Value(auth.ContextKey).(string)
+
+	if pubKeyFromAuth == "" {
+		fmt.Println("no pubkey from auth")
+		w.WriteHeader(http.StatusUnauthorized)
+		return
+	}
+
+	workspace_uuid := chi.URLParam(r, "workspace_uuid")
+	uuid := chi.URLParam(r, "uuid")
+
+	oh.db.DeleteWorkspaceRepository(workspace_uuid, uuid)
+
+	w.WriteHeader(http.StatusOK)
+}
+
+// New method for getting features by workspace uuid
+func (oh *workspaceHandler) GetFeaturesByWorkspaceUuid(w http.ResponseWriter, r *http.Request) {
+	ctx := r.Context()
+	pubKeyFromAuth, _ := ctx.Value(auth.ContextKey).(string)
+	if pubKeyFromAuth == "" {
+		fmt.Println("no pubkey from auth")
+		w.WriteHeader(http.StatusUnauthorized)
+		return
+	}
+
+	uuid := chi.URLParam(r, "workspace_uuid")
+	workspaceFeatures := oh.db.GetFeaturesByWorkspaceUuid(uuid, r)
+
+	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode(workspaceFeatures)
 }
