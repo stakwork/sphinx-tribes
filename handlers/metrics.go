@@ -33,6 +33,8 @@ func NewMetricHandler(db db.Database) *metricHandler {
 func PaymentMetrics(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 	pubKeyFromAuth, _ := ctx.Value(auth.ContextKey).(string)
+	keys := r.URL.Query()
+	workspace := keys.Get("workspace")
 
 	if pubKeyFromAuth == "" {
 		fmt.Println("no pubkey from auth")
@@ -51,7 +53,7 @@ func PaymentMetrics(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	sumAmount := db.DB.TotalPaymentsByDateRange(request)
+	sumAmount := db.DB.TotalPaymentsByDateRange(request, workspace)
 
 	w.WriteHeader(http.StatusOK)
 	json.NewEncoder(w).Encode(sumAmount)
@@ -114,6 +116,8 @@ func PeopleMetrics(w http.ResponseWriter, r *http.Request) {
 func (mh *metricHandler) BountyMetrics(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 	pubKeyFromAuth, _ := ctx.Value(auth.ContextKey).(string)
+	keys := r.URL.Query()
+	workspace := keys.Get("workspace")
 
 	if pubKeyFromAuth == "" {
 		fmt.Println("no pubkey from auth")
@@ -146,20 +150,22 @@ func (mh *metricHandler) BountyMetrics(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
-	totalBountiesPosted := mh.db.TotalBountiesPosted(request)
-	totalBountiesPaid := mh.db.TotalPaidBounties(request)
-	bountiesPaidPercentage := mh.db.BountiesPaidPercentage(request)
-	totalSatsPosted := mh.db.TotalSatsPosted(request)
-	totalSatsPaid := mh.db.TotalSatsPaid(request)
-	satsPaidPercentage := mh.db.SatsPaidPercentage(request)
-	avgPaidDays := mh.db.AveragePaidTime(request)
-	avgCompletedDays := mh.db.AverageCompletedTime(request)
-	uniqueHuntersPaid := mh.db.TotalHuntersPaid(request)
-	newHuntersPaid := mh.db.NewHuntersPaid(request)
+	totalBountiesPosted := mh.db.TotalBountiesPosted(request, workspace)
+	totalBountiesPaid := mh.db.TotalPaidBounties(request, workspace)
+	totalBountiesAssigned := mh.db.TotalAssignedBounties(request, workspace)
+	bountiesPaidPercentage := mh.db.BountiesPaidPercentage(request, workspace)
+	totalSatsPosted := mh.db.TotalSatsPosted(request, workspace)
+	totalSatsPaid := mh.db.TotalSatsPaid(request, workspace)
+	satsPaidPercentage := mh.db.SatsPaidPercentage(request, workspace)
+	avgPaidDays := mh.db.AveragePaidTime(request, workspace)
+	avgCompletedDays := mh.db.AverageCompletedTime(request, workspace)
+	uniqueHuntersPaid := mh.db.TotalHuntersPaid(request, workspace)
+	newHuntersPaid := mh.db.NewHuntersPaid(request, workspace)
 
 	bountyMetrics := db.BountyMetrics{
 		BountiesPosted:         totalBountiesPosted,
 		BountiesPaid:           totalBountiesPaid,
+		BountiesAssigned:       totalBountiesAssigned,
 		BountiesPaidPercentage: bountiesPaidPercentage,
 		SatsPosted:             totalSatsPosted,
 		SatsPaid:               totalSatsPaid,
@@ -300,46 +306,65 @@ func MetricsCsv(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func (mh *metricHandler) GetMetricsBountiesData(metricBounties []db.Bounty) []db.BountyData {
+func GetAdminWorkspaces(w http.ResponseWriter, r *http.Request) {
+	ctx := r.Context()
+	pubKeyFromAuth, _ := ctx.Value(auth.ContextKey).(string)
+
+	if pubKeyFromAuth == "" {
+		fmt.Println("no pubkey from auth")
+		w.WriteHeader(http.StatusUnauthorized)
+		return
+	}
+
+	workspaces := db.DB.GetWorkspaces(r)
+	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode(workspaces)
+}
+
+func (mh *metricHandler) GetMetricsBountiesData(metricBounties []db.NewBounty) []db.BountyData {
 	var metricBountiesData []db.BountyData
 	for _, bounty := range metricBounties {
 		bountyOwner := mh.db.GetPersonByPubkey(bounty.OwnerID)
 		bountyAssignee := mh.db.GetPersonByPubkey(bounty.Assignee)
-		organization := mh.db.GetWorkspaceByUuid(bounty.OrgUuid)
+		workspace := mh.db.GetWorkspaceByUuid(bounty.WorkspaceUuid)
 
 		bountyData := db.BountyData{
-			Bounty:               bounty,
-			BountyId:             bounty.ID,
-			Person:               bountyOwner,
-			BountyCreated:        bounty.Created,
-			BountyDescription:    bounty.Description,
-			BountyUpdated:        bounty.Updated,
-			AssigneeId:           bountyAssignee.ID,
-			AssigneeImg:          bountyAssignee.Img,
-			AssigneeAlias:        bountyAssignee.OwnerAlias,
-			AssigneeDescription:  bountyAssignee.Description,
-			AssigneeRouteHint:    bountyAssignee.OwnerRouteHint,
-			BountyOwnerId:        bountyOwner.ID,
-			OwnerUuid:            bountyOwner.Uuid,
-			OwnerDescription:     bountyOwner.Description,
-			OwnerUniqueName:      bountyOwner.UniqueName,
-			OwnerImg:             bountyOwner.Img,
-			OrganizationName:     organization.Name,
-			OrganizationImg:      organization.Img,
-			WorkspaceUuid:        organization.Uuid,
-			WorkspaceDescription: organization.Description,
+			NewBounty:               bounty,
+			BountyId:                bounty.ID,
+			Person:                  bountyOwner,
+			BountyCreated:           bounty.Created,
+			BountyDescription:       bounty.Description,
+			BountyUpdated:           bounty.Updated,
+			AssigneeId:              bountyAssignee.ID,
+			AssigneeImg:             bountyAssignee.Img,
+			AssigneeAlias:           bountyAssignee.OwnerAlias,
+			AssigneeDescription:     bountyAssignee.Description,
+			AssigneeRouteHint:       bountyAssignee.OwnerRouteHint,
+			BountyOwnerId:           bountyOwner.ID,
+			OwnerUuid:               bountyOwner.Uuid,
+			OwnerDescription:        bountyOwner.Description,
+			OwnerUniqueName:         bountyOwner.UniqueName,
+			OwnerImg:                bountyOwner.Img,
+			OrganizationName:        workspace.Name,
+			OrganizationImg:         workspace.Img,
+			OrganizationUuid:        workspace.Uuid,
+			OrganizationDescription: workspace.Description,
+			WorkspaceName:           workspace.Name,
+			WorkspaceImg:            workspace.Img,
+			WorkspaceUuid:           workspace.Uuid,
+			WorkspaceDescription:    workspace.Description,
 		}
 		metricBountiesData = append(metricBountiesData, bountyData)
 	}
 	return metricBountiesData
 }
 
-func getMetricsBountyCsv(metricBounties []db.Bounty) []db.MetricsBountyCsv {
+func getMetricsBountyCsv(metricBounties []db.NewBounty) []db.MetricsBountyCsv {
 	var metricBountiesCsv []db.MetricsBountyCsv
 	for _, bounty := range metricBounties {
 		bountyOwner := db.DB.GetPersonByPubkey(bounty.OwnerID)
 		bountyAssignee := db.DB.GetPersonByPubkey(bounty.Assignee)
-		organization := db.DB.GetWorkspaceByUuid(bounty.OrgUuid)
+		workspace := db.DB.GetWorkspaceByUuid(bounty.WorkspaceUuid)
 
 		bountyLink := fmt.Sprintf("https://community.sphinx.chat/bounty/%d", bounty.ID)
 		bountyStatus := "Open"
@@ -353,7 +378,7 @@ func getMetricsBountyCsv(metricBounties []db.Bounty) []db.MetricsBountyCsv {
 		tm := time.Unix(bounty.Created, 0)
 		bountyCsv := db.MetricsBountyCsv{
 			DatePosted:   &tm,
-			Organization: organization.Name,
+			Organization: workspace.Name,
 			BountyAmount: bounty.Price,
 			Provider:     bountyOwner.OwnerAlias,
 			Hunter:       bountyAssignee.OwnerAlias,
