@@ -600,9 +600,10 @@ func (h *bountyHandler) BountyBudgetWithdraw(w http.ResponseWriter, r *http.Requ
 	body, err := io.ReadAll(r.Body)
 	r.Body.Close()
 
-	err = json.Unmarshal(body, &request)
-	if err != nil {
+	merr := json.Unmarshal(body, &request)
+	if merr != nil {
 		w.WriteHeader(http.StatusNotAcceptable)
+		log.Println("Could not marshal WithdrawRequest")
 		return
 	}
 
@@ -611,6 +612,7 @@ func (h *bountyHandler) BountyBudgetWithdraw(w http.ResponseWriter, r *http.Requ
 	hasRole := h.userHasAccess(pubKeyFromAuth, request.OrgUuid, db.WithdrawBudget)
 	if !hasRole {
 		w.WriteHeader(http.StatusUnauthorized)
+		log.Printf("User %s on Workspace %s doesn't have appropriate permissions to withdraw bounty budget", pubKeyFromAuth, request.OrgUuid)
 		errMsg := formatPayError("You don't have appropriate permissions to withdraw bounty budget")
 		json.NewEncoder(w).Encode(errMsg)
 		return
@@ -632,13 +634,16 @@ func (h *bountyHandler) BountyBudgetWithdraw(w http.ResponseWriter, r *http.Requ
 		if paymentSuccess.Success {
 			// withdraw amount from workspace budget
 			h.db.WithdrawBudget(pubKeyFromAuth, request.OrgUuid, amount)
+			log.Printf("Paid Lightning invoice %s and withdrew from workspace %s budget", request.PaymentRequest, request.OrgUuid)
 			w.WriteHeader(http.StatusOK)
 			json.NewEncoder(w).Encode(paymentSuccess)
 		} else {
+			log.Printf("Could not pay Lightning invoice %s", request.PaymentRequest)
 			w.WriteHeader(http.StatusBadRequest)
 			json.NewEncoder(w).Encode(paymentError)
 		}
 	} else {
+		log.Printf("Budget Balance Error amount %d exceeds Workspace %s budget balance", amount, request.OrgUuid)
 		w.WriteHeader(http.StatusForbidden)
 		errMsg := formatPayError("Could not pay lightning invoice")
 		json.NewEncoder(w).Encode(errMsg)
