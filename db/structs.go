@@ -429,38 +429,42 @@ type BountyOwners struct {
 }
 
 type BountyData struct {
-	Bounty
+	NewBounty
 	BountyId          uint       `json:"bounty_id"`
 	BountyCreated     int64      `json:"bounty_created"`
 	BountyUpdated     *time.Time `json:"bounty_updated"`
 	BountyDescription string     `json:"bounty_description"`
 	Person
-	AssigneeAlias         string         `json:"assignee_alias"`
-	AssigneeId            uint           `json:"assignee_id"`
-	AssigneeImg           string         `json:"assignee_img"`
-	AssigneeCreated       *time.Time     `json:"assignee_created"`
-	AssigneeUpdated       *time.Time     `json:"assignee_updated"`
-	AssigneeDescription   string         `json:"assignee_description"`
-	AssigneeRouteHint     string         `json:"assignee_route_hint"`
-	BountyOwnerId         uint           `json:"bounty_owner_id"`
-	OwnerUuid             string         `json:"owner_uuid"`
-	OwnerKey              string         `json:"owner_key"`
-	OwnerAlias            string         `json:"owner_alias"`
-	OwnerUniqueName       string         `json:"owner_unique_name"`
-	OwnerDescription      string         `json:"owner_description"`
-	OwnerTags             pq.StringArray `gorm:"type:text[]" json:"owner_tags" null`
-	OwnerImg              string         `json:"owner_img"`
-	OwnerCreated          *time.Time     `json:"owner_created"`
-	OwnerUpdated          *time.Time     `json:"owner_updated"`
-	OwnerLastLogin        int64          `json:"owner_last_login"`
-	OwnerRouteHint        string         `json:"owner_route_hint"`
-	OwnerContactKey       string         `json:"owner_contact_key"`
-	OwnerPriceToMeet      int64          `json:"owner_price_to_meet"`
-	OwnerTwitterConfirmed bool           `json:"owner_twitter_confirmed"`
-	OrganizationName      string         `json:"organization_name"`
-	OrganizationImg       string         `json:"organization_img"`
-	WorkspaceUuid         string         `json:"organization_uuid"`
-	WorkspaceDescription  string         `json:"description"`
+	AssigneeAlias           string         `json:"assignee_alias"`
+	AssigneeId              uint           `json:"assignee_id"`
+	AssigneeImg             string         `json:"assignee_img"`
+	AssigneeCreated         *time.Time     `json:"assignee_created"`
+	AssigneeUpdated         *time.Time     `json:"assignee_updated"`
+	AssigneeDescription     string         `json:"assignee_description"`
+	AssigneeRouteHint       string         `json:"assignee_route_hint"`
+	BountyOwnerId           uint           `json:"bounty_owner_id"`
+	OwnerUuid               string         `json:"owner_uuid"`
+	OwnerKey                string         `json:"owner_key"`
+	OwnerAlias              string         `json:"owner_alias"`
+	OwnerUniqueName         string         `json:"owner_unique_name"`
+	OwnerDescription        string         `json:"owner_description"`
+	OwnerTags               pq.StringArray `gorm:"type:text[]" json:"owner_tags" null`
+	OwnerImg                string         `json:"owner_img"`
+	OwnerCreated            *time.Time     `json:"owner_created"`
+	OwnerUpdated            *time.Time     `json:"owner_updated"`
+	OwnerLastLogin          int64          `json:"owner_last_login"`
+	OwnerRouteHint          string         `json:"owner_route_hint"`
+	OwnerContactKey         string         `json:"owner_contact_key"`
+	OwnerPriceToMeet        int64          `json:"owner_price_to_meet"`
+	OwnerTwitterConfirmed   bool           `json:"owner_twitter_confirmed"`
+	OrganizationName        string         `json:"organization_name"`
+	OrganizationImg         string         `json:"organization_img"`
+	OrganizationUuid        string         `json:"organization_uuid"`
+	OrganizationDescription string         `json:"description"`
+	WorkspaceName           string         `json:"workspace_name"`
+	WorkspaceImg            string         `json:"workspace_img"`
+	WorkspaceUuid           string         `json:"workspace_uuid"`
+	WorkspaceDescription    string         `json:"workspace_description"`
 }
 
 type BountyResponse struct {
@@ -547,6 +551,43 @@ type WorkspaceUsersData struct {
 	Person
 }
 
+type WorkspaceRepositories struct {
+	ID            uint       `json:"id"`
+	Uuid          string     `gorm:"not null" json:"uuid"`
+	WorkspaceUuid string     `gorm:"not null" json:"workspace_uuid"`
+	Name          string     `gorm:"not null" json:"name"`
+	Url           string     `json:"url"`
+	Created       *time.Time `json:"created"`
+	Updated       *time.Time `json:"updated"`
+	CreatedBy     string     `json:"created_by"`
+	UpdatedBy     string     `json:"updated_by"`
+}
+
+type WorkspaceFeatures struct {
+	ID            uint       `json:"id"`
+	Uuid          string     `gorm:"not null" json:"uuid"`
+	WorkspaceUuid string     `gorm:"not null" json:"workspace_uuid"`
+	Name          string     `gorm:"not null" json:"name"`
+	Brief         string     `json:"brief"`
+	Requirements  string     `json:"requirements"`
+	Architecture  string     `json:"architecture"`
+	Created       *time.Time `json:"created"`
+	Updated       *time.Time `json:"updated"`
+	CreatedBy     string     `json:"created_by"`
+	UpdatedBy     string     `json:"updated_by"`
+}
+
+type FeaturePhase struct {
+	Uuid        string     `json:"uuid" gorm:"primary_key"`
+	FeatureUuid string     `json:"feature_uuid"`
+	Name        string     `json:"name"`
+	Priority    int        `json:"priority"`
+	Created     *time.Time `json:"created"`
+	Updated     *time.Time `json:"updated"`
+	CreatedBy   string     `json:"created_by"`
+	UpdatedBy   string     `json:"updated_by"`
+}
+
 type BountyRoles struct {
 	Name string `json:"name"`
 }
@@ -587,15 +628,18 @@ type NewBountyBudget struct {
 }
 
 type StatusBudget struct {
-	OrgUuid         string `json:"org_uuid"`
-	WorkspaceUuid   string `json:"workspace_uuid"`
-	CurrentBudget   uint   `json:"current_budget"`
-	OpenBudget      uint   `json:"open_budget"`
-	OpenCount       int64  `json:"open_count"`
-	AssignedBudget  uint   `json:"assigned_budget"`
-	AssignedCount   int64  `json:"assigned_count"`
-	CompletedBudget uint   `json:"completed_budget"`
-	CompletedCount  int64  `json:"completed_count"`
+	OrgUuid             string `json:"org_uuid"`
+	WorkspaceUuid       string `json:"workspace_uuid"`
+	CurrentBudget       uint   `json:"current_budget"`
+	OpenBudget          uint   `json:"open_budget"`
+	OpenCount           int64  `json:"open_count"`
+	OpenDifference      int    `json:"open_difference"`
+	AssignedBudget      uint   `json:"assigned_budget"`
+	AssignedCount       int64  `json:"assigned_count"`
+	AssignedDifference  int    `json:"assigned_difference"`
+	CompletedBudget     uint   `json:"completed_budget"`
+	CompletedCount      int64  `json:"completed_count"`
+	CompletedDifference int    `json:"completed_difference"`
 }
 
 type BudgetInvoiceRequest struct {
@@ -635,6 +679,18 @@ type BudgetHistory struct {
 	PaymentType  PaymentType `json:"payment_type"`
 }
 
+type FeatureStory struct {
+	ID          uint       `json:"id"`
+	Uuid        string     `json:"uuid"`
+	FeatureUuid string     `json:"feature_uuid"`
+	Description string     `json:"description"`
+	Priority    int        `json:"priority"`
+	Created     *time.Time `json:"created"`
+	Updated     *time.Time `json:"updated"`
+	CreatedBy   string     `json:"created_by"`
+	UpdatedBy   string     `json:"updated_by"`
+}
+
 type BudgetHistoryData struct {
 	BudgetHistory
 	SenderName string `json:"sender_name"`
@@ -668,11 +724,11 @@ type NewPaymentHistory struct {
 }
 
 type PaymentHistoryData struct {
-	PaymentHistory NewPaymentHistory
-	SenderName     string `json:"sender_name"`
-	ReceiverName   string `json:"receiver_name"`
-	SenderImg      string `json:"sender_img"`
-	ReceiverImg    string `json:"receiver_img"`
+	NewPaymentHistory
+	SenderName   string `json:"sender_name"`
+	ReceiverName string `json:"receiver_name"`
+	SenderImg    string `json:"sender_img"`
+	ReceiverImg  string `json:"receiver_img"`
 }
 
 type PaymentData struct {
@@ -799,6 +855,7 @@ type DateDifference struct {
 type BountyMetrics struct {
 	BountiesPosted         int64 `json:"bounties_posted"`
 	BountiesPaid           int64 `json:"bounties_paid"`
+	BountiesAssigned       int64 `json:"bounties_assigned"`
 	BountiesPaidPercentage uint  `json:"bounties_paid_average"`
 	SatsPosted             uint  `json:"sats_posted"`
 	SatsPaid               uint  `json:"sats_paid"`
