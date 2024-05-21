@@ -607,6 +607,9 @@ func (h *bountyHandler) BountyBudgetWithdraw(w http.ResponseWriter, r *http.Requ
 		return
 	}
 
+	fmt.Println("[BountyBudgetWithdraw] Logging body:")
+	fmt.Println(body)
+
 	// check if user is the admin of the workspace
 	// or has a withdraw bounty budget role
 	hasRole := h.userHasAccess(pubKeyFromAuth, request.OrgUuid, db.WithdrawBudget)
