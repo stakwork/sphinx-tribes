@@ -20,6 +20,7 @@ func WorkspaceRoutes() chi.Router {
 		r.Get("/bounties/{uuid}/count", workspaceHandlers.GetWorkspaceBountiesCount)
 		r.Get("/user/{userId}", handlers.GetUserWorkspaces)
 		r.Get("/user/dropdown/{userId}", workspaceHandlers.GetUserDropdownWorkspaces)
+		r.Get("/conversation/receive", handlers.ReceiveConversation)
 	})
 	r.Group(func(r chi.Router) {
 		r.Use(auth.PubKeyContext)
@@ -51,7 +52,6 @@ func WorkspaceRoutes() chi.Router {
 		r.Delete("/{workspace_uuid}/repository/{uuid}", workspaceHandlers.DeleteWorkspaceRepository)
 		r.Get("/conversation", handlers.GetConversation)
 		r.Post("/conversation/post", handlers.PostConversation)
-		r.Post("/conversation/receive", handlers.ReceiveConversation)
 	})
 	return r
 }

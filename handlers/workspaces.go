@@ -952,7 +952,15 @@ func PostConversation(w http.ResponseWriter, r *http.Request) {
 }
 
 func ReceiveConversation(w http.ResponseWriter, r *http.Request) {
+	body, _ := io.ReadAll(r.Body)
+	r.Body.Close()
 
+	fmt.Println("REquest Response ===", r.Response)
+
+	fmt.Println("REquest Body ===", body)
+
+	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode("Received Body")
 }
 
 func GetConversation(w http.ResponseWriter, r *http.Request) {
