@@ -26,9 +26,8 @@ type bountyHandler struct {
 	generateBountyResponse   func(bounties []db.NewBounty) []db.BountyResponse
 	userHasAccess            func(pubKeyFromAuth string, uuid string, role string) bool
 	userHasManageBountyRoles func(pubKeyFromAuth string, uuid string) bool
+	m                        sync.Mutex
 }
-
-var m sync.Mutex
 
 func NewBountyHandler(httpClient HttpClient, database db.Database) *bountyHandler {
 	dbConf := db.NewDatabaseConfig(&gorm.DB{})
@@ -449,7 +448,7 @@ func (h *bountyHandler) GenerateBountyResponse(bounties []db.NewBounty) []db.Bou
 }
 
 func (h *bountyHandler) MakeBountyPayment(w http.ResponseWriter, r *http.Request) {
-	m.Lock()
+	h.m.Lock()
 
 	ctx := r.Context()
 	pubKeyFromAuth, _ := ctx.Value(auth.ContextKey).(string)
@@ -581,11 +580,11 @@ func (h *bountyHandler) MakeBountyPayment(w http.ResponseWriter, r *http.Request
 		}
 	}
 
-	m.Unlock()
+	h.m.Unlock()
 }
 
 func (h *bountyHandler) BountyBudgetWithdraw(w http.ResponseWriter, r *http.Request) {
-	m.Lock()
+	h.m.Lock()
 
 	ctx := r.Context()
 	pubKeyFromAuth, _ := ctx.Value(auth.ContextKey).(string)
@@ -647,12 +646,12 @@ func (h *bountyHandler) BountyBudgetWithdraw(w http.ResponseWriter, r *http.Requ
 		json.NewEncoder(w).Encode(errMsg)
 	}
 
-	m.Unlock()
+	h.m.Unlock()
 }
 
 // Todo: change back to NewBountyBudgetWithdraw
 func (h *bountyHandler) NewBountyBudgetWithdraw(w http.ResponseWriter, r *http.Request) {
-	m.Lock()
+	h.m.Lock()
 
 	ctx := r.Context()
 	pubKeyFromAuth, _ := ctx.Value(auth.ContextKey).(string)
@@ -711,7 +710,7 @@ func (h *bountyHandler) NewBountyBudgetWithdraw(w http.ResponseWriter, r *http.R
 		json.NewEncoder(w).Encode(errMsg)
 	}
 
-	m.Unlock()
+	h.m.Unlock()
 }
 
 func formatPayError(errorMsg string) db.InvoicePayError {
