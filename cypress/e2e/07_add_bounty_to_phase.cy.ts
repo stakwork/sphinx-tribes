@@ -94,7 +94,7 @@ describe('Get Bounties for Phase', () => {
         cy.upsertlogin(User).then(value => {
                 cy.request({
                     method: 'GET',
-                    url: `${HostName}${HostName}/features/${Phases[0].feature_uuid}/phase/${Phases[0].feature_uuid}/bounty`,
+                    url: `${HostName}/features/${Phases[0].feature_uuid}/phase/${Phases[0].uuid}/bounty`,
                     headers: { 'x-jwt': `${value}` },
                     //body: Bounties[i],
                     failOnStatusCode: false
