@@ -519,6 +519,7 @@ type Workspace struct {
 	Mission      string     `json:"mission"`
 	Tactics      string     `json:"tactics"`
 	SchematicUrl string     `json:"schematic_url"`
+	SchematicImg string     `json:"schematic_img"`
 }
 
 type WorkspaceShort struct {
