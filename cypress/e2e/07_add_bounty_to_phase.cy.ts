@@ -2,7 +2,7 @@ import { User, HostName, Phases, Bounties } from '../support/objects/objects';
 
 
 //This test passes! It only asserts that response contains workspace_uuid 
-describe('Create Bounties - don\'t check phase_uuid', () => {
+describe('Create Bounties - don\'t check phase_uuid or phase_priority', () => {
     it('passes', () => {
         cy.upsertlogin(User).then(value => {
             for (let i = 0; i < Bounties.length; i++) {
@@ -24,7 +24,7 @@ describe('Create Bounties - don\'t check phase_uuid', () => {
 
 //This test initially does not pass! It asserts that the response should contain phase_uuid
 //You need to add phase_uuid to bounties 
-describe('Create Bounties - with check phase_uuid', () => {
+describe('Create Bounties - with check phase_uuid and phase_priority', () => {
     it('passes', () => {
         cy.upsertlogin(User).then(value => {
             for (let i = 0; i < Bounties.length; i++) {
@@ -37,6 +37,7 @@ describe('Create Bounties - with check phase_uuid', () => {
                 }).then((resp) => {
                     expect(resp.status).to.eq(200);
                     expect(resp.body).to.have.property('phase_uuid').and.equal(Bounties[i].phase_uuid);
+                    expect(resp.body).to.have.property('phase_priority').and.equal(Bounties[i].phase_priority);
                     console.log(resp);
                 })
             }
@@ -79,6 +80,7 @@ describe('Get All Bounties - check phase_uuid', () => {
                     expect(resp.status).to.eq(200);
                     JSON.parse(resp.body).forEach((bounty) => {
                         expect(bounty).to.have.property('bounty').to.have.property('phase_uuid');
+                        expect(bounty).to.have.property('bounty').to.have.property('phase_priority');
                     })
                 })
         })
@@ -100,6 +102,7 @@ describe('Get Bounties for Phase', () => {
                     expect(resp.status).to.eq(200);
                     JSON.parse(resp.body).forEach((bounty) => {
                         expect(bounty).to.have.property('bounty').to.have.property('phase_uuid');
+                        expect(bounty).to.have.property('bounty').to.have.property('phase_priority');
                     })
                 })
         })
