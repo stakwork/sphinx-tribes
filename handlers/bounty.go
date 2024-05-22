@@ -229,17 +229,17 @@ func (h *bountyHandler) CreateOrEditBounty(w http.ResponseWriter, r *http.Reques
 		bounty.Tribe = "None"
 	}
 
-	if bounty.PhaseUuid == nil {
-		w.WriteHeader(http.StatusBadRequest)
-		json.NewEncoder(w).Encode("PhaseUuid is a required field")
-		return
-	}
+	// if bounty.PhaseUuid == nil {
+	// 	w.WriteHeader(http.StatusBadRequest)
+	// 	json.NewEncoder(w).Encode("PhaseUuid is a required field")
+	// 	return
+	// }
 
-	if bounty.PhasePriority == nil {
-		w.WriteHeader(http.StatusBadRequest)
-		json.NewEncoder(w).Encode("PhasePriority is a required field")
-		return
-	}
+	// if bounty.PhasePriority == nil {
+	// 	w.WriteHeader(http.StatusBadRequest)
+	// 	json.NewEncoder(w).Encode("PhasePriority is a required field")
+	// 	return
+	// }
 
 	if bounty.Show == false && bounty.ID != 0 {
 		h.db.UpdateBountyBoolColumn(bounty, "show")
