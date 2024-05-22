@@ -182,3 +182,14 @@ func (db database) DeleteFeatureStoryByUuid(featureUuid, storyUuid string) error
 	}
 	return nil
 }
+
+func (db database) GetBountyByFeatureAndPhaseUuid(featureUuid string, phaseUuid string) (Bounty, error) {
+    bounty := Bounty{}
+
+    result := db.db.Model(&Bounty{}).Where("feature_uuid = ? AND phase_uuid = ?", featureUuid, phaseUuid).First(&bounty)
+    if result.RowsAffected == 0 {
+        return bounty, errors.New("no bounty found")
+    }
+
+    return bounty, nil
+}
