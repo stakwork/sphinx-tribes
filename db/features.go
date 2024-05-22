@@ -8,6 +8,7 @@ import (
 	"time"
 
 	"github.com/stakwork/sphinx-tribes/utils"
+	"gorm.io/gorm"
 )
 
 func (db database) GetFeaturesByWorkspaceUuid(uuid string, r *http.Request) []WorkspaceFeatures {
@@ -181,4 +182,16 @@ func (db database) DeleteFeatureStoryByUuid(featureUuid, storyUuid string) error
 		return errors.New("no story found to delete")
 	}
 	return nil
+}
+
+func (db *database) GetFeaturePhaseBounty(featureUUID string, phaseUUID string) (*Bounty, error) {
+	var bounty Bounty
+	result := db.db.Where("feature_uuid = ? AND phase_uuid = ?", featureUUID, phaseUUID).First(&bounty)
+	if result.Error != nil {
+		if errors.Is(result.Error, gorm.ErrRecordNotFound) {
+			return nil, nil
+		}
+		return nil, result.Error
+	}
+	return &bounty, nil
 }
