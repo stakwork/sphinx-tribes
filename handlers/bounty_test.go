@@ -106,8 +106,7 @@ func TestCreateOrEditBounty(t *testing.T) {
 		rr := httptest.NewRecorder()
 		handler := http.HandlerFunc(bHandler.CreateOrEditBounty)
 
-		phaseUuid := "08d7e988-5554-41b5-8b2f-1cdb79d84e29"
-		phasePriority := 1
+	
 		existingBounty := db.NewBounty{
 			ID:            1,
 			Type:          "coding",
@@ -115,8 +114,6 @@ func TestCreateOrEditBounty(t *testing.T) {
 			Description:   "first bounty description",
 			WorkspaceUuid: "work-1",
 			Assignee:      "user1",
-			PhaseUuid:     &phaseUuid,
-			PhasePriority: &phasePriority,
 		}
 		mockDb.On("UpdateBountyBoolColumn", mock.AnythingOfType("db.NewBounty"), "show").Return(existingBounty)
 		mockDb.On("GetBounty", uint(1)).Return(existingBounty).Once()
