@@ -125,8 +125,3 @@ describe('Create Bounties with wrong phase_uuid', () => {
         })
     })
 });
-
-
-
-
-
