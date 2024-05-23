@@ -20,7 +20,7 @@ func WorkspaceRoutes() chi.Router {
 		r.Get("/bounties/{uuid}/count", workspaceHandlers.GetWorkspaceBountiesCount)
 		r.Get("/user/{userId}", handlers.GetUserWorkspaces)
 		r.Get("/user/dropdown/{userId}", workspaceHandlers.GetUserDropdownWorkspaces)
-		r.Get("/conversation/receive", handlers.ReceiveConversation)
+		r.Post("/conversation/receive", handlers.ReceiveConversation)
 	})
 	r.Group(func(r chi.Router) {
 		r.Use(auth.PubKeyContext)

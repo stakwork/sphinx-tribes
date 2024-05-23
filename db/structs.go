@@ -920,6 +920,17 @@ type UserConversationBody struct {
 	Message       string `json:"message"`
 }
 
+type WebhookMessage struct {
+	Role    string `json:"role"`
+	Content string `json:"content"`
+}
+
+type ConversationWebhookResult struct {
+	Result     string           `json:"result"`
+	Messages   []WebhookMessage `json:"messages"`
+	WebhookUrl string           `json:"webhook_url"`
+}
+
 func (Person) TableName() string {
 	return "people"
 }

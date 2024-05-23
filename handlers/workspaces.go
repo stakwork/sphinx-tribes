@@ -955,9 +955,16 @@ func ReceiveConversation(w http.ResponseWriter, r *http.Request) {
 	body, _ := io.ReadAll(r.Body)
 	r.Body.Close()
 
-	fmt.Println("REquest Response ===", r.Response)
+	webhookResult := db.ConversationWebhookResult{}
+	err := json.Unmarshal(body, &webhookResult)
 
-	fmt.Println("REquest Body ===", body)
+	if err != nil {
+		fmt.Println("Unmarshalling Error", err)
+		w.WriteHeader(http.StatusNotAcceptable)
+		return
+	}
+
+	// fmt.Println("REquest Response ===", webhookResult.Result)
 
 	w.WriteHeader(http.StatusOK)
 	json.NewEncoder(w).Encode("Received Body")
