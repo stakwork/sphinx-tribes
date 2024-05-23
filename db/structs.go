@@ -387,8 +387,8 @@ type Bounty struct {
 	MarkAsPaidDate          *time.Time     `json:"mark_as_paid_date,omitempty"`
 	PaidDate                *time.Time     `json:"paid_date,omitempty"`
 	CodingLanguages         pq.StringArray `gorm:"type:text[];not null default:'[]'" json:"coding_languages"`
-	PhaseUuid               *string        `json:"phase_uuid,omitempty"`
-	PhasePriority           *int           `json:"phase_priority,omitempty"`
+	PhaseUuid               *string        `json:"phase_uuid"`
+	PhasePriority           *int           `json:"phase_priority"`
 }
 
 // Todo: Change back to Bounty
@@ -424,8 +424,8 @@ type NewBounty struct {
 	MarkAsPaidDate          *time.Time     `json:"mark_as_paid_date,omitempty"`
 	PaidDate                *time.Time     `json:"paid_date,omitempty"`
 	CodingLanguages         pq.StringArray `gorm:"type:text[];not null default:'[]'" json:"coding_languages"`
-	PhaseUuid               *string        `json:"phase_uuid,omitempty"`
-	PhasePriority           *int           `json:"phase_priority,omitempty"`
+	PhaseUuid               *string        `json:"phase_uuid"`
+	PhasePriority           *int           `json:"phase_priority"`
 }
 
 type BountyOwners struct {
