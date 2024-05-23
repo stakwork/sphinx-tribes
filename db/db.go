@@ -1141,8 +1141,8 @@ func (db database) GetAllBounties(r *http.Request) []NewBounty {
 	languages := keys.Get("languages")
 	languageArray := strings.Split(languages, ",")
 	languageLength := len(languageArray)
-	phaseUuid := keys.Get("phase_uuid")
-	phasePriority := keys.Get("phase_priority")
+	PhaseUuid := keys.Get("phase_uuid")
+	PhasePriority := keys.Get("phase_priority")
 
 	if workspaceUuid == "" && orgUuid != "" {
 		workspaceUuid = orgUuid
@@ -1170,12 +1170,12 @@ func (db database) GetAllBounties(r *http.Request) []NewBounty {
 		searchQuery = fmt.Sprintf("AND LOWER(title) LIKE %s", "'%"+strings.ToLower(search)+"%'")
 	}
 
-	if phaseUuid != "" {
-		phaseUuidQuery = "AND phase_uuid = '" + phaseUuid + "'"
+	if PhaseUuid != "" {
+		phaseUuidQuery = "AND phase_uuid = '" + PhaseUuid + "'"
 	}
 
-	if phasePriority != "" {
-		phasePriorityQuery = "AND phase_priority = '" + phasePriority + "'"
+	if PhasePriority != "" {
+		phasePriorityQuery = "AND phase_priority = '" + PhasePriority + "'"
 	}
 
 	var statusConditions []string
