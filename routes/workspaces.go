@@ -52,6 +52,7 @@ func WorkspaceRoutes() chi.Router {
 		r.Delete("/{workspace_uuid}/repository/{uuid}", workspaceHandlers.DeleteWorkspaceRepository)
 		r.Get("/conversation", handlers.GetConversation)
 		r.Post("/conversation/post", handlers.PostConversation)
+		r.Post("/conversation/poll", handlers.PollConversation)
 	})
 	return r
 }

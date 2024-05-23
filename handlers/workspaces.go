@@ -896,6 +896,23 @@ func (oh *workspaceHandler) DeleteWorkspaceRepository(w http.ResponseWriter, r *
 	w.WriteHeader(http.StatusOK)
 }
 
+// New method for getting features by workspace uuid
+func (oh *workspaceHandler) GetFeaturesByWorkspaceUuid(w http.ResponseWriter, r *http.Request) {
+	ctx := r.Context()
+	pubKeyFromAuth, _ := ctx.Value(auth.ContextKey).(string)
+	if pubKeyFromAuth == "" {
+		fmt.Println("no pubkey from auth")
+		w.WriteHeader(http.StatusUnauthorized)
+		return
+	}
+
+	uuid := chi.URLParam(r, "workspace_uuid")
+	workspaceFeatures := oh.db.GetFeaturesByWorkspaceUuid(uuid, r)
+
+	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode(workspaceFeatures)
+}
+
 func PostConversation(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 	pubKeyFromAuth, _ := ctx.Value(auth.ContextKey).(string)
@@ -944,11 +961,55 @@ func PostConversation(w http.ResponseWriter, r *http.Request) {
 	db.DB.CreateConversationMessage(conversationMessage)
 
 	webhookUrl := config.StakworkWebhookHost + "/workspaces/conversation/receive"
-
 	processConversationWorkflow(conversationBody.Message, webhookUrl)
+
+	conversationStoreData := db.ConversationStoreData{
+		UserConversationBody: conversationBody,
+		Status:               false,
+	}
+
+	// Set to the cache
+	db.Store.SetConversationCache(conversationBody.Message, conversationStoreData)
 
 	w.WriteHeader(http.StatusOK)
 	json.NewEncoder(w).Encode("Added conversation")
+}
+
+func PollConversation(w http.ResponseWriter, r *http.Request) {
+	ctx := r.Context()
+	pubKeyFromAuth, _ := ctx.Value(auth.ContextKey).(string)
+	if pubKeyFromAuth == "" {
+		fmt.Println("no pubkey from auth")
+		w.WriteHeader(http.StatusUnauthorized)
+		return
+	}
+
+	conversationBody := db.UserConversationBody{}
+	body, _ := io.ReadAll(r.Body)
+	r.Body.Close()
+	err := json.Unmarshal(body, &conversationBody)
+
+	if err != nil {
+		fmt.Println(err)
+		w.WriteHeader(http.StatusNotAcceptable)
+		return
+	}
+
+	storeConversation, err := db.Store.GetConversationCache(conversationBody.Message)
+	if err != nil {
+		fmt.Println("Conversatio store error", err)
+		w.WriteHeader(http.StatusNotAcceptable)
+		return
+	}
+
+	if !storeConversation.Status {
+		w.WriteHeader(http.StatusNoContent)
+		json.NewEncoder(w).Encode("No content has been returned from the worklfow")
+		return
+	} else {
+		w.WriteHeader(http.StatusOK)
+		json.NewEncoder(w).Encode(conversationBody)
+	}
 }
 
 func ReceiveConversation(w http.ResponseWriter, r *http.Request) {
@@ -964,10 +1025,23 @@ func ReceiveConversation(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// fmt.Println("REquest Response ===", webhookResult.Result)
+	if webhookResult.Result != "" {
+		conversation, err := db.Store.GetConversationCache(webhookResult.Messages[0].Content)
 
-	w.WriteHeader(http.StatusOK)
-	json.NewEncoder(w).Encode("Received Body")
+		if err != nil {
+			fmt.Println("Conversation store error", err)
+			w.WriteHeader(http.StatusNotAcceptable)
+		}
+
+		conversation.Status = true
+		// Set conversation to the store after updating
+		db.Store.SetConversationCache(conversation.Message, conversation)
+		w.WriteHeader(http.StatusOK)
+		json.NewEncoder(w).Encode(conversation)
+	} else {
+		fmt.Println("Conversation receive error", err)
+		w.WriteHeader(http.StatusNotAcceptable)
+	}
 }
 
 func GetConversation(w http.ResponseWriter, r *http.Request) {
@@ -1050,21 +1124,4 @@ func processConversationWorkflow(msg string, webhook string) {
 		}
 		fmt.Println("Conversation Succcess ==", string(res))
 	}
-}
-
-// New method for getting features by workspace uuid
-func (oh *workspaceHandler) GetFeaturesByWorkspaceUuid(w http.ResponseWriter, r *http.Request) {
-	ctx := r.Context()
-	pubKeyFromAuth, _ := ctx.Value(auth.ContextKey).(string)
-	if pubKeyFromAuth == "" {
-		fmt.Println("no pubkey from auth")
-		w.WriteHeader(http.StatusUnauthorized)
-		return
-	}
-
-	uuid := chi.URLParam(r, "workspace_uuid")
-	workspaceFeatures := oh.db.GetFeaturesByWorkspaceUuid(uuid, r)
-
-	w.WriteHeader(http.StatusOK)
-	json.NewEncoder(w).Encode(workspaceFeatures)
 }

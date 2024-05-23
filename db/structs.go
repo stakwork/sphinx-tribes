@@ -931,6 +931,11 @@ type ConversationWebhookResult struct {
 	WebhookUrl string           `json:"webhook_url"`
 }
 
+type ConversationStoreData struct {
+	UserConversationBody
+	Status bool `json:"status"`
+}
+
 func (Person) TableName() string {
 	return "people"
 }

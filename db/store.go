@@ -72,6 +72,20 @@ func (s StoreData) GetLnCache(key string) (LnStore, error) {
 	return c, nil
 }
 
+func (s StoreData) SetConversationCache(key string, value ConversationStoreData) error {
+	s.Cache.Set(key, value, 6*time.Minute)
+	return nil
+}
+
+func (s StoreData) GetConversationCache(key string) (ConversationStoreData, error) {
+	value, found := s.Cache.Get(key)
+	c, _ := value.(ConversationStoreData)
+	if !found {
+		return ConversationStoreData{}, errors.New("not found")
+	}
+	return c, nil
+}
+
 func (s StoreData) SetInvoiceCache(value []InvoiceStoreData) error {
 	// The invoice should expire every 6 minutes
 	s.Cache.Set(config.InvoiceList, value, 6*time.Minute)
