@@ -397,3 +397,28 @@ func (db database) DeleteAllUsersFromWorkspace(org string) error {
 
 	return nil
 }
+
+func (db database) GetConversation(uuid string) Conversations {
+	conversation := Conversations{}
+
+	db.db.Model(&Conversations{}).Where("uuid", uuid).Find(&conversation)
+	return conversation
+}
+
+func (db database) CreateConversation(c Conversations) Conversations {
+
+	if db.db.Model(&c).Where("uuid = ?", c.Uuid).Updates(&c).RowsAffected == 0 {
+		db.db.Create(&c)
+	}
+
+	return c
+}
+
+func (db database) CreateConversationMessage(c ConversationMessages) ConversationMessages {
+
+	if db.db.Model(&c).Where("uuid = ?", c.Uuid).Updates(&c).RowsAffected == 0 {
+		db.db.Create(&c)
+	}
+
+	return c
+}

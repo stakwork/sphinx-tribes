@@ -23,6 +23,7 @@ var RelayUrl string
 var MemeUrl string
 var RelayAuthKey string
 var RelayNodeKey string
+var StakworkWebhookHost string
 var SuperAdmins []string = []string{""}
 
 // these are constants for the store
@@ -54,6 +55,7 @@ func InitConfig() {
 	S3Url = os.Getenv("S3_URL")
 	AdminCheck = os.Getenv("ADMIN_CHECK")
 	Connection_Auth = os.Getenv("CONNECTION_AUTH")
+	StakworkWebhookHost = os.Getenv("STAKWORK_WEBHOOK_HOST")
 
 	// Add to super admins
 	SuperAdmins = StripSuperAdmins(AdminStrings)
@@ -100,6 +102,10 @@ func InitConfig() {
 
 	if S3Url == "" {
 		S3Url = "https://sphinx-tribes.s3.amazonaws.com"
+	}
+
+	if StakworkWebhookHost == "" {
+		StakworkWebhookHost = "https://community.sphinx.chat"
 	}
 }
 

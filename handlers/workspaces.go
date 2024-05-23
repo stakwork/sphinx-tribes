@@ -1,16 +1,19 @@
 package handlers
 
 import (
+	"bytes"
 	"encoding/json"
 	"fmt"
 	"io"
 	"net/http"
+	"os"
 	"strings"
 	"time"
 
 	"github.com/go-chi/chi"
 	"github.com/rs/xid"
 	"github.com/stakwork/sphinx-tribes/auth"
+	"github.com/stakwork/sphinx-tribes/config"
 	"github.com/stakwork/sphinx-tribes/db"
 	"github.com/stakwork/sphinx-tribes/utils"
 	"gorm.io/gorm"
@@ -783,7 +786,7 @@ func (oh *workspaceHandler) UpdateWorkspace(w http.ResponseWriter, r *http.Reque
 	json.NewEncoder(w).Encode(p)
 }
 
-func (oh *workspaceHandler) CreateOrEditWorkspaceRepository(w http.ResponseWriter, r *http.Request) {
+func PostConversation(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 	pubKeyFromAuth, _ := ctx.Value(auth.ContextKey).(string)
 	if pubKeyFromAuth == "" {
@@ -792,10 +795,12 @@ func (oh *workspaceHandler) CreateOrEditWorkspaceRepository(w http.ResponseWrite
 		return
 	}
 
-	workspaceRepo := db.WorkspaceRepositories{}
+	conversation := db.Conversations{}
+	conversationBody := db.UserConversationBody{}
+	conversationMessage := db.ConversationMessages{}
 	body, _ := io.ReadAll(r.Body)
 	r.Body.Close()
-	err := json.Unmarshal(body, &workspaceRepo)
+	err := json.Unmarshal(body, &conversationBody)
 
 	if err != nil {
 		fmt.Println(err)
@@ -803,102 +808,123 @@ func (oh *workspaceHandler) CreateOrEditWorkspaceRepository(w http.ResponseWrite
 		return
 	}
 
-	if len(workspaceRepo.Uuid) == 0 {
-		workspaceRepo.Uuid = xid.New().String()
-		workspaceRepo.CreatedBy = pubKeyFromAuth
+	now := time.Now()
+
+	if conversationBody.Uuid == "" {
+		conversation.Uuid = xid.New().String()
+		conversation.Field = conversationBody.Field
+		conversation.WorkspaceUuid = conversationBody.WorkspaceUuid
+		conversation.FeatureUuid = conversationBody.FeatureUuid
+		conversation.UserstoryUuid = conversationBody.UserstoryUuid
+		conversation.CreatedBy = pubKeyFromAuth
+		conversation.Created = &now
+		conversation.Updated = &now
+
+		db.DB.CreateConversation(conversation)
 	}
 
-	workspaceRepo.UpdatedBy = pubKeyFromAuth
+	conversationMessage.Uuid = xid.New().String()
+	conversationMessage.ConversationUuid = conversation.Uuid
+	conversationMessage.Message = conversationBody.Message
+	conversationMessage.Direction = 1
+	conversationMessage.CreatedBy = pubKeyFromAuth
+	conversationMessage.Created = &now
+	conversationMessage.Updated = &now
 
-	if workspaceRepo.Uuid == "" {
-		workspaceRepo.Uuid = xid.New().String()
+	db.DB.CreateConversationMessage(conversationMessage)
+
+	webhookUrl := config.StakworkWebhookHost + "/workspaces/conversation/receive"
+
+	processConversationWorkflow(conversationBody.Message, webhookUrl)
+
+	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode("Added conversation")
+}
+
+func ReceiveConversation(w http.ResponseWriter, r *http.Request) {
+
+}
+
+func GetConversation(w http.ResponseWriter, r *http.Request) {
+	keys := r.URL.Query()
+	conversationUuid := keys.Get("uuid")
+
+	ctx := r.Context()
+	pubKeyFromAuth, _ := ctx.Value(auth.ContextKey).(string)
+	if pubKeyFromAuth == "" {
+		fmt.Println("no pubkey from auth")
+		w.WriteHeader(http.StatusUnauthorized)
+		return
+	}
+
+	conversations := db.DB.GetConversation(conversationUuid)
+	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode(conversations)
+}
+
+func processConversationWorkflow(msg string, webhook string) {
+	stakworkKey := fmt.Sprintf("Token token=%s", os.Getenv("STAKWORK_KEY"))
+	if stakworkKey == "" {
+		fmt.Println("Youtube Download Error: Stakwork key not found")
 	} else {
-		workspaceRepo.UpdatedBy = pubKeyFromAuth
+		type Vars struct {
+			UserMessage string `json:"user_message"`
+			WebhookUrl  string `json:"webhook_url"`
+		}
+
+		type Attributes struct {
+			Vars Vars `json:"vars"`
+		}
+
+		type SetVar struct {
+			Attributes Attributes `json:"attributes"`
+		}
+
+		type WorkflowParams struct {
+			SetVar SetVar `json:"set_var"`
+		}
+
+		workflows := WorkflowParams{
+			SetVar: SetVar{
+				Attributes: Attributes{
+					Vars: Vars{UserMessage: msg, WebhookUrl: webhook},
+				},
+			},
+		}
+
+		body := map[string]interface{}{
+			"name":            "SphinxTribes Conversation",
+			"workflow_id":     "18217",
+			"workflow_params": workflows,
+		}
+
+		buf, err := json.Marshal(body)
+		if err != nil {
+			fmt.Println("Youtube error: Unable to parse message into byte buffer", err)
+			return
+		}
+
+		requestUrl := "https://jobs.stakwork.com/api/v1/projects"
+		request, reqErr := http.NewRequest(http.MethodPost, requestUrl, bytes.NewBuffer(buf))
+		request.Header.Set("Content-Type", "application/json")
+		request.Header.Set("Authorization", stakworkKey)
+
+		if reqErr != nil {
+			fmt.Println("Conversation Workflow Request Error ===", err)
+		}
+
+		client := &http.Client{}
+		response, err := client.Do(request)
+		if err != nil {
+			fmt.Println("Youtube Download Response Error ===", err)
+		}
+		defer response.Body.Close()
+		res, err := io.ReadAll(response.Body)
+		if err != nil {
+			fmt.Println("Youtube Download Response Body Error ==", err)
+		}
+		fmt.Println("Conversation Succcess ==", string(res))
 	}
-
-	// Validate struct data
-	err = db.Validate.Struct(workspaceRepo)
-	if err != nil {
-		w.WriteHeader(http.StatusBadRequest)
-		msg := fmt.Sprintf("Error: did not pass validation test : %s", err)
-		json.NewEncoder(w).Encode(msg)
-		return
-	}
-
-	// Check if workspace exists
-	workpace := oh.db.GetWorkspaceByUuid(workspaceRepo.WorkspaceUuid)
-	if workpace.Uuid != workspaceRepo.WorkspaceUuid {
-		w.WriteHeader(http.StatusUnauthorized)
-		json.NewEncoder(w).Encode("Workspace does not exists")
-		return
-	}
-
-	p, err := oh.db.CreateOrEditWorkspaceRepository(workspaceRepo)
-	if err != nil {
-		w.WriteHeader(http.StatusBadRequest)
-		return
-	}
-
-	w.WriteHeader(http.StatusOK)
-	json.NewEncoder(w).Encode(p)
-}
-
-func (oh *workspaceHandler) GetWorkspaceRepositorByWorkspaceUuid(w http.ResponseWriter, r *http.Request) {
-	ctx := r.Context()
-	pubKeyFromAuth, _ := ctx.Value(auth.ContextKey).(string)
-	if pubKeyFromAuth == "" {
-		fmt.Println("no pubkey from auth")
-		w.WriteHeader(http.StatusUnauthorized)
-		return
-	}
-
-	uuid := chi.URLParam(r, "uuid")
-	workspaceFeatures := oh.db.GetWorkspaceRepositorByWorkspaceUuid(uuid)
-
-	w.WriteHeader(http.StatusOK)
-	json.NewEncoder(w).Encode(workspaceFeatures)
-}
-
-func (oh *workspaceHandler) GetWorkspaceRepoByWorkspaceUuidAndRepoUuid(w http.ResponseWriter, r *http.Request) {
-	ctx := r.Context()
-	pubKeyFromAuth, _ := ctx.Value(auth.ContextKey).(string)
-	if pubKeyFromAuth == "" {
-		fmt.Println("no pubkey from auth")
-		w.WriteHeader(http.StatusUnauthorized)
-		return
-	}
-
-	workspace_uuid := chi.URLParam(r, "workspace_uuid")
-	uuid := chi.URLParam(r, "uuid")
-	WorkspaceRepository, err := oh.db.GetWorkspaceRepoByWorkspaceUuidAndRepoUuid(workspace_uuid, uuid)
-	if err != nil {
-		fmt.Println("workspace repository not found:", err)
-		w.WriteHeader(http.StatusNotFound)
-		json.NewEncoder(w).Encode(map[string]string{"error": "Repository not found"})
-		return
-	}
-
-	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(http.StatusOK)
-	json.NewEncoder(w).Encode(WorkspaceRepository)
-}
-
-func (oh *workspaceHandler) DeleteWorkspaceRepository(w http.ResponseWriter, r *http.Request) {
-	ctx := r.Context()
-	pubKeyFromAuth, _ := ctx.Value(auth.ContextKey).(string)
-
-	if pubKeyFromAuth == "" {
-		fmt.Println("no pubkey from auth")
-		w.WriteHeader(http.StatusUnauthorized)
-		return
-	}
-
-	workspace_uuid := chi.URLParam(r, "workspace_uuid")
-	uuid := chi.URLParam(r, "uuid")
-
-	oh.db.DeleteWorkspaceRepository(workspace_uuid, uuid)
-
-	w.WriteHeader(http.StatusOK)
 }
 
 // New method for getting features by workspace uuid

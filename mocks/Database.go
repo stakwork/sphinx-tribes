@@ -740,6 +740,98 @@ func (_c *Database_CreateConnectionCode_Call) RunAndReturn(run func([]db.Connect
 	return _c
 }
 
+// CreateConversation provides a mock function with given fields: c
+func (_m *Database) CreateConversation(c db.Conversations) db.Conversations {
+	ret := _m.Called(c)
+
+	if len(ret) == 0 {
+		panic("no return value specified for CreateConversation")
+	}
+
+	var r0 db.Conversations
+	if rf, ok := ret.Get(0).(func(db.Conversations) db.Conversations); ok {
+		r0 = rf(c)
+	} else {
+		r0 = ret.Get(0).(db.Conversations)
+	}
+
+	return r0
+}
+
+// Database_CreateConversation_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'CreateConversation'
+type Database_CreateConversation_Call struct {
+	*mock.Call
+}
+
+// CreateConversation is a helper method to define mock.On call
+//   - c db.Conversations
+func (_e *Database_Expecter) CreateConversation(c interface{}) *Database_CreateConversation_Call {
+	return &Database_CreateConversation_Call{Call: _e.mock.On("CreateConversation", c)}
+}
+
+func (_c *Database_CreateConversation_Call) Run(run func(c db.Conversations)) *Database_CreateConversation_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(db.Conversations))
+	})
+	return _c
+}
+
+func (_c *Database_CreateConversation_Call) Return(_a0 db.Conversations) *Database_CreateConversation_Call {
+	_c.Call.Return(_a0)
+	return _c
+}
+
+func (_c *Database_CreateConversation_Call) RunAndReturn(run func(db.Conversations) db.Conversations) *Database_CreateConversation_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
+// CreateConversationMessage provides a mock function with given fields: c
+func (_m *Database) CreateConversationMessage(c db.ConversationMessages) db.ConversationMessages {
+	ret := _m.Called(c)
+
+	if len(ret) == 0 {
+		panic("no return value specified for CreateConversationMessage")
+	}
+
+	var r0 db.ConversationMessages
+	if rf, ok := ret.Get(0).(func(db.ConversationMessages) db.ConversationMessages); ok {
+		r0 = rf(c)
+	} else {
+		r0 = ret.Get(0).(db.ConversationMessages)
+	}
+
+	return r0
+}
+
+// Database_CreateConversationMessage_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'CreateConversationMessage'
+type Database_CreateConversationMessage_Call struct {
+	*mock.Call
+}
+
+// CreateConversationMessage is a helper method to define mock.On call
+//   - c db.ConversationMessages
+func (_e *Database_Expecter) CreateConversationMessage(c interface{}) *Database_CreateConversationMessage_Call {
+	return &Database_CreateConversationMessage_Call{Call: _e.mock.On("CreateConversationMessage", c)}
+}
+
+func (_c *Database_CreateConversationMessage_Call) Run(run func(c db.ConversationMessages)) *Database_CreateConversationMessage_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(db.ConversationMessages))
+	})
+	return _c
+}
+
+func (_c *Database_CreateConversationMessage_Call) Return(_a0 db.ConversationMessages) *Database_CreateConversationMessage_Call {
+	_c.Call.Return(_a0)
+	return _c
+}
+
+func (_c *Database_CreateConversationMessage_Call) RunAndReturn(run func(db.ConversationMessages) db.ConversationMessages) *Database_CreateConversationMessage_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
 // CreateLeaderBoard provides a mock function with given fields: uuid, leaderboards
 func (_m *Database) CreateLeaderBoard(uuid string, leaderboards []db.LeaderBoard) ([]db.LeaderBoard, error) {
 	ret := _m.Called(uuid, leaderboards)
@@ -2867,6 +2959,52 @@ func (_c *Database_GetConnectionCode_Call) RunAndReturn(run func() db.Connection
 	return _c
 }
 
+// GetConversation provides a mock function with given fields: uuid
+func (_m *Database) GetConversation(uuid string) db.Conversations {
+	ret := _m.Called(uuid)
+
+	if len(ret) == 0 {
+		panic("no return value specified for GetConversation")
+	}
+
+	var r0 db.Conversations
+	if rf, ok := ret.Get(0).(func(string) db.Conversations); ok {
+		r0 = rf(uuid)
+	} else {
+		r0 = ret.Get(0).(db.Conversations)
+	}
+
+	return r0
+}
+
+// Database_GetConversation_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'GetConversation'
+type Database_GetConversation_Call struct {
+	*mock.Call
+}
+
+// GetConversation is a helper method to define mock.On call
+//   - uuid string
+func (_e *Database_Expecter) GetConversation(uuid interface{}) *Database_GetConversation_Call {
+	return &Database_GetConversation_Call{Call: _e.mock.On("GetConversation", uuid)}
+}
+
+func (_c *Database_GetConversation_Call) Run(run func(uuid string)) *Database_GetConversation_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(string))
+	})
+	return _c
+}
+
+func (_c *Database_GetConversation_Call) Return(_a0 db.Conversations) *Database_GetConversation_Call {
+	_c.Call.Return(_a0)
+	return _c
+}
+
+func (_c *Database_GetConversation_Call) RunAndReturn(run func(string) db.Conversations) *Database_GetConversation_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
 // GetCreatedBounties provides a mock function with given fields: r
 func (_m *Database) GetCreatedBounties(r *http.Request) ([]db.NewBounty, error) {
 	ret := _m.Called(r)
@@ -3193,18 +3331,18 @@ func (_c *Database_GetFeaturesByWorkspaceUuid_Call) RunAndReturn(run func(string
 }
 
 // GetFilterStatusCount provides a mock function with given fields:
-func (_m *Database) GetFilterStatusCount() db.FilterStattuCount {
+func (_m *Database) GetFilterStatusCount() db.FilterStatusCount {
 	ret := _m.Called()
 
 	if len(ret) == 0 {
 		panic("no return value specified for GetFilterStatusCount")
 	}
 
-	var r0 db.FilterStattuCount
-	if rf, ok := ret.Get(0).(func() db.FilterStattuCount); ok {
+	var r0 db.FilterStatusCount
+	if rf, ok := ret.Get(0).(func() db.FilterStatusCount); ok {
 		r0 = rf()
 	} else {
-		r0 = ret.Get(0).(db.FilterStattuCount)
+		r0 = ret.Get(0).(db.FilterStatusCount)
 	}
 
 	return r0
@@ -3227,12 +3365,12 @@ func (_c *Database_GetFilterStatusCount_Call) Run(run func()) *Database_GetFilte
 	return _c
 }
 
-func (_c *Database_GetFilterStatusCount_Call) Return(_a0 db.FilterStattuCount) *Database_GetFilterStatusCount_Call {
+func (_c *Database_GetFilterStatusCount_Call) Return(_a0 db.FilterStatusCount) *Database_GetFilterStatusCount_Call {
 	_c.Call.Return(_a0)
 	return _c
 }
 
-func (_c *Database_GetFilterStatusCount_Call) RunAndReturn(run func() db.FilterStattuCount) *Database_GetFilterStatusCount_Call {
+func (_c *Database_GetFilterStatusCount_Call) RunAndReturn(run func() db.FilterStatusCount) *Database_GetFilterStatusCount_Call {
 	_c.Call.Return(run)
 	return _c
 }

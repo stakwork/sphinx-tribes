@@ -565,7 +565,7 @@ func (db database) GetBountiesCount(r *http.Request) int64 {
 	return count
 }
 
-func (db database) GetFilterStatusCount() FilterStattuCount {
+func (db database) GetFilterStatusCount() FilterStatusCount {
 	var openCount int64
 	var assignedCount int64
 	var completedCount int64
@@ -576,7 +576,7 @@ func (db database) GetFilterStatusCount() FilterStattuCount {
 	db.db.Model(&Bounty{}).Where("show != false").Where("assignee != ''").Where("completed = true").Where("paid != true").Count(&completedCount)
 	db.db.Model(&Bounty{}).Where("show != false").Where("assignee != ''").Where("paid = true").Count(&paidCount)
 
-	ms := FilterStattuCount{
+	ms := FilterStatusCount{
 		Open:      openCount,
 		Assigned:  assignedCount,
 		Completed: completedCount,
