@@ -532,6 +532,7 @@ func (h *bountyHandler) MakeBountyPayment(w http.ResponseWriter, r *http.Request
 	req, _ := http.NewRequest(http.MethodPost, url, bytes.NewBuffer(jsonBody))
 	req.Header.Set("x-user-token", config.RelayAuthKey)
 	req.Header.Set("Content-Type", "application/json")
+	log.Printf("Making Bounty Payment: amount: %d, pubkey: %s, route_hint: %s", amount, assignee.OwnerPubKey, assignee.OwnerRouteHint)
 	res, err := h.httpClient.Do(req)
 
 	if err != nil {
@@ -615,8 +616,7 @@ func (h *bountyHandler) BountyBudgetWithdraw(w http.ResponseWriter, r *http.Requ
 		return
 	}
 
-	fmt.Println("[BountyBudgetWithdraw] Logging body:")
-	fmt.Println(body)
+	log.Printf("[BountyBudgetWithdraw] Logging body: orguuid: %s, pubkey: %s, invoice: %s", request.OrgUuid, pubKeyFromAuth, request.PaymentRequest)
 
 	// check if user is the admin of the workspace
 	// or has a withdraw bounty budget role
