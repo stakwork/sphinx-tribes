@@ -26,6 +26,7 @@ type bountyHandler struct {
 	generateBountyResponse   func(bounties []db.NewBounty) []db.BountyResponse
 	userHasAccess            func(pubKeyFromAuth string, uuid string, role string) bool
 	userHasManageBountyRoles func(pubKeyFromAuth string, uuid string) bool
+	m                        sync.Mutex
 }
 
 func NewBountyHandler(httpClient HttpClient, database db.Database) *bountyHandler {
@@ -447,8 +448,7 @@ func (h *bountyHandler) GenerateBountyResponse(bounties []db.NewBounty) []db.Bou
 }
 
 func (h *bountyHandler) MakeBountyPayment(w http.ResponseWriter, r *http.Request) {
-	var m sync.Mutex
-	m.Lock()
+	h.m.Lock()
 
 	ctx := r.Context()
 	pubKeyFromAuth, _ := ctx.Value(auth.ContextKey).(string)
@@ -458,12 +458,14 @@ func (h *bountyHandler) MakeBountyPayment(w http.ResponseWriter, r *http.Request
 	if err != nil {
 		fmt.Println("could not parse id")
 		w.WriteHeader(http.StatusForbidden)
+		h.m.Unlock()
 		return
 	}
 
 	if pubKeyFromAuth == "" {
 		fmt.Println("no pubkey from auth")
 		w.WriteHeader(http.StatusUnauthorized)
+		h.m.Unlock()
 		return
 	}
 
@@ -476,6 +478,7 @@ func (h *bountyHandler) MakeBountyPayment(w http.ResponseWriter, r *http.Request
 
 	if bounty.ID != id {
 		w.WriteHeader(http.StatusNotFound)
+		h.m.Unlock()
 		return
 	}
 
@@ -483,6 +486,7 @@ func (h *bountyHandler) MakeBountyPayment(w http.ResponseWriter, r *http.Request
 	if bounty.Paid {
 		w.WriteHeader(http.StatusMethodNotAllowed)
 		json.NewEncoder(w).Encode("Bounty has already been paid")
+		h.m.Unlock()
 		return
 	}
 
@@ -492,6 +496,7 @@ func (h *bountyHandler) MakeBountyPayment(w http.ResponseWriter, r *http.Request
 	if !hasRole {
 		w.WriteHeader(http.StatusUnauthorized)
 		json.NewEncoder(w).Encode("You don't have appropriate permissions to pay bounties")
+		h.m.Unlock()
 		return
 	}
 
@@ -501,6 +506,7 @@ func (h *bountyHandler) MakeBountyPayment(w http.ResponseWriter, r *http.Request
 	if orgBudget.TotalBudget < amount {
 		w.WriteHeader(http.StatusForbidden)
 		json.NewEncoder(w).Encode("workspace budget is not enough to pay the amount")
+		h.m.Unlock()
 		return
 	}
 
@@ -512,6 +518,7 @@ func (h *bountyHandler) MakeBountyPayment(w http.ResponseWriter, r *http.Request
 	if err != nil {
 		fmt.Println(err)
 		w.WriteHeader(http.StatusNotAcceptable)
+		h.m.Unlock()
 		return
 	}
 
@@ -529,6 +536,7 @@ func (h *bountyHandler) MakeBountyPayment(w http.ResponseWriter, r *http.Request
 
 	if err != nil {
 		log.Printf("Request Failed: %s", err)
+		h.m.Unlock()
 		return
 	}
 
@@ -580,12 +588,11 @@ func (h *bountyHandler) MakeBountyPayment(w http.ResponseWriter, r *http.Request
 		}
 	}
 
-	m.Unlock()
+	h.m.Unlock()
 }
 
 func (h *bountyHandler) BountyBudgetWithdraw(w http.ResponseWriter, r *http.Request) {
-	var m sync.Mutex
-	m.Lock()
+	h.m.Lock()
 
 	ctx := r.Context()
 	pubKeyFromAuth, _ := ctx.Value(auth.ContextKey).(string)
@@ -593,6 +600,7 @@ func (h *bountyHandler) BountyBudgetWithdraw(w http.ResponseWriter, r *http.Requ
 	if pubKeyFromAuth == "" {
 		fmt.Println("no pubkey from auth")
 		w.WriteHeader(http.StatusUnauthorized)
+		h.m.Unlock()
 		return
 	}
 
@@ -603,8 +611,12 @@ func (h *bountyHandler) BountyBudgetWithdraw(w http.ResponseWriter, r *http.Requ
 	err = json.Unmarshal(body, &request)
 	if err != nil {
 		w.WriteHeader(http.StatusNotAcceptable)
+		h.m.Unlock()
 		return
 	}
+
+	fmt.Println("[BountyBudgetWithdraw] Logging body:")
+	fmt.Println(body)
 
 	// check if user is the admin of the workspace
 	// or has a withdraw bounty budget role
@@ -613,6 +625,7 @@ func (h *bountyHandler) BountyBudgetWithdraw(w http.ResponseWriter, r *http.Requ
 		w.WriteHeader(http.StatusUnauthorized)
 		errMsg := formatPayError("You don't have appropriate permissions to withdraw bounty budget")
 		json.NewEncoder(w).Encode(errMsg)
+		h.m.Unlock()
 		return
 	}
 
@@ -626,6 +639,7 @@ func (h *bountyHandler) BountyBudgetWithdraw(w http.ResponseWriter, r *http.Requ
 			w.WriteHeader(http.StatusForbidden)
 			errMsg := formatPayError("Workspace budget is not enough to withdraw the amount")
 			json.NewEncoder(w).Encode(errMsg)
+			h.m.Unlock()
 			return
 		}
 		paymentSuccess, paymentError := h.PayLightningInvoice(request.PaymentRequest)
@@ -644,13 +658,12 @@ func (h *bountyHandler) BountyBudgetWithdraw(w http.ResponseWriter, r *http.Requ
 		json.NewEncoder(w).Encode(errMsg)
 	}
 
-	m.Unlock()
+	h.m.Unlock()
 }
 
 // Todo: change back to NewBountyBudgetWithdraw
 func (h *bountyHandler) NewBountyBudgetWithdraw(w http.ResponseWriter, r *http.Request) {
-	var m sync.Mutex
-	m.Lock()
+	h.m.Lock()
 
 	ctx := r.Context()
 	pubKeyFromAuth, _ := ctx.Value(auth.ContextKey).(string)
@@ -658,6 +671,7 @@ func (h *bountyHandler) NewBountyBudgetWithdraw(w http.ResponseWriter, r *http.R
 	if pubKeyFromAuth == "" {
 		fmt.Println("no pubkey from auth")
 		w.WriteHeader(http.StatusUnauthorized)
+		h.m.Unlock()
 		return
 	}
 
@@ -668,6 +682,7 @@ func (h *bountyHandler) NewBountyBudgetWithdraw(w http.ResponseWriter, r *http.R
 	err = json.Unmarshal(body, &request)
 	if err != nil {
 		w.WriteHeader(http.StatusNotAcceptable)
+		h.m.Unlock()
 		return
 	}
 
@@ -678,6 +693,7 @@ func (h *bountyHandler) NewBountyBudgetWithdraw(w http.ResponseWriter, r *http.R
 		w.WriteHeader(http.StatusUnauthorized)
 		errMsg := formatPayError("You don't have appropriate permissions to withdraw bounty budget")
 		json.NewEncoder(w).Encode(errMsg)
+		h.m.Unlock()
 		return
 	}
 
@@ -691,6 +707,7 @@ func (h *bountyHandler) NewBountyBudgetWithdraw(w http.ResponseWriter, r *http.R
 			w.WriteHeader(http.StatusForbidden)
 			errMsg := formatPayError("Workspace budget is not enough to withdraw the amount")
 			json.NewEncoder(w).Encode(errMsg)
+			h.m.Unlock()
 			return
 		}
 		paymentSuccess, paymentError := h.PayLightningInvoice(request.PaymentRequest)
@@ -709,7 +726,7 @@ func (h *bountyHandler) NewBountyBudgetWithdraw(w http.ResponseWriter, r *http.R
 		json.NewEncoder(w).Encode(errMsg)
 	}
 
-	m.Unlock()
+	h.m.Unlock()
 }
 
 func formatPayError(errorMsg string) db.InvoicePayError {
