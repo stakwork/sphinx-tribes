@@ -16,6 +16,7 @@ describe('Create Features for Workspace', () => {
                     expect(body).to.have.property('brief').and.equal(Features[i].brief.trim());
                     expect(body).to.have.property('requirements').and.equal(Features[i].requirements.trim());
                     expect(body).to.have.property('architecture').and.equal(Features[i].architecture.trim());
+                    expect(body).to.have.property('priority').and.equal(Features[i].priority);
                 });
             }
         })
@@ -39,6 +40,7 @@ describe('Modify name for Feature', () => {
                     expect(body).to.have.property('brief').and.equal(Features[i].brief.trim());
                     expect(body).to.have.property('requirements').and.equal(Features[i].requirements.trim());
                     expect(body).to.have.property('architecture').and.equal(Features[i].architecture.trim());
+                    expect(body).to.have.property('priority').and.equal(Features[i].priority);
                 });
             }
         })
@@ -62,6 +64,7 @@ describe('Modify brief for Feature', () => {
                     expect(body).to.have.property('brief').and.equal(Features[i].brief.trim() + " _addtext");
                     expect(body).to.have.property('requirements').and.equal(Features[i].requirements.trim());
                     expect(body).to.have.property('architecture').and.equal(Features[i].architecture.trim());
+                    expect(body).to.have.property('priority').and.equal(Features[i].priority);
                 });
             }
         })
@@ -85,6 +88,7 @@ describe('Modify requirements for Feature', () => {
                     expect(body).to.have.property('brief').and.equal(Features[i].brief.trim() + " _addtext");
                     expect(body).to.have.property('requirements').and.equal(Features[i].requirements.trim() + " _addtext");
                     expect(body).to.have.property('architecture').and.equal(Features[i].architecture.trim());
+                    expect(body).to.have.property('priority').and.equal(Features[i].priority);
                 });
             }
         })
@@ -108,6 +112,7 @@ describe('Modify architecture for Feature', () => {
                     expect(body).to.have.property('brief').and.equal(Features[i].brief.trim() + " _addtext");
                     expect(body).to.have.property('requirements').and.equal(Features[i].requirements.trim() + " _addtext");
                     expect(body).to.have.property('architecture').and.equal(Features[i].architecture.trim() + " _addtext");
+                    expect(body).to.have.property('priority').and.equal(Features[i].priority);
                 });
             }
         })
@@ -131,6 +136,7 @@ describe('Get Features for Workspace', () => {
                     expect(feature).to.have.property('brief', expectedFeature.brief.trim() + " _addtext");
                     expect(feature).to.have.property('requirements', expectedFeature.requirements.trim() + " _addtext");
                     expect(feature).to.have.property('architecture', expectedFeature.architecture.trim() + " _addtext");
+                    expect(feature).to.have.property('priority', expectedFeature.priority);
                 });
             })
         })
@@ -154,6 +160,7 @@ describe('Old Get Features for Workspace', () => {
                         expect(feature).to.have.property('brief', expectedFeature.brief.trim() + " _addtext");
                         expect(feature).to.have.property('requirements', expectedFeature.requirements.trim() + " _addtext");
                         expect(feature).to.have.property('architecture', expectedFeature.architecture.trim() + " _addtext");
+                        expect(feature).to.have.property('priority', expectedFeature.priority);
                     });
                 }
             });
@@ -176,6 +183,7 @@ describe('Get Feature by uuid', () => {
                     expect(resp.body).to.have.property('brief', Features[i].brief.trim() + " _addtext")
                     expect(resp.body).to.have.property('requirements', Features[i].requirements.trim() + " _addtext")
                     expect(resp.body).to.have.property('architecture', Features[i].architecture.trim() + " _addtext")
+                    expect(resp.body).to.have.property('priority', Features[i].priority)
                 })
             }
         })
