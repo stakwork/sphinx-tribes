@@ -64,11 +64,9 @@ func (db database) CreateOrEditFeature(m WorkspaceFeatures) (WorkspaceFeatures, 
 	var existing WorkspaceFeatures
 	result := db.db.Model(&WorkspaceFeatures{}).Where("uuid = ?", m.Uuid).First(&existing)
 	if result.RowsAffected == 0 {
-
 		m.Created = &now
 		db.db.Create(&m)
 	} else {
-
 		db.db.Model(&WorkspaceFeatures{}).Where("uuid = ?", m.Uuid).Updates(m)
 	}
 
@@ -185,9 +183,8 @@ func (db database) DeleteFeatureStoryByUuid(featureUuid, storyUuid string) error
 
 func (db database) GetBountyByFeatureAndPhaseUuid(featureUuid string, phaseUuid string) (Bounty, error) {
 	bounty := Bounty{}
-
 	result := db.db.Model(&Bounty{}).
-	    Select("bounty.*").
+		Select("bounty.*").
 		Joins(`INNER JOIN "feature_phases" ON "feature_phases"."uuid" = "bounty"."phase_uuid" `).
 		Where(`"feature_phases"."feature_uuid" = ? AND "feature_phases"."uuid" = ?`, featureUuid, phaseUuid).
 		Order(`"bounty"."id"`).
@@ -197,6 +194,14 @@ func (db database) GetBountyByFeatureAndPhaseUuid(featureUuid string, phaseUuid 
 	if result.RowsAffected == 0 {
 		return bounty, errors.New("no bounty found")
 	}
-
 	return bounty, nil
+}
+
+func (db database) GetPhaseByUuid(phaseUuid string) (FeaturePhase, error) {
+	phase := FeaturePhase{}
+	result := db.db.Model(&FeaturePhase{}).Where("uuid = ?", phaseUuid).First(&phase)
+	if result.RowsAffected == 0 {
+		return phase, errors.New("no phase found")
+	}
+	return phase, nil
 }
