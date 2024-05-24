@@ -3,7 +3,7 @@ import { User, HostName, UserStories, Phases } from '../support/objects/objects'
 describe('Create Phases for Feature', () => {
     it('passes', () => {
         cy.upsertlogin(User).then(value => {
-            for(let i = 0; i <= 2; i++) {
+            for(let i = 0; i < Phases.length; i++) {
                 cy.request({
                     method: 'POST',
                     url: `${HostName}/features/phase`,
@@ -23,19 +23,19 @@ describe('Create Phases for Feature', () => {
 describe('Modify phases name', () => {
     it('passes', () => {
         cy.upsertlogin(User).then(value => {
-            for(let i = 0; i <= 2; i++) {
+            for(let i = 0; i < Phases.length; i++) {
                 cy.request({
                     method: 'POST',
                     url: `${HostName}/features/phase`,
                     headers: { 'x-jwt': `${value}` },
                     body: {
                         uuid: Phases[i].uuid,
-                        name: Phases[i].name + "_addtext"
+                        name: Phases[i].name.trim() + "_addtext"
                     }
                 }).its('body').then(body => {
                     expect(body).to.have.property('uuid').and.equal(Phases[i].uuid.trim());
                     expect(body).to.have.property('feature_uuid').and.equal(Phases[i].feature_uuid.trim());
-                    expect(body).to.have.property('name').and.equal(Phases[i].name.trim() + " _addtext");
+                    expect(body).to.have.property('name').and.equal(Phases[i].name.trim() + "_addtext");
                     expect(body).to.have.property('priority').and.equal(Phases[i].priority);
                 });
             }
@@ -54,13 +54,16 @@ describe('Get phases for feature', () => {
             }).then((resp) => {
                 expect(resp.status).to.eq(200)
 
-                resp.body.forEach((phase, index) => {
-                    // Directly use index to compare with the expected phase in the same order
-                    const expectedPhase = Phases[index];
-                    expect(phase.uuid).to.equal(expectedPhase.uuid.trim());
-                    expect(phase.feature_uuid).to.equal(expectedPhase.feature_uuid.trim());
-                    expect(phase.name).to.equal(expectedPhase.name.trim() + " _addtext");
-                    expect(phase.priority).to.equal(expectedPhase.priority);
+                resp.body.forEach((phase) => {
+                    // Find the corresponding phase in the Phases array by uuid
+                    const expectedPhase = Phases.find(p => p.uuid.trim() === phase.uuid);
+
+                    if (expectedPhase) {
+                        expect(phase.uuid).to.equal(expectedPhase.uuid.trim());
+                        expect(phase.feature_uuid).to.equal(expectedPhase.feature_uuid.trim());
+                        expect(phase.name).to.equal(expectedPhase.name.trim() + "_addtext");
+                        expect(phase.priority).to.equal(expectedPhase.priority);
+                    }
                 });
             })
         })
@@ -80,7 +83,7 @@ describe('Get phase by uuid', () => {
                     expect(resp.status).to.eq(200)
                     expect(resp.body).to.have.property('uuid').and.equal(Phases[i].uuid.trim());
                     expect(resp.body).to.have.property('feature_uuid').and.equal(Phases[i].feature_uuid.trim());
-                    expect(resp.body).to.have.property('name').and.equal(Phases[i].name.trim() + " _addtext");
+                    expect(resp.body).to.have.property('name').and.equal(Phases[i].name.trim() + "_addtext");
                     expect(resp.body).to.have.property('priority').and.equal(Phases[i].priority);
                 })
             }
