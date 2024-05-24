@@ -314,3 +314,17 @@ func (oh *featureHandler) DeleteStory(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusOK)
 	json.NewEncoder(w).Encode(map[string]string{"message": "Story deleted successfully"})
 }
+
+func (oh *featureHandler) GetBountyByFeatureAndPhaseUuid(w http.ResponseWriter, r *http.Request) {
+	featureUuid := chi.URLParam(r, "feature_uuid")
+	phaseUuid := chi.URLParam(r, "phase_uuid")
+
+	bounty, err := oh.db.GetBountyByFeatureAndPhaseUuid(featureUuid, phaseUuid)
+	if err != nil {
+		w.WriteHeader(http.StatusNotFound)
+		return
+	}
+
+	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode(bounty)
+}

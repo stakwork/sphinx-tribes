@@ -182,3 +182,21 @@ func (db database) DeleteFeatureStoryByUuid(featureUuid, storyUuid string) error
 	}
 	return nil
 }
+
+func (db database) GetBountyByFeatureAndPhaseUuid(featureUuid string, phaseUuid string) (Bounty, error) {
+	bounty := Bounty{}
+
+	result := db.db.Model(&Bounty{}).
+	    Select("bounty.*").
+		Joins(`INNER JOIN "feature_phases" ON "feature_phases"."uuid" = "bounty"."phase_uuid" `).
+		Where(`"feature_phases"."feature_uuid" = ? AND "feature_phases"."uuid" = ?`, featureUuid, phaseUuid).
+		Order(`"bounty"."id"`).
+		Limit(1).
+		First(&bounty)
+
+	if result.RowsAffected == 0 {
+		return bounty, errors.New("no bounty found")
+	}
+
+	return bounty, nil
+}
