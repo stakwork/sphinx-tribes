@@ -268,6 +268,20 @@ func (h *bountyHandler) CreateOrEditBounty(w http.ResponseWriter, r *http.Reques
 		}
 	}
 
+	if bounty.PhaseUuid != "" {
+		phase, err := h.db.GetPhaseByUuid(bounty.PhaseUuid)
+		if err != nil {
+			w.WriteHeader(http.StatusBadRequest)
+			json.NewEncoder(w).Encode("Phase Error")
+			return
+		}
+		if bounty.PhaseUuid != phase.Uuid {
+			w.WriteHeader(http.StatusBadRequest)
+			json.NewEncoder(w).Encode("Not a valid phase")
+			return
+		}
+	}
+
 	b, err := h.db.CreateOrEditBounty(bounty)
 	if err != nil {
 		fmt.Println(err)
