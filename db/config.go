@@ -178,12 +178,14 @@ func (db database) GetRolesCount() int64 {
 }
 
 func (db database) MigrateTablesWithOrgUuid() {
-	if !db.db.Migrator().HasTable("bounty") {
+	if db.db.Migrator().HasTable("bounty") {
 		if !db.db.Migrator().HasColumn(Bounty{}, "workspace_uuid") {
 			db.db.AutoMigrate(&Bounty{})
 		} else {
 			db.db.AutoMigrate(&NewBounty{})
 		}
+	} else {
+		db.db.AutoMigrate(&NewBounty{})
 	}
 	if !db.db.Migrator().HasTable("budget_histories") {
 		if !db.db.Migrator().HasColumn(BudgetHistory{}, "workspace_uuid") {

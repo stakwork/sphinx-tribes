@@ -106,6 +106,7 @@ func TestCreateOrEditBounty(t *testing.T) {
 		rr := httptest.NewRecorder()
 		handler := http.HandlerFunc(bHandler.CreateOrEditBounty)
 
+	
 		existingBounty := db.NewBounty{
 			ID:            1,
 			Type:          "coding",
