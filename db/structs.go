@@ -577,6 +577,7 @@ type WorkspaceFeatures struct {
 	Requirements  string     `json:"requirements"`
 	Architecture  string     `json:"architecture"`
 	Url           string     `json:"url"`
+	Priority      int        `json:"priority"`
 	Created       *time.Time `json:"created"`
 	Updated       *time.Time `json:"updated"`
 	CreatedBy     string     `json:"created_by"`
