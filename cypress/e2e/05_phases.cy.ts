@@ -3,7 +3,7 @@ import { User, HostName, UserStories, Phases } from '../support/objects/objects'
 describe('Create Phases for Feature', () => {
     it('passes', () => {
         cy.upsertlogin(User).then(value => {
-            for(let i = 0; i < Phases.length; i++) {
+            for (let i = 0; i <= 2; i++) {
                 cy.request({
                     method: 'POST',
                     url: `${HostName}/features/phase`,
@@ -23,7 +23,7 @@ describe('Create Phases for Feature', () => {
 describe('Modify phases name', () => {
     it('passes', () => {
         cy.upsertlogin(User).then(value => {
-            for(let i = 0; i < Phases.length; i++) {
+            for (let i = 0; i <= 2; i++) {
                 cy.request({
                     method: 'POST',
                     url: `${HostName}/features/phase`,
@@ -49,7 +49,7 @@ describe('Get phases for feature', () => {
             cy.request({
                 method: 'GET',
                 url: `${HostName}/features/${Phases[0].feature_uuid}/phase`,
-                headers: { 'x-jwt': `${ value }` },
+                headers: { 'x-jwt': `${value}` },
                 body: {}
             }).then((resp) => {
                 expect(resp.status).to.eq(200)
@@ -73,11 +73,11 @@ describe('Get phases for feature', () => {
 describe('Get phase by uuid', () => {
     it('passes', () => {
         cy.upsertlogin(User).then(value => {
-            for(let i = 0; i <= 2; i++) {
+            for (let i = 0; i <= 2; i++) {
                 cy.request({
                     method: 'GET',
                     url: `${HostName}/features/${Phases[0].feature_uuid}/phase/${Phases[i].uuid}`,
-                    headers: { 'x-jwt': `${ value }` },
+                    headers: { 'x-jwt': `${value}` },
                     body: {}
                 }).then((resp) => {
                     expect(resp.status).to.eq(200)
@@ -97,7 +97,7 @@ describe('Delete phase by uuid', () => {
             cy.request({
                 method: 'DELETE',
                 url: `${HostName}/features/${Phases[0].feature_uuid}/phase/${Phases[0].uuid}`,
-                headers: { 'x-jwt': `${ value }` },
+                headers: { 'x-jwt': `${value}` },
                 body: {}
             }).then((resp) => {
                 expect(resp.status).to.eq(200)
@@ -112,7 +112,7 @@ describe('Check delete by uuid', () => {
             cy.request({
                 method: 'GET',
                 url: `${HostName}/features/${Phases[0].feature_uuid}/phase/${Phases[0].uuid}`,
-                headers: { 'x-jwt': `${ value }` },
+                headers: { 'x-jwt': `${value}` },
                 body: {},
                 failOnStatusCode: false
             }).then((resp) => {
