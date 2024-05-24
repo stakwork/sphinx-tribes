@@ -158,4 +158,5 @@ type Database interface {
 	DeleteFeatureStoryByUuid(featureUuid, storyUuid string) error
 	DeleteFeatureByUuid(uuid string) error
 	GetBountyByFeatureAndPhaseUuid(featureUuid string, phaseUuid string) (Bounty, error)
+	CheckPhaseIDExist(uuid string) bool
 }

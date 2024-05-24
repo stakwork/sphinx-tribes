@@ -1727,3 +1727,9 @@ func (db database) DeleteUserInvoiceData(payment_request string) UserInvoiceData
 	db.db.Where("payment_request = ?", payment_request).Delete(&ms)
 	return ms
 }
+
+func (db database) CheckPhaseIDExist(uuid string) bool {
+	var count int64 
+	db.db.Model(&FeaturePhase{}).Where("uuid = ?", uuid).Count(&count)
+	return count > 0
+}
