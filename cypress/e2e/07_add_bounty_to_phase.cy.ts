@@ -115,18 +115,22 @@ describe('Get Bounties for Phase', () => {
     });
 });
 
-//This test initially does not pass! It asserts that the endpoint should not receive a phase_uuid that doesn't exist
-describe('Create Bounties with wrong phase_uuid', () => {
+
+//This test passes! It asserts that the endpoint should receive a valid phase_uuid
+describe('Create Bounties with valid phase_uuid', () => {
     it('passes', () => {
         cy.upsertlogin(User).then(value => {
             cy.request({
                 method: 'POST',
                 url: `${HostName}/gobounties/`,
                 headers: { 'x-jwt': `${value}` },
-                body: {...Bounties[0], phase_uuid: 'cp68lagn1e462l489mu0'}, //phase_uuid does not exist
+                body: {...Bounties[0], phase_uuid: Phases[0].uuid},
                 failOnStatusCode: false
             }).then((resp) => {
-                expect(resp.status).to.eq(400);
+                expect(resp.status).to.eq(200);
+                expect(resp.body).to.have.property('phase_uuid').and.equal(Phases[0].uuid);
+                expect(resp.body).to.have.property('phase_priority').and.equal(Phases[0].priority);
+                console.log(resp);
             })
         })
     })
