@@ -499,52 +499,6 @@ func (_c *Database_ChangeWorkspaceDeleteStatus_Call) RunAndReturn(run func(strin
 	return _c
 }
 
-// CheckPhaseIDExist provides a mock function with given fields: uuid
-func (_m *Database) CheckPhaseIDExist(uuid string) bool {
-	ret := _m.Called(uuid)
-
-	if len(ret) == 0 {
-		panic("no return value specified for CheckPhaseIDExist")
-	}
-
-	var r0 bool
-	if rf, ok := ret.Get(0).(func(string) bool); ok {
-		r0 = rf(uuid)
-	} else {
-		r0 = ret.Get(0).(bool)
-	}
-
-	return r0
-}
-
-// Database_CheckPhaseIDExist_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'CheckPhaseIDExist'
-type Database_CheckPhaseIDExist_Call struct {
-	*mock.Call
-}
-
-// CheckPhaseIDExist is a helper method to define mock.On call
-//   - uuid string
-func (_e *Database_Expecter) CheckPhaseIDExist(uuid interface{}) *Database_CheckPhaseIDExist_Call {
-	return &Database_CheckPhaseIDExist_Call{Call: _e.mock.On("CheckPhaseIDExist", uuid)}
-}
-
-func (_c *Database_CheckPhaseIDExist_Call) Run(run func(uuid string)) *Database_CheckPhaseIDExist_Call {
-	_c.Call.Run(func(args mock.Arguments) {
-		run(args[0].(string))
-	})
-	return _c
-}
-
-func (_c *Database_CheckPhaseIDExist_Call) Return(_a0 bool) *Database_CheckPhaseIDExist_Call {
-	_c.Call.Return(_a0)
-	return _c
-}
-
-func (_c *Database_CheckPhaseIDExist_Call) RunAndReturn(run func(string) bool) *Database_CheckPhaseIDExist_Call {
-	_c.Call.Return(run)
-	return _c
-}
-
 // CountBounties provides a mock function with given fields:
 func (_m *Database) CountBounties() uint64 {
 	ret := _m.Called()

@@ -209,12 +209,6 @@ func (h *bountyHandler) CreateOrEditBounty(w http.ResponseWriter, r *http.Reques
 		return
 	}
 
-	if !h.db.CheckPhaseIDExist(*bounty.PhaseUuid) {
-		w.WriteHeader(http.StatusBadRequest)
-		json.NewEncoder(w).Encode("phase Id does not exist")
-		return
-	}
-
 	if bounty.Title == "" {
 		w.WriteHeader(http.StatusBadRequest)
 		json.NewEncoder(w).Encode("Title is a required field")
