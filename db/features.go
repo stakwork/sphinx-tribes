@@ -214,15 +214,21 @@ func (db database) GetBountiesByFeatureAndPhaseUuid(featureUuid string, phaseUui
 
 	// Add search filter
 	if search != "" {
-		searchQuery := fmt.Sprintf("LOWER(title) LIKE ?", "%"+strings.ToLower(search)+"%")
+		searchQuery := fmt.Sprintf("LOWER(title) LIKE %s", "'%"+strings.ToLower(search)+"%'")
 		query = query.Where(searchQuery)
 	}
 
 	// Add language filter
 	if len(languageArray) > 0 {
-		for _, lang := range languageArray {
-			if lang != "" {
-				query = query.Where("coding_languages @> ARRAY[?]::varchar[]", lang)
+		langs := ""
+		for i, val := range languageArray {
+			if val != "" {
+				if i == 0 {
+					langs = "'" + val + "'"
+				} else {
+					langs = langs + ", '" + val + "'"
+				}
+				query = query.Where("coding_languages && ARRAY[" + langs + "]")
 			}
 		}
 	}
@@ -231,10 +237,10 @@ func (db database) GetBountiesByFeatureAndPhaseUuid(featureUuid string, phaseUui
 	var statusConditions []string
 
 	if open == "true" {
-		statusConditions = append(statusConditions, "assignee = '' AND paid != true")
+		statusConditions = append(statusConditions, "assignee = '' AND paid != true AND completed != true")
 	}
 	if assigned == "true" {
-		statusConditions = append(statusConditions, "assignee != '' AND paid = false")
+		statusConditions = append(statusConditions, "assignee != '' AND paid = false AND completed = false")
 	}
 	if completed == "true" {
 		statusConditions = append(statusConditions, "assignee != '' AND completed = true AND paid = false")
@@ -256,9 +262,10 @@ func (db database) GetBountiesByFeatureAndPhaseUuid(featureUuid string, phaseUui
 
 	// Handle tags if any
 	if tags != "" {
+		// pull out the tags and add them in here
 		t := strings.Split(tags, ",")
 		for _, s := range t {
-			query = query.Where("? = ANY (tags)", s)
+			query = query.Where("'" + s + "'" + " = any (tags)")
 		}
 		query.Scan(&bounties)
 	}
@@ -283,10 +290,10 @@ func (db database) GetBountiesCountByFeatureAndPhaseUuid(featureUuid string, pha
 	var statusConditions []string
 
 	if open == "true" {
-		statusConditions = append(statusConditions, "assignee = '' AND paid != true")
+		statusConditions = append(statusConditions, "assignee = '' AND paid != true AND completed != true")
 	}
 	if assigned == "true" {
-		statusConditions = append(statusConditions, "assignee != '' AND paid = false")
+		statusConditions = append(statusConditions, "assignee != '' AND paid = false AND completed = false")
 	}
 	if completed == "true" {
 		statusConditions = append(statusConditions, "assignee != '' AND completed = true AND paid = false")
