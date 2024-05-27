@@ -159,4 +159,5 @@ type Database interface {
 	DeleteFeatureByUuid(uuid string) error
 	GetBountyByFeatureAndPhaseUuid(featureUuid string, phaseUuid string) (Bounty, error)
 	GetPhaseByUuid(phaseUuid string) (FeaturePhase, error)
+	GetBountiesByPhaseUuid(phaseUuid string) []Bounty
 }

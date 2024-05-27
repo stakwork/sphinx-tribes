@@ -914,6 +914,30 @@ func (oh *workspaceHandler) GetFeaturesByWorkspaceUuid(w http.ResponseWriter, r 
 	uuid := chi.URLParam(r, "workspace_uuid")
 	workspaceFeatures := oh.db.GetFeaturesByWorkspaceUuid(uuid, r)
 
+	for i, feature := range workspaceFeatures {
+
+		phases := oh.db.GetPhasesByFeatureUuid(feature.Uuid)
+
+		var totalCompleted, totalAssigned, totalOpen int
+
+		for _, phase := range phases {
+			bounties := oh.db.GetBountiesByPhaseUuid(phase.Uuid)
+			for _, bounty := range bounties {
+				if bounty.Completed {
+					totalCompleted++
+				} else if bounty.Assignee != "" {
+					totalAssigned++
+				} else {
+					totalOpen++
+				}
+			}
+		}
+
+		workspaceFeatures[i].BountiesCountCompleted = totalCompleted
+		workspaceFeatures[i].BountiesCountAssigned = totalAssigned
+		workspaceFeatures[i].BountiesCountOpen = totalOpen
+	}
+
 	w.WriteHeader(http.StatusOK)
 	json.NewEncoder(w).Encode(workspaceFeatures)
 }
