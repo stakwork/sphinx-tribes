@@ -569,19 +569,22 @@ type WorkspaceRepositories struct {
 }
 
 type WorkspaceFeatures struct {
-	ID            uint       `json:"id"`
-	Uuid          string     `gorm:"not null" json:"uuid"`
-	WorkspaceUuid string     `gorm:"not null" json:"workspace_uuid"`
-	Name          string     `gorm:"not null" json:"name"`
-	Brief         string     `json:"brief"`
-	Requirements  string     `json:"requirements"`
-	Architecture  string     `json:"architecture"`
-	Url           string     `json:"url"`
-	Priority      int        `json:"priority"`
-	Created       *time.Time `json:"created"`
-	Updated       *time.Time `json:"updated"`
-	CreatedBy     string     `json:"created_by"`
-	UpdatedBy     string     `json:"updated_by"`
+	ID                     uint       `json:"id"`
+	Uuid                   string     `gorm:"not null" json:"uuid"`
+	WorkspaceUuid          string     `gorm:"not null" json:"workspace_uuid"`
+	Name                   string     `gorm:"not null" json:"name"`
+	Brief                  string     `json:"brief"`
+	Requirements           string     `json:"requirements"`
+	Architecture           string     `json:"architecture"`
+	Url                    string     `json:"url"`
+	Priority               int        `json:"priority"`
+	Created                *time.Time `json:"created"`
+	Updated                *time.Time `json:"updated"`
+	CreatedBy              string     `json:"created_by"`
+	UpdatedBy              string     `json:"updated_by"`
+	BountiesCountCompleted int        `json:"bounties_count_completed"`
+	BountiesCountAssigned  int        `json:"bounties_count_assigned"`
+	BountiesCountOpen      int        `json:"bounties_count_open"`
 }
 
 type FeaturePhase struct {
