@@ -915,22 +915,17 @@ func (oh *workspaceHandler) GetFeaturesByWorkspaceUuid(w http.ResponseWriter, r 
 	workspaceFeatures := oh.db.GetFeaturesByWorkspaceUuid(uuid, r)
 
 	for i, feature := range workspaceFeatures {
-
 		phases := oh.db.GetPhasesByFeatureUuid(feature.Uuid)
-
 		var totalCompleted, totalAssigned, totalOpen int
 
 		for _, phase := range phases {
-			bounties := oh.db.GetBountiesByPhaseUuid(phase.Uuid)
-			for _, bounty := range bounties {
-				if bounty.Completed {
-					totalCompleted++
-				} else if bounty.Assignee != "" {
-					totalAssigned++
-				} else {
-					totalOpen++
-				}
-			}
+			completed := oh.db.GetFeaturePhasesBountiesCount("completed", phase.Uuid)
+			assigned := oh.db.GetFeaturePhasesBountiesCount("assigned", phase.Uuid)
+			open := oh.db.GetFeaturePhasesBountiesCount("open", phase.Uuid)
+
+			totalAssigned += int(assigned)
+			totalCompleted += int(completed)
+			totalOpen += int(open)
 		}
 
 		workspaceFeatures[i].BountiesCountCompleted = totalCompleted
