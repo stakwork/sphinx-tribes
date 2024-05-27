@@ -397,3 +397,21 @@ func (db database) DeleteAllUsersFromWorkspace(org string) error {
 
 	return nil
 }
+
+func (db database) GetFeaturePhasesBountiesCount(bountyType string, phaseUuid string) int64 {
+	var count int64
+
+	query := db.db.Model(&NewBounty{})
+	if bountyType == "open" {
+		query.Where("phase_uuid", phaseUuid).Where("assignee = '' ")
+	} else if bountyType == "assigned" {
+		query.Where("phase_uuid", phaseUuid).Where("assignee != '' ").Where("paid != true").Where("completed != true")
+	} else if bountyType == "completed" {
+		query.Where("phase_uuid", phaseUuid).Where("completed = true")
+	} else if bountyType == "paid" {
+		query.Where("phase_uuid", phaseUuid).Where("paid = true")
+	}
+
+	query.Count(&count)
+	return count
+}
