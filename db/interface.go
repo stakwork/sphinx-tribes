@@ -157,6 +157,7 @@ type Database interface {
 	GetFeatureStoryByUuid(featureUuid, storyUuid string) (FeatureStory, error)
 	DeleteFeatureStoryByUuid(featureUuid, storyUuid string) error
 	DeleteFeatureByUuid(uuid string) error
-	GetBountyByFeatureAndPhaseUuid(featureUuid string, phaseUuid string) (Bounty, error)
+	GetBountiesByFeatureAndPhaseUuid(featureUuid string, phaseUuid string, r *http.Request) ([]NewBounty, error)
+	GetBountiesCountByFeatureAndPhaseUuid(featureUuid string, phaseUuid string, r *http.Request) int64
 	GetPhaseByUuid(phaseUuid string) (FeaturePhase, error)
 }
