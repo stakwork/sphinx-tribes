@@ -7551,3 +7551,43 @@ func NewDatabase(t interface {
 
 	return mock
 }
+
+func (_m *Database) GetBountiesByPhaseUuid(phaseUuid string) []db.Bounty {
+	ret := _m.Called(phaseUuid)
+
+	var r0 []db.Bounty
+	if rf, ok := ret.Get(0).(func(string) []db.Bounty); ok {
+		r0 = rf(phaseUuid)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).([]db.Bounty)
+		}
+	}
+
+	return r0
+}
+
+type Database_GetBountiesByPhaseUuid_Call struct {
+	*mock.Call
+}
+
+func (_e *Database_Expecter) GetBountiesByPhaseUuid(phaseUuid interface{}) *Database_GetBountiesByPhaseUuid_Call {
+	return &Database_GetBountiesByPhaseUuid_Call{Call: _e.mock.On("GetBountiesByPhaseUuid", phaseUuid)}
+}
+
+func (_c *Database_GetBountiesByPhaseUuid_Call) Run(run func(phaseUuid string)) *Database_GetBountiesByPhaseUuid_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(string))
+	})
+	return _c
+}
+
+func (_c *Database_GetBountiesByPhaseUuid_Call) Return(_a0 []db.Bounty) *Database_GetBountiesByPhaseUuid_Call {
+	_c.Call.Return(_a0)
+	return _c
+}
+
+func (_c *Database_GetBountiesByPhaseUuid_Call) RunAndReturn(run func(string) []db.Bounty) *Database_GetBountiesByPhaseUuid_Call {
+	_c.Call.Return(run)
+	return _c
+}
