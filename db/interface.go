@@ -161,4 +161,5 @@ type Database interface {
 	GetBountiesCountByFeatureAndPhaseUuid(featureUuid string, phaseUuid string, r *http.Request) int64
 	GetPhaseByUuid(phaseUuid string) (FeaturePhase, error)
 	GetBountiesByPhaseUuid(phaseUuid string) []Bounty
+	GetFeaturePhasesBountiesCount(bountyType string, phaseUuid string) int64
 }

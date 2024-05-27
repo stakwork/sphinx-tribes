@@ -2344,6 +2344,54 @@ func (_c *Database_GetBountiesByFeatureAndPhaseUuid_Call) RunAndReturn(run func(
 	return _c
 }
 
+// GetBountiesByPhaseUuid provides a mock function with given fields: phaseUuid
+func (_m *Database) GetBountiesByPhaseUuid(phaseUuid string) []db.Bounty {
+	ret := _m.Called(phaseUuid)
+
+	if len(ret) == 0 {
+		panic("no return value specified for GetBountiesByPhaseUuid")
+	}
+
+	var r0 []db.Bounty
+	if rf, ok := ret.Get(0).(func(string) []db.Bounty); ok {
+		r0 = rf(phaseUuid)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).([]db.Bounty)
+		}
+	}
+
+	return r0
+}
+
+// Database_GetBountiesByPhaseUuid_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'GetBountiesByPhaseUuid'
+type Database_GetBountiesByPhaseUuid_Call struct {
+	*mock.Call
+}
+
+// GetBountiesByPhaseUuid is a helper method to define mock.On call
+//   - phaseUuid string
+func (_e *Database_Expecter) GetBountiesByPhaseUuid(phaseUuid interface{}) *Database_GetBountiesByPhaseUuid_Call {
+	return &Database_GetBountiesByPhaseUuid_Call{Call: _e.mock.On("GetBountiesByPhaseUuid", phaseUuid)}
+}
+
+func (_c *Database_GetBountiesByPhaseUuid_Call) Run(run func(phaseUuid string)) *Database_GetBountiesByPhaseUuid_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(string))
+	})
+	return _c
+}
+
+func (_c *Database_GetBountiesByPhaseUuid_Call) Return(_a0 []db.Bounty) *Database_GetBountiesByPhaseUuid_Call {
+	_c.Call.Return(_a0)
+	return _c
+}
+
+func (_c *Database_GetBountiesByPhaseUuid_Call) RunAndReturn(run func(string) []db.Bounty) *Database_GetBountiesByPhaseUuid_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
 // GetBountiesCount provides a mock function with given fields: r
 func (_m *Database) GetBountiesCount(r *http.Request) int64 {
 	ret := _m.Called(r)
@@ -3141,6 +3189,53 @@ func (_c *Database_GetFeaturePhaseByUuid_Call) Return(_a0 db.FeaturePhase, _a1 e
 }
 
 func (_c *Database_GetFeaturePhaseByUuid_Call) RunAndReturn(run func(string, string) (db.FeaturePhase, error)) *Database_GetFeaturePhaseByUuid_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
+// GetFeaturePhasesBountiesCount provides a mock function with given fields: bountyType, phaseUuid
+func (_m *Database) GetFeaturePhasesBountiesCount(bountyType string, phaseUuid string) int64 {
+	ret := _m.Called(bountyType, phaseUuid)
+
+	if len(ret) == 0 {
+		panic("no return value specified for GetFeaturePhasesBountiesCount")
+	}
+
+	var r0 int64
+	if rf, ok := ret.Get(0).(func(string, string) int64); ok {
+		r0 = rf(bountyType, phaseUuid)
+	} else {
+		r0 = ret.Get(0).(int64)
+	}
+
+	return r0
+}
+
+// Database_GetFeaturePhasesBountiesCount_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'GetFeaturePhasesBountiesCount'
+type Database_GetFeaturePhasesBountiesCount_Call struct {
+	*mock.Call
+}
+
+// GetFeaturePhasesBountiesCount is a helper method to define mock.On call
+//   - bountyType string
+//   - phaseUuid string
+func (_e *Database_Expecter) GetFeaturePhasesBountiesCount(bountyType interface{}, phaseUuid interface{}) *Database_GetFeaturePhasesBountiesCount_Call {
+	return &Database_GetFeaturePhasesBountiesCount_Call{Call: _e.mock.On("GetFeaturePhasesBountiesCount", bountyType, phaseUuid)}
+}
+
+func (_c *Database_GetFeaturePhasesBountiesCount_Call) Run(run func(bountyType string, phaseUuid string)) *Database_GetFeaturePhasesBountiesCount_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(string), args[1].(string))
+	})
+	return _c
+}
+
+func (_c *Database_GetFeaturePhasesBountiesCount_Call) Return(_a0 int64) *Database_GetFeaturePhasesBountiesCount_Call {
+	_c.Call.Return(_a0)
+	return _c
+}
+
+func (_c *Database_GetFeaturePhasesBountiesCount_Call) RunAndReturn(run func(string, string) int64) *Database_GetFeaturePhasesBountiesCount_Call {
 	_c.Call.Return(run)
 	return _c
 }
@@ -7550,44 +7645,4 @@ func NewDatabase(t interface {
 	t.Cleanup(func() { mock.AssertExpectations(t) })
 
 	return mock
-}
-
-func (_m *Database) GetBountiesByPhaseUuid(phaseUuid string) []db.Bounty {
-	ret := _m.Called(phaseUuid)
-
-	var r0 []db.Bounty
-	if rf, ok := ret.Get(0).(func(string) []db.Bounty); ok {
-		r0 = rf(phaseUuid)
-	} else {
-		if ret.Get(0) != nil {
-			r0 = ret.Get(0).([]db.Bounty)
-		}
-	}
-
-	return r0
-}
-
-type Database_GetBountiesByPhaseUuid_Call struct {
-	*mock.Call
-}
-
-func (_e *Database_Expecter) GetBountiesByPhaseUuid(phaseUuid interface{}) *Database_GetBountiesByPhaseUuid_Call {
-	return &Database_GetBountiesByPhaseUuid_Call{Call: _e.mock.On("GetBountiesByPhaseUuid", phaseUuid)}
-}
-
-func (_c *Database_GetBountiesByPhaseUuid_Call) Run(run func(phaseUuid string)) *Database_GetBountiesByPhaseUuid_Call {
-	_c.Call.Run(func(args mock.Arguments) {
-		run(args[0].(string))
-	})
-	return _c
-}
-
-func (_c *Database_GetBountiesByPhaseUuid_Call) Return(_a0 []db.Bounty) *Database_GetBountiesByPhaseUuid_Call {
-	_c.Call.Return(_a0)
-	return _c
-}
-
-func (_c *Database_GetBountiesByPhaseUuid_Call) RunAndReturn(run func(string) []db.Bounty) *Database_GetBountiesByPhaseUuid_Call {
-	_c.Call.Return(run)
-	return _c
 }

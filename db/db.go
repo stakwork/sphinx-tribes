@@ -506,7 +506,7 @@ func (db database) GetListedPosts(r *http.Request) ([]PeopleExtra, error) {
 func (db database) GetUserBountiesCount(personKey string, tabType string) int64 {
 	var count int64
 
-	query := db.db.Model(&Bounty{})
+	query := db.db.Model(&NewBounty{})
 	if tabType == "bounties" {
 		query.Where("owner_id", personKey)
 	} else if tabType == "assigned" {
