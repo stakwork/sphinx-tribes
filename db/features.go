@@ -181,20 +181,136 @@ func (db database) DeleteFeatureStoryByUuid(featureUuid, storyUuid string) error
 	return nil
 }
 
-func (db database) GetBountyByFeatureAndPhaseUuid(featureUuid string, phaseUuid string) (Bounty, error) {
-	bounty := Bounty{}
-	result := db.db.Model(&Bounty{}).
+func (db database) GetBountiesByFeatureAndPhaseUuid(featureUuid string, phaseUuid string, r *http.Request) ([]NewBounty, error) {
+	keys := r.URL.Query()
+	tags := keys.Get("tags")
+	offset, limit, sortBy, direction, search := utils.GetPaginationParams(r)
+	open := keys.Get("Open")
+	assigned := keys.Get("Assigned")
+	completed := keys.Get("Completed")
+	paid := keys.Get("Paid")
+	languages := keys.Get("languages")
+	languageArray := strings.Split(languages, ",")
+
+	var bounties []NewBounty
+
+	// Initialize the query with the necessary joins and initial filters
+	query := db.db.Model(&Bounty{}).
 		Select("bounty.*").
-		Joins(`INNER JOIN "feature_phases" ON "feature_phases"."uuid" = "bounty"."phase_uuid" `).
-		Where(`"feature_phases"."feature_uuid" = ? AND "feature_phases"."uuid" = ?`, featureUuid, phaseUuid).
-		Order(`"bounty"."id"`).
-		Limit(1).
-		First(&bounty)
+		Joins(`INNER JOIN "feature_phases" ON "feature_phases"."uuid" = "bounty"."phase_uuid"`).
+		Where(`"feature_phases"."feature_uuid" = ? AND "feature_phases"."uuid" = ?`, featureUuid, phaseUuid)
+
+	// Add pagination if applicable
+	if limit > 1 {
+		query = query.Limit(limit).Offset(offset)
+	}
+
+	// Add sorting if applicable
+	if sortBy != "" && direction != "" {
+		query = query.Order(fmt.Sprintf("%s %s", sortBy, direction))
+	} else {
+		query = query.Order("created_at DESC")
+	}
+
+	// Add search filter
+	if search != "" {
+		searchQuery := fmt.Sprintf("LOWER(title) LIKE %s", "'%"+strings.ToLower(search)+"%'")
+		query = query.Where(searchQuery)
+	}
+
+	// Add language filter
+	if len(languageArray) > 0 {
+		langs := ""
+		for i, val := range languageArray {
+			if val != "" {
+				if i == 0 {
+					langs = "'" + val + "'"
+				} else {
+					langs = langs + ", '" + val + "'"
+				}
+				query = query.Where("coding_languages && ARRAY[" + langs + "]")
+			}
+		}
+	}
+
+	// Add status filters
+	var statusConditions []string
+
+	if open == "true" {
+		statusConditions = append(statusConditions, "assignee = '' AND paid != true AND completed != true")
+	}
+	if assigned == "true" {
+		statusConditions = append(statusConditions, "assignee != '' AND paid = false AND completed = false")
+	}
+	if completed == "true" {
+		statusConditions = append(statusConditions, "assignee != '' AND completed = true AND paid = false")
+	}
+	if paid == "true" {
+		statusConditions = append(statusConditions, "paid = true")
+	}
+
+	if len(statusConditions) > 0 {
+		query = query.Where(strings.Join(statusConditions, " OR "))
+	}
+
+	// Execute the query
+	result := query.Find(&bounties)
 
 	if result.RowsAffected == 0 {
-		return bounty, errors.New("no bounty found")
+		return bounties, errors.New("no bounty found")
 	}
-	return bounty, nil
+
+	// Handle tags if any
+	if tags != "" {
+		// pull out the tags and add them in here
+		t := strings.Split(tags, ",")
+		for _, s := range t {
+			query = query.Where("'" + s + "'" + " = any (tags)")
+		}
+		query.Scan(&bounties)
+	}
+
+	return bounties, nil
+}
+
+func (db database) GetBountiesCountByFeatureAndPhaseUuid(featureUuid string, phaseUuid string, r *http.Request) int64 {
+	keys := r.URL.Query()
+	open := keys.Get("Open")
+	assigned := keys.Get("Assigned")
+	completed := keys.Get("Completed")
+	paid := keys.Get("Paid")
+
+	// Initialize the query with the necessary joins and initial filters
+	query := db.db.Model(&Bounty{}).
+		Select("COUNT(*)").
+		Joins(`INNER JOIN "feature_phases" ON "feature_phases"."uuid" = "bounty"."phase_uuid"`).
+		Where(`"feature_phases"."feature_uuid" = ? AND "feature_phases"."uuid" = ?`, featureUuid, phaseUuid)
+
+	// Add status filters
+	var statusConditions []string
+
+	if open == "true" {
+		statusConditions = append(statusConditions, "assignee = '' AND paid != true AND completed != true")
+	}
+	if assigned == "true" {
+		statusConditions = append(statusConditions, "assignee != '' AND paid = false AND completed = false")
+	}
+	if completed == "true" {
+		statusConditions = append(statusConditions, "assignee != '' AND completed = true AND paid = false")
+	}
+	if paid == "true" {
+		statusConditions = append(statusConditions, "paid = true")
+	}
+
+	if len(statusConditions) > 0 {
+		query = query.Where(strings.Join(statusConditions, " OR "))
+	}
+
+	var count int64
+
+	query.Count(&count)
+
+	return count
 }
 
 func (db database) GetPhaseByUuid(phaseUuid string) (FeaturePhase, error) {
