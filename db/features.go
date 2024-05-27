@@ -201,7 +201,7 @@ func (db database) GetBountiesByFeatureAndPhaseUuid(featureUuid string, phaseUui
 		Where(`"feature_phases"."feature_uuid" = ? AND "feature_phases"."uuid" = ?`, featureUuid, phaseUuid)
 
 	// Add pagination if applicable
-	if limit > 0 {
+	if limit > 1 {
 		query = query.Limit(limit).Offset(offset)
 	}
 
