@@ -321,3 +321,9 @@ func (db database) GetPhaseByUuid(phaseUuid string) (FeaturePhase, error) {
 	}
 	return phase, nil
 }
+
+func (db database) GetBountiesByPhaseUuid(phaseUuid string) []Bounty {
+	bounties := []Bounty{}
+	db.db.Model(&Bounty{}).Where("phase_uuid = ?", phaseUuid).Find(&bounties)
+	return bounties
+}
