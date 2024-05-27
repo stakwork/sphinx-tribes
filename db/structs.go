@@ -582,9 +582,9 @@ type WorkspaceFeatures struct {
 	Updated                *time.Time `json:"updated"`
 	CreatedBy              string     `json:"created_by"`
 	UpdatedBy              string     `json:"updated_by"`
-	BountiesCountCompleted int        `json:"bounties_count_completed"`
-	BountiesCountAssigned  int        `json:"bounties_count_assigned"`
-	BountiesCountOpen      int        `json:"bounties_count_open"`
+	BountiesCountCompleted int        `gorm:"-" json:"bounties_count_completed"`
+	BountiesCountAssigned  int        `gorm:"-" json:"bounties_count_assigned"`
+	BountiesCountOpen      int        `gorm:"-" json:"bounties_count_open"`
 }
 
 type FeaturePhase struct {

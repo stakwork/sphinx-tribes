@@ -102,7 +102,6 @@ func (oh *featureHandler) DeleteFeature(w http.ResponseWriter, r *http.Request) 
 }
 
 // Old Method for getting features for workspace uuid
-
 func (oh *featureHandler) GetFeaturesByWorkspaceUuid(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 	pubKeyFromAuth, _ := ctx.Value(auth.ContextKey).(string)
