@@ -57,7 +57,7 @@ func (h *bountyHandler) GetBountyById(w http.ResponseWriter, r *http.Request) {
 	bounties, err := h.db.GetBountyById(bountyId)
 	if err != nil {
 		w.WriteHeader(http.StatusBadRequest)
-		fmt.Println("Error", err)
+		fmt.Println("[bounty] Error", err)
 	} else {
 		var bountyResponse []db.BountyResponse = h.GenerateBountyResponse(bounties)
 		w.WriteHeader(http.StatusOK)
@@ -69,7 +69,7 @@ func (h *bountyHandler) GetNextBountyByCreated(w http.ResponseWriter, r *http.Re
 	bounties, err := h.db.GetNextBountyByCreated(r)
 	if err != nil {
 		w.WriteHeader(http.StatusBadRequest)
-		fmt.Println("Error", err)
+		fmt.Println("[bounty] Error", err)
 	} else {
 		w.WriteHeader(http.StatusOK)
 		json.NewEncoder(w).Encode(bounties)
@@ -80,7 +80,7 @@ func (h *bountyHandler) GetPreviousBountyByCreated(w http.ResponseWriter, r *htt
 	bounties, err := h.db.GetPreviousBountyByCreated(r)
 	if err != nil {
 		w.WriteHeader(http.StatusBadRequest)
-		fmt.Println("Error", err)
+		fmt.Println("[bounty] Error", err)
 	} else {
 		w.WriteHeader(http.StatusOK)
 		json.NewEncoder(w).Encode(bounties)
@@ -91,7 +91,7 @@ func (h *bountyHandler) GetWorkspaceNextBountyByCreated(w http.ResponseWriter, r
 	bounties, err := h.db.GetNextWorkspaceBountyByCreated(r)
 	if err != nil {
 		w.WriteHeader(http.StatusBadRequest)
-		fmt.Println("Error", err)
+		fmt.Println("[bounty] Error", err)
 	} else {
 		w.WriteHeader(http.StatusOK)
 		json.NewEncoder(w).Encode(bounties)
@@ -102,7 +102,7 @@ func (h *bountyHandler) GetWorkspacePreviousBountyByCreated(w http.ResponseWrite
 	bounties, err := h.db.GetPreviousWorkspaceBountyByCreated(r)
 	if err != nil {
 		w.WriteHeader(http.StatusBadRequest)
-		fmt.Println("Error", err)
+		fmt.Println("[bounty] Error", err)
 	} else {
 		w.WriteHeader(http.StatusOK)
 		json.NewEncoder(w).Encode(bounties)
@@ -127,7 +127,7 @@ func (h *bountyHandler) GetBountyByCreated(w http.ResponseWriter, r *http.Reques
 	bounties, err := h.db.GetBountyDataByCreated(created)
 	if err != nil {
 		w.WriteHeader(http.StatusBadRequest)
-		fmt.Println("Error", err)
+		fmt.Println("[bounty] Error", err)
 	} else {
 		var bountyResponse []db.BountyResponse = h.GenerateBountyResponse(bounties)
 
@@ -159,7 +159,7 @@ func (h *bountyHandler) GetPersonCreatedBounties(w http.ResponseWriter, r *http.
 	bounties, err := h.db.GetCreatedBounties(r)
 	if err != nil {
 		w.WriteHeader(http.StatusBadRequest)
-		fmt.Println("Error", err)
+		fmt.Println("[bounty] Error", err)
 	} else {
 		var bountyResponse []db.BountyResponse = h.GenerateBountyResponse(bounties)
 		w.WriteHeader(http.StatusOK)
@@ -171,7 +171,7 @@ func (h *bountyHandler) GetPersonAssignedBounties(w http.ResponseWriter, r *http
 	bounties, err := h.db.GetAssignedBounties(r)
 	if err != nil {
 		w.WriteHeader(http.StatusBadRequest)
-		fmt.Println("Error", err)
+		fmt.Println("[bounty] Error", err)
 	} else {
 		var bountyResponse []db.BountyResponse = h.GenerateBountyResponse(bounties)
 		w.WriteHeader(http.StatusOK)
@@ -189,7 +189,7 @@ func (h *bountyHandler) CreateOrEditBounty(w http.ResponseWriter, r *http.Reques
 	r.Body.Close()
 	err = json.Unmarshal(body, &bounty)
 	if err != nil {
-		fmt.Println(err)
+		fmt.Println("[bounty]", err)
 		w.WriteHeader(http.StatusNotAcceptable)
 		return
 	}
@@ -253,14 +253,14 @@ func (h *bountyHandler) CreateOrEditBounty(w http.ResponseWriter, r *http.Reques
 				hasBountyRoles := h.userHasManageBountyRoles(pubKeyFromAuth, bounty.WorkspaceUuid)
 				if !hasBountyRoles {
 					msg := "You don't have a=the right permission ton update bounty"
-					fmt.Println(msg)
+					fmt.Println("[bounty]", msg)
 					w.WriteHeader(http.StatusBadRequest)
 					json.NewEncoder(w).Encode(msg)
 					return
 				}
 			} else {
 				msg := "Cannot edit another user's bounty"
-				fmt.Println(msg)
+				fmt.Println("[bounty]", msg)
 				w.WriteHeader(http.StatusBadRequest)
 				json.NewEncoder(w).Encode(msg)
 				return
@@ -284,7 +284,7 @@ func (h *bountyHandler) CreateOrEditBounty(w http.ResponseWriter, r *http.Reques
 
 	b, err := h.db.CreateOrEditBounty(bounty)
 	if err != nil {
-		fmt.Println(err)
+		fmt.Println("[bounty]", err)
 		w.WriteHeader(http.StatusBadRequest)
 		return
 	}
@@ -298,7 +298,7 @@ func (h *bountyHandler) DeleteBounty(w http.ResponseWriter, r *http.Request) {
 	pubKeyFromAuth, _ := ctx.Value(auth.ContextKey).(string)
 
 	if pubKeyFromAuth == "" {
-		fmt.Println("no pubkey from auth")
+		fmt.Println("[bounty] no pubkey from auth")
 		w.WriteHeader(http.StatusUnauthorized)
 		return
 	}
@@ -307,19 +307,19 @@ func (h *bountyHandler) DeleteBounty(w http.ResponseWriter, r *http.Request) {
 	pubkey := chi.URLParam(r, "pubkey")
 
 	if pubkey == "" {
-		fmt.Println("no pubkey from route")
+		fmt.Println("[bounty] no pubkey from route")
 		w.WriteHeader(http.StatusUnauthorized)
 		return
 	}
 	if created == "" {
-		fmt.Println("no created timestamp from route")
+		fmt.Println("[bounty] no created timestamp from route")
 		w.WriteHeader(http.StatusUnauthorized)
 		return
 	}
 
 	b, err := h.db.DeleteBounty(pubkey, created)
 	if err != nil {
-		fmt.Println("failed to delete bounty", err.Error())
+		fmt.Println("[bounty] failed to delete bounty", err.Error())
 		w.WriteHeader(http.StatusInternalServerError)
 		json.NewEncoder(w).Encode("failed to delete bounty")
 		return
@@ -470,14 +470,14 @@ func (h *bountyHandler) MakeBountyPayment(w http.ResponseWriter, r *http.Request
 
 	id, err := utils.ConvertStringToUint(idParam)
 	if err != nil {
-		fmt.Println("could not parse id")
+		fmt.Println("[bounty] could not parse id")
 		w.WriteHeader(http.StatusForbidden)
 		h.m.Unlock()
 		return
 	}
 
 	if pubKeyFromAuth == "" {
-		fmt.Println("no pubkey from auth")
+		fmt.Println("[bounty] no pubkey from auth")
 		w.WriteHeader(http.StatusUnauthorized)
 		h.m.Unlock()
 		return
@@ -530,7 +530,7 @@ func (h *bountyHandler) MakeBountyPayment(w http.ResponseWriter, r *http.Request
 
 	err = json.Unmarshal(body, &request)
 	if err != nil {
-		fmt.Println(err)
+		fmt.Println("[bounty]", err)
 		w.WriteHeader(http.StatusNotAcceptable)
 		h.m.Unlock()
 		return
@@ -546,11 +546,11 @@ func (h *bountyHandler) MakeBountyPayment(w http.ResponseWriter, r *http.Request
 	req, _ := http.NewRequest(http.MethodPost, url, bytes.NewBuffer(jsonBody))
 	req.Header.Set("x-user-token", config.RelayAuthKey)
 	req.Header.Set("Content-Type", "application/json")
-	log.Printf("Making Bounty Payment: amount: %d, pubkey: %s, route_hint: %s", amount, assignee.OwnerPubKey, assignee.OwnerRouteHint)
+	log.Printf("[bounty] Making Bounty Payment: amount: %d, pubkey: %s, route_hint: %s", amount, assignee.OwnerPubKey, assignee.OwnerRouteHint)
 	res, err := h.httpClient.Do(req)
 
 	if err != nil {
-		log.Printf("Request Failed: %s", err)
+		log.Printf("[bounty] Request Failed: %s", err)
 		h.m.Unlock()
 		return
 	}
@@ -613,7 +613,7 @@ func (h *bountyHandler) BountyBudgetWithdraw(w http.ResponseWriter, r *http.Requ
 	pubKeyFromAuth, _ := ctx.Value(auth.ContextKey).(string)
 
 	if pubKeyFromAuth == "" {
-		fmt.Println("no pubkey from auth")
+		fmt.Println("[bounty] no pubkey from auth")
 		w.WriteHeader(http.StatusUnauthorized)
 		h.m.Unlock()
 		return
@@ -630,7 +630,7 @@ func (h *bountyHandler) BountyBudgetWithdraw(w http.ResponseWriter, r *http.Requ
 		return
 	}
 
-	log.Printf("[BountyBudgetWithdraw] Logging body: orguuid: %s, pubkey: %s, invoice: %s", request.OrgUuid, pubKeyFromAuth, request.PaymentRequest)
+	log.Printf("[bounty] [BountyBudgetWithdraw] Logging body: orguuid: %s, pubkey: %s, invoice: %s", request.OrgUuid, pubKeyFromAuth, request.PaymentRequest)
 
 	// check if user is the admin of the workspace
 	// or has a withdraw bounty budget role
@@ -683,7 +683,7 @@ func (h *bountyHandler) NewBountyBudgetWithdraw(w http.ResponseWriter, r *http.R
 	pubKeyFromAuth, _ := ctx.Value(auth.ContextKey).(string)
 
 	if pubKeyFromAuth == "" {
-		fmt.Println("no pubkey from auth")
+		fmt.Println("[bounty] no pubkey from auth")
 		w.WriteHeader(http.StatusUnauthorized)
 		h.m.Unlock()
 		return
@@ -760,7 +760,7 @@ func (h *bountyHandler) GetLightningInvoice(payment_request string) (db.InvoiceR
 	res, _ := h.httpClient.Do(req)
 
 	if err != nil {
-		log.Printf("Request Failed: %s", err)
+		log.Printf("[bounty] Request Failed: %s", err)
 		return db.InvoiceResult{}, db.InvoiceError{}
 	}
 
@@ -774,7 +774,7 @@ func (h *bountyHandler) GetLightningInvoice(payment_request string) (db.InvoiceR
 		err = json.Unmarshal(body, &invoiceErr)
 
 		if err != nil {
-			log.Printf("Reading Invoice body failed: %s", err)
+			log.Printf("[bounty] Reading Invoice body failed: %s", err)
 			return db.InvoiceResult{}, invoiceErr
 		}
 
@@ -785,7 +785,7 @@ func (h *bountyHandler) GetLightningInvoice(payment_request string) (db.InvoiceR
 		err = json.Unmarshal(body, &invoiceRes)
 
 		if err != nil {
-			log.Printf("Reading Invoice body failed: %s", err)
+			log.Printf("[bounty] Reading Invoice body failed: %s", err)
 			return invoiceRes, db.InvoiceError{}
 		}
 
@@ -805,7 +805,7 @@ func (h *bountyHandler) PayLightningInvoice(payment_request string) (db.InvoiceP
 	res, err := h.httpClient.Do(req)
 
 	if err != nil {
-		log.Printf("Request Failed: %s", err)
+		log.Printf("[bounty] Request Failed: %s", err)
 		return db.InvoicePaySuccess{}, db.InvoicePayError{}
 	}
 
@@ -818,7 +818,7 @@ func (h *bountyHandler) PayLightningInvoice(payment_request string) (db.InvoiceP
 		err = json.Unmarshal(body, &invoiceError)
 
 		if err != nil {
-			log.Printf("Reading Invoice pay error body failed: %s", err)
+			log.Printf("[bounty] Reading Invoice pay error body failed: %s", err)
 			return db.InvoicePaySuccess{}, db.InvoicePayError{}
 		}
 
@@ -828,7 +828,7 @@ func (h *bountyHandler) PayLightningInvoice(payment_request string) (db.InvoiceP
 		err = json.Unmarshal(body, &invoiceSuccess)
 
 		if err != nil {
-			log.Printf("Reading Invoice pay success body failed: %s", err)
+			log.Printf("[bounty] Reading Invoice pay success body failed: %s", err)
 			return db.InvoicePaySuccess{}, db.InvoicePayError{}
 		}
 
@@ -857,7 +857,7 @@ func (h *bountyHandler) PollInvoice(w http.ResponseWriter, r *http.Request) {
 	var err error
 
 	if pubKeyFromAuth == "" {
-		fmt.Println("no pubkey from auth")
+		fmt.Println("[bounty] no pubkey from auth")
 		w.WriteHeader(http.StatusUnauthorized)
 		return
 	}
@@ -896,7 +896,7 @@ func (h *bountyHandler) PollInvoice(w http.ResponseWriter, r *http.Request) {
 				res, _ := h.httpClient.Do(req)
 
 				if err != nil {
-					log.Printf("Request Failed: %s", err)
+					log.Printf("[bounty] Request Failed: %s", err)
 					return
 				}
 
@@ -925,7 +925,7 @@ func (h *bountyHandler) PollInvoice(w http.ResponseWriter, r *http.Request) {
 					// Unmarshal result
 					keysendError := db.KeysendError{}
 					err = json.Unmarshal(body, &keysendError)
-					log.Printf("Keysend Payment to %s Failed, with Error: %s", invData.UserPubkey, keysendError.Error)
+					log.Printf("[bounty] Keysend Payment to %s Failed, with Error: %s", invData.UserPubkey, keysendError.Error)
 				}
 			}
 			// Update the invoice status
