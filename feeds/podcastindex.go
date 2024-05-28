@@ -40,7 +40,6 @@ func EpisodeToGeneric(ep Episode, includeFeedStuff bool) Item {
 
 func PodcastToGeneric(url string, p *Podcast) (Feed, error) {
 	items := []Item{}
-	// fmt.Println("P EPISODES", len(p.Episodes), p)
 	for _, ep := range p.Episodes {
 		items = append(items, EpisodeToGeneric(ep, false))
 	}
@@ -80,7 +79,6 @@ func PodcastIndexHeaders() map[string]string {
 
 func ParsePodcastFeed(url string, fulltext bool) (*Feed, error) {
 	pod, err := PodcastFeed(url, fulltext)
-	fmt.Println("GOT A POD!", pod)
 	if err != nil || pod == nil {
 		return nil, err
 	}
