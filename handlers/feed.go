@@ -58,7 +58,7 @@ func DownloadYoutubeFeed(w http.ResponseWriter, r *http.Request) {
 	r.Body.Close()
 	err = json.Unmarshal(body, &youtube_download)
 	if err != nil {
-		fmt.Println(err)
+		fmt.Println("[feed] ", err)
 		w.WriteHeader(http.StatusNotAcceptable)
 		return
 	}
@@ -94,7 +94,7 @@ func DownloadYoutubeFeed(w http.ResponseWriter, r *http.Request) {
 func processYoutubeDownload(data []string) {
 	stakworkKey := fmt.Sprintf("Token token=%s", os.Getenv("STAKWORK_KEY"))
 	if stakworkKey == "" {
-		fmt.Println("Youtube Download Error: Stakwork key not found")
+		fmt.Println("[feed] Youtube Download Error: Stakwork key not found")
 	} else {
 		type Vars struct {
 			YoutubeContent []string `json:"youtube_content"`
@@ -128,7 +128,7 @@ func processYoutubeDownload(data []string) {
 
 		buf, err := json.Marshal(body)
 		if err != nil {
-			fmt.Println("Youtube error: Unable to parse message into byte buffer", err)
+			fmt.Println("[feed] Youtube error: Unable to parse message into byte buffer", err)
 			return
 		}
 
@@ -140,14 +140,14 @@ func processYoutubeDownload(data []string) {
 		client := &http.Client{}
 		response, err := client.Do(request)
 		if err != nil {
-			fmt.Println("Youtube Download Request Error ===", err)
+			fmt.Println("[feed] Youtube Download Request Error ===", err)
 		}
 		defer response.Body.Close()
 		res, err := io.ReadAll(response.Body)
 		if err != nil {
-			fmt.Println("Youtube Download Request Error ==", err)
+			fmt.Println("[feed] Youtube Download Request Error ==", err)
 		}
-		fmt.Println("Youtube Download Succces ==", string(res))
+		fmt.Println("[feed] Youtube Download Succces ==", string(res))
 	}
 }
 
@@ -166,7 +166,7 @@ func GetPodcast(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusOK)
 	err = json.NewEncoder(w).Encode(podcast)
 	if err != nil {
-		fmt.Println(err)
+		fmt.Println("[feed]", err)
 	}
 }
 
@@ -266,7 +266,7 @@ func getFeed(feedURL string, feedID string) (*feeds.Podcast, error) {
 	resp, err := client.Do(req)
 
 	if err != nil {
-		fmt.Println("GET error:", err)
+		fmt.Println("[feed] GET error:", err)
 		return nil, err
 	}
 	defer resp.Body.Close()
@@ -275,7 +275,7 @@ func getFeed(feedURL string, feedID string) (*feeds.Podcast, error) {
 	body, err := io.ReadAll(resp.Body)
 	err = json.Unmarshal(body, &r)
 	if err != nil {
-		fmt.Println("json unmarshall error", err)
+		fmt.Println("[feed] json unmarshall error", err)
 		return nil, err
 	}
 
@@ -308,7 +308,7 @@ func getEpisodes(feedURL string, feedID string) ([]feeds.Episode, error) {
 	resp, err := client.Do(req)
 
 	if err != nil {
-		fmt.Println("GET error:", err)
+		fmt.Println("[feed] GET error:", err)
 		return nil, err
 	}
 	defer resp.Body.Close()
@@ -317,7 +317,7 @@ func getEpisodes(feedURL string, feedID string) ([]feeds.Episode, error) {
 	body, err := io.ReadAll(resp.Body)
 	err = json.Unmarshal(body, &r)
 	if err != nil {
-		fmt.Println("json unmarshall error", err)
+		fmt.Println("[feed] json unmarshall error", err)
 		return nil, err
 	}
 
@@ -342,7 +342,7 @@ func searchPodcastIndex(term string) ([]feeds.Podcast, error) {
 	resp, err := client.Do(req)
 
 	if err != nil {
-		fmt.Println("GET error:", err)
+		fmt.Println("[feed] GET error:", err)
 		return nil, err
 	}
 	defer resp.Body.Close()
@@ -351,7 +351,7 @@ func searchPodcastIndex(term string) ([]feeds.Podcast, error) {
 	body, err := io.ReadAll(resp.Body)
 	err = json.Unmarshal(body, &r)
 	if err != nil {
-		fmt.Println("json unmarshall error", err)
+		fmt.Println("[feed] json unmarshall error", err)
 		return nil, err
 	}
 
