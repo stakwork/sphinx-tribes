@@ -39,8 +39,6 @@ func PubKeyContext(next http.Handler) http.Handler {
 		if token == "" {
 			token = r.Header.Get("x-jwt")
 		}
-		fmt.Println("PubKeyContext Token:")
-		fmt.Println(token)
 
 		if token == "" {
 			fmt.Println("[auth] no token")
@@ -50,8 +48,6 @@ func PubKeyContext(next http.Handler) http.Handler {
 
 		isJwt := strings.Contains(token, ".") && !strings.HasPrefix(token, ".")
 
-		fmt.Println("Checking if JWT: ")
-		fmt.Println(isJwt)
 		if isJwt {
 			claims, err := DecodeJwt(token)
 
@@ -67,14 +63,11 @@ func PubKeyContext(next http.Handler) http.Handler {
 				return
 			}
 
-			fmt.Println("Passed jwt check")
 			ctx := context.WithValue(r.Context(), ContextKey, claims["pubkey"])
 			next.ServeHTTP(w, r.WithContext(ctx))
 		} else {
 			pubkey, err := VerifyTribeUUID(token, true)
 
-			fmt.Println("Checking pubkey and error: ")
-			fmt.Println(pubkey)
 			if pubkey == "" || err != nil {
 				fmt.Println("[auth] no pubkey || err != nil")
 				if err != nil {
