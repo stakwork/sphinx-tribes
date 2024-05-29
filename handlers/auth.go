@@ -70,7 +70,7 @@ func (ah *authHandler) CreateConnectionCode(w http.ResponseWriter, r *http.Reque
 	}
 
 	if err != nil {
-		fmt.Println(err)
+		fmt.Println("[auth]", err)
 		w.WriteHeader(http.StatusNotAcceptable)
 		return
 	}
@@ -78,7 +78,7 @@ func (ah *authHandler) CreateConnectionCode(w http.ResponseWriter, r *http.Reque
 	_, err = ah.db.CreateConnectionCode(codeArr)
 
 	if err != nil {
-		fmt.Println("=> ERR create connection code", err)
+		fmt.Println("[auth] => ERR create connection code", err)
 		w.WriteHeader(http.StatusBadRequest)
 		return
 	}
@@ -131,7 +131,7 @@ func ReceiveLnAuthData(w http.ResponseWriter, r *http.Request) {
 
 	exVerify, err := auth.VerifyDerSig(sig, k1, userKey)
 	if err != nil || !exVerify {
-		fmt.Println("Error signing signature")
+		fmt.Println("[auth] Error signing signature")
 		w.WriteHeader(http.StatusUnauthorized)
 		json.NewEncoder(w).Encode(err.Error())
 		return
@@ -150,7 +150,7 @@ func ReceiveLnAuthData(w http.ResponseWriter, r *http.Request) {
 		tokenString, err := auth.EncodeJwt(userKey)
 
 		if err != nil {
-			fmt.Println("error creating LNAUTH JWT")
+			fmt.Println("[auth] error creating LNAUTH JWT")
 			w.WriteHeader(http.StatusNotAcceptable)
 			json.NewEncoder(w).Encode(err.Error())
 			return
@@ -174,7 +174,7 @@ func ReceiveLnAuthData(w http.ResponseWriter, r *http.Request) {
 			socket.Conn.WriteJSON(socketMsg)
 			db.Store.DeleteCache(k1[0:20])
 		} else {
-			fmt.Println("Socket Error", err)
+			fmt.Println("[auth] Socket Error", err)
 		}
 
 		responseMsg["status"] = "OK"
@@ -194,7 +194,7 @@ func (ah *authHandler) RefreshToken(w http.ResponseWriter, r *http.Request) {
 	claims, err := ah.decodeJwt(token)
 
 	if err != nil {
-		fmt.Println("Failed to parse JWT")
+		fmt.Println("[auth] Failed to parse JWT")
 		w.WriteHeader(http.StatusUnauthorized)
 		json.NewEncoder(w).Encode(err.Error())
 		return
@@ -209,7 +209,7 @@ func (ah *authHandler) RefreshToken(w http.ResponseWriter, r *http.Request) {
 		tokenString, err := ah.encodeJwt(pubkey)
 
 		if err != nil {
-			fmt.Println("error creating  refresh JWT")
+			fmt.Println("[auth] error creating  refresh JWT")
 			w.WriteHeader(http.StatusNotAcceptable)
 			json.NewEncoder(w).Encode(err.Error())
 			return
