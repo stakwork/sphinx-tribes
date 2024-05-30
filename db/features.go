@@ -21,7 +21,7 @@ func (db database) GetFeaturesByWorkspaceUuid(uuid string, r *http.Request) []Wo
 	if sortBy != "" && direction != "" {
 		orderQuery = "ORDER BY " + sortBy + " " + direction
 	} else {
-		orderQuery = "ORDER BY created DESC"
+		orderQuery = "ORDER BY priority ASC"
 	}
 
 	if limit > 1 {
@@ -109,7 +109,7 @@ func (db database) CreateOrEditFeaturePhase(phase FeaturePhase) (FeaturePhase, e
 
 func (db database) GetPhasesByFeatureUuid(featureUuid string) []FeaturePhase {
 	phases := []FeaturePhase{}
-	db.db.Model(&FeaturePhase{}).Where("feature_uuid = ?", featureUuid).Order("Created ASC").Find(&phases)
+	db.db.Model(&FeaturePhase{}).Where("feature_uuid = ?", featureUuid).Order("created ASC").Find(&phases)
 	return phases
 }
 
@@ -153,7 +153,7 @@ func (db database) CreateOrEditFeatureStory(story FeatureStory) (FeatureStory, e
 
 func (db database) GetFeatureStoriesByFeatureUuid(featureUuid string) ([]FeatureStory, error) {
 	var stories []FeatureStory
-	result := db.db.Where("feature_uuid = ?", featureUuid).Find(&stories)
+	result := db.db.Where("feature_uuid = ?", featureUuid).Order("priority ASC").Find(&stories)
 	if result.Error != nil {
 		return nil, result.Error
 	}
