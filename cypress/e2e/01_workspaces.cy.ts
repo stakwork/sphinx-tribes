@@ -1,20 +1,24 @@
 import { User, HostName, Workspaces } from '../support/objects/objects';
 
-
 describe('Create Workspaces', () => {
     it('passes', () => {
         cy.upsertlogin(User).then(value => {
-            for(let i = 0; i <= 2; i++) {
+            for(let i = 0; i < Workspaces.length; i++) {
                 cy.request({
                     method: 'POST',
-                    url: `${HostName}/workspaces/`,
+                    url: `${HostName}/workspaces`,
                     headers: { 'x-jwt': `${value}` },
-                    body: Workspaces[i]
-                }).its('body').should('have.property', 'name', Workspaces[i].name.trim());
+                    body: Workspaces[i],
+                    failOnStatusCode: false
+                }).then((response) => {
+                    expect(response.status).to.eq(200);
+                    expect(response.body).to.have.property('name', Workspaces[i].name.trim());
+                });
             }
-        })
-    })
-})
+        });
+    });
+});
+
 
 describe('Edit Mission', () => {
     it('passes', () => {
