@@ -111,21 +111,22 @@ func (oh *workspaceHandler) CreateOrEditWorkspace(w http.ResponseWriter, r *http
 
 		name := workspace.Name
 
-		// check if the organization name already exists
-		workspace_same_name := oh.db.GetWorkspaceByName(name)
-
-		if workspace_same_name.Name == name && workspace_same_name.Uuid != workspace.Uuid {
-			w.WriteHeader(http.StatusUnauthorized)
-			json.NewEncoder(w).Encode("Workspace name already exists - " + name + " " + workspace.Uuid + " | " + workspace_same_name.Uuid)
+		// check if the workspace name already exists
+		workspaceSameName := oh.db.GetWorkspaceByName(name)
+		if workspaceSameName.Name == name {
+			w.WriteHeader(http.StatusConflict)
+			json.NewEncoder(w).Encode("Workspace name already exists - " + name)
 			return
-		} else {
-			workspace.Created = &now
-			workspace.Updated = &now
-			if len(workspace.Uuid) == 0 {
-				workspace.Uuid = xid.New().String()
-			}
-			workspace.Name = name
 		}
+
+		workspace.Created = &now
+		workspace.Updated = &now
+		if len(workspace.Uuid) == 0 {
+			workspace.Uuid = xid.New().String()
+		}
+	} else {
+		workspace.Updated = &now
+		workspace.Created = existing.Created
 	}
 
 	p, err := oh.db.CreateOrEditWorkspace(workspace)
