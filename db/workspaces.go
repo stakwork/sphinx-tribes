@@ -200,36 +200,36 @@ func (db database) GetWorkspaceBudget(workspace_uuid string) NewBountyBudget {
 }
 
 func (db database) GetWorkspaceStatusBudget(workspace_uuid string) StatusBudget {
-	orgBudget := db.GetWorkspaceBudget(workspace_uuid)
+	workspaceBudget := db.GetWorkspaceBudget(workspace_uuid)
 
 	var openBudget uint
-	db.db.Model(&NewBounty{}).Where("assignee = '' ").Where("paid != true").Select("SUM(price)").Row().Scan(&openBudget)
+	db.db.Model(&NewBounty{}).Where("workspace_uuid = ?", workspace_uuid).Where("assignee = '' ").Where("paid != true").Select("SUM(price)").Row().Scan(&openBudget)
 
 	var openCount int64
-	db.db.Model(&NewBounty{}).Where("assignee = '' ").Where("paid != true").Count(&openCount)
+	db.db.Model(&NewBounty{}).Where("workspace_uuid = ?", workspace_uuid).Where("assignee = '' ").Where("paid != true").Count(&openCount)
 
-	var openDifference int = int(orgBudget.TotalBudget - openBudget)
+	var openDifference int = int(workspaceBudget.TotalBudget - openBudget)
 
 	var assignedBudget uint
-	db.db.Model(&NewBounty{}).Where("assignee != '' ").Where("paid != true").Select("SUM(price)").Row().Scan(&assignedBudget)
+	db.db.Model(&NewBounty{}).Where("workspace_uuid = ?", workspace_uuid).Where("assignee != '' ").Where("paid != true").Select("SUM(price)").Row().Scan(&assignedBudget)
 
 	var assignedCount int64
-	db.db.Model(&NewBounty{}).Where("assignee != '' ").Where("paid != true").Count(&assignedCount)
+	db.db.Model(&NewBounty{}).Where("workspace_uuid = ?", workspace_uuid).Where("assignee != '' ").Where("paid != true").Count(&assignedCount)
 
-	var assignedDifference int = int(orgBudget.TotalBudget - assignedBudget)
+	var assignedDifference int = int(workspaceBudget.TotalBudget - assignedBudget)
 
 	var completedBudget uint
-	db.db.Model(&NewBounty{}).Where("completed = true ").Where("paid != true").Select("SUM(price)").Row().Scan(&completedBudget)
+	db.db.Model(&NewBounty{}).Where("workspace_uuid = ?", workspace_uuid).Where("completed = true ").Where("paid != true").Select("SUM(price)").Row().Scan(&completedBudget)
 
 	var completedCount int64
-	db.db.Model(&NewBounty{}).Where("completed = true ").Where("paid != true").Count(&completedCount)
+	db.db.Model(&NewBounty{}).Where("workspace_uuid = ?", workspace_uuid).Where("completed = true ").Where("paid != true").Count(&completedCount)
 
-	var completedDifference int = int(orgBudget.TotalBudget - completedBudget)
+	var completedDifference int = int(workspaceBudget.TotalBudget - completedBudget)
 
 	statusBudget := StatusBudget{
 		OrgUuid:             workspace_uuid,
 		WorkspaceUuid:       workspace_uuid,
-		CurrentBudget:       orgBudget.TotalBudget,
+		CurrentBudget:       workspaceBudget.TotalBudget,
 		OpenBudget:          openBudget,
 		OpenCount:           openCount,
 		OpenDifference:      openDifference,
@@ -378,19 +378,19 @@ func (db database) UpdateWorkspaceForDeletion(uuid string) error {
 	return nil
 }
 
-func (db database) DeleteAllUsersFromWorkspace(org string) error {
-	if org == "" {
-		return errors.New("no org uuid provided")
+func (db database) DeleteAllUsersFromWorkspace(workspace_uuid string) error {
+	if workspace_uuid == "" {
+		return errors.New("no workspoace uuid provided")
 	}
 
 	// Delete all users associated with the Workspace
-	result := db.db.Where("workspace_uuid = ?", org).Delete(&WorkspaceUsers{})
+	result := db.db.Where("workspace_uuid = ?", workspace_uuid).Delete(&WorkspaceUsers{})
 	if result.Error != nil {
 		return result.Error
 	}
 
 	// Delete all user roles associated with the Workspace
-	result = db.db.Where("workspace_uuid = ?", org).Delete(&UserRoles{})
+	result = db.db.Where("workspace_uuid = ?", workspace_uuid).Delete(&WorkspaceUserRoles{})
 	if result.Error != nil {
 		return result.Error
 	}
