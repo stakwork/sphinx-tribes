@@ -715,15 +715,17 @@ func (oh *workspaceHandler) DeleteWorkspace(w http.ResponseWriter, r *http.Reque
 
 	// Update workspace to hide and clear certain fields
 	if err := oh.db.UpdateWorkspaceForDeletion(uuid); err != nil {
-		fmt.Println("[workspaces] Error updating workspace:", err)
+		fmt.Println("Error updating workspace:", err)
 		w.WriteHeader(http.StatusInternalServerError)
+		json.NewEncoder(w).Encode("Could not update workspace fields for deletion")
 		return
 	}
 
 	// Delete all users from the workspace
 	if err := oh.db.DeleteAllUsersFromWorkspace(uuid); err != nil {
-		fmt.Println("[workspaces] Error removing users from workspace:", err)
+		fmt.Println("Error removing users from workspace:", err)
 		w.WriteHeader(http.StatusInternalServerError)
+		json.NewEncoder(w).Encode("Could not delete workspace users")
 		return
 	}
 
