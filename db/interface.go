@@ -114,6 +114,7 @@ type Database interface {
 	GetWorkspaceInvoicesCount(workspace_uuid string) int64
 	UpdateInvoice(payment_request string) NewInvoiceList
 	AddInvoice(invoice NewInvoiceList) NewInvoiceList
+	DeleteInvoice(payment_request string) NewInvoiceList
 	AddUserInvoiceData(userData UserInvoiceData) UserInvoiceData
 	GetUserInvoiceData(payment_request string) UserInvoiceData
 	DeleteUserInvoiceData(payment_request string) UserInvoiceData
