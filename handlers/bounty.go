@@ -895,11 +895,6 @@ func (h *bountyHandler) PollInvoice(w http.ResponseWriter, r *http.Request) {
 				req.Header.Set("Content-Type", "application/json")
 				res, _ := h.httpClient.Do(req)
 
-				if err != nil {
-					log.Printf("[bounty] Request Failed: %s", err)
-					return
-				}
-
 				defer res.Body.Close()
 
 				body, _ := io.ReadAll(res.Body)
@@ -909,11 +904,15 @@ func (h *bountyHandler) PollInvoice(w http.ResponseWriter, r *http.Request) {
 					keysendRes := db.KeysendSuccess{}
 					err = json.Unmarshal(body, &keysendRes)
 
-					bounty, err := h.db.GetBountyByCreated(uint(invData.Created))
+					if err != nil {
+						w.WriteHeader(http.StatusForbidden)
+						json.NewEncoder(w).Encode("Could not decode keysend response")
+						return
+					}
 
+					bounty, err := h.db.GetBountyByCreated(uint(invData.Created))
 					if err == nil {
 						now := time.Now()
-
 						bounty.Paid = true
 						bounty.PaidDate = &now
 						bounty.Completed = true
@@ -925,13 +924,19 @@ func (h *bountyHandler) PollInvoice(w http.ResponseWriter, r *http.Request) {
 					// Unmarshal result
 					keysendError := db.KeysendError{}
 					err = json.Unmarshal(body, &keysendError)
-					log.Printf("[bounty] Keysend Payment to %s Failed, with Error: %s", invData.UserPubkey, keysendError.Error)
+					log.Printf("[bounty] Keysend Payment to %s Failed, with Error: %s", invData.UserPubkey, err)
 				}
 			}
 			// Update the invoice status
 			h.db.UpdateInvoice(paymentRequest)
 		}
-
+	} else {
+		// Cheeck if time has expired
+		isInvoiceExpired := utils.GetInvoiceExpired(paymentRequest)
+		// If the invoice has expired and it is not paid delete from the DB
+		if isInvoiceExpired {
+			h.db.DeleteInvoice(paymentRequest)
+		}
 	}
 
 	w.WriteHeader(http.StatusOK)

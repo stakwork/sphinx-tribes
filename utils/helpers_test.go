@@ -72,3 +72,9 @@ func TestGetInvoiceAmount(t *testing.T) {
 	amount2 := GetInvoiceAmount(invalidInvoice)
 	assert.Equal(t, uint(0), amount2)
 }
+
+func TestGetInvoiceExpired(t *testing.T) {
+	expiredInvoice := "lnbcrt100u1pnr5gtzpp5r7ew6nzqd9y9w5ktsspftnckxdn3te0y04n9mw7c6hkkrznh4pgsdqhgf6kgem9wssyjmnkda5kxegcqzpgxqyz5vqsp5mc09mpl4l3rllnfl3y902yxa29flke8r4ertqswdcrk766z5nq4q9qyyssq7wteenxtwlxatsd8dqdncqnn6u23jmcpe0d7ne6dcpafwlx9ckr3dp6y4p7sl4j3pq6l93g6vc4w8z04ry9yzwjv6cggm06eecad9psp9dh6u5"
+	isInvoiceExpired := GetInvoiceExpired(expiredInvoice)
+	assert.Equal(t, true, isInvoiceExpired)
+}

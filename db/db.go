@@ -1711,6 +1711,12 @@ func (db database) AddInvoice(invoice NewInvoiceList) NewInvoiceList {
 	return invoice
 }
 
+func (db database) DeleteInvoice(payment_request string) NewInvoiceList {
+	ms := NewInvoiceList{}
+	db.db.Model(&NewInvoiceList{}).Where("payment_request = ?", payment_request).Delete(&ms)
+	return ms
+}
+
 func (db database) AddUserInvoiceData(userData UserInvoiceData) UserInvoiceData {
 	db.db.Create(&userData)
 	return userData
