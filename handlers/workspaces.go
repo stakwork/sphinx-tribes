@@ -652,9 +652,8 @@ func (oh *workspaceHandler) PollBudgetInvoices(w http.ResponseWriter, r *http.Re
 		return
 	}
 
-	orgInvoices := oh.db.GetWorkspaceInvoices(uuid)
-
-	for _, inv := range orgInvoices {
+	workInvoices := oh.db.GetWorkspaceInvoices(uuid)
+	for _, inv := range workInvoices {
 		invoiceRes, invoiceErr := oh.getLightningInvoice(inv.PaymentRequest)
 
 		if invoiceErr.Error != "" {
@@ -668,6 +667,13 @@ func (oh *workspaceHandler) PollBudgetInvoices(w http.ResponseWriter, r *http.Re
 				oh.db.AddAndUpdateBudget(inv)
 				// Update the invoice status
 				oh.db.UpdateInvoice(inv.PaymentRequest)
+			}
+		} else {
+			// Cheeck if time has expired
+			isInvoiceExpired := utils.GetInvoiceExpired(inv.PaymentRequest)
+			// If the invoice has expired and it is not paid delete from the DB
+			if isInvoiceExpired {
+				oh.db.DeleteInvoice(inv.PaymentRequest)
 			}
 		}
 	}

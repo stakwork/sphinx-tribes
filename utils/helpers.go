@@ -54,6 +54,23 @@ func GetInvoiceAmount(paymentRequest string) uint {
 	return amount
 }
 
+func GetInvoiceExpired(paymentRequest string) bool {
+	decodedInvoice, err := decodepay.Decodepay(paymentRequest)
+	if err != nil {
+		fmt.Println("Could not Decode Invoice", err)
+		return false
+	}
+
+	timeInUnix := time.Now().Unix()
+	expiryDate := decodedInvoice.CreatedAt + decodedInvoice.Expiry
+
+	if timeInUnix > int64(expiryDate) {
+		return true
+	} else {
+		return false
+	}
+}
+
 func GetDateDaysDifference(createdDate int64, paidDate *time.Time) int64 {
 	firstDate := time.Unix(createdDate, 0)
 	difference := paidDate.Sub(*&firstDate)

@@ -1707,6 +1707,52 @@ func (_c *Database_DeleteFeatureStoryByUuid_Call) RunAndReturn(run func(string, 
 	return _c
 }
 
+// DeleteInvoice provides a mock function with given fields: payment_request
+func (_m *Database) DeleteInvoice(payment_request string) db.NewInvoiceList {
+	ret := _m.Called(payment_request)
+
+	if len(ret) == 0 {
+		panic("no return value specified for DeleteInvoice")
+	}
+
+	var r0 db.NewInvoiceList
+	if rf, ok := ret.Get(0).(func(string) db.NewInvoiceList); ok {
+		r0 = rf(payment_request)
+	} else {
+		r0 = ret.Get(0).(db.NewInvoiceList)
+	}
+
+	return r0
+}
+
+// Database_DeleteInvoice_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'DeleteInvoice'
+type Database_DeleteInvoice_Call struct {
+	*mock.Call
+}
+
+// DeleteInvoice is a helper method to define mock.On call
+//   - payment_request string
+func (_e *Database_Expecter) DeleteInvoice(payment_request interface{}) *Database_DeleteInvoice_Call {
+	return &Database_DeleteInvoice_Call{Call: _e.mock.On("DeleteInvoice", payment_request)}
+}
+
+func (_c *Database_DeleteInvoice_Call) Run(run func(payment_request string)) *Database_DeleteInvoice_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(string))
+	})
+	return _c
+}
+
+func (_c *Database_DeleteInvoice_Call) Return(_a0 db.NewInvoiceList) *Database_DeleteInvoice_Call {
+	_c.Call.Return(_a0)
+	return _c
+}
+
+func (_c *Database_DeleteInvoice_Call) RunAndReturn(run func(string) db.NewInvoiceList) *Database_DeleteInvoice_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
 // DeleteUserInvoiceData provides a mock function with given fields: payment_request
 func (_m *Database) DeleteUserInvoiceData(payment_request string) db.UserInvoiceData {
 	ret := _m.Called(payment_request)
