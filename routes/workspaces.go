@@ -36,7 +36,9 @@ func WorkspaceRoutes() chi.Router {
 		r.Get("/budget/history/{uuid}", workspaceHandlers.GetWorkspaceBudgetHistory)
 		r.Get("/payments/{uuid}", handlers.GetPaymentHistory)
 		r.Get("/poll/invoices/{uuid}", workspaceHandlers.PollBudgetInvoices)
+		r.Get("/poll/user/invoices", workspaceHandlers.PollUserWorkspacesBudget)
 		r.Get("/invoices/count/{uuid}", handlers.GetInvoicesCount)
+		r.Get("/user/invoices/count", handlers.GetAllUserInvoicesCount)
 		r.Delete("/delete/{uuid}", workspaceHandlers.DeleteWorkspace)
 
 		r.Post("/mission", workspaceHandlers.UpdateWorkspace)
