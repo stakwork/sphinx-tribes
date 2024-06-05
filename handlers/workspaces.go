@@ -720,6 +720,26 @@ func GetInvoicesCount(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(invoiceCount)
 }
 
+func GetAllUserInvoicesCount(w http.ResponseWriter, r *http.Request) {
+	ctx := r.Context()
+	pubKeyFromAuth, _ := ctx.Value(auth.ContextKey).(string)
+
+	if pubKeyFromAuth == "" {
+		fmt.Println("[workspaces] no pubkey from auth")
+		w.WriteHeader(http.StatusUnauthorized)
+		return
+	}
+
+	allCount := int64(0)
+	workspaces := GetAllUserWorkspaces(pubKeyFromAuth)
+	for _, space := range workspaces {
+		invoiceCount := db.DB.GetWorkspaceInvoicesCount(space.Uuid)
+		allCount += invoiceCount
+	}
+	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode(allCount)
+}
+
 func (oh *workspaceHandler) DeleteWorkspace(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 	pubKeyFromAuth, _ := ctx.Value(auth.ContextKey).(string)
