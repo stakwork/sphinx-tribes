@@ -105,6 +105,7 @@ type Database interface {
 	GetWorkspaceBudget(workspace_uuid string) NewBountyBudget
 	GetWorkspaceStatusBudget(workspace_uuid string) StatusBudget
 	GetWorkspaceBudgetHistory(workspace_uuid string) []BudgetHistoryData
+	ProcessUpdateBudget(invoice NewInvoiceList) error
 	AddAndUpdateBudget(invoice NewInvoiceList) NewPaymentHistory
 	WithdrawBudget(sender_pubkey string, workspace_uuid string, amount uint)
 	AddPaymentHistory(payment NewPaymentHistory) NewPaymentHistory

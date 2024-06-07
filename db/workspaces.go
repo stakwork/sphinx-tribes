@@ -251,6 +251,60 @@ func (db database) GetWorkspaceBudgetHistory(workspace_uuid string) []BudgetHist
 	return budgetHistory
 }
 
+func (db database) ProcessUpdateBudget(invoice NewInvoiceList) error {
+	// Start db transaction
+	tx := db.db.Begin()
+
+	created := invoice.Created
+	workspace_uuid := invoice.WorkspaceUuid
+
+	var err error
+
+	// Get payment history and update budget
+	paymentHistory := db.GetPaymentHistoryByCreated(created, workspace_uuid)
+	if paymentHistory.WorkspaceUuid != "" && paymentHistory.Amount != 0 {
+		paymentHistory.Status = true
+
+		// Update payment history
+		if err = tx.Where("created = ?", created).Where("workspace_uuid = ? ", workspace_uuid).Updates(paymentHistory).Error; err != nil {
+			tx.Rollback()
+		}
+
+		// get Workspace budget and add payment to total budget
+		WorkspaceBudget := db.GetWorkspaceBudget(workspace_uuid)
+
+		if WorkspaceBudget.WorkspaceUuid == "" {
+			now := time.Now()
+			workBudget := NewBountyBudget{
+				WorkspaceUuid: workspace_uuid,
+				TotalBudget:   paymentHistory.Amount,
+				Created:       &now,
+				Updated:       &now,
+			}
+
+			if err = tx.Create(&workBudget).Error; err != nil {
+				tx.Rollback()
+			}
+		} else {
+			totalBudget := WorkspaceBudget.TotalBudget
+			WorkspaceBudget.TotalBudget = totalBudget + paymentHistory.Amount
+
+			if err = tx.Model(&NewBountyBudget{}).Where("workspace_uuid = ?", WorkspaceBudget.WorkspaceUuid).Updates(map[string]interface{}{
+				"total_budget": WorkspaceBudget.TotalBudget,
+			}).Error; err != nil {
+				tx.Rollback()
+			}
+		}
+
+		// update invoice
+		if err = tx.Model(&NewInvoiceList{}).Where("payment_request = ?", invoice.PaymentRequest).Update("status", true).Error; err != nil {
+			tx.Rollback()
+		}
+	}
+
+	return tx.Commit().Error
+}
+
 func (db database) AddAndUpdateBudget(invoice NewInvoiceList) NewPaymentHistory {
 	created := invoice.Created
 	workspace_uuid := invoice.WorkspaceUuid

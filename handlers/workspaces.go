@@ -639,9 +639,7 @@ func (oh *workspaceHandler) PollBudgetInvoices(w http.ResponseWriter, r *http.Re
 
 		if invoiceRes.Response.Settled {
 			if !inv.Status && inv.Type == "BUDGET" {
-				oh.db.AddAndUpdateBudget(inv)
-				// Update the invoice status
-				oh.db.UpdateInvoice(inv.PaymentRequest)
+				oh.db.ProcessUpdateBudget(inv)
 			}
 		} else {
 			// Cheeck if time has expired
@@ -685,9 +683,7 @@ func (oh *workspaceHandler) PollUserWorkspacesBudget(w http.ResponseWriter, r *h
 
 			if invoiceRes.Response.Settled {
 				if !inv.Status && inv.Type == "BUDGET" {
-					oh.db.AddAndUpdateBudget(inv)
-					// Update the invoice status
-					oh.db.UpdateInvoice(inv.PaymentRequest)
+					oh.db.ProcessUpdateBudget(inv)
 				}
 			} else {
 				// Cheeck if time has expired
