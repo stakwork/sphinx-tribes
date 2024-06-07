@@ -121,6 +121,7 @@ type Database interface {
 	DeleteUserInvoiceData(payment_request string) UserInvoiceData
 	ChangeWorkspaceDeleteStatus(workspace_uuid string, status bool) Workspace
 	UpdateWorkspaceForDeletion(uuid string) error
+	ProcessDeleteWorkspace(workspace_uuid string) error
 	DeleteAllUsersFromWorkspace(uuid string) error
 	GetFilterStatusCount() FilterStattuCount
 	UserHasManageBountyRoles(pubKeyFromAuth string, uuid string) bool

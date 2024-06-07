@@ -6356,6 +6356,52 @@ func (_c *Database_ProcessAlerts_Call) RunAndReturn(run func(db.Person)) *Databa
 	return _c
 }
 
+// ProcessDeleteWorkspace provides a mock function with given fields: workspace_uuid
+func (_m *Database) ProcessDeleteWorkspace(workspace_uuid string) error {
+	ret := _m.Called(workspace_uuid)
+
+	if len(ret) == 0 {
+		panic("no return value specified for ProcessDeleteWorkspace")
+	}
+
+	var r0 error
+	if rf, ok := ret.Get(0).(func(string) error); ok {
+		r0 = rf(workspace_uuid)
+	} else {
+		r0 = ret.Error(0)
+	}
+
+	return r0
+}
+
+// Database_ProcessDeleteWorkspace_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'ProcessDeleteWorkspace'
+type Database_ProcessDeleteWorkspace_Call struct {
+	*mock.Call
+}
+
+// ProcessDeleteWorkspace is a helper method to define mock.On call
+//   - workspace_uuid string
+func (_e *Database_Expecter) ProcessDeleteWorkspace(workspace_uuid interface{}) *Database_ProcessDeleteWorkspace_Call {
+	return &Database_ProcessDeleteWorkspace_Call{Call: _e.mock.On("ProcessDeleteWorkspace", workspace_uuid)}
+}
+
+func (_c *Database_ProcessDeleteWorkspace_Call) Run(run func(workspace_uuid string)) *Database_ProcessDeleteWorkspace_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(string))
+	})
+	return _c
+}
+
+func (_c *Database_ProcessDeleteWorkspace_Call) Return(_a0 error) *Database_ProcessDeleteWorkspace_Call {
+	_c.Call.Return(_a0)
+	return _c
+}
+
+func (_c *Database_ProcessDeleteWorkspace_Call) RunAndReturn(run func(string) error) *Database_ProcessDeleteWorkspace_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
 // ProcessUpdateBudget provides a mock function with given fields: invoice
 func (_m *Database) ProcessUpdateBudget(invoice db.NewInvoiceList) error {
 	ret := _m.Called(invoice)
