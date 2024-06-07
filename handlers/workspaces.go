@@ -748,7 +748,6 @@ func (oh *workspaceHandler) DeleteWorkspace(w http.ResponseWriter, r *http.Reque
 	}
 
 	workspace := oh.db.GetWorkspaceByUuid(uuid)
-
 	if pubKeyFromAuth != workspace.OwnerPubKey {
 		msg := "only workspace admin can delete an workspace"
 		fmt.Println("[workspaces]", msg)
@@ -757,24 +756,15 @@ func (oh *workspaceHandler) DeleteWorkspace(w http.ResponseWriter, r *http.Reque
 		return
 	}
 
-	// Update workspace to hide and clear certain fields
-	if err := oh.db.UpdateWorkspaceForDeletion(uuid); err != nil {
-		fmt.Println("Error updating workspace:", err)
+	// Soft delete Workspace and delete user data
+	if err := oh.db.ProcessDeleteWorkspace(uuid); err != nil {
+		msg := "Error removing users from workspace"
+		fmt.Println(msg, err)
 		w.WriteHeader(http.StatusInternalServerError)
-		json.NewEncoder(w).Encode("Could not update workspace fields for deletion")
+		json.NewEncoder(w).Encode(msg)
 		return
 	}
 
-	// Delete all users from the workspace
-	if err := oh.db.DeleteAllUsersFromWorkspace(uuid); err != nil {
-		fmt.Println("Error removing users from workspace:", err)
-		w.WriteHeader(http.StatusInternalServerError)
-		json.NewEncoder(w).Encode("Could not delete workspace users")
-		return
-	}
-
-	// soft delete workspace
-	workspace = oh.db.ChangeWorkspaceDeleteStatus(uuid, true)
 	w.WriteHeader(http.StatusOK)
 	json.NewEncoder(w).Encode(workspace)
 }

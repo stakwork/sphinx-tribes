@@ -131,9 +131,9 @@ func (db database) CreateWorkspaceUser(orgUser WorkspaceUsers) WorkspaceUsers {
 	return orgUser
 }
 
-func (db database) DeleteWorkspaceUser(orgUser WorkspaceUsersData, org string) WorkspaceUsersData {
-	db.db.Where("owner_pub_key = ?", orgUser.OwnerPubKey).Where("workspace_uuid = ?", org).Delete(&WorkspaceUsers{})
-	db.db.Where("owner_pub_key = ?", orgUser.OwnerPubKey).Where("workspace_uuid = ?", org).Delete(&UserRoles{})
+func (db database) DeleteWorkspaceUser(orgUser WorkspaceUsersData, workspace_uuid string) WorkspaceUsersData {
+	db.db.Where("owner_pub_key = ?", orgUser.OwnerPubKey).Where("workspace_uuid = ?", workspace_uuid).Delete(&WorkspaceUsers{})
+	db.db.Where("owner_pub_key = ?", orgUser.OwnerPubKey).Where("workspace_uuid = ?", workspace_uuid).Delete(&UserRoles{})
 	return orgUser
 }
 
@@ -430,6 +430,42 @@ func (db database) UpdateWorkspaceForDeletion(uuid string) error {
 	}
 
 	return nil
+}
+
+func (db database) ProcessDeleteWorkspace(workspace_uuid string) error {
+	tx := db.db.Begin()
+	var err error
+
+	updates := map[string]interface{}{
+		"website":     "",
+		"github":      "",
+		"description": "",
+		"show":        false,
+	}
+
+	// Update workspace
+	if err = tx.Model(&Workspace{}).Where("uuid = ?", workspace_uuid).Updates(updates).Error; err != nil {
+		tx.Rollback()
+	}
+
+	// Delete all users associated with the Workspace
+	if err = tx.Where("workspace_uuid = ?", workspace_uuid).Delete(&WorkspaceUsers{}).Error; err != nil {
+		tx.Rollback()
+	}
+
+	// Delete all user roles associated with the Workspace
+	if err = tx.Where("workspace_uuid = ?", workspace_uuid).Delete(&WorkspaceUserRoles{}).Error; err != nil {
+		tx.Rollback()
+	}
+
+	// Change delete status to true
+	if err = tx.Model(&Workspace{}).Where("uuid", workspace_uuid).Updates(map[string]interface{}{
+		"deleted": true,
+	}).Error; err != nil {
+		tx.Rollback()
+	}
+
+	return tx.Commit().Error
 }
 
 func (db database) DeleteAllUsersFromWorkspace(workspace_uuid string) error {
