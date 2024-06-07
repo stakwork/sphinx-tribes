@@ -527,8 +527,6 @@ func GenerateInvoice(w http.ResponseWriter, r *http.Request) {
 		Status:         false,
 	}
 
-	db.DB.AddInvoice(newInvoice)
-
 	newInvoiceData := db.UserInvoiceData{
 		PaymentRequest: paymentRequest,
 		Created:        date,
@@ -537,7 +535,7 @@ func GenerateInvoice(w http.ResponseWriter, r *http.Request) {
 		RouteHint:      routeHint,
 	}
 
-	db.DB.AddUserInvoiceData(newInvoiceData)
+	db.DB.ProcessAddInvoice(newInvoice, newInvoiceData)
 
 	w.WriteHeader(http.StatusOK)
 	json.NewEncoder(w).Encode(invoiceRes)

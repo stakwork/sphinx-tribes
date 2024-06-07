@@ -6323,6 +6323,53 @@ func (_c *Database_PersonUniqueNameFromName_Call) RunAndReturn(run func(string) 
 	return _c
 }
 
+// ProcessAddInvoice provides a mock function with given fields: invoice, userData
+func (_m *Database) ProcessAddInvoice(invoice db.NewInvoiceList, userData db.UserInvoiceData) error {
+	ret := _m.Called(invoice, userData)
+
+	if len(ret) == 0 {
+		panic("no return value specified for ProcessAddInvoice")
+	}
+
+	var r0 error
+	if rf, ok := ret.Get(0).(func(db.NewInvoiceList, db.UserInvoiceData) error); ok {
+		r0 = rf(invoice, userData)
+	} else {
+		r0 = ret.Error(0)
+	}
+
+	return r0
+}
+
+// Database_ProcessAddInvoice_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'ProcessAddInvoice'
+type Database_ProcessAddInvoice_Call struct {
+	*mock.Call
+}
+
+// ProcessAddInvoice is a helper method to define mock.On call
+//   - invoice db.NewInvoiceList
+//   - userData db.UserInvoiceData
+func (_e *Database_Expecter) ProcessAddInvoice(invoice interface{}, userData interface{}) *Database_ProcessAddInvoice_Call {
+	return &Database_ProcessAddInvoice_Call{Call: _e.mock.On("ProcessAddInvoice", invoice, userData)}
+}
+
+func (_c *Database_ProcessAddInvoice_Call) Run(run func(invoice db.NewInvoiceList, userData db.UserInvoiceData)) *Database_ProcessAddInvoice_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(db.NewInvoiceList), args[1].(db.UserInvoiceData))
+	})
+	return _c
+}
+
+func (_c *Database_ProcessAddInvoice_Call) Return(_a0 error) *Database_ProcessAddInvoice_Call {
+	_c.Call.Return(_a0)
+	return _c
+}
+
+func (_c *Database_ProcessAddInvoice_Call) RunAndReturn(run func(db.NewInvoiceList, db.UserInvoiceData) error) *Database_ProcessAddInvoice_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
 // ProcessAlerts provides a mock function with given fields: p
 func (_m *Database) ProcessAlerts(p db.Person) {
 	_m.Called(p)
