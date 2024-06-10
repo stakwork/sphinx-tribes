@@ -131,9 +131,9 @@ func (db database) CreateWorkspaceUser(orgUser WorkspaceUsers) WorkspaceUsers {
 	return orgUser
 }
 
-func (db database) DeleteWorkspaceUser(orgUser WorkspaceUsersData, org string) WorkspaceUsersData {
-	db.db.Where("owner_pub_key = ?", orgUser.OwnerPubKey).Where("workspace_uuid = ?", org).Delete(&WorkspaceUsers{})
-	db.db.Where("owner_pub_key = ?", orgUser.OwnerPubKey).Where("workspace_uuid = ?", org).Delete(&UserRoles{})
+func (db database) DeleteWorkspaceUser(orgUser WorkspaceUsersData, workspace_uuid string) WorkspaceUsersData {
+	db.db.Where("owner_pub_key = ?", orgUser.OwnerPubKey).Where("workspace_uuid = ?", workspace_uuid).Delete(&WorkspaceUsers{})
+	db.db.Where("owner_pub_key = ?", orgUser.OwnerPubKey).Where("workspace_uuid = ?", workspace_uuid).Delete(&UserRoles{})
 	return orgUser
 }
 
@@ -251,6 +251,70 @@ func (db database) GetWorkspaceBudgetHistory(workspace_uuid string) []BudgetHist
 	return budgetHistory
 }
 
+func (db database) ProcessUpdateBudget(invoice NewInvoiceList) error {
+	// Start db transaction
+	tx := db.db.Begin()
+
+	var err error
+
+	defer func() {
+		if r := recover(); r != nil {
+			tx.Rollback()
+		}
+	}()
+
+	if err = tx.Error; err != nil {
+		return err
+	}
+
+	created := invoice.Created
+	workspace_uuid := invoice.WorkspaceUuid
+
+	// Get payment history and update budget
+	paymentHistory := db.GetPaymentHistoryByCreated(created, workspace_uuid)
+	if paymentHistory.WorkspaceUuid != "" && paymentHistory.Amount != 0 {
+		paymentHistory.Status = true
+
+		// Update payment history
+		if err = tx.Where("created = ?", created).Where("workspace_uuid = ? ", workspace_uuid).Updates(paymentHistory).Error; err != nil {
+			tx.Rollback()
+		}
+
+		// get Workspace budget and add payment to total budget
+		WorkspaceBudget := db.GetWorkspaceBudget(workspace_uuid)
+
+		if WorkspaceBudget.WorkspaceUuid == "" {
+			now := time.Now()
+			workBudget := NewBountyBudget{
+				WorkspaceUuid: workspace_uuid,
+				TotalBudget:   paymentHistory.Amount,
+				Created:       &now,
+				Updated:       &now,
+			}
+
+			if err = tx.Create(&workBudget).Error; err != nil {
+				tx.Rollback()
+			}
+		} else {
+			totalBudget := WorkspaceBudget.TotalBudget
+			WorkspaceBudget.TotalBudget = totalBudget + paymentHistory.Amount
+
+			if err = tx.Model(&NewBountyBudget{}).Where("workspace_uuid = ?", WorkspaceBudget.WorkspaceUuid).Updates(map[string]interface{}{
+				"total_budget": WorkspaceBudget.TotalBudget,
+			}).Error; err != nil {
+				tx.Rollback()
+			}
+		}
+
+		// update invoice
+		if err = tx.Model(&NewInvoiceList{}).Where("payment_request = ?", invoice.PaymentRequest).Update("status", true).Error; err != nil {
+			tx.Rollback()
+		}
+	}
+
+	return tx.Commit().Error
+}
+
 func (db database) AddAndUpdateBudget(invoice NewInvoiceList) NewPaymentHistory {
 	created := invoice.Created
 	workspace_uuid := invoice.WorkspaceUuid
@@ -284,17 +348,32 @@ func (db database) AddAndUpdateBudget(invoice NewInvoiceList) NewPaymentHistory 
 }
 
 func (db database) WithdrawBudget(sender_pubkey string, workspace_uuid string, amount uint) {
+	tx := db.db.Begin()
+	var err error
+
+	defer func() {
+		if r := recover(); r != nil {
+			tx.Rollback()
+		}
+	}()
+
+	if err = tx.Error; err != nil {
+		return
+	}
+
 	// get Workspace budget and add payment to total budget
 	WorkspaceBudget := db.GetWorkspaceBudget(workspace_uuid)
 	totalBudget := WorkspaceBudget.TotalBudget
 
 	newBudget := totalBudget - amount
-	db.db.Model(&NewBountyBudget{}).Where("workspace_uuid = ?", workspace_uuid).Updates(map[string]interface{}{
+
+	if err = tx.Model(&NewBountyBudget{}).Where("workspace_uuid = ?", workspace_uuid).Updates(map[string]interface{}{
 		"total_budget": newBudget,
-	})
+	}).Error; err != nil {
+		tx.Rollback()
+	}
 
 	now := time.Now()
-
 	budgetHistory := NewPaymentHistory{
 		WorkspaceUuid:  workspace_uuid,
 		Amount:         amount,
@@ -306,7 +385,11 @@ func (db database) WithdrawBudget(sender_pubkey string, workspace_uuid string, a
 		ReceiverPubKey: "",
 		BountyId:       0,
 	}
-	db.AddPaymentHistory(budgetHistory)
+
+	if err = tx.Create(&budgetHistory).Error; err != nil {
+		tx.Rollback()
+	}
+	tx.Commit()
 }
 
 func (db database) AddPaymentHistory(payment NewPaymentHistory) NewPaymentHistory {
@@ -324,6 +407,48 @@ func (db database) AddPaymentHistory(payment NewPaymentHistory) NewPaymentHistor
 	db.UpdateWorkspaceBudget(WorkspaceBudget)
 
 	return payment
+}
+
+func (db database) ProcessBountyPayment(payment NewPaymentHistory, bounty NewBounty) error {
+	tx := db.db.Begin()
+	var err error
+
+	defer func() {
+		if r := recover(); r != nil {
+			tx.Rollback()
+		}
+	}()
+
+	if err = tx.Error; err != nil {
+		return err
+	}
+
+	// add to payment history
+	if err = tx.Create(&payment).Error; err != nil {
+		tx.Rollback()
+		return err
+	}
+
+	// get Workspace budget and subtract payment from total budget
+	WorkspaceBudget := db.GetWorkspaceBudget(payment.WorkspaceUuid)
+	totalBudget := WorkspaceBudget.TotalBudget
+
+	// update budget
+	WorkspaceBudget.TotalBudget = totalBudget - payment.Amount
+	if err = tx.Model(&NewBountyBudget{}).Where("workspace_uuid = ?", payment.WorkspaceUuid).Updates(map[string]interface{}{
+		"total_budget": WorkspaceBudget.TotalBudget,
+	}).Error; err != nil {
+		tx.Rollback()
+		return err
+	}
+
+	// updatge bounty status
+	if err = tx.Where("created", bounty.Created).Updates(&bounty).Error; err != nil {
+		tx.Rollback()
+		return err
+	}
+
+	return tx.Commit().Error
 }
 
 func (db database) GetPaymentHistory(workspace_uuid string, r *http.Request) []NewPaymentHistory {
@@ -376,6 +501,52 @@ func (db database) UpdateWorkspaceForDeletion(uuid string) error {
 	}
 
 	return nil
+}
+
+func (db database) ProcessDeleteWorkspace(workspace_uuid string) error {
+	tx := db.db.Begin()
+	var err error
+
+	defer func() {
+		if r := recover(); r != nil {
+			tx.Rollback()
+		}
+	}()
+
+	if err = tx.Error; err != nil {
+		return err
+	}
+
+	updates := map[string]interface{}{
+		"website":     "",
+		"github":      "",
+		"description": "",
+		"show":        false,
+	}
+
+	// Update workspace
+	if err = tx.Model(&Workspace{}).Where("uuid = ?", workspace_uuid).Updates(updates).Error; err != nil {
+		tx.Rollback()
+	}
+
+	// Delete all users associated with the Workspace
+	if err = tx.Where("workspace_uuid = ?", workspace_uuid).Delete(&WorkspaceUsers{}).Error; err != nil {
+		tx.Rollback()
+	}
+
+	// Delete all user roles associated with the Workspace
+	if err = tx.Where("workspace_uuid = ?", workspace_uuid).Delete(&WorkspaceUserRoles{}).Error; err != nil {
+		tx.Rollback()
+	}
+
+	// Change delete status to true
+	if err = tx.Model(&Workspace{}).Where("uuid", workspace_uuid).Updates(map[string]interface{}{
+		"deleted": true,
+	}).Error; err != nil {
+		tx.Rollback()
+	}
+
+	return tx.Commit().Error
 }
 
 func (db database) DeleteAllUsersFromWorkspace(workspace_uuid string) error {

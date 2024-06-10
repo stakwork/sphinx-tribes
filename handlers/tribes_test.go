@@ -636,9 +636,7 @@ func TestGenerateBudgetInvoice(t *testing.T) {
 	})
 
 	t.Run("Should mock a call to relay /invoices with the correct body", func(t *testing.T) {
-
-		mockDb.On("AddPaymentHistory", mock.AnythingOfType("db.NewPaymentHistory")).Return(db.NewPaymentHistory{}, nil)
-		mockDb.On("AddInvoice", mock.AnythingOfType("db.NewInvoiceList")).Return(db.NewInvoiceList{}, nil)
+		mockDb.On("ProcessBudgetInvoice", mock.AnythingOfType("db.NewPaymentHistory"), mock.AnythingOfType("db.NewInvoiceList")).Return(nil)
 
 		ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 
@@ -673,8 +671,7 @@ func TestGenerateBudgetInvoice(t *testing.T) {
 
 		userAmount := float64(1000)
 
-		mockDb.On("AddPaymentHistory", mock.AnythingOfType("db.NewPaymentHistory")).Return(db.NewPaymentHistory{}, nil)
-		mockDb.On("AddInvoice", mock.AnythingOfType("db.NewInvoiceList")).Return(db.NewInvoiceList{}, nil)
+		mockDb.On("ProcessBudgetInvoice", mock.AnythingOfType("db.NewPaymentHistory"), mock.AnythingOfType("db.NewInvoiceList")).Return(nil)
 
 		ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 			var body map[string]interface{}
@@ -704,11 +701,7 @@ func TestGenerateBudgetInvoice(t *testing.T) {
 	})
 
 	t.Run("Should add payments to the payment history and invoice to the invoice list upon successful relay call", func(t *testing.T) {
-		expectedPaymentHistory := db.NewPaymentHistory{Amount: userAmount}
-		expectedInvoice := db.NewInvoiceList{PaymentRequest: invoiceResponse.Response.Invoice}
-
-		mockDb.On("AddPaymentHistory", mock.AnythingOfType("db.NewPaymentHistory")).Return(expectedPaymentHistory, nil)
-		mockDb.On("AddInvoice", mock.AnythingOfType("db.NewInvoiceList")).Return(expectedInvoice, nil)
+		mockDb.On("ProcessBudgetInvoice", mock.AnythingOfType("db.NewPaymentHistory"), mock.AnythingOfType("db.NewInvoiceList")).Return(nil)
 
 		ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 			w.WriteHeader(http.StatusOK)
@@ -735,7 +728,6 @@ func TestGenerateBudgetInvoice(t *testing.T) {
 		assert.True(t, response.Succcess, "Invoice generation should be successful")
 		assert.Equal(t, "example_invoice", response.Response.Invoice, "The invoice in the response should match the mock")
 
-		mockDb.AssertCalled(t, "AddPaymentHistory", mock.AnythingOfType("db.NewPaymentHistory"))
-		mockDb.AssertCalled(t, "AddInvoice", mock.AnythingOfType("db.NewInvoiceList"))
+		mockDb.AssertCalled(t, "ProcessBudgetInvoice", mock.AnythingOfType("db.NewPaymentHistory"), mock.AnythingOfType("db.NewInvoiceList"))
 	})
 }
