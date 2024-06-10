@@ -527,6 +527,12 @@ func (h *bountyHandler) MakeBountyPayment(w http.ResponseWriter, r *http.Request
 	request := db.BountyPayRequest{}
 	body, err := io.ReadAll(r.Body)
 	r.Body.Close()
+	if err != nil {
+		fmt.Println("[read body]", err)
+		w.WriteHeader(http.StatusNotAcceptable)
+		h.m.Unlock()
+		return
+	}
 
 	err = json.Unmarshal(body, &request)
 	if err != nil {
@@ -557,6 +563,13 @@ func (h *bountyHandler) MakeBountyPayment(w http.ResponseWriter, r *http.Request
 
 	defer res.Body.Close()
 	body, err = io.ReadAll(res.Body)
+	if err != nil {
+		fmt.Println("[read body]", err)
+		w.WriteHeader(http.StatusNotAcceptable)
+		h.m.Unlock()
+		return
+	}
+
 	msg := make(map[string]interface{})
 
 	// payment is successful add to payment history
@@ -566,7 +579,15 @@ func (h *bountyHandler) MakeBountyPayment(w http.ResponseWriter, r *http.Request
 		keysendRes := db.KeysendSuccess{}
 		err = json.Unmarshal(body, &keysendRes)
 
+		if err != nil {
+			fmt.Println("[Unmarshal]", err)
+			w.WriteHeader(http.StatusNotAcceptable)
+			h.m.Unlock()
+			return
+		}
+
 		now := time.Now()
+
 		paymentHistory := db.NewPaymentHistory{
 			Amount:         amount,
 			SenderPubKey:   pubKeyFromAuth,
@@ -578,13 +599,13 @@ func (h *bountyHandler) MakeBountyPayment(w http.ResponseWriter, r *http.Request
 			Status:         true,
 			PaymentType:    "payment",
 		}
-		h.db.AddPaymentHistory(paymentHistory)
 
 		bounty.Paid = true
 		bounty.PaidDate = &now
 		bounty.Completed = true
 		bounty.CompletionDate = &now
-		h.db.UpdateBounty(bounty)
+
+		h.db.ProcessBountyPayment(paymentHistory, bounty)
 
 		msg["msg"] = "keysend_success"
 		msg["invoice"] = ""
@@ -623,6 +644,12 @@ func (h *bountyHandler) BountyBudgetWithdraw(w http.ResponseWriter, r *http.Requ
 	body, err := io.ReadAll(r.Body)
 	r.Body.Close()
 
+	if err != nil {
+		w.WriteHeader(http.StatusNotAcceptable)
+		h.m.Unlock()
+		return
+	}
+
 	err = json.Unmarshal(body, &request)
 	if err != nil {
 		w.WriteHeader(http.StatusNotAcceptable)
@@ -630,7 +657,7 @@ func (h *bountyHandler) BountyBudgetWithdraw(w http.ResponseWriter, r *http.Requ
 		return
 	}
 
-	log.Printf("[bounty] [BountyBudgetWithdraw] Logging body: orguuid: %s, pubkey: %s, invoice: %s", request.OrgUuid, pubKeyFromAuth, request.PaymentRequest)
+	log.Printf("[bounty] [BountyBudgetWithdraw] Logging body: workspace_uuid: %s, pubkey: %s, invoice: %s", request.OrgUuid, pubKeyFromAuth, request.PaymentRequest)
 
 	// check if user is the admin of the workspace
 	// or has a withdraw bounty budget role
@@ -644,8 +671,7 @@ func (h *bountyHandler) BountyBudgetWithdraw(w http.ResponseWriter, r *http.Requ
 	}
 
 	amount := utils.GetInvoiceAmount(request.PaymentRequest)
-
-	if err == nil && amount > 0 {
+	if amount > 0 {
 		// check if the workspace bounty balance
 		// is greater than the amount
 		orgBudget := h.db.GetWorkspaceBudget(request.OrgUuid)
@@ -693,6 +719,12 @@ func (h *bountyHandler) NewBountyBudgetWithdraw(w http.ResponseWriter, r *http.R
 	body, err := io.ReadAll(r.Body)
 	r.Body.Close()
 
+	if err != nil {
+		w.WriteHeader(http.StatusNotAcceptable)
+		h.m.Unlock()
+		return
+	}
+
 	err = json.Unmarshal(body, &request)
 	if err != nil {
 		w.WriteHeader(http.StatusNotAcceptable)
@@ -713,7 +745,7 @@ func (h *bountyHandler) NewBountyBudgetWithdraw(w http.ResponseWriter, r *http.R
 
 	amount := utils.GetInvoiceAmount(request.PaymentRequest)
 
-	if err == nil && amount > 0 {
+	if amount > 0 {
 		// check if the workspace bounty balance
 		// is greater than the amount
 		orgBudget := h.db.GetWorkspaceBudget(request.WorkspaceUuid)

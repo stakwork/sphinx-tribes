@@ -6323,6 +6323,53 @@ func (_c *Database_PersonUniqueNameFromName_Call) RunAndReturn(run func(string) 
 	return _c
 }
 
+// ProcessAddInvoice provides a mock function with given fields: invoice, userData
+func (_m *Database) ProcessAddInvoice(invoice db.NewInvoiceList, userData db.UserInvoiceData) error {
+	ret := _m.Called(invoice, userData)
+
+	if len(ret) == 0 {
+		panic("no return value specified for ProcessAddInvoice")
+	}
+
+	var r0 error
+	if rf, ok := ret.Get(0).(func(db.NewInvoiceList, db.UserInvoiceData) error); ok {
+		r0 = rf(invoice, userData)
+	} else {
+		r0 = ret.Error(0)
+	}
+
+	return r0
+}
+
+// Database_ProcessAddInvoice_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'ProcessAddInvoice'
+type Database_ProcessAddInvoice_Call struct {
+	*mock.Call
+}
+
+// ProcessAddInvoice is a helper method to define mock.On call
+//   - invoice db.NewInvoiceList
+//   - userData db.UserInvoiceData
+func (_e *Database_Expecter) ProcessAddInvoice(invoice interface{}, userData interface{}) *Database_ProcessAddInvoice_Call {
+	return &Database_ProcessAddInvoice_Call{Call: _e.mock.On("ProcessAddInvoice", invoice, userData)}
+}
+
+func (_c *Database_ProcessAddInvoice_Call) Run(run func(invoice db.NewInvoiceList, userData db.UserInvoiceData)) *Database_ProcessAddInvoice_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(db.NewInvoiceList), args[1].(db.UserInvoiceData))
+	})
+	return _c
+}
+
+func (_c *Database_ProcessAddInvoice_Call) Return(_a0 error) *Database_ProcessAddInvoice_Call {
+	_c.Call.Return(_a0)
+	return _c
+}
+
+func (_c *Database_ProcessAddInvoice_Call) RunAndReturn(run func(db.NewInvoiceList, db.UserInvoiceData) error) *Database_ProcessAddInvoice_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
 // ProcessAlerts provides a mock function with given fields: p
 func (_m *Database) ProcessAlerts(p db.Person) {
 	_m.Called(p)
@@ -6352,6 +6399,192 @@ func (_c *Database_ProcessAlerts_Call) Return() *Database_ProcessAlerts_Call {
 }
 
 func (_c *Database_ProcessAlerts_Call) RunAndReturn(run func(db.Person)) *Database_ProcessAlerts_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
+// ProcessBountyPayment provides a mock function with given fields: payment, bounty
+func (_m *Database) ProcessBountyPayment(payment db.NewPaymentHistory, bounty db.NewBounty) error {
+	ret := _m.Called(payment, bounty)
+
+	if len(ret) == 0 {
+		panic("no return value specified for ProcessBountyPayment")
+	}
+
+	var r0 error
+	if rf, ok := ret.Get(0).(func(db.NewPaymentHistory, db.NewBounty) error); ok {
+		r0 = rf(payment, bounty)
+	} else {
+		r0 = ret.Error(0)
+	}
+
+	return r0
+}
+
+// Database_ProcessBountyPayment_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'ProcessBountyPayment'
+type Database_ProcessBountyPayment_Call struct {
+	*mock.Call
+}
+
+// ProcessBountyPayment is a helper method to define mock.On call
+//   - payment db.NewPaymentHistory
+//   - bounty db.NewBounty
+func (_e *Database_Expecter) ProcessBountyPayment(payment interface{}, bounty interface{}) *Database_ProcessBountyPayment_Call {
+	return &Database_ProcessBountyPayment_Call{Call: _e.mock.On("ProcessBountyPayment", payment, bounty)}
+}
+
+func (_c *Database_ProcessBountyPayment_Call) Run(run func(payment db.NewPaymentHistory, bounty db.NewBounty)) *Database_ProcessBountyPayment_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(db.NewPaymentHistory), args[1].(db.NewBounty))
+	})
+	return _c
+}
+
+func (_c *Database_ProcessBountyPayment_Call) Return(_a0 error) *Database_ProcessBountyPayment_Call {
+	_c.Call.Return(_a0)
+	return _c
+}
+
+func (_c *Database_ProcessBountyPayment_Call) RunAndReturn(run func(db.NewPaymentHistory, db.NewBounty) error) *Database_ProcessBountyPayment_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
+// ProcessBudgetInvoice provides a mock function with given fields: paymentHistory, newInvoice
+func (_m *Database) ProcessBudgetInvoice(paymentHistory db.NewPaymentHistory, newInvoice db.NewInvoiceList) error {
+	ret := _m.Called(paymentHistory, newInvoice)
+
+	if len(ret) == 0 {
+		panic("no return value specified for ProcessBudgetInvoice")
+	}
+
+	var r0 error
+	if rf, ok := ret.Get(0).(func(db.NewPaymentHistory, db.NewInvoiceList) error); ok {
+		r0 = rf(paymentHistory, newInvoice)
+	} else {
+		r0 = ret.Error(0)
+	}
+
+	return r0
+}
+
+// Database_ProcessBudgetInvoice_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'ProcessBudgetInvoice'
+type Database_ProcessBudgetInvoice_Call struct {
+	*mock.Call
+}
+
+// ProcessBudgetInvoice is a helper method to define mock.On call
+//   - paymentHistory db.NewPaymentHistory
+//   - newInvoice db.NewInvoiceList
+func (_e *Database_Expecter) ProcessBudgetInvoice(paymentHistory interface{}, newInvoice interface{}) *Database_ProcessBudgetInvoice_Call {
+	return &Database_ProcessBudgetInvoice_Call{Call: _e.mock.On("ProcessBudgetInvoice", paymentHistory, newInvoice)}
+}
+
+func (_c *Database_ProcessBudgetInvoice_Call) Run(run func(paymentHistory db.NewPaymentHistory, newInvoice db.NewInvoiceList)) *Database_ProcessBudgetInvoice_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(db.NewPaymentHistory), args[1].(db.NewInvoiceList))
+	})
+	return _c
+}
+
+func (_c *Database_ProcessBudgetInvoice_Call) Return(_a0 error) *Database_ProcessBudgetInvoice_Call {
+	_c.Call.Return(_a0)
+	return _c
+}
+
+func (_c *Database_ProcessBudgetInvoice_Call) RunAndReturn(run func(db.NewPaymentHistory, db.NewInvoiceList) error) *Database_ProcessBudgetInvoice_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
+// ProcessDeleteWorkspace provides a mock function with given fields: workspace_uuid
+func (_m *Database) ProcessDeleteWorkspace(workspace_uuid string) error {
+	ret := _m.Called(workspace_uuid)
+
+	if len(ret) == 0 {
+		panic("no return value specified for ProcessDeleteWorkspace")
+	}
+
+	var r0 error
+	if rf, ok := ret.Get(0).(func(string) error); ok {
+		r0 = rf(workspace_uuid)
+	} else {
+		r0 = ret.Error(0)
+	}
+
+	return r0
+}
+
+// Database_ProcessDeleteWorkspace_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'ProcessDeleteWorkspace'
+type Database_ProcessDeleteWorkspace_Call struct {
+	*mock.Call
+}
+
+// ProcessDeleteWorkspace is a helper method to define mock.On call
+//   - workspace_uuid string
+func (_e *Database_Expecter) ProcessDeleteWorkspace(workspace_uuid interface{}) *Database_ProcessDeleteWorkspace_Call {
+	return &Database_ProcessDeleteWorkspace_Call{Call: _e.mock.On("ProcessDeleteWorkspace", workspace_uuid)}
+}
+
+func (_c *Database_ProcessDeleteWorkspace_Call) Run(run func(workspace_uuid string)) *Database_ProcessDeleteWorkspace_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(string))
+	})
+	return _c
+}
+
+func (_c *Database_ProcessDeleteWorkspace_Call) Return(_a0 error) *Database_ProcessDeleteWorkspace_Call {
+	_c.Call.Return(_a0)
+	return _c
+}
+
+func (_c *Database_ProcessDeleteWorkspace_Call) RunAndReturn(run func(string) error) *Database_ProcessDeleteWorkspace_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
+// ProcessUpdateBudget provides a mock function with given fields: invoice
+func (_m *Database) ProcessUpdateBudget(invoice db.NewInvoiceList) error {
+	ret := _m.Called(invoice)
+
+	if len(ret) == 0 {
+		panic("no return value specified for ProcessUpdateBudget")
+	}
+
+	var r0 error
+	if rf, ok := ret.Get(0).(func(db.NewInvoiceList) error); ok {
+		r0 = rf(invoice)
+	} else {
+		r0 = ret.Error(0)
+	}
+
+	return r0
+}
+
+// Database_ProcessUpdateBudget_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'ProcessUpdateBudget'
+type Database_ProcessUpdateBudget_Call struct {
+	*mock.Call
+}
+
+// ProcessUpdateBudget is a helper method to define mock.On call
+//   - invoice db.NewInvoiceList
+func (_e *Database_Expecter) ProcessUpdateBudget(invoice interface{}) *Database_ProcessUpdateBudget_Call {
+	return &Database_ProcessUpdateBudget_Call{Call: _e.mock.On("ProcessUpdateBudget", invoice)}
+}
+
+func (_c *Database_ProcessUpdateBudget_Call) Run(run func(invoice db.NewInvoiceList)) *Database_ProcessUpdateBudget_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(db.NewInvoiceList))
+	})
+	return _c
+}
+
+func (_c *Database_ProcessUpdateBudget_Call) Return(_a0 error) *Database_ProcessUpdateBudget_Call {
+	_c.Call.Return(_a0)
+	return _c
+}
+
+func (_c *Database_ProcessUpdateBudget_Call) RunAndReturn(run func(db.NewInvoiceList) error) *Database_ProcessUpdateBudget_Call {
 	_c.Call.Return(run)
 	return _c
 }
