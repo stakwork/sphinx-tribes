@@ -118,6 +118,7 @@ type Database interface {
 	DeleteInvoice(payment_request string) NewInvoiceList
 	AddUserInvoiceData(userData UserInvoiceData) UserInvoiceData
 	ProcessAddInvoice(invoice NewInvoiceList, userData UserInvoiceData) error
+	ProcessBudgetInvoice(paymentHistory NewPaymentHistory, newInvoice NewInvoiceList) error
 	GetUserInvoiceData(payment_request string) UserInvoiceData
 	DeleteUserInvoiceData(payment_request string) UserInvoiceData
 	ChangeWorkspaceDeleteStatus(workspace_uuid string, status bool) Workspace

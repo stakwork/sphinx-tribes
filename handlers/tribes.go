@@ -465,7 +465,14 @@ func UpdateLeaderBoard(w http.ResponseWriter, r *http.Request) {
 func GenerateInvoice(w http.ResponseWriter, r *http.Request) {
 	invoice := db.InvoiceRequest{}
 	body, err := io.ReadAll(r.Body)
+
 	r.Body.Close()
+
+	if err != nil {
+		fmt.Println(err)
+		w.WriteHeader(http.StatusNotAcceptable)
+		return
+	}
 
 	err = json.Unmarshal(body, &invoice)
 
@@ -505,13 +512,18 @@ func GenerateInvoice(w http.ResponseWriter, r *http.Request) {
 
 	body, err = io.ReadAll(res.Body)
 
+	if err != nil {
+		log.Printf("Reading body failed: %s", err)
+		return
+	}
+
 	// Unmarshal result
 	invoiceRes := db.InvoiceResponse{}
 
 	err = json.Unmarshal(body, &invoiceRes)
 
 	if err != nil {
-		log.Printf("Reading body failed: %s", err)
+		log.Printf("Unmarshal body failed: %s", err)
 		return
 	}
 
@@ -543,9 +555,17 @@ func GenerateInvoice(w http.ResponseWriter, r *http.Request) {
 
 func (th *tribeHandler) GenerateBudgetInvoice(w http.ResponseWriter, r *http.Request) {
 	invoice := db.BudgetInvoiceRequest{}
+
+	var err error
 	body, err := io.ReadAll(r.Body)
 
 	r.Body.Close()
+
+	if err != nil {
+		fmt.Println(err)
+		w.WriteHeader(http.StatusNotAcceptable)
+		return
+	}
 
 	err = json.Unmarshal(body, &invoice)
 
@@ -581,13 +601,18 @@ func (th *tribeHandler) GenerateBudgetInvoice(w http.ResponseWriter, r *http.Req
 
 	body, err = io.ReadAll(res.Body)
 
+	if err != nil {
+		log.Printf("Reading body failed: %s", err)
+		return
+	}
+
 	// Unmarshal result
 	invoiceRes := db.InvoiceResponse{}
 
 	err = json.Unmarshal(body, &invoiceRes)
 
 	if err != nil {
-		log.Printf("Reading body failed: %s", err)
+		log.Printf("Json Unmarshal failed: %s", err)
 		return
 	}
 
@@ -614,26 +639,8 @@ func (th *tribeHandler) GenerateBudgetInvoice(w http.ResponseWriter, r *http.Req
 		Status:         false,
 	}
 
-	th.db.AddPaymentHistory(paymentHistory)
-	th.db.AddInvoice(newInvoice)
+	th.db.ProcessBudgetInvoice(paymentHistory, newInvoice)
 
 	w.WriteHeader(http.StatusOK)
 	json.NewEncoder(w).Encode(invoiceRes)
-}
-
-func makeInvoiceRequest(amount string, memo string) (*http.Response, error) {
-	url := fmt.Sprintf("%s/invoices", config.RelayUrl)
-
-	bodyData := fmt.Sprintf(`{"amount": %s, "memo": "%s"}`, amount, memo)
-
-	jsonBody := []byte(bodyData)
-
-	client := &http.Client{}
-	req, err := http.NewRequest(http.MethodPost, url, bytes.NewBuffer(jsonBody))
-
-	req.Header.Set("x-user-token", config.RelayAuthKey)
-	req.Header.Set("Content-Type", "application/json")
-	res, _ := client.Do(req)
-
-	return res, err
 }

@@ -1738,6 +1738,22 @@ func (db database) ProcessAddInvoice(invoice NewInvoiceList, userData UserInvoic
 	return tx.Commit().Error
 }
 
+func (db database) ProcessBudgetInvoice(paymentHistory NewPaymentHistory, newInvoice NewInvoiceList) error {
+	tx := db.db.Begin()
+
+	var err error
+
+	if err = tx.Create(&paymentHistory).Error; err != nil {
+		tx.Rollback()
+	}
+
+	if err = tx.Create(&newInvoice).Error; err != nil {
+		tx.Rollback()
+	}
+
+	return tx.Commit().Error
+}
+
 func (db database) GetUserInvoiceData(payment_request string) UserInvoiceData {
 	ms := UserInvoiceData{}
 	db.db.Where("payment_request = ?", payment_request).Find(&ms)
