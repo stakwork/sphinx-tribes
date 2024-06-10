@@ -1724,8 +1724,17 @@ func (db database) AddUserInvoiceData(userData UserInvoiceData) UserInvoiceData 
 
 func (db database) ProcessAddInvoice(invoice NewInvoiceList, userData UserInvoiceData) error {
 	tx := db.db.Begin()
-
 	var err error
+
+	defer func() {
+		if r := recover(); r != nil {
+			tx.Rollback()
+		}
+	}()
+
+	if err = tx.Error; err != nil {
+		return err
+	}
 
 	if err = tx.Create(&invoice).Error; err != nil {
 		tx.Rollback()
@@ -1740,8 +1749,17 @@ func (db database) ProcessAddInvoice(invoice NewInvoiceList, userData UserInvoic
 
 func (db database) ProcessBudgetInvoice(paymentHistory NewPaymentHistory, newInvoice NewInvoiceList) error {
 	tx := db.db.Begin()
-
 	var err error
+
+	defer func() {
+		if r := recover(); r != nil {
+			tx.Rollback()
+		}
+	}()
+
+	if err = tx.Error; err != nil {
+		return err
+	}
 
 	if err = tx.Create(&paymentHistory).Error; err != nil {
 		tx.Rollback()
