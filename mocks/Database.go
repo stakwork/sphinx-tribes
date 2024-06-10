@@ -6403,6 +6403,53 @@ func (_c *Database_ProcessAlerts_Call) RunAndReturn(run func(db.Person)) *Databa
 	return _c
 }
 
+// ProcessBudgetInvoice provides a mock function with given fields: paymentHistory, newInvoice
+func (_m *Database) ProcessBudgetInvoice(paymentHistory db.NewPaymentHistory, newInvoice db.NewInvoiceList) error {
+	ret := _m.Called(paymentHistory, newInvoice)
+
+	if len(ret) == 0 {
+		panic("no return value specified for ProcessBudgetInvoice")
+	}
+
+	var r0 error
+	if rf, ok := ret.Get(0).(func(db.NewPaymentHistory, db.NewInvoiceList) error); ok {
+		r0 = rf(paymentHistory, newInvoice)
+	} else {
+		r0 = ret.Error(0)
+	}
+
+	return r0
+}
+
+// Database_ProcessBudgetInvoice_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'ProcessBudgetInvoice'
+type Database_ProcessBudgetInvoice_Call struct {
+	*mock.Call
+}
+
+// ProcessBudgetInvoice is a helper method to define mock.On call
+//   - paymentHistory db.NewPaymentHistory
+//   - newInvoice db.NewInvoiceList
+func (_e *Database_Expecter) ProcessBudgetInvoice(paymentHistory interface{}, newInvoice interface{}) *Database_ProcessBudgetInvoice_Call {
+	return &Database_ProcessBudgetInvoice_Call{Call: _e.mock.On("ProcessBudgetInvoice", paymentHistory, newInvoice)}
+}
+
+func (_c *Database_ProcessBudgetInvoice_Call) Run(run func(paymentHistory db.NewPaymentHistory, newInvoice db.NewInvoiceList)) *Database_ProcessBudgetInvoice_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(db.NewPaymentHistory), args[1].(db.NewInvoiceList))
+	})
+	return _c
+}
+
+func (_c *Database_ProcessBudgetInvoice_Call) Return(_a0 error) *Database_ProcessBudgetInvoice_Call {
+	_c.Call.Return(_a0)
+	return _c
+}
+
+func (_c *Database_ProcessBudgetInvoice_Call) RunAndReturn(run func(db.NewPaymentHistory, db.NewInvoiceList) error) *Database_ProcessBudgetInvoice_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
 // ProcessDeleteWorkspace provides a mock function with given fields: workspace_uuid
 func (_m *Database) ProcessDeleteWorkspace(workspace_uuid string) error {
 	ret := _m.Called(workspace_uuid)
