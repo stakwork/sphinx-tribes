@@ -527,6 +527,12 @@ func (h *bountyHandler) MakeBountyPayment(w http.ResponseWriter, r *http.Request
 	request := db.BountyPayRequest{}
 	body, err := io.ReadAll(r.Body)
 	r.Body.Close()
+	if err != nil {
+		fmt.Println("[read body]", err)
+		w.WriteHeader(http.StatusNotAcceptable)
+		h.m.Unlock()
+		return
+	}
 
 	err = json.Unmarshal(body, &request)
 	if err != nil {
@@ -557,6 +563,13 @@ func (h *bountyHandler) MakeBountyPayment(w http.ResponseWriter, r *http.Request
 
 	defer res.Body.Close()
 	body, err = io.ReadAll(res.Body)
+	if err != nil {
+		fmt.Println("[read body]", err)
+		w.WriteHeader(http.StatusNotAcceptable)
+		h.m.Unlock()
+		return
+	}
+
 	msg := make(map[string]interface{})
 
 	// payment is successful add to payment history
@@ -566,7 +579,15 @@ func (h *bountyHandler) MakeBountyPayment(w http.ResponseWriter, r *http.Request
 		keysendRes := db.KeysendSuccess{}
 		err = json.Unmarshal(body, &keysendRes)
 
+		if err != nil {
+			fmt.Println("[Unmarshal]", err)
+			w.WriteHeader(http.StatusNotAcceptable)
+			h.m.Unlock()
+			return
+		}
+
 		now := time.Now()
+
 		paymentHistory := db.NewPaymentHistory{
 			Amount:         amount,
 			SenderPubKey:   pubKeyFromAuth,
@@ -578,13 +599,13 @@ func (h *bountyHandler) MakeBountyPayment(w http.ResponseWriter, r *http.Request
 			Status:         true,
 			PaymentType:    "payment",
 		}
-		h.db.AddPaymentHistory(paymentHistory)
 
 		bounty.Paid = true
 		bounty.PaidDate = &now
 		bounty.Completed = true
 		bounty.CompletionDate = &now
-		h.db.UpdateBounty(bounty)
+
+		h.db.ProcessBountyPayment(paymentHistory, bounty)
 
 		msg["msg"] = "keysend_success"
 		msg["invoice"] = ""

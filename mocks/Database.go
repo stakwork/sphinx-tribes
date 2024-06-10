@@ -6403,6 +6403,53 @@ func (_c *Database_ProcessAlerts_Call) RunAndReturn(run func(db.Person)) *Databa
 	return _c
 }
 
+// ProcessBountyPayment provides a mock function with given fields: payment, bounty
+func (_m *Database) ProcessBountyPayment(payment db.NewPaymentHistory, bounty db.NewBounty) error {
+	ret := _m.Called(payment, bounty)
+
+	if len(ret) == 0 {
+		panic("no return value specified for ProcessBountyPayment")
+	}
+
+	var r0 error
+	if rf, ok := ret.Get(0).(func(db.NewPaymentHistory, db.NewBounty) error); ok {
+		r0 = rf(payment, bounty)
+	} else {
+		r0 = ret.Error(0)
+	}
+
+	return r0
+}
+
+// Database_ProcessBountyPayment_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'ProcessBountyPayment'
+type Database_ProcessBountyPayment_Call struct {
+	*mock.Call
+}
+
+// ProcessBountyPayment is a helper method to define mock.On call
+//   - payment db.NewPaymentHistory
+//   - bounty db.NewBounty
+func (_e *Database_Expecter) ProcessBountyPayment(payment interface{}, bounty interface{}) *Database_ProcessBountyPayment_Call {
+	return &Database_ProcessBountyPayment_Call{Call: _e.mock.On("ProcessBountyPayment", payment, bounty)}
+}
+
+func (_c *Database_ProcessBountyPayment_Call) Run(run func(payment db.NewPaymentHistory, bounty db.NewBounty)) *Database_ProcessBountyPayment_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(db.NewPaymentHistory), args[1].(db.NewBounty))
+	})
+	return _c
+}
+
+func (_c *Database_ProcessBountyPayment_Call) Return(_a0 error) *Database_ProcessBountyPayment_Call {
+	_c.Call.Return(_a0)
+	return _c
+}
+
+func (_c *Database_ProcessBountyPayment_Call) RunAndReturn(run func(db.NewPaymentHistory, db.NewBounty) error) *Database_ProcessBountyPayment_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
 // ProcessBudgetInvoice provides a mock function with given fields: paymentHistory, newInvoice
 func (_m *Database) ProcessBudgetInvoice(paymentHistory db.NewPaymentHistory, newInvoice db.NewInvoiceList) error {
 	ret := _m.Called(paymentHistory, newInvoice)

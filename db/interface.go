@@ -109,6 +109,7 @@ type Database interface {
 	AddAndUpdateBudget(invoice NewInvoiceList) NewPaymentHistory
 	WithdrawBudget(sender_pubkey string, workspace_uuid string, amount uint)
 	AddPaymentHistory(payment NewPaymentHistory) NewPaymentHistory
+	ProcessBountyPayment(payment NewPaymentHistory, bounty NewBounty) error
 	GetPaymentHistory(workspace_uuid string, r *http.Request) []NewPaymentHistory
 	GetInvoice(payment_request string) NewInvoiceList
 	GetWorkspaceInvoices(workspace_uuid string) []NewInvoiceList

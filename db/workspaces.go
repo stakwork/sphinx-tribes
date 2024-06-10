@@ -255,10 +255,20 @@ func (db database) ProcessUpdateBudget(invoice NewInvoiceList) error {
 	// Start db transaction
 	tx := db.db.Begin()
 
+	var err error
+
+	defer func() {
+		if r := recover(); r != nil {
+			tx.Rollback()
+		}
+	}()
+
+	if err = tx.Error; err != nil {
+		return err
+	}
+
 	created := invoice.Created
 	workspace_uuid := invoice.WorkspaceUuid
-
-	var err error
 
 	// Get payment history and update budget
 	paymentHistory := db.GetPaymentHistoryByCreated(created, workspace_uuid)
@@ -341,6 +351,16 @@ func (db database) WithdrawBudget(sender_pubkey string, workspace_uuid string, a
 	tx := db.db.Begin()
 	var err error
 
+	defer func() {
+		if r := recover(); r != nil {
+			tx.Rollback()
+		}
+	}()
+
+	if err = tx.Error; err != nil {
+		return
+	}
+
 	// get Workspace budget and add payment to total budget
 	WorkspaceBudget := db.GetWorkspaceBudget(workspace_uuid)
 	totalBudget := WorkspaceBudget.TotalBudget
@@ -387,6 +407,48 @@ func (db database) AddPaymentHistory(payment NewPaymentHistory) NewPaymentHistor
 	db.UpdateWorkspaceBudget(WorkspaceBudget)
 
 	return payment
+}
+
+func (db database) ProcessBountyPayment(payment NewPaymentHistory, bounty NewBounty) error {
+	tx := db.db.Begin()
+	var err error
+
+	defer func() {
+		if r := recover(); r != nil {
+			tx.Rollback()
+		}
+	}()
+
+	if err = tx.Error; err != nil {
+		return err
+	}
+
+	// add to payment history
+	if err = tx.Create(&payment).Error; err != nil {
+		tx.Rollback()
+		return err
+	}
+
+	// get Workspace budget and subtract payment from total budget
+	WorkspaceBudget := db.GetWorkspaceBudget(payment.WorkspaceUuid)
+	totalBudget := WorkspaceBudget.TotalBudget
+
+	// update budget
+	WorkspaceBudget.TotalBudget = totalBudget - payment.Amount
+	if err = tx.Model(&NewBountyBudget{}).Where("workspace_uuid = ?", payment.WorkspaceUuid).Updates(map[string]interface{}{
+		"total_budget": WorkspaceBudget.TotalBudget,
+	}).Error; err != nil {
+		tx.Rollback()
+		return err
+	}
+
+	// updatge bounty status
+	if err = tx.Where("created", bounty.Created).Updates(&bounty).Error; err != nil {
+		tx.Rollback()
+		return err
+	}
+
+	return tx.Commit().Error
 }
 
 func (db database) GetPaymentHistory(workspace_uuid string, r *http.Request) []NewPaymentHistory {
@@ -444,6 +506,16 @@ func (db database) UpdateWorkspaceForDeletion(uuid string) error {
 func (db database) ProcessDeleteWorkspace(workspace_uuid string) error {
 	tx := db.db.Begin()
 	var err error
+
+	defer func() {
+		if r := recover(); r != nil {
+			tx.Rollback()
+		}
+	}()
+
+	if err = tx.Error; err != nil {
+		return err
+	}
 
 	updates := map[string]interface{}{
 		"website":     "",

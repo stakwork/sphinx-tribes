@@ -106,7 +106,6 @@ func TestCreateOrEditBounty(t *testing.T) {
 		rr := httptest.NewRecorder()
 		handler := http.HandlerFunc(bHandler.CreateOrEditBounty)
 
-	
 		existingBounty := db.NewBounty{
 			ID:            1,
 			Type:          "coding",
@@ -1325,28 +1324,10 @@ func TestMakeBountyPayment(t *testing.T) {
 		bHandler.getSocketConnections = mockGetSocketConnections
 		bHandler.userHasAccess = mockUserHasAccessTrue
 
-		now := time.Now()
-		expectedBounty := db.NewBounty{
-			ID:             bountyID,
-			OrgUuid:        "org-1",
-			WorkspaceUuid:  "work-1",
-			Assignee:       "assignee-1",
-			Price:          uint(1000),
-			Paid:           true,
-			PaidDate:       &now,
-			CompletionDate: &now,
-		}
-
 		mockDb.On("GetBounty", bountyID).Return(bounty, nil)
 		mockDb.On("GetWorkspaceBudget", bounty.WorkspaceUuid).Return(db.NewBountyBudget{TotalBudget: 2000}, nil)
 		mockDb.On("GetPersonByPubkey", bounty.Assignee).Return(db.Person{OwnerPubKey: "assignee-1", OwnerRouteHint: "OwnerRouteHint"}, nil)
-		mockDb.On("AddPaymentHistory", mock.AnythingOfType("db.NewPaymentHistory")).Return(db.NewPaymentHistory{ID: 1})
-		mockDb.On("UpdateBounty", mock.AnythingOfType("db.NewBounty")).Run(func(args mock.Arguments) {
-			updatedBounty := args.Get(0).(db.NewBounty)
-			assert.True(t, updatedBounty.Paid)
-			assert.NotNil(t, updatedBounty.PaidDate)
-			assert.NotNil(t, updatedBounty.CompletionDate)
-		}).Return(expectedBounty, nil).Once()
+		mockDb.On("ProcessBountyPayment", mock.AnythingOfType("db.NewPaymentHistory"), mock.AnythingOfType("db.NewBounty")).Return(nil)
 
 		expectedUrl := fmt.Sprintf("%s/payment", config.RelayUrl)
 		expectedBody := `{"amount": 1000, "destination_key": "assignee-1", "route_hint": "OwnerRouteHint", "text": "memotext added for notification"}`
