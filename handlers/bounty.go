@@ -623,6 +623,12 @@ func (h *bountyHandler) BountyBudgetWithdraw(w http.ResponseWriter, r *http.Requ
 	body, err := io.ReadAll(r.Body)
 	r.Body.Close()
 
+	if err != nil {
+		w.WriteHeader(http.StatusNotAcceptable)
+		h.m.Unlock()
+		return
+	}
+
 	err = json.Unmarshal(body, &request)
 	if err != nil {
 		w.WriteHeader(http.StatusNotAcceptable)
@@ -630,7 +636,7 @@ func (h *bountyHandler) BountyBudgetWithdraw(w http.ResponseWriter, r *http.Requ
 		return
 	}
 
-	log.Printf("[bounty] [BountyBudgetWithdraw] Logging body: orguuid: %s, pubkey: %s, invoice: %s", request.OrgUuid, pubKeyFromAuth, request.PaymentRequest)
+	log.Printf("[bounty] [BountyBudgetWithdraw] Logging body: workspace_uuid: %s, pubkey: %s, invoice: %s", request.OrgUuid, pubKeyFromAuth, request.PaymentRequest)
 
 	// check if user is the admin of the workspace
 	// or has a withdraw bounty budget role
@@ -644,8 +650,7 @@ func (h *bountyHandler) BountyBudgetWithdraw(w http.ResponseWriter, r *http.Requ
 	}
 
 	amount := utils.GetInvoiceAmount(request.PaymentRequest)
-
-	if err == nil && amount > 0 {
+	if amount > 0 {
 		// check if the workspace bounty balance
 		// is greater than the amount
 		orgBudget := h.db.GetWorkspaceBudget(request.OrgUuid)
@@ -693,6 +698,12 @@ func (h *bountyHandler) NewBountyBudgetWithdraw(w http.ResponseWriter, r *http.R
 	body, err := io.ReadAll(r.Body)
 	r.Body.Close()
 
+	if err != nil {
+		w.WriteHeader(http.StatusNotAcceptable)
+		h.m.Unlock()
+		return
+	}
+
 	err = json.Unmarshal(body, &request)
 	if err != nil {
 		w.WriteHeader(http.StatusNotAcceptable)
@@ -713,7 +724,7 @@ func (h *bountyHandler) NewBountyBudgetWithdraw(w http.ResponseWriter, r *http.R
 
 	amount := utils.GetInvoiceAmount(request.PaymentRequest)
 
-	if err == nil && amount > 0 {
+	if amount > 0 {
 		// check if the workspace bounty balance
 		// is greater than the amount
 		orgBudget := h.db.GetWorkspaceBudget(request.WorkspaceUuid)
