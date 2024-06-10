@@ -338,17 +338,22 @@ func (db database) AddAndUpdateBudget(invoice NewInvoiceList) NewPaymentHistory 
 }
 
 func (db database) WithdrawBudget(sender_pubkey string, workspace_uuid string, amount uint) {
+	tx := db.db.Begin()
+	var err error
+
 	// get Workspace budget and add payment to total budget
 	WorkspaceBudget := db.GetWorkspaceBudget(workspace_uuid)
 	totalBudget := WorkspaceBudget.TotalBudget
 
 	newBudget := totalBudget - amount
-	db.db.Model(&NewBountyBudget{}).Where("workspace_uuid = ?", workspace_uuid).Updates(map[string]interface{}{
+
+	if err = tx.Model(&NewBountyBudget{}).Where("workspace_uuid = ?", workspace_uuid).Updates(map[string]interface{}{
 		"total_budget": newBudget,
-	})
+	}).Error; err != nil {
+		tx.Rollback()
+	}
 
 	now := time.Now()
-
 	budgetHistory := NewPaymentHistory{
 		WorkspaceUuid:  workspace_uuid,
 		Amount:         amount,
@@ -360,7 +365,11 @@ func (db database) WithdrawBudget(sender_pubkey string, workspace_uuid string, a
 		ReceiverPubKey: "",
 		BountyId:       0,
 	}
-	db.AddPaymentHistory(budgetHistory)
+
+	if err = tx.Create(&budgetHistory).Error; err != nil {
+		tx.Rollback()
+	}
+	tx.Commit()
 }
 
 func (db database) AddPaymentHistory(payment NewPaymentHistory) NewPaymentHistory {
