@@ -3,6 +3,7 @@ module github.com/stakwork/sphinx-tribes
 go 1.2
 
 require (
+	dario.cat/mergo v1.0.0 // indirect
 	github.com/Azure/go-ansiterm v0.0.0-20230124172434-306776ec8161 // indirect
 	github.com/Azure/go-autorest/autorest/adal v0.9.16 // indirect
 	github.com/ClickHouse/clickhouse-go v1.4.3 // indirect
@@ -76,6 +77,7 @@ require (
 	github.com/redis/go-redis/v9 v9.3.0
 	github.com/rs/cors v1.10.1
 	github.com/rs/xid v1.5.0
+	github.com/sirupsen/logrus v1.9.2 // indirect
 	github.com/snowflakedb/gosnowflake v1.6.3 // indirect
 	github.com/stretchr/testify v1.8.4
 	github.com/test-go/testify v1.1.4 // indirect
