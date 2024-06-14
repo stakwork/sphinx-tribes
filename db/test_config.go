@@ -11,7 +11,7 @@ import (
 var TestDB database
 
 func InitTestDB() {
-	rdsHost := "test_db"
+	rdsHost := "test_postgres"
 	rdsPort := fmt.Sprintf("%d", 5532)
 	rdsDbName := "test_posrgres"
 	rdsUsername := "test_user"
@@ -35,7 +35,7 @@ func InitTestDB() {
 
 	TestDB.db = db
 
-	fmt.Println("db connected")
+	fmt.Println("DB CONNECTED")
 
 	// migrate table changes
 	db.AutoMigrate(&Tribe{})
