@@ -11,9 +11,9 @@ import (
 var TestDB database
 
 func InitTestDB() {
-	rdsHost := "test_db"
+	rdsHost := "172.17.0.1"
 	rdsPort := fmt.Sprintf("%d", 5532)
-	rdsDbName := "test_posrgres"
+	rdsDbName := "test_db"
 	rdsUsername := "test_user"
 	rdsPassword := "test_password"
 	dbURL := fmt.Sprintf("postgres://%s:%s@%s:%s/%s", rdsUsername, rdsPassword, rdsHost, rdsPort, rdsDbName)
@@ -35,7 +35,7 @@ func InitTestDB() {
 
 	TestDB.db = db
 
-	fmt.Println("db connected")
+	fmt.Println("DB CONNECTED")
 
 	// migrate table changes
 	db.AutoMigrate(&Tribe{})
