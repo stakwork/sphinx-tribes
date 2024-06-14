@@ -28,14 +28,5 @@ jobs:
         run: go get golang.org/x/tools/cmd/cover
       - name: Tests
         run: RELAY_AUTH_KEY=TEST go test ./... -race -v -coverprofile=coverage.out && ./cover-check.sh coverage.out 8.4
-
-  drop-db:
-    runs-on:
-      - ubuntu-latest
-    name: Drop
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v2
-
       - name: Droping with docker compose
         run: docker compose -f ./docker/testdb-docker-compose.yml -p test_db down
