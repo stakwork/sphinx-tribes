@@ -13,7 +13,7 @@ var TestDB database
 func InitTestDB() {
 	rdsHost := "test_db_default"
 	rdsPort := fmt.Sprintf("%d", 5532)
-	rdsDbName := "test_posrgres"
+	rdsDbName := "test_postgres"
 	rdsUsername := "test_user"
 	rdsPassword := "test_password"
 	dbURL := fmt.Sprintf("postgres://%s:%s@%s:%s/%s", rdsUsername, rdsPassword, rdsHost, rdsPort, rdsDbName)
