@@ -13,13 +13,13 @@ jobs:
         run: |
           pwd && sudo bash -c 'echo "172.17.0.1 host.docker.internal" >> /etc/hosts'
 
-      - name: check container
-        run: docker container ls
-
       - uses: actions/checkout@v2
 
       - name: Starting DB
         run: docker compose -f ./docker/testdb-docker-compose.yml -p test_db  up -d
+
+      - name: check container
+        run: docker container ls
 
       - name: Install cover
         run: go get golang.org/x/tools/cmd/cover
