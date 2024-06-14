@@ -11,7 +11,7 @@ import (
 var TestDB database
 
 func InitTestDB() {
-	rdsHost := "test_postgres"
+	rdsHost := "test_db_default"
 	rdsPort := fmt.Sprintf("%d", 5532)
 	rdsDbName := "test_posrgres"
 	rdsUsername := "test_user"
