@@ -4,6 +4,8 @@ import (
 	"bytes"
 	"context"
 	"encoding/json"
+	"fmt"
+	"log"
 	"net/http"
 	"net/http/httptest"
 	"strings"
@@ -83,6 +85,53 @@ func TestGetTribesByOwner(t *testing.T) {
 		}
 		assert.ElementsMatch(t, mockTribes, responseData)
 	})
+}
+
+func setupSuite(_ *testing.T) func(tb testing.TB) {
+	db.InitTestDB()
+
+	return func(_ testing.TB) {
+		log.Println("Teardown test")
+	}
+}
+
+func TestGetPeopleReal(t *testing.T) {
+	teardownSuite := setupSuite(t)
+	defer teardownSuite(t)
+
+	tHandler := NewPeopleHandler(db.TestDB)
+	// Initialize test database connection and populate test data
+
+	// Create a request to your handler
+	req, err := http.NewRequest("GET", "/people", nil)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	// Create a ResponseRecorder to record the response
+	rr := httptest.NewRecorder()
+
+	// Create a Chi router and register your handler
+	r := chi.NewRouter()
+	r.Get("/people", tHandler.GetListedPeople)
+
+	// Serve the request to the handler
+	r.ServeHTTP(rr, req)
+
+	// Check the response status code
+	if status := rr.Code; status != http.StatusOK {
+		t.Errorf("handler returned wrong status code: got %v want %v",
+			status, http.StatusOK)
+	}
+
+	dbPeople := db.TestDB.GetListedPeople(req)
+
+	var returnedPersons []db.Person
+	err = json.Unmarshal(rr.Body.Bytes(), &returnedPersons)
+	assert.NoError(t, err)
+	fmt.Println("Returned People ==", returnedPersons)
+	assert.Equal(t, len(dbPeople), len(returnedPersons))
+	// Check the response body or any other expected behavior
 }
 
 func TestGetTribe(t *testing.T) {
