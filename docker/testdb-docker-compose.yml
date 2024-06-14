@@ -1,0 +1,14 @@
+version: '3.9'
+
+services:
+  postgres:
+    container_name: test_postgres
+    image: postgres:14-alpine
+    ports:
+      - 5532:5432
+    volumes:
+      - ~/apps/postgres:/var/lib/postgresql/data
+    environment:
+      - POSTGRES_PASSWORD=test_password
+      - POSTGRES_USER=test_user
+      - POSTGRES_DB=test_db
