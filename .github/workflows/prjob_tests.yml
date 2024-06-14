@@ -18,9 +18,6 @@ jobs:
       - name: Starting DB
         run: docker compose -f ./docker/testdb-docker-compose.yml -p test_db  up -d
 
-      - name: check container
-        run: docker container ls
-
       - name: Install cover
         run: go get golang.org/x/tools/cmd/cover
 
