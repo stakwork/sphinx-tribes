@@ -10,7 +10,7 @@ jobs:
     name: Setup DB
     steps:
       - name: Starting DB
-        run: docker compose -f docker/testdb-docker-compose.yml -p test_db  up -d
+        run: docker compose -f ./docker/testdb-docker-compose.yml -p test_db  up -d
 
   test-go:
     name: Go
@@ -29,4 +29,4 @@ jobs:
     name: Drop
     steps:
       - name: Droping with docker compose
-        run: docker compose -f docker/testdb-docker-compose.yml -p test_db down
+        run: docker compose -f ./docker/testdb-docker-compose.yml -p test_db down
