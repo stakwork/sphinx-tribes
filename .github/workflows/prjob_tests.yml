@@ -4,26 +4,14 @@ on:
     branches:
       - "*"
 jobs:
-  db-setup:
-    runs-on:
-      - ubuntu-latest
-    name: Setup DB
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v2
-
-      - name: Ls
-        run: ls
-
-      - name: Starting DB
-        run: docker compose -f ./docker/testdb-docker-compose.yml -p test_db  up -d
-
   test-go:
     name: Go
     runs-on:
       - ubuntu-latest
     steps:
       - uses: actions/checkout@v2
+      - name: Starting DB
+        run: docker compose -f ./docker/testdb-docker-compose.yml -p test_db  up -d
       - name: Install cover
         run: go get golang.org/x/tools/cmd/cover
       - name: Tests
