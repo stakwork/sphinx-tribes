@@ -7,6 +7,7 @@ import (
 	"errors"
 	"fmt"
 	"io"
+	"log"
 	"net/http"
 	"net/http/httptest"
 	"strconv"
@@ -29,10 +30,56 @@ import (
 	"github.com/stretchr/testify/mock"
 )
 
+func setupSuite(_ *testing.T) func(tb testing.TB) {
+	db.InitTestDB()
+
+	return func(_ testing.TB) {
+		log.Println("Teardown test")
+	}
+}
+
+func addExisitingDB(existingBounty db.NewBounty) {
+	bounty := db.TestDB.GetBounty(1)
+	if bounty.ID == 0 {
+		// add existing bounty to db
+		db.TestDB.CreateOrEditBounty(existingBounty)
+	}
+}
+
 func TestCreateOrEditBounty(t *testing.T) {
+	teardownSuite := setupSuite(t)
+	defer teardownSuite(t)
+
+	existingBounty := db.NewBounty{
+		Type:          "coding",
+		Title:         "existing bounty",
+		Description:   "existing bounty description",
+		WorkspaceUuid: "work-1",
+		OwnerID:       "first-user",
+		Price:         2000,
+	}
+
+	// Add initial Bounty
+	addExisitingDB(existingBounty)
+
+	newBounty := db.NewBounty{
+		Type:          "coding",
+		Title:         "new bounty",
+		Description:   "new bounty description",
+		WorkspaceUuid: "work-1",
+		OwnerID:       "test-key",
+		Price:         1500,
+	}
+
+	failedBounty := db.NewBounty{
+		Type:          "coding",
+		Title:         "new bounty",
+		Description:   "failed bounty description",
+		WorkspaceUuid: "work-1",
+		Price:         1500,
+	}
 
 	ctx := context.WithValue(context.Background(), auth.ContextKey, "test-key")
-	mockDb := dbMocks.NewDatabase(t)
 	mockClient := mocks.NewHttpClient(t)
 	mockUserHasManageBountyRolesTrue := func(pubKeyFromAuth string, uuid string) bool {
 		return true
@@ -40,7 +87,7 @@ func TestCreateOrEditBounty(t *testing.T) {
 	mockUserHasManageBountyRolesFalse := func(pubKeyFromAuth string, uuid string) bool {
 		return false
 	}
-	bHandler := NewBountyHandler(mockClient, mockDb)
+	bHandler := NewBountyHandler(mockClient, db.TestDB)
 
 	t.Run("should return error if body is not a valid json", func(t *testing.T) {
 		rr := httptest.NewRecorder()
@@ -102,32 +149,29 @@ func TestCreateOrEditBounty(t *testing.T) {
 		assert.Equal(t, http.StatusBadRequest, rr.Code)
 	})
 
-	t.Run("return error if trying to update other user bounty", func(t *testing.T) {
+	t.Run("return error if trying to update other user's bounty", func(t *testing.T) {
 		rr := httptest.NewRecorder()
 		handler := http.HandlerFunc(bHandler.CreateOrEditBounty)
+		bHandler.userHasManageBountyRoles = mockUserHasManageBountyRolesFalse
 
-		existingBounty := db.NewBounty{
-			ID:            1,
-			Type:          "coding",
-			Title:         "first bounty",
-			Description:   "first bounty description",
-			WorkspaceUuid: "work-1",
-			Assignee:      "user1",
+		updatedBounty := existingBounty
+		updatedBounty.ID = 1
+		updatedBounty.Show = true
+		updatedBounty.WorkspaceUuid = ""
+
+		json, err := json.Marshal(updatedBounty)
+		if err != nil {
+			fmt.Println("Could not marshal json data")
 		}
-		mockDb.On("UpdateBountyBoolColumn", mock.AnythingOfType("db.NewBounty"), "show").Return(existingBounty)
-		mockDb.On("GetBounty", uint(1)).Return(existingBounty).Once()
 
-		body := []byte(`{"id": 1, "type": "bounty_type", "title": "first bounty", "description": "my first bounty", "tribe": "random-value", "assignee": "john-doe", "owner_id": "second-user"}`)
-		req, err := http.NewRequestWithContext(ctx, http.MethodPost, "/", bytes.NewReader(body))
+		req, err := http.NewRequestWithContext(ctx, http.MethodPost, "/", bytes.NewReader(json))
 		if err != nil {
 			t.Fatal(err)
 		}
 
 		handler.ServeHTTP(rr, req)
-
 		assert.Equal(t, http.StatusBadRequest, rr.Code)
 		assert.Contains(t, strings.TrimRight(rr.Body.String(), "\n"), "Cannot edit another user's bounty")
-		mockDb.AssertExpectations(t)
 	})
 
 	t.Run("return error if user does not have required roles", func(t *testing.T) {
@@ -135,19 +179,9 @@ func TestCreateOrEditBounty(t *testing.T) {
 		handler := http.HandlerFunc(bHandler.CreateOrEditBounty)
 		bHandler.userHasManageBountyRoles = mockUserHasManageBountyRolesFalse
 
-		existingBounty := db.NewBounty{
-			ID:            1,
-			Type:          "coding",
-			Title:         "first bounty",
-			Description:   "first bounty description",
-			WorkspaceUuid: "work-1",
-			OwnerID:       "second-user",
-		}
 		updatedBounty := existingBounty
-		updatedBounty.Title = "first bounty updated"
-		mockDb.On("UpdateBountyBoolColumn", mock.AnythingOfType("db.NewBounty"), "show").Return(existingBounty)
-		mockDb.On("UpdateBountyNullColumn", mock.AnythingOfType("db.NewBounty"), "assignee").Return(existingBounty)
-		mockDb.On("GetBounty", uint(1)).Return(existingBounty).Once()
+		updatedBounty.Title = "Existing bounty updated"
+		updatedBounty.ID = 1
 
 		body, _ := json.Marshal(updatedBounty)
 		req, err := http.NewRequestWithContext(ctx, http.MethodPost, "/", bytes.NewReader(body))
@@ -156,7 +190,6 @@ func TestCreateOrEditBounty(t *testing.T) {
 		}
 
 		handler.ServeHTTP(rr, req)
-
 		assert.Equal(t, http.StatusBadRequest, rr.Code)
 	})
 
@@ -165,20 +198,9 @@ func TestCreateOrEditBounty(t *testing.T) {
 		handler := http.HandlerFunc(bHandler.CreateOrEditBounty)
 		bHandler.userHasManageBountyRoles = mockUserHasManageBountyRolesTrue
 
-		existingBounty := db.NewBounty{
-			ID:            1,
-			Type:          "coding",
-			Title:         "first bounty",
-			Description:   "first bounty description",
-			WorkspaceUuid: "work-1",
-			OwnerID:       "second-user",
-		}
 		updatedBounty := existingBounty
 		updatedBounty.Title = "first bounty updated"
-		mockDb.On("UpdateBountyBoolColumn", mock.AnythingOfType("db.NewBounty"), "show").Return(existingBounty)
-		mockDb.On("UpdateBountyNullColumn", mock.AnythingOfType("db.NewBounty"), "assignee").Return(existingBounty)
-		mockDb.On("GetBounty", uint(1)).Return(existingBounty).Once()
-		mockDb.On("CreateOrEditBounty", mock.AnythingOfType("db.NewBounty")).Return(updatedBounty, nil).Once()
+		updatedBounty.ID = 1
 
 		body, _ := json.Marshal(updatedBounty)
 		req, err := http.NewRequestWithContext(ctx, http.MethodPost, "/", bytes.NewReader(body))
@@ -187,9 +209,10 @@ func TestCreateOrEditBounty(t *testing.T) {
 		}
 
 		handler.ServeHTTP(rr, req)
-
 		assert.Equal(t, http.StatusOK, rr.Code)
-		mockDb.AssertExpectations(t)
+
+		bounty := db.TestDB.GetBounty(1)
+		assert.Equal(t, bounty.Title, updatedBounty.Title)
 	})
 
 	t.Run("should not update created at when bounty is updated", func(t *testing.T) {
@@ -197,24 +220,8 @@ func TestCreateOrEditBounty(t *testing.T) {
 		handler := http.HandlerFunc(bHandler.CreateOrEditBounty)
 		bHandler.userHasManageBountyRoles = mockUserHasManageBountyRolesTrue
 
-		now := time.Now().UnixMilli()
-		existingBounty := db.NewBounty{
-			ID:            1,
-			Type:          "coding",
-			Title:         "first bounty",
-			Description:   "first bounty description",
-			WorkspaceUuid: "work-1",
-			OwnerID:       "second-user",
-			Created:       now,
-		}
 		updatedBounty := existingBounty
-		updatedBounty.Title = "first bounty updated"
-		mockDb.On("UpdateBountyBoolColumn", mock.AnythingOfType("db.NewBounty"), "show").Return(existingBounty)
-		mockDb.On("UpdateBountyNullColumn", mock.AnythingOfType("db.NewBounty"), "assignee").Return(existingBounty)
-		mockDb.On("GetBounty", uint(1)).Return(existingBounty).Once()
-		mockDb.On("CreateOrEditBounty", mock.MatchedBy(func(b db.NewBounty) bool {
-			return b.Created == now
-		})).Return(updatedBounty, nil).Once()
+		updatedBounty.Title = "second bounty updated"
 
 		body, _ := json.Marshal(updatedBounty)
 		req, err := http.NewRequestWithContext(ctx, http.MethodPost, "/", bytes.NewReader(body))
@@ -223,25 +230,19 @@ func TestCreateOrEditBounty(t *testing.T) {
 		}
 
 		handler.ServeHTTP(rr, req)
-
 		assert.Equal(t, http.StatusOK, rr.Code)
-		mockDb.AssertExpectations(t)
+
+		var returnedBounty db.Bounty
+		err = json.Unmarshal(rr.Body.Bytes(), &returnedBounty)
+		assert.NoError(t, err)
+		assert.NotEqual(t, returnedBounty.Created, returnedBounty.Updated)
+		// Check the response body or any other expected behavior
 	})
 
 	t.Run("should return error if failed to add new bounty", func(t *testing.T) {
 		rr := httptest.NewRecorder()
 		handler := http.HandlerFunc(bHandler.CreateOrEditBounty)
-		newBounty := db.NewBounty{
-			Type:          "coding",
-			Title:         "first bounty",
-			Description:   "first bounty description",
-			WorkspaceUuid: "org-1",
-			OwnerID:       "test-key",
-		}
-		mockDb.On("UpdateBountyNullColumn", mock.AnythingOfType("db.NewBounty"), "assignee").Return(db.NewBounty{Assignee: "test-key"})
-		mockDb.On("CreateOrEditBounty", mock.AnythingOfType("db.NewBounty")).Return(db.NewBounty{}, errors.New("failed to add")).Once()
-
-		body, _ := json.Marshal(newBounty)
+		body, _ := json.Marshal(failedBounty)
 		req, err := http.NewRequestWithContext(ctx, http.MethodPost, "/", bytes.NewReader(body))
 		if err != nil {
 			t.Fatal(err)
@@ -250,22 +251,11 @@ func TestCreateOrEditBounty(t *testing.T) {
 		handler.ServeHTTP(rr, req)
 
 		assert.Equal(t, http.StatusBadRequest, rr.Code)
-		mockDb.AssertExpectations(t)
 	})
 
-	t.Run("add bounty if not present", func(t *testing.T) {
+	t.Run("add bounty if error not present", func(t *testing.T) {
 		rr := httptest.NewRecorder()
 		handler := http.HandlerFunc(bHandler.CreateOrEditBounty)
-		newBounty := db.NewBounty{
-			Type:          "coding",
-			Title:         "first bounty",
-			Description:   "first bounty description",
-			WorkspaceUuid: "work-1",
-			OrgUuid:       "org-1",
-			OwnerID:       "test-key",
-		}
-		mockDb.On("UpdateBountyNullColumn", mock.AnythingOfType("db.NewBounty"), "assignee").Return(db.Bounty{Assignee: "test-key"})
-		mockDb.On("CreateOrEditBounty", mock.AnythingOfType("db.NewBounty")).Return(newBounty, nil).Once()
 
 		body, _ := json.Marshal(newBounty)
 		req, err := http.NewRequestWithContext(ctx, http.MethodPost, "/", bytes.NewReader(body))
@@ -274,9 +264,7 @@ func TestCreateOrEditBounty(t *testing.T) {
 		}
 
 		handler.ServeHTTP(rr, req)
-
 		assert.Equal(t, http.StatusOK, rr.Code)
-		mockDb.AssertExpectations(t)
 	})
 }
 

@@ -185,8 +185,14 @@ func (h *bountyHandler) CreateOrEditBounty(w http.ResponseWriter, r *http.Reques
 
 	bounty := db.NewBounty{}
 	body, err := io.ReadAll(r.Body)
-
 	r.Body.Close()
+
+	if err != nil {
+		fmt.Println("[bounty read]", err)
+		w.WriteHeader(http.StatusNotAcceptable)
+		return
+	}
+
 	err = json.Unmarshal(body, &bounty)
 	if err != nil {
 		fmt.Println("[bounty]", err)
@@ -230,7 +236,7 @@ func (h *bountyHandler) CreateOrEditBounty(w http.ResponseWriter, r *http.Reques
 		bounty.Tribe = "None"
 	}
 
-	if bounty.Show == false && bounty.ID != 0 {
+	if !bounty.Show && bounty.ID != 0 {
 		h.db.UpdateBountyBoolColumn(bounty, "show")
 	}
 
