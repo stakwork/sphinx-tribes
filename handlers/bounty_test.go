@@ -381,9 +381,23 @@ func TestPayLightningInvoice(t *testing.T) {
 }
 
 func TestDeleteBounty(t *testing.T) {
-	mockDb := dbMocks.NewDatabase(t)
+	teardownSuite := setupSuite(t)
+	defer teardownSuite(t)
+
+	existingBounty := db.NewBounty{
+		Type:          "coding",
+		Title:         "existing bounty",
+		Description:   "existing bounty description",
+		WorkspaceUuid: "work-1",
+		OwnerID:       "first-user",
+		Price:         2000,
+	}
+
+	// Add initial Bounty
+	addExisitingDB(existingBounty)
+
 	mockHttpClient := mocks.NewHttpClient(t)
-	bHandler := NewBountyHandler(mockHttpClient, mockDb)
+	bHandler := NewBountyHandler(mockHttpClient, db.TestDB)
 	ctx := context.WithValue(context.Background(), auth.ContextKey, "test-key")
 
 	t.Run("should return unauthorized error if users public key not present", func(t *testing.T) {
@@ -435,11 +449,11 @@ func TestDeleteBounty(t *testing.T) {
 	t.Run("should return error if failed to delete from db", func(t *testing.T) {
 		rr := httptest.NewRecorder()
 		handler := http.HandlerFunc(bHandler.DeleteBounty)
-		mockDb.On("DeleteBounty", "pub-key", "1111").Return(db.NewBounty{}, errors.New("some-error")).Once()
 
 		rctx := chi.NewRouteContext()
 		rctx.URLParams.Add("pubkey", "pub-key")
 		rctx.URLParams.Add("created", "1111")
+
 		req, err := http.NewRequestWithContext(context.WithValue(ctx, chi.RouteCtxKey, rctx), http.MethodDelete, "/pub-key/createdAt", nil)
 		if err != nil {
 			t.Fatal(err)
@@ -447,32 +461,31 @@ func TestDeleteBounty(t *testing.T) {
 		handler.ServeHTTP(rr, req)
 
 		assert.Equal(t, http.StatusInternalServerError, rr.Code)
-		mockDb.AssertExpectations(t)
 	})
 
 	t.Run("should successfully delete bounty from db", func(t *testing.T) {
 		rr := httptest.NewRecorder()
 		handler := http.HandlerFunc(bHandler.DeleteBounty)
-		existingBounty := db.NewBounty{
-			OwnerID: "pub-key",
-			Created: 1111,
-		}
-		mockDb.On("DeleteBounty", "pub-key", "1111").Return(existingBounty, nil).Once()
+		existingBounty := db.TestDB.GetBounty(1)
 
 		rctx := chi.NewRouteContext()
-		rctx.URLParams.Add("pubkey", "pub-key")
-		rctx.URLParams.Add("created", "1111")
-		req, err := http.NewRequestWithContext(context.WithValue(ctx, chi.RouteCtxKey, rctx), http.MethodDelete, "/pub-key/1111", nil)
+		rctx.URLParams.Add("pubkey", existingBounty.OwnerID)
+
+		created := fmt.Sprintf("%d", existingBounty.Created)
+		rctx.URLParams.Add("created", created)
+
+		route := fmt.Sprintf("/%s/%d", existingBounty.OwnerID, existingBounty.Created)
+		req, err := http.NewRequestWithContext(context.WithValue(ctx, chi.RouteCtxKey, rctx), http.MethodDelete, route, nil)
+
 		if err != nil {
 			t.Fatal(err)
 		}
 		handler.ServeHTTP(rr, req)
 
-		var returnedBounty db.NewBounty
-		_ = json.Unmarshal(rr.Body.Bytes(), &returnedBounty)
-		assert.Equal(t, http.StatusOK, rr.Code)
-		assert.EqualValues(t, existingBounty, returnedBounty)
-		mockDb.AssertExpectations(t)
+		// get Bounty from DB
+		checkBounty := db.TestDB.GetBounty(1)
+		// chcek that the bounty's ID is now zero
+		assert.Equal(t, 0, int(checkBounty.ID))
 	})
 }
 
