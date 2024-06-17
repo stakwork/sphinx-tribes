@@ -11,8 +11,7 @@ import (
 var TestDB database
 
 func InitTestDB() {
-	// rdsHost := "172.17.0.1"
-	rdsHost := "127.0.0.1"
+	rdsHost := "172.17.0.1"
 	rdsPort := fmt.Sprintf("%d", 5532)
 	rdsDbName := "test_db"
 	rdsUsername := "test_user"
