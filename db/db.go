@@ -146,12 +146,6 @@ func (db database) CreateOrEditPerson(m Person) (Person, error) {
 		db.db.Create(&m)
 	}
 
-	db.db.Exec(`UPDATE people SET tsv =
-  	setweight(to_tsvector(owner_alias), 'A') ||
-	setweight(to_tsvector(description), 'B') ||
-	setweight(array_to_tsvector(tags), 'C')
-	WHERE id = '` + strconv.Itoa(int(m.ID)) + "'")
-
 	return m, nil
 }
 
@@ -784,7 +778,7 @@ func (db database) GetAssignedBounties(r *http.Request) ([]NewBounty, error) {
 	} else {
 		orderQuery = " ORDER BY created DESC"
 	}
-	if offset >= 0 && limit != 0 {
+	if offset >= 0 && limit > 1 {
 		limitQuery = fmt.Sprintf("LIMIT %d  OFFSET %d", limit, offset)
 	}
 
