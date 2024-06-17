@@ -574,43 +574,72 @@ func TestGetBountyByCreated(t *testing.T) {
 }
 
 func TestGetPersonAssignedBounties(t *testing.T) {
-	mockDb := dbMocks.NewDatabase(t)
+	teardownSuite := setupSuite(t)
+	defer teardownSuite(t)
 	mockHttpClient := mocks.NewHttpClient(t)
-	bHandler := NewBountyHandler(mockHttpClient, mockDb)
+	bHandler := NewBountyHandler(mockHttpClient, db.TestDB)
+
+	bountyOwner := db.Person{
+		Uuid:        "user_1_uuid",
+		OwnerAlias:  "user1",
+		UniqueName:  "user1",
+		OwnerPubKey: "user_1_pubkey",
+		PriceToMeet: 0,
+		Description: "this is test user 1",
+	}
+
+	bountyAssignee := db.Person{
+		Uuid:        "user_2_uuid",
+		OwnerAlias:  "user2",
+		UniqueName:  "user2",
+		OwnerPubKey: "user_2_pubkey",
+		PriceToMeet: 0,
+		Description: "this is user 2",
+	}
+
+	bounty := db.NewBounty{
+		Type:          "coding",
+		Title:         "first bounty",
+		Description:   "first bounty description",
+		OrgUuid:       "org-1",
+		WorkspaceUuid: "work-1",
+		Assignee:      bountyAssignee.OwnerPubKey,
+		OwnerID:       bountyOwner.OwnerPubKey,
+		Show:          true,
+	}
+
 	t.Run("Should successfull Get Person Assigned Bounties", func(t *testing.T) {
 		rr := httptest.NewRecorder()
 		handler := http.HandlerFunc(bHandler.GetPersonAssignedBounties)
-		bounty := db.NewBounty{
-			ID:            1,
-			Type:          "coding",
-			Title:         "first bounty",
-			Description:   "first bounty description",
-			OrgUuid:       "org-1",
-			WorkspaceUuid: "work-1",
-			Assignee:      "user1",
-			Created:       1707991475,
-			OwnerID:       "owner-1",
-		}
+
+		// create users
+		db.TestDB.CreateOrEditPerson(bountyOwner)
+		db.TestDB.CreateOrEditPerson(bountyAssignee)
+
+		// create bounty
+		db.TestDB.CreateOrEditBounty(bounty)
 
 		rctx := chi.NewRouteContext()
-		rctx.URLParams.Add("uuid", "clu80datu2rjujsmim40")
+		rctx.URLParams.Add("uuid", bountyAssignee.Uuid)
 		rctx.URLParams.Add("sortBy", "paid")
-		rctx.URLParams.Add("page", "1")
+		rctx.URLParams.Add("page", "0")
 		rctx.URLParams.Add("limit", "20")
 		rctx.URLParams.Add("search", "")
-		req, _ := http.NewRequestWithContext(context.WithValue(context.Background(), chi.RouteCtxKey, rctx), http.MethodGet, "/people/wanteds/assigned/clu80datu2rjujsmim40?sortBy=paid&page=1&limit=20&search=", nil)
 
-		mockDb.On("GetAssignedBounties", req).Return([]db.NewBounty{bounty}, nil).Once()
-		mockDb.On("GetPersonByPubkey", "owner-1").Return(db.Person{}, nil).Once()
-		mockDb.On("GetPersonByPubkey", "user1").Return(db.Person{}, nil).Once()
-		mockDb.On("GetWorkspaceByUuid", "work-1").Return(db.Workspace{}, nil).Once()
+		route := fmt.Sprintf("/people/wanteds/assigned/%s?sortBy=paid&page=0&limit=20&search=''", bountyAssignee.Uuid)
+		req, _ := http.NewRequestWithContext(context.WithValue(context.Background(), chi.RouteCtxKey, rctx), http.MethodGet, route, nil)
+
 		handler.ServeHTTP(rr, req)
+
+		// bounty from db
+		expectedBounty, _ := db.TestDB.GetAssignedBounties(req)
 
 		var returnedBounty []db.BountyResponse
 		err := json.Unmarshal(rr.Body.Bytes(), &returnedBounty)
 		assert.NoError(t, err)
 		assert.Equal(t, http.StatusOK, rr.Code)
 		assert.NotEmpty(t, returnedBounty)
+		assert.Equal(t, len(expectedBounty), len(returnedBounty))
 	})
 }
 
