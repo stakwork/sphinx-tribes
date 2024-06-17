@@ -828,7 +828,7 @@ func (db database) GetCreatedBounties(r *http.Request) ([]NewBounty, error) {
 		orderQuery = "ORDER BY created DESC"
 	}
 
-	if offset >= 0 && limit != 0 {
+	if offset >= 0 && limit > 1 {
 		limitQuery = fmt.Sprintf("LIMIT %d  OFFSET %d", limit, offset)
 	}
 
