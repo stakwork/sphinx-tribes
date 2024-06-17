@@ -323,6 +323,23 @@ func (h *bountyHandler) DeleteBounty(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	// get bounty by created
+	createdUint, _ := utils.ConvertStringToUint(created)
+	createdBounty, err := h.db.GetBountyByCreated(createdUint)
+	if err != nil {
+		fmt.Println("[bounty] failed to delete bounty", err.Error())
+		w.WriteHeader(http.StatusInternalServerError)
+		json.NewEncoder(w).Encode("failed to delete bounty")
+		return
+	}
+
+	if createdBounty.ID == 0 {
+		fmt.Println("[bounty] failed to delete bounty")
+		w.WriteHeader(http.StatusInternalServerError)
+		json.NewEncoder(w).Encode("failed to delete bounty")
+		return
+	}
+
 	b, err := h.db.DeleteBounty(pubkey, created)
 	if err != nil {
 		fmt.Println("[bounty] failed to delete bounty", err.Error())
