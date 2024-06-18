@@ -71,6 +71,37 @@ var bountyNext = db.NewBounty{
 	Created:       111111112,
 }
 
+var workspace = db.Workspace{
+	Uuid:        "workspace_uuid13",
+	Name:        "TestWorkspace",
+	Description: "This is a test workspace",
+	OwnerPubKey: bountyOwner.OwnerPubKey,
+	Img:         "",
+	Website:     "",
+}
+
+var workBountyPrev = db.NewBounty{
+	Type:          "coding",
+	Title:         "Workspace Previous bounty",
+	Description:   "Workspace Previous bounty description",
+	WorkspaceUuid: workspace.Uuid,
+	Assignee:      bountyAssignee.OwnerPubKey,
+	OwnerID:       bountyOwner.OwnerPubKey,
+	Show:          true,
+	Created:       111111113,
+}
+
+var workBountyNext = db.NewBounty{
+	Type:          "coding",
+	Title:         "Workpace Next bounty",
+	Description:   "Workspace Next bounty description",
+	WorkspaceUuid: workspace.Uuid,
+	Assignee:      "",
+	OwnerID:       bountyOwner.OwnerPubKey,
+	Show:          true,
+	Created:       111111114,
+}
+
 func setupSuite(_ *testing.T) func(tb testing.TB) {
 	db.InitTestDB()
 
@@ -889,41 +920,74 @@ func TestGetPreviousBountyByCreated(t *testing.T) {
 }
 
 func TestGetWorkspaceNextBountyByCreated(t *testing.T) {
-	ctx := context.Background()
-	mockDb := dbMocks.NewDatabase(t)
+	teardownSuite := setupSuite(t)
+	defer teardownSuite(t)
+
+	db.TestDB.CreateOrEditWorkspace(workspace)
+	db.TestDB.CreateOrEditBounty(workBountyPrev)
+	db.TestDB.CreateOrEditBounty(workBountyNext)
+
 	mockHttpClient := mocks.NewHttpClient(t)
-	bHandler := NewBountyHandler(mockHttpClient, mockDb)
+	bHandler := NewBountyHandler(mockHttpClient, db.TestDB)
 
 	t.Run("Should test that the next bounty on the workspace bounties homepage can be gotten by its created value and the selected filters", func(t *testing.T) {
-		mockDb.On("GetNextWorkspaceBountyByCreated", mock.AnythingOfType("*http.Request")).Return(uint(1), nil).Once()
-
 		rr := httptest.NewRecorder()
-		req, _ := http.NewRequest("GET", "/org/next/org-uuid/123456789", nil)
 
-		bHandler.GetWorkspaceNextBountyByCreated(rr, req.WithContext(ctx))
+		rctx := chi.NewRouteContext()
+		created := fmt.Sprintf("%d", workBountyPrev.Created)
+		rctx.URLParams.Add("created", created)
+		rctx.URLParams.Add("uuid", workspace.Uuid)
+
+		route := fmt.Sprintf("/org/next/%s/%d", workspace.Uuid, workBountyPrev.Created)
+		req, err := http.NewRequestWithContext(context.WithValue(context.Background(), chi.RouteCtxKey, rctx), http.MethodGet, route, nil)
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		bHandler.GetWorkspaceNextBountyByCreated(rr, req)
 
 		assert.Equal(t, http.StatusOK, rr.Code)
-		mockDb.AssertExpectations(t)
+
+		var responseData uint
+		err = json.Unmarshal(rr.Body.Bytes(), &responseData)
+		if err != nil {
+			t.Fatalf("Error decoding JSON response: %s", err)
+		}
+		assert.Greater(t, responseData, uint(2))
 	})
 }
 
 func TestGetWorkspacePreviousBountyByCreated(t *testing.T) {
-	ctx := context.Background()
-	mockDb := dbMocks.NewDatabase(t)
+	teardownSuite := setupSuite(t)
+	defer teardownSuite(t)
+
 	mockHttpClient := mocks.NewHttpClient(t)
-	bHandler := NewBountyHandler(mockHttpClient, mockDb)
+	bHandler := NewBountyHandler(mockHttpClient, db.TestDB)
 
 	t.Run("Should test that the previous bounty on the workspace bounties homepage can be gotten by its created value and the selected filters", func(t *testing.T) {
-		mockDb.On("GetPreviousWorkspaceBountyByCreated", mock.AnythingOfType("*http.Request")).Return(uint(1), nil).Once()
-
 		rr := httptest.NewRecorder()
-		req, _ := http.NewRequest("GET", "/org/previous/org-uuid/123456789", nil)
 
-		bHandler.GetWorkspacePreviousBountyByCreated(rr, req.WithContext(ctx))
+		rctx := chi.NewRouteContext()
+		created := fmt.Sprintf("%d", workBountyNext.Created)
+		rctx.URLParams.Add("created", created)
+		rctx.URLParams.Add("uuid", workspace.Uuid)
+
+		route := fmt.Sprintf("/org/previous/%s/%d", workspace.Uuid, workBountyNext.Created)
+		req, err := http.NewRequestWithContext(context.WithValue(context.Background(), chi.RouteCtxKey, rctx), http.MethodGet, route, nil)
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		bHandler.GetWorkspacePreviousBountyByCreated(rr, req)
 
 		assert.Equal(t, http.StatusOK, rr.Code)
 
-		mockDb.AssertExpectations(t)
+		var responseData uint
+		err = json.Unmarshal(rr.Body.Bytes(), &responseData)
+		if err != nil {
+			t.Fatalf("Error decoding JSON response: %s", err)
+		}
+		assert.Greater(t, responseData, uint(2))
 	})
 }
 
