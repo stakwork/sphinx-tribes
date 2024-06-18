@@ -30,6 +30,47 @@ import (
 	"github.com/stretchr/testify/mock"
 )
 
+var bountyOwner = db.Person{
+	Uuid:        "user_3_uuid",
+	OwnerAlias:  "user3",
+	UniqueName:  "user3",
+	OwnerPubKey: "user_3_pubkey",
+	PriceToMeet: 0,
+	Description: "this is test user 3",
+}
+
+var bountyAssignee = db.Person{
+	Uuid:        "user_4_uuid",
+	OwnerAlias:  "user4",
+	UniqueName:  "user4",
+	OwnerPubKey: "user_4_pubkey",
+	PriceToMeet: 0,
+	Description: "this is user 4",
+}
+
+var bountyPrev = db.NewBounty{
+	Type:          "coding",
+	Title:         "Previous bounty",
+	Description:   "Previous bounty description",
+	OrgUuid:       "org-4",
+	WorkspaceUuid: "work-4",
+	Assignee:      bountyAssignee.OwnerPubKey,
+	OwnerID:       bountyOwner.OwnerPubKey,
+	Show:          true,
+	Created:       111111111,
+}
+
+var bountyNext = db.NewBounty{
+	Type:          "coding",
+	Title:         "Next bounty",
+	Description:   "Next bounty description",
+	WorkspaceUuid: "work-4",
+	Assignee:      "",
+	OwnerID:       bountyOwner.OwnerPubKey,
+	Show:          true,
+	Created:       111111112,
+}
+
 func setupSuite(_ *testing.T) func(tb testing.TB) {
 	db.InitTestDB()
 
@@ -651,24 +692,6 @@ func TestGetPersonCreatedBounties(t *testing.T) {
 	mockHttpClient := mocks.NewHttpClient(t)
 	bHandler := NewBountyHandler(mockHttpClient, db.TestDB)
 
-	bountyOwner := db.Person{
-		Uuid:        "user_3_uuid",
-		OwnerAlias:  "user3",
-		UniqueName:  "user3",
-		OwnerPubKey: "user_3_pubkey",
-		PriceToMeet: 0,
-		Description: "this is test user 3",
-	}
-
-	bountyAssignee := db.Person{
-		Uuid:        "user_4_uuid",
-		OwnerAlias:  "user4",
-		UniqueName:  "user4",
-		OwnerPubKey: "user_4_pubkey",
-		PriceToMeet: 0,
-		Description: "this is user 4",
-	}
-
 	bounty := db.NewBounty{
 		Type:          "coding",
 		Title:         "first bounty 3",
@@ -798,42 +821,70 @@ func TestGetPersonCreatedBounties(t *testing.T) {
 }
 
 func TestGetNextBountyByCreated(t *testing.T) {
-	ctx := context.Background()
+	teardownSuite := setupSuite(t)
+	defer teardownSuite(t)
 
-	mockDb := dbMocks.NewDatabase(t)
+	db.TestDB.CreateOrEditBounty(bountyPrev)
+	db.TestDB.CreateOrEditBounty(bountyNext)
+
 	mockHttpClient := mocks.NewHttpClient(t)
-	bHandler := NewBountyHandler(mockHttpClient, mockDb)
+	bHandler := NewBountyHandler(mockHttpClient, db.TestDB)
 
 	t.Run("Should test that the next bounty on the bounties homepage can be gotten by its created value and the selected filters", func(t *testing.T) {
-		mockDb.On("GetNextBountyByCreated", mock.Anything).Return(uint(1), nil).Once()
-
 		rr := httptest.NewRecorder()
-		req, _ := http.NewRequest("GET", "/next/123456789", nil)
 
-		bHandler.GetNextBountyByCreated(rr, req.WithContext(ctx))
+		rctx := chi.NewRouteContext()
+		created := fmt.Sprintf("%d", bountyPrev.Created)
+		rctx.URLParams.Add("created", created)
+
+		route := fmt.Sprintf("/next/%d", bountyPrev.Created)
+		req, err := http.NewRequestWithContext(context.WithValue(context.Background(), chi.RouteCtxKey, rctx), http.MethodGet, route, nil)
+		if err != nil {
+			t.Fatal(err)
+		}
+		bHandler.GetNextBountyByCreated(rr, req)
 
 		assert.Equal(t, http.StatusOK, rr.Code)
-		mockDb.AssertExpectations(t)
+
+		var responseData uint
+		err = json.Unmarshal(rr.Body.Bytes(), &responseData)
+		if err != nil {
+			t.Fatalf("Error decoding JSON response: %s", err)
+		}
+		assert.Greater(t, responseData, uint(1))
 	})
 }
 
 func TestGetPreviousBountyByCreated(t *testing.T) {
-	ctx := context.Background()
+	teardownSuite := setupSuite(t)
+	defer teardownSuite(t)
 
-	mockDb := dbMocks.NewDatabase(t)
 	mockHttpClient := mocks.NewHttpClient(t)
-	bHandler := NewBountyHandler(mockHttpClient, mockDb)
+	bHandler := NewBountyHandler(mockHttpClient, db.TestDB)
 
 	t.Run("Should test that the previous bounty on the bounties homepage can be gotten by its created value and the selected filters", func(t *testing.T) {
-		mockDb.On("GetPreviousBountyByCreated", mock.Anything).Return(uint(1), nil).Once()
-
 		rr := httptest.NewRecorder()
-		req, _ := http.NewRequest("GET", "/previous/123456789", nil)
 
-		bHandler.GetPreviousBountyByCreated(rr, req.WithContext(ctx))
+		rctx := chi.NewRouteContext()
+		created := fmt.Sprintf("%d", bountyPrev.Created)
+		rctx.URLParams.Add("created", created)
+
+		route := fmt.Sprintf("/previous/%d", bountyNext.Created)
+		req, err := http.NewRequestWithContext(context.WithValue(context.Background(), chi.RouteCtxKey, rctx), http.MethodGet, route, nil)
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		bHandler.GetPreviousBountyByCreated(rr, req)
 
 		assert.Equal(t, http.StatusOK, rr.Code)
-		mockDb.AssertExpectations(t)
+
+		var responseData uint
+		err = json.Unmarshal(rr.Body.Bytes(), &responseData)
+		if err != nil {
+			t.Fatalf("Error decoding JSON response: %s", err)
+		}
+		assert.Greater(t, responseData, uint(1))
 	})
 }
 
@@ -877,7 +928,6 @@ func TestGetWorkspacePreviousBountyByCreated(t *testing.T) {
 }
 
 func TestGetBountyById(t *testing.T) {
-
 	mockDb := dbMocks.NewDatabase(t)
 	mockHttpClient := mocks.NewHttpClient(t)
 	bHandler := NewBountyHandler(mockHttpClient, mockDb)
