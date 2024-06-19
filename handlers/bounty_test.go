@@ -102,7 +102,7 @@ var workBountyNext = db.NewBounty{
 	Created:       111111114,
 }
 
-func setupSuite(_ *testing.T) func(tb testing.TB) {
+func SetupSuite(_ *testing.T) func(tb testing.TB) {
 	db.InitTestDB()
 
 	return func(_ testing.TB) {
@@ -110,7 +110,7 @@ func setupSuite(_ *testing.T) func(tb testing.TB) {
 	}
 }
 
-func addExisitingDB(existingBounty db.NewBounty) {
+func AddExisitingDB(existingBounty db.NewBounty) {
 	bounty := db.TestDB.GetBounty(1)
 	if bounty.ID == 0 {
 		// add existing bounty to db
@@ -119,7 +119,7 @@ func addExisitingDB(existingBounty db.NewBounty) {
 }
 
 func TestCreateOrEditBounty(t *testing.T) {
-	teardownSuite := setupSuite(t)
+	teardownSuite := SetupSuite(t)
 	defer teardownSuite(t)
 
 	existingBounty := db.NewBounty{
@@ -132,7 +132,7 @@ func TestCreateOrEditBounty(t *testing.T) {
 	}
 
 	// Add initial Bounty
-	addExisitingDB(existingBounty)
+	AddExisitingDB(existingBounty)
 
 	newBounty := db.NewBounty{
 		Type:          "coding",
@@ -453,7 +453,7 @@ func TestPayLightningInvoice(t *testing.T) {
 }
 
 func TestDeleteBounty(t *testing.T) {
-	teardownSuite := setupSuite(t)
+	teardownSuite := SetupSuite(t)
 	defer teardownSuite(t)
 
 	existingBounty := db.NewBounty{
@@ -466,7 +466,7 @@ func TestDeleteBounty(t *testing.T) {
 	}
 
 	// Add initial Bounty
-	addExisitingDB(existingBounty)
+	AddExisitingDB(existingBounty)
 
 	mockHttpClient := mocks.NewHttpClient(t)
 	bHandler := NewBountyHandler(mockHttpClient, db.TestDB)
@@ -646,7 +646,7 @@ func TestGetBountyByCreated(t *testing.T) {
 }
 
 func TestGetPersonAssignedBounties(t *testing.T) {
-	teardownSuite := setupSuite(t)
+	teardownSuite := SetupSuite(t)
 	defer teardownSuite(t)
 	mockHttpClient := mocks.NewHttpClient(t)
 	bHandler := NewBountyHandler(mockHttpClient, db.TestDB)
@@ -716,7 +716,7 @@ func TestGetPersonAssignedBounties(t *testing.T) {
 }
 
 func TestGetPersonCreatedBounties(t *testing.T) {
-	teardownSuite := setupSuite(t)
+	teardownSuite := SetupSuite(t)
 	defer teardownSuite(t)
 
 	ctx := context.Background()
@@ -852,7 +852,7 @@ func TestGetPersonCreatedBounties(t *testing.T) {
 }
 
 func TestGetNextBountyByCreated(t *testing.T) {
-	teardownSuite := setupSuite(t)
+	teardownSuite := SetupSuite(t)
 	defer teardownSuite(t)
 
 	db.TestDB.CreateOrEditBounty(bountyPrev)
@@ -887,7 +887,7 @@ func TestGetNextBountyByCreated(t *testing.T) {
 }
 
 func TestGetPreviousBountyByCreated(t *testing.T) {
-	teardownSuite := setupSuite(t)
+	teardownSuite := SetupSuite(t)
 	defer teardownSuite(t)
 
 	mockHttpClient := mocks.NewHttpClient(t)
@@ -920,7 +920,7 @@ func TestGetPreviousBountyByCreated(t *testing.T) {
 }
 
 func TestGetWorkspaceNextBountyByCreated(t *testing.T) {
-	teardownSuite := setupSuite(t)
+	teardownSuite := SetupSuite(t)
 	defer teardownSuite(t)
 
 	db.TestDB.CreateOrEditWorkspace(workspace)
@@ -958,7 +958,7 @@ func TestGetWorkspaceNextBountyByCreated(t *testing.T) {
 }
 
 func TestGetWorkspacePreviousBountyByCreated(t *testing.T) {
-	teardownSuite := setupSuite(t)
+	teardownSuite := SetupSuite(t)
 	defer teardownSuite(t)
 
 	mockHttpClient := mocks.NewHttpClient(t)
@@ -1069,105 +1069,6 @@ func TestGetBountyById(t *testing.T) {
 	})
 }
 
-func GetPersonAssigned(t *testing.T) {
-	ctx := context.Background()
-	mockDb := dbMocks.NewDatabase(t)
-	mockHttpClient := mocks.NewHttpClient(t)
-	bHandler := NewBountyHandler(mockHttpClient, mockDb)
-	t.Run("should return bounties assigned to the user", func(t *testing.T) {
-		mockGenerateBountyResponse := func(bounties []db.NewBounty) []db.BountyResponse {
-			var bountyResponses []db.BountyResponse
-
-			for _, bounty := range bounties {
-				owner := db.Person{
-					ID: 1,
-				}
-				assignee := db.Person{
-					ID: 1,
-				}
-				workspace := db.WorkspaceShort{
-					Uuid: "uuid",
-				}
-
-				bountyResponse := db.BountyResponse{
-					Bounty:       bounty,
-					Assignee:     assignee,
-					Owner:        owner,
-					Organization: workspace,
-					Workspace:    workspace,
-				}
-				bountyResponses = append(bountyResponses, bountyResponse)
-			}
-
-			return bountyResponses
-		}
-		bHandler.generateBountyResponse = mockGenerateBountyResponse
-
-		expectedBounties := []db.NewBounty{
-			{ID: 1, Assignee: "user1"},
-			{ID: 2, Assignee: "user1"},
-			{ID: 3, OwnerID: "user2", Assignee: "user1"},
-			{ID: 4, OwnerID: "user2", Assignee: "user1", Paid: true},
-		}
-
-		mockDb.On("GetAssignedBounties", mock.Anything).Return(expectedBounties, nil).Once()
-		mockDb.On("GetPersonByPubkey", mock.Anything).Return(db.Person{}, nil)
-		mockDb.On("GetWorkspaceByUuid", mock.Anything).Return(db.Workspace{}, nil)
-		rr := httptest.NewRecorder()
-		req, err := http.NewRequest("GET", "/wanteds/assigned/uuid?Assigned=true&Paid=true&offset=0&limit=4", nil)
-		req = req.WithContext(ctx)
-		if err != nil {
-			t.Fatal(err)
-		}
-
-		bHandler.GetPersonAssignedBounties(rr, req)
-
-		assert.Equal(t, http.StatusOK, rr.Code)
-
-		var responseData []db.BountyResponse
-		err = json.Unmarshal(rr.Body.Bytes(), &responseData)
-		if err != nil {
-			t.Fatalf("Error decoding JSON response: %s", err)
-		}
-
-		assert.NotEmpty(t, responseData)
-		assert.Len(t, responseData, 2)
-
-		for i, expectedBounty := range expectedBounties {
-			assert.Equal(t, expectedBounty.ID, responseData[i].Bounty.ID)
-			assert.Equal(t, expectedBounty.Assignee, responseData[i].Bounty.Assignee)
-		}
-	})
-
-	t.Run("should not return bounties assigned to other users", func(t *testing.T) {
-		mockGenerateBountyResponse := func(bounties []db.NewBounty) []db.BountyResponse {
-			return []db.BountyResponse{}
-		}
-		bHandler.generateBountyResponse = mockGenerateBountyResponse
-
-		mockDb.On("GetAssignedBounties", mock.Anything).Return([]db.NewBounty{}, nil).Once()
-
-		rr := httptest.NewRecorder()
-		req, err := http.NewRequest("GET", "/wanteds/assigned/uuid", nil)
-		req = req.WithContext(ctx)
-		if err != nil {
-			t.Fatal(err)
-		}
-
-		bHandler.GetPersonAssignedBounties(rr, req)
-
-		assert.Equal(t, http.StatusOK, rr.Code)
-
-		var responseData []db.BountyResponse
-		err = json.Unmarshal(rr.Body.Bytes(), &responseData)
-		if err != nil {
-			t.Fatalf("Error decoding JSON response: %s", err)
-		}
-
-		assert.Empty(t, responseData)
-		assert.Len(t, responseData, 0)
-	})
-}
 func TestGetBountyIndexById(t *testing.T) {
 	mockDb := dbMocks.NewDatabase(t)
 	mockHttpClient := mocks.NewHttpClient(t)
