@@ -107,6 +107,12 @@ Add `STAKWORK_KEY` for YouTube video downloads.
 
 Run unit tests with coverage:
 
+- Have Docker installed on your machine
+- Run Docker
+- Spin up a Postgres DB container before the test with this command
+  `docker compose -f docker/testdb-docker-compose.yml -p test_db  up -d`
+- Change the rdHost `rdsHost := "172.17.0.1"` variable value in `db/test_config.go` to your `127.0.0.1`
+
 ```sh
     // you may need to install cover with this command first
     go get golang.org/x/tools/cmd/cover
@@ -115,6 +121,10 @@ Run unit tests with coverage:
     // To get code coverage in html format do the following after running the code above
     go tool cover -html="coverage.out"
 ```
+
+- Drop the Postgres DB container after the test with this command
+  `docker compose -f docker/testdb-docker-compose.yml -p test_db down`
+- Change the rdHost variable value in `db/test_config.go` to the default value for github workflow `rdsHost := "172.17.0.1"`
 
 ### Mocking Interfaces
 
