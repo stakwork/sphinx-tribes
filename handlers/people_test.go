@@ -237,21 +237,28 @@ func TestGetPersonById(t *testing.T) {
 }
 
 func TestDeletePerson(t *testing.T) {
-	mockDb := mocks.NewDatabase(t)
-	pHandler := NewPeopleHandler(mockDb)
+	teardownSuite := SetupSuite(t)
+	defer teardownSuite(t)
+
+	pHandler := NewPeopleHandler(db.TestDB)
 
 	t.Run("successful deletion", func(t *testing.T) {
 		rr := httptest.NewRecorder()
 		handler := http.HandlerFunc(pHandler.DeletePerson)
 		person := db.Person{
-			ID:          1,
-			Uuid:        "test-uuid",
-			OwnerPubKey: "owner-pub-key",
-			OwnerAlias:  "owner",
+			ID:           112,
+			Uuid:         "person_112_uuid",
+			OwnerPubKey:  "person_112_pubkey",
+			OwnerAlias:   "owner",
+			UniqueName:   "test_user",
+			Description:  "test user",
+			Tags:         pq.StringArray{},
+			Extras:       db.PropertyMap{},
+			GithubIssues: db.PropertyMap{},
 		}
 
 		rctx := chi.NewRouteContext()
-		rctx.URLParams.Add("id", "1")
+		rctx.URLParams.Add("id", strconv.Itoa(int(person.ID)))
 
 		ctx := context.WithValue(context.Background(), chi.RouteCtxKey, rctx)
 		ctx = context.WithValue(ctx, auth.ContextKey, person.OwnerPubKey)
@@ -259,12 +266,16 @@ func TestDeletePerson(t *testing.T) {
 		req, err := http.NewRequestWithContext(ctx, http.MethodDelete, "/person", nil)
 		assert.NoError(t, err)
 
-		mockDb.On("GetPerson", person.ID).Return(person).Once()
-		mockDb.On("UpdatePerson", person.ID, mock.Anything).Return(true).Once()
+		db.TestDB.CreateOrEditPerson(person)
+		fetchedPerson := db.TestDB.GetPerson(person.ID)
+		assert.Equal(t, person, fetchedPerson)
+
 		handler.ServeHTTP(rr, req)
 
 		assert.Equal(t, http.StatusOK, rr.Code)
-		mockDb.AssertExpectations(t)
+
+		deletedPerson := db.TestDB.GetPerson(person.ID)
+		assert.Empty(t, deletedPerson)
 	})
 }
 
