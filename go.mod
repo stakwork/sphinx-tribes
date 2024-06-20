@@ -86,6 +86,7 @@ require (
 	go.mongodb.org/mongo-driver v1.7.5 // indirect
 	golang.org/x/exp v0.0.0-20230315142452-642cacee5cc0 // indirect
 	golang.org/x/oauth2 v0.15.0
+	golang.org/x/tools/cmd/cover v0.1.0-deprecated // indirect
 	google.golang.org/api v0.153.0
 	gopkg.in/go-playground/validator.v9 v9.31.0 // indirect
 	gorm.io/driver/postgres v1.5.4
