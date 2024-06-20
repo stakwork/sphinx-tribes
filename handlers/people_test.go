@@ -41,8 +41,8 @@ func TestGetPersonByPuKey(t *testing.T) {
 		db.TestDB.CreateOrEditPerson(person)
 
 		rctx := chi.NewRouteContext()
-		rctx.URLParams.Add("pubkey", "person_104_pubkey")
-		req, err := http.NewRequestWithContext(context.WithValue(context.Background(), chi.RouteCtxKey, rctx), http.MethodGet, "/person/person_104_pubkey", nil)
+		rctx.URLParams.Add("pubkey", person.OwnerPubKey)
+		req, err := http.NewRequestWithContext(context.WithValue(context.Background(), chi.RouteCtxKey, rctx), http.MethodGet, "/person/"+person.OwnerPubKey, nil)
 		if err != nil {
 			t.Fatal(err)
 		}
