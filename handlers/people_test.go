@@ -53,8 +53,9 @@ func TestGetPersonByPuKey(t *testing.T) {
 func TestCreateOrEditPerson(t *testing.T) {
 
 	ctx := context.WithValue(context.Background(), auth.ContextKey, "test-key")
-	mockDb := mocks.NewDatabase(t)
-	pHandler := NewPeopleHandler(mockDb)
+	teardownSuite := SetupSuite(t)
+	defer teardownSuite(t)
+	pHandler := NewPeopleHandler(db.TestDB)
 
 	t.Run("should return error if body is not a valid json", func(t *testing.T) {
 		rr := httptest.NewRecorder()
@@ -111,34 +112,45 @@ func TestCreateOrEditPerson(t *testing.T) {
 			t.Fatal(err)
 		}
 
-		mockDb.On("GetPersonByPubkey", "test-key").Return(db.Person{}).Once()
 		handler.ServeHTTP(rr, req)
 
 		assert.Equal(t, http.StatusUnauthorized, rr.Code, "invalid status received")
-		mockDb.AssertExpectations(t)
 	})
 
 	t.Run("should create user with unique name from owner_alias", func(t *testing.T) {
 		rr := httptest.NewRecorder()
 		handler := http.HandlerFunc(pHandler.CreateOrEditPerson)
 
-		bodyJson := []byte(`{"owner_pubkey": "test-key", "owner_alias": "test-user"}`)
-		req, err := http.NewRequestWithContext(ctx, http.MethodPost, "/", bytes.NewReader(bodyJson))
+		person := db.Person{
+			ID:           2,
+			Uuid:         "perosn_2_uuid",
+			OwnerAlias:   "person",
+			UniqueName:   "person",
+			OwnerPubKey:  "test-key",
+			PriceToMeet:  0,
+			Description:  "this is test user 1",
+			Tags:         pq.StringArray{},
+			Extras:       db.PropertyMap{},
+			GithubIssues: db.PropertyMap{},
+		}
+		requestBody, _ := json.Marshal(person)
+
+		req, err := http.NewRequestWithContext(ctx, http.MethodPost, "/", bytes.NewReader(requestBody))
 		if err != nil {
 			t.Fatal(err)
 		}
 
-		mockDb.On("GetPersonByPubkey", "test-key").Return(db.Person{}).Once()
-		mockDb.On("PersonUniqueNameFromName", "test-user").Return("unique-name", nil).Once()
-		mockDb.On("CreateOrEditPerson", mock.MatchedBy(func(p db.Person) bool {
-			return p.UniqueName == "unique-name" &&
-				p.OwnerPubKey == "test-key" &&
-				p.OwnerAlias == "test-user"
-		})).Return(db.Person{}, nil).Once()
+		db.TestDB.CreateOrEditPerson(person)
+
+		fetchedPerson := db.TestDB.GetPersonByUuid(person.Uuid)
+
 		handler.ServeHTTP(rr, req)
 
+		person.Created = fetchedPerson.Created
+		person.Updated = fetchedPerson.Updated
+
 		assert.Equal(t, http.StatusOK, rr.Code, "invalid status received")
-		mockDb.AssertExpectations(t)
+		assert.EqualValues(t, person, fetchedPerson)
 	})
 
 	t.Run("should return error if trying to update other user", func(t *testing.T) {
@@ -151,33 +163,45 @@ func TestCreateOrEditPerson(t *testing.T) {
 			t.Fatal(err)
 		}
 
-		mockDb.On("GetPersonByPubkey", "test-key").Return(db.Person{ID: 2}).Once()
 		handler.ServeHTTP(rr, req)
 
 		assert.Equal(t, http.StatusUnauthorized, rr.Code, "invalid status received")
-		mockDb.AssertExpectations(t)
+
 	})
 
 	t.Run("should update user successfully", func(t *testing.T) {
 		rr := httptest.NewRecorder()
 		handler := http.HandlerFunc(pHandler.CreateOrEditPerson)
 
-		bodyJson := []byte(`{"owner_pubkey": "test-key", "owner_alias": "test-user", "id": 1, "img": "img-url"}`)
-		req, err := http.NewRequestWithContext(ctx, http.MethodPost, "/", bytes.NewReader(bodyJson))
+		updatePerson := db.Person{
+			ID:           2,
+			Uuid:         "perosn_2_uuid",
+			OwnerAlias:   "person",
+			UniqueName:   "person",
+			OwnerPubKey:  "test-key",
+			PriceToMeet:  100,
+			Description:  "this is Updated test user 1",
+			Tags:         pq.StringArray{},
+			Extras:       db.PropertyMap{},
+			GithubIssues: db.PropertyMap{},
+		}
+		requestBody, _ := json.Marshal(updatePerson)
+
+		req, err := http.NewRequestWithContext(ctx, http.MethodPut, "/", bytes.NewReader(requestBody))
 		if err != nil {
 			t.Fatal(err)
 		}
 
-		mockDb.On("GetPersonByPubkey", "test-key").Return(db.Person{ID: 1}).Once()
-		mockDb.On("CreateOrEditPerson", mock.MatchedBy(func(p db.Person) bool {
-			return p.OwnerPubKey == "test-key" &&
-				p.OwnerAlias == "test-user" &&
-				p.Img == "img-url"
-		})).Return(db.Person{}, nil).Once()
+		db.TestDB.CreateOrEditPerson(updatePerson)
+		fetchedUpdatedPerson := db.TestDB.GetPersonByUuid(updatePerson.Uuid)
+
 		handler.ServeHTTP(rr, req)
 
+		updatePerson.Created = fetchedUpdatedPerson.Created
+		updatePerson.Updated = fetchedUpdatedPerson.Updated
+
 		assert.Equal(t, http.StatusOK, rr.Code, "invalid status received")
-		mockDb.AssertExpectations(t)
+		assert.EqualValues(t, updatePerson, fetchedUpdatedPerson)
 	})
 }
 
