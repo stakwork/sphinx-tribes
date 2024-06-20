@@ -20,33 +20,39 @@ import (
 )
 
 func TestGetPersonByPuKey(t *testing.T) {
-	mockDb := mocks.NewDatabase(t)
-	pHandler := NewPeopleHandler(mockDb)
+	teardownSuite := SetupSuite(t)
+	defer teardownSuite(t)
+
+	pHandler := NewPeopleHandler(db.TestDB)
 	t.Run("should return person if present in db", func(t *testing.T) {
 		rr := httptest.NewRecorder()
 		handler := http.HandlerFunc(pHandler.GetPersonByPubkey)
 		person := db.Person{
-			ID:          1,
-			Uuid:        uuid.New().String(),
-			OwnerPubKey: "person-pub-key",
-			OwnerAlias:  "owner",
-			UniqueName:  "test_user",
-			Description: "test user",
+			ID:           104,
+			Uuid:         "person_104_uuid",
+			OwnerPubKey:  "person_104_pubkey",
+			OwnerAlias:   "owner",
+			UniqueName:   "test_user",
+			Description:  "test user",
+			Tags:         pq.StringArray{},
+			Extras:       db.PropertyMap{},
+			GithubIssues: db.PropertyMap{},
 		}
+		db.TestDB.CreateOrEditPerson(person)
+
 		rctx := chi.NewRouteContext()
-		rctx.URLParams.Add("pubkey", "person-pub-key")
-		req, err := http.NewRequestWithContext(context.WithValue(context.Background(), chi.RouteCtxKey, rctx), http.MethodGet, "/person/person-pub-key", nil)
+		rctx.URLParams.Add("pubkey", "person_104_pubkey")
+		req, err := http.NewRequestWithContext(context.WithValue(context.Background(), chi.RouteCtxKey, rctx), http.MethodGet, "/person/person_104_pubkey", nil)
 		if err != nil {
 			t.Fatal(err)
 		}
-		mockDb.On("GetPersonByPubkey", "person-pub-key").Return(person).Once()
+
 		handler.ServeHTTP(rr, req)
 
 		var returnedPerson db.Person
 		_ = json.Unmarshal(rr.Body.Bytes(), &returnedPerson)
 		assert.Equal(t, http.StatusOK, rr.Code)
 		assert.EqualValues(t, person, returnedPerson)
-		mockDb.AssertExpectations(t)
 	})
 }
 
