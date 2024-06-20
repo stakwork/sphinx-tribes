@@ -11,6 +11,7 @@ import (
 
 	"github.com/go-chi/chi"
 	"github.com/google/uuid"
+	"github.com/lib/pq"
 	"github.com/stakwork/sphinx-tribes/auth"
 	"github.com/stakwork/sphinx-tribes/db"
 	mocks "github.com/stakwork/sphinx-tribes/mocks"
@@ -181,17 +182,25 @@ func TestCreateOrEditPerson(t *testing.T) {
 }
 
 func TestGetPersonById(t *testing.T) {
-	mockDb := mocks.NewDatabase(t)
-	pHandler := NewPeopleHandler(mockDb)
+	teardownSuite := SetupSuite(t)
+	defer teardownSuite(t)
+
+	pHandler := NewPeopleHandler(db.TestDB)
 
 	t.Run("successful retrieval", func(t *testing.T) {
 		rr := httptest.NewRecorder()
 		handler := http.HandlerFunc(pHandler.GetPersonById)
 		person := db.Person{
-			ID:          1,
-			Uuid:        "test-uuid",
-			OwnerPubKey: "owner-pub-key",
-			OwnerAlias:  "owner",
+			ID:           100,
+			Uuid:         "perosn_1_uuid",
+			OwnerAlias:   "person",
+			UniqueName:   "person",
+			OwnerPubKey:  "person_1_pubkey",
+			PriceToMeet:  0,
+			Description:  "this is test user 1",
+			Tags:         pq.StringArray{},
+			Extras:       db.PropertyMap{},
+			GithubIssues: db.PropertyMap{},
 		}
 
 		rctx := chi.NewRouteContext()
@@ -199,7 +208,9 @@ func TestGetPersonById(t *testing.T) {
 		req, err := http.NewRequestWithContext(context.WithValue(context.Background(), chi.RouteCtxKey, rctx), http.MethodGet, "/person", nil)
 		assert.NoError(t, err)
 
-		mockDb.On("GetPerson", mock.Anything).Return(person).Once()
+		db.TestDB.CreateOrEditPerson(person)
+		fetchedPerson := db.TestDB.GetPerson(person.ID)
+
 		handler.ServeHTTP(rr, req)
 
 		var returnedPerson db.Person
@@ -207,7 +218,7 @@ func TestGetPersonById(t *testing.T) {
 		assert.NoError(t, err)
 		assert.Equal(t, http.StatusOK, rr.Code)
 		assert.EqualValues(t, person, returnedPerson)
-		mockDb.AssertExpectations(t)
+		assert.EqualValues(t, person, fetchedPerson)
 	})
 
 	t.Run("person not found", func(t *testing.T) {
@@ -219,11 +230,9 @@ func TestGetPersonById(t *testing.T) {
 		req, err := http.NewRequestWithContext(context.WithValue(context.Background(), chi.RouteCtxKey, rctx), http.MethodGet, "/person", nil)
 		assert.NoError(t, err)
 
-		mockDb.On("GetPerson", mock.Anything).Return(db.Person{}).Once()
 		handler.ServeHTTP(rr, req)
 
 		assert.Equal(t, http.StatusOK, rr.Code)
-		mockDb.AssertExpectations(t)
 	})
 }
 
