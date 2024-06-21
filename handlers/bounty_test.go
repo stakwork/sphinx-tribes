@@ -1122,39 +1122,43 @@ func TestGetBountyIndexById(t *testing.T) {
 }
 
 func TestGetAllBounties(t *testing.T) {
-	mockDb := dbMocks.NewDatabase(t)
+	teardownSuite := SetupSuite(t)
+	defer teardownSuite(t)
+
 	mockHttpClient := mocks.NewHttpClient(t)
-	bHandler := NewBountyHandler(mockHttpClient, mockDb)
-	t.Run("Should successfull All Bounties", func(t *testing.T) {
+	bHandler := NewBountyHandler(mockHttpClient, db.TestDB)
+
+	t.Run("Should successfully return all bounties", func(t *testing.T) {
+		now := time.Now().Unix()
+		bounty := db.NewBounty{
+			Type:          "coding",
+			Title:         "Bounty With ID",
+			Description:   "Bounty ID description",
+			WorkspaceUuid: "",
+			Assignee:      "",
+			OwnerID:       "test-owner",
+			Show:          true,
+			Created:       now,
+		}
+		db.TestDB.CreateOrEditBounty(bounty)
+
+		bountyInDb, err := db.TestDB.GetBountyByCreated(uint(bounty.Created))
+		assert.NoError(t, err)
+		assert.NotNil(t, bountyInDb)
+
 		rr := httptest.NewRecorder()
 		handler := http.HandlerFunc(bHandler.GetAllBounties)
-		bounties := []db.NewBounty{
-			{ID: 1,
-				Type:          "coding",
-				Title:         "first bounty",
-				Description:   "first bounty description",
-				OrgUuid:       "org-1",
-				WorkspaceUuid: "work-1",
-				Assignee:      "user1",
-				Created:       1707991475,
-				OwnerID:       "owner-1",
-			},
-		}
 
 		rctx := chi.NewRouteContext()
 		req, _ := http.NewRequestWithContext(context.WithValue(context.Background(), chi.RouteCtxKey, rctx), http.MethodGet, "/all", nil)
 
-		mockDb.On("GetAllBounties", req).Return(bounties)
-		mockDb.On("GetPersonByPubkey", mock.Anything).Return(db.Person{}, nil)
-		mockDb.On("GetWorkspaceByUuid", mock.Anything).Return(db.Workspace{}, nil)
 		handler.ServeHTTP(rr, req)
 
 		var returnedBounty []db.BountyResponse
-		err := json.Unmarshal(rr.Body.Bytes(), &returnedBounty)
+		err = json.Unmarshal(rr.Body.Bytes(), &returnedBounty)
 		assert.NoError(t, err)
 		assert.Equal(t, http.StatusOK, rr.Code)
 		assert.NotEmpty(t, returnedBounty)
-
 	})
 }
 
