@@ -52,7 +52,7 @@ func TestGetPersonByPuKey(t *testing.T) {
 
 func TestCreateOrEditPerson(t *testing.T) {
 
-	ctx := context.WithValue(context.Background(), auth.ContextKey, "test-key")
+	ctx := context.WithValue(context.Background(), auth.ContextKey, "test_key")
 	teardownSuite := SetupSuite(t)
 	defer teardownSuite(t)
 	pHandler := NewPeopleHandler(db.TestDB)
@@ -107,7 +107,7 @@ func TestCreateOrEditPerson(t *testing.T) {
 		handler := http.HandlerFunc(pHandler.CreateOrEditPerson)
 
 		bodyJson := []byte(`{"owner_pubkey": "test-key", "id": 100}`)
-		req, err := http.NewRequestWithContext(ctx, http.MethodPost, "/", bytes.NewReader(bodyJson))
+		req, err := http.NewRequestWithContext(ctx, http.MethodPut, "/", bytes.NewReader(bodyJson))
 		if err != nil {
 			t.Fatal(err)
 		}
@@ -122,13 +122,13 @@ func TestCreateOrEditPerson(t *testing.T) {
 		handler := http.HandlerFunc(pHandler.CreateOrEditPerson)
 
 		person := db.Person{
-			ID:           2,
-			Uuid:         "perosn_2_uuid",
+			ID:           4,
+			Uuid:         "perosn_4_uuid",
 			OwnerAlias:   "person",
 			UniqueName:   "person",
-			OwnerPubKey:  "test-key",
+			OwnerPubKey:  "test_key",
 			PriceToMeet:  0,
-			Description:  "this is test user 1",
+			Description:  "this is test user 4",
 			Tags:         pq.StringArray{},
 			Extras:       db.PropertyMap{},
 			GithubIssues: db.PropertyMap{},
@@ -174,13 +174,13 @@ func TestCreateOrEditPerson(t *testing.T) {
 		handler := http.HandlerFunc(pHandler.CreateOrEditPerson)
 
 		updatePerson := db.Person{
-			ID:           2,
-			Uuid:         "perosn_2_uuid",
+			ID:           4,
+			Uuid:         "perosn_4_uuid",
 			OwnerAlias:   "person",
 			UniqueName:   "person",
-			OwnerPubKey:  "test-key",
+			OwnerPubKey:  "test_key",
 			PriceToMeet:  100,
-			Description:  "this is Updated test user 1",
+			Description:  "this is Updated test user 4",
 			Tags:         pq.StringArray{},
 			Extras:       db.PropertyMap{},
 			GithubIssues: db.PropertyMap{},
