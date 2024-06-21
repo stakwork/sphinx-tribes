@@ -1085,7 +1085,7 @@ func TestGetBountyIndexById(t *testing.T) {
 			ID:            1,
 			Type:          "coding",
 			Title:         "Bounty With ID",
-			Description:   "Bounty ID description",
+			Description:   "Bounty description",
 			WorkspaceUuid: "",
 			Assignee:      "",
 			OwnerID:       bountyOwner.OwnerPubKey,
