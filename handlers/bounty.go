@@ -113,6 +113,7 @@ func (h *bountyHandler) GetBountyIndexById(w http.ResponseWriter, r *http.Reques
 	bountyId := chi.URLParam(r, "bountyId")
 	if bountyId == "" {
 		w.WriteHeader(http.StatusNotFound)
+		return
 	}
 	bountyIndex := h.db.GetBountyIndexById(bountyId)
 	w.WriteHeader(http.StatusOK)
