@@ -20,33 +20,39 @@ import (
 )
 
 func TestGetPersonByPuKey(t *testing.T) {
-	mockDb := mocks.NewDatabase(t)
-	pHandler := NewPeopleHandler(mockDb)
+	teardownSuite := SetupSuite(t)
+	defer teardownSuite(t)
+
+	pHandler := NewPeopleHandler(db.TestDB)
 	t.Run("should return person if present in db", func(t *testing.T) {
 		rr := httptest.NewRecorder()
 		handler := http.HandlerFunc(pHandler.GetPersonByPubkey)
 		person := db.Person{
-			ID:          1,
-			Uuid:        uuid.New().String(),
-			OwnerPubKey: "person-pub-key",
-			OwnerAlias:  "owner",
-			UniqueName:  "test_user",
-			Description: "test user",
+			ID:           104,
+			Uuid:         "person_104_uuid",
+			OwnerPubKey:  "person_104_pubkey",
+			OwnerAlias:   "owner",
+			UniqueName:   "test_user",
+			Description:  "test user",
+			Tags:         pq.StringArray{},
+			Extras:       db.PropertyMap{},
+			GithubIssues: db.PropertyMap{},
 		}
+		db.TestDB.CreateOrEditPerson(person)
+
 		rctx := chi.NewRouteContext()
-		rctx.URLParams.Add("pubkey", "person-pub-key")
-		req, err := http.NewRequestWithContext(context.WithValue(context.Background(), chi.RouteCtxKey, rctx), http.MethodGet, "/person/person-pub-key", nil)
+		rctx.URLParams.Add("pubkey", person.OwnerPubKey)
+		req, err := http.NewRequestWithContext(context.WithValue(context.Background(), chi.RouteCtxKey, rctx), http.MethodGet, "/person/"+person.OwnerPubKey, nil)
 		if err != nil {
 			t.Fatal(err)
 		}
-		mockDb.On("GetPersonByPubkey", "person-pub-key").Return(person).Once()
+
 		handler.ServeHTTP(rr, req)
 
 		var returnedPerson db.Person
 		_ = json.Unmarshal(rr.Body.Bytes(), &returnedPerson)
 		assert.Equal(t, http.StatusOK, rr.Code)
 		assert.EqualValues(t, person, returnedPerson)
-		mockDb.AssertExpectations(t)
 	})
 }
 
@@ -293,34 +299,64 @@ func TestDeletePerson(t *testing.T) {
 }
 
 func TestGetPeopleBySearch(t *testing.T) {
-	mockDb := mocks.NewDatabase(t)
-	pHandler := NewPeopleHandler(mockDb)
+	teardownSuite := SetupSuite(t)
+	defer teardownSuite(t)
+	pHandler := NewPeopleHandler(db.TestDB)
+
+	person := db.Person{
+		ID:           102,
+		Uuid:         "perosn_102_uuid",
+		OwnerAlias:   "person102",
+		UniqueName:   "person102",
+		OwnerPubKey:  "person_102_pubkey",
+		PriceToMeet:  0,
+		Description:  "This is test user 102",
+		Tags:         pq.StringArray{},
+		Extras:       db.PropertyMap{},
+		GithubIssues: db.PropertyMap{},
+	}
+	person2 := db.Person{
+		ID:           103,
+		Uuid:         "perosn_103_uuid",
+		OwnerAlias:   "person103",
+		UniqueName:   "person103",
+		OwnerPubKey:  "person_103_pubkey",
+		PriceToMeet:  0,
+		Description:  "This is test user 103",
+		Tags:         pq.StringArray{},
+		Extras:       db.PropertyMap{},
+		GithubIssues: db.PropertyMap{},
+	}
+	db.TestDB.CreateOrEditPerson(person)
+	db.TestDB.CreateOrEditPerson(person2)
 
 	t.Run("should return users that match the search text", func(t *testing.T) {
 		rr := httptest.NewRecorder()
 		handler := http.HandlerFunc(pHandler.GetPeopleBySearch)
-		expectedPeople := []db.Person{
-			{ID: 1, Uuid: "uuid1", OwnerPubKey: "pubkey1", OwnerAlias: "John Doe"},
-			{ID: 2, Uuid: "uuid2", OwnerPubKey: "pubkey2", OwnerAlias: "John Smith"},
-		}
 
 		rctx := chi.NewRouteContext()
-		req, err := http.NewRequestWithContext(context.WithValue(context.Background(), chi.RouteCtxKey, rctx), http.MethodGet, "/search?search=John", nil)
+		req, err := http.NewRequestWithContext(context.WithValue(context.Background(), chi.RouteCtxKey, rctx), http.MethodGet, "/search?search="+person.OwnerAlias, nil)
 		assert.NoError(t, err)
 
-		mockDb.On("GetPeopleBySearch", mock.Anything).Return(expectedPeople)
+		fetchedPerson := db.TestDB.GetPerson(person.ID)
+		fetchedPerson2 := db.TestDB.GetPerson(person2.ID)
+
+		expectedPeople := []db.Person{
+			fetchedPerson,
+		}
+
 		handler.ServeHTTP(rr, req)
 
 		var returnedPeople []db.Person
 		err = json.Unmarshal(rr.Body.Bytes(), &returnedPeople)
 		assert.NoError(t, err)
 		assert.Equal(t, http.StatusOK, rr.Code)
+		assert.EqualValues(t, person, fetchedPerson)
+		assert.EqualValues(t, person2, fetchedPerson2)
 		assert.EqualValues(t, expectedPeople, returnedPeople)
-		mockDb.AssertExpectations(t)
 	})
 
 	t.Run("should return an empty search result when no user matches the search text", func(t *testing.T) {
-		mockDb.ExpectedCalls = nil
 		rr := httptest.NewRecorder()
 		handler := http.HandlerFunc(pHandler.GetPeopleBySearch)
 		expectedPeople := []db.Person{}
@@ -329,7 +365,6 @@ func TestGetPeopleBySearch(t *testing.T) {
 		req, err := http.NewRequestWithContext(context.WithValue(context.Background(), chi.RouteCtxKey, rctx), http.MethodGet, "/search?search=user not matched", nil)
 		assert.NoError(t, err)
 
-		mockDb.On("GetPeopleBySearch", mock.Anything).Return(expectedPeople)
 		handler.ServeHTTP(rr, req)
 
 		var returnedPeople []db.Person
@@ -337,7 +372,6 @@ func TestGetPeopleBySearch(t *testing.T) {
 		assert.NoError(t, err)
 		assert.Equal(t, http.StatusOK, rr.Code)
 		assert.EqualValues(t, expectedPeople, returnedPeople)
-		mockDb.AssertExpectations(t)
 	})
 }
 
