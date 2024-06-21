@@ -139,7 +139,15 @@ func TestCreateOrEditPerson(t *testing.T) {
 			Tags:         pq.StringArray{},
 			Extras:       db.PropertyMap{},
 			GithubIssues: db.PropertyMap{},
+			Img:          "img-url",
 		}
+
+		db.TestDB.CreateOrEditPerson(person)
+
+		fetchedUpdatedPerson := db.TestDB.GetPersonByUuid(person.Uuid)
+
+		person.ID = fetchedUpdatedPerson.ID
+
 		requestBody, _ := json.Marshal(person)
 
 		ctx := context.WithValue(context.Background(), auth.ContextKey, person.OwnerPubKey)
@@ -149,9 +157,14 @@ func TestCreateOrEditPerson(t *testing.T) {
 			t.Fatal(err)
 		}
 
+		person.Created = fetchedUpdatedPerson.Created
+		person.Updated = fetchedUpdatedPerson.Updated
+
 		handler.ServeHTTP(rr, req)
 
 		assert.Equal(t, http.StatusOK, rr.Code, "invalid status received")
+
+		assert.EqualValues(t, person, fetchedUpdatedPerson)
 	})
 
 	t.Run("should return error if trying to update other user", func(t *testing.T) {
