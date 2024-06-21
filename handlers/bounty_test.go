@@ -1099,6 +1099,8 @@ func TestGetBountyIndexById(t *testing.T) {
 		assert.Equal(t, bounty, bountyInDb)
 		assert.NoError(t, err)
 
+		bountyIndex := db.TestDB.GetBountyIndexById(strconv.Itoa(int(bountyInDb.ID)))
+
 		rctx := chi.NewRouteContext()
 		rctx.URLParams.Add("bountyId", strconv.Itoa(int(bountyInDb.ID)))
 		req, err := http.NewRequestWithContext(context.WithValue(context.Background(), chi.RouteCtxKey, rctx), http.MethodGet, "/index/"+strconv.Itoa(int(bountyInDb.ID)), nil)
@@ -1108,9 +1110,9 @@ func TestGetBountyIndexById(t *testing.T) {
 
 		responseBody := rr.Body.Bytes()
 		responseString := strings.TrimSpace(string(responseBody))
-		returnedIndex, err := strconv.Atoi(responseString)
+		returnedIndex, err := strconv.ParseInt(responseString, 10, 64)
 		assert.NoError(t, err)
-		assert.Equal(t, 1, returnedIndex)
+		assert.Equal(t, bountyIndex, returnedIndex)
 
 		assert.Equal(t, http.StatusOK, rr.Code)
 	})
