@@ -65,3 +65,7 @@ func InitTestDB() {
 		}
 	}
 }
+
+func CleanDB() {
+	TestDB.db.Exec("DELETE FROM people")
+}
