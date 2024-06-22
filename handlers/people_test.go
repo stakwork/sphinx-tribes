@@ -420,6 +420,8 @@ func TestGetListedPeople(t *testing.T) {
 
 	pHandler := NewPeopleHandler(db.TestDB)
 
+	db.CleanDB()
+
 	person := db.Person{
 		ID:           101,
 		Uuid:         "person_101_uuid",
@@ -490,6 +492,56 @@ func TestGetListedPeople(t *testing.T) {
 		assert.EqualValues(t, person3, fetchedPerson2)
 		assert.EqualValues(t, expectedPeople, returnedPeople)
 	})
+
+	t.Run("should return only users that match a search text when a search is added to the URL query", func(t *testing.T) {
+		rr := httptest.NewRecorder()
+		handler := http.HandlerFunc(pHandler.GetListedPeople)
+
+		rctx := chi.NewRouteContext()
+		req, err := http.NewRequestWithContext(context.WithValue(context.Background(), chi.RouteCtxKey, rctx), http.MethodGet, "/?page=1&limit=10&search="+person2.OwnerAlias, nil)
+		assert.NoError(t, err)
+
+		expectedPeople := []db.Person{
+			fetchedPerson,
+		}
+
+		handler.ServeHTTP(rr, req)
+
+		var returnedPeople []db.Person
+		err = json.Unmarshal(rr.Body.Bytes(), &returnedPeople)
+		assert.NoError(t, err)
+		assert.Equal(t, http.StatusOK, rr.Code)
+		assert.EqualValues(t, person2, fetchedPerson)
+		assert.EqualValues(t, expectedPeople, returnedPeople)
+	})
+
+	t.Run("should return only users that match a skill set when languages are passed to the URL query", func(t *testing.T) {
+		rr := httptest.NewRecorder()
+		handler := http.HandlerFunc(pHandler.GetListedPeople)
+
+		rctx := chi.NewRouteContext()
+		req, err := http.NewRequestWithContext(
+			context.WithValue(context.Background(), chi.RouteCtxKey, rctx),
+			http.MethodGet,
+			"page=1&limit=10&languages="+person2.Extras["coding_languages"].(string),
+			nil,
+		)
+		assert.NoError(t, err)
+
+		expectedPeople := []db.Person{
+			fetchedPerson,
+		}
+
+		handler.ServeHTTP(rr, req)
+
+		var returnedPeople []db.Person
+		err = json.Unmarshal(rr.Body.Bytes(), &returnedPeople)
+		assert.NoError(t, err)
+		assert.Equal(t, http.StatusOK, rr.Code)
+		assert.EqualValues(t, person2, fetchedPerson)
+		assert.EqualValues(t, expectedPeople, returnedPeople)
+	})
+
 }
 
 func TestGetPersonByUuid(t *testing.T) {
