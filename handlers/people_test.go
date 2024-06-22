@@ -490,55 +490,62 @@ func TestGetListedPeople(t *testing.T) {
 }
 
 func TestGetPersonByUuid(t *testing.T) {
-	mockDb := mocks.NewDatabase(t)
-	pHandler := NewPeopleHandler(mockDb)
+	teardownSuite := SetupSuite(t)
+	defer teardownSuite(t)
+
+	pHandler := NewPeopleHandler(db.TestDB)
 
 	t.Run("should return a user with the right UUID", func(t *testing.T) {
 		rr := httptest.NewRecorder()
 		handler := http.HandlerFunc(pHandler.GetPersonByUuid)
-		expectedPerson := db.Person{
-			ID:          1,
-			Uuid:        uuid.New().String(),
-			OwnerPubKey: "person-pub-key",
-			OwnerAlias:  "owner",
-			UniqueName:  "test_user",
-			Description: "test user",
+		person := db.Person{
+			ID:           101,
+			Uuid:         uuid.New().String(),
+			OwnerAlias:   "person101",
+			UniqueName:   "person101",
+			OwnerPubKey:  "person_101_pubkey",
+			PriceToMeet:  0,
+			Description:  "this is test user 1",
+			Tags:         pq.StringArray{},
+			Extras:       db.PropertyMap{},
+			GithubIssues: db.PropertyMap{},
 		}
+		db.TestDB.CreateOrEditPerson(person)
+		fetchedPerson := db.TestDB.GetPerson(person.ID)
 
 		rctx := chi.NewRouteContext()
-		rctx.URLParams.Add("uuid", "uuid")
+		rctx.URLParams.Add("uuid", person.Uuid)
 		req, err := http.NewRequestWithContext(context.WithValue(context.Background(), chi.RouteCtxKey, rctx), http.MethodGet, "/uuid", nil)
 		assert.NoError(t, err)
 
-		mockDb.On("GetPersonByUuid", mock.Anything).Return(expectedPerson)
 		handler.ServeHTTP(rr, req)
 
 		var returnedPerson db.Person
 		err = json.Unmarshal(rr.Body.Bytes(), &returnedPerson)
 		assert.NoError(t, err)
 		assert.Equal(t, http.StatusOK, rr.Code)
-		assert.EqualValues(t, expectedPerson, returnedPerson)
-		mockDb.AssertExpectations(t)
+
+		if returnedPerson.Extras == nil {
+			returnedPerson.Extras = db.PropertyMap{}
+		}
+
+		assert.EqualValues(t, fetchedPerson, returnedPerson)
 	})
 
 	t.Run("should return no user for a wrong UUID", func(t *testing.T) {
-		mockDb.ExpectedCalls = nil
 		rr := httptest.NewRecorder()
 		handler := http.HandlerFunc(pHandler.GetPersonByUuid)
-		expectedPerson := db.Person{}
 
 		rctx := chi.NewRouteContext()
 		rctx.URLParams.Add("uuid", "wrong-uuid")
 		req, err := http.NewRequestWithContext(context.WithValue(context.Background(), chi.RouteCtxKey, rctx), http.MethodGet, "/uuid", nil)
 		assert.NoError(t, err)
 
-		mockDb.On("GetPersonByUuid", mock.Anything).Return(expectedPerson)
 		handler.ServeHTTP(rr, req)
 
 		var returnedPerson db.Person
 		err = json.Unmarshal(rr.Body.Bytes(), &returnedPerson)
 		assert.NoError(t, err)
-		assert.EqualValues(t, expectedPerson, returnedPerson)
-		mockDb.AssertExpectations(t)
+		assert.Empty(t, returnedPerson)
 	})
 }
