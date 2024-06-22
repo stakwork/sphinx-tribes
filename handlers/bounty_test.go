@@ -20,7 +20,6 @@ import (
 	"github.com/stakwork/sphinx-tribes/utils"
 
 	"github.com/go-chi/chi"
-	"github.com/lib/pq"
 	"github.com/stakwork/sphinx-tribes/auth"
 	"github.com/stakwork/sphinx-tribes/config"
 	"github.com/stakwork/sphinx-tribes/db"
@@ -992,56 +991,38 @@ func TestGetWorkspacePreviousBountyByCreated(t *testing.T) {
 }
 
 func TestGetBountyById(t *testing.T) {
-	mockDb := dbMocks.NewDatabase(t)
+	teardownSuite := SetupSuite(t)
+	defer teardownSuite(t)
+
 	mockHttpClient := mocks.NewHttpClient(t)
-	bHandler := NewBountyHandler(mockHttpClient, mockDb)
+	bHandler := NewBountyHandler(mockHttpClient, db.TestDB)
 
 	t.Run("successful retrieval of bounty by ID", func(t *testing.T) {
 		rr := httptest.NewRecorder()
 		handler := http.HandlerFunc(bHandler.GetBountyById)
 
+		now := time.Now().Unix()
 		bounty := db.NewBounty{
-			ID:                      1,
-			OwnerID:                 "owner123",
-			Paid:                    false,
-			Show:                    true,
-			Type:                    "bug fix",
-			Award:                   "500",
-			AssignedHours:           10,
-			BountyExpires:           "2023-12-31",
-			CommitmentFee:           1000,
-			Price:                   500,
-			Title:                   "Fix critical bug in payment system",
-			Tribe:                   "development",
-			Assignee:                "user1",
-			TicketUrl:               "http://example.com/issues/1",
-			OrgUuid:                 "org-789",
-			WorkspaceUuid:           "work-789",
-			Description:             "This bounty is for fixing a critical bug in the payment system that causes transactions to fail under certain conditions.",
-			WantedType:              "immediate",
-			Deliverables:            "A pull request with a fix, including tests",
-			GithubDescription:       true,
-			OneSentenceSummary:      "Fix a critical payment system bug",
-			EstimatedSessionLength:  "2 hours",
-			EstimatedCompletionDate: "2023-10-01",
-			Created:                 time.Now().Unix(),
-			Updated:                 nil,
-			AssignedDate:            nil,
-			CompletionDate:          nil,
-			MarkAsPaidDate:          nil,
-			PaidDate:                nil,
-			CodingLanguages:         pq.StringArray{"Go", "Python"},
+			Type:          "coding",
+			Title:         "Bounty With ID",
+			Description:   "Bounty ID description",
+			WorkspaceUuid: "",
+			Assignee:      "",
+			OwnerID:       bountyOwner.OwnerPubKey,
+			Show:          true,
+			Created:       now,
 		}
 
-		rctx := chi.NewRouteContext()
-		rctx.URLParams.Add("bountyId", strconv.Itoa(int(bounty.ID)))
-		req, err := http.NewRequestWithContext(context.WithValue(context.Background(), chi.RouteCtxKey, rctx), http.MethodGet, "/bounty/1", nil)
-		assert.NoError(t, err)
+		db.TestDB.CreateOrEditBounty(bounty)
 
-		mockDb.On("GetBountyById", mock.Anything).Return([]db.NewBounty{bounty}, nil).Once()
-		mockDb.On("GetPersonByPubkey", "owner123").Return(db.Person{}).Once()
-		mockDb.On("GetPersonByPubkey", "user1").Return(db.Person{}).Once()
-		mockDb.On("GetWorkspaceByUuid", "work-789").Return(db.Workspace{}).Once()
+		bountyInDb, err := db.TestDB.GetBountyByCreated(uint(bounty.Created))
+		assert.NoError(t, err)
+		assert.NotNil(t, bountyInDb)
+
+		rctx := chi.NewRouteContext()
+		rctx.URLParams.Add("bountyId", strconv.Itoa(int(bountyInDb.ID)))
+		req, err := http.NewRequestWithContext(context.WithValue(context.Background(), chi.RouteCtxKey, rctx), http.MethodGet, "/bounty/"+strconv.Itoa(int(bountyInDb.ID)), nil)
+		assert.NoError(t, err)
 
 		handler.ServeHTTP(rr, req)
 
@@ -1049,7 +1030,7 @@ func TestGetBountyById(t *testing.T) {
 		err = json.Unmarshal(rr.Body.Bytes(), &returnedBounty)
 		assert.NoError(t, err)
 		assert.Equal(t, http.StatusOK, rr.Code)
-		mockDb.AssertExpectations(t)
+		assert.NotEmpty(t, returnedBounty)
 	})
 
 	t.Run("bounty not found", func(t *testing.T) {
@@ -1061,11 +1042,9 @@ func TestGetBountyById(t *testing.T) {
 		req, err := http.NewRequestWithContext(context.WithValue(context.Background(), chi.RouteCtxKey, rctx), http.MethodGet, "/bounty/999", nil)
 		assert.NoError(t, err)
 
-		mockDb.On("GetBountyById", "999").Return(nil, errors.New("not-found")).Once()
 		handler.ServeHTTP(rr, req)
 
 		assert.Equal(t, http.StatusBadRequest, rr.Code)
-		mockDb.AssertExpectations(t)
 	})
 }
 
