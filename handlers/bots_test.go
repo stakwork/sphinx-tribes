@@ -446,29 +446,44 @@ func TestGetBot(t *testing.T) {
 }
 
 func TestGetListedBots(t *testing.T) {
-	mockDb := dbMocks.NewDatabase(t)
-	bHandler := NewBotHandler(mockDb)
+	teardownSuite := SetupSuite(t)
+	defer teardownSuite(t)
+
+	bHandler := NewBotHandler(db.TestDB)
 
 	t.Run("should test that all bots that are not unlisted or deleted get listed", func(t *testing.T) {
 		rr := httptest.NewRecorder()
 		handler := http.HandlerFunc(bHandler.GetListedBots)
 
-		allBots := []db.Bot{
-			{UUID: "uuid1", Name: "Bot1", Unlisted: false, Deleted: false},
-			{UUID: "uuid2", Name: "Bot2", Unlisted: false, Deleted: true},
-			{UUID: "uuid3", Name: "Bot3", Unlisted: true, Deleted: false},
-			{UUID: "uuid4", Name: "Bot4", Unlisted: true, Deleted: true},
+		bot := db.Bot{
+			UUID:        "bot_uuid1",
+			OwnerPubKey: "your_pubkey1",
+			OwnerAlias:  "your_owner1",
+			Name:        "test_bot1",
+			UniqueName:  "test_bot1",
+			Description: "bot description 1",
+			Tags:        pq.StringArray{},
+			Unlisted:    false,
 		}
 
-		expectedBots := []db.Bot{
-			{UUID: "uuid1", Name: "Bot1", Unlisted: false, Deleted: false},
+		bot2 := db.Bot{
+			UUID:        "bot_uuid2",
+			OwnerPubKey: "your_pubkey2",
+			OwnerAlias:  "your_owner2",
+			Name:        "test_bot2",
+			UniqueName:  "test_bot2",
+			Description: "bot description 2",
+			Tags:        pq.StringArray{},
+			Unlisted:    true,
 		}
+
+		db.TestDB.CreateOrEditBot(bot)
+		db.TestDB.CreateOrEditBot(bot2)
 
 		rctx := chi.NewRouteContext()
 		req, err := http.NewRequestWithContext(context.WithValue(context.Background(), chi.RouteCtxKey, rctx), http.MethodGet, "/", nil)
 		assert.NoError(t, err)
 
-		mockDb.On("GetListedBots", mock.Anything).Return(allBots)
 		handler.ServeHTTP(rr, req)
 		var returnedBots []db.Bot
 		err = json.Unmarshal(rr.Body.Bytes(), &returnedBots)
@@ -476,14 +491,13 @@ func TestGetListedBots(t *testing.T) {
 		assert.Equal(t, http.StatusOK, rr.Code)
 
 		var filteredBots []db.Bot
-		for _, bot := range returnedBots {
-			if !bot.Deleted && !bot.Unlisted {
-				filteredBots = append(filteredBots, bot)
+		for _, returnBot := range returnedBots {
+			if !returnBot.Deleted && !returnBot.Unlisted {
+				filteredBots = append(filteredBots, returnBot)
 			}
 		}
 
-		assert.ElementsMatch(t, expectedBots, filteredBots)
-		mockDb.AssertExpectations(t)
+		assert.ElementsMatch(t, []db.Bot{bot}, filteredBots)
 	})
 
 }
