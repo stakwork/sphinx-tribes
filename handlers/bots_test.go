@@ -490,14 +490,7 @@ func TestGetListedBots(t *testing.T) {
 		assert.NoError(t, err)
 		assert.Equal(t, http.StatusOK, rr.Code)
 
-		var filteredBots []db.Bot
-		for _, returnBot := range returnedBots {
-			if !returnBot.Deleted && !returnBot.Unlisted {
-				filteredBots = append(filteredBots, returnBot)
-			}
-		}
-
-		assert.ElementsMatch(t, []db.Bot{bot}, filteredBots)
+		assert.ElementsMatch(t, []db.Bot{bot}, returnedBots)
 	})
 
 }
