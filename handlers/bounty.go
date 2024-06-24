@@ -53,21 +53,16 @@ func (h *bountyHandler) GetBountyById(w http.ResponseWriter, r *http.Request) {
 	bountyId := chi.URLParam(r, "bountyId")
 	if bountyId == "" {
 		w.WriteHeader(http.StatusNotFound)
-		return
 	}
 	bounties, err := h.db.GetBountyById(bountyId)
 	if err != nil {
 		w.WriteHeader(http.StatusBadRequest)
 		fmt.Println("[bounty] Error", err)
-		return
+	} else {
+		var bountyResponse []db.BountyResponse = h.GenerateBountyResponse(bounties)
+		w.WriteHeader(http.StatusOK)
+		json.NewEncoder(w).Encode(bountyResponse)
 	}
-	if len(bounties) == 0 {
-		w.WriteHeader(http.StatusBadRequest)
-		return
-	}
-	var bountyResponse []db.BountyResponse = h.GenerateBountyResponse(bounties)
-	w.WriteHeader(http.StatusOK)
-	json.NewEncoder(w).Encode(bountyResponse)
 }
 
 func (h *bountyHandler) GetNextBountyByCreated(w http.ResponseWriter, r *http.Request) {

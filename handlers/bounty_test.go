@@ -1038,8 +1038,8 @@ func TestGetBountyById(t *testing.T) {
 		handler := http.HandlerFunc(bHandler.GetBountyById)
 
 		rctx := chi.NewRouteContext()
-		rctx.URLParams.Add("bountyId", "999")
-		req, err := http.NewRequestWithContext(context.WithValue(context.Background(), chi.RouteCtxKey, rctx), http.MethodGet, "/bounty/999", nil)
+		rctx.URLParams.Add("bountyId", "Invalid-id")
+		req, err := http.NewRequestWithContext(context.WithValue(context.Background(), chi.RouteCtxKey, rctx), http.MethodGet, "/bounty/Invalid-id", nil)
 		assert.NoError(t, err)
 
 		handler.ServeHTTP(rr, req)
