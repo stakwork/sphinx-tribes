@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"context"
 	"encoding/json"
+	"github.com/google/uuid"
 	"net/http"
 	"net/http/httptest"
 	"testing"
@@ -420,31 +421,44 @@ func TestCreateOrEditBot(t *testing.T) {
 }
 
 func TestGetBot(t *testing.T) {
-	mockDb := dbMocks.NewDatabase(t)
-	bHandler := NewBotHandler(mockDb)
+	teardownSuite := SetupSuite(t)
+	defer teardownSuite(t)
+	bHandler := NewBotHandler(db.TestDB)
 
 	t.Run("should test that a bot can be fetched with its uuid", func(t *testing.T) {
-
-		mockUUID := "valid_uuid"
-		mockBot := db.Bot{UUID: mockUUID, Name: "Test Bot"}
-		mockDb.On("GetBot", mock.Anything).Return(mockBot).Once()
-
 		rr := httptest.NewRecorder()
+		handler := http.HandlerFunc(bHandler.GetBot)
+
+		bot := db.Bot{
+			UUID:        uuid.New().String(),
+			OwnerPubKey: "owner-pubkey-123",
+			Name:        "bot-name",
+			UniqueName:  "unique-bot-name",
+			Description: "bot-description",
+			Tags:        pq.StringArray{"tag1", "tag2"},
+			Img:         "bot-img-url",
+			PricePerUse: 100,
+		}
+
+		db.TestDB.CreateOrEditBot(bot)
+
 		rctx := chi.NewRouteContext()
-		rctx.URLParams.Add("uuid", mockUUID)
-		req, err := http.NewRequestWithContext(context.WithValue(context.Background(), chi.RouteCtxKey, rctx), http.MethodGet, "/"+mockUUID, nil)
+		rctx.URLParams.Add("uuid", bot.UUID)
+		req, err := http.NewRequestWithContext(context.WithValue(context.Background(), chi.RouteCtxKey, rctx), http.MethodGet, "/"+bot.UUID, nil)
 
 		if err != nil {
 			t.Fatal(err)
 		}
 
-		handler := http.HandlerFunc(bHandler.GetBot)
+		fetchedBot := db.TestDB.GetBot(bot.UUID)
+
 		handler.ServeHTTP(rr, req)
 
-		assert.Equal(t, http.StatusOK, rr.Code)
 		var returnedBot db.Bot
-		json.Unmarshal(rr.Body.Bytes(), &returnedBot)
-		assert.Equal(t, mockBot, returnedBot)
+		err = json.Unmarshal(rr.Body.Bytes(), &returnedBot)
+		assert.Equal(t, http.StatusOK, rr.Code)
+		assert.Equal(t, bot, returnedBot)
+		assert.Equal(t, bot, fetchedBot)
 	})
 }
 
