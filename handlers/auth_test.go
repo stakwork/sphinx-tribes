@@ -5,6 +5,9 @@ import (
 	"context"
 	"encoding/json"
 	"errors"
+	"github.com/google/uuid"
+	"github.com/lib/pq"
+	mocks "github.com/stakwork/sphinx-tribes/mocks"
 	"net/http"
 	"net/http/httptest"
 	"os"
@@ -16,7 +19,6 @@ import (
 	"github.com/stakwork/sphinx-tribes/auth"
 	"github.com/stakwork/sphinx-tribes/config"
 	"github.com/stakwork/sphinx-tribes/db"
-	mocks "github.com/stakwork/sphinx-tribes/mocks"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -203,22 +205,27 @@ func TestGetIsAdmin(t *testing.T) {
 }
 
 func TestRefreshToken(t *testing.T) {
-	mockDb := mocks.NewDatabase(t)
-	aHandler := NewAuthHandler(mockDb)
+	teardownSuite := SetupSuite(t)
+	defer teardownSuite(t)
+	aHandler := NewAuthHandler(db.TestDB)
 
 	t.Run("Should test that a user token can be refreshed", func(t *testing.T) {
 		mockToken := "mock_token"
-		mockUserPubkey := "mock_pubkey"
-		mockPerson := db.Person{
-			ID:          1,
-			OwnerPubKey: mockUserPubkey,
+		person := db.Person{
+			Uuid:         uuid.New().String(),
+			OwnerPubKey:  "your_pubkey",
+			OwnerAlias:   "your_owner",
+			UniqueName:   "your_user",
+			Description:  "your user",
+			Tags:         pq.StringArray{},
+			Extras:       db.PropertyMap{},
+			GithubIssues: db.PropertyMap{},
 		}
-		mockDb.On("GetLnUser", mockUserPubkey).Return(int64(1)).Once()
-		mockDb.On("GetPersonByPubkey", mockUserPubkey).Return(mockPerson).Once()
+		db.TestDB.CreateOrEditPerson(person)
 
 		// Mock JWT decoding
 		mockClaims := jwt.MapClaims{
-			"pubkey": mockUserPubkey,
+			"pubkey": person.OwnerPubKey,
 		}
 		mockDecodeJwt := func(token string) (jwt.MapClaims, error) {
 			return mockClaims, nil
@@ -239,6 +246,8 @@ func TestRefreshToken(t *testing.T) {
 		}
 		req.Header.Set("x-jwt", mockToken)
 
+		fetchedPerson := db.TestDB.GetPersonByUuid(person.Uuid)
+		person.ID = fetchedPerson.ID
 		// Serve request
 		rr := httptest.NewRecorder()
 		handler := http.HandlerFunc(aHandler.RefreshToken)
@@ -253,5 +262,6 @@ func TestRefreshToken(t *testing.T) {
 		}
 		assert.Equal(t, true, responseData["status"])
 		assert.Equal(t, mockEncodedToken, responseData["jwt"])
+		assert.EqualValues(t, person, fetchedPerson)
 	})
 }

@@ -14,9 +14,7 @@ import (
 	"github.com/lib/pq"
 	"github.com/stakwork/sphinx-tribes/auth"
 	"github.com/stakwork/sphinx-tribes/db"
-	mocks "github.com/stakwork/sphinx-tribes/mocks"
 	"github.com/stretchr/testify/assert"
-	"github.com/stretchr/testify/mock"
 )
 
 func TestGetPersonByPuKey(t *testing.T) {
@@ -554,7 +552,7 @@ func TestGetPersonByUuid(t *testing.T) {
 		rr := httptest.NewRecorder()
 		handler := http.HandlerFunc(pHandler.GetPersonByUuid)
 		person := db.Person{
-			ID:           101,
+			ID:           105,
 			Uuid:         uuid.New().String(),
 			OwnerAlias:   "person101",
 			UniqueName:   "person101",
