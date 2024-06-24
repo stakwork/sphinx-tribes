@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"context"
 	"encoding/json"
+	"github.com/google/uuid"
 	"net/http"
 	"net/http/httptest"
 	"testing"
@@ -62,38 +63,32 @@ func TestGetBotByUniqueName(t *testing.T) {
 }
 
 func TestGetBotsByOwner(t *testing.T) {
+	teardownSuite := SetupSuite(t)
+	defer teardownSuite(t)
 
-	mockDb := dbMocks.NewDatabase(t)
-	btHandler := NewBotHandler(mockDb)
+	btHandler := NewBotHandler(db.TestDB)
 
 	t.Run("empty list is returned when a user has no bots", func(t *testing.T) {
 		rr := httptest.NewRecorder()
 		handler := http.HandlerFunc(btHandler.GetBotsByOwner)
 
-		bot := db.Bot{
-			UUID:           "uuid-123",
-			OwnerPubKey:    "owner-pubkey-123",
-			OwnerAlias:     "owner-alias",
-			Name:           "bot-name",
-			UniqueName:     "unique-bot-name",
-			Description:    "bot-description",
-			Tags:           pq.StringArray{"tag1", "tag2"},
-			Img:            "bot-img-url",
-			PricePerUse:    100,
-			Created:        nil,
-			Updated:        nil,
-			Unlisted:       false,
-			Deleted:        false,
-			MemberCount:    10,
-			OwnerRouteHint: "route-hint",
+		person := db.Person{
+			Uuid:         uuid.New().String(),
+			OwnerAlias:   "person",
+			UniqueName:   "person",
+			OwnerPubKey:  uuid.New().String(),
+			PriceToMeet:  0,
+			Description:  "this is test user 1",
+			Tags:         pq.StringArray{},
+			Extras:       db.PropertyMap{},
+			GithubIssues: db.PropertyMap{},
 		}
+		db.TestDB.CreateOrEditPerson(person)
 
 		rctx := chi.NewRouteContext()
-		rctx.URLParams.Add("pubkey", bot.OwnerPubKey)
-		req, err := http.NewRequestWithContext(context.WithValue(context.Background(), chi.RouteCtxKey, rctx), http.MethodGet, "/bots/owner/"+bot.OwnerPubKey, nil)
+		rctx.URLParams.Add("pubkey", person.OwnerPubKey)
+		req, err := http.NewRequestWithContext(context.WithValue(context.Background(), chi.RouteCtxKey, rctx), http.MethodGet, "/bots/owner/"+person.OwnerPubKey, nil)
 		assert.NoError(t, err)
-
-		mockDb.On("GetBotsByOwner", bot.OwnerPubKey).Return([]db.Bot{}, nil).Once()
 
 		handler.ServeHTTP(rr, req)
 
@@ -101,21 +96,34 @@ func TestGetBotsByOwner(t *testing.T) {
 		err = json.Unmarshal(rr.Body.Bytes(), &returnedBot)
 		assert.NoError(t, err)
 		assert.Equal(t, http.StatusOK, rr.Code)
-		mockDb.AssertExpectations(t)
+		assert.Empty(t, returnedBot)
 	})
 
 	t.Run("retrieval all bots by an owner", func(t *testing.T) {
 		rr := httptest.NewRecorder()
 		handler := http.HandlerFunc(btHandler.GetBotsByOwner)
 
+		person := db.Person{
+			Uuid:         uuid.New().String(),
+			OwnerAlias:   "person",
+			UniqueName:   "person",
+			OwnerPubKey:  uuid.New().String(),
+			PriceToMeet:  0,
+			Description:  "this is test user 1",
+			Tags:         pq.StringArray{},
+			Extras:       db.PropertyMap{},
+			GithubIssues: db.PropertyMap{},
+		}
+		db.TestDB.CreateOrEditPerson(person)
+
 		bot := db.Bot{
-			UUID:           "uuid-123",
-			OwnerPubKey:    "owner-pubkey-123",
-			OwnerAlias:     "owner-alias",
-			Name:           "bot-name",
-			UniqueName:     "unique-bot-name",
-			Description:    "bot-description",
-			Tags:           pq.StringArray{"tag1", "tag2"},
+			UUID:           "bot1_uuid",
+			OwnerPubKey:    person.OwnerPubKey,
+			OwnerAlias:     person.OwnerAlias,
+			Name:           "test_bot_owner",
+			UniqueName:     "test_bot_owner",
+			Description:    "bot description",
+			Tags:           pq.StringArray{},
 			Img:            "bot-img-url",
 			PricePerUse:    100,
 			Created:        nil,
@@ -126,20 +134,40 @@ func TestGetBotsByOwner(t *testing.T) {
 			OwnerRouteHint: "route-hint",
 		}
 
-		rctx := chi.NewRouteContext()
-		rctx.URLParams.Add("pubkey", bot.OwnerPubKey)
-		req, err := http.NewRequestWithContext(context.WithValue(context.Background(), chi.RouteCtxKey, rctx), http.MethodGet, "/bots/owner/"+bot.OwnerPubKey, nil)
-		assert.NoError(t, err)
+		bot2 := db.Bot{
+			UUID:           "bot2_uuid",
+			OwnerPubKey:    person.OwnerPubKey,
+			OwnerAlias:     person.OwnerAlias,
+			Name:           "test_bot_owner2",
+			UniqueName:     "test_bot_owner2",
+			Description:    "bot description",
+			Tags:           pq.StringArray{},
+			Img:            "bot-img-url",
+			PricePerUse:    100,
+			Created:        nil,
+			Updated:        nil,
+			Unlisted:       false,
+			Deleted:        false,
+			MemberCount:    10,
+			OwnerRouteHint: "route-hint",
+		}
 
-		mockDb.On("GetBotsByOwner", bot.OwnerPubKey).Return([]db.Bot{bot}, nil)
+		db.TestDB.CreateOrEditBot(bot)
+		db.TestDB.CreateOrEditBot(bot2)
+
+		rctx := chi.NewRouteContext()
+		rctx.URLParams.Add("pubkey", person.OwnerPubKey)
+		req, err := http.NewRequestWithContext(context.WithValue(context.Background(), chi.RouteCtxKey, rctx), http.MethodGet, "/bots/owner/"+person.OwnerPubKey, nil)
+		assert.NoError(t, err)
 
 		handler.ServeHTTP(rr, req)
 
-		var returnedBot []db.BotRes
-		err = json.Unmarshal(rr.Body.Bytes(), &returnedBot)
+		var returnedBots []db.BotRes
+		err = json.Unmarshal(rr.Body.Bytes(), &returnedBots)
 		assert.NoError(t, err)
 		assert.Equal(t, http.StatusOK, rr.Code)
-		mockDb.AssertExpectations(t)
+		assert.Len(t, returnedBots, 2)
+		assert.ElementsMatch(t, []string{bot.UUID, bot2.UUID}, []string{returnedBots[0].UUID, returnedBots[1].UUID})
 	})
 }
 
