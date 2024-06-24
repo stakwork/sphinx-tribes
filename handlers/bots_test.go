@@ -18,9 +18,10 @@ import (
 )
 
 func TestGetBotByUniqueName(t *testing.T) {
+	teardownSuite := SetupSuite(t)
+	defer teardownSuite(t)
 
-	mockDb := dbMocks.NewDatabase(t)
-	btHandler := NewBotHandler(mockDb)
+	btHandler := NewBotHandler(db.TestDB)
 
 	t.Run("successful retrieval of bots by uniqueName", func(t *testing.T) {
 		rr := httptest.NewRecorder()
@@ -44,12 +45,12 @@ func TestGetBotByUniqueName(t *testing.T) {
 			OwnerRouteHint: "route-hint",
 		}
 
+		db.TestDB.CreateOrEditBot(bot)
+
 		rctx := chi.NewRouteContext()
 		rctx.URLParams.Add("name", bot.UniqueName)
 		req, err := http.NewRequestWithContext(context.WithValue(context.Background(), chi.RouteCtxKey, rctx), http.MethodGet, "/bot/"+bot.UniqueName, nil)
 		assert.NoError(t, err)
-
-		mockDb.On("GetBotByUniqueName", bot.UniqueName).Return(db.Bot{}, nil).Once()
 
 		handler.ServeHTTP(rr, req)
 
@@ -57,7 +58,9 @@ func TestGetBotByUniqueName(t *testing.T) {
 		err = json.Unmarshal(rr.Body.Bytes(), &returnedBot)
 		assert.NoError(t, err)
 		assert.Equal(t, http.StatusOK, rr.Code)
-		mockDb.AssertExpectations(t)
+		assert.Equal(t, bot.UUID, returnedBot.UUID)
+		assert.Equal(t, bot.Name, returnedBot.Name)
+		assert.Equal(t, bot.UniqueName, returnedBot.UniqueName)
 	})
 }
 
