@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"context"
 	"encoding/json"
+	"github.com/google/uuid"
 	"net/http"
 	"net/http/httptest"
 	"testing"
@@ -214,38 +215,49 @@ func TestSearchBots(t *testing.T) {
 }
 
 func TestDeleteBot(t *testing.T) {
+	teardownSuite := SetupSuite(t)
+	defer teardownSuite(t)
+
+	btHandler := NewBotHandler(db.TestDB)
+
+	btHandler.verifyTribeUUID = func(uuid string, checkTimestamp bool) (string, error) {
+		return "owner-pubkey-123", nil
+	}
+
 	t.Run("bot can be deleted by the creator of the bot", func(t *testing.T) {
-		mockDb := dbMocks.NewDatabase(t)
-		mockVerifyTribeUUID := func(uuid string, checkTimestamp bool) (string, error) {
-			return "creator-public-key", nil
-		}
-		mockUUID := "123-456-789"
+		rr := httptest.NewRecorder()
+		handler := http.HandlerFunc(btHandler.DeleteBot)
 
-		btHandler := &botHandler{
-			db:              mockDb,
-			verifyTribeUUID: mockVerifyTribeUUID,
+		bot := db.Bot{
+			UUID:        uuid.New().String(),
+			OwnerPubKey: "owner-pubkey-123",
+			Name:        "bot-name",
+			UniqueName:  "unique-bot-name",
+			Description: "bot-description",
+			Tags:        pq.StringArray{"tag1", "tag2"},
+			Img:         "bot-img-url",
+			PricePerUse: 100,
 		}
 
-		ctx := context.WithValue(context.Background(), auth.ContextKey, "creator-public-key")
+		db.TestDB.CreateOrEditBot(bot)
+
+		ctx := context.WithValue(context.Background(), auth.ContextKey, bot.OwnerPubKey)
 
 		rctx := chi.NewRouteContext()
-		rctx.URLParams.Add("uuid", mockUUID)
-		req, err := http.NewRequestWithContext(context.WithValue(ctx, chi.RouteCtxKey, rctx), http.MethodDelete, "/"+mockUUID, nil)
+		rctx.URLParams.Add("uuid", bot.UUID)
+		req, err := http.NewRequestWithContext(ctx, http.MethodDelete, "/"+bot.UUID, nil)
 		assert.NoError(t, err)
 
-		expectedUUID := "123-456-789"
+		req = req.WithContext(context.WithValue(req.Context(), chi.RouteCtxKey, rctx))
 
-		mockDb.On("UpdateBot", mockUUID, map[string]interface{}{"deleted": true}).Return(true)
-
-		rr := httptest.NewRecorder()
-
-		btHandler.DeleteBot(rr, req)
+		handler.ServeHTTP(rr, req)
 
 		assert.Equal(t, http.StatusOK, rr.Code)
-
-		mockDb.AssertCalled(t, "UpdateBot", expectedUUID, map[string]interface{}{"deleted": true})
+		deletedBot := db.TestDB.GetBot(bot.UUID)
+		assert.Empty(t, deletedBot)
 	})
 }
+
 func TestCreateOrEditBot(t *testing.T) {
 	mockDb := dbMocks.NewDatabase(t)
 	bHandler := NewBotHandler(mockDb)
