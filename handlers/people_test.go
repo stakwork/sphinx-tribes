@@ -552,7 +552,7 @@ func TestGetPersonByUuid(t *testing.T) {
 		rr := httptest.NewRecorder()
 		handler := http.HandlerFunc(pHandler.GetPersonByUuid)
 		person := db.Person{
-			ID:           101,
+			ID:           105,
 			Uuid:         uuid.New().String(),
 			OwnerAlias:   "person101",
 			UniqueName:   "person101",
