@@ -1469,6 +1469,7 @@ func (db database) SearchBots(s string, limit, offset int) []BotRes {
 	// set limit
 	limitStr := strconv.Itoa(limit)
 	offsetStr := strconv.Itoa(offset)
+	s = strings.ReplaceAll(s, " ", " & ")
 	db.db.Raw(
 		`SELECT uuid, owner_pub_key, name, unique_name, img, description, tags, price_per_use, ts_rank(tsv, q) as rank
 		FROM bots, to_tsquery(?) q
