@@ -55,7 +55,7 @@ type Bot struct {
 	Name           string         `json:"name"`
 	UniqueName     string         `json:"unique_name"`
 	Description    string         `json:"description"`
-	Tags           pq.StringArray ` `
+	Tags           pq.StringArray `gorm:"type:text[]" json:"tags"`
 	Img            string         `json:"img"`
 	PricePerUse    int64          `json:"price_per_use"`
 	Created        *time.Time     `json:"created"`
@@ -64,6 +64,7 @@ type Bot struct {
 	Deleted        bool           `json:"deleted"`
 	MemberCount    uint64         `json:"member_count"`
 	OwnerRouteHint string         `json:"owner_route_hint"`
+	Tsv            string         `gorm:"type:tsvector"`
 }
 
 // Bot struct
@@ -73,7 +74,7 @@ type BotRes struct {
 	Name        string         `json:"name"`
 	UniqueName  string         `json:"unique_name"`
 	Description string         `json:"description"`
-	Tags        pq.StringArray `json:"tags"`
+	Tags        pq.StringArray `gorm:"type:text[]" json:"tags"`
 	Img         string         `json:"img"`
 	PricePerUse int64          `json:"price_per_use"`
 }
