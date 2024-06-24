@@ -148,14 +148,33 @@ func TestGetBotsByOwner(t *testing.T) {
 }
 
 func TestSearchBots(t *testing.T) {
-	mockDb := dbMocks.NewDatabase(t)
-	btHandler := NewBotHandler(mockDb)
+	teardownSuite := SetupSuite(t)
+	defer teardownSuite(t)
+
+	btHandler := NewBotHandler(db.TestDB)
 
 	t.Run("successful search query returns data", func(t *testing.T) {
 		rr := httptest.NewRecorder()
 		handler := http.HandlerFunc(btHandler.SearchBots)
 
-		query := "bot"
+		bot := db.Bot{
+			UUID:        "uuid-1",
+			OwnerPubKey: "owner-pubkey-1",
+			OwnerAlias:  "owner-alias-1",
+			Name:        "Bot 1",
+			UniqueName:  "unique-bot-1",
+			Description: "Description for Bot 1",
+			Tags:        pq.StringArray{"tag1", "tag2"},
+			Img:         "bot-img-url-1",
+			PricePerUse: 100,
+		}
+
+		bot, err := db.TestDB.CreateOrEditBot(bot)
+		if err != nil {
+			t.Fatalf("Failed to create bot: %v", err)
+		}
+
+		query := bot.Name
 
 		bots := []db.BotRes{
 			{
@@ -169,8 +188,6 @@ func TestSearchBots(t *testing.T) {
 				PricePerUse: 100,
 			},
 		}
-
-		mockDb.On("SearchBots", query, mock.AnythingOfType("int"), mock.AnythingOfType("int")).Return(bots)
 
 		rctx := chi.NewRouteContext()
 		rctx.URLParams.Add("query", query)
@@ -187,8 +204,6 @@ func TestSearchBots(t *testing.T) {
 		assert.NotEmpty(t, returnedBots)
 
 		assert.EqualValues(t, bots, returnedBots)
-
-		mockDb.AssertExpectations(t)
 	})
 
 	t.Run("empty data returned for non-matching search query", func(t *testing.T) {
@@ -196,8 +211,6 @@ func TestSearchBots(t *testing.T) {
 		handler := http.HandlerFunc(btHandler.SearchBots)
 
 		query := "nonexistentbot"
-
-		mockDb.On("SearchBots", query, mock.AnythingOfType("int"), mock.AnythingOfType("int")).Return([]db.BotRes{})
 
 		rctx := chi.NewRouteContext()
 		rctx.URLParams.Add("query", query)
@@ -212,8 +225,6 @@ func TestSearchBots(t *testing.T) {
 		err = json.Unmarshal(rr.Body.Bytes(), &returnedBots)
 		assert.NoError(t, err)
 		assert.Empty(t, returnedBots)
-
-		mockDb.AssertExpectations(t)
 	})
 }
 
