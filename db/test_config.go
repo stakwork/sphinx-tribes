@@ -57,6 +57,7 @@ func InitTestDB() {
 	db.AutoMigrate(&Workspace{})
 	db.AutoMigrate(&WorkspaceUsers{})
 	db.AutoMigrate(&WorkspaceUserRoles{})
+	db.AutoMigrate(&Bot{})
 
 	people := TestDB.GetAllPeople()
 	for _, p := range people {
