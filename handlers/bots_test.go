@@ -14,7 +14,6 @@ import (
 	"github.com/lib/pq"
 	"github.com/stakwork/sphinx-tribes/auth"
 	"github.com/stakwork/sphinx-tribes/db"
-
 	"github.com/stretchr/testify/assert"
 )
 
