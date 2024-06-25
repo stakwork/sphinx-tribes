@@ -146,6 +146,10 @@ func TestDeleteChannel(t *testing.T) {
 	t.Run("Should test that non-channel owners cannot delete the channel, it should return a 401 error", func(t *testing.T) {
 		ctx := context.WithValue(context.Background(), auth.ContextKey, "other_pubkey")
 
+		db.TestDB.CreateOrEditPerson(person)
+		db.TestDB.CreateOrEditTribe(tribe)
+		db.TestDB.CreateChannel(channel)
+
 		channels := db.TestDB.GetChannelsByTribe(tribe.UUID)
 		channelId := strconv.FormatUint(uint64(channels[0].ID), 10)
 
