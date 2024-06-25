@@ -4,10 +4,11 @@ import (
 	"bytes"
 	"context"
 	"encoding/json"
-	"github.com/google/uuid"
 	"net/http"
 	"net/http/httptest"
 	"testing"
+
+	"github.com/google/uuid"
 
 	"github.com/go-chi/chi"
 	"github.com/lib/pq"
@@ -487,6 +488,7 @@ func TestGetBot(t *testing.T) {
 			Tags:        pq.StringArray{"tag1", "tag2"},
 			Img:         "bot-img-url",
 			PricePerUse: 100,
+			Tsv:         "'bot':2A,5B 'bot-descript':4B 'bot-nam':1A 'descript':6B 'name':3A 'tag1' 'tag2'",
 		}
 
 		db.TestDB.CreateOrEditBot(bot)
@@ -532,6 +534,7 @@ func TestGetListedBots(t *testing.T) {
 			Description: "bot description 1",
 			Tags:        pq.StringArray{},
 			Unlisted:    false,
+			Tsv:         "'1':5B 'bot':3B 'bot1':2A 'descript':4B 'test':1A",
 		}
 
 		bot2 := db.Bot{
@@ -557,12 +560,6 @@ func TestGetListedBots(t *testing.T) {
 		err = json.Unmarshal(rr.Body.Bytes(), &returnedBots)
 		assert.NoError(t, err)
 		assert.Equal(t, http.StatusOK, rr.Code)
-
-		// Remove Tsv field from returnedBots for comparison
-		for i := range returnedBots {
-			returnedBots[i].Tsv = ""
-		}
-
 		assert.ElementsMatch(t, []db.Bot{bot}, returnedBots)
 	})
 
