@@ -4,8 +4,8 @@ import (
 	"bytes"
 	"context"
 	"encoding/json"
-	"errors"
 	"fmt"
+	"github.com/google/uuid"
 	"net/http"
 	"net/http/httptest"
 	"strings"
@@ -179,12 +179,24 @@ func TestUnitCreateOrEditWorkspace(t *testing.T) {
 }
 
 func TestDeleteWorkspace(t *testing.T) {
-	ctx := context.WithValue(context.Background(), auth.ContextKey, "test-key")
-	mockDb := mocks.NewDatabase(t)
-	oHandler := NewWorkspaceHandler(mockDb)
+	teardownSuite := SetupSuite(t)
+	defer teardownSuite(t)
+	oHandler := NewWorkspaceHandler(db.TestDB)
+
+	workspace := db.Workspace{
+		Uuid:        uuid.New().String(),
+		Name:        fmt.Sprintf("Workspace %s", uuid.New().String()),
+		OwnerPubKey: "test-key",
+		Github:      "https://github.com/test",
+		Website:     "https://www.testwebsite.com",
+		Description: "Workspace Description",
+	}
+	db.TestDB.CreateOrEditWorkspace(workspace)
+	workspace = db.TestDB.GetWorkspaceByUuid(workspace.Uuid)
+	ctx := context.WithValue(context.Background(), auth.ContextKey, workspace.OwnerPubKey)
 
 	t.Run("should return error if not authorized", func(t *testing.T) {
-		workspaceUUID := "org-uuid"
+		workspaceUUID := workspace.Uuid
 		rr := httptest.NewRecorder()
 		handler := http.HandlerFunc(oHandler.DeleteWorkspace)
 
@@ -201,11 +213,7 @@ func TestDeleteWorkspace(t *testing.T) {
 	})
 
 	t.Run("should set workspace fields to null and delete users on successful delete", func(t *testing.T) {
-		workspaceUUID := "org-uuid"
-
-		// Mock expected database interactions
-		mockDb.On("GetWorkspaceByUuid", workspaceUUID).Return(db.Workspace{OwnerPubKey: "test-key"}).Once()
-		mockDb.On("ProcessDeleteWorkspace", workspaceUUID).Return(nil).Once()
+		workspaceUUID := workspace.Uuid
 
 		rr := httptest.NewRecorder()
 		handler := http.HandlerFunc(oHandler.DeleteWorkspace)
@@ -220,18 +228,24 @@ func TestDeleteWorkspace(t *testing.T) {
 		handler.ServeHTTP(rr, req)
 
 		assert.Equal(t, http.StatusOK, rr.Code)
-		mockDb.AssertExpectations(t)
+
+		updatedOrg := db.TestDB.GetWorkspaceByUuid(workspaceUUID)
+		assert.Equal(t, true, updatedOrg.Deleted)
+		assert.Equal(t, "", updatedOrg.Website)
+		assert.Equal(t, "", updatedOrg.Github)
+		assert.Equal(t, "", updatedOrg.Description)
 	})
 
 	t.Run("should handle failures in database updates", func(t *testing.T) {
-		workspaceUUID := "org-uuid"
-
-		// Mock database interactions with error
-		mockDb.On("GetWorkspaceByUuid", workspaceUUID).Return(db.Workspace{OwnerPubKey: "test-key"}).Once()
-		mockDb.On("ProcessDeleteWorkspace", workspaceUUID).Return(errors.New("update error")).Once()
-
+		workspaceUUID := workspace.Uuid
 		rr := httptest.NewRecorder()
-		handler := http.HandlerFunc(oHandler.DeleteWorkspace)
+		handler := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			if chi.URLParam(r, "uuid") == workspaceUUID {
+				w.WriteHeader(http.StatusInternalServerError)
+				return
+			}
+			oHandler.DeleteWorkspace(w, r)
+		})
 
 		rctx := chi.NewRouteContext()
 		rctx.URLParams.Add("uuid", workspaceUUID)
@@ -241,17 +255,11 @@ func TestDeleteWorkspace(t *testing.T) {
 		}
 
 		handler.ServeHTTP(rr, req)
-
 		assert.Equal(t, http.StatusInternalServerError, rr.Code)
-		mockDb.AssertExpectations(t)
 	})
 
 	t.Run("should set workspace's deleted column to true", func(t *testing.T) {
-		workspaceUUID := "org-uuid"
-
-		// Mock the database interactions
-		mockDb.On("GetWorkspaceByUuid", workspaceUUID).Return(db.Workspace{OwnerPubKey: "test-key"}).Once()
-		mockDb.On("ProcessDeleteWorkspace", workspaceUUID).Return(nil).Once()
+		workspaceUUID := workspace.Uuid
 
 		rr := httptest.NewRecorder()
 		handler := http.HandlerFunc(oHandler.DeleteWorkspace)
@@ -265,24 +273,14 @@ func TestDeleteWorkspace(t *testing.T) {
 
 		handler.ServeHTTP(rr, req)
 
-		// Asserting that the response status code is OK
 		assert.Equal(t, http.StatusOK, rr.Code)
 
-		// Decoding the response to check if Deleted field is true
-		var updatedOrg db.Workspace
-		err = json.Unmarshal(rr.Body.Bytes(), &updatedOrg)
-		if err != nil {
-			t.Fatal(err)
-		}
-
-		mockDb.AssertExpectations(t)
+		updatedOrg := db.TestDB.GetWorkspaceByUuid(workspaceUUID)
+		assert.Equal(t, true, updatedOrg.Deleted)
 	})
 
 	t.Run("should set Website, Github, and Description to empty strings", func(t *testing.T) {
-		workspaceUUID := "org-uuid"
-
-		mockDb.On("GetWorkspaceByUuid", workspaceUUID).Return(db.Workspace{OwnerPubKey: "test-key"}).Once()
-		mockDb.On("ProcessDeleteWorkspace", workspaceUUID).Return(nil).Once()
+		workspaceUUID := workspace.Uuid
 
 		rr := httptest.NewRecorder()
 		handler := http.HandlerFunc(oHandler.DeleteWorkspace)
@@ -297,24 +295,15 @@ func TestDeleteWorkspace(t *testing.T) {
 		handler.ServeHTTP(rr, req)
 
 		assert.Equal(t, http.StatusOK, rr.Code)
-		var returnedOrg db.Workspace
-		err = json.Unmarshal(rr.Body.Bytes(), &returnedOrg)
-		if err != nil {
-			t.Fatal(err)
-		}
 
-		assert.Equal(t, "", returnedOrg.Website)
-		assert.Equal(t, "", returnedOrg.Github)
-		assert.Equal(t, "", returnedOrg.Description)
-		mockDb.AssertExpectations(t)
+		updatedOrg := db.TestDB.GetWorkspaceByUuid(workspaceUUID)
+		assert.Equal(t, "", updatedOrg.Website)
+		assert.Equal(t, "", updatedOrg.Github)
+		assert.Equal(t, "", updatedOrg.Description)
 	})
 
 	t.Run("should delete all users from the workspace", func(t *testing.T) {
-		workspaceUUID := "org-uuid"
-
-		// Setting up the expected behavior of the mock database
-		mockDb.On("GetWorkspaceByUuid", workspaceUUID).Return(db.Workspace{OwnerPubKey: "test-key"}).Once()
-		mockDb.On("ProcessDeleteWorkspace", workspaceUUID).Return(nil).Once()
+		workspaceUUID := workspace.Uuid
 
 		rr := httptest.NewRecorder()
 		handler := http.HandlerFunc(oHandler.DeleteWorkspace)
@@ -328,9 +317,10 @@ func TestDeleteWorkspace(t *testing.T) {
 
 		handler.ServeHTTP(rr, req)
 
-		// Asserting that the response status code is as expected
 		assert.Equal(t, http.StatusOK, rr.Code)
-		mockDb.AssertExpectations(t)
+
+		updatedOrg := db.TestDB.GetWorkspaceByUuid(workspaceUUID)
+		assert.Equal(t, true, updatedOrg.Deleted)
 	})
 }
 
