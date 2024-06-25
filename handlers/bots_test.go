@@ -4,10 +4,11 @@ import (
 	"bytes"
 	"context"
 	"encoding/json"
-	"github.com/google/uuid"
 	"net/http"
 	"net/http/httptest"
 	"testing"
+
+	"github.com/google/uuid"
 
 	"github.com/go-chi/chi"
 	"github.com/lib/pq"
@@ -487,6 +488,7 @@ func TestGetBot(t *testing.T) {
 			Tags:        pq.StringArray{"tag1", "tag2"},
 			Img:         "bot-img-url",
 			PricePerUse: 100,
+			Tsv:         "'bot':2A,5B 'bot-descript':4B 'bot-nam':1A 'descript':6B 'name':3A 'tag1' 'tag2'",
 		}
 
 		db.TestDB.CreateOrEditBot(bot)
@@ -512,44 +514,53 @@ func TestGetBot(t *testing.T) {
 }
 
 func TestGetListedBots(t *testing.T) {
-	mockDb := dbMocks.NewDatabase(t)
-	bHandler := NewBotHandler(mockDb)
+	teardownSuite := SetupSuite(t)
+	defer teardownSuite(t)
+
+	bHandler := NewBotHandler(db.TestDB)
 
 	t.Run("should test that all bots that are not unlisted or deleted get listed", func(t *testing.T) {
 		rr := httptest.NewRecorder()
 		handler := http.HandlerFunc(bHandler.GetListedBots)
 
-		allBots := []db.Bot{
-			{UUID: "uuid1", Name: "Bot1", Unlisted: false, Deleted: false},
-			{UUID: "uuid2", Name: "Bot2", Unlisted: false, Deleted: true},
-			{UUID: "uuid3", Name: "Bot3", Unlisted: true, Deleted: false},
-			{UUID: "uuid4", Name: "Bot4", Unlisted: true, Deleted: true},
+		db.TestDB.DeleteBot()
+
+		bot := db.Bot{
+			UUID:        "bot_uuid1",
+			OwnerPubKey: "your_pubkey1",
+			OwnerAlias:  "your_owner1",
+			Name:        "test_bot1",
+			UniqueName:  "test_bot1",
+			Description: "bot description 1",
+			Tags:        pq.StringArray{},
+			Unlisted:    false,
+			Tsv:         "'1':5B 'bot':3B 'bot1':2A 'descript':4B 'test':1A",
 		}
 
-		expectedBots := []db.Bot{
-			{UUID: "uuid1", Name: "Bot1", Unlisted: false, Deleted: false},
+		bot2 := db.Bot{
+			UUID:        "bot_uuid2",
+			OwnerPubKey: "your_pubkey2",
+			OwnerAlias:  "your_owner2",
+			Name:        "test_bot2",
+			UniqueName:  "test_bot2",
+			Description: "bot description 2",
+			Tags:        pq.StringArray{},
+			Unlisted:    true,
 		}
+
+		db.TestDB.CreateOrEditBot(bot)
+		db.TestDB.CreateOrEditBot(bot2)
 
 		rctx := chi.NewRouteContext()
 		req, err := http.NewRequestWithContext(context.WithValue(context.Background(), chi.RouteCtxKey, rctx), http.MethodGet, "/", nil)
 		assert.NoError(t, err)
 
-		mockDb.On("GetListedBots", mock.Anything).Return(allBots)
 		handler.ServeHTTP(rr, req)
 		var returnedBots []db.Bot
 		err = json.Unmarshal(rr.Body.Bytes(), &returnedBots)
 		assert.NoError(t, err)
 		assert.Equal(t, http.StatusOK, rr.Code)
-
-		var filteredBots []db.Bot
-		for _, bot := range returnedBots {
-			if !bot.Deleted && !bot.Unlisted {
-				filteredBots = append(filteredBots, bot)
-			}
-		}
-
-		assert.ElementsMatch(t, expectedBots, filteredBots)
-		mockDb.AssertExpectations(t)
+		assert.ElementsMatch(t, []db.Bot{bot}, returnedBots)
 	})
 
 }
