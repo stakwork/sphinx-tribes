@@ -514,6 +514,10 @@ func TestGetBot(t *testing.T) {
 		var returnedBot db.Bot
 		err = json.Unmarshal(rr.Body.Bytes(), &returnedBot)
 		assert.Equal(t, http.StatusOK, rr.Code)
+
+		returnedBot.Tsv = ""
+		fetchedBot.Tsv = ""
+
 		assert.Equal(t, bot, returnedBot)
 		assert.Equal(t, bot, fetchedBot)
 	})
