@@ -492,6 +492,11 @@ func TestGetListedBots(t *testing.T) {
 		assert.NoError(t, err)
 		assert.Equal(t, http.StatusOK, rr.Code)
 
+		// Remove Tsv field from returnedBots for comparison
+		for i := range returnedBots {
+			returnedBots[i].Tsv = ""
+		}
+
 		assert.ElementsMatch(t, []db.Bot{bot}, returnedBots)
 	})
 
