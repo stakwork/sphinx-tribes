@@ -14,9 +14,8 @@ import (
 	"github.com/lib/pq"
 	"github.com/stakwork/sphinx-tribes/auth"
 	"github.com/stakwork/sphinx-tribes/db"
-	dbMocks "github.com/stakwork/sphinx-tribes/mocks"
+
 	"github.com/stretchr/testify/assert"
-	"github.com/stretchr/testify/mock"
 )
 
 func TestGetBotByUniqueName(t *testing.T) {
@@ -516,9 +515,6 @@ func TestGetBot(t *testing.T) {
 		var returnedBot db.Bot
 		err = json.Unmarshal(rr.Body.Bytes(), &returnedBot)
 		assert.Equal(t, http.StatusOK, rr.Code)
-
-		returnedBot.Tsv = ""
-		fetchedBot.Tsv = ""
 
 		assert.Equal(t, bot, returnedBot)
 		assert.Equal(t, bot, fetchedBot)

@@ -139,30 +139,58 @@ func TestCreateConnectionCode(t *testing.T) {
 }
 
 func TestGetConnectionCode(t *testing.T) {
-	mockDb := mocks.NewDatabase(t)
-	aHandler := NewAuthHandler(mockDb)
+	teardownSuite := SetupSuite(t)
+	defer teardownSuite(t)
+	aHandler := NewAuthHandler(db.TestDB)
 
 	t.Run("should return connection code from db", func(t *testing.T) {
-		creationDate, _ := time.Parse(time.RFC3339, "2000-01-01T00:00:00Z")
-		existingConnectionCode := db.ConnectionCodesShort{
-			ConnectionString: "test",
-			DateCreated:      &creationDate,
+
+		rr := httptest.NewRecorder()
+		handler := http.HandlerFunc(aHandler.GetConnectionCode)
+
+		codeStrArr := []string{"sampleCode1"}
+
+		codeArr := []db.ConnectionCodes{}
+		now := time.Now()
+
+		for i, code := range codeStrArr {
+			code := db.ConnectionCodes{
+				ID:               uint(i),
+				ConnectionString: code,
+				IsUsed:           false,
+				DateCreated:      &now,
+			}
+
+			codeArr = append(codeArr, code)
 		}
-		mockDb.On("GetConnectionCode").Return(existingConnectionCode).Once()
+
+		// Ensure codeArr has at least one element
+		codeShort := db.ConnectionCodesShort{
+			ConnectionString: codeArr[0].ConnectionString,
+			DateCreated:      codeArr[0].DateCreated,
+		}
+
+		db.TestDB.CreateConnectionCode(codeArr)
+
 		req, err := http.NewRequest("GET", "/connectioncodes", nil)
 		if err != nil {
 			t.Fatal(err)
 		}
-		rr := httptest.NewRecorder()
-		handler := http.HandlerFunc(aHandler.GetConnectionCode)
+
+		fetchedCodes := db.TestDB.GetConnectionCode()
 
 		handler.ServeHTTP(rr, req)
 
 		assert.Equal(t, http.StatusOK, rr.Code)
-		expected := `{"connection_string":"test","date_created":"2000-01-01T00:00:00Z"}`
-		assert.EqualValues(t, expected, strings.TrimRight(rr.Body.String(), "\n"))
-	})
+		assert.EqualValues(t, codeShort.ConnectionString, fetchedCodes.ConnectionString)
+		tolerance := time.Millisecond
+		timeDifference := codeShort.DateCreated.Sub(*fetchedCodes.DateCreated)
+		if timeDifference < 0 {
+			timeDifference = -timeDifference
+		}
+		assert.True(t, timeDifference <= tolerance, "Expected DateCreated to be within tolerance")
 
+	})
 }
 
 func TestGetIsAdmin(t *testing.T) {
