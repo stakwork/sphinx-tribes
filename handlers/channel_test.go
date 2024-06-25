@@ -6,9 +6,11 @@ import (
 	"encoding/json"
 	"net/http"
 	"net/http/httptest"
+	"strconv"
 	"testing"
 
 	"github.com/go-chi/chi"
+	"github.com/lib/pq"
 	"github.com/stakwork/sphinx-tribes/auth"
 	"github.com/stakwork/sphinx-tribes/db"
 	mocks "github.com/stakwork/sphinx-tribes/mocks"
@@ -81,27 +83,57 @@ func TestCreateChannel(t *testing.T) {
 }
 
 func TestDeleteChannel(t *testing.T) {
-	ctx := context.WithValue(context.Background(), auth.ContextKey, "mock_pubkey")
-	mockDb := mocks.NewDatabase(t)
-	cHandler := NewChannelHandler(mockDb)
+	teardownSuite := SetupSuite(t)
+	defer teardownSuite(t)
 
-	// Mock data for testing
-	mockPubKey := "mock_pubkey"
-	mockChannelID := uint(1)
+	cHandler := NewChannelHandler(db.TestDB)
+
+	person := db.Person{
+		Uuid:         "person_chan1_uuid",
+		OwnerAlias:   "person_chan1",
+		UniqueName:   "person_chan1",
+		OwnerPubKey:  "mock_pubkey",
+		PriceToMeet:  0,
+		Description:  "This is test user chan1",
+		Unlisted:     false,
+		Tags:         pq.StringArray{},
+		GithubIssues: db.PropertyMap{},
+		Extras:       db.PropertyMap{"coding_languages": "Lightning"},
+	}
+
+	tribe := db.Tribe{
+		UUID:        "tribe_uuid1",
+		OwnerPubKey: person.OwnerPubKey,
+		OwnerAlias:  person.OwnerAlias,
+		Name:        "New Tribe 1",
+		Unlisted:    false,
+		UniqueName:  "NewTribe1",
+	}
+
+	channel := db.Channel{
+		TribeUUID: tribe.UUID,
+		Name:      "Test Channe 1l",
+		Deleted:   false,
+	}
 
 	t.Run("Should test that the owner of a channel can delete the channel", func(t *testing.T) {
-		mockDb.On("GetChannel", mockChannelID).Return(db.Channel{ID: mockChannelID, TribeUUID: "mock_tribe_uuid"})
-		mockDb.On("GetTribe", "mock_tribe_uuid").Return(db.Tribe{OwnerPubKey: mockPubKey})
-		mockDb.On("UpdateChannel", mockChannelID, mock.Anything).Return(true)
+		ctx := context.WithValue(context.Background(), auth.ContextKey, "mock_pubkey")
+
+		db.TestDB.CreateOrEditPerson(person)
+		db.TestDB.CreateOrEditTribe(tribe)
+		db.TestDB.CreateChannel(channel)
+
+		channels := db.TestDB.GetChannelsByTribe(tribe.UUID)
+		channelId := strconv.FormatUint(uint64(channels[0].ID), 10)
 
 		// Create and Serve request
 		rr := httptest.NewRecorder()
-		req, err := http.NewRequestWithContext(ctx, "DELETE", "/channel/1", nil)
+		req, err := http.NewRequestWithContext(ctx, "DELETE", "/channel/"+channelId, nil)
 		if err != nil {
 			t.Fatal(err)
 		}
 		chiCtx := chi.NewRouteContext()
-		chiCtx.URLParams.Add("id", "1")
+		chiCtx.URLParams.Add("id", channelId)
 		req = req.WithContext(context.WithValue(req.Context(), chi.RouteCtxKey, chiCtx))
 
 		handler := http.HandlerFunc(cHandler.DeleteChannel)
@@ -112,20 +144,19 @@ func TestDeleteChannel(t *testing.T) {
 	})
 
 	t.Run("Should test that non-channel owners cannot delete the channel, it should return a 401 error", func(t *testing.T) {
-		mockPubKey := "other_pubkey"
+		ctx := context.WithValue(context.Background(), auth.ContextKey, "other_pubkey")
 
-		mockDb.ExpectedCalls = nil
-		mockDb.On("GetChannel", mockChannelID).Return(db.Channel{ID: mockChannelID, TribeUUID: "mock_tribe_uuid"})
-		mockDb.On("GetTribe", "mock_tribe_uuid").Return(db.Tribe{OwnerPubKey: mockPubKey})
+		channels := db.TestDB.GetChannelsByTribe(tribe.UUID)
+		channelId := strconv.FormatUint(uint64(channels[0].ID), 10)
 
 		// Create and Serve request
 		rr := httptest.NewRecorder()
-		req, err := http.NewRequestWithContext(ctx, "DELETE", "/channel/1", nil)
+		req, err := http.NewRequestWithContext(ctx, "DELETE", "/channel/"+channelId, nil)
 		if err != nil {
 			t.Fatal(err)
 		}
 		chiCtx := chi.NewRouteContext()
-		chiCtx.URLParams.Add("id", "1")
+		chiCtx.URLParams.Add("id", channelId)
 		req = req.WithContext(context.WithValue(req.Context(), chi.RouteCtxKey, chiCtx))
 
 		handler := http.HandlerFunc(cHandler.DeleteChannel)
