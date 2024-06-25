@@ -108,6 +108,14 @@ func (db database) CreateOrEditBot(b Bot) (Bot, error) {
 	return b, nil
 }
 
+func (db database) DeleteBot() (bool, error) {
+	result := db.db.Exec("DELETE FROM bots")
+	if result.Error != nil {
+		return false, result.Error
+	}
+	return true, nil
+}
+
 // check that update owner_pub_key does in fact throws an error
 func (db database) CreateOrEditPerson(m Person) (Person, error) {
 	if m.OwnerPubKey == "" {

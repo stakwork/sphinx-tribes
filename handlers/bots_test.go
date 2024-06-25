@@ -455,6 +455,8 @@ func TestGetListedBots(t *testing.T) {
 		rr := httptest.NewRecorder()
 		handler := http.HandlerFunc(bHandler.GetListedBots)
 
+		db.TestDB.DeleteBot()
+
 		bot := db.Bot{
 			UUID:        "bot_uuid1",
 			OwnerPubKey: "your_pubkey1",
