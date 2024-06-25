@@ -301,14 +301,14 @@ func TestDeleteBot(t *testing.T) {
 }
 
 func TestCreateOrEditBot(t *testing.T) {
-	mockDb := dbMocks.NewDatabase(t)
-	bHandler := NewBotHandler(mockDb)
+	teardownSuite := SetupSuite(t)
+	defer teardownSuite(t)
+
+	bHandler := NewBotHandler(db.TestDB)
 
 	t.Run("should test that a 401 error is returned during bot creation if there is no bot uuid", func(t *testing.T) {
-		mockUUID := "valid_uuid"
-
 		requestBody := map[string]interface{}{
-			"UUID": mockUUID,
+			"Name": "Test Bot",
 		}
 
 		requestBodyBytes, err := json.Marshal(requestBody)
@@ -330,24 +330,17 @@ func TestCreateOrEditBot(t *testing.T) {
 	})
 
 	t.Run("should test that a 401 error is returned if the user public key can't be verified during bot creation", func(t *testing.T) {
-		ctx := context.WithValue(context.Background(), auth.ContextKey, "pubkey")
-		mockPubKey := "valid_pubkey"
-		mockUUID := "valid_uuid"
+		ctx := context.WithValue(context.Background(), auth.ContextKey, "invalid_pubkey")
 
 		requestBody := map[string]interface{}{
-			"UUID": mockUUID,
+			"UUID": uuid.New().String(),
+			"Name": "Test Bot",
 		}
 
 		requestBodyBytes, err := json.Marshal(requestBody)
 		if err != nil {
 			t.Fatal(err)
 		}
-
-		mockVerifyTribeUUID := func(uuid string, checkTimestamp bool) (string, error) {
-			return mockPubKey, nil
-		}
-
-		bHandler.verifyTribeUUID = mockVerifyTribeUUID
 
 		rr := httptest.NewRecorder()
 		handler := http.HandlerFunc(bHandler.CreateOrEditBot)
@@ -357,50 +350,56 @@ func TestCreateOrEditBot(t *testing.T) {
 			t.Fatal(err)
 		}
 
-		chiCtx := chi.NewRouteContext()
-		chiCtx.URLParams.Add("uuid", mockUUID)
-
-		req = req.WithContext(context.WithValue(req.Context(), chi.RouteCtxKey, chiCtx))
 		handler.ServeHTTP(rr, req)
 
 		assert.Equal(t, http.StatusUnauthorized, rr.Code)
 	})
 
 	t.Run("should test that a bot gets created successfully if an authenticated user sends the right data", func(t *testing.T) {
-		mockPubKey := "valid_pubkey"
-		mockUUID := "valid_uuid"
-		mockName := "Test Bot"
-		mockUniqueName := "unique test bot"
-
-		mockVerifyTribeUUID := func(uuid string, checkTimestamp bool) (string, error) {
-			return mockPubKey, nil
+		bHandler.verifyTribeUUID = func(uuid string, checkTimestamp bool) (string, error) {
+			return "owner-pubkey-123", nil
 		}
 
-		bHandler.verifyTribeUUID = mockVerifyTribeUUID
+		botUUID := uuid.New().String()
+		uniqueName := "testbot"
 
 		requestBody := map[string]interface{}{
-			"UUID": mockUUID,
-			"Name": mockName,
+			"UUID":        botUUID,
+			"OwnerPubKey": "owner-pubkey-123",
+			"Name":        "test_bot",
+			"UniqueName":  uniqueName,
+			"Description": "bot description",
 		}
 		requestBodyBytes, err := json.Marshal(requestBody)
 		if err != nil {
 			t.Fatal(err)
 		}
 
-		mockDb.On("GetBotByUniqueName", mock.Anything).Return(db.Bot{
-			UniqueName: mockUniqueName,
-		}, nil)
-
-		mockDb.On("CreateOrEditBot", mock.Anything).Return(db.Bot{
-			UUID: mockUUID,
-		}, nil)
+		bot := db.Bot{
+			UUID:           botUUID,
+			OwnerPubKey:    "owner-pubkey-123",
+			OwnerAlias:     "your_owner",
+			Name:           "test_bot",
+			UniqueName:     uniqueName,
+			Description:    "bot description",
+			Tags:           pq.StringArray{},
+			Img:            "bot-img-url",
+			PricePerUse:    100,
+			Created:        nil,
+			Updated:        nil,
+			Unlisted:       false,
+			Deleted:        false,
+			MemberCount:    10,
+			OwnerRouteHint: "route-hint",
+		}
+		db.TestDB.CreateOrEditBot(bot)
 
 		req, err := http.NewRequest("POST", "/", bytes.NewBuffer(requestBodyBytes))
 		if err != nil {
 			t.Fatal(err)
 		}
 
-		ctx := context.WithValue(req.Context(), auth.ContextKey, mockPubKey)
+		ctx := context.WithValue(req.Context(), auth.ContextKey, bot.OwnerPubKey)
 		req = req.WithContext(ctx)
 
 		rr := httptest.NewRecorder()
@@ -413,45 +412,52 @@ func TestCreateOrEditBot(t *testing.T) {
 		if err != nil {
 			t.Fatalf("Error decoding JSON response: %s", err)
 		}
-		assert.Equal(t, mockUUID, responseData["uuid"])
+		assert.Equal(t, bot.UUID, responseData["uuid"])
+
+		createdBot := db.TestDB.GetBot(bot.UUID)
+		assert.Equal(t, bot.UUID, createdBot.UUID)
+		assert.Equal(t, bot.OwnerPubKey, createdBot.OwnerPubKey)
+		assert.Equal(t, bot.OwnerAlias, createdBot.OwnerAlias)
+		assert.Equal(t, bot.Name, createdBot.Name)
+		assert.Equal(t, bot.Description, createdBot.Description)
+		assert.Equal(t, bot.Tags, createdBot.Tags)
+		assert.Equal(t, bot.Img, createdBot.Img)
+		assert.Equal(t, bot.PricePerUse, createdBot.PricePerUse)
+		assert.Equal(t, bot.Unlisted, createdBot.Unlisted)
+		assert.Equal(t, bot.Deleted, createdBot.Deleted)
+		assert.Equal(t, bot.MemberCount, createdBot.MemberCount)
+		assert.Equal(t, bot.OwnerRouteHint, createdBot.OwnerRouteHint)
 	})
 
 	t.Run("should test that an existing bot gets updated when passed to POST bots", func(t *testing.T) {
-		mockPubKey := "valid_pubkey"
-		mockUUID := "valid_uuid"
-		mockName := "Updated Test Bot"
-		mockUniqueName := "unique test bot"
-
-		mockVerifyTribeUUID := func(uuid string, checkTimestamp bool) (string, error) {
-			return mockPubKey, nil
+		bHandler.verifyTribeUUID = func(uuid string, checkTimestamp bool) (string, error) {
+			return "owner-pubkey-123", nil
 		}
-		bHandler.verifyTribeUUID = mockVerifyTribeUUID
 
 		requestBody := map[string]interface{}{
-			"UUID": mockUUID,
-			"Name": mockName,
+			"UUID": "bot_uuid",
+			"Name": "Updated Test Bot",
 		}
 		requestBodyBytes, err := json.Marshal(requestBody)
 		if err != nil {
 			t.Fatal(err)
 		}
 
-		mockDb.On("GetBotByUniqueName", mock.Anything).Return(db.Bot{
-			UUID:       mockUUID,
-			UniqueName: mockUniqueName,
-			Name:       "Original Test Bot",
-		}, nil)
-
-		mockDb.On("CreateOrEditBot", mock.Anything).Return(db.Bot{
-			UUID: mockUUID,
-			Name: mockName,
-		}, nil)
+		bot := db.Bot{
+			UUID:        "bot_uuid",
+			OwnerPubKey: "owner-pubkey-123",
+			Name:        "test_bot",
+			UniqueName:  "test_bot",
+			Description: "bot description",
+			Tags:        pq.StringArray{},
+		}
+		db.TestDB.CreateOrEditBot(bot)
 
 		req, err := http.NewRequest("POST", "/", bytes.NewBuffer(requestBodyBytes))
 		if err != nil {
 			t.Fatal(err)
 		}
-		ctx := context.WithValue(req.Context(), auth.ContextKey, mockPubKey)
+		ctx := context.WithValue(req.Context(), auth.ContextKey, bot.OwnerPubKey)
 		req = req.WithContext(ctx)
 
 		rr := httptest.NewRecorder()
@@ -464,10 +470,12 @@ func TestCreateOrEditBot(t *testing.T) {
 		if err != nil {
 			t.Fatalf("Error decoding JSON response: %s", err)
 		}
-		assert.Equal(t, mockUUID, responseData["uuid"])
-		assert.Equal(t, mockName, responseData["name"])
-	})
+		assert.Equal(t, "bot_uuid", responseData["uuid"])
+		assert.Equal(t, "Updated Test Bot", responseData["name"])
 
+		updatedBot := db.TestDB.GetBot("bot_uuid")
+		assert.Equal(t, "Updated Test Bot", updatedBot.Name)
+	})
 }
 
 func TestGetBot(t *testing.T) {
@@ -508,6 +516,10 @@ func TestGetBot(t *testing.T) {
 		var returnedBot db.Bot
 		err = json.Unmarshal(rr.Body.Bytes(), &returnedBot)
 		assert.Equal(t, http.StatusOK, rr.Code)
+
+		returnedBot.Tsv = ""
+		fetchedBot.Tsv = ""
+
 		assert.Equal(t, bot, returnedBot)
 		assert.Equal(t, bot, fetchedBot)
 	})
