@@ -403,55 +403,51 @@ func TestSetTribePreview(t *testing.T) {
 }
 
 func TestCreateOrEditTribe(t *testing.T) {
-	mockDb := mocks.NewDatabase(t)
-	tHandler := NewTribeHandler(mockDb)
+	teardownSuite := SetupSuite(t)
+	defer teardownSuite(t)
+
+	tHandler := NewTribeHandler(db.TestDB)
 
 	t.Run("Should test that a tribe can be created when the right data is passed", func(t *testing.T) {
-		// Mock data
-		mockPubKey := "valid_pubkey"
-		mockUUID := "valid_uuid"
-		mockName := "Test Tribe"
-		mockDescription := "This is a test tribe."
-		mockTags := []string{"tag1", "tag2"}
 
+		tribe := db.Tribe{
+			UUID:        "uuid",
+			OwnerPubKey: "pubkey",
+			Name:        "name",
+			Description: "description",
+			Tags:        []string{"tag3", "tag4"},
+			AppURL:      "valid_app_url",
+			Badges:      []string{},
+		}
+
+		requestBody := map[string]interface{}{
+			"UUID":        tribe.UUID,
+			"OwnerPubkey": tribe.OwnerPubKey,
+			"Name":        tribe.Name,
+			"Description": tribe.Description,
+			"Tags":        tribe.Tags,
+			"AppURL":      tribe.AppURL,
+			"Badges":      tribe.Badges,
+		}
 		mockVerifyTribeUUID := func(uuid string, checkTimestamp bool) (string, error) {
-			return mockPubKey, nil
+			return tribe.OwnerPubKey, nil
 		}
 
 		tHandler.verifyTribeUUID = mockVerifyTribeUUID
 
-		// Mock request body
-		requestBody := map[string]interface{}{
-			"UUID":        mockUUID,
-			"Name":        mockName,
-			"Description": mockDescription,
-			"Tags":        mockTags,
-		}
 		requestBodyBytes, err := json.Marshal(requestBody)
 		if err != nil {
 			t.Fatal(err)
 		}
 
-		// Mock database calls
-		mockDb.On("GetTribe", mock.Anything).Return(db.Tribe{
-			UUID:        mockUUID,
-			OwnerPubKey: mockPubKey,
-		}).Once()
-		mockDb.On("CreateOrEditTribe", mock.Anything).Return(db.Tribe{
-			UUID: mockUUID,
-		}, nil)
-
-		// Create request with mock body
 		req, err := http.NewRequest("POST", "/", bytes.NewBuffer(requestBodyBytes))
 		if err != nil {
 			t.Fatal(err)
 		}
 
-		// Set context with mock pub key
-		ctx := context.WithValue(req.Context(), auth.ContextKey, mockPubKey)
+		ctx := context.WithValue(req.Context(), auth.ContextKey, tribe.OwnerPubKey)
 		req = req.WithContext(ctx)
 
-		// Serve request
 		rr := httptest.NewRecorder()
 		handler := http.HandlerFunc(tHandler.CreateOrEditTribe)
 		handler.ServeHTTP(rr, req)
@@ -463,7 +459,13 @@ func TestCreateOrEditTribe(t *testing.T) {
 		if err != nil {
 			t.Fatalf("Error decoding JSON response: %s", err)
 		}
-		assert.Equal(t, mockUUID, responseData["uuid"])
+
+		// Assert that the response data is equal to the tribe POST data sent to the request
+		assert.Equal(t, tribe.UUID, responseData["uuid"])
+		assert.Equal(t, tribe.Name, responseData["name"])
+		assert.Equal(t, tribe.Description, responseData["description"])
+		assert.ElementsMatch(t, tribe.Tags, responseData["tags"])
+		assert.Equal(t, tribe.OwnerPubKey, responseData["owner_pubkey"])
 	})
 }
 
