@@ -514,31 +514,57 @@ func TestGetTribeByUniqueName(t *testing.T) {
 }
 
 func TestGetAllTribes(t *testing.T) {
-	mockDb := mocks.NewDatabase(t)
-	tHandler := NewTribeHandler(mockDb)
+	teardownSuite := SetupSuite(t)
+	defer teardownSuite(t)
+
+	tHandler := NewTribeHandler(db.TestDB)
 	t.Run("should return all tribes", func(t *testing.T) {
 		rr := httptest.NewRecorder()
 		handler := http.HandlerFunc(tHandler.GetAllTribes)
 
+		db.TestDB.DeleteTribe()
+
+		tribe := db.Tribe{
+			UUID:        "uuid",
+			OwnerPubKey: "pubkey",
+			Name:        "name",
+			UniqueName:  "uniqueName",
+			Description: "description",
+			Tags:        []string{"tag3", "tag4"},
+			AppURL:      "AppURl",
+			Badges:      []string{},
+		}
+
+		tribe2 := db.Tribe{
+			UUID:        "uuid2",
+			OwnerPubKey: "pubkey2",
+			Name:        "name2",
+			UniqueName:  "uniqueName2",
+			Description: "description2",
+			Tags:        []string{"tag3", "tag4"},
+			AppURL:      "AppURl2",
+			Badges:      []string{},
+		}
+
+		db.TestDB.CreateOrEditTribe(tribe)
+		db.TestDB.CreateOrEditTribe(tribe2)
+
 		expectedTribes := []db.Tribe{
-			{UUID: "uuid", Name: "Tribe1"},
-			{UUID: "uuid", Name: "Tribe2"},
-			{UUID: "uuid", Name: "Tribe3"},
+			tribe,
+			tribe2,
 		}
 
 		rctx := chi.NewRouteContext()
 		req, err := http.NewRequestWithContext(context.WithValue(context.Background(), chi.RouteCtxKey, rctx), http.MethodGet, "/", nil)
 		assert.NoError(t, err)
 
-		mockDb.On("GetAllTribes", mock.Anything).Return(expectedTribes)
 		handler.ServeHTTP(rr, req)
 		var returnedTribes []db.Tribe
 		err = json.Unmarshal(rr.Body.Bytes(), &returnedTribes)
 		assert.NoError(t, err)
 		assert.Equal(t, http.StatusOK, rr.Code)
+		assert.Len(t, returnedTribes, 2)
 		assert.EqualValues(t, expectedTribes, returnedTribes)
-		mockDb.AssertExpectations(t)
-
 	})
 }
 
