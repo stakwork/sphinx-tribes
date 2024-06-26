@@ -5,16 +5,15 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"math/rand"
 	"net/http"
 	"net/http/httptest"
 	"strings"
 	"testing"
 	"time"
 
-	"github.com/google/uuid"
-	"golang.org/x/exp/rand"
-
 	"github.com/go-chi/chi"
+	"github.com/google/uuid"
 	"github.com/stakwork/sphinx-tribes/auth"
 	"github.com/stakwork/sphinx-tribes/db"
 	mocks "github.com/stakwork/sphinx-tribes/mocks"
@@ -112,7 +111,7 @@ func TestUnitCreateOrEditWorkspace(t *testing.T) {
 		handler := http.HandlerFunc(oHandler.CreateOrEditWorkspace)
 
 		const letters = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
-		rand.Seed(uint64(time.Now().UnixNano()))
+		rand.Seed(int64(time.Now().UnixNano()))
 
 		b := make([]byte, 10)
 		for i := range b {
@@ -148,7 +147,7 @@ func TestUnitCreateOrEditWorkspace(t *testing.T) {
 		handler := http.HandlerFunc(oHandler.CreateOrEditWorkspace)
 
 		const letters = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
-		rand.Seed(uint64(time.Now().UnixNano()))
+		rand.Seed(int64(time.Now().UnixNano()))
 
 		b := make([]byte, 10)
 		for i := range b {
@@ -505,17 +504,51 @@ func TestGetWorkspaceBudget(t *testing.T) {
 }
 
 func TestGetWorkspaceBudgetHistory(t *testing.T) {
-	ctx := context.WithValue(context.Background(), auth.ContextKey, "test-key")
-	mockDb := mocks.NewDatabase(t)
-	oHandler := NewWorkspaceHandler(mockDb)
+	teardownSuite := SetupSuite(t)
+	defer teardownSuite(t)
+	oHandler := NewWorkspaceHandler(db.TestDB)
+
+	workspace := db.Workspace{
+		Uuid:        uuid.New().String(),
+		Name:        "Workspace History Name" + uuid.New().String(),
+		OwnerPubKey: "test-key",
+		Github:      "https://github.com/history",
+		Website:     "https://www.historywebsite.com",
+		Description: "Workspace History Description",
+	}
+	db.TestDB.CreateOrEditWorkspace(workspace)
+	ctx := context.WithValue(context.Background(), auth.ContextKey, workspace.OwnerPubKey)
+
+	budgetAmount := uint(5000)
+	bounty := db.NewBountyBudget{
+		WorkspaceUuid: workspace.Uuid,
+		TotalBudget:   budgetAmount,
+	}
+	db.TestDB.CreateWorkspaceBudget(bounty)
+
+	now := time.Now()
+	paymentHistory := db.NewPaymentHistory{
+		WorkspaceUuid:  workspace.Uuid,
+		Amount:         budgetAmount,
+		Status:         true,
+		PaymentType:    "budget",
+		Created:        &now,
+		Updated:        &now,
+		SenderPubKey:   workspace.OwnerPubKey,
+		ReceiverPubKey: "",
+		BountyId:       0,
+	}
+	db.TestDB.AddPaymentHistory(paymentHistory)
+
+	workspace = db.TestDB.GetWorkspaceByUuid(workspace.Uuid)
 
 	t.Run("Should test that a 401 is returned when trying to view an workspace's budget history without a token", func(t *testing.T) {
-		workspaceUUID := "valid-uuid"
+		workspaceUUID := workspace.Uuid
 
-		mockUserHasAccess := func(pubKeyFromAuth string, uuid string, role string) bool {
+		handlerUserHasAccess := func(pubKeyFromAuth string, uuid string, role string) bool {
 			return false
 		}
-		oHandler.userHasAccess = mockUserHasAccess
+		oHandler.userHasAccess = handlerUserHasAccess
 
 		rctx := chi.NewRouteContext()
 		rctx.URLParams.Add("uuid", workspaceUUID)
@@ -531,18 +564,12 @@ func TestGetWorkspaceBudgetHistory(t *testing.T) {
 	})
 
 	t.Run("Should test that the right budget history is returned, if the user is the workspace admin or has the ViewReport role", func(t *testing.T) {
-		workspaceUUID := "valid-uuid"
-		expectedBudgetHistory := []db.BudgetHistoryData{
-			{BudgetHistory: db.BudgetHistory{ID: 1, OrgUuid: workspaceUUID, Created: nil, Updated: nil}, SenderName: "Sender1"},
-			{BudgetHistory: db.BudgetHistory{ID: 2, OrgUuid: workspaceUUID, Created: nil, Updated: nil}, SenderName: "Sender2"},
-		}
+		workspaceUUID := workspace.Uuid
 
-		mockUserHasAccess := func(pubKeyFromAuth string, uuid string, role string) bool {
+		handlerUserHasAccess := func(pubKeyFromAuth string, uuid string, role string) bool {
 			return true
 		}
-		oHandler.userHasAccess = mockUserHasAccess
-
-		mockDb.On("GetWorkspaceBudgetHistory", workspaceUUID).Return(expectedBudgetHistory).Once()
+		oHandler.userHasAccess = handlerUserHasAccess
 
 		rctx := chi.NewRouteContext()
 		rctx.URLParams.Add("uuid", workspaceUUID)
@@ -561,6 +588,8 @@ func TestGetWorkspaceBudgetHistory(t *testing.T) {
 		if err != nil {
 			t.Fatal(err)
 		}
+
+		expectedBudgetHistory := db.TestDB.GetWorkspaceBudgetHistory(workspaceUUID)
 
 		assert.Equal(t, expectedBudgetHistory, responseBudgetHistory)
 	})
