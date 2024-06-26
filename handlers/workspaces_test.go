@@ -6,6 +6,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"github.com/google/uuid"
 	"net/http"
 	"net/http/httptest"
 	"strings"
@@ -336,41 +337,62 @@ func TestDeleteWorkspace(t *testing.T) {
 
 func TestGetWorkspaceBounties(t *testing.T) {
 	ctx := context.WithValue(context.Background(), auth.ContextKey, "test-key")
-	mockDb := mocks.NewDatabase(t)
+	teardownSuite := SetupSuite(t)
+	defer teardownSuite(t)
 	mockGenerateBountyHandler := func(bounties []db.NewBounty) []db.BountyResponse {
 		return []db.BountyResponse{} // Mocked response
 	}
-	oHandler := NewWorkspaceHandler(mockDb)
+	oHandler := NewWorkspaceHandler(db.TestDB)
+
+	workspace := db.Workspace{
+		Uuid:        uuid.New().String(),
+		Name:        uuid.New().String(),
+		OwnerPubKey: "workspace_owner_bounties_pubkey",
+		Github:      "https://github.com/bounties",
+		Website:     "https://www.bountieswebsite.com",
+		Description: "Workspace Bounties Description",
+	}
+	db.TestDB.CreateOrEditWorkspace(workspace)
+
+	bounty := db.NewBounty{
+		Type:          "coding",
+		Title:         "existing bounty",
+		Description:   "existing bounty description",
+		WorkspaceUuid: workspace.Uuid,
+		OwnerID:       "workspace-user",
+		Price:         2000,
+	}
+	db.TestDB.CreateOrEditBounty(bounty)
 
 	t.Run("Should test that a workspace's bounties can be listed without authentication", func(t *testing.T) {
-		workspaceUUID := "valid-uuid"
+
 		oHandler.generateBountyHandler = mockGenerateBountyHandler
-
-		expectedBounties := []db.NewBounty{{}, {}} // Mocked response
-		mockDb.On("GetWorkspaceBounties", mock.AnythingOfType("*http.Request"), workspaceUUID).Return(expectedBounties).Once()
-
 		rr := httptest.NewRecorder()
 		handler := http.HandlerFunc(oHandler.GetWorkspaceBounties)
 
 		rctx := chi.NewRouteContext()
-		rctx.URLParams.Add("uuid", workspaceUUID)
-		req, err := http.NewRequestWithContext(context.WithValue(context.Background(), chi.RouteCtxKey, rctx), http.MethodGet, "/bounties/"+workspaceUUID, nil)
+		rctx.URLParams.Add("uuid", workspace.Uuid)
+		req, err := http.NewRequestWithContext(context.WithValue(context.Background(), chi.RouteCtxKey, rctx), http.MethodGet, "/bounties/"+workspace.Uuid, nil)
 		if err != nil {
 			t.Fatal(err)
 		}
 
+		fetchedWorkspace := db.TestDB.GetWorkspaceByUuid(workspace.Uuid)
+		workspace.ID = fetchedWorkspace.ID
+
+		fetchedBounty := db.TestDB.GetWorkspaceBounties(req, bounty.WorkspaceUuid)
+		bounty.ID = fetchedBounty[0].ID
 		handler.ServeHTTP(rr, req)
 
 		assert.Equal(t, http.StatusOK, rr.Code)
+		assert.Equal(t, workspace, fetchedWorkspace)
+		assert.Equal(t, bounty, fetchedBounty[0])
 	})
 
 	t.Run("should return empty array when wrong workspace UUID is passed", func(t *testing.T) {
-		workspaceUUID := "wrong-uuid"
-
-		mockDb.On("GetWorkspaceBounties", mock.AnythingOfType("*http.Request"), workspaceUUID).Return([]db.NewBounty{}).Once()
-
 		rr := httptest.NewRecorder()
 		handler := http.HandlerFunc(oHandler.GetWorkspaceBounties)
+		workspaceUUID := "wrong-uuid"
 
 		rctx := chi.NewRouteContext()
 		rctx.URLParams.Add("uuid", workspaceUUID)
@@ -379,6 +401,8 @@ func TestGetWorkspaceBounties(t *testing.T) {
 			t.Fatal(err)
 		}
 
+		fetchedWorkspaceWrong := db.TestDB.GetWorkspaceByUuid(workspaceUUID)
+
 		handler.ServeHTTP(rr, req)
 
 		// Assert that the response status code is as expected
@@ -386,6 +410,7 @@ func TestGetWorkspaceBounties(t *testing.T) {
 
 		// Assert that the response body is an empty array
 		assert.Equal(t, "[]\n", rr.Body.String())
+		assert.NotEqual(t, workspace, fetchedWorkspaceWrong)
 	})
 }
 
