@@ -26,7 +26,7 @@ func TestGetTribesByOwner(t *testing.T) {
 
 	tHandler := NewTribeHandler(db.TestDB)
 
-	t.Run("Should test that all tribes that an owner did not delete are returned if all=true is added to the request query", func(t *testing.T) {
+	t.Run("Should test that all tribes an owner did not delete are returned if all=true is added to the request query", func(t *testing.T) {
 
 		// Create a user
 		person := db.Person{
