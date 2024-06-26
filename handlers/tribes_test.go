@@ -245,13 +245,18 @@ func TestDeleteTribe(t *testing.T) {
 		// Verify response
 		assert.Equal(t, http.StatusOK, rr.Code)
 		var responseData bool
-		errors := json.Unmarshal(rr.Body.Bytes(), &responseData)
-		assert.NoError(t, errors)
+		err = json.Unmarshal(rr.Body.Bytes(), &responseData)
+		assert.NoError(t, err)
 		assert.True(t, responseData)
+
+		// Assert that the tribe is deleted from the DB
+		deletedTribe := db.TestDB.GetTribe(tribeUUID)
+		assert.NoError(t, err)
+		assert.Empty(t, deletedTribe)
+		assert.Equal(t, db.Tribe{}, deletedTribe)
 	})
 
 	t.Run("Should test that a 401 error is returned when a tribe is attempted to be deleted by someone other than the owner", func(t *testing.T) {
-
 		ctx := context.WithValue(context.Background(), auth.ContextKey, "other_pubkey")
 		mockUUID := tribe.AppURL
 		mockOwnerPubKey := person.OwnerPubKey
