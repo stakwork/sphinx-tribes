@@ -5,11 +5,14 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"github.com/google/uuid"
 	"net/http"
 	"net/http/httptest"
 	"strings"
 	"testing"
+	"time"
+
+	"github.com/google/uuid"
+	"golang.org/x/exp/rand"
 
 	"github.com/go-chi/chi"
 	"github.com/stakwork/sphinx-tribes/auth"
@@ -20,9 +23,9 @@ import (
 )
 
 func TestUnitCreateOrEditWorkspace(t *testing.T) {
-	ctx := context.WithValue(context.Background(), auth.ContextKey, "test-key")
-	mockDb := mocks.NewDatabase(t)
-	oHandler := NewWorkspaceHandler(mockDb)
+	teardownSuite := SetupSuite(t)
+	defer teardownSuite(t)
+	oHandler := NewWorkspaceHandler(db.TestDB)
 
 	t.Run("should return error if body is not a valid json", func(t *testing.T) {
 		rr := httptest.NewRecorder()
@@ -61,6 +64,7 @@ func TestUnitCreateOrEditWorkspace(t *testing.T) {
 		handler := http.HandlerFunc(oHandler.CreateOrEditWorkspace)
 
 		invalidJson := []byte(`{"name": ""}`)
+		ctx := context.WithValue(context.Background(), auth.ContextKey, "test-key")
 		req, err := http.NewRequestWithContext(ctx, http.MethodPost, "/", bytes.NewReader(invalidJson))
 		if err != nil {
 			t.Fatal(err)
@@ -76,6 +80,7 @@ func TestUnitCreateOrEditWorkspace(t *testing.T) {
 		handler := http.HandlerFunc(oHandler.CreateOrEditWorkspace)
 
 		invalidJson := []byte(`{"name": "DemoTestingNewWorkspace"}`)
+		ctx := context.WithValue(context.Background(), auth.ContextKey, "test-key")
 		req, err := http.NewRequestWithContext(ctx, http.MethodPost, "/", bytes.NewReader(invalidJson))
 		if err != nil {
 			t.Fatal(err)
@@ -91,6 +96,7 @@ func TestUnitCreateOrEditWorkspace(t *testing.T) {
 		handler := http.HandlerFunc(oHandler.CreateOrEditWorkspace)
 
 		invalidJson := []byte(`{"name": "   "}`)
+		ctx := context.WithValue(context.Background(), auth.ContextKey, "test-key")
 		req, err := http.NewRequestWithContext(ctx, http.MethodPost, "/", bytes.NewReader(invalidJson))
 		if err != nil {
 			t.Fatal(err)
@@ -105,13 +111,20 @@ func TestUnitCreateOrEditWorkspace(t *testing.T) {
 		rr := httptest.NewRecorder()
 		handler := http.HandlerFunc(oHandler.CreateOrEditWorkspace)
 
-		mockDb.On("GetWorkspaceByUuid", mock.AnythingOfType("string")).Return(db.Workspace{}).Once()
-		mockDb.On("GetWorkspaceByName", "Abdul").Return(db.Workspace{}).Once()
-		mockDb.On("CreateOrEditWorkspace", mock.MatchedBy(func(org db.Workspace) bool {
-			return org.Name == "Abdul" && org.Uuid != "" && org.Updated != nil && org.Created != nil
-		})).Return(db.Workspace{Name: "Abdul"}, nil).Once()
+		const letters = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
+		rand.Seed(uint64(time.Now().UnixNano()))
 
-		jsonInput := []byte(`{"name": " Abdul ", "owner_pubkey": "test-key" ,"description": "Test"}`)
+		b := make([]byte, 10)
+		for i := range b {
+			b[i] = letters[rand.Intn(len(letters))]
+		}
+		name := string(b)
+
+		spacedName := "  " + name + "  "
+
+		jsonInput := []byte(fmt.Sprintf(`{"name": "%s", "owner_pubkey": "test-key", "description": "Workspace Bounties Description"}`, spacedName))
+
+		ctx := context.WithValue(context.Background(), auth.ContextKey, "test-key")
 		req, err := http.NewRequestWithContext(ctx, http.MethodPost, "/", bytes.NewReader(jsonInput))
 		if err != nil {
 			t.Fatal(err)
@@ -127,21 +140,38 @@ func TestUnitCreateOrEditWorkspace(t *testing.T) {
 			t.Fatal(err)
 		}
 
-		assert.Equal(t, "Abdul", responseOrg.Name)
+		assert.Equal(t, name, responseOrg.Name)
 	})
 
 	t.Run("should successfully add workspace if request is valid", func(t *testing.T) {
 		rr := httptest.NewRecorder()
 		handler := http.HandlerFunc(oHandler.CreateOrEditWorkspace)
 
-		mockDb.On("GetWorkspaceByUuid", mock.AnythingOfType("string")).Return(db.Workspace{}).Once()
-		mockDb.On("GetWorkspaceByName", "TestWorkspace").Return(db.Workspace{}).Once()
-		mockDb.On("CreateOrEditWorkspace", mock.MatchedBy(func(org db.Workspace) bool {
-			return org.Name == "TestWorkspace" && org.Uuid != "" && org.Updated != nil && org.Created != nil
-		})).Return(db.Workspace{}, nil).Once()
+		const letters = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
+		rand.Seed(uint64(time.Now().UnixNano()))
 
-		invalidJson := []byte(`{"name": "TestWorkspace", "owner_pubkey": "test-key" ,"description": "Test"}`)
-		req, err := http.NewRequestWithContext(ctx, http.MethodPost, "/", bytes.NewReader(invalidJson))
+		b := make([]byte, 10)
+		for i := range b {
+			b[i] = letters[rand.Intn(len(letters))]
+		}
+		name := string(b)
+
+		workspace := db.Workspace{
+			Uuid:        uuid.New().String(),
+			Name:        name,
+			OwnerPubKey: uuid.New().String(),
+			Github:      "https://github.com/bounties",
+			Website:     "https://www.bountieswebsite.com",
+			Description: "Workspace Bounties Description",
+		}
+		db.TestDB.CreateOrEditWorkspace(workspace)
+
+		Workspace := db.TestDB.GetWorkspaceByUuid(workspace.Uuid)
+		workspace.ID = Workspace.ID
+
+		requestBody, _ := json.Marshal(workspace)
+		ctx := context.WithValue(context.Background(), auth.ContextKey, workspace.OwnerPubKey)
+		req, err := http.NewRequestWithContext(ctx, http.MethodPost, "/", bytes.NewReader(requestBody))
 		if err != nil {
 			t.Fatal(err)
 		}
@@ -149,6 +179,7 @@ func TestUnitCreateOrEditWorkspace(t *testing.T) {
 		handler.ServeHTTP(rr, req)
 
 		assert.Equal(t, http.StatusOK, rr.Code)
+		assert.Equal(t, workspace, Workspace)
 	})
 	t.Run("should return error if org description is empty or too long", func(t *testing.T) {
 		tests := []struct {
@@ -164,7 +195,7 @@ func TestUnitCreateOrEditWorkspace(t *testing.T) {
 				rr := httptest.NewRecorder()
 				handler := http.HandlerFunc(oHandler.CreateOrEditWorkspace)
 				invalidJson := []byte(fmt.Sprintf(`{"name": "TestWorkspace", "owner_pubkey": "test-key", "description": "%s"}`, tc.description))
-
+				ctx := context.WithValue(context.Background(), auth.ContextKey, "test-key")
 				req, err := http.NewRequestWithContext(ctx, http.MethodPost, "/", bytes.NewReader(invalidJson))
 				if err != nil {
 					t.Fatal(err)
