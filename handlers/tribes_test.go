@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"context"
 	"encoding/json"
+	"github.com/google/uuid"
 	"net/http"
 	"net/http/httptest"
 	"strings"
@@ -86,21 +87,23 @@ func TestGetTribesByOwner(t *testing.T) {
 }
 
 func TestGetTribe(t *testing.T) {
-	mockDb := mocks.NewDatabase(t)
-	tHandler := NewTribeHandler(mockDb)
+	teardownSuite := SetupSuite(t)
+	defer teardownSuite(t)
+	tHandler := NewTribeHandler(db.TestDB)
+
+	tribe := db.Tribe{
+		UUID:        uuid.New().String(),
+		OwnerPubKey: uuid.New().String(),
+		Name:        "tribe",
+		Description: "description",
+		Tags:        []string{"tag1", "tag2"},
+		Badges:      pq.StringArray{},
+	}
+	db.TestDB.CreateOrEditTribe(tribe)
 
 	t.Run("Should test that a tribe can be returned when the right UUID is passed to the request parameter", func(t *testing.T) {
 		// Mock data
-		mockUUID := "valid_uuid"
-		mockTribe := db.Tribe{
-			UUID: mockUUID,
-		}
-		mockChannels := []db.Channel{
-			{ID: 1, TribeUUID: mockUUID},
-			{ID: 2, TribeUUID: mockUUID},
-		}
-		mockDb.On("GetTribe", mock.Anything).Return(mockTribe).Once()
-		mockDb.On("GetChannelsByTribe", mock.Anything).Return(mockChannels).Once()
+		mockUUID := tribe.UUID
 
 		// Serve request
 		rr := httptest.NewRecorder()
@@ -110,6 +113,8 @@ func TestGetTribe(t *testing.T) {
 		if err != nil {
 			t.Fatal(err)
 		}
+
+		fetchedTribe := db.TestDB.GetTribe(mockUUID)
 
 		handler := http.HandlerFunc(tHandler.GetTribe)
 		handler.ServeHTTP(rr, req)
@@ -121,15 +126,13 @@ func TestGetTribe(t *testing.T) {
 		if err != nil {
 			t.Fatalf("Error decoding JSON response: %s", err)
 		}
-		assert.Equal(t, mockTribe.UUID, responseData["uuid"])
+		assert.Equal(t, tribe.UUID, responseData["uuid"])
+		assert.Equal(t, tribe, fetchedTribe)
 	})
 
 	t.Run("Should test that no tribe is returned when a nonexistent UUID is passed", func(t *testing.T) {
-		// Mock data
-		mockDb.ExpectedCalls = nil
+
 		nonexistentUUID := "nonexistent_uuid"
-		mockDb.On("GetTribe", nonexistentUUID).Return(db.Tribe{}).Once()
-		mockDb.On("GetChannelsByTribe", mock.Anything).Return([]db.Channel{}).Once()
 
 		// Serve request
 		rr := httptest.NewRecorder()
