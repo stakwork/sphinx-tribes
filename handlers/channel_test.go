@@ -9,12 +9,14 @@ import (
 	"strconv"
 	"testing"
 
+	"github.com/google/uuid"
+	"github.com/stretchr/testify/assert"
+
 	"github.com/lib/pq"
 
 	"github.com/go-chi/chi"
 	"github.com/stakwork/sphinx-tribes/auth"
 	"github.com/stakwork/sphinx-tribes/db"
-	"github.com/stretchr/testify/assert"
 )
 
 func TestCreateChannel(t *testing.T) {
@@ -71,7 +73,7 @@ func TestCreateChannel(t *testing.T) {
 	})
 
 	t.Run("Should test that an authenticated user can create a channel", func(t *testing.T) {
-		person, tribe := createTestPersonAndTribe("person_chan_pubkey", "tribe_uuid", "New Tribe")
+		person, tribe := createTestPersonAndTribe("person_chan_pubkey", uuid.New().String(), "New Tribe")
 
 		requestBody := map[string]interface{}{
 			"tribe_uuid": tribe.UUID,
