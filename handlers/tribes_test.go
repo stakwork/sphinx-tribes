@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"context"
 	"encoding/json"
+	"github.com/google/uuid"
 	"net/http"
 	"net/http/httptest"
 	"strings"
@@ -200,23 +201,43 @@ func TestGetTribesByAppUrl(t *testing.T) {
 }
 
 func TestDeleteTribe(t *testing.T) {
-	ctx := context.WithValue(context.Background(), auth.ContextKey, "owner_pubkey")
-	mockDb := mocks.NewDatabase(t)
-	tHandler := NewTribeHandler(mockDb)
+	teardownSuite := SetupSuite(t)
+	defer teardownSuite(t)
+
+	personUUID := uuid.New().String()
+	person := db.Person{
+		Uuid:        personUUID,
+		OwnerAlias:  "person_alias",
+		UniqueName:  "person_unique_name",
+		OwnerPubKey: "owner_pubkey",
+		PriceToMeet: 0,
+		Description: "this is test user 1",
+	}
+	db.TestDB.CreateOrEditPerson(person)
+
+	tribeUUID := uuid.New().String()
+	tribe := db.Tribe{
+		UUID:        tribeUUID,
+		OwnerPubKey: person.OwnerPubKey,
+		Name:        "tribe_name",
+		Description: "description",
+		Tags:        []string{"tag3", "tag4"},
+		AppURL:      "tribe_app_url",
+	}
+	db.TestDB.CreateOrEditTribe(tribe)
+
+	tHandler := NewTribeHandler(db.TestDB)
 
 	t.Run("Should test that the owner of a tribe can delete a tribe", func(t *testing.T) {
-		// Mock data
-		mockUUID := "valid_uuid"
-		mockOwnerPubKey := "owner_pubkey"
+		mockUUID := tribe.AppURL
+		mockOwnerPubKey := person.OwnerPubKey
 
 		mockVerifyTribeUUID := func(uuid string, checkTimestamp bool) (string, error) {
 			return mockOwnerPubKey, nil
 		}
-		mockDb.On("UpdateTribe", mock.Anything, map[string]interface{}{"deleted": true}).Return(true)
-
 		tHandler.verifyTribeUUID = mockVerifyTribeUUID
 
-		// Create and serve request
+		ctx := context.WithValue(context.Background(), auth.ContextKey, mockOwnerPubKey)
 		rr := httptest.NewRecorder()
 		handler := http.HandlerFunc(tHandler.DeleteTribe)
 
@@ -225,7 +246,7 @@ func TestDeleteTribe(t *testing.T) {
 			t.Fatal(err)
 		}
 		chiCtx := chi.NewRouteContext()
-		chiCtx.URLParams.Add("uuid", "mockUUID")
+		chiCtx.URLParams.Add("uuid", tribeUUID)
 		req = req.WithContext(context.WithValue(req.Context(), chi.RouteCtxKey, chiCtx))
 
 		handler.ServeHTTP(rr, req)
@@ -233,24 +254,27 @@ func TestDeleteTribe(t *testing.T) {
 		// Verify response
 		assert.Equal(t, http.StatusOK, rr.Code)
 		var responseData bool
-		errors := json.Unmarshal(rr.Body.Bytes(), &responseData)
-		assert.NoError(t, errors)
+		err = json.Unmarshal(rr.Body.Bytes(), &responseData)
+		assert.NoError(t, err)
 		assert.True(t, responseData)
+
+		// Assert that the tribe is deleted from the DB
+		deletedTribe := db.TestDB.GetTribe(tribeUUID)
+		assert.NoError(t, err)
+		assert.Empty(t, deletedTribe)
+		assert.Equal(t, db.Tribe{}, deletedTribe)
 	})
 
 	t.Run("Should test that a 401 error is returned when a tribe is attempted to be deleted by someone other than the owner", func(t *testing.T) {
-		// Mock data
-		ctx := context.WithValue(context.Background(), auth.ContextKey, "pubkey")
-		mockUUID := "valid_uuid"
-		mockOwnerPubKey := "owner_pubkey"
+		ctx := context.WithValue(context.Background(), auth.ContextKey, "other_pubkey")
+		mockUUID := tribe.AppURL
+		mockOwnerPubKey := person.OwnerPubKey
 
 		mockVerifyTribeUUID := func(uuid string, checkTimestamp bool) (string, error) {
 			return mockOwnerPubKey, nil
 		}
-
 		tHandler.verifyTribeUUID = mockVerifyTribeUUID
 
-		// Create and serve request
 		rr := httptest.NewRecorder()
 		handler := http.HandlerFunc(tHandler.DeleteTribe)
 
@@ -259,7 +283,7 @@ func TestDeleteTribe(t *testing.T) {
 			t.Fatal(err)
 		}
 		chiCtx := chi.NewRouteContext()
-		chiCtx.URLParams.Add("uuid", "mockUUID")
+		chiCtx.URLParams.Add("uuid", tribeUUID)
 		req = req.WithContext(context.WithValue(req.Context(), chi.RouteCtxKey, chiCtx))
 
 		handler.ServeHTTP(rr, req)
