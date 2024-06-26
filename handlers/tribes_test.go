@@ -472,44 +472,52 @@ func TestCreateOrEditTribe(t *testing.T) {
 }
 
 func TestGetTribeByUniqueName(t *testing.T) {
-	mockDb := mocks.NewDatabase(t)
-	tHandler := NewTribeHandler(mockDb)
+	teardownSuite := SetupSuite(t)
+	defer teardownSuite(t)
+
+	tHandler := NewTribeHandler(db.TestDB)
 
 	t.Run("Should test that a tribe can be fetched by its unique name", func(t *testing.T) {
-		// Mock data
-		mockUniqueName := "test_tribe"
-		mockTribe := db.Tribe{
-			UniqueName: mockUniqueName,
-			UUID:       "valid_uuid",
-		}
-		mockChannels := []db.Channel{
-			{ID: 1, TribeUUID: "UUID"},
-			{ID: 2, TribeUUID: "UUID"},
-		}
 
-		// Mock database calls
-		mockDb.On("GetTribeByUniqueName", mock.Anything).Return(mockTribe)
-		mockDb.On("GetChannelsByTribe", mock.Anything).Return(mockChannels).Once()
+		tribe := db.Tribe{
+			UUID:        "uuid",
+			OwnerPubKey: "pubkey",
+			Name:        "name",
+			UniqueName:  "test_tribe",
+			Description: "description",
+			Tags:        []string{"tag3", "tag4"},
+			AppURL:      "valid_app_url",
+			Badges:      []string{},
+		}
+		db.TestDB.CreateOrEditTribe(tribe)
 
-		// Create request with mock unique name
-		req, err := http.NewRequest("GET", "/tribe_by_un/"+mockUniqueName, nil)
+		mockUniqueName := tribe.UniqueName
+
+		rr := httptest.NewRecorder()
+		rctx := chi.NewRouteContext()
+
+		rctx.URLParams.Add("un", mockUniqueName)
+		req, err := http.NewRequestWithContext(context.WithValue(context.Background(), chi.RouteCtxKey, rctx), http.MethodGet, "/tribe_by_un/"+mockUniqueName, nil)
 		if err != nil {
 			t.Fatal(err)
 		}
 
-		// Serve request
-		rr := httptest.NewRecorder()
 		handler := http.HandlerFunc(tHandler.GetTribeByUniqueName)
 		handler.ServeHTTP(rr, req)
 
 		// Verify response
 		assert.Equal(t, http.StatusOK, rr.Code)
+
 		var responseData map[string]interface{}
 		err = json.Unmarshal(rr.Body.Bytes(), &responseData)
 		if err != nil {
 			t.Fatalf("Error decoding JSON response: %s", err)
 		}
 		assert.Equal(t, mockUniqueName, responseData["unique_name"])
+		assert.Equal(t, tribe.UUID, responseData["uuid"])
+		assert.Equal(t, tribe.Name, responseData["name"])
+		assert.Equal(t, tribe.Description, responseData["description"])
+		assert.ElementsMatch(t, tribe.Tags, responseData["tags"])
 	})
 }
 
