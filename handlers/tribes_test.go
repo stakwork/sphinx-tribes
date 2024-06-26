@@ -4,7 +4,6 @@ import (
 	"bytes"
 	"context"
 	"encoding/json"
-	"github.com/google/uuid"
 	"net/http"
 	"net/http/httptest"
 	"strings"
@@ -379,7 +378,7 @@ func TestCreateOrEditTribe(t *testing.T) {
 	t.Run("Should test that a tribe can be created when the right data is passed", func(t *testing.T) {
 
 		tribe := db.Tribe{
-			UUID:        uuid.New().String(),
+			UUID:        "uuid",
 			OwnerPubKey: "pubkey",
 			Name:        "name",
 			Description: "description",
