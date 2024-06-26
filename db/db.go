@@ -1357,8 +1357,16 @@ func (db database) UpdateBot(uuid string, u map[string]interface{}) bool {
 
 func (db database) GetAllTribes() []Tribe {
 	ms := []Tribe{}
-	db.db.Where("(deleted = 'f' OR de leted is null)").Find(&ms)
+	db.db.Where("(deleted = 'f' OR deleted is null)").Find(&ms)
 	return ms
+}
+
+func (db database) DeleteTribe() (bool, error) {
+	result := db.db.Exec("DELETE FROM tribes")
+	if result.Error != nil {
+		return false, result.Error
+	}
+	return true, nil
 }
 
 func (db database) GetTribesTotal() int64 {
