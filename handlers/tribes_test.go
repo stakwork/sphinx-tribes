@@ -155,17 +155,26 @@ func TestGetTribe(t *testing.T) {
 }
 
 func TestGetTribesByAppUrl(t *testing.T) {
-	mockDb := mocks.NewDatabase(t)
-	tHandler := NewTribeHandler(mockDb)
+	teardownSuite := SetupSuite(t)
+	defer teardownSuite(t)
+
+	tHandler := NewTribeHandler(db.TestDB)
 
 	t.Run("Should test that a tribe is returned when the right app URL is passed", func(t *testing.T) {
-		// Mock data
-		mockAppURL := "valid_app_url"
-		mockTribes := []db.Tribe{
-			{UUID: "uuid", AppURL: mockAppURL},
-			{UUID: "uuid", AppURL: mockAppURL},
+		tribe := db.Tribe{
+			UUID:        "uuid",
+			OwnerPubKey: "pubkey",
+			Name:        "name",
+			Description: "description",
+			Tags:        []string{"tag3", "tag4"},
+			AppURL:      "valid_app_url",
+			Badges:      []string{},
 		}
-		mockDb.On("GetTribesByAppUrl", mockAppURL).Return(mockTribes).Once()
+		db.TestDB.CreateOrEditTribe(tribe)
+
+		// Mock data
+		mockAppURL := tribe.AppURL
+		mockTribes := []db.Tribe{tribe}
 
 		// Serve request
 		rr := httptest.NewRecorder()
