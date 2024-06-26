@@ -6,6 +6,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"github.com/google/uuid"
 	"net/http"
 	"net/http/httptest"
 	"strings"
@@ -390,15 +391,34 @@ func TestGetWorkspaceBounties(t *testing.T) {
 }
 
 func TestGetWorkspaceBudget(t *testing.T) {
+	teardownSuite := SetupSuite(t)
+	defer teardownSuite(t)
 	ctx := context.WithValue(context.Background(), auth.ContextKey, "test-key")
-	mockDb := mocks.NewDatabase(t)
-	mockUserHasAccess := func(pubKeyFromAuth string, uuid string, role string) bool {
+	oHandler := NewWorkspaceHandler(db.TestDB)
+	handlerUserHasAccess := func(pubKeyFromAuth string, uuid string, role string) bool {
 		return true
 	}
-	oHandler := NewWorkspaceHandler(mockDb)
+	workspace := db.Workspace{
+		Uuid:        uuid.New().String(),
+		Name:        "Workspace Budget Name " + uuid.New().String(),
+		OwnerPubKey: "workspace_owner_budget_pubkey",
+		Github:      "https://github.com/budget",
+		Website:     "https://www.budgetwebsite.com",
+		Description: "Workspace Budget Description",
+	}
+	db.TestDB.CreateOrEditWorkspace(workspace)
+
+	budgetAmount := uint(5000)
+	bounty := db.NewBountyBudget{
+		WorkspaceUuid: workspace.Uuid,
+		TotalBudget:   budgetAmount,
+	}
+	db.TestDB.CreateWorkspaceBudget(bounty)
+
+	workspace = db.TestDB.GetWorkspaceByUuid(workspace.Uuid)
 
 	t.Run("Should test that a 401 is returned when trying to view an workspace's budget without a token", func(t *testing.T) {
-		workspaceUUID := "valid-uuid"
+		workspaceUUID := workspace.Uuid
 
 		rctx := chi.NewRouteContext()
 		rctx.URLParams.Add("uuid", workspaceUUID)
@@ -414,20 +434,9 @@ func TestGetWorkspaceBudget(t *testing.T) {
 	})
 
 	t.Run("Should test that the right workspace budget is returned, if the user is the workspace admin or has the ViewReport role", func(t *testing.T) {
-		workspaceUUID := "valid-uuid"
-		statusBudget := db.StatusBudget{
-			OrgUuid:         workspaceUUID,
-			CurrentBudget:   10000,
-			OpenBudget:      1000,
-			OpenCount:       10,
-			AssignedBudget:  2000,
-			AssignedCount:   15,
-			CompletedBudget: 3000,
-			CompletedCount:  5,
-		}
+		workspaceUUID := workspace.Uuid
 
-		oHandler.userHasAccess = mockUserHasAccess
-		mockDb.On("GetWorkspaceStatusBudget", workspaceUUID).Return(statusBudget).Once()
+		oHandler.userHasAccess = handlerUserHasAccess
 
 		rctx := chi.NewRouteContext()
 		rctx.URLParams.Add("uuid", workspaceUUID)
@@ -447,7 +456,7 @@ func TestGetWorkspaceBudget(t *testing.T) {
 			t.Fatal(err)
 		}
 
-		assert.Equal(t, statusBudget, responseBudget)
+		assert.Equal(t, budgetAmount, responseBudget.CurrentBudget)
 	})
 }
 
