@@ -6,7 +6,6 @@ import (
 	"encoding/json"
 	"net/http"
 	"net/http/httptest"
-	"strings"
 	"testing"
 
 	"github.com/google/uuid"
@@ -704,73 +703,102 @@ func TestGetTotalTribes(t *testing.T) {
 }
 
 func TestGetListedTribes(t *testing.T) {
-	mockDb := mocks.NewDatabase(t)
-	tHandler := NewTribeHandler(mockDb)
+	teardownSuite := SetupSuite(t)
+	defer teardownSuite(t)
+	tHandler := NewTribeHandler(db.TestDB)
 
 	t.Run("should only return tribes associated with a passed tag query", func(t *testing.T) {
 		rr := httptest.NewRecorder()
 		handler := http.HandlerFunc(tHandler.GetListedTribes)
-		expectedTribes := []db.Tribe{
-			{UUID: "1", Name: "Tribe 1", Tags: pq.StringArray{"tag1", "tag2", "tag3"}},
-			{UUID: "2", Name: "Tribe 2", Tags: pq.StringArray{"tag4", "tag5"}},
-			{UUID: "3", Name: "Tribe 3", Tags: pq.StringArray{"tag6", "tag7", "tag8"}},
+
+		tribe := db.Tribe{
+			UUID:        uuid.New().String(),
+			OwnerPubKey: "OwnerPubkey",
+			Name:        "tribe name",
+			Description: "tribe description",
+			Tags:        []string{"tag3", "tag4"},
+			AppURL:      "valid_app_url",
+			Unlisted:    true,
+			Badges:      pq.StringArray{},
 		}
-		req, err := http.NewRequest("GET", "/tribes", nil)
-		if err != nil {
-			t.Fatal(err)
+		tribe2 := db.Tribe{
+			UUID:        uuid.New().String(),
+			OwnerPubKey: "OwnerPubkey2",
+			Name:        "tribe name2",
+			Description: "tribe description2",
+			Tags:        []string{"tag3", "tag4"},
+			AppURL:      "valid_app_url2",
+			Unlisted:    false,
+			Badges:      pq.StringArray{},
 		}
-		query := req.URL.Query()
-		tagVals := pq.StringArray{"tag1", "tag4", "tag7"}
-		tags := strings.Join(tagVals, ",")
-		query.Set("tags", tags)
-		req.URL.RawQuery = query.Encode()
+
+		db.TestDB.CreateOrEditTribe(tribe)
+		db.TestDB.CreateOrEditTribe(tribe2)
+
+		req, err := http.NewRequest("GET", "/tribes?tags="+tribe.Tags[0], nil)
 		if err != nil {
 			t.Fatal(err)
 		}
 
-		mockDb.On("GetListedTribes", req).Return(expectedTribes)
 		handler.ServeHTTP(rr, req)
 		var returnedTribes []db.Tribe
 		err = json.Unmarshal(rr.Body.Bytes(), &returnedTribes)
 		assert.NoError(t, err)
 		assert.Equal(t, http.StatusOK, rr.Code)
-		assert.EqualValues(t, expectedTribes, returnedTribes)
 
+		for _, tribe := range returnedTribes {
+			assert.False(t, tribe.Unlisted)
+			assert.Contains(t, tribe.Tags, "tag3")
+		}
 	})
 
 	t.Run("should return all tribes when no tag queries are passed", func(t *testing.T) {
 		rr := httptest.NewRecorder()
 		handler := http.HandlerFunc(tHandler.GetListedTribes)
-		expectedTribes := []db.Tribe{
-			{UUID: "1", Name: "Tribe 1", Tags: pq.StringArray{"tag1", "tag2", "tag3"}},
-			{UUID: "2", Name: "Tribe 2", Tags: pq.StringArray{"tag4", "tag5"}},
-			{UUID: "3", Name: "Tribe 3", Tags: pq.StringArray{"tag6", "tag7", "tag8"}},
+
+		tribe3 := db.Tribe{
+			UUID:        uuid.New().String(),
+			OwnerPubKey: "OwnerPubkey3",
+			Name:        "tribe name3",
+			Description: "tribe description3",
+			Tags:        []string{"tag3", "tag4"},
+			AppURL:      "valid_app_url3",
+			Unlisted:    false,
+			Deleted:     false,
+			Badges:      pq.StringArray{},
 		}
+
+		tribe4 := db.Tribe{
+			UUID:        uuid.New().String(),
+			OwnerPubKey: "OwnerPubkey4",
+			Name:        "tribe name4",
+			Description: "tribe description4",
+			Tags:        []string{"tag3", "tag4"},
+			AppURL:      "valid_app_url4",
+			Unlisted:    false,
+			Deleted:     false,
+			Badges:      pq.StringArray{},
+		}
+
+		db.TestDB.CreateOrEditTribe(tribe3)
+		db.TestDB.CreateOrEditTribe(tribe4)
 
 		req, err := http.NewRequest("GET", "/tribes", nil)
 		if err != nil {
 			t.Fatal(err)
 		}
-		query := req.URL.Query()
-		tagVals := pq.StringArray{"tag1", "tag4", "tag7"}
-		tags := strings.Join(tagVals, ",")
-		query.Set("tags", tags)
-		req.URL.RawQuery = query.Encode()
-		if err != nil {
-			t.Fatal(err)
-		}
 
-		mockDb.On("GetListedTribes", req).Return(expectedTribes)
 		handler.ServeHTTP(rr, req)
 
 		var returnedTribes []db.Tribe
 		err = json.Unmarshal(rr.Body.Bytes(), &returnedTribes)
 		assert.NoError(t, err)
 		assert.Equal(t, http.StatusOK, rr.Code)
-		assert.EqualValues(t, expectedTribes, returnedTribes)
 
+		for _, tribe := range returnedTribes {
+			assert.False(t, tribe.Unlisted)
+		}
 	})
-
 }
 
 func TestGenerateBudgetInvoice(t *testing.T) {
