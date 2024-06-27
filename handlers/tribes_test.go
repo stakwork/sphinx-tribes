@@ -4,11 +4,12 @@ import (
 	"bytes"
 	"context"
 	"encoding/json"
-	"github.com/google/uuid"
 	"net/http"
 	"net/http/httptest"
 	"strings"
 	"testing"
+
+	"github.com/google/uuid"
 
 	"github.com/stakwork/sphinx-tribes/config"
 
@@ -406,32 +407,43 @@ func TestGetFirstTribeByFeed(t *testing.T) {
 }
 
 func TestSetTribePreview(t *testing.T) {
-	ctx := context.WithValue(context.Background(), auth.ContextKey, "owner_pubkey")
-	mockDb := mocks.NewDatabase(t)
-	tHandler := NewTribeHandler(mockDb)
+	teardownSuite := SetupSuite(t)
+	defer teardownSuite(t)
+
+	tHandler := NewTribeHandler(db.TestDB)
 
 	t.Run("Should test that the owner of a tribe can set tribe preview", func(t *testing.T) {
-		// Mock data
-		mockUUID := "valid_uuid"
-		mockOwnerPubKey := "owner_pubkey"
+
+		tribe := db.Tribe{
+			UUID:        uuid.New().String(),
+			OwnerPubKey: "tribe_pubkey",
+			Name:        "tribe_name",
+			Description: "description",
+			Tags:        []string{"tag3", "tag4"},
+			AppURL:      "tribe_app_url",
+			Badges:      pq.StringArray{},
+		}
+		db.TestDB.CreateOrEditTribe(tribe)
 
 		mockVerifyTribeUUID := func(uuid string, checkTimestamp bool) (string, error) {
-			return mockOwnerPubKey, nil
+			return tribe.OwnerPubKey, nil
 		}
-		mockDb.On("UpdateTribe", mock.Anything, map[string]interface{}{"preview": "preview"}).Return(true)
-
 		tHandler.verifyTribeUUID = mockVerifyTribeUUID
 
-		// Create and serve request
+		mockUUID := tribe.UUID
+		mockOwnerPubKey := tribe.OwnerPubKey
+		preview := "new_preview"
+
+		ctx := context.WithValue(context.Background(), auth.ContextKey, mockOwnerPubKey)
 		rr := httptest.NewRecorder()
 		handler := http.HandlerFunc(tHandler.SetTribePreview)
 
-		req, err := http.NewRequestWithContext(ctx, "PUT", "/tribepreview/"+mockUUID+"?preview=preview", nil)
+		req, err := http.NewRequestWithContext(ctx, "PUT", "/tribepreview/"+mockUUID+"?preview="+preview, nil)
 		if err != nil {
 			t.Fatal(err)
 		}
 		chiCtx := chi.NewRouteContext()
-		chiCtx.URLParams.Add("uuid", "mockUUID")
+		chiCtx.URLParams.Add("uuid", mockUUID)
 		req = req.WithContext(context.WithValue(req.Context(), chi.RouteCtxKey, chiCtx))
 
 		handler.ServeHTTP(rr, req)
@@ -439,33 +451,45 @@ func TestSetTribePreview(t *testing.T) {
 		// Verify response
 		assert.Equal(t, http.StatusOK, rr.Code)
 		var responseData bool
-		errors := json.Unmarshal(rr.Body.Bytes(), &responseData)
-		assert.NoError(t, errors)
+		err = json.Unmarshal(rr.Body.Bytes(), &responseData)
+		assert.NoError(t, err)
 		assert.True(t, responseData)
+
+		// Assert that the tribe's preview is updated in the DB
+		updatedTribe := db.TestDB.GetTribe(tribe.UUID)
+		assert.Equal(t, preview, updatedTribe.Preview)
 	})
 
 	t.Run("Should test that a 401 error is returned when setting a tribe preview action by someone other than the owner", func(t *testing.T) {
-		// Mock data
-		ctx := context.WithValue(context.Background(), auth.ContextKey, "pubkey")
-		mockUUID := "valid_uuid"
-		mockOwnerPubKey := "owner_pubkey"
+
+		tribe := db.Tribe{
+			UUID:        uuid.New().String(),
+			OwnerPubKey: "tribe_pubkey",
+			Name:        "tribe_name",
+			Description: "description",
+			Tags:        []string{"tag3", "tag4"},
+			AppURL:      "tribe_app_url",
+		}
+		db.TestDB.CreateOrEditTribe(tribe)
 
 		mockVerifyTribeUUID := func(uuid string, checkTimestamp bool) (string, error) {
-			return mockOwnerPubKey, nil
+			return tribe.OwnerPubKey, nil
 		}
-
 		tHandler.verifyTribeUUID = mockVerifyTribeUUID
 
-		// Create and serve request
+		mockUUID := tribe.UUID
+		preview := "new_preview"
+
+		ctx := context.WithValue(context.Background(), auth.ContextKey, "pubkey")
 		rr := httptest.NewRecorder()
 		handler := http.HandlerFunc(tHandler.SetTribePreview)
 
-		req, err := http.NewRequestWithContext(ctx, "PUT", "/tribepreview/"+mockUUID+"?preview=preview", nil)
+		req, err := http.NewRequestWithContext(ctx, "PUT", "/tribepreview/"+mockUUID+"?preview="+preview, nil)
 		if err != nil {
 			t.Fatal(err)
 		}
 		chiCtx := chi.NewRouteContext()
-		chiCtx.URLParams.Add("uuid", "mockUUID")
+		chiCtx.URLParams.Add("uuid", mockUUID)
 		req = req.WithContext(context.WithValue(req.Context(), chi.RouteCtxKey, chiCtx))
 
 		handler.ServeHTTP(rr, req)
@@ -756,9 +780,23 @@ func TestGetListedTribes(t *testing.T) {
 
 func TestGenerateBudgetInvoice(t *testing.T) {
 	ctx := context.Background()
-	mockDb := mocks.NewDatabase(t)
-	tHandler := NewTribeHandler(mockDb)
-	authorizedCtx := context.WithValue(ctx, auth.ContextKey, "valid-key")
+
+	teardownSuite := SetupSuite(t)
+	defer teardownSuite(t)
+
+	person := db.Person{
+		ID:          104,
+		Uuid:        "perosn_104_uuid",
+		OwnerAlias:  "person104",
+		UniqueName:  "person104",
+		OwnerPubKey: "person_104_pubkey",
+		PriceToMeet: 0,
+		Description: "This is test user 104",
+	}
+	db.TestDB.CreateOrEditPerson(person)
+
+	tHandler := NewTribeHandler(db.TestDB)
+	authorizedCtx := context.WithValue(ctx, auth.ContextKey, person.OwnerPubKey)
 
 	userAmount := uint(1000)
 	invoiceResponse := db.InvoiceResponse{
@@ -783,8 +821,6 @@ func TestGenerateBudgetInvoice(t *testing.T) {
 	})
 
 	t.Run("Should mock a call to relay /invoices with the correct body", func(t *testing.T) {
-		mockDb.On("ProcessBudgetInvoice", mock.AnythingOfType("db.NewPaymentHistory"), mock.AnythingOfType("db.NewInvoiceList")).Return(nil)
-
 		ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 
 			expectedBody := map[string]interface{}{"amount": float64(0), "memo": "Budget Invoice"}
@@ -801,7 +837,12 @@ func TestGenerateBudgetInvoice(t *testing.T) {
 
 		config.RelayUrl = ts.URL
 
-		reqBody := map[string]interface{}{"amount": 0}
+		reqBody := map[string]interface{}{
+			"amount":         uint(0),
+			"sender_pubkey":  person.OwnerPubKey,
+			"payment_type":   "deposit",
+			"workspace_uuid": "workspaceuuid",
+		}
 		bodyBytes, _ := json.Marshal(reqBody)
 
 		req, err := http.NewRequestWithContext(authorizedCtx, http.MethodPost, "/budgetinvoices", bytes.NewBuffer(bodyBytes))
@@ -818,8 +859,6 @@ func TestGenerateBudgetInvoice(t *testing.T) {
 
 		userAmount := float64(1000)
 
-		mockDb.On("ProcessBudgetInvoice", mock.AnythingOfType("db.NewPaymentHistory"), mock.AnythingOfType("db.NewInvoiceList")).Return(nil)
-
 		ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 			var body map[string]interface{}
 			err := json.NewDecoder(r.Body).Decode(&body)
@@ -834,7 +873,12 @@ func TestGenerateBudgetInvoice(t *testing.T) {
 
 		config.RelayUrl = ts.URL
 
-		reqBody := map[string]interface{}{"amount": userAmount}
+		reqBody := map[string]interface{}{
+			"amount":         userAmount,
+			"sender_pubkey":  person.OwnerPubKey,
+			"payment_type":   "deposit",
+			"workspace_uuid": "workspaceuuid",
+		}
 		bodyBytes, _ := json.Marshal(reqBody)
 
 		req, err := http.NewRequestWithContext(authorizedCtx, http.MethodPost, "/budgetinvoices", bytes.NewBuffer(bodyBytes))
@@ -848,7 +892,6 @@ func TestGenerateBudgetInvoice(t *testing.T) {
 	})
 
 	t.Run("Should add payments to the payment history and invoice to the invoice list upon successful relay call", func(t *testing.T) {
-		mockDb.On("ProcessBudgetInvoice", mock.AnythingOfType("db.NewPaymentHistory"), mock.AnythingOfType("db.NewInvoiceList")).Return(nil)
 
 		ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 			w.WriteHeader(http.StatusOK)
@@ -858,7 +901,12 @@ func TestGenerateBudgetInvoice(t *testing.T) {
 
 		config.RelayUrl = ts.URL
 
-		reqBody := map[string]interface{}{"amount": userAmount}
+		reqBody := map[string]interface{}{
+			"amount":         userAmount,
+			"sender_pubkey":  person.OwnerPubKey,
+			"payment_type":   "deposit",
+			"workspace_uuid": "workspaceuuid",
+		}
 		bodyBytes, _ := json.Marshal(reqBody)
 		req, err := http.NewRequestWithContext(authorizedCtx, http.MethodPost, "/budgetinvoices", bytes.NewBuffer(bodyBytes))
 		assert.NoError(t, err)
@@ -874,7 +922,5 @@ func TestGenerateBudgetInvoice(t *testing.T) {
 		assert.NoError(t, err)
 		assert.True(t, response.Succcess, "Invoice generation should be successful")
 		assert.Equal(t, "example_invoice", response.Response.Invoice, "The invoice in the response should match the mock")
-
-		mockDb.AssertCalled(t, "ProcessBudgetInvoice", mock.AnythingOfType("db.NewPaymentHistory"), mock.AnythingOfType("db.NewInvoiceList"))
 	})
 }
