@@ -4,7 +4,6 @@ import (
 	"bytes"
 	"context"
 	"encoding/json"
-	"errors"
 	"github.com/google/uuid"
 	"github.com/lib/pq"
 	mocks "github.com/stakwork/sphinx-tribes/mocks"
@@ -53,37 +52,56 @@ func TestGetAdminPubkeys(t *testing.T) {
 }
 
 func TestCreateConnectionCode(t *testing.T) {
-	mockDb := mocks.NewDatabase(t)
-	aHandler := NewAuthHandler(mockDb)
+	teardownSuite := SetupSuite(t)
+	defer teardownSuite(t)
+	aHandler := NewAuthHandler(db.TestDB)
 	t.Run("should create connection code successful", func(t *testing.T) {
-		codeToBeInserted := []string{"custom connection string", "custom connection string 2"}
+		rr := httptest.NewRecorder()
+		handler := http.HandlerFunc(aHandler.CreateConnectionCode)
+		codeStrArr := []string{"sampleCode1"}
 
 		codeArr := []db.ConnectionCodes{}
-		for _, code := range codeToBeInserted {
+		now := time.Now()
+
+		for i, code := range codeStrArr {
 			code := db.ConnectionCodes{
+				ID:               uint(i),
 				ConnectionString: code,
 				IsUsed:           false,
+				DateCreated:      &now,
 			}
+
 			codeArr = append(codeArr, code)
 		}
 
-		mockDb.On("CreateConnectionCode", codeArr).Return(codeArr, nil).Once()
+		codeShort := db.ConnectionCodesShort{
+			ConnectionString: codeArr[0].ConnectionString,
+			DateCreated:      codeArr[0].DateCreated,
+		}
 
-		body, _ := json.Marshal(codeToBeInserted)
+		db.TestDB.CreateConnectionCode(codeArr)
+
+		body, _ := json.Marshal(codeStrArr)
 		req, err := http.NewRequest("POST", "/connectioncodes", bytes.NewBuffer(body))
 		if err != nil {
 			t.Fatal(err)
 		}
-		rr := httptest.NewRecorder()
-		handler := http.HandlerFunc(aHandler.CreateConnectionCode)
 
+		codes := db.TestDB.GetConnectionCode()
 		handler.ServeHTTP(rr, req)
 		assert.Equal(t, http.StatusOK, rr.Code)
-		mockDb.AssertExpectations(t)
+
+		assert.EqualValues(t, codeShort.ConnectionString, codes.ConnectionString)
+		tolerance := time.Millisecond
+		timeDifference := codeShort.DateCreated.Sub(*codes.DateCreated)
+		if timeDifference < 0 {
+			timeDifference = -timeDifference
+		}
+		assert.True(t, timeDifference <= tolerance, "Expected DateCreated to be within tolerance")
 	})
 
 	t.Run("should return error if failed to add connection code", func(t *testing.T) {
-		codeToBeInserted := []string{"custom connection string", "custom connection string 2"}
+		codeToBeInserted := []string{}
 
 		codeArr := []db.ConnectionCodes{}
 		for _, code := range codeToBeInserted {
@@ -93,8 +111,6 @@ func TestCreateConnectionCode(t *testing.T) {
 			}
 			codeArr = append(codeArr, code)
 		}
-
-		mockDb.On("CreateConnectionCode", codeArr).Return(codeArr, errors.New("failed to create connection")).Once()
 
 		body, _ := json.Marshal(codeToBeInserted)
 		req, err := http.NewRequest("POST", "/connectioncodes", bytes.NewBuffer(body))
@@ -106,7 +122,6 @@ func TestCreateConnectionCode(t *testing.T) {
 
 		handler.ServeHTTP(rr, req)
 		assert.Equal(t, http.StatusBadRequest, rr.Code)
-		mockDb.AssertExpectations(t)
 	})
 
 	t.Run("should return error for malformed request body", func(t *testing.T) {
@@ -120,7 +135,6 @@ func TestCreateConnectionCode(t *testing.T) {
 
 		handler.ServeHTTP(rr, req)
 		assert.Equal(t, http.StatusNotAcceptable, rr.Code)
-		mockDb.AssertExpectations(t)
 	})
 
 	t.Run("should return error for invalid json", func(t *testing.T) {
@@ -134,7 +148,6 @@ func TestCreateConnectionCode(t *testing.T) {
 
 		handler.ServeHTTP(rr, req)
 		assert.Equal(t, http.StatusNotAcceptable, rr.Code)
-		mockDb.AssertExpectations(t)
 	})
 }
 
@@ -191,6 +204,7 @@ func TestGetConnectionCode(t *testing.T) {
 		assert.True(t, timeDifference <= tolerance, "Expected DateCreated to be within tolerance")
 
 	})
+
 }
 
 func TestGetIsAdmin(t *testing.T) {
