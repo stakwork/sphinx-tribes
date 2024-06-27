@@ -22,26 +22,62 @@ import (
 )
 
 func TestGetTribesByOwner(t *testing.T) {
-	mockDb := mocks.NewDatabase(t)
-	tHandler := NewTribeHandler(mockDb)
+	teardownSuite := SetupSuite(t)
+	defer teardownSuite(t)
 
-	t.Run("Should test that all tribes that an owner did not delete are returned if all=true is added to the request query", func(t *testing.T) {
-		// Mock data
-		mockPubkey := "mock_pubkey"
-		mockTribes := []db.Tribe{
-			{UUID: "uuid", OwnerPubKey: mockPubkey, Deleted: false},
-			{UUID: "uuid", OwnerPubKey: mockPubkey, Deleted: false},
+	tHandler := NewTribeHandler(db.TestDB)
+
+	t.Run("Should test that all tribes an owner did not delete are returned if all=true is added to the request query", func(t *testing.T) {
+
+		// Create a user
+		person := db.Person{
+			Uuid:        "person_uuid",
+			OwnerAlias:  "person_alias",
+			UniqueName:  "person_unique_name",
+			OwnerPubKey: "person_pubkey",
+			PriceToMeet: 0,
+			Description: "This is test user 1",
 		}
-		mockDb.On("GetAllTribesByOwner", mock.Anything).Return(mockTribes).Once()
+		db.TestDB.CreateOrEditPerson(person)
+
+		// Create tribes
+		tribe1 := db.Tribe{
+			UUID:        "tribe_uuid_1",
+			OwnerPubKey: person.OwnerPubKey,
+			Name:        "Tribe 1",
+			Description: "Description 1",
+			Tags:        []string{"tag1", "tag2"},
+			AppURL:      "app_url_1",
+			Badges:      []string{},
+			Deleted:     false,
+		}
+		tribe2 := db.Tribe{
+			UUID:        "tribe_uuid_2",
+			OwnerPubKey: person.OwnerPubKey,
+			Name:        "Tribe 2",
+			Description: "Description 2",
+			Tags:        []string{"tag3", "tag4"},
+			AppURL:      "app_url_2",
+			Badges:      []string{},
+			Deleted:     false,
+		}
+		db.TestDB.CreateOrEditTribe(tribe1)
+		db.TestDB.CreateOrEditTribe(tribe2)
+
+		mockPubkey := person.OwnerPubKey
+
+		rr := httptest.NewRecorder()
+		rctx := chi.NewRouteContext()
+
+		rctx.URLParams.Add("pubkey", mockPubkey)
 
 		// Create request with "all=true" query parameter
-		req, err := http.NewRequest("GET", "/tribes_by_owner/"+mockPubkey+"?all=true", nil)
+		req, err := http.NewRequestWithContext(context.WithValue(context.Background(), chi.RouteCtxKey, rctx), http.MethodGet, "/tribes_by_owner/"+mockPubkey+"?all=true", nil)
 		if err != nil {
 			t.Fatal(err)
 		}
 
 		// Serve request
-		rr := httptest.NewRecorder()
 		handler := http.HandlerFunc(tHandler.GetTribesByOwner)
 		handler.ServeHTTP(rr, req)
 
@@ -52,26 +88,61 @@ func TestGetTribesByOwner(t *testing.T) {
 		if err != nil {
 			t.Fatalf("Error decoding JSON response: %s", err)
 		}
-		assert.ElementsMatch(t, mockTribes, responseData)
+		assert.ElementsMatch(t, []db.Tribe{tribe1, tribe2}, responseData)
 	})
 
 	t.Run("Should test that all tribes that are not unlisted by an owner are returned", func(t *testing.T) {
-		// Mock data
-		mockPubkey := "mock_pubkey"
-		mockTribes := []db.Tribe{
-			{UUID: "uuid", OwnerPubKey: mockPubkey, Unlisted: false},
-			{UUID: "uuid", OwnerPubKey: mockPubkey, Unlisted: false},
+		// Create a user
+		person := db.Person{
+			Uuid:        "person_uuid",
+			OwnerAlias:  "person_alias",
+			UniqueName:  "person_unique_name",
+			OwnerPubKey: "person_pubkey",
+			PriceToMeet: 0,
+			Description: "This is test user 1",
 		}
-		mockDb.On("GetTribesByOwner", mock.Anything).Return(mockTribes)
+		db.TestDB.CreateOrEditPerson(person)
 
-		// Create request without "all=true" query parameter
-		req, err := http.NewRequest("GET", "/tribes/"+mockPubkey, nil)
+		// Create tribes
+		tribe1 := db.Tribe{
+			UUID:        "tribe_uuid_1",
+			OwnerPubKey: person.OwnerPubKey,
+			Name:        "Tribe 1",
+			Description: "Description 1",
+			Tags:        []string{"tag1", "tag2"},
+			AppURL:      "app_url_1",
+			Badges:      []string{},
+			Unlisted:    false,
+			Deleted:     false,
+		}
+		tribe2 := db.Tribe{
+			UUID:        "tribe_uuid_2",
+			OwnerPubKey: person.OwnerPubKey,
+			Name:        "Tribe 2",
+			Description: "Description 2",
+			Tags:        []string{"tag3", "tag4"},
+			AppURL:      "app_url_2",
+			Badges:      []string{},
+			Unlisted:    false,
+			Deleted:     false,
+		}
+		db.TestDB.CreateOrEditTribe(tribe1)
+		db.TestDB.CreateOrEditTribe(tribe2)
+
+		mockPubkey := person.OwnerPubKey
+
+		rr := httptest.NewRecorder()
+		rctx := chi.NewRouteContext()
+
+		rctx.URLParams.Add("pubkey", mockPubkey)
+
+		// Create request with "all=true" query parameter
+		req, err := http.NewRequestWithContext(context.WithValue(context.Background(), chi.RouteCtxKey, rctx), http.MethodGet, "/tribes/"+mockPubkey, nil)
 		if err != nil {
 			t.Fatal(err)
 		}
 
 		// Serve request
-		rr := httptest.NewRecorder()
 		handler := http.HandlerFunc(tHandler.GetTribesByOwner)
 		handler.ServeHTTP(rr, req)
 
@@ -82,7 +153,7 @@ func TestGetTribesByOwner(t *testing.T) {
 		if err != nil {
 			t.Fatalf("Error decoding JSON response: %s", err)
 		}
-		assert.ElementsMatch(t, mockTribes, responseData)
+		assert.ElementsMatch(t, []db.Tribe{tribe1, tribe2}, responseData)
 	})
 }
 
