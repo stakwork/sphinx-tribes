@@ -391,15 +391,14 @@ func TestGetFirstTribeByFeed(t *testing.T) {
 
 		mockFeedURL := tribe.FeedURL
 
-		// Serve request
-		rr := httptest.NewRecorder()
-		rctx := chi.NewRouteContext()
-		rctx.URLParams.Add("url", mockFeedURL)
-		req, err := http.NewRequestWithContext(context.WithValue(context.Background(), chi.RouteCtxKey, rctx), http.MethodGet, "/tribe_by_feed?url="+mockFeedURL, nil)
+		// Create request with valid feed URL
+		req, err := http.NewRequest("GET", "/tribe_by_feed?url="+mockFeedURL, nil)
 		if err != nil {
 			t.Fatal(err)
 		}
 
+		// Serve request
+		rr := httptest.NewRecorder()
 		handler := http.HandlerFunc(tHandler.GetFirstTribeByFeed)
 		handler.ServeHTTP(rr, req)
 
