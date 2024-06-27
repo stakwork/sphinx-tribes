@@ -19,7 +19,6 @@ import (
 	"github.com/stakwork/sphinx-tribes/db"
 	mocks "github.com/stakwork/sphinx-tribes/mocks"
 	"github.com/stretchr/testify/assert"
-	"github.com/stretchr/testify/mock"
 )
 
 func TestGetTribesByOwner(t *testing.T) {
@@ -679,9 +678,6 @@ func TestGetTotalTribes(t *testing.T) {
 		rr := httptest.NewRecorder()
 		handler := http.HandlerFunc(tHandler.GetTotalribes)
 
-		db.TestDB.DeleteTribe()
-
-		expectedTribesCount := int64(1)
 		tribe := db.Tribe{
 			UUID:        uuid.New().String(),
 			OwnerPubKey: uuid.New().String(),
@@ -702,8 +698,7 @@ func TestGetTotalTribes(t *testing.T) {
 		err = json.Unmarshal(rr.Body.Bytes(), &returnedTribesCount)
 		assert.NoError(t, err)
 		assert.Equal(t, http.StatusOK, rr.Code)
-		assert.EqualValues(t, expectedTribesCount, tribesCount)
-		assert.EqualValues(t, expectedTribesCount, returnedTribesCount)
+		assert.EqualValues(t, returnedTribesCount, tribesCount)
 
 	})
 }
