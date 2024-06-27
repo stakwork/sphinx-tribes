@@ -19,7 +19,6 @@ import (
 	"github.com/stakwork/sphinx-tribes/db"
 	mocks "github.com/stakwork/sphinx-tribes/mocks"
 	"github.com/stretchr/testify/assert"
-	"github.com/stretchr/testify/mock"
 )
 
 func TestGetTribesByOwner(t *testing.T) {
@@ -672,33 +671,34 @@ func TestGetAllTribes(t *testing.T) {
 }
 
 func TestGetTotalTribes(t *testing.T) {
-	mockDb := mocks.NewDatabase(t)
-	tHandler := NewTribeHandler(mockDb)
+	teardownSuite := SetupSuite(t)
+	defer teardownSuite(t)
+	tHandler := NewTribeHandler(db.TestDB)
 	t.Run("should return the total number of tribes", func(t *testing.T) {
 		rr := httptest.NewRecorder()
 		handler := http.HandlerFunc(tHandler.GetTotalribes)
 
-		expectedTribes := []db.Tribe{
-			{UUID: "uuid", Name: "Tribe1"},
-			{UUID: "uuid", Name: "Tribe2"},
-			{UUID: "uuid", Name: "Tribe3"},
+		tribe := db.Tribe{
+			UUID:        uuid.New().String(),
+			OwnerPubKey: uuid.New().String(),
+			Name:        "tribe",
+			Description: "description",
+			Tags:        []string{"tag3", "tag4"},
+			AppURL:      "valid_app_url",
 		}
-
-		expectedTribesCount := int64(len(expectedTribes))
+		db.TestDB.CreateOrEditTribe(tribe)
 
 		rctx := chi.NewRouteContext()
 		req, err := http.NewRequestWithContext(context.WithValue(context.Background(), chi.RouteCtxKey, rctx), http.MethodGet, "/total", nil)
 		assert.NoError(t, err)
 
-		mockDb.On("GetTribesTotal", mock.Anything).Return(expectedTribesCount)
-
+		tribesCount := db.TestDB.GetTribesTotal()
 		handler.ServeHTTP(rr, req)
 		var returnedTribesCount int64
 		err = json.Unmarshal(rr.Body.Bytes(), &returnedTribesCount)
 		assert.NoError(t, err)
 		assert.Equal(t, http.StatusOK, rr.Code)
-		assert.EqualValues(t, expectedTribesCount, returnedTribesCount)
-		mockDb.AssertExpectations(t)
+		assert.EqualValues(t, returnedTribesCount, tribesCount)
 
 	})
 }
