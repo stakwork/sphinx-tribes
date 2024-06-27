@@ -795,7 +795,7 @@ func TestGenerateBudgetInvoice(t *testing.T) {
 	t.Run("Should mock a call to relay /invoices with the correct body", func(t *testing.T) {
 		ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 
-			expectedBody := map[string]interface{}{"amount": float64(1000), "memo": "Budget Invoice"}
+			expectedBody := map[string]interface{}{"amount": float64(0), "memo": "Budget Invoice"}
 			var body map[string]interface{}
 			err := json.NewDecoder(r.Body).Decode(&body)
 			assert.NoError(t, err)
@@ -810,7 +810,7 @@ func TestGenerateBudgetInvoice(t *testing.T) {
 		config.RelayUrl = ts.URL
 
 		reqBody := map[string]interface{}{
-			"amount":         userAmount,
+			"amount":         uint(0),
 			"sender_pubkey":  person.OwnerPubKey,
 			"payment_type":   "deposit",
 			"workspace_uuid": "workspaceuuid",
