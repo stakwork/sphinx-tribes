@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"context"
 	"encoding/json"
+	"github.com/google/uuid"
 	"net/http"
 	"net/http/httptest"
 	"strings"
@@ -86,21 +87,23 @@ func TestGetTribesByOwner(t *testing.T) {
 }
 
 func TestGetTribe(t *testing.T) {
-	mockDb := mocks.NewDatabase(t)
-	tHandler := NewTribeHandler(mockDb)
+	teardownSuite := SetupSuite(t)
+	defer teardownSuite(t)
+	tHandler := NewTribeHandler(db.TestDB)
+
+	tribe := db.Tribe{
+		UUID:        uuid.New().String(),
+		OwnerPubKey: uuid.New().String(),
+		Name:        "tribe",
+		Description: "description",
+		Tags:        []string{"tag1", "tag2"},
+		Badges:      pq.StringArray{},
+	}
+	db.TestDB.CreateOrEditTribe(tribe)
 
 	t.Run("Should test that a tribe can be returned when the right UUID is passed to the request parameter", func(t *testing.T) {
 		// Mock data
-		mockUUID := "valid_uuid"
-		mockTribe := db.Tribe{
-			UUID: mockUUID,
-		}
-		mockChannels := []db.Channel{
-			{ID: 1, TribeUUID: mockUUID},
-			{ID: 2, TribeUUID: mockUUID},
-		}
-		mockDb.On("GetTribe", mock.Anything).Return(mockTribe).Once()
-		mockDb.On("GetChannelsByTribe", mock.Anything).Return(mockChannels).Once()
+		mockUUID := tribe.UUID
 
 		// Serve request
 		rr := httptest.NewRecorder()
@@ -110,6 +113,8 @@ func TestGetTribe(t *testing.T) {
 		if err != nil {
 			t.Fatal(err)
 		}
+
+		fetchedTribe := db.TestDB.GetTribe(mockUUID)
 
 		handler := http.HandlerFunc(tHandler.GetTribe)
 		handler.ServeHTTP(rr, req)
@@ -121,15 +126,13 @@ func TestGetTribe(t *testing.T) {
 		if err != nil {
 			t.Fatalf("Error decoding JSON response: %s", err)
 		}
-		assert.Equal(t, mockTribe.UUID, responseData["uuid"])
+		assert.Equal(t, tribe.UUID, responseData["uuid"])
+		assert.Equal(t, tribe, fetchedTribe)
 	})
 
 	t.Run("Should test that no tribe is returned when a nonexistent UUID is passed", func(t *testing.T) {
-		// Mock data
-		mockDb.ExpectedCalls = nil
+
 		nonexistentUUID := "nonexistent_uuid"
-		mockDb.On("GetTribe", nonexistentUUID).Return(db.Tribe{}).Once()
-		mockDb.On("GetChannelsByTribe", mock.Anything).Return([]db.Channel{}).Once()
 
 		// Serve request
 		rr := httptest.NewRecorder()
@@ -200,23 +203,43 @@ func TestGetTribesByAppUrl(t *testing.T) {
 }
 
 func TestDeleteTribe(t *testing.T) {
-	ctx := context.WithValue(context.Background(), auth.ContextKey, "owner_pubkey")
-	mockDb := mocks.NewDatabase(t)
-	tHandler := NewTribeHandler(mockDb)
+	teardownSuite := SetupSuite(t)
+	defer teardownSuite(t)
+
+	personUUID := uuid.New().String()
+	person := db.Person{
+		Uuid:        personUUID,
+		OwnerAlias:  "person_alias",
+		UniqueName:  "person_unique_name",
+		OwnerPubKey: "owner_pubkey",
+		PriceToMeet: 0,
+		Description: "this is test user 1",
+	}
+	db.TestDB.CreateOrEditPerson(person)
+
+	tribeUUID := uuid.New().String()
+	tribe := db.Tribe{
+		UUID:        tribeUUID,
+		OwnerPubKey: person.OwnerPubKey,
+		Name:        "tribe_name",
+		Description: "description",
+		Tags:        []string{"tag3", "tag4"},
+		AppURL:      "tribe_app_url",
+	}
+	db.TestDB.CreateOrEditTribe(tribe)
+
+	tHandler := NewTribeHandler(db.TestDB)
 
 	t.Run("Should test that the owner of a tribe can delete a tribe", func(t *testing.T) {
-		// Mock data
-		mockUUID := "valid_uuid"
-		mockOwnerPubKey := "owner_pubkey"
+		mockUUID := tribe.AppURL
+		mockOwnerPubKey := person.OwnerPubKey
 
 		mockVerifyTribeUUID := func(uuid string, checkTimestamp bool) (string, error) {
 			return mockOwnerPubKey, nil
 		}
-		mockDb.On("UpdateTribe", mock.Anything, map[string]interface{}{"deleted": true}).Return(true)
-
 		tHandler.verifyTribeUUID = mockVerifyTribeUUID
 
-		// Create and serve request
+		ctx := context.WithValue(context.Background(), auth.ContextKey, mockOwnerPubKey)
 		rr := httptest.NewRecorder()
 		handler := http.HandlerFunc(tHandler.DeleteTribe)
 
@@ -225,7 +248,7 @@ func TestDeleteTribe(t *testing.T) {
 			t.Fatal(err)
 		}
 		chiCtx := chi.NewRouteContext()
-		chiCtx.URLParams.Add("uuid", "mockUUID")
+		chiCtx.URLParams.Add("uuid", tribeUUID)
 		req = req.WithContext(context.WithValue(req.Context(), chi.RouteCtxKey, chiCtx))
 
 		handler.ServeHTTP(rr, req)
@@ -233,24 +256,27 @@ func TestDeleteTribe(t *testing.T) {
 		// Verify response
 		assert.Equal(t, http.StatusOK, rr.Code)
 		var responseData bool
-		errors := json.Unmarshal(rr.Body.Bytes(), &responseData)
-		assert.NoError(t, errors)
+		err = json.Unmarshal(rr.Body.Bytes(), &responseData)
+		assert.NoError(t, err)
 		assert.True(t, responseData)
+
+		// Assert that the tribe is deleted from the DB
+		deletedTribe := db.TestDB.GetTribe(tribeUUID)
+		assert.NoError(t, err)
+		assert.Empty(t, deletedTribe)
+		assert.Equal(t, db.Tribe{}, deletedTribe)
 	})
 
 	t.Run("Should test that a 401 error is returned when a tribe is attempted to be deleted by someone other than the owner", func(t *testing.T) {
-		// Mock data
-		ctx := context.WithValue(context.Background(), auth.ContextKey, "pubkey")
-		mockUUID := "valid_uuid"
-		mockOwnerPubKey := "owner_pubkey"
+		ctx := context.WithValue(context.Background(), auth.ContextKey, "other_pubkey")
+		mockUUID := tribe.AppURL
+		mockOwnerPubKey := person.OwnerPubKey
 
 		mockVerifyTribeUUID := func(uuid string, checkTimestamp bool) (string, error) {
 			return mockOwnerPubKey, nil
 		}
-
 		tHandler.verifyTribeUUID = mockVerifyTribeUUID
 
-		// Create and serve request
 		rr := httptest.NewRecorder()
 		handler := http.HandlerFunc(tHandler.DeleteTribe)
 
@@ -259,7 +285,7 @@ func TestDeleteTribe(t *testing.T) {
 			t.Fatal(err)
 		}
 		chiCtx := chi.NewRouteContext()
-		chiCtx.URLParams.Add("uuid", "mockUUID")
+		chiCtx.URLParams.Add("uuid", tribeUUID)
 		req = req.WithContext(context.WithValue(req.Context(), chi.RouteCtxKey, chiCtx))
 
 		handler.ServeHTTP(rr, req)
@@ -379,55 +405,51 @@ func TestSetTribePreview(t *testing.T) {
 }
 
 func TestCreateOrEditTribe(t *testing.T) {
-	mockDb := mocks.NewDatabase(t)
-	tHandler := NewTribeHandler(mockDb)
+	teardownSuite := SetupSuite(t)
+	defer teardownSuite(t)
+
+	tHandler := NewTribeHandler(db.TestDB)
 
 	t.Run("Should test that a tribe can be created when the right data is passed", func(t *testing.T) {
-		// Mock data
-		mockPubKey := "valid_pubkey"
-		mockUUID := "valid_uuid"
-		mockName := "Test Tribe"
-		mockDescription := "This is a test tribe."
-		mockTags := []string{"tag1", "tag2"}
 
+		tribe := db.Tribe{
+			UUID:        "uuid",
+			OwnerPubKey: "pubkey",
+			Name:        "name",
+			Description: "description",
+			Tags:        []string{"tag3", "tag4"},
+			AppURL:      "valid_app_url",
+			Badges:      []string{},
+		}
+
+		requestBody := map[string]interface{}{
+			"UUID":        tribe.UUID,
+			"OwnerPubkey": tribe.OwnerPubKey,
+			"Name":        tribe.Name,
+			"Description": tribe.Description,
+			"Tags":        tribe.Tags,
+			"AppURL":      tribe.AppURL,
+			"Badges":      tribe.Badges,
+		}
 		mockVerifyTribeUUID := func(uuid string, checkTimestamp bool) (string, error) {
-			return mockPubKey, nil
+			return tribe.OwnerPubKey, nil
 		}
 
 		tHandler.verifyTribeUUID = mockVerifyTribeUUID
 
-		// Mock request body
-		requestBody := map[string]interface{}{
-			"UUID":        mockUUID,
-			"Name":        mockName,
-			"Description": mockDescription,
-			"Tags":        mockTags,
-		}
 		requestBodyBytes, err := json.Marshal(requestBody)
 		if err != nil {
 			t.Fatal(err)
 		}
 
-		// Mock database calls
-		mockDb.On("GetTribe", mock.Anything).Return(db.Tribe{
-			UUID:        mockUUID,
-			OwnerPubKey: mockPubKey,
-		}).Once()
-		mockDb.On("CreateOrEditTribe", mock.Anything).Return(db.Tribe{
-			UUID: mockUUID,
-		}, nil)
-
-		// Create request with mock body
 		req, err := http.NewRequest("POST", "/", bytes.NewBuffer(requestBodyBytes))
 		if err != nil {
 			t.Fatal(err)
 		}
 
-		// Set context with mock pub key
-		ctx := context.WithValue(req.Context(), auth.ContextKey, mockPubKey)
+		ctx := context.WithValue(req.Context(), auth.ContextKey, tribe.OwnerPubKey)
 		req = req.WithContext(ctx)
 
-		// Serve request
 		rr := httptest.NewRecorder()
 		handler := http.HandlerFunc(tHandler.CreateOrEditTribe)
 		handler.ServeHTTP(rr, req)
@@ -439,78 +461,118 @@ func TestCreateOrEditTribe(t *testing.T) {
 		if err != nil {
 			t.Fatalf("Error decoding JSON response: %s", err)
 		}
-		assert.Equal(t, mockUUID, responseData["uuid"])
+
+		// Assert that the response data is equal to the tribe POST data sent to the request
+		assert.Equal(t, tribe.UUID, responseData["uuid"])
+		assert.Equal(t, tribe.Name, responseData["name"])
+		assert.Equal(t, tribe.Description, responseData["description"])
+		assert.ElementsMatch(t, tribe.Tags, responseData["tags"])
+		assert.Equal(t, tribe.OwnerPubKey, responseData["owner_pubkey"])
 	})
 }
 
 func TestGetTribeByUniqueName(t *testing.T) {
-	mockDb := mocks.NewDatabase(t)
-	tHandler := NewTribeHandler(mockDb)
+	teardownSuite := SetupSuite(t)
+	defer teardownSuite(t)
+
+	tHandler := NewTribeHandler(db.TestDB)
 
 	t.Run("Should test that a tribe can be fetched by its unique name", func(t *testing.T) {
-		// Mock data
-		mockUniqueName := "test_tribe"
-		mockTribe := db.Tribe{
-			UniqueName: mockUniqueName,
-			UUID:       "valid_uuid",
-		}
-		mockChannels := []db.Channel{
-			{ID: 1, TribeUUID: "UUID"},
-			{ID: 2, TribeUUID: "UUID"},
-		}
 
-		// Mock database calls
-		mockDb.On("GetTribeByUniqueName", mock.Anything).Return(mockTribe)
-		mockDb.On("GetChannelsByTribe", mock.Anything).Return(mockChannels).Once()
+		tribe := db.Tribe{
+			UUID:        "uuid",
+			OwnerPubKey: "pubkey",
+			Name:        "name",
+			UniqueName:  "test_tribe",
+			Description: "description",
+			Tags:        []string{"tag3", "tag4"},
+			AppURL:      "valid_app_url",
+			Badges:      []string{},
+		}
+		db.TestDB.CreateOrEditTribe(tribe)
 
-		// Create request with mock unique name
-		req, err := http.NewRequest("GET", "/tribe_by_un/"+mockUniqueName, nil)
+		mockUniqueName := tribe.UniqueName
+
+		rr := httptest.NewRecorder()
+		rctx := chi.NewRouteContext()
+
+		rctx.URLParams.Add("un", mockUniqueName)
+		req, err := http.NewRequestWithContext(context.WithValue(context.Background(), chi.RouteCtxKey, rctx), http.MethodGet, "/tribe_by_un/"+mockUniqueName, nil)
 		if err != nil {
 			t.Fatal(err)
 		}
 
-		// Serve request
-		rr := httptest.NewRecorder()
 		handler := http.HandlerFunc(tHandler.GetTribeByUniqueName)
 		handler.ServeHTTP(rr, req)
 
 		// Verify response
 		assert.Equal(t, http.StatusOK, rr.Code)
+
 		var responseData map[string]interface{}
 		err = json.Unmarshal(rr.Body.Bytes(), &responseData)
 		if err != nil {
 			t.Fatalf("Error decoding JSON response: %s", err)
 		}
 		assert.Equal(t, mockUniqueName, responseData["unique_name"])
+		assert.Equal(t, tribe.UUID, responseData["uuid"])
+		assert.Equal(t, tribe.Name, responseData["name"])
+		assert.Equal(t, tribe.Description, responseData["description"])
+		assert.ElementsMatch(t, tribe.Tags, responseData["tags"])
 	})
 }
 
 func TestGetAllTribes(t *testing.T) {
-	mockDb := mocks.NewDatabase(t)
-	tHandler := NewTribeHandler(mockDb)
+	teardownSuite := SetupSuite(t)
+	defer teardownSuite(t)
+
+	tHandler := NewTribeHandler(db.TestDB)
 	t.Run("should return all tribes", func(t *testing.T) {
 		rr := httptest.NewRecorder()
 		handler := http.HandlerFunc(tHandler.GetAllTribes)
 
+		db.TestDB.DeleteTribe()
+
+		tribe := db.Tribe{
+			UUID:        "uuid",
+			OwnerPubKey: "pubkey",
+			Name:        "name",
+			UniqueName:  "uniqueName",
+			Description: "description",
+			Tags:        []string{"tag3", "tag4"},
+			AppURL:      "AppURl",
+			Badges:      []string{},
+		}
+
+		tribe2 := db.Tribe{
+			UUID:        "uuid2",
+			OwnerPubKey: "pubkey2",
+			Name:        "name2",
+			UniqueName:  "uniqueName2",
+			Description: "description2",
+			Tags:        []string{"tag3", "tag4"},
+			AppURL:      "AppURl2",
+			Badges:      []string{},
+		}
+
+		db.TestDB.CreateOrEditTribe(tribe)
+		db.TestDB.CreateOrEditTribe(tribe2)
+
 		expectedTribes := []db.Tribe{
-			{UUID: "uuid", Name: "Tribe1"},
-			{UUID: "uuid", Name: "Tribe2"},
-			{UUID: "uuid", Name: "Tribe3"},
+			tribe,
+			tribe2,
 		}
 
 		rctx := chi.NewRouteContext()
 		req, err := http.NewRequestWithContext(context.WithValue(context.Background(), chi.RouteCtxKey, rctx), http.MethodGet, "/", nil)
 		assert.NoError(t, err)
 
-		mockDb.On("GetAllTribes", mock.Anything).Return(expectedTribes)
 		handler.ServeHTTP(rr, req)
 		var returnedTribes []db.Tribe
 		err = json.Unmarshal(rr.Body.Bytes(), &returnedTribes)
 		assert.NoError(t, err)
 		assert.Equal(t, http.StatusOK, rr.Code)
+		assert.Len(t, returnedTribes, 2)
 		assert.EqualValues(t, expectedTribes, returnedTribes)
-		mockDb.AssertExpectations(t)
-
 	})
 }
 

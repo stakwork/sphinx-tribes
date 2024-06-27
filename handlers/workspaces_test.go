@@ -16,9 +16,7 @@ import (
 	"github.com/google/uuid"
 	"github.com/stakwork/sphinx-tribes/auth"
 	"github.com/stakwork/sphinx-tribes/db"
-	mocks "github.com/stakwork/sphinx-tribes/mocks"
 	"github.com/stretchr/testify/assert"
-	"github.com/stretchr/testify/mock"
 )
 
 func TestUnitCreateOrEditWorkspace(t *testing.T) {
@@ -596,34 +594,56 @@ func TestGetWorkspaceBudgetHistory(t *testing.T) {
 }
 
 func TestGetWorkspaceBountiesCount(t *testing.T) {
-	ctx := context.WithValue(context.Background(), auth.ContextKey, "test-key")
-	mockDb := mocks.NewDatabase(t)
-	oHandler := NewWorkspaceHandler(mockDb)
+	teardownSuite := SetupSuite(t)
+	defer teardownSuite(t)
+	oHandler := NewWorkspaceHandler(db.TestDB)
 
 	t.Run("should return the count of workspace bounties", func(t *testing.T) {
-		workspaceUUID := "valid-uuid"
-		expectedCount := int64(5)
-
-		mockDb.On("GetWorkspaceBountiesCount", mock.AnythingOfType("*http.Request"), workspaceUUID).Return(expectedCount).Once()
-
-		rctx := chi.NewRouteContext()
-		rctx.URLParams.Add("uuid", workspaceUUID)
-		req, err := http.NewRequestWithContext(context.WithValue(ctx, chi.RouteCtxKey, rctx), http.MethodGet, "/bounties/"+workspaceUUID+"/count/", nil)
-		if err != nil {
-			t.Fatal(err)
-		}
 
 		rr := httptest.NewRecorder()
-		http.HandlerFunc(oHandler.GetWorkspaceBountiesCount).ServeHTTP(rr, req)
+		handler := http.HandlerFunc(oHandler.GetWorkspaceBountiesCount)
 
-		assert.Equal(t, http.StatusOK, rr.Code)
+		expectedCount := int(1)
 
-		var count int64
-		err = json.Unmarshal(rr.Body.Bytes(), &count)
+		workspace := db.Workspace{
+			Uuid:        uuid.New().String(),
+			Name:        uuid.New().String(),
+			OwnerPubKey: uuid.New().String(),
+			Github:      "https://github.com/bounties",
+			Website:     "https://www.bountieswebsite.com",
+			Description: "Workspace Bounties Description",
+		}
+		db.TestDB.CreateOrEditWorkspace(workspace)
+		bounty := db.NewBounty{
+			Type:          "coding",
+			Title:         "existing bounty",
+			Description:   "existing bounty description",
+			WorkspaceUuid: workspace.Uuid,
+			OwnerID:       "workspace-user",
+			Price:         2000,
+		}
+
+		db.TestDB.CreateOrEditBounty(bounty)
+
+		rctx := chi.NewRouteContext()
+		rctx.URLParams.Add("uuid", workspace.Uuid)
+		ctx := context.WithValue(context.Background(), auth.ContextKey, workspace.OwnerPubKey)
+		req, err := http.NewRequestWithContext(context.WithValue(ctx, chi.RouteCtxKey, rctx), http.MethodGet, "/bounties/"+workspace.Uuid+"/count/", nil)
 		if err != nil {
 			t.Fatal(err)
 		}
 
-		assert.Equal(t, expectedCount, count)
+		fetchedWorkspace := db.TestDB.GetWorkspaceByUuid(workspace.Uuid)
+		workspace.ID = fetchedWorkspace.ID
+
+		fetchedBounty := db.TestDB.GetWorkspaceBounties(req, bounty.WorkspaceUuid)
+		bounty.ID = fetchedBounty[0].ID
+
+		handler.ServeHTTP(rr, req)
+		assert.Equal(t, http.StatusOK, rr.Code)
+
+		assert.Equal(t, expectedCount, len(fetchedBounty))
+		assert.Equal(t, workspace, fetchedWorkspace)
+		assert.Equal(t, bounty, fetchedBounty[0])
 	})
 }
