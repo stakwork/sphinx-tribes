@@ -406,32 +406,43 @@ func TestGetFirstTribeByFeed(t *testing.T) {
 }
 
 func TestSetTribePreview(t *testing.T) {
-	ctx := context.WithValue(context.Background(), auth.ContextKey, "owner_pubkey")
-	mockDb := mocks.NewDatabase(t)
-	tHandler := NewTribeHandler(mockDb)
+	teardownSuite := SetupSuite(t)
+	defer teardownSuite(t)
+
+	tHandler := NewTribeHandler(db.TestDB)
 
 	t.Run("Should test that the owner of a tribe can set tribe preview", func(t *testing.T) {
-		// Mock data
-		mockUUID := "valid_uuid"
-		mockOwnerPubKey := "owner_pubkey"
+
+		tribe := db.Tribe{
+			UUID:        uuid.New().String(),
+			OwnerPubKey: "tribe_pubkey",
+			Name:        "tribe_name",
+			Description: "description",
+			Tags:        []string{"tag3", "tag4"},
+			AppURL:      "tribe_app_url",
+			Badges:      pq.StringArray{},
+		}
+		db.TestDB.CreateOrEditTribe(tribe)
 
 		mockVerifyTribeUUID := func(uuid string, checkTimestamp bool) (string, error) {
-			return mockOwnerPubKey, nil
+			return tribe.OwnerPubKey, nil
 		}
-		mockDb.On("UpdateTribe", mock.Anything, map[string]interface{}{"preview": "preview"}).Return(true)
-
 		tHandler.verifyTribeUUID = mockVerifyTribeUUID
 
-		// Create and serve request
+		mockUUID := tribe.UUID
+		mockOwnerPubKey := tribe.OwnerPubKey
+		preview := "new_preview"
+
+		ctx := context.WithValue(context.Background(), auth.ContextKey, mockOwnerPubKey)
 		rr := httptest.NewRecorder()
 		handler := http.HandlerFunc(tHandler.SetTribePreview)
 
-		req, err := http.NewRequestWithContext(ctx, "PUT", "/tribepreview/"+mockUUID+"?preview=preview", nil)
+		req, err := http.NewRequestWithContext(ctx, "PUT", "/tribepreview/"+mockUUID+"?preview="+preview, nil)
 		if err != nil {
 			t.Fatal(err)
 		}
 		chiCtx := chi.NewRouteContext()
-		chiCtx.URLParams.Add("uuid", "mockUUID")
+		chiCtx.URLParams.Add("uuid", mockUUID)
 		req = req.WithContext(context.WithValue(req.Context(), chi.RouteCtxKey, chiCtx))
 
 		handler.ServeHTTP(rr, req)
@@ -439,33 +450,45 @@ func TestSetTribePreview(t *testing.T) {
 		// Verify response
 		assert.Equal(t, http.StatusOK, rr.Code)
 		var responseData bool
-		errors := json.Unmarshal(rr.Body.Bytes(), &responseData)
-		assert.NoError(t, errors)
+		err = json.Unmarshal(rr.Body.Bytes(), &responseData)
+		assert.NoError(t, err)
 		assert.True(t, responseData)
+
+		// Assert that the tribe's preview is updated in the DB
+		updatedTribe := db.TestDB.GetTribe(tribe.UUID)
+		assert.Equal(t, preview, updatedTribe.Preview)
 	})
 
 	t.Run("Should test that a 401 error is returned when setting a tribe preview action by someone other than the owner", func(t *testing.T) {
-		// Mock data
-		ctx := context.WithValue(context.Background(), auth.ContextKey, "pubkey")
-		mockUUID := "valid_uuid"
-		mockOwnerPubKey := "owner_pubkey"
+
+		tribe := db.Tribe{
+			UUID:        uuid.New().String(),
+			OwnerPubKey: "tribe_pubkey",
+			Name:        "tribe_name",
+			Description: "description",
+			Tags:        []string{"tag3", "tag4"},
+			AppURL:      "tribe_app_url",
+		}
+		db.TestDB.CreateOrEditTribe(tribe)
 
 		mockVerifyTribeUUID := func(uuid string, checkTimestamp bool) (string, error) {
-			return mockOwnerPubKey, nil
+			return tribe.OwnerPubKey, nil
 		}
-
 		tHandler.verifyTribeUUID = mockVerifyTribeUUID
 
-		// Create and serve request
+		mockUUID := tribe.UUID
+		preview := "new_preview"
+
+		ctx := context.WithValue(context.Background(), auth.ContextKey, "pubkey")
 		rr := httptest.NewRecorder()
 		handler := http.HandlerFunc(tHandler.SetTribePreview)
 
-		req, err := http.NewRequestWithContext(ctx, "PUT", "/tribepreview/"+mockUUID+"?preview=preview", nil)
+		req, err := http.NewRequestWithContext(ctx, "PUT", "/tribepreview/"+mockUUID+"?preview="+preview, nil)
 		if err != nil {
 			t.Fatal(err)
 		}
 		chiCtx := chi.NewRouteContext()
-		chiCtx.URLParams.Add("uuid", "mockUUID")
+		chiCtx.URLParams.Add("uuid", mockUUID)
 		req = req.WithContext(context.WithValue(req.Context(), chi.RouteCtxKey, chiCtx))
 
 		handler.ServeHTTP(rr, req)
