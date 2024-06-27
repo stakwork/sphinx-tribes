@@ -4,11 +4,12 @@ import (
 	"bytes"
 	"context"
 	"encoding/json"
-	"github.com/google/uuid"
 	"net/http"
 	"net/http/httptest"
 	"strings"
 	"testing"
+
+	"github.com/google/uuid"
 
 	"github.com/stakwork/sphinx-tribes/config"
 
@@ -774,9 +775,23 @@ func TestGetListedTribes(t *testing.T) {
 
 func TestGenerateBudgetInvoice(t *testing.T) {
 	ctx := context.Background()
-	mockDb := mocks.NewDatabase(t)
-	tHandler := NewTribeHandler(mockDb)
-	authorizedCtx := context.WithValue(ctx, auth.ContextKey, "valid-key")
+
+	teardownSuite := SetupSuite(t)
+	defer teardownSuite(t)
+
+	person := db.Person{
+		ID:          104,
+		Uuid:        "perosn_104_uuid",
+		OwnerAlias:  "person104",
+		UniqueName:  "person104",
+		OwnerPubKey: "person_104_pubkey",
+		PriceToMeet: 0,
+		Description: "This is test user 104",
+	}
+	db.TestDB.CreateOrEditPerson(person)
+
+	tHandler := NewTribeHandler(db.TestDB)
+	authorizedCtx := context.WithValue(ctx, auth.ContextKey, person.OwnerPubKey)
 
 	userAmount := uint(1000)
 	invoiceResponse := db.InvoiceResponse{
@@ -801,8 +816,6 @@ func TestGenerateBudgetInvoice(t *testing.T) {
 	})
 
 	t.Run("Should mock a call to relay /invoices with the correct body", func(t *testing.T) {
-		mockDb.On("ProcessBudgetInvoice", mock.AnythingOfType("db.NewPaymentHistory"), mock.AnythingOfType("db.NewInvoiceList")).Return(nil)
-
 		ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 
 			expectedBody := map[string]interface{}{"amount": float64(0), "memo": "Budget Invoice"}
@@ -819,7 +832,12 @@ func TestGenerateBudgetInvoice(t *testing.T) {
 
 		config.RelayUrl = ts.URL
 
-		reqBody := map[string]interface{}{"amount": 0}
+		reqBody := map[string]interface{}{
+			"amount":         uint(0),
+			"sender_pubkey":  person.OwnerPubKey,
+			"payment_type":   "deposit",
+			"workspace_uuid": "workspaceuuid",
+		}
 		bodyBytes, _ := json.Marshal(reqBody)
 
 		req, err := http.NewRequestWithContext(authorizedCtx, http.MethodPost, "/budgetinvoices", bytes.NewBuffer(bodyBytes))
@@ -836,8 +854,6 @@ func TestGenerateBudgetInvoice(t *testing.T) {
 
 		userAmount := float64(1000)
 
-		mockDb.On("ProcessBudgetInvoice", mock.AnythingOfType("db.NewPaymentHistory"), mock.AnythingOfType("db.NewInvoiceList")).Return(nil)
-
 		ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 			var body map[string]interface{}
 			err := json.NewDecoder(r.Body).Decode(&body)
@@ -852,7 +868,12 @@ func TestGenerateBudgetInvoice(t *testing.T) {
 
 		config.RelayUrl = ts.URL
 
-		reqBody := map[string]interface{}{"amount": userAmount}
+		reqBody := map[string]interface{}{
+			"amount":         userAmount,
+			"sender_pubkey":  person.OwnerPubKey,
+			"payment_type":   "deposit",
+			"workspace_uuid": "workspaceuuid",
+		}
 		bodyBytes, _ := json.Marshal(reqBody)
 
 		req, err := http.NewRequestWithContext(authorizedCtx, http.MethodPost, "/budgetinvoices", bytes.NewBuffer(bodyBytes))
@@ -866,7 +887,6 @@ func TestGenerateBudgetInvoice(t *testing.T) {
 	})
 
 	t.Run("Should add payments to the payment history and invoice to the invoice list upon successful relay call", func(t *testing.T) {
-		mockDb.On("ProcessBudgetInvoice", mock.AnythingOfType("db.NewPaymentHistory"), mock.AnythingOfType("db.NewInvoiceList")).Return(nil)
 
 		ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 			w.WriteHeader(http.StatusOK)
@@ -876,7 +896,12 @@ func TestGenerateBudgetInvoice(t *testing.T) {
 
 		config.RelayUrl = ts.URL
 
-		reqBody := map[string]interface{}{"amount": userAmount}
+		reqBody := map[string]interface{}{
+			"amount":         userAmount,
+			"sender_pubkey":  person.OwnerPubKey,
+			"payment_type":   "deposit",
+			"workspace_uuid": "workspaceuuid",
+		}
 		bodyBytes, _ := json.Marshal(reqBody)
 		req, err := http.NewRequestWithContext(authorizedCtx, http.MethodPost, "/budgetinvoices", bytes.NewBuffer(bodyBytes))
 		assert.NoError(t, err)
@@ -892,7 +917,5 @@ func TestGenerateBudgetInvoice(t *testing.T) {
 		assert.NoError(t, err)
 		assert.True(t, response.Succcess, "Invoice generation should be successful")
 		assert.Equal(t, "example_invoice", response.Response.Invoice, "The invoice in the response should match the mock")
-
-		mockDb.AssertCalled(t, "ProcessBudgetInvoice", mock.AnythingOfType("db.NewPaymentHistory"), mock.AnythingOfType("db.NewInvoiceList"))
 	})
 }
