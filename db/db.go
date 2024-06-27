@@ -1570,9 +1570,12 @@ func (db database) GetPeopleListShort(count uint32) *[]PersonInShort {
 }
 
 func (db database) CreateConnectionCode(c []ConnectionCodes) ([]ConnectionCodes, error) {
+	if len(c) == 0 {
+		return nil, fmt.Errorf("no connection codes provided")
+	}
 	now := time.Now()
 	for _, code := range c {
-		if code.DateCreated.IsZero() {
+		if code.DateCreated == nil || code.DateCreated.IsZero() {
 			code.DateCreated = &now
 		}
 	}
