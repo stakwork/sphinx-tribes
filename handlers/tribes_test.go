@@ -382,7 +382,7 @@ func TestGetFirstTribeByFeed(t *testing.T) {
 			OwnerPubKey: "pubkey",
 			Name:        "name",
 			Description: "description",
-			Tags:        []string{"tag3", "tag4"},
+			Tags:        []string{"tag2", "tag3"},
 			AppURL:      "app_url",
 			FeedURL:     "valid_feed_url",
 			Badges:      pq.StringArray{},
