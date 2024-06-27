@@ -50,17 +50,15 @@ func TestGetAdminPubkeys(t *testing.T) {
 		}
 	})
 }
+
 func TestCreateConnectionCode(t *testing.T) {
 	teardownSuite := SetupSuite(t)
 	defer teardownSuite(t)
 	aHandler := NewAuthHandler(db.TestDB)
-
 	t.Run("should create connection code successful", func(t *testing.T) {
-
 		rr := httptest.NewRecorder()
 		handler := http.HandlerFunc(aHandler.CreateConnectionCode)
-
-		codeStrArr := []string{"custom connection string"}
+		codeStrArr := []string{"sampleCode1"}
 
 		codeArr := []db.ConnectionCodes{}
 		now := time.Now()
@@ -78,6 +76,7 @@ func TestCreateConnectionCode(t *testing.T) {
 
 		codeShort := db.ConnectionCodesShort{
 			ConnectionString: codeArr[0].ConnectionString,
+			DateCreated:      codeArr[0].DateCreated,
 		}
 
 		db.TestDB.CreateConnectionCode(codeArr)
@@ -88,16 +87,21 @@ func TestCreateConnectionCode(t *testing.T) {
 			t.Fatal(err)
 		}
 
+		codes := db.TestDB.GetConnectionCode()
 		handler.ServeHTTP(rr, req)
 		assert.Equal(t, http.StatusOK, rr.Code)
 
-		fetchedCodes := db.TestDB.GetConnectionCode()
-
-		assert.EqualValues(t, codeShort.ConnectionString, fetchedCodes.ConnectionString)
+		assert.EqualValues(t, codeShort.ConnectionString, codes.ConnectionString)
+		tolerance := time.Millisecond
+		timeDifference := codeShort.DateCreated.Sub(*codes.DateCreated)
+		if timeDifference < 0 {
+			timeDifference = -timeDifference
+		}
+		assert.True(t, timeDifference <= tolerance, "Expected DateCreated to be within tolerance")
 	})
 
 	t.Run("should return error if failed to add connection code", func(t *testing.T) {
-		codeToBeInserted := []string{"custom connection string", "custom connection string 2"}
+		codeToBeInserted := []string{}
 
 		codeArr := []db.ConnectionCodes{}
 		for _, code := range codeToBeInserted {
@@ -114,9 +118,7 @@ func TestCreateConnectionCode(t *testing.T) {
 			t.Fatal(err)
 		}
 		rr := httptest.NewRecorder()
-		handler := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-			http.Error(w, "failed to create connection", http.StatusBadRequest)
-		})
+		handler := http.HandlerFunc(aHandler.CreateConnectionCode)
 
 		handler.ServeHTTP(rr, req)
 		assert.Equal(t, http.StatusBadRequest, rr.Code)
