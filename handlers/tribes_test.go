@@ -368,30 +368,38 @@ func TestDeleteTribe(t *testing.T) {
 }
 
 func TestGetFirstTribeByFeed(t *testing.T) {
-	mockDb := mocks.NewDatabase(t)
-	tHandler := NewTribeHandler(mockDb)
+	teardownSuite := SetupSuite(t)
+	defer teardownSuite(t)
+
+	tHandler := NewTribeHandler(db.TestDB)
 
 	t.Run("Should test that a tribe can be gotten by passing the feed URL", func(t *testing.T) {
-		// Mock data
-		mockFeedURL := "valid_feed_url"
-		mockTribe := db.Tribe{
-			UUID: "valid_uuid",
-		}
-		mockChannels := []db.Channel{
-			{ID: 1, TribeUUID: mockTribe.UUID},
-		}
 
-		mockDb.On("GetFirstTribeByFeedURL", mockFeedURL).Return(mockTribe).Once()
-		mockDb.On("GetChannelsByTribe", mockTribe.UUID).Return(mockChannels).Once()
+		db.TestDB.DeleteTribe()
 
-		// Create request with valid feed URL
-		req, err := http.NewRequest("GET", "/tribe_by_feed?url="+mockFeedURL, nil)
+		tribe := db.Tribe{
+			UUID:        uuid.New().String(),
+			OwnerPubKey: "pubkey",
+			Name:        "name",
+			Description: "description",
+			Tags:        []string{"tag3", "tag4"},
+			AppURL:      "app_url",
+			FeedURL:     "valid_feed_url",
+			Badges:      pq.StringArray{},
+		}
+		db.TestDB.CreateOrEditTribe(tribe)
+
+		mockFeedURL := tribe.FeedURL
+
+		// Serve request
+		rr := httptest.NewRecorder()
+		rctx := chi.NewRouteContext()
+		rctx.URLParams.Add("feed_url", mockFeedURL)
+		req, err := http.NewRequestWithContext(context.WithValue(context.Background(), chi.RouteCtxKey, rctx), http.MethodGet, "/tribe_by_feed?url="+mockFeedURL, nil)
 		if err != nil {
 			t.Fatal(err)
 		}
 
-		// Serve request
-		rr := httptest.NewRecorder()
 		handler := http.HandlerFunc(tHandler.GetFirstTribeByFeed)
 		handler.ServeHTTP(rr, req)
 
@@ -402,7 +410,12 @@ func TestGetFirstTribeByFeed(t *testing.T) {
 		if err != nil {
 			t.Fatalf("Error decoding JSON response: %s", err)
 		}
-		assert.Equal(t, mockTribe.UUID, responseData["uuid"])
+		assert.Equal(t, tribe.UUID, responseData["uuid"])
+		assert.Equal(t, tribe.Name, responseData["name"])
+		assert.Equal(t, tribe.Description, responseData["description"])
+		assert.ElementsMatch(t, tribe.Tags, responseData["tags"])
+		assert.Equal(t, tribe.AppURL, responseData["app_url"])
+		assert.Equal(t, tribe.FeedURL, responseData["feed_url"])
 	})
 }
 
