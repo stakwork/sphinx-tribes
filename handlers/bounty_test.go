@@ -1695,13 +1695,13 @@ func TestPollInvoice(t *testing.T) {
 	bHandler := NewBountyHandler(mockHttpClient, db.TestDB)
 
 	paymentRequest := "DummyPayReq"
-	db.TestDB.DeleteInvoice(paymentRequest)
 
 	now := time.Now()
 	bountyAmount := uint(5000)
 	invoice := db.NewInvoiceList{
 		PaymentRequest: paymentRequest,
 		Status:         false,
+		Type:           "KEYSEND",
 		OwnerPubkey:    "owner_pubkey",
 		WorkspaceUuid:  "workspace_uuid",
 		Created:        &now,
@@ -1773,51 +1773,7 @@ func TestPollInvoice(t *testing.T) {
 		mockHttpClient.AssertExpectations(t)
 	})
 
-	t.Run("If the invoice is settled and the invoice.Type is equal to BUDGET the invoice amount should be added to the workspace budget and the payment status of the related invoice should be sent to true on the payment history table", func(t *testing.T) {
-		ctx := context.Background()
-		mockHttpClient := &mocks.HttpClient{}
-		bHandler := NewBountyHandler(mockHttpClient, db.TestDB)
-		authorizedCtx := context.WithValue(ctx, auth.ContextKey, invoice.OwnerPubkey)
-		expectedUrl := fmt.Sprintf("%s/invoice?payment_request=%s", config.RelayUrl, invoice.PaymentRequest)
-		expectedBody := fmt.Sprintf(`{"success": true, "response": { "settled": true, "payment_request": "%s", "payment_hash": "payment_hash", "preimage": "preimage", "Amount": %d}}`, invoice.OwnerPubkey, bountyAmount)
-
-		r := io.NopCloser(bytes.NewReader([]byte(expectedBody)))
-		mockHttpClient.On("Do", mock.MatchedBy(func(req *http.Request) bool {
-			return req.Method == http.MethodGet && expectedUrl == req.URL.String() && req.Header.Get("x-user-token") == config.RelayAuthKey
-		})).Return(&http.Response{
-			StatusCode: 200,
-			Body:       r,
-		}, nil).Once()
-
-		ro := chi.NewRouter()
-		ro.Post("/poll/invoice/{paymentRequest}", bHandler.PollInvoice)
-
-		rr := httptest.NewRecorder()
-		req, err := http.NewRequestWithContext(authorizedCtx, http.MethodPost, "/poll/invoice/"+invoice.PaymentRequest, bytes.NewBufferString(`{}`))
-		if err != nil {
-			t.Fatal(err)
-		}
-
-		ro.ServeHTTP(rr, req)
-
-		assert.Equal(t, http.StatusOK, rr.Code)
-		mockHttpClient.AssertExpectations(t)
-	})
-
 	t.Run("Should mock relay payment is successful update the bounty associated with the invoice and set the paid as true", func(t *testing.T) {
-		db.TestDB.DeleteInvoice(paymentRequest)
-
-		invoice := db.NewInvoiceList{
-			PaymentRequest: paymentRequest,
-			Status:         false,
-			Type:           "KEYSEND",
-			OwnerPubkey:    "owner_pubkey",
-			WorkspaceUuid:  "workspace_uuid",
-			Created:        &now,
-		}
-
-		db.TestDB.AddInvoice(invoice)
-
 		expectedUrl := fmt.Sprintf("%s/invoice?payment_request=%s", config.RelayUrl, invoice.PaymentRequest)
 		expectedBody := fmt.Sprintf(`{"success": true, "response": { "settled": true, "payment_request": "%s", "payment_hash": "payment_hash", "preimage": "preimage", "Amount": %d}}`, invoice.OwnerPubkey, bountyAmount)
 
@@ -1839,6 +1795,49 @@ func TestPollInvoice(t *testing.T) {
 		})).Return(&http.Response{
 			StatusCode: 200,
 			Body:       r2,
+		}, nil).Once()
+
+		ro := chi.NewRouter()
+		ro.Post("/poll/invoice/{paymentRequest}", bHandler.PollInvoice)
+
+		rr := httptest.NewRecorder()
+		req, err := http.NewRequestWithContext(authorizedCtx, http.MethodPost, "/poll/invoice/"+invoice.PaymentRequest, bytes.NewBufferString(`{}`))
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		ro.ServeHTTP(rr, req)
+
+		assert.Equal(t, http.StatusOK, rr.Code)
+		mockHttpClient.AssertExpectations(t)
+	})
+
+	t.Run("If the invoice is settled and the invoice.Type is equal to BUDGET the invoice amount should be added to the workspace budget and the payment status of the related invoice should be sent to true on the payment history table", func(t *testing.T) {
+		db.TestDB.DeleteInvoice(paymentRequest)
+
+		invoice := db.NewInvoiceList{
+			PaymentRequest: paymentRequest,
+			Status:         false,
+			OwnerPubkey:    "owner_pubkey",
+			WorkspaceUuid:  "workspace_uuid",
+			Created:        &now,
+		}
+
+		db.TestDB.AddInvoice(invoice)
+
+		ctx := context.Background()
+		mockHttpClient := &mocks.HttpClient{}
+		bHandler := NewBountyHandler(mockHttpClient, db.TestDB)
+		authorizedCtx := context.WithValue(ctx, auth.ContextKey, invoice.OwnerPubkey)
+		expectedUrl := fmt.Sprintf("%s/invoice?payment_request=%s", config.RelayUrl, invoice.PaymentRequest)
+		expectedBody := fmt.Sprintf(`{"success": true, "response": { "settled": true, "payment_request": "%s", "payment_hash": "payment_hash", "preimage": "preimage", "Amount": %d}}`, invoice.OwnerPubkey, bountyAmount)
+
+		r := io.NopCloser(bytes.NewReader([]byte(expectedBody)))
+		mockHttpClient.On("Do", mock.MatchedBy(func(req *http.Request) bool {
+			return req.Method == http.MethodGet && expectedUrl == req.URL.String() && req.Header.Get("x-user-token") == config.RelayAuthKey
+		})).Return(&http.Response{
+			StatusCode: 200,
+			Body:       r,
 		}, nil).Once()
 
 		ro := chi.NewRouter()
