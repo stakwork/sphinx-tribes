@@ -7,6 +7,7 @@ import (
 	"errors"
 	"net/http"
 	"net/http/httptest"
+	"strconv"
 	"testing"
 
 	"fmt"
@@ -104,9 +105,72 @@ func TestBountyMetrics(t *testing.T) {
 }
 
 func TestMetricsBounties(t *testing.T) {
+	teardownSuite := SetupSuite(t)
+	defer teardownSuite(t)
+
 	ctx := context.WithValue(context.Background(), auth.ContextKey, "test-key")
-	mockDb := mocks.NewDatabase(t)
-	mh := NewMetricHandler(mockDb)
+	mh := NewMetricHandler(db.TestDB)
+
+	now := time.Now()
+	bountyOwner := db.Person{OwnerPubKey: "owner-1"}
+	db.TestDB.CreateOrEditPerson(bountyOwner)
+
+	bounty1 := db.NewBounty{
+		Type:          "coding",
+		Title:         "Bounty With ID 1",
+		Description:   "Bounty ID 1 Description",
+		WorkspaceUuid: "",
+		Assignee:      "",
+		OwnerID:       bountyOwner.OwnerPubKey,
+		Show:          true,
+		Created:       now.AddDate(0, 0, -30).Unix(),
+		Paid:          true,
+	}
+	db.TestDB.CreateOrEditBounty(bounty1)
+
+	bounty2 := db.NewBounty{
+		Type:          "coding",
+		Title:         "Bounty With ID 2",
+		Description:   "Bounty ID 2 Description",
+		WorkspaceUuid: "",
+		Assignee:      "",
+		OwnerID:       bountyOwner.OwnerPubKey,
+		Show:          true,
+		Created:       now.AddDate(0, 0, -20).Unix(),
+		Paid:          true,
+	}
+	db.TestDB.CreateOrEditBounty(bounty2)
+
+	bounty3 := db.NewBounty{
+		Type:          "coding",
+		Title:         "Bounty With ID 3",
+		Description:   "Bounty ID 3 Description",
+		WorkspaceUuid: "",
+		Assignee:      "",
+		OwnerID:       bountyOwner.OwnerPubKey,
+		Show:          true,
+		Created:       now.AddDate(0, 0, -10).Unix(),
+		Paid:          false,
+	}
+	db.TestDB.CreateOrEditBounty(bounty3)
+
+	bounty4 := db.NewBounty{
+		Type:          "coding",
+		Title:         "Bounty With ID 4",
+		Description:   "Bounty ID 4 Description",
+		WorkspaceUuid: "",
+		Assignee:      "",
+		OwnerID:       bountyOwner.OwnerPubKey,
+		Show:          true,
+		Created:       now.Unix(),
+		Paid:          false,
+	}
+	db.TestDB.CreateOrEditBounty(bounty4)
+
+	dateRange := db.PaymentDateRange{
+		StartDate: strconv.FormatInt(bounty1.Created, 10),
+		EndDate:   strconv.FormatInt(bounty4.Created, 10),
+	}
 
 	t.Run("should return error if body is not a valid json", func(t *testing.T) {
 		rr := httptest.NewRecorder()
@@ -127,7 +191,7 @@ func TestMetricsBounties(t *testing.T) {
 		rr := httptest.NewRecorder()
 		handler := http.HandlerFunc(mh.MetricsBounties)
 
-		invalidJson := []byte(`{"key": "value"}`)
+		invalidJson := []byte(`{"key": "value"`)
 		req, err := http.NewRequestWithContext(context.Background(), http.MethodPost, "/bounties", bytes.NewReader(invalidJson))
 		if err != nil {
 			t.Fatal(err)
@@ -139,102 +203,59 @@ func TestMetricsBounties(t *testing.T) {
 	})
 
 	t.Run("should fetch bounties from db", func(t *testing.T) {
-		db.RedisError = errors.New("redis not initialized")
 		rr := httptest.NewRecorder()
 		handler := http.HandlerFunc(mh.MetricsBounties)
-		dateRange := db.PaymentDateRange{
-			StartDate: "1111",
-			EndDate:   "2222",
-		}
+
 		body, _ := json.Marshal(dateRange)
-		req, err := http.NewRequestWithContext(ctx, http.MethodPost, "/boutnies", bytes.NewReader(body))
+		req, err := http.NewRequestWithContext(ctx, http.MethodPost, "/bounties", bytes.NewReader(body))
 		if err != nil {
 			t.Fatal(err)
 		}
 
-		bounties := []db.NewBounty{
-			{
-				ID:          1,
-				OwnerID:     "owner-1",
-				Price:       100,
-				Title:       "bounty 1",
-				Description: "test bounty",
-				Created:     1112,
-			},
-		}
-		mockDb.On("GetBountiesByDateRange", dateRange, req).Return(bounties).Once()
-		mockDb.On("GetPersonByPubkey", "owner-1").Return(db.Person{ID: 1}).Once()
-		mockDb.On("GetPersonByPubkey", "").Return(db.Person{}).Once()
-		mockDb.On("GetWorkspaceByUuid", "").Return(db.Workspace{}).Once()
 		handler.ServeHTTP(rr, req)
 
 		var res []db.BountyData
 		_ = json.Unmarshal(rr.Body.Bytes(), &res)
 
+		bounties := db.TestDB.GetBountiesByDateRange(dateRange, req)
 		assert.Equal(t, http.StatusOK, rr.Code)
-		assert.Equal(t, res[0].BountyId, uint(1))
-		assert.Equal(t, res[0].OwnerID, "owner-1")
-		assert.Equal(t, res[0].Price, uint(100))
-		assert.Equal(t, res[0].Title, "bounty 1")
-		assert.Equal(t, res[0].BountyDescription, "test bounty")
-		assert.Equal(t, res[0].BountyCreated, int64(1112))
+		assert.Equal(t, len(bounties), len(res))
+
+		for i, bounty := range bounties {
+			assert.Equal(t, bounty.ID, res[i].BountyId)
+			assert.Equal(t, bounty.OwnerID, res[i].OwnerID)
+			assert.Equal(t, bounty.Price, res[i].Price)
+			assert.Equal(t, bounty.Title, res[i].Title)
+			assert.Equal(t, bounty.Description, res[i].BountyDescription)
+			assert.Equal(t, bounty.Created, res[i].BountyCreated)
+		}
 	})
 
 	t.Run("should fetch bounties from db for selected providers", func(t *testing.T) {
-		db.RedisError = errors.New("redis not initialized")
 		rr := httptest.NewRecorder()
 		handler := http.HandlerFunc(mh.MetricsBounties)
-		dateRange := db.PaymentDateRange{
-			StartDate: "1111",
-			EndDate:   "2222",
-		}
+
 		body, _ := json.Marshal(dateRange)
-		req, err := http.NewRequestWithContext(ctx, http.MethodPost, "/boutnies", bytes.NewReader(body))
+		req, err := http.NewRequestWithContext(ctx, http.MethodPost, "/bounties", bytes.NewReader(body))
 		if err != nil {
 			t.Fatal(err)
 		}
 
 		// Provide multiple provider IDs in the request query parameters
-		req.URL.RawQuery = "provider=provider1,provider2"
-
-		// Mock bounties data for multiple providers
-		bounties := []db.NewBounty{
-			{
-				ID:          1,
-				OwnerID:     "provider1",
-				Price:       100,
-				Title:       "bounty 1",
-				Description: "test bounty",
-				Created:     1112,
-			},
-			{
-				ID:          2,
-				OwnerID:     "provider2",
-				Price:       100,
-				Title:       "bounty 2",
-				Description: "test bounty",
-				Created:     1112,
-			},
-		}
-		// Mock the database call to return bounties for the selected providers
-		mockDb.On("GetBountiesByDateRange", dateRange, req).Return(bounties).Once()
-		mockDb.On("GetPersonByPubkey", "provider1").Return(db.Person{ID: 1}).Once()
-		mockDb.On("GetPersonByPubkey", "").Return(db.Person{}).Once()
-		mockDb.On("GetWorkspaceByUuid", "").Return(db.Workspace{}).Once()
-		mockDb.On("GetPersonByPubkey", "provider2").Return(db.Person{ID: 2}).Once()
-		mockDb.On("GetPersonByPubkey", "").Return(db.Person{}).Once()
-		mockDb.On("GetWorkspaceByUuid", "").Return(db.Workspace{}).Once()
+		req.URL.RawQuery = "provider=owner-1"
 
 		handler.ServeHTTP(rr, req)
 
 		var res []db.BountyData
 		_ = json.Unmarshal(rr.Body.Bytes(), &res)
 
+		bounties := db.TestDB.GetBountiesByDateRange(dateRange, req)
 		assert.Equal(t, http.StatusOK, rr.Code)
+		assert.Equal(t, len(bounties), len(res))
 
 		// Assert that the response contains bounties only from the selected providers
 		for _, bounty := range res {
-			assert.Contains(t, []string{"provider1", "provider2"}, bounty.OwnerID)
+			assert.Equal(t, "owner-1", bounty.OwnerID)
 		}
 	})
 }
