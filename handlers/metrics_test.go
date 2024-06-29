@@ -5,6 +5,8 @@ import (
 	"context"
 	"encoding/json"
 	"errors"
+	"github.com/google/uuid"
+	"github.com/lib/pq"
 	"net/http"
 	"net/http/httptest"
 	"strconv"
@@ -17,7 +19,6 @@ import (
 	"github.com/stakwork/sphinx-tribes/db"
 	mocks "github.com/stakwork/sphinx-tribes/mocks"
 	"github.com/stretchr/testify/assert"
-	"github.com/stretchr/testify/mock"
 )
 
 func TestBountyMetrics(t *testing.T) {
@@ -429,8 +430,9 @@ func TestConvertMetricsToCSV(t *testing.T) {
 
 func TestMetricsBountiesProviders(t *testing.T) {
 	ctx := context.Background()
-	mockDb := mocks.NewDatabase(t)
-	mh := NewMetricHandler(mockDb)
+	teardownSuite := SetupSuite(t)
+	defer teardownSuite(t)
+	mh := NewMetricHandler(db.TestDB)
 	unauthorizedCtx := context.WithValue(context.Background(), auth.ContextKey, "")
 	authorizedCtx := context.WithValue(ctx, auth.ContextKey, "valid-key")
 
@@ -467,18 +469,99 @@ func TestMetricsBountiesProviders(t *testing.T) {
 		rr := httptest.NewRecorder()
 		handler := http.HandlerFunc(mh.MetricsBountiesProviders)
 
-		validJson := []byte(`{"start_date": "2021-01-01", "end_date": "2021-12-31"}`)
-		req, err := http.NewRequestWithContext(authorizedCtx, http.MethodPost, "/bounties/providers", bytes.NewReader(validJson))
+		db.TestDB.DeleteAllBounties()
+
+		person1 := db.Person{
+			Uuid:         uuid.New().String(),
+			OwnerPubKey:  "person1_pubkey",
+			OwnerAlias:   "person1",
+			UniqueName:   "person1",
+			Description:  "description",
+			Tags:         pq.StringArray{},
+			Extras:       db.PropertyMap{},
+			GithubIssues: db.PropertyMap{},
+		}
+		person2 := db.Person{
+			Uuid:         uuid.New().String(),
+			OwnerPubKey:  "person2_pubkey",
+			OwnerAlias:   "person2",
+			UniqueName:   "person2",
+			Description:  "description",
+			Tags:         pq.StringArray{},
+			Extras:       db.PropertyMap{},
+			GithubIssues: db.PropertyMap{},
+		}
+
+		db.TestDB.CreateOrEditPerson(person1)
+		db.TestDB.CreateOrEditPerson(person2)
+
+		now := time.Now()
+		thirtyDaysBefore := now.AddDate(0, 0, -30).Unix()
+		twentyDaysBefore := now.AddDate(0, 0, -20).Unix()
+		tenDaysBefore := now.AddDate(0, 0, -10).Unix()
+		nowUnix := now.Unix()
+
+		bounty1 := db.NewBounty{
+			Type:          "coding",
+			Title:         "Bounty With ID",
+			Description:   "Bounty ID Description",
+			WorkspaceUuid: "",
+			Assignee:      "",
+			Show:          true,
+			OwnerID:       person2.OwnerPubKey,
+			Paid:          true,
+			Created:       thirtyDaysBefore,
+		}
+		bounty2 := db.NewBounty{
+			Type:          "coding",
+			Title:         "Bounty With ID",
+			Description:   "Bounty ID Description",
+			WorkspaceUuid: "",
+			Assignee:      "",
+			Show:          true,
+			OwnerID:       person2.OwnerPubKey,
+			Created:       twentyDaysBefore,
+		}
+		bounty3 := db.NewBounty{
+			Type:          "coding",
+			Title:         "Bounty With ID",
+			Description:   "Bounty ID Description",
+			WorkspaceUuid: "",
+			Assignee:      "",
+			Show:          true,
+			OwnerID:       person1.OwnerPubKey,
+			Paid:          true,
+			Created:       tenDaysBefore,
+		}
+		bounty4 := db.NewBounty{
+			Type:          "coding",
+			Title:         "Bounty With ID",
+			Description:   "Bounty ID Description",
+			WorkspaceUuid: "",
+			Assignee:      "",
+			Show:          true,
+			OwnerID:       person1.OwnerPubKey,
+			Created:       nowUnix,
+		}
+
+		db.TestDB.CreateOrEditBounty(bounty1)
+		db.TestDB.CreateOrEditBounty(bounty2)
+		db.TestDB.CreateOrEditBounty(bounty3)
+		db.TestDB.CreateOrEditBounty(bounty4)
+
+		dateRange := db.PaymentDateRange{
+			StartDate: strconv.FormatInt(bounty1.Created, 10),
+			EndDate:   strconv.FormatInt(bounty4.Created, 10),
+		}
+
+		body, _ := json.Marshal(dateRange)
+
+		req, err := http.NewRequestWithContext(authorizedCtx, http.MethodPost, "/bounties/providers?limit=10", bytes.NewReader(body))
 		if err != nil {
 			t.Fatal(err)
 		}
 
-		expectedProviders := []db.Person{
-			{ID: 1, OwnerAlias: "Provider One"},
-			{ID: 2, OwnerAlias: "Provider Two"},
-		}
-
-		mockDb.On("GetBountiesProviders", mock.Anything, req).Return(expectedProviders).Once()
+		fetchedProviders := db.TestDB.GetBountiesProviders(dateRange, req)
 
 		handler.ServeHTTP(rr, req)
 
@@ -489,6 +572,13 @@ func TestMetricsBountiesProviders(t *testing.T) {
 		}
 
 		assert.Equal(t, http.StatusOK, rr.Code)
+		//Assert that the API call response matches the value returned from the DB
+		assert.EqualValues(t, fetchedProviders, actualProviders)
+		//Assert that the Providers returned are equal to the persons created
+		person1.ID = fetchedProviders[0].ID
+		person2.ID = fetchedProviders[1].ID
+		expectedProviders := []db.Person{person1, person2}
 		assert.EqualValues(t, expectedProviders, actualProviders)
 	})
+
 }
