@@ -4,7 +4,6 @@ import (
 	"bytes"
 	"context"
 	"encoding/json"
-	"errors"
 	"github.com/google/uuid"
 	"github.com/lib/pq"
 	"net/http"
@@ -17,14 +16,89 @@ import (
 
 	"github.com/stakwork/sphinx-tribes/auth"
 	"github.com/stakwork/sphinx-tribes/db"
-	mocks "github.com/stakwork/sphinx-tribes/mocks"
 	"github.com/stretchr/testify/assert"
 )
 
 func TestBountyMetrics(t *testing.T) {
-	ctx := context.WithValue(context.Background(), auth.ContextKey, "test-key")
-	mockDb := mocks.NewDatabase(t)
-	mh := NewMetricHandler(mockDb)
+	teardownSuite := SetupSuite(t)
+	defer teardownSuite(t)
+
+	mh := NewMetricHandler(db.TestDB)
+
+	db.TestDB.DeleteAllBounties()
+
+	person := db.Person{
+		Uuid:         uuid.New().String(),
+		OwnerPubKey:  "person1_pubkey",
+		OwnerAlias:   "person1",
+		UniqueName:   "person1",
+		Description:  "description",
+		Tags:         pq.StringArray{},
+		Extras:       db.PropertyMap{},
+		GithubIssues: db.PropertyMap{},
+	}
+	db.TestDB.CreateOrEditPerson(person)
+	ctx := context.WithValue(context.Background(), auth.ContextKey, person.OwnerPubKey)
+	now := time.Now()
+
+	bounty1 := db.NewBounty{
+		Type:          "coding",
+		Title:         "Bounty With ID 1",
+		Description:   "Bounty ID 1 Description",
+		WorkspaceUuid: "workspace",
+		Assignee:      "ali",
+		OwnerID:       person.OwnerPubKey,
+		Show:          true,
+		Created:       now.AddDate(0, 0, -30).Unix(),
+		Paid:          true,
+		Price:         100,
+	}
+	db.TestDB.CreateOrEditBounty(bounty1)
+
+	bounty2 := db.NewBounty{
+		Type:          "coding",
+		Title:         "Bounty With ID 2",
+		Description:   "Bounty ID 2 Description",
+		WorkspaceUuid: "workspace",
+		Assignee:      "ali",
+		OwnerID:       person.OwnerPubKey,
+		Show:          true,
+		Created:       now.AddDate(0, 0, -20).Unix(),
+		Paid:          true,
+		Price:         150,
+	}
+	db.TestDB.CreateOrEditBounty(bounty2)
+
+	bounty3 := db.NewBounty{
+		Type:          "coding",
+		Title:         "Bounty With ID 3",
+		Description:   "Bounty ID 3 Description",
+		WorkspaceUuid: "workspace",
+		Assignee:      "ali",
+		OwnerID:       person.OwnerPubKey,
+		Show:          true,
+		Created:       now.AddDate(0, 0, -10).Unix(),
+		Paid:          false,
+	}
+	db.TestDB.CreateOrEditBounty(bounty3)
+
+	bounty4 := db.NewBounty{
+		Type:          "coding",
+		Title:         "Bounty With ID 4",
+		Description:   "Bounty ID 4 Description",
+		WorkspaceUuid: "workspace",
+		Assignee:      "ali",
+		OwnerID:       person.OwnerPubKey,
+		Show:          true,
+		Created:       now.Unix(),
+		Paid:          false,
+	}
+	db.TestDB.CreateOrEditBounty(bounty4)
+
+	dateRange := db.PaymentDateRange{
+		StartDate: strconv.FormatInt(bounty1.Created, 10),
+		EndDate:   strconv.FormatInt(bounty4.Created, 10),
+	}
 
 	t.Run("should return error if body is not a valid json", func(t *testing.T) {
 		rr := httptest.NewRecorder()
@@ -57,51 +131,36 @@ func TestBountyMetrics(t *testing.T) {
 	})
 
 	t.Run("should fetch stats from db", func(t *testing.T) {
-		db.RedisError = errors.New("redis not initialized")
 		rr := httptest.NewRecorder()
 		handler := http.HandlerFunc(mh.BountyMetrics)
-		workspace := "test-workspace"
 
-		dateRange := db.PaymentDateRange{
-			StartDate: "1111",
-			EndDate:   "2222",
-		}
 		body, _ := json.Marshal(dateRange)
-		req, err := http.NewRequestWithContext(ctx, http.MethodPost, "/bounty_stats?workspace="+workspace, bytes.NewReader(body))
+		req, err := http.NewRequestWithContext(ctx, http.MethodPost, "/bounty_stats?workspace=workspace", bytes.NewReader(body))
 		if err != nil {
 			t.Fatal(err)
 		}
-		mockDb.On("TotalBountiesPosted", dateRange, workspace).Return(int64(1)).Once()
-		mockDb.On("TotalPaidBounties", dateRange, workspace).Return(int64(1)).Once()
-		mockDb.On("TotalAssignedBounties", dateRange, workspace).Return(int64(2)).Once()
-		mockDb.On("BountiesPaidPercentage", dateRange, workspace).Return(uint(1)).Once()
-		mockDb.On("TotalSatsPosted", dateRange, workspace).Return(uint(1)).Once()
-		mockDb.On("TotalSatsPaid", dateRange, workspace).Return(uint(1)).Once()
-		mockDb.On("SatsPaidPercentage", dateRange, workspace).Return(uint(1)).Once()
-		mockDb.On("AveragePaidTime", dateRange, workspace).Return(uint(1)).Once()
-		mockDb.On("AverageCompletedTime", dateRange, workspace).Return(uint(1)).Once()
-		mockDb.On("TotalHuntersPaid", dateRange, workspace).Return(int64(1)).Once()
-		mockDb.On("NewHuntersPaid", dateRange, workspace).Return(int64(1)).Once()
+
 		handler.ServeHTTP(rr, req)
+		assert.Equal(t, http.StatusOK, rr.Code)
 
 		expectedMetricRes := db.BountyMetrics{
-			BountiesPosted:         1,
-			BountiesPaid:           1,
-			BountiesAssigned:       2,
-			BountiesPaidPercentage: 1,
-			SatsPosted:             1,
-			SatsPaid:               1,
-			SatsPaidPercentage:     1,
-			AveragePaid:            1,
-			AverageCompleted:       1,
-			UniqueHuntersPaid:      1,
-			NewHuntersPaid:         1,
+			BountiesPosted:         4,
+			BountiesPaid:           2,
+			BountiesAssigned:       4,
+			BountiesPaidPercentage: 50,
+			SatsPosted:             250,
+			SatsPaid:               250,
+			SatsPaidPercentage:     100,
+			AveragePaid:            0,
+			AverageCompleted:       0,
+			UniqueHuntersPaid:      0,
+			NewHuntersPaid:         0,
 		}
+
 		var res db.BountyMetrics
 		_ = json.Unmarshal(rr.Body.Bytes(), &res)
 
 		assert.EqualValues(t, expectedMetricRes, res)
-		assert.Equal(t, http.StatusOK, rr.Code)
 	})
 }
 
