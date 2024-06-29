@@ -1808,6 +1808,15 @@ func TestPollInvoice(t *testing.T) {
 
 		ro.ServeHTTP(rr, req)
 
+		invData := db.TestDB.GetUserInvoiceData(invoice.PaymentRequest)
+		updatedBounty, err := db.TestDB.GetBountyByCreated(uint(invData.Created))
+		if err != nil {
+			t.Fatal(err)
+		}
+		updatedInvoice := db.TestDB.GetInvoice(invoice.PaymentRequest)
+
+		assert.True(t, updatedBounty.Paid, "Expected bounty to be marked as paid")
+		assert.True(t, updatedInvoice.Status, "Expected invoice status to be true")
 		assert.Equal(t, http.StatusOK, rr.Code)
 		mockHttpClient.AssertExpectations(t)
 	})
