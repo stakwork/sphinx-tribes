@@ -1797,3 +1797,10 @@ func (db database) DeleteUserInvoiceData(payment_request string) UserInvoiceData
 	db.db.Where("payment_request = ?", payment_request).Delete(&ms)
 	return ms
 }
+
+func (db database) DeleteAllBounties() error {
+	if err := db.db.Exec("DELETE FROM bounty").Error; err != nil {
+		return err
+	}
+	return nil
+}
