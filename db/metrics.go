@@ -60,8 +60,8 @@ func (db database) TotalSatsPaid(r PaymentDateRange, workspace string) uint {
 }
 
 func (db database) SatsPaidPercentage(r PaymentDateRange, workspace string) uint {
-	satsPosted := DB.TotalSatsPosted(r, workspace)
-	satsPaid := DB.TotalSatsPaid(r, workspace)
+	satsPosted := db.TotalSatsPosted(r, workspace)
+	satsPaid := db.TotalSatsPaid(r, workspace)
 	if satsPaid != 0 && satsPosted != 0 {
 		value := (satsPaid * 100) / satsPosted
 		paidPercentage := math.Round(float64(value))
@@ -143,8 +143,8 @@ func (db database) TotalBountiesPosted(r PaymentDateRange, workspace string) int
 }
 
 func (db database) BountiesPaidPercentage(r PaymentDateRange, workspace string) uint {
-	bountiesPosted := DB.TotalBountiesPosted(r, workspace)
-	bountiesPaid := DB.TotalPaidBounties(r, workspace)
+	bountiesPosted := db.TotalBountiesPosted(r, workspace)
+	bountiesPaid := db.TotalPaidBounties(r, workspace)
 	if bountiesPaid != 0 && bountiesPosted != 0 {
 		value := bountiesPaid * 100 / bountiesPosted
 		paidPercentage := math.Round(float64(value))
@@ -176,11 +176,11 @@ func (db database) PaidDifferenceCount(r PaymentDateRange, workspace string) int
 }
 
 func (db database) AveragePaidTime(r PaymentDateRange, workspace string) uint {
-	paidList := DB.PaidDifference(r, workspace)
-	paidCount := DB.PaidDifferenceCount(r, workspace)
+	paidList := db.PaidDifference(r, workspace)
+	paidCount := db.PaidDifferenceCount(r, workspace)
 	var paidSum uint
 	for _, diff := range paidList {
-		paidSum = uint(math.Round(diff.Diff))
+		paidSum += uint(math.Round(diff.Diff))
 	}
 	return CalculateAverageDays(paidCount, paidSum)
 }
@@ -208,11 +208,11 @@ func (db database) CompletedDifferenceCount(r PaymentDateRange, workspace string
 }
 
 func (db database) AverageCompletedTime(r PaymentDateRange, workspace string) uint {
-	paidList := DB.CompletedDifference(r, workspace)
-	paidCount := DB.CompletedDifferenceCount(r, workspace)
+	paidList := db.CompletedDifference(r, workspace)
+	paidCount := db.CompletedDifferenceCount(r, workspace)
 	var paidSum uint
 	for _, diff := range paidList {
-		paidSum = uint(math.Round(diff.Diff))
+		paidSum += uint(math.Round(diff.Diff))
 	}
 	return CalculateAverageDays(paidCount, paidSum)
 }
@@ -231,7 +231,7 @@ func (db database) GetBountiesByDateRange(r PaymentDateRange, re *http.Request) 
 	offset, limit, sortBy, direction, _ := utils.GetPaginationParams(re)
 	keys := re.URL.Query()
 	open := keys.Get("Open")
-	assingned := keys.Get("Assigned")
+	assigned := keys.Get("Assigned")
 	paid := keys.Get("Paid")
 	providers := keys.Get("provider")
 	workspace := keys.Get("workspace")
@@ -245,7 +245,7 @@ func (db database) GetBountiesByDateRange(r PaymentDateRange, re *http.Request) 
 	if open == "true" {
 		statusConditions = append(statusConditions, "assignee = '' AND paid != true")
 	}
-	if assingned == "true" {
+	if assigned == "true" {
 		statusConditions = append(statusConditions, "assignee != '' AND paid = false")
 	}
 	if paid == "true" {
@@ -262,7 +262,7 @@ func (db database) GetBountiesByDateRange(r PaymentDateRange, re *http.Request) 
 	if sortBy != "" && direction != "" {
 		orderQuery = "ORDER BY " + sortBy + " " + direction
 	} else {
-		orderQuery = " ORDER BY " + sortBy + "" + "DESC"
+		orderQuery = " ORDER BY " + sortBy + " DESC"
 	}
 	if limit > 1 {
 		limitQuery = fmt.Sprintf("LIMIT %d  OFFSET %d", limit, offset)
@@ -289,7 +289,7 @@ func (db database) GetBountiesByDateRange(r PaymentDateRange, re *http.Request) 
 func (db database) GetBountiesByDateRangeCount(r PaymentDateRange, re *http.Request) int64 {
 	keys := re.URL.Query()
 	open := keys.Get("Open")
-	assingned := keys.Get("Assigned")
+	assigned := keys.Get("Assigned")
 	paid := keys.Get("Paid")
 	providers := keys.Get("provider")
 	workspace := keys.Get("workspace")
@@ -299,7 +299,7 @@ func (db database) GetBountiesByDateRangeCount(r PaymentDateRange, re *http.Requ
 	if open == "true" {
 		statusConditions = append(statusConditions, "assignee = '' AND paid != true")
 	}
-	if assingned == "true" {
+	if assigned == "true" {
 		statusConditions = append(statusConditions, "assignee != '' AND paid = false")
 	}
 	if paid == "true" {
@@ -335,7 +335,7 @@ func (db database) GetBountiesProviders(r PaymentDateRange, re *http.Request) []
 	offset, limit, _, _, _ := utils.GetPaginationParams(re)
 	keys := re.URL.Query()
 	open := keys.Get("Open")
-	assingned := keys.Get("Assigned")
+	assigned := keys.Get("Assigned")
 	paid := keys.Get("Paid")
 	providers := keys.Get("provider")
 
@@ -346,7 +346,7 @@ func (db database) GetBountiesProviders(r PaymentDateRange, re *http.Request) []
 	if open == "true" {
 		statusConditions = append(statusConditions, "assignee = '' AND paid != true")
 	}
-	if assingned == "true" {
+	if assigned == "true" {
 		statusConditions = append(statusConditions, "assignee != '' AND paid = false")
 	}
 	if paid == "true" {
