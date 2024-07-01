@@ -8,6 +8,7 @@ import (
 	"math/rand"
 	"net/http"
 	"net/http/httptest"
+	"strconv"
 	"strings"
 	"testing"
 	"time"
@@ -930,7 +931,90 @@ func TestGetWorkspaceUsers(t *testing.T) {
 }
 
 func TestGetUserDropdownWorkspaces(t *testing.T) {
+	teardownSuite := SetupSuite(t)
+	defer teardownSuite(t)
 
+	db.TestDB.DeleteWorkSpaceAllData()
+
+	oHandler := NewWorkspaceHandler(db.TestDB)
+
+	person := db.Person{
+		Uuid:        uuid.New().String(),
+		OwnerAlias:  "test-alias",
+		UniqueName:  "test-unique-name",
+		OwnerPubKey: "test-pubkey",
+		PriceToMeet: 0,
+		Description: "test-description",
+	}
+	person2 := db.Person{
+		Uuid:        uuid.New().String(),
+		OwnerAlias:  "test-alias2",
+		UniqueName:  "test-unique-name2",
+		OwnerPubKey: "test-pubkey2",
+		PriceToMeet: 0,
+		Description: "test-description2",
+	}
+	db.TestDB.CreateOrEditPerson(person)
+	db.TestDB.CreateOrEditPerson(person2)
+
+	workspace := db.Workspace{
+		Uuid:        uuid.New().String(),
+		Name:        "test-workspace" + uuid.New().String(),
+		OwnerPubKey: person2.OwnerPubKey,
+		Github:      "https://github.com/test",
+		Website:     "https://www.testwebsite.com",
+		Description: "test-description",
+	}
+	db.TestDB.CreateOrEditWorkspace(workspace)
+	workspace = db.TestDB.GetWorkspaceByUuid(workspace.Uuid)
+	ctx := context.WithValue(context.Background(), auth.ContextKey, workspace.OwnerPubKey)
+
+	roles := []db.WorkspaceUserRoles{
+		{WorkspaceUuid: workspace.Uuid, OwnerPubKey: person2.OwnerPubKey, Role: "ADD BOUNTY"},
+		{WorkspaceUuid: workspace.Uuid, OwnerPubKey: person2.OwnerPubKey, Role: "UPDATE BOUNTY"},
+		{WorkspaceUuid: workspace.Uuid, OwnerPubKey: person2.OwnerPubKey, Role: "DELETE BOUNTY"},
+		{WorkspaceUuid: workspace.Uuid, OwnerPubKey: person2.OwnerPubKey, Role: "PAY BOUNTY"},
+	}
+	db.TestDB.CreateUserRoles(roles, workspace.Uuid, person2.OwnerPubKey)
+
+	dbPerson := db.TestDB.GetPersonByUuid(person2.Uuid)
+
+	handlerUserHasAccess := func(pubKeyFromAuth string, uuid string, role string) bool {
+		return true
+	}
+	oHandler.userHasAccess = handlerUserHasAccess
+
+	handlerUserHasManageBountyRoles := func(pubKeyFromAuth string, uuid string) bool {
+		return true
+	}
+	oHandler.userHasManageBountyRoles = handlerUserHasManageBountyRoles
+
+	rr := httptest.NewRecorder()
+	rctx := chi.NewRouteContext()
+	rctx.URLParams.Add("userId", strconv.Itoa(int(dbPerson.ID)))
+	req, err := http.NewRequestWithContext(context.WithValue(ctx, chi.RouteCtxKey, rctx), http.MethodGet, "/user/dropdown/"+strconv.Itoa(int(dbPerson.ID)), nil)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	handler := http.HandlerFunc(oHandler.GetUserDropdownWorkspaces)
+	handler.ServeHTTP(rr, req)
+
+	assert.Equal(t, http.StatusOK, rr.Code)
+
+	var responseWorkspaces []db.Workspace
+	err = json.Unmarshal(rr.Body.Bytes(), &responseWorkspaces)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	assert.NotEmpty(t, responseWorkspaces)
+	assert.Equal(t, workspace.Uuid, responseWorkspaces[0].Uuid)
+	assert.Equal(t, workspace.Name, responseWorkspaces[0].Name)
+	assert.Equal(t, workspace.OwnerPubKey, responseWorkspaces[0].OwnerPubKey)
+	assert.Equal(t, workspace.Github, responseWorkspaces[0].Github)
+	assert.Equal(t, workspace.Website, responseWorkspaces[0].Website)
+	assert.Equal(t, workspace.Description, responseWorkspaces[0].Description)
 }
 
 func TestCreateOrEditWorkspaceRepository(t *testing.T) {
