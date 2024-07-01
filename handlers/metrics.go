@@ -141,13 +141,15 @@ func (mh *metricHandler) BountyMetrics(w http.ResponseWriter, r *http.Request) {
 	check redis if cache id available for the date range
 	or add to redis
 	*/
-	if db.RedisError == nil {
+	if db.RedisError == nil && db.RedisClient != nil {
 		redisMetrics := db.GetMap(metricsKey)
 		if len(redisMetrics) != 0 {
 			w.WriteHeader(http.StatusOK)
 			json.NewEncoder(w).Encode(redisMetrics)
 			return
 		}
+	} else {
+		fmt.Println("Redis client is not initialized or there is an error with Redis")
 	}
 
 	totalBountiesPosted := mh.db.TotalBountiesPosted(request, workspace)
@@ -176,9 +178,11 @@ func (mh *metricHandler) BountyMetrics(w http.ResponseWriter, r *http.Request) {
 		NewHuntersPaid:         newHuntersPaid,
 	}
 
-	if db.RedisError == nil {
+	if db.RedisError == nil && db.RedisClient != nil {
 		metricsMap := structs.Map(bountyMetrics)
 		db.SetMap(metricsKey, metricsMap)
+	} else {
+		fmt.Println("Redis client is not initialized or there is an error with Redis")
 	}
 
 	w.WriteHeader(http.StatusOK)
