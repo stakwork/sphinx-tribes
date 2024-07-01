@@ -647,3 +647,43 @@ func TestGetWorkspaceBountiesCount(t *testing.T) {
 		assert.Equal(t, bounty, fetchedBounty[0])
 	})
 }
+
+func TestAddUserRoles(t *testing.T) {
+
+}
+
+func TestGetUserRoles(t *testing.T) {
+
+}
+
+func TestCreateWorkspaceUser(t *testing.T) {
+
+}
+
+func TestGetWorkspaceUsers(t *testing.T) {
+
+}
+
+func TestGetUserDropdownWorkspaces(t *testing.T) {
+
+}
+
+func TestCreateOrEditWorkspaceRepository(t *testing.T) {
+
+}
+
+func TestGetWorkspaceRepositorByWorkspaceUuid(t *testing.T) {
+
+}
+
+func TestGetWorkspaceRepoByWorkspaceUuidAndRepoUuid(t *testing.T) {
+
+}
+
+func GetFeaturesByWorkspaceUuid(t *testing.T) {
+
+}
+
+func TestDeleteWorkspaceRepository(t *testing.T) {
+
+}
