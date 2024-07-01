@@ -169,6 +169,13 @@ func CreateWorkspaceUser(w http.ResponseWriter, r *http.Request) {
 	workspaceUser := db.WorkspaceUsers{}
 	body, err := io.ReadAll(r.Body)
 	r.Body.Close()
+
+	if err != nil {
+		fmt.Println("[body] ", err)
+		w.WriteHeader(http.StatusNotAcceptable)
+		return
+	}
+
 	err = json.Unmarshal(body, &workspaceUser)
 
 	if workspaceUser.WorkspaceUuid == "" && workspaceUser.OrgUuid != "" {
@@ -278,6 +285,13 @@ func DeleteWorkspaceUser(w http.ResponseWriter, r *http.Request) {
 	workspaceUser := db.WorkspaceUsersData{}
 	body, err := io.ReadAll(r.Body)
 	r.Body.Close()
+
+	if err != nil {
+		fmt.Println("[body] ", err)
+		w.WriteHeader(http.StatusNotAcceptable)
+		return
+	}
+
 	err = json.Unmarshal(body, &workspaceUser)
 
 	if workspaceUser.WorkspaceUuid == "" && workspaceUser.OrgUuid != "" {
@@ -340,6 +354,13 @@ func AddUserRoles(w http.ResponseWriter, r *http.Request) {
 	roles := []db.WorkspaceUserRoles{}
 	body, err := io.ReadAll(r.Body)
 	r.Body.Close()
+
+	if err != nil {
+		fmt.Println("[body] ", err)
+		w.WriteHeader(http.StatusNotAcceptable)
+		return
+	}
+
 	err = json.Unmarshal(body, &roles)
 
 	if err != nil {
