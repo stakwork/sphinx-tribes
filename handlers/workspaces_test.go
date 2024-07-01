@@ -673,7 +673,77 @@ func TestCreateOrEditWorkspaceRepository(t *testing.T) {
 }
 
 func TestGetWorkspaceRepositorByWorkspaceUuid(t *testing.T) {
+	teardownSuite := SetupSuite(t)
+	defer teardownSuite(t)
 
+	oHandler := NewWorkspaceHandler(db.TestDB)
+
+	person := db.Person{
+		Uuid:        uuid.New().String(),
+		OwnerAlias:  "test-alias",
+		UniqueName:  "test-unique-name",
+		OwnerPubKey: "test-pubkey",
+		PriceToMeet: 0,
+		Description: "test-description",
+	}
+	db.TestDB.CreateOrEditPerson(person)
+
+	workspace := db.Workspace{
+		Uuid:        uuid.New().String(),
+		Name:        "test-workspace" + uuid.New().String(),
+		OwnerPubKey: person.OwnerPubKey,
+		Github:      "https://github.com/test",
+		Website:     "https://www.testwebsite.com",
+		Description: "test-description",
+	}
+	db.TestDB.CreateOrEditWorkspace(workspace)
+
+	// Create a workspace repository
+	repository := db.WorkspaceRepositories{
+		Uuid:          uuid.New().String(),
+		WorkspaceUuid: workspace.Uuid,
+		Name:          "test-repo",
+		Url:           "https://github.com/test-repo",
+	}
+	db.TestDB.CreateOrEditWorkspaceRepository(repository)
+
+	t.Run("should return error if user is not authorized", func(t *testing.T) {
+		rr := httptest.NewRecorder()
+		handler := http.HandlerFunc(oHandler.GetWorkspaceRepositorByWorkspaceUuid)
+
+		rctx := chi.NewRouteContext()
+		rctx.URLParams.Add("uuid", workspace.Uuid)
+		req, err := http.NewRequestWithContext(context.WithValue(context.Background(), chi.RouteCtxKey, rctx), http.MethodGet, "/repositories/"+workspace.Uuid, nil)
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		handler.ServeHTTP(rr, req)
+		assert.Equal(t, http.StatusUnauthorized, rr.Code)
+	})
+
+	t.Run("should return workspace repositories if user is authorized", func(t *testing.T) {
+		rr := httptest.NewRecorder()
+		handler := http.HandlerFunc(oHandler.GetWorkspaceRepositorByWorkspaceUuid)
+
+		rctx := chi.NewRouteContext()
+		rctx.URLParams.Add("uuid", workspace.Uuid)
+		ctx := context.WithValue(context.Background(), auth.ContextKey, person.OwnerPubKey)
+		req, err := http.NewRequestWithContext(context.WithValue(ctx, chi.RouteCtxKey, rctx), http.MethodGet, "/repositories/"+workspace.Uuid, nil)
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		handler.ServeHTTP(rr, req)
+		assert.Equal(t, http.StatusOK, rr.Code)
+
+		var returnedRepos []db.WorkspaceRepositories
+		err = json.Unmarshal(rr.Body.Bytes(), &returnedRepos)
+		assert.NoError(t, err)
+		assert.Len(t, returnedRepos, 1)
+		assert.Equal(t, repository.Name, returnedRepos[0].Name)
+		assert.Equal(t, repository.Url, returnedRepos[0].Url)
+	})
 }
 
 func TestGetWorkspaceRepoByWorkspaceUuidAndRepoUuid(t *testing.T) {
