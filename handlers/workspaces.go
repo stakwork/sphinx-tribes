@@ -161,7 +161,7 @@ func GetWorkspaceByUuid(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(workspace)
 }
 
-func CreateWorkspaceUser(w http.ResponseWriter, r *http.Request) {
+func (oh *workspaceHandler) CreateWorkspaceUser(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 	pubKeyFromAuth, _ := ctx.Value(auth.ContextKey).(string)
 	now := time.Now()
@@ -183,7 +183,7 @@ func CreateWorkspaceUser(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// get orgnanization
-	workspace := db.DB.GetWorkspaceByUuid(workspaceUser.WorkspaceUuid)
+	workspace := oh.db.GetWorkspaceByUuid(workspaceUser.WorkspaceUuid)
 
 	if err != nil {
 		fmt.Println("[workspaces] ", err)
@@ -212,7 +212,7 @@ func CreateWorkspaceUser(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// if not the orgnization admin
-	hasRole := db.UserHasAccess(pubKeyFromAuth, workspaceUser.WorkspaceUuid, db.AddUser)
+	hasRole := oh.userHasAccess(pubKeyFromAuth, workspaceUser.WorkspaceUuid, db.AddUser)
 	if !hasRole {
 		w.WriteHeader(http.StatusUnauthorized)
 		json.NewEncoder(w).Encode("Don't have access to add user")
@@ -220,7 +220,7 @@ func CreateWorkspaceUser(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// check if the user exists on peoples table
-	isUser := db.DB.GetPersonByPubkey(workspaceUser.OwnerPubKey)
+	isUser := oh.db.GetPersonByPubkey(workspaceUser.OwnerPubKey)
 	if isUser.OwnerPubKey != workspaceUser.OwnerPubKey {
 		w.WriteHeader(http.StatusUnauthorized)
 		json.NewEncoder(w).Encode("User doesn't exists in people")
@@ -228,7 +228,7 @@ func CreateWorkspaceUser(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// check if user already exists
-	userExists := db.DB.GetWorkspaceUser(workspaceUser.OwnerPubKey, workspaceUser.WorkspaceUuid)
+	userExists := oh.db.GetWorkspaceUser(workspaceUser.OwnerPubKey, workspaceUser.WorkspaceUuid)
 
 	if userExists.ID != 0 {
 		w.WriteHeader(http.StatusUnauthorized)
@@ -240,7 +240,7 @@ func CreateWorkspaceUser(w http.ResponseWriter, r *http.Request) {
 	workspaceUser.Updated = &now
 
 	// create user
-	user := db.DB.CreateWorkspaceUser(workspaceUser)
+	user := oh.db.CreateWorkspaceUser(workspaceUser)
 	w.WriteHeader(http.StatusOK)
 	json.NewEncoder(w).Encode(user)
 }
