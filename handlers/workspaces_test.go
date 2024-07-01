@@ -669,6 +669,124 @@ func TestGetUserDropdownWorkspaces(t *testing.T) {
 }
 
 func TestCreateOrEditWorkspaceRepository(t *testing.T) {
+	teardownSuite := SetupSuite(t)
+	defer teardownSuite(t)
+	oHandler := NewWorkspaceHandler(db.TestDB)
+
+	t.Run("should return error if a user is not authorized", func(t *testing.T) {
+		rr := httptest.NewRecorder()
+		handler := http.HandlerFunc(oHandler.CreateOrEditWorkspaceRepository)
+
+		bodyJson := []byte(`{"key": "value"}`)
+		ctx := context.WithValue(context.Background(), auth.ContextKey, "")
+		req, err := http.NewRequestWithContext(ctx, http.MethodPost, "/repositories", bytes.NewReader(bodyJson))
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		handler.ServeHTTP(rr, req)
+
+		assert.Equal(t, http.StatusUnauthorized, rr.Code)
+	})
+
+	t.Run("should return error if body is not a valid json", func(t *testing.T) {
+		rr := httptest.NewRecorder()
+		handler := http.HandlerFunc(oHandler.CreateOrEditWorkspaceRepository)
+
+		invalidJson := []byte(`{"key": "value"`)
+
+		ctx := context.WithValue(context.Background(), auth.ContextKey, "pub-key")
+
+		req, err := http.NewRequestWithContext(ctx, http.MethodPost, "/repositories", bytes.NewReader(invalidJson))
+		if err != nil {
+			t.Fatal(err)
+		}
+		handler.ServeHTTP(rr, req)
+		assert.Equal(t, http.StatusNotAcceptable, rr.Code)
+	})
+
+	t.Run("should return error if a Workspace UUID that does not exist Is passed to the API body", func(t *testing.T) {
+		rr := httptest.NewRecorder()
+		handler := http.HandlerFunc(oHandler.CreateOrEditWorkspaceRepository)
+
+		workspace := db.Workspace{
+			Uuid:        uuid.New().String(),
+			Name:        uuid.New().String(),
+			OwnerPubKey: "workspace_owner_bounties_pubkey",
+			Github:      "https://github.com/bounties",
+			Website:     "https://www.bountieswebsite.com",
+			Description: "Workspace Bounties Description",
+		}
+		db.TestDB.CreateOrEditWorkspace(workspace)
+
+		repository := db.WorkspaceRepositories{
+			Uuid:          uuid.New().String(),
+			WorkspaceUuid: "wrongid",
+			Name:          "workspacerepo",
+			Url:           "https://github.com/bounties",
+		}
+
+		db.TestDB.CreateOrEditWorkspaceRepository(repository)
+		requestBody, _ := json.Marshal(repository)
+
+		ctx := context.WithValue(context.Background(), auth.ContextKey, "pub-key")
+
+		req, err := http.NewRequestWithContext(ctx, http.MethodPost, "/repositories", bytes.NewReader(requestBody))
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		handler.ServeHTTP(rr, req)
+		assert.Equal(t, http.StatusUnauthorized, rr.Code)
+	})
+
+	t.Run("user should be able to add a workspace repository when the right conditions are met", func(t *testing.T) {
+		rr := httptest.NewRecorder()
+		handler := http.HandlerFunc(oHandler.CreateOrEditWorkspaceRepository)
+
+		workspace := db.Workspace{
+			Uuid:        uuid.New().String(),
+			Name:        uuid.New().String(),
+			OwnerPubKey: "workspace_owner_bounties_pubkey",
+			Github:      "https://github.com/bounties",
+			Website:     "https://www.bountieswebsite.com",
+			Description: "Workspace Bounties Description",
+		}
+		db.TestDB.CreateOrEditWorkspace(workspace)
+
+		repository := db.WorkspaceRepositories{
+			Uuid:          uuid.New().String(),
+			WorkspaceUuid: workspace.Uuid,
+			Name:          "workspacerepo",
+			Url:           "https://github.com/bounties",
+		}
+
+		db.TestDB.CreateOrEditWorkspaceRepository(repository)
+		requestBody, _ := json.Marshal(repository)
+
+		ctx := context.WithValue(context.Background(), auth.ContextKey, "pub-key")
+
+		req, err := http.NewRequestWithContext(ctx, http.MethodPost, "/repositories", bytes.NewReader(requestBody))
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		getWorkspaceRepo := db.TestDB.GetWorkspaceRepositorByWorkspaceUuid(workspace.Uuid)
+
+		handler.ServeHTTP(rr, req)
+
+		var returnedWorkspaceRepo db.WorkspaceRepositories
+		err = json.Unmarshal(rr.Body.Bytes(), &returnedWorkspaceRepo)
+		assert.NoError(t, err)
+
+		assert.Equal(t, http.StatusOK, rr.Code)
+		// Assert that the workspace repository is created by using the GetWorkspaceRepositorByWorkspaceUuid function
+		assert.Equal(t, repository.Name, getWorkspaceRepo[0].Name)
+		assert.Equal(t, repository.Url, getWorkspaceRepo[0].Url)
+		// Assert that the Name and Url  of the repository returned matches what was sent in the API body.
+		assert.Equal(t, repository.Name, returnedWorkspaceRepo.Name)
+		assert.Equal(t, repository.Url, returnedWorkspaceRepo.Url)
+	})
 
 }
 
