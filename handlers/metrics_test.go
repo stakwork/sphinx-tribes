@@ -60,7 +60,7 @@ func TestBountyMetrics(t *testing.T) {
 		Title:         "Bounty With ID 2",
 		Description:   "Bounty ID 2 Description",
 		WorkspaceUuid: "workspace",
-		Assignee:      "ali",
+		Assignee:      "raza",
 		OwnerID:       person.OwnerPubKey,
 		Show:          true,
 		Created:       now.AddDate(0, 0, -20).Unix(),
@@ -143,18 +143,30 @@ func TestBountyMetrics(t *testing.T) {
 		handler.ServeHTTP(rr, req)
 		assert.Equal(t, http.StatusOK, rr.Code)
 
+		totalBountiesPosted := int64(4)
+		totalBountiesPaid := int64(2)
+		totalBountiesAssigned := int64(2)
+		bountiesPaidPercentage := uint((totalBountiesPaid * 100) / totalBountiesPosted)
+		totalSatsPosted := bounty1.Price + bounty2.Price + bounty3.Price + bounty4.Price
+		totalSatsPaid := bounty1.Price + bounty2.Price
+		satsPaidPercentage := uint((totalSatsPaid * 100) / totalSatsPosted)
+		avgPaidDays := uint(0)
+		avgCompletedDays := uint(0)
+		uniqueHuntersPaid := int64(2)
+		newHuntersPaid := int64(2)
+
 		expectedMetricRes := db.BountyMetrics{
-			BountiesPosted:         4,
-			BountiesPaid:           2,
-			BountiesAssigned:       4,
-			BountiesPaidPercentage: 50,
-			SatsPosted:             250,
-			SatsPaid:               250,
-			SatsPaidPercentage:     100,
-			AveragePaid:            0,
-			AverageCompleted:       0,
-			UniqueHuntersPaid:      0,
-			NewHuntersPaid:         0,
+			BountiesPosted:         totalBountiesPosted,
+			BountiesPaid:           int64(totalBountiesPaid),
+			BountiesAssigned:       int64(totalBountiesAssigned),
+			BountiesPaidPercentage: bountiesPaidPercentage,
+			SatsPosted:             uint(totalSatsPosted),
+			SatsPaid:               uint(totalSatsPaid),
+			SatsPaidPercentage:     satsPaidPercentage,
+			AveragePaid:            avgPaidDays,
+			AverageCompleted:       avgCompletedDays,
+			UniqueHuntersPaid:      uniqueHuntersPaid,
+			NewHuntersPaid:         newHuntersPaid,
 		}
 
 		var res db.BountyMetrics
