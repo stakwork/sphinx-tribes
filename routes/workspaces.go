@@ -25,7 +25,7 @@ func WorkspaceRoutes() chi.Router {
 		r.Use(auth.PubKeyContext)
 
 		r.Post("/", workspaceHandlers.CreateOrEditWorkspace)
-		r.Post("/users/{uuid}", handlers.CreateWorkspaceUser)
+		r.Post("/users/{uuid}", workspaceHandlers.CreateWorkspaceUser)
 		r.Delete("/users/{uuid}", handlers.DeleteWorkspaceUser)
 		r.Post("/users/role/{uuid}/{user}", handlers.AddUserRoles)
 
