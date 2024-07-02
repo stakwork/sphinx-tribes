@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"context"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"io"
 	"log"
@@ -11,15 +12,19 @@ import (
 	"net/http/httptest"
 	"strconv"
 	"strings"
+	"sync"
 	"testing"
 	"time"
 
-	"github.com/go-chi/chi"
 	"github.com/gorilla/websocket"
+	"github.com/stakwork/sphinx-tribes/utils"
+
+	"github.com/go-chi/chi"
 	"github.com/stakwork/sphinx-tribes/auth"
 	"github.com/stakwork/sphinx-tribes/config"
 	"github.com/stakwork/sphinx-tribes/db"
 	"github.com/stakwork/sphinx-tribes/handlers/mocks"
+	dbMocks "github.com/stakwork/sphinx-tribes/mocks"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
 )
@@ -334,117 +339,117 @@ func TestCreateOrEditBounty(t *testing.T) {
 	})
 }
 
-//func TestPayLightningInvoice(t *testing.T) {
-//	expectedUrl := fmt.Sprintf("%s/invoices", config.RelayUrl)
-//	expectedBody := `{"payment_request": "req-id"}`
-//
-//	t.Run("validate request url, body and headers", func(t *testing.T) {
-//		mockHttpClient := &mocks.HttpClient{}
-//		mockDb := &dbMocks.Database{}
-//		handler := NewBountyHandler(mockHttpClient, mockDb)
-//		mockHttpClient.On("Do", mock.MatchedBy(func(req *http.Request) bool {
-//			bodyByt, _ := io.ReadAll(req.Body)
-//			return req.Method == http.MethodPut && expectedUrl == req.URL.String() && req.Header.Get("x-user-token") == config.RelayAuthKey && expectedBody == string(bodyByt)
-//		})).Return(nil, errors.New("some-error")).Once()
-//
-//		success, invoicePayErr := handler.PayLightningInvoice("req-id")
-//
-//		assert.Empty(t, invoicePayErr)
-//		assert.Empty(t, success)
-//		mockHttpClient.AssertExpectations(t)
-//	})
-//
-//	t.Run("put on invoice request failed with error status and invalid json", func(t *testing.T) {
-//		mockHttpClient := &mocks.HttpClient{}
-//		mockDb := &dbMocks.Database{}
-//		handler := NewBountyHandler(mockHttpClient, mockDb)
-//		r := io.NopCloser(bytes.NewReader([]byte(`"internal server error"`)))
-//		mockHttpClient.On("Do", mock.MatchedBy(func(req *http.Request) bool {
-//			bodyByt, _ := io.ReadAll(req.Body)
-//			return req.Method == http.MethodPut && expectedUrl == req.URL.String() && req.Header.Get("x-user-token") == config.RelayAuthKey && expectedBody == string(bodyByt)
-//		})).Return(&http.Response{
-//			StatusCode: 500,
-//			Body:       r,
-//		}, nil)
-//
-//		success, invoicePayErr := handler.PayLightningInvoice("req-id")
-//
-//		assert.False(t, invoicePayErr.Success)
-//		assert.Empty(t, success)
-//		mockHttpClient.AssertExpectations(t)
-//	})
-//
-//	t.Run("put on invoice request failed with error status", func(t *testing.T) {
-//		mockHttpClient := &mocks.HttpClient{}
-//		mockDb := &dbMocks.Database{}
-//		handler := NewBountyHandler(mockHttpClient, mockDb)
-//		r := io.NopCloser(bytes.NewReader([]byte(`{"error": "internal server error"}`)))
-//		mockHttpClient.On("Do", mock.MatchedBy(func(req *http.Request) bool {
-//			bodyByt, _ := io.ReadAll(req.Body)
-//			return req.Method == http.MethodPut && expectedUrl == req.URL.String() && req.Header.Get("x-user-token") == config.RelayAuthKey && expectedBody == string(bodyByt)
-//		})).Return(&http.Response{
-//			StatusCode: 500,
-//			Body:       r,
-//		}, nil).Once()
-//
-//		success, invoicePayErr := handler.PayLightningInvoice("req-id")
-//
-//		assert.Equal(t, invoicePayErr.Error, "internal server error")
-//		assert.Empty(t, success)
-//		mockHttpClient.AssertExpectations(t)
-//	})
-//
-//	t.Run("put on invoice request succeed with invalid json", func(t *testing.T) {
-//		mockHttpClient := &mocks.HttpClient{}
-//		mockDb := &dbMocks.Database{}
-//		handler := NewBountyHandler(mockHttpClient, mockDb)
-//		r := io.NopCloser(bytes.NewReader([]byte(`"invalid json"`)))
-//		mockHttpClient.On("Do", mock.MatchedBy(func(req *http.Request) bool {
-//			bodyByt, _ := io.ReadAll(req.Body)
-//			return req.Method == http.MethodPut && expectedUrl == req.URL.String() && req.Header.Get("x-user-token") == config.RelayAuthKey && expectedBody == string(bodyByt)
-//		})).Return(&http.Response{
-//			StatusCode: 200,
-//			Body:       r,
-//		}, nil).Once()
-//
-//		success, invoicePayErr := handler.PayLightningInvoice("req-id")
-//
-//		assert.False(t, success.Success)
-//		assert.Empty(t, invoicePayErr)
-//		mockHttpClient.AssertExpectations(t)
-//	})
-//
-//	t.Run("should unmarshal the response properly after success", func(t *testing.T) {
-//		mockHttpClient := &mocks.HttpClient{}
-//		mockDb := &dbMocks.Database{}
-//		handler := NewBountyHandler(mockHttpClient, mockDb)
-//		r := io.NopCloser(bytes.NewReader([]byte(`{"success": true, "response": { "settled": true, "payment_request": "req", "payment_hash": "hash", "preimage": "random-string", "amount": "1000"}}`)))
-//		expectedSuccessMsg := db.InvoicePaySuccess{
-//			Success: true,
-//			Response: db.InvoiceCheckResponse{
-//				Settled:         true,
-//				Payment_request: "req",
-//				Payment_hash:    "hash",
-//				Preimage:        "random-string",
-//				Amount:          "1000",
-//			},
-//		}
-//		mockHttpClient.On("Do", mock.MatchedBy(func(req *http.Request) bool {
-//			bodyByt, _ := io.ReadAll(req.Body)
-//			return req.Method == http.MethodPut && expectedUrl == req.URL.String() && req.Header.Get("x-user-token") == config.RelayAuthKey && expectedBody == string(bodyByt)
-//		})).Return(&http.Response{
-//			StatusCode: 200,
-//			Body:       r,
-//		}, nil).Once()
-//
-//		success, invoicePayErr := handler.PayLightningInvoice("req-id")
-//
-//		assert.Empty(t, invoicePayErr)
-//		assert.EqualValues(t, expectedSuccessMsg, success)
-//		mockHttpClient.AssertExpectations(t)
-//	})
-//
-//}
+func TestPayLightningInvoice(t *testing.T) {
+	expectedUrl := fmt.Sprintf("%s/invoices", config.RelayUrl)
+	expectedBody := `{"payment_request": "req-id"}`
+
+	t.Run("validate request url, body and headers", func(t *testing.T) {
+		mockHttpClient := &mocks.HttpClient{}
+		mockDb := &dbMocks.Database{}
+		handler := NewBountyHandler(mockHttpClient, mockDb)
+		mockHttpClient.On("Do", mock.MatchedBy(func(req *http.Request) bool {
+			bodyByt, _ := io.ReadAll(req.Body)
+			return req.Method == http.MethodPut && expectedUrl == req.URL.String() && req.Header.Get("x-user-token") == config.RelayAuthKey && expectedBody == string(bodyByt)
+		})).Return(nil, errors.New("some-error")).Once()
+
+		success, invoicePayErr := handler.PayLightningInvoice("req-id")
+
+		assert.Empty(t, invoicePayErr)
+		assert.Empty(t, success)
+		mockHttpClient.AssertExpectations(t)
+	})
+
+	t.Run("put on invoice request failed with error status and invalid json", func(t *testing.T) {
+		mockHttpClient := &mocks.HttpClient{}
+		mockDb := &dbMocks.Database{}
+		handler := NewBountyHandler(mockHttpClient, mockDb)
+		r := io.NopCloser(bytes.NewReader([]byte(`"internal server error"`)))
+		mockHttpClient.On("Do", mock.MatchedBy(func(req *http.Request) bool {
+			bodyByt, _ := io.ReadAll(req.Body)
+			return req.Method == http.MethodPut && expectedUrl == req.URL.String() && req.Header.Get("x-user-token") == config.RelayAuthKey && expectedBody == string(bodyByt)
+		})).Return(&http.Response{
+			StatusCode: 500,
+			Body:       r,
+		}, nil)
+
+		success, invoicePayErr := handler.PayLightningInvoice("req-id")
+
+		assert.False(t, invoicePayErr.Success)
+		assert.Empty(t, success)
+		mockHttpClient.AssertExpectations(t)
+	})
+
+	t.Run("put on invoice request failed with error status", func(t *testing.T) {
+		mockHttpClient := &mocks.HttpClient{}
+		mockDb := &dbMocks.Database{}
+		handler := NewBountyHandler(mockHttpClient, mockDb)
+		r := io.NopCloser(bytes.NewReader([]byte(`{"error": "internal server error"}`)))
+		mockHttpClient.On("Do", mock.MatchedBy(func(req *http.Request) bool {
+			bodyByt, _ := io.ReadAll(req.Body)
+			return req.Method == http.MethodPut && expectedUrl == req.URL.String() && req.Header.Get("x-user-token") == config.RelayAuthKey && expectedBody == string(bodyByt)
+		})).Return(&http.Response{
+			StatusCode: 500,
+			Body:       r,
+		}, nil).Once()
+
+		success, invoicePayErr := handler.PayLightningInvoice("req-id")
+
+		assert.Equal(t, invoicePayErr.Error, "internal server error")
+		assert.Empty(t, success)
+		mockHttpClient.AssertExpectations(t)
+	})
+
+	t.Run("put on invoice request succeed with invalid json", func(t *testing.T) {
+		mockHttpClient := &mocks.HttpClient{}
+		mockDb := &dbMocks.Database{}
+		handler := NewBountyHandler(mockHttpClient, mockDb)
+		r := io.NopCloser(bytes.NewReader([]byte(`"invalid json"`)))
+		mockHttpClient.On("Do", mock.MatchedBy(func(req *http.Request) bool {
+			bodyByt, _ := io.ReadAll(req.Body)
+			return req.Method == http.MethodPut && expectedUrl == req.URL.String() && req.Header.Get("x-user-token") == config.RelayAuthKey && expectedBody == string(bodyByt)
+		})).Return(&http.Response{
+			StatusCode: 200,
+			Body:       r,
+		}, nil).Once()
+
+		success, invoicePayErr := handler.PayLightningInvoice("req-id")
+
+		assert.False(t, success.Success)
+		assert.Empty(t, invoicePayErr)
+		mockHttpClient.AssertExpectations(t)
+	})
+
+	t.Run("should unmarshal the response properly after success", func(t *testing.T) {
+		mockHttpClient := &mocks.HttpClient{}
+		mockDb := &dbMocks.Database{}
+		handler := NewBountyHandler(mockHttpClient, mockDb)
+		r := io.NopCloser(bytes.NewReader([]byte(`{"success": true, "response": { "settled": true, "payment_request": "req", "payment_hash": "hash", "preimage": "random-string", "amount": "1000"}}`)))
+		expectedSuccessMsg := db.InvoicePaySuccess{
+			Success: true,
+			Response: db.InvoiceCheckResponse{
+				Settled:         true,
+				Payment_request: "req",
+				Payment_hash:    "hash",
+				Preimage:        "random-string",
+				Amount:          "1000",
+			},
+		}
+		mockHttpClient.On("Do", mock.MatchedBy(func(req *http.Request) bool {
+			bodyByt, _ := io.ReadAll(req.Body)
+			return req.Method == http.MethodPut && expectedUrl == req.URL.String() && req.Header.Get("x-user-token") == config.RelayAuthKey && expectedBody == string(bodyByt)
+		})).Return(&http.Response{
+			StatusCode: 200,
+			Body:       r,
+		}, nil).Once()
+
+		success, invoicePayErr := handler.PayLightningInvoice("req-id")
+
+		assert.Empty(t, invoicePayErr)
+		assert.EqualValues(t, expectedSuccessMsg, success)
+		mockHttpClient.AssertExpectations(t)
+	})
+
+}
 
 func TestDeleteBounty(t *testing.T) {
 	teardownSuite := SetupSuite(t)
@@ -555,89 +560,89 @@ func TestDeleteBounty(t *testing.T) {
 	})
 }
 
-//func TestGetBountyByCreated(t *testing.T) {
-//	mockDb := dbMocks.NewDatabase(t)
-//	mockHttpClient := mocks.NewHttpClient(t)
-//	bHandler := NewBountyHandler(mockHttpClient, mockDb)
-//
-//	t.Run("Should return bounty by its created value", func(t *testing.T) {
-//		mockGenerateBountyResponse := func(bounties []db.NewBounty) []db.BountyResponse {
-//			var bountyResponses []db.BountyResponse
-//
-//			for _, bounty := range bounties {
-//				owner := db.Person{
-//					ID: 1,
-//				}
-//				assignee := db.Person{
-//					ID: 1,
-//				}
-//				workspace := db.WorkspaceShort{
-//					Uuid: "uuid",
-//				}
-//
-//				bountyResponse := db.BountyResponse{
-//					Bounty:       bounty,
-//					Assignee:     assignee,
-//					Owner:        owner,
-//					Organization: workspace,
-//					Workspace:    workspace,
-//				}
-//				bountyResponses = append(bountyResponses, bountyResponse)
-//			}
-//
-//			return bountyResponses
-//		}
-//		bHandler.generateBountyResponse = mockGenerateBountyResponse
-//
-//		rr := httptest.NewRecorder()
-//		handler := http.HandlerFunc(bHandler.GetBountyByCreated)
-//		bounty := db.NewBounty{
-//			ID:            1,
-//			Type:          "coding",
-//			Title:         "first bounty",
-//			Description:   "first bounty description",
-//			OrgUuid:       "org-1",
-//			WorkspaceUuid: "work-1",
-//			Assignee:      "user1",
-//			Created:       1707991475,
-//			OwnerID:       "owner-1",
-//		}
-//		createdStr := strconv.FormatInt(bounty.Created, 10)
-//
-//		rctx := chi.NewRouteContext()
-//		rctx.URLParams.Add("created", "1707991475")
-//		req, _ := http.NewRequestWithContext(context.WithValue(context.Background(), chi.RouteCtxKey, rctx), http.MethodGet, "/created/1707991475", nil)
-//		mockDb.On("GetBountyDataByCreated", createdStr).Return([]db.NewBounty{bounty}, nil).Once()
-//		mockDb.On("GetPersonByPubkey", "owner-1").Return(db.Person{}).Once()
-//		mockDb.On("GetPersonByPubkey", "user1").Return(db.Person{}).Once()
-//		mockDb.On("GetWorkspaceByUuid", "work-1").Return(db.Workspace{}).Once()
-//		handler.ServeHTTP(rr, req)
-//
-//		var returnedBounty []db.BountyResponse
-//		err := json.Unmarshal(rr.Body.Bytes(), &returnedBounty)
-//		assert.NoError(t, err)
-//		assert.Equal(t, http.StatusOK, rr.Code)
-//		assert.NotEmpty(t, returnedBounty)
-//
-//	})
-//	t.Run("Should return 404 if bounty is not present in db", func(t *testing.T) {
-//		rr := httptest.NewRecorder()
-//		handler := http.HandlerFunc(bHandler.GetBountyByCreated)
-//		createdStr := ""
-//
-//		rctx := chi.NewRouteContext()
-//		rctx.URLParams.Add("created", createdStr)
-//		req, _ := http.NewRequestWithContext(context.WithValue(context.Background(), chi.RouteCtxKey, rctx), http.MethodGet, "/created/"+createdStr, nil)
-//
-//		mockDb.On("GetBountyDataByCreated", createdStr).Return([]db.NewBounty{}, nil).Once()
-//
-//		handler.ServeHTTP(rr, req)
-//		assert.Equal(t, http.StatusNotFound, rr.Code, "Expected 404 Not Found for nonexistent bounty")
-//
-//		mockDb.AssertExpectations(t)
-//	})
-//
-//}
+func TestGetBountyByCreated(t *testing.T) {
+	mockDb := dbMocks.NewDatabase(t)
+	mockHttpClient := mocks.NewHttpClient(t)
+	bHandler := NewBountyHandler(mockHttpClient, mockDb)
+
+	t.Run("Should return bounty by its created value", func(t *testing.T) {
+		mockGenerateBountyResponse := func(bounties []db.NewBounty) []db.BountyResponse {
+			var bountyResponses []db.BountyResponse
+
+			for _, bounty := range bounties {
+				owner := db.Person{
+					ID: 1,
+				}
+				assignee := db.Person{
+					ID: 1,
+				}
+				workspace := db.WorkspaceShort{
+					Uuid: "uuid",
+				}
+
+				bountyResponse := db.BountyResponse{
+					Bounty:       bounty,
+					Assignee:     assignee,
+					Owner:        owner,
+					Organization: workspace,
+					Workspace:    workspace,
+				}
+				bountyResponses = append(bountyResponses, bountyResponse)
+			}
+
+			return bountyResponses
+		}
+		bHandler.generateBountyResponse = mockGenerateBountyResponse
+
+		rr := httptest.NewRecorder()
+		handler := http.HandlerFunc(bHandler.GetBountyByCreated)
+		bounty := db.NewBounty{
+			ID:            1,
+			Type:          "coding",
+			Title:         "first bounty",
+			Description:   "first bounty description",
+			OrgUuid:       "org-1",
+			WorkspaceUuid: "work-1",
+			Assignee:      "user1",
+			Created:       1707991475,
+			OwnerID:       "owner-1",
+		}
+		createdStr := strconv.FormatInt(bounty.Created, 10)
+
+		rctx := chi.NewRouteContext()
+		rctx.URLParams.Add("created", "1707991475")
+		req, _ := http.NewRequestWithContext(context.WithValue(context.Background(), chi.RouteCtxKey, rctx), http.MethodGet, "/created/1707991475", nil)
+		mockDb.On("GetBountyDataByCreated", createdStr).Return([]db.NewBounty{bounty}, nil).Once()
+		mockDb.On("GetPersonByPubkey", "owner-1").Return(db.Person{}).Once()
+		mockDb.On("GetPersonByPubkey", "user1").Return(db.Person{}).Once()
+		mockDb.On("GetWorkspaceByUuid", "work-1").Return(db.Workspace{}).Once()
+		handler.ServeHTTP(rr, req)
+
+		var returnedBounty []db.BountyResponse
+		err := json.Unmarshal(rr.Body.Bytes(), &returnedBounty)
+		assert.NoError(t, err)
+		assert.Equal(t, http.StatusOK, rr.Code)
+		assert.NotEmpty(t, returnedBounty)
+
+	})
+	t.Run("Should return 404 if bounty is not present in db", func(t *testing.T) {
+		rr := httptest.NewRecorder()
+		handler := http.HandlerFunc(bHandler.GetBountyByCreated)
+		createdStr := ""
+
+		rctx := chi.NewRouteContext()
+		rctx.URLParams.Add("created", createdStr)
+		req, _ := http.NewRequestWithContext(context.WithValue(context.Background(), chi.RouteCtxKey, rctx), http.MethodGet, "/created/"+createdStr, nil)
+
+		mockDb.On("GetBountyDataByCreated", createdStr).Return([]db.NewBounty{}, nil).Once()
+
+		handler.ServeHTTP(rr, req)
+		assert.Equal(t, http.StatusNotFound, rr.Code, "Expected 404 Not Found for nonexistent bounty")
+
+		mockDb.AssertExpectations(t)
+	})
+
+}
 
 func TestGetPersonAssignedBounties(t *testing.T) {
 	teardownSuite := SetupSuite(t)
@@ -1170,515 +1175,515 @@ func MockNewWSServer(t *testing.T) (*httptest.Server, *websocket.Conn) {
 	return s, ws
 }
 
-//func TestMakeBountyPayment(t *testing.T) {
-//	ctx := context.Background()
-//	mockDb := &dbMocks.Database{}
-//	mockHttpClient := &mocks.HttpClient{}
-//	mockUserHasAccessTrue := func(pubKeyFromAuth string, uuid string, role string) bool {
-//		return true
-//	}
-//	mockUserHasAccessFalse := func(pubKeyFromAuth string, uuid string, role string) bool {
-//		return false
-//	}
-//	mockGetSocketConnections := func(host string) (db.Client, error) {
-//		s, ws := MockNewWSServer(t)
-//		defer s.Close()
-//		defer ws.Close()
-//
-//		mockClient := db.Client{
-//			Host: "mocked_host",
-//			Conn: ws,
-//		}
-//
-//		return mockClient, nil
-//	}
-//	bHandler := NewBountyHandler(mockHttpClient, mockDb)
-//
-//	unauthorizedCtx := context.WithValue(ctx, auth.ContextKey, "")
-//	authorizedCtx := context.WithValue(ctx, auth.ContextKey, "valid-key")
-//
-//	var mutex sync.Mutex
-//	var processingTimes []time.Time
-//
-//	bountyID := uint(1)
-//	bounty := db.NewBounty{
-//		ID:            bountyID,
-//		OrgUuid:       "org-1",
-//		WorkspaceUuid: "work-1",
-//		Assignee:      "assignee-1",
-//		Price:         uint(1000),
-//	}
-//
-//	t.Run("mutex lock ensures sequential access", func(t *testing.T) {
-//		server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-//			mutex.Lock()
-//			processingTimes = append(processingTimes, time.Now())
-//			time.Sleep(10 * time.Millisecond)
-//			mutex.Unlock()
-//
-//			bHandler.MakeBountyPayment(w, r)
-//		}))
-//		defer server.Close()
-//
-//		var wg sync.WaitGroup
-//		for i := 0; i < 3; i++ {
-//			wg.Add(1)
-//			go func() {
-//				defer wg.Done()
-//				_, err := http.Get(server.URL)
-//				if err != nil {
-//					t.Errorf("Failed to send request: %v", err)
-//				}
-//			}()
-//		}
-//		wg.Wait()
-//
-//		for i := 1; i < len(processingTimes); i++ {
-//			assert.True(t, processingTimes[i].After(processingTimes[i-1]),
-//				"Expected processing times to be sequential, indicating mutex is locking effectively.")
-//		}
-//	})
-//
-//	t.Run("401 unauthorized error when unauthorized user hits endpoint", func(t *testing.T) {
-//
-//		r := chi.NewRouter()
-//		r.Post("/gobounties/pay/{id}", bHandler.MakeBountyPayment)
-//
-//		rr := httptest.NewRecorder()
-//		req, err := http.NewRequestWithContext(unauthorizedCtx, http.MethodPost, "/gobounties/pay/1", nil)
-//
-//		if err != nil {
-//			t.Fatal(err)
-//		}
-//
-//		r.ServeHTTP(rr, req)
-//
-//		assert.Equal(t, http.StatusUnauthorized, rr.Code, "Expected 401 Unauthorized for unauthorized access")
-//		mockDb.AssertExpectations(t)
-//	})
-//
-//	t.Run("405 when trying to pay an already-paid bounty", func(t *testing.T) {
-//		mockDb.ExpectedCalls = nil
-//		mockDb.On("GetBounty", mock.AnythingOfType("uint")).Return(db.NewBounty{
-//			ID:            1,
-//			Price:         1000,
-//			OrgUuid:       "org-1",
-//			WorkspaceUuid: "work-1",
-//			Assignee:      "assignee-1",
-//			Paid:          true,
-//		}, nil)
-//
-//		r := chi.NewRouter()
-//		r.Post("/gobounties/pay/{id}", bHandler.MakeBountyPayment)
-//
-//		requestBody := bytes.NewBuffer([]byte("{}"))
-//		rr := httptest.NewRecorder()
-//		req, err := http.NewRequestWithContext(authorizedCtx, http.MethodPost, "/gobounties/pay/1", requestBody)
-//		if err != nil {
-//			t.Fatal(err)
-//		}
-//
-//		r.ServeHTTP(rr, req)
-//		assert.Equal(t, http.StatusMethodNotAllowed, rr.Code, "Expected 405 Method Not Allowed for an already-paid bounty")
-//		mockDb.AssertExpectations(t)
-//	})
-//
-//	t.Run("401 error if user not workspace admin or does not have PAY BOUNTY role", func(t *testing.T) {
-//		bHandler.userHasAccess = mockUserHasAccessFalse
-//
-//		mockDb.On("GetBounty", mock.AnythingOfType("uint")).Return(db.NewBounty{
-//			ID:            1,
-//			Price:         1000,
-//			OrgUuid:       "org-1",
-//			WorkspaceUuid: "work-1",
-//			Assignee:      "assignee-1",
-//			Paid:          false,
-//		}, nil)
-//
-//		r := chi.NewRouter()
-//		r.Post("/gobounties/pay/{id}", bHandler.MakeBountyPayment)
-//
-//		rr := httptest.NewRecorder()
-//		req, err := http.NewRequestWithContext(unauthorizedCtx, http.MethodPost, "/gobounties/pay/1", bytes.NewBufferString(`{}`))
-//		if err != nil {
-//			t.Fatal(err)
-//		}
-//
-//		r.ServeHTTP(rr, req)
-//
-//		assert.Equal(t, http.StatusUnauthorized, rr.Code, "Expected 401 Unauthorized when the user lacks the PAY BOUNTY role")
-//
-//	})
-//
-//	t.Run("403 error when amount exceeds workspace's budget balance", func(t *testing.T) {
-//		ctx := context.WithValue(context.Background(), auth.ContextKey, "valid-key")
-//
-//		mockDb := dbMocks.NewDatabase(t)
-//		mockHttpClient := mocks.NewHttpClient(t)
-//		bHandler := NewBountyHandler(mockHttpClient, mockDb)
-//		bHandler.userHasAccess = mockUserHasAccessTrue
-//		mockDb.On("GetBounty", mock.AnythingOfType("uint")).Return(db.NewBounty{
-//			ID:            1,
-//			Price:         1000,
-//			OrgUuid:       "org-1",
-//			WorkspaceUuid: "work-1",
-//			Assignee:      "assignee-1",
-//			Paid:          false,
-//		}, nil)
-//		mockDb.On("GetWorkspaceBudget", "work-1").Return(db.NewBountyBudget{
-//			TotalBudget: 500,
-//		}, nil)
-//
-//		r := chi.NewRouter()
-//		r.Post("/gobounties/pay/{id}", bHandler.MakeBountyPayment)
-//
-//		rr := httptest.NewRecorder()
-//		req, err := http.NewRequestWithContext(ctx, http.MethodPost, "/gobounties/pay/1", nil)
-//		if err != nil {
-//			t.Fatal(err)
-//		}
-//
-//		r.ServeHTTP(rr, req)
-//
-//		assert.Equal(t, http.StatusForbidden, rr.Code, "Expected 403 Forbidden when the payment exceeds the workspace's budget")
-//
-//	})
-//
-//	t.Run("Should test that a successful WebSocket message is sent if the payment is successful", func(t *testing.T) {
-//		mockDb.ExpectedCalls = nil
-//		bHandler.getSocketConnections = mockGetSocketConnections
-//		bHandler.userHasAccess = mockUserHasAccessTrue
-//
-//		mockDb.On("GetBounty", bountyID).Return(bounty, nil)
-//		mockDb.On("GetWorkspaceBudget", bounty.WorkspaceUuid).Return(db.NewBountyBudget{TotalBudget: 2000}, nil)
-//		mockDb.On("GetPersonByPubkey", bounty.Assignee).Return(db.Person{OwnerPubKey: "assignee-1", OwnerRouteHint: "OwnerRouteHint"}, nil)
-//		mockDb.On("ProcessBountyPayment", mock.AnythingOfType("db.NewPaymentHistory"), mock.AnythingOfType("db.NewBounty")).Return(nil)
-//
-//		expectedUrl := fmt.Sprintf("%s/payment", config.RelayUrl)
-//		expectedBody := `{"amount": 1000, "destination_key": "assignee-1", "route_hint": "OwnerRouteHint", "text": "memotext added for notification"}`
-//
-//		r := io.NopCloser(bytes.NewReader([]byte(`{"success": true, "response": { "sumAmount": "1"}}`)))
-//		mockHttpClient.On("Do", mock.MatchedBy(func(req *http.Request) bool {
-//			bodyByt, _ := io.ReadAll(req.Body)
-//			return req.Method == http.MethodPost && expectedUrl == req.URL.String() && req.Header.Get("x-user-token") == config.RelayAuthKey && expectedBody == string(bodyByt)
-//		})).Return(&http.Response{
-//			StatusCode: 200,
-//			Body:       r,
-//		}, nil).Once()
-//
-//		ro := chi.NewRouter()
-//		ro.Post("/gobounties/pay/{id}", bHandler.MakeBountyPayment)
-//
-//		requestBody := bytes.NewBuffer([]byte("{}"))
-//		rr := httptest.NewRecorder()
-//		req, err := http.NewRequestWithContext(authorizedCtx, http.MethodPost, "/gobounties/pay/1", requestBody)
-//		if err != nil {
-//			t.Fatal(err)
-//		}
-//
-//		ro.ServeHTTP(rr, req)
-//
-//		assert.Equal(t, http.StatusOK, rr.Code)
-//		mockDb.AssertExpectations(t)
-//		mockHttpClient.AssertExpectations(t)
-//	})
-//
-//	t.Run("Should test that an error WebSocket message is sent if the payment fails", func(t *testing.T) {
-//		mockDb2 := &dbMocks.Database{}
-//		mockHttpClient2 := &mocks.HttpClient{}
-//		mockDb2.ExpectedCalls = nil
-//
-//		bHandler2 := NewBountyHandler(mockHttpClient2, mockDb2)
-//		bHandler2.getSocketConnections = mockGetSocketConnections
-//		bHandler2.userHasAccess = mockUserHasAccessTrue
-//
-//		mockDb2.On("GetBounty", bountyID).Return(bounty, nil)
-//		mockDb2.On("GetWorkspaceBudget", bounty.WorkspaceUuid).Return(db.NewBountyBudget{TotalBudget: 2000}, nil)
-//		mockDb2.On("GetPersonByPubkey", bounty.Assignee).Return(db.Person{OwnerPubKey: "assignee-1", OwnerRouteHint: "OwnerRouteHint"}, nil)
-//
-//		expectedUrl := fmt.Sprintf("%s/payment", config.RelayUrl)
-//		expectedBody := `{"amount": 1000, "destination_key": "assignee-1", "route_hint": "OwnerRouteHint", "text": "memotext added for notification"}`
-//
-//		r := io.NopCloser(bytes.NewReader([]byte(`"internal server error"`)))
-//		mockHttpClient2.On("Do", mock.MatchedBy(func(req *http.Request) bool {
-//			bodyByt, _ := io.ReadAll(req.Body)
-//			return req.Method == http.MethodPost && expectedUrl == req.URL.String() && req.Header.Get("x-user-token") == config.RelayAuthKey && expectedBody == string(bodyByt)
-//		})).Return(&http.Response{
-//			StatusCode: 500,
-//			Body:       r,
-//		}, nil).Once()
-//
-//		ro := chi.NewRouter()
-//		ro.Post("/gobounties/pay/{id}", bHandler2.MakeBountyPayment)
-//
-//		requestBody := bytes.NewBuffer([]byte("{}"))
-//		rr := httptest.NewRecorder()
-//		req, err := http.NewRequestWithContext(authorizedCtx, http.MethodPost, "/gobounties/pay/1", requestBody)
-//		if err != nil {
-//			t.Fatal(err)
-//		}
-//
-//		ro.ServeHTTP(rr, req)
-//
-//		assert.Equal(t, http.StatusOK, rr.Code)
-//		mockDb2.AssertExpectations(t)
-//		mockHttpClient2.AssertExpectations(t)
-//	})
-//}
+func TestMakeBountyPayment(t *testing.T) {
+	ctx := context.Background()
+	mockDb := &dbMocks.Database{}
+	mockHttpClient := &mocks.HttpClient{}
+	mockUserHasAccessTrue := func(pubKeyFromAuth string, uuid string, role string) bool {
+		return true
+	}
+	mockUserHasAccessFalse := func(pubKeyFromAuth string, uuid string, role string) bool {
+		return false
+	}
+	mockGetSocketConnections := func(host string) (db.Client, error) {
+		s, ws := MockNewWSServer(t)
+		defer s.Close()
+		defer ws.Close()
 
-//func TestBountyBudgetWithdraw(t *testing.T) {
-//	ctx := context.Background()
-//	mockDb := dbMocks.NewDatabase(t)
-//	mockHttpClient := mocks.NewHttpClient(t)
-//	mockUserHasAccessTrue := func(pubKeyFromAuth string, uuid string, role string) bool {
-//		return true
-//	}
-//	mockUserHasAccessFalse := func(pubKeyFromAuth string, uuid string, role string) bool {
-//		return false
-//	}
-//	bHandler := NewBountyHandler(mockHttpClient, mockDb)
-//	unauthorizedCtx := context.WithValue(context.Background(), auth.ContextKey, "")
-//	authorizedCtx := context.WithValue(ctx, auth.ContextKey, "valid-key")
-//
-//	t.Run("401 error if user is unauthorized", func(t *testing.T) {
-//		rr := httptest.NewRecorder()
-//		handler := http.HandlerFunc(bHandler.BountyBudgetWithdraw)
-//
-//		req, err := http.NewRequestWithContext(unauthorizedCtx, http.MethodPost, "/budget/withdraw", nil)
-//		if err != nil {
-//			t.Fatal(err)
-//		}
-//
-//		handler.ServeHTTP(rr, req)
-//
-//		assert.Equal(t, http.StatusUnauthorized, rr.Code)
-//	})
-//
-//	t.Run("Should test that a 406 error is returned if wrong data is passed", func(t *testing.T) {
-//		rr := httptest.NewRecorder()
-//		handler := http.HandlerFunc(bHandler.BountyBudgetWithdraw)
-//
-//		invalidJson := []byte(`"key": "value"`)
-//
-//		req, err := http.NewRequestWithContext(authorizedCtx, http.MethodPost, "/budget/withdraw", bytes.NewReader(invalidJson))
-//		if err != nil {
-//			t.Fatal(err)
-//		}
-//		handler.ServeHTTP(rr, req)
-//		assert.Equal(t, http.StatusNotAcceptable, rr.Code)
-//	})
-//
-//	t.Run("401 error if user is not the workspace admin or does not have WithdrawBudget role", func(t *testing.T) {
-//		bHandler.userHasAccess = mockUserHasAccessFalse
-//
-//		rr := httptest.NewRecorder()
-//		handler := http.HandlerFunc(bHandler.BountyBudgetWithdraw)
-//
-//		validData := []byte(`{"orgUuid": "org-1", "paymentRequest": "invoice"}`)
-//		req, err := http.NewRequestWithContext(authorizedCtx, http.MethodPost, "/budget/withdraw", bytes.NewReader(validData))
-//		if err != nil {
-//			t.Fatal(err)
-//		}
-//
-//		handler.ServeHTTP(rr, req)
-//
-//		assert.Equal(t, http.StatusUnauthorized, rr.Code)
-//		assert.Contains(t, rr.Body.String(), "You don't have appropriate permissions to withdraw bounty budget")
-//	})
-//
-//	t.Run("403 error when amount exceeds workspace's budget", func(t *testing.T) {
-//		ctxs := context.WithValue(context.Background(), auth.ContextKey, "valid-key")
-//		mockDb := dbMocks.NewDatabase(t)
-//		mockHttpClient := mocks.NewHttpClient(t)
-//		bHandler := NewBountyHandler(mockHttpClient, mockDb)
-//		bHandler.userHasAccess = mockUserHasAccessTrue
-//
-//		mockDb.On("GetWorkspaceBudget", "org-1").Return(db.NewBountyBudget{
-//			TotalBudget: 500,
-//		}, nil)
-//		invoice := "lnbc15u1p3xnhl2pp5jptserfk3zk4qy42tlucycrfwxhydvlemu9pqr93tuzlv9cc7g3sdqsvfhkcap3xyhx7un8cqzpgxqzjcsp5f8c52y2stc300gl6s4xswtjpc37hrnnr3c9wvtgjfuvqmpm35evq9qyyssqy4lgd8tj637qcjp05rdpxxykjenthxftej7a2zzmwrmrl70fyj9hvj0rewhzj7jfyuwkwcg9g2jpwtk3wkjtwnkdks84hsnu8xps5vsq4gj5hs"
-//
-//		amount := utils.GetInvoiceAmount(invoice)
-//		assert.Equal(t, uint(1500), amount)
-//
-//		withdrawRequest := db.WithdrawBudgetRequest{
-//			PaymentRequest: invoice,
-//			OrgUuid:        "org-1",
-//		}
-//		requestBody, _ := json.Marshal(withdrawRequest)
-//		req, _ := http.NewRequestWithContext(ctxs, http.MethodPost, "/budget/withdraw", bytes.NewReader(requestBody))
-//
-//		rr := httptest.NewRecorder()
-//
-//		bHandler.BountyBudgetWithdraw(rr, req)
-//
-//		assert.Equal(t, http.StatusForbidden, rr.Code, "Expected 403 Forbidden when the payment exceeds the workspace's budget")
-//		assert.Contains(t, rr.Body.String(), "Workspace budget is not enough to withdraw the amount", "Expected specific error message")
-//	})
-//
-//	t.Run("budget invoices get paid if amount is lesser than workspace's budget", func(t *testing.T) {
-//		ctxs := context.WithValue(context.Background(), auth.ContextKey, "valid-key")
-//		mockDb := dbMocks.NewDatabase(t)
-//		mockHttpClient := mocks.NewHttpClient(t)
-//		bHandler := NewBountyHandler(mockHttpClient, mockDb)
-//		bHandler.userHasAccess = mockUserHasAccessTrue
-//
-//		paymentAmount := uint(1500)
-//
-//		mockDb.On("GetWorkspaceBudget", "org-1").Return(db.NewBountyBudget{
-//			TotalBudget: 5000,
-//		}, nil)
-//		mockDb.On("WithdrawBudget", "valid-key", "org-1", paymentAmount).Return(nil)
-//		mockHttpClient.On("Do", mock.AnythingOfType("*http.Request")).Return(&http.Response{
-//			StatusCode: 200,
-//			Body:       io.NopCloser(bytes.NewBufferString(`{"success": true}`)),
-//		}, nil)
-//
-//		invoice := "lnbc15u1p3xnhl2pp5jptserfk3zk4qy42tlucycrfwxhydvlemu9pqr93tuzlv9cc7g3sdqsvfhkcap3xyhx7un8cqzpgxqzjcsp5f8c52y2stc300gl6s4xswtjpc37hrnnr3c9wvtgjfuvqmpm35evq9qyyssqy4lgd8tj637qcjp05rdpxxykjenthxftej7a2zzmwrmrl70fyj9hvj0rewhzj7jfyuwkwcg9g2jpwtk3wkjtwnkdks84hsnu8xps5vsq4gj5hs"
-//
-//		withdrawRequest := db.WithdrawBudgetRequest{
-//			PaymentRequest: invoice,
-//			OrgUuid:        "org-1",
-//		}
-//		requestBody, _ := json.Marshal(withdrawRequest)
-//		req, _ := http.NewRequestWithContext(ctxs, http.MethodPost, "/budget/withdraw", bytes.NewReader(requestBody))
-//
-//		rr := httptest.NewRecorder()
-//
-//		bHandler.BountyBudgetWithdraw(rr, req)
-//		assert.Equal(t, http.StatusOK, rr.Code)
-//		var response db.InvoicePaySuccess
-//		err := json.Unmarshal(rr.Body.Bytes(), &response)
-//		assert.NoError(t, err)
-//		assert.True(t, response.Success, "Expected invoice payment to succeed")
-//
-//		mockDb.AssertCalled(t, "WithdrawBudget", "valid-key", "org-1", paymentAmount)
-//	})
-//
-//	t.Run("400 BadRequest error if there is an error with invoice payment", func(t *testing.T) {
-//		ctxs := context.WithValue(context.Background(), auth.ContextKey, "valid-key")
-//		mockDb := dbMocks.NewDatabase(t)
-//		mockHttpClient := mocks.NewHttpClient(t)
-//		bHandler := NewBountyHandler(mockHttpClient, mockDb)
-//		bHandler.userHasAccess = mockUserHasAccessTrue
-//
-//		mockDb.On("GetWorkspaceBudget", "org-1").Return(db.NewBountyBudget{
-//			TotalBudget: 5000,
-//		}, nil)
-//		mockHttpClient.On("Do", mock.AnythingOfType("*http.Request")).Return(&http.Response{
-//			StatusCode: 400,
-//			Body:       io.NopCloser(bytes.NewBufferString(`{"success": false, "error": "Payment error"}`)),
-//		}, nil)
-//
-//		invoice := "lnbc15u1p3xnhl2pp5jptserfk3zk4qy42tlucycrfwxhydvlemu9pqr93tuzlv9cc7g3sdqsvfhkcap3xyhx7un8cqzpgxqzjcsp5f8c52y2stc300gl6s4xswtjpc37hrnnr3c9wvtgjfuvqmpm35evq9qyyssqy4lgd8tj637qcjp05rdpxxykjenthxftej7a2zzmwrmrl70fyj9hvj0rewhzj7jfyuwkwcg9g2jpwtk3wkjtwnkdks84hsnu8xps5vsq4gj5hs"
-//
-//		withdrawRequest := db.WithdrawBudgetRequest{
-//			PaymentRequest: invoice,
-//			OrgUuid:        "org-1",
-//		}
-//		requestBody, _ := json.Marshal(withdrawRequest)
-//		req, _ := http.NewRequestWithContext(ctxs, http.MethodPost, "/budget/withdraw", bytes.NewReader(requestBody))
-//
-//		rr := httptest.NewRecorder()
-//
-//		bHandler.BountyBudgetWithdraw(rr, req)
-//
-//		assert.Equal(t, http.StatusBadRequest, rr.Code)
-//		var response map[string]interface{}
-//		err := json.Unmarshal(rr.Body.Bytes(), &response)
-//		assert.NoError(t, err)
-//		assert.False(t, response["success"].(bool))
-//		assert.Equal(t, "Payment error", response["error"].(string))
-//		mockHttpClient.AssertCalled(t, "Do", mock.AnythingOfType("*http.Request"))
-//	})
-//
-//	t.Run("Should test that an Workspace's Budget Total Amount is accurate after three (3) successful 'Budget Withdrawal Requests'", func(t *testing.T) {
-//		ctxs := context.WithValue(context.Background(), auth.ContextKey, "valid-key")
-//		mockDb := dbMocks.NewDatabase(t)
-//		mockHttpClient := mocks.NewHttpClient(t)
-//		bHandler := NewBountyHandler(mockHttpClient, mockDb)
-//		bHandler.userHasAccess = mockUserHasAccessTrue
-//
-//		paymentAmount := uint(1500)
-//		initialBudget := uint(5000)
-//		invoice := "lnbc15u1p3xnhl2pp5jptserfk3zk4qy42tlucycrfwxhydvlemu9pqr93tuzlv9cc7g3sdqsvfhkcap3xyhx7un8cqzpgxqzjcsp5f8c52y2stc300gl6s4xswtjpc37hrnnr3c9wvtgjfuvqmpm35evq9qyyssqy4lgd8tj637qcjp05rdpxxykjenthxftej7a2zzmwrmrl70fyj9hvj0rewhzj7jfyuwkwcg9g2jpwtk3wkjtwnkdks84hsnu8xps5vsq4gj5hs"
-//
-//		for i := 0; i < 3; i++ {
-//			expectedFinalBudget := initialBudget - (paymentAmount * uint(i))
-//
-//			mockDb.ExpectedCalls = nil
-//			mockDb.Calls = nil
-//			mockHttpClient.ExpectedCalls = nil
-//			mockHttpClient.Calls = nil
-//
-//			mockDb.On("GetWorkspaceBudget", "org-1").Return(db.NewBountyBudget{
-//				TotalBudget: expectedFinalBudget,
-//			}, nil)
-//			mockDb.On("WithdrawBudget", "valid-key", "org-1", paymentAmount).Return(nil)
-//			mockHttpClient.On("Do", mock.AnythingOfType("*http.Request")).Return(&http.Response{
-//				StatusCode: 200,
-//				Body:       io.NopCloser(bytes.NewBufferString(`{"success": true}`)),
-//			}, nil)
-//
-//			withdrawRequest := db.WithdrawBudgetRequest{
-//				PaymentRequest: invoice,
-//				OrgUuid:        "org-1",
-//			}
-//			requestBody, _ := json.Marshal(withdrawRequest)
-//			req, _ := http.NewRequestWithContext(ctxs, http.MethodPost, "/budget/withdraw", bytes.NewReader(requestBody))
-//
-//			rr := httptest.NewRecorder()
-//
-//			bHandler.BountyBudgetWithdraw(rr, req)
-//			assert.Equal(t, http.StatusOK, rr.Code)
-//			var response db.InvoicePaySuccess
-//			err := json.Unmarshal(rr.Body.Bytes(), &response)
-//			assert.NoError(t, err)
-//			assert.True(t, response.Success, "Expected invoice payment to succeed")
-//			finalBudget := mockDb.GetWorkspaceBudget("org-1")
-//			assert.Equal(t, expectedFinalBudget, finalBudget.TotalBudget, "The workspace's final budget should reflect the deductions from the successful withdrawals")
-//
-//		}
-//	})
-//
-//	t.Run("Should test that the BountyBudgetWithdraw handler gets locked by go mutex when it is called i.e. the handler has to be fully executed before it processes another request.", func(t *testing.T) {
-//		mockDb := dbMocks.NewDatabase(t)
-//		mockHttpClient := mocks.NewHttpClient(t)
-//		bHandler := NewBountyHandler(mockHttpClient, mockDb)
-//
-//		var processingTimes []time.Time
-//		var mutex sync.Mutex
-//
-//		server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-//			mutex.Lock()
-//			processingTimes = append(processingTimes, time.Now())
-//			time.Sleep(10 * time.Millisecond)
-//			mutex.Unlock()
-//
-//			bHandler.BountyBudgetWithdraw(w, r)
-//		}))
-//		defer server.Close()
-//
-//		var wg sync.WaitGroup
-//		for i := 0; i < 3; i++ {
-//			wg.Add(1)
-//			go func() {
-//				defer wg.Done()
-//				_, err := http.Get(server.URL)
-//				if err != nil {
-//					t.Errorf("Failed to send request: %v", err)
-//				}
-//			}()
-//		}
-//		wg.Wait()
-//
-//		for i := 1; i < len(processingTimes); i++ {
-//			assert.True(t, processingTimes[i].After(processingTimes[i-1]),
-//				"Expected processing times to be sequential, indicating mutex is locking effectively.")
-//		}
-//	})
-//
-//}
+		mockClient := db.Client{
+			Host: "mocked_host",
+			Conn: ws,
+		}
+
+		return mockClient, nil
+	}
+	bHandler := NewBountyHandler(mockHttpClient, mockDb)
+
+	unauthorizedCtx := context.WithValue(ctx, auth.ContextKey, "")
+	authorizedCtx := context.WithValue(ctx, auth.ContextKey, "valid-key")
+
+	var mutex sync.Mutex
+	var processingTimes []time.Time
+
+	bountyID := uint(1)
+	bounty := db.NewBounty{
+		ID:            bountyID,
+		OrgUuid:       "org-1",
+		WorkspaceUuid: "work-1",
+		Assignee:      "assignee-1",
+		Price:         uint(1000),
+	}
+
+	t.Run("mutex lock ensures sequential access", func(t *testing.T) {
+		server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			mutex.Lock()
+			processingTimes = append(processingTimes, time.Now())
+			time.Sleep(10 * time.Millisecond)
+			mutex.Unlock()
+
+			bHandler.MakeBountyPayment(w, r)
+		}))
+		defer server.Close()
+
+		var wg sync.WaitGroup
+		for i := 0; i < 3; i++ {
+			wg.Add(1)
+			go func() {
+				defer wg.Done()
+				_, err := http.Get(server.URL)
+				if err != nil {
+					t.Errorf("Failed to send request: %v", err)
+				}
+			}()
+		}
+		wg.Wait()
+
+		for i := 1; i < len(processingTimes); i++ {
+			assert.True(t, processingTimes[i].After(processingTimes[i-1]),
+				"Expected processing times to be sequential, indicating mutex is locking effectively.")
+		}
+	})
+
+	t.Run("401 unauthorized error when unauthorized user hits endpoint", func(t *testing.T) {
+
+		r := chi.NewRouter()
+		r.Post("/gobounties/pay/{id}", bHandler.MakeBountyPayment)
+
+		rr := httptest.NewRecorder()
+		req, err := http.NewRequestWithContext(unauthorizedCtx, http.MethodPost, "/gobounties/pay/1", nil)
+
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		r.ServeHTTP(rr, req)
+
+		assert.Equal(t, http.StatusUnauthorized, rr.Code, "Expected 401 Unauthorized for unauthorized access")
+		mockDb.AssertExpectations(t)
+	})
+
+	t.Run("405 when trying to pay an already-paid bounty", func(t *testing.T) {
+		mockDb.ExpectedCalls = nil
+		mockDb.On("GetBounty", mock.AnythingOfType("uint")).Return(db.NewBounty{
+			ID:            1,
+			Price:         1000,
+			OrgUuid:       "org-1",
+			WorkspaceUuid: "work-1",
+			Assignee:      "assignee-1",
+			Paid:          true,
+		}, nil)
+
+		r := chi.NewRouter()
+		r.Post("/gobounties/pay/{id}", bHandler.MakeBountyPayment)
+
+		requestBody := bytes.NewBuffer([]byte("{}"))
+		rr := httptest.NewRecorder()
+		req, err := http.NewRequestWithContext(authorizedCtx, http.MethodPost, "/gobounties/pay/1", requestBody)
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		r.ServeHTTP(rr, req)
+		assert.Equal(t, http.StatusMethodNotAllowed, rr.Code, "Expected 405 Method Not Allowed for an already-paid bounty")
+		mockDb.AssertExpectations(t)
+	})
+
+	t.Run("401 error if user not workspace admin or does not have PAY BOUNTY role", func(t *testing.T) {
+		bHandler.userHasAccess = mockUserHasAccessFalse
+
+		mockDb.On("GetBounty", mock.AnythingOfType("uint")).Return(db.NewBounty{
+			ID:            1,
+			Price:         1000,
+			OrgUuid:       "org-1",
+			WorkspaceUuid: "work-1",
+			Assignee:      "assignee-1",
+			Paid:          false,
+		}, nil)
+
+		r := chi.NewRouter()
+		r.Post("/gobounties/pay/{id}", bHandler.MakeBountyPayment)
+
+		rr := httptest.NewRecorder()
+		req, err := http.NewRequestWithContext(unauthorizedCtx, http.MethodPost, "/gobounties/pay/1", bytes.NewBufferString(`{}`))
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		r.ServeHTTP(rr, req)
+
+		assert.Equal(t, http.StatusUnauthorized, rr.Code, "Expected 401 Unauthorized when the user lacks the PAY BOUNTY role")
+
+	})
+
+	t.Run("403 error when amount exceeds workspace's budget balance", func(t *testing.T) {
+		ctx := context.WithValue(context.Background(), auth.ContextKey, "valid-key")
+
+		mockDb := dbMocks.NewDatabase(t)
+		mockHttpClient := mocks.NewHttpClient(t)
+		bHandler := NewBountyHandler(mockHttpClient, mockDb)
+		bHandler.userHasAccess = mockUserHasAccessTrue
+		mockDb.On("GetBounty", mock.AnythingOfType("uint")).Return(db.NewBounty{
+			ID:            1,
+			Price:         1000,
+			OrgUuid:       "org-1",
+			WorkspaceUuid: "work-1",
+			Assignee:      "assignee-1",
+			Paid:          false,
+		}, nil)
+		mockDb.On("GetWorkspaceBudget", "work-1").Return(db.NewBountyBudget{
+			TotalBudget: 500,
+		}, nil)
+
+		r := chi.NewRouter()
+		r.Post("/gobounties/pay/{id}", bHandler.MakeBountyPayment)
+
+		rr := httptest.NewRecorder()
+		req, err := http.NewRequestWithContext(ctx, http.MethodPost, "/gobounties/pay/1", nil)
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		r.ServeHTTP(rr, req)
+
+		assert.Equal(t, http.StatusForbidden, rr.Code, "Expected 403 Forbidden when the payment exceeds the workspace's budget")
+
+	})
+
+	t.Run("Should test that a successful WebSocket message is sent if the payment is successful", func(t *testing.T) {
+		mockDb.ExpectedCalls = nil
+		bHandler.getSocketConnections = mockGetSocketConnections
+		bHandler.userHasAccess = mockUserHasAccessTrue
+
+		mockDb.On("GetBounty", bountyID).Return(bounty, nil)
+		mockDb.On("GetWorkspaceBudget", bounty.WorkspaceUuid).Return(db.NewBountyBudget{TotalBudget: 2000}, nil)
+		mockDb.On("GetPersonByPubkey", bounty.Assignee).Return(db.Person{OwnerPubKey: "assignee-1", OwnerRouteHint: "OwnerRouteHint"}, nil)
+		mockDb.On("ProcessBountyPayment", mock.AnythingOfType("db.NewPaymentHistory"), mock.AnythingOfType("db.NewBounty")).Return(nil)
+
+		expectedUrl := fmt.Sprintf("%s/payment", config.RelayUrl)
+		expectedBody := `{"amount": 1000, "destination_key": "assignee-1", "route_hint": "OwnerRouteHint", "text": "memotext added for notification"}`
+
+		r := io.NopCloser(bytes.NewReader([]byte(`{"success": true, "response": { "sumAmount": "1"}}`)))
+		mockHttpClient.On("Do", mock.MatchedBy(func(req *http.Request) bool {
+			bodyByt, _ := io.ReadAll(req.Body)
+			return req.Method == http.MethodPost && expectedUrl == req.URL.String() && req.Header.Get("x-user-token") == config.RelayAuthKey && expectedBody == string(bodyByt)
+		})).Return(&http.Response{
+			StatusCode: 200,
+			Body:       r,
+		}, nil).Once()
+
+		ro := chi.NewRouter()
+		ro.Post("/gobounties/pay/{id}", bHandler.MakeBountyPayment)
+
+		requestBody := bytes.NewBuffer([]byte("{}"))
+		rr := httptest.NewRecorder()
+		req, err := http.NewRequestWithContext(authorizedCtx, http.MethodPost, "/gobounties/pay/1", requestBody)
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		ro.ServeHTTP(rr, req)
+
+		assert.Equal(t, http.StatusOK, rr.Code)
+		mockDb.AssertExpectations(t)
+		mockHttpClient.AssertExpectations(t)
+	})
+
+	t.Run("Should test that an error WebSocket message is sent if the payment fails", func(t *testing.T) {
+		mockDb2 := &dbMocks.Database{}
+		mockHttpClient2 := &mocks.HttpClient{}
+		mockDb2.ExpectedCalls = nil
+
+		bHandler2 := NewBountyHandler(mockHttpClient2, mockDb2)
+		bHandler2.getSocketConnections = mockGetSocketConnections
+		bHandler2.userHasAccess = mockUserHasAccessTrue
+
+		mockDb2.On("GetBounty", bountyID).Return(bounty, nil)
+		mockDb2.On("GetWorkspaceBudget", bounty.WorkspaceUuid).Return(db.NewBountyBudget{TotalBudget: 2000}, nil)
+		mockDb2.On("GetPersonByPubkey", bounty.Assignee).Return(db.Person{OwnerPubKey: "assignee-1", OwnerRouteHint: "OwnerRouteHint"}, nil)
+
+		expectedUrl := fmt.Sprintf("%s/payment", config.RelayUrl)
+		expectedBody := `{"amount": 1000, "destination_key": "assignee-1", "route_hint": "OwnerRouteHint", "text": "memotext added for notification"}`
+
+		r := io.NopCloser(bytes.NewReader([]byte(`"internal server error"`)))
+		mockHttpClient2.On("Do", mock.MatchedBy(func(req *http.Request) bool {
+			bodyByt, _ := io.ReadAll(req.Body)
+			return req.Method == http.MethodPost && expectedUrl == req.URL.String() && req.Header.Get("x-user-token") == config.RelayAuthKey && expectedBody == string(bodyByt)
+		})).Return(&http.Response{
+			StatusCode: 500,
+			Body:       r,
+		}, nil).Once()
+
+		ro := chi.NewRouter()
+		ro.Post("/gobounties/pay/{id}", bHandler2.MakeBountyPayment)
+
+		requestBody := bytes.NewBuffer([]byte("{}"))
+		rr := httptest.NewRecorder()
+		req, err := http.NewRequestWithContext(authorizedCtx, http.MethodPost, "/gobounties/pay/1", requestBody)
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		ro.ServeHTTP(rr, req)
+
+		assert.Equal(t, http.StatusOK, rr.Code)
+		mockDb2.AssertExpectations(t)
+		mockHttpClient2.AssertExpectations(t)
+	})
+}
+
+func TestBountyBudgetWithdraw(t *testing.T) {
+	ctx := context.Background()
+	mockDb := dbMocks.NewDatabase(t)
+	mockHttpClient := mocks.NewHttpClient(t)
+	mockUserHasAccessTrue := func(pubKeyFromAuth string, uuid string, role string) bool {
+		return true
+	}
+	mockUserHasAccessFalse := func(pubKeyFromAuth string, uuid string, role string) bool {
+		return false
+	}
+	bHandler := NewBountyHandler(mockHttpClient, mockDb)
+	unauthorizedCtx := context.WithValue(context.Background(), auth.ContextKey, "")
+	authorizedCtx := context.WithValue(ctx, auth.ContextKey, "valid-key")
+
+	t.Run("401 error if user is unauthorized", func(t *testing.T) {
+		rr := httptest.NewRecorder()
+		handler := http.HandlerFunc(bHandler.BountyBudgetWithdraw)
+
+		req, err := http.NewRequestWithContext(unauthorizedCtx, http.MethodPost, "/budget/withdraw", nil)
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		handler.ServeHTTP(rr, req)
+
+		assert.Equal(t, http.StatusUnauthorized, rr.Code)
+	})
+
+	t.Run("Should test that a 406 error is returned if wrong data is passed", func(t *testing.T) {
+		rr := httptest.NewRecorder()
+		handler := http.HandlerFunc(bHandler.BountyBudgetWithdraw)
+
+		invalidJson := []byte(`"key": "value"`)
+
+		req, err := http.NewRequestWithContext(authorizedCtx, http.MethodPost, "/budget/withdraw", bytes.NewReader(invalidJson))
+		if err != nil {
+			t.Fatal(err)
+		}
+		handler.ServeHTTP(rr, req)
+		assert.Equal(t, http.StatusNotAcceptable, rr.Code)
+	})
+
+	t.Run("401 error if user is not the workspace admin or does not have WithdrawBudget role", func(t *testing.T) {
+		bHandler.userHasAccess = mockUserHasAccessFalse
+
+		rr := httptest.NewRecorder()
+		handler := http.HandlerFunc(bHandler.BountyBudgetWithdraw)
+
+		validData := []byte(`{"orgUuid": "org-1", "paymentRequest": "invoice"}`)
+		req, err := http.NewRequestWithContext(authorizedCtx, http.MethodPost, "/budget/withdraw", bytes.NewReader(validData))
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		handler.ServeHTTP(rr, req)
+
+		assert.Equal(t, http.StatusUnauthorized, rr.Code)
+		assert.Contains(t, rr.Body.String(), "You don't have appropriate permissions to withdraw bounty budget")
+	})
+
+	t.Run("403 error when amount exceeds workspace's budget", func(t *testing.T) {
+		ctxs := context.WithValue(context.Background(), auth.ContextKey, "valid-key")
+		mockDb := dbMocks.NewDatabase(t)
+		mockHttpClient := mocks.NewHttpClient(t)
+		bHandler := NewBountyHandler(mockHttpClient, mockDb)
+		bHandler.userHasAccess = mockUserHasAccessTrue
+
+		mockDb.On("GetWorkspaceBudget", "org-1").Return(db.NewBountyBudget{
+			TotalBudget: 500,
+		}, nil)
+		invoice := "lnbc15u1p3xnhl2pp5jptserfk3zk4qy42tlucycrfwxhydvlemu9pqr93tuzlv9cc7g3sdqsvfhkcap3xyhx7un8cqzpgxqzjcsp5f8c52y2stc300gl6s4xswtjpc37hrnnr3c9wvtgjfuvqmpm35evq9qyyssqy4lgd8tj637qcjp05rdpxxykjenthxftej7a2zzmwrmrl70fyj9hvj0rewhzj7jfyuwkwcg9g2jpwtk3wkjtwnkdks84hsnu8xps5vsq4gj5hs"
+
+		amount := utils.GetInvoiceAmount(invoice)
+		assert.Equal(t, uint(1500), amount)
+
+		withdrawRequest := db.WithdrawBudgetRequest{
+			PaymentRequest: invoice,
+			OrgUuid:        "org-1",
+		}
+		requestBody, _ := json.Marshal(withdrawRequest)
+		req, _ := http.NewRequestWithContext(ctxs, http.MethodPost, "/budget/withdraw", bytes.NewReader(requestBody))
+
+		rr := httptest.NewRecorder()
+
+		bHandler.BountyBudgetWithdraw(rr, req)
+
+		assert.Equal(t, http.StatusForbidden, rr.Code, "Expected 403 Forbidden when the payment exceeds the workspace's budget")
+		assert.Contains(t, rr.Body.String(), "Workspace budget is not enough to withdraw the amount", "Expected specific error message")
+	})
+
+	t.Run("budget invoices get paid if amount is lesser than workspace's budget", func(t *testing.T) {
+		ctxs := context.WithValue(context.Background(), auth.ContextKey, "valid-key")
+		mockDb := dbMocks.NewDatabase(t)
+		mockHttpClient := mocks.NewHttpClient(t)
+		bHandler := NewBountyHandler(mockHttpClient, mockDb)
+		bHandler.userHasAccess = mockUserHasAccessTrue
+
+		paymentAmount := uint(1500)
+
+		mockDb.On("GetWorkspaceBudget", "org-1").Return(db.NewBountyBudget{
+			TotalBudget: 5000,
+		}, nil)
+		mockDb.On("WithdrawBudget", "valid-key", "org-1", paymentAmount).Return(nil)
+		mockHttpClient.On("Do", mock.AnythingOfType("*http.Request")).Return(&http.Response{
+			StatusCode: 200,
+			Body:       io.NopCloser(bytes.NewBufferString(`{"success": true}`)),
+		}, nil)
+
+		invoice := "lnbc15u1p3xnhl2pp5jptserfk3zk4qy42tlucycrfwxhydvlemu9pqr93tuzlv9cc7g3sdqsvfhkcap3xyhx7un8cqzpgxqzjcsp5f8c52y2stc300gl6s4xswtjpc37hrnnr3c9wvtgjfuvqmpm35evq9qyyssqy4lgd8tj637qcjp05rdpxxykjenthxftej7a2zzmwrmrl70fyj9hvj0rewhzj7jfyuwkwcg9g2jpwtk3wkjtwnkdks84hsnu8xps5vsq4gj5hs"
+
+		withdrawRequest := db.WithdrawBudgetRequest{
+			PaymentRequest: invoice,
+			OrgUuid:        "org-1",
+		}
+		requestBody, _ := json.Marshal(withdrawRequest)
+		req, _ := http.NewRequestWithContext(ctxs, http.MethodPost, "/budget/withdraw", bytes.NewReader(requestBody))
+
+		rr := httptest.NewRecorder()
+
+		bHandler.BountyBudgetWithdraw(rr, req)
+		assert.Equal(t, http.StatusOK, rr.Code)
+		var response db.InvoicePaySuccess
+		err := json.Unmarshal(rr.Body.Bytes(), &response)
+		assert.NoError(t, err)
+		assert.True(t, response.Success, "Expected invoice payment to succeed")
+
+		mockDb.AssertCalled(t, "WithdrawBudget", "valid-key", "org-1", paymentAmount)
+	})
+
+	t.Run("400 BadRequest error if there is an error with invoice payment", func(t *testing.T) {
+		ctxs := context.WithValue(context.Background(), auth.ContextKey, "valid-key")
+		mockDb := dbMocks.NewDatabase(t)
+		mockHttpClient := mocks.NewHttpClient(t)
+		bHandler := NewBountyHandler(mockHttpClient, mockDb)
+		bHandler.userHasAccess = mockUserHasAccessTrue
+
+		mockDb.On("GetWorkspaceBudget", "org-1").Return(db.NewBountyBudget{
+			TotalBudget: 5000,
+		}, nil)
+		mockHttpClient.On("Do", mock.AnythingOfType("*http.Request")).Return(&http.Response{
+			StatusCode: 400,
+			Body:       io.NopCloser(bytes.NewBufferString(`{"success": false, "error": "Payment error"}`)),
+		}, nil)
+
+		invoice := "lnbc15u1p3xnhl2pp5jptserfk3zk4qy42tlucycrfwxhydvlemu9pqr93tuzlv9cc7g3sdqsvfhkcap3xyhx7un8cqzpgxqzjcsp5f8c52y2stc300gl6s4xswtjpc37hrnnr3c9wvtgjfuvqmpm35evq9qyyssqy4lgd8tj637qcjp05rdpxxykjenthxftej7a2zzmwrmrl70fyj9hvj0rewhzj7jfyuwkwcg9g2jpwtk3wkjtwnkdks84hsnu8xps5vsq4gj5hs"
+
+		withdrawRequest := db.WithdrawBudgetRequest{
+			PaymentRequest: invoice,
+			OrgUuid:        "org-1",
+		}
+		requestBody, _ := json.Marshal(withdrawRequest)
+		req, _ := http.NewRequestWithContext(ctxs, http.MethodPost, "/budget/withdraw", bytes.NewReader(requestBody))
+
+		rr := httptest.NewRecorder()
+
+		bHandler.BountyBudgetWithdraw(rr, req)
+
+		assert.Equal(t, http.StatusBadRequest, rr.Code)
+		var response map[string]interface{}
+		err := json.Unmarshal(rr.Body.Bytes(), &response)
+		assert.NoError(t, err)
+		assert.False(t, response["success"].(bool))
+		assert.Equal(t, "Payment error", response["error"].(string))
+		mockHttpClient.AssertCalled(t, "Do", mock.AnythingOfType("*http.Request"))
+	})
+
+	t.Run("Should test that an Workspace's Budget Total Amount is accurate after three (3) successful 'Budget Withdrawal Requests'", func(t *testing.T) {
+		ctxs := context.WithValue(context.Background(), auth.ContextKey, "valid-key")
+		mockDb := dbMocks.NewDatabase(t)
+		mockHttpClient := mocks.NewHttpClient(t)
+		bHandler := NewBountyHandler(mockHttpClient, mockDb)
+		bHandler.userHasAccess = mockUserHasAccessTrue
+
+		paymentAmount := uint(1500)
+		initialBudget := uint(5000)
+		invoice := "lnbc15u1p3xnhl2pp5jptserfk3zk4qy42tlucycrfwxhydvlemu9pqr93tuzlv9cc7g3sdqsvfhkcap3xyhx7un8cqzpgxqzjcsp5f8c52y2stc300gl6s4xswtjpc37hrnnr3c9wvtgjfuvqmpm35evq9qyyssqy4lgd8tj637qcjp05rdpxxykjenthxftej7a2zzmwrmrl70fyj9hvj0rewhzj7jfyuwkwcg9g2jpwtk3wkjtwnkdks84hsnu8xps5vsq4gj5hs"
+
+		for i := 0; i < 3; i++ {
+			expectedFinalBudget := initialBudget - (paymentAmount * uint(i))
+
+			mockDb.ExpectedCalls = nil
+			mockDb.Calls = nil
+			mockHttpClient.ExpectedCalls = nil
+			mockHttpClient.Calls = nil
+
+			mockDb.On("GetWorkspaceBudget", "org-1").Return(db.NewBountyBudget{
+				TotalBudget: expectedFinalBudget,
+			}, nil)
+			mockDb.On("WithdrawBudget", "valid-key", "org-1", paymentAmount).Return(nil)
+			mockHttpClient.On("Do", mock.AnythingOfType("*http.Request")).Return(&http.Response{
+				StatusCode: 200,
+				Body:       io.NopCloser(bytes.NewBufferString(`{"success": true}`)),
+			}, nil)
+
+			withdrawRequest := db.WithdrawBudgetRequest{
+				PaymentRequest: invoice,
+				OrgUuid:        "org-1",
+			}
+			requestBody, _ := json.Marshal(withdrawRequest)
+			req, _ := http.NewRequestWithContext(ctxs, http.MethodPost, "/budget/withdraw", bytes.NewReader(requestBody))
+
+			rr := httptest.NewRecorder()
+
+			bHandler.BountyBudgetWithdraw(rr, req)
+			assert.Equal(t, http.StatusOK, rr.Code)
+			var response db.InvoicePaySuccess
+			err := json.Unmarshal(rr.Body.Bytes(), &response)
+			assert.NoError(t, err)
+			assert.True(t, response.Success, "Expected invoice payment to succeed")
+			finalBudget := mockDb.GetWorkspaceBudget("org-1")
+			assert.Equal(t, expectedFinalBudget, finalBudget.TotalBudget, "The workspace's final budget should reflect the deductions from the successful withdrawals")
+
+		}
+	})
+
+	t.Run("Should test that the BountyBudgetWithdraw handler gets locked by go mutex when it is called i.e. the handler has to be fully executed before it processes another request.", func(t *testing.T) {
+		mockDb := dbMocks.NewDatabase(t)
+		mockHttpClient := mocks.NewHttpClient(t)
+		bHandler := NewBountyHandler(mockHttpClient, mockDb)
+
+		var processingTimes []time.Time
+		var mutex sync.Mutex
+
+		server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			mutex.Lock()
+			processingTimes = append(processingTimes, time.Now())
+			time.Sleep(10 * time.Millisecond)
+			mutex.Unlock()
+
+			bHandler.BountyBudgetWithdraw(w, r)
+		}))
+		defer server.Close()
+
+		var wg sync.WaitGroup
+		for i := 0; i < 3; i++ {
+			wg.Add(1)
+			go func() {
+				defer wg.Done()
+				_, err := http.Get(server.URL)
+				if err != nil {
+					t.Errorf("Failed to send request: %v", err)
+				}
+			}()
+		}
+		wg.Wait()
+
+		for i := 1; i < len(processingTimes); i++ {
+			assert.True(t, processingTimes[i].After(processingTimes[i-1]),
+				"Expected processing times to be sequential, indicating mutex is locking effectively.")
+		}
+	})
+
+}
 
 func TestPollInvoice(t *testing.T) {
 	ctx := context.Background()
