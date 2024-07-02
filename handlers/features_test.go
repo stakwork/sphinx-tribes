@@ -2,7 +2,7 @@ package handlers
 
 import (
 	"context"
-  "encoding/json"
+  	"encoding/json"
 	"net/http"
 	"net/http/httptest"
 	"testing"
