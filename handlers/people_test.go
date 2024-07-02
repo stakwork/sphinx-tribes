@@ -6,7 +6,6 @@ import (
 	"encoding/json"
 	"net/http"
 	"net/http/httptest"
-	"sort"
 	"strconv"
 	"testing"
 
@@ -422,7 +421,7 @@ func TestGetListedPeople(t *testing.T) {
 	db.CleanDB()
 
 	person := db.Person{
-		ID:           101,
+		ID:           200,
 		Uuid:         "person_101_uuid",
 		OwnerAlias:   "person101",
 		UniqueName:   "person101",
@@ -435,7 +434,7 @@ func TestGetListedPeople(t *testing.T) {
 		Extras:       db.PropertyMap{"coding_languages": "Typescript"},
 	}
 	person2 := db.Person{
-		ID:           102,
+		ID:           201,
 		Uuid:         "person_102_uuid",
 		OwnerAlias:   "person102",
 		UniqueName:   "person102",
@@ -448,7 +447,7 @@ func TestGetListedPeople(t *testing.T) {
 		Extras:       db.PropertyMap{"coding_languages": "Golang"},
 	}
 	person3 := db.Person{
-		ID:           103,
+		ID:           203,
 		Uuid:         "person_103_uuid",
 		OwnerAlias:   "person103",
 		UniqueName:   "person103",
@@ -486,16 +485,9 @@ func TestGetListedPeople(t *testing.T) {
 		var returnedPeople []db.Person
 		err = json.Unmarshal(rr.Body.Bytes(), &returnedPeople)
 		assert.NoError(t, err)
-
-		// Sort both slices to ensure order
-		sort.Slice(expectedPeople, func(i, j int) bool {
-			return expectedPeople[i].ID < expectedPeople[j].ID
-		})
-		sort.Slice(returnedPeople, func(i, j int) bool {
-			return returnedPeople[i].ID < returnedPeople[j].ID
-		})
-
 		assert.Equal(t, http.StatusOK, rr.Code)
+		assert.EqualValues(t, person2, fetchedPerson)
+		assert.EqualValues(t, person3, fetchedPerson2)
 		assert.EqualValues(t, expectedPeople, returnedPeople)
 	})
 
@@ -516,16 +508,8 @@ func TestGetListedPeople(t *testing.T) {
 		var returnedPeople []db.Person
 		err = json.Unmarshal(rr.Body.Bytes(), &returnedPeople)
 		assert.NoError(t, err)
-
-		// Sort both slices to ensure order
-		sort.Slice(expectedPeople, func(i, j int) bool {
-			return expectedPeople[i].ID < expectedPeople[j].ID
-		})
-		sort.Slice(returnedPeople, func(i, j int) bool {
-			return returnedPeople[i].ID < returnedPeople[j].ID
-		})
-
 		assert.Equal(t, http.StatusOK, rr.Code)
+		assert.EqualValues(t, person2, fetchedPerson)
 		assert.EqualValues(t, expectedPeople, returnedPeople)
 	})
 
@@ -551,18 +535,11 @@ func TestGetListedPeople(t *testing.T) {
 		var returnedPeople []db.Person
 		err = json.Unmarshal(rr.Body.Bytes(), &returnedPeople)
 		assert.NoError(t, err)
-
-		// Sort both slices to ensure order
-		sort.Slice(expectedPeople, func(i, j int) bool {
-			return expectedPeople[i].ID < expectedPeople[j].ID
-		})
-		sort.Slice(returnedPeople, func(i, j int) bool {
-			return returnedPeople[i].ID < returnedPeople[j].ID
-		})
-
 		assert.Equal(t, http.StatusOK, rr.Code)
+		assert.EqualValues(t, person2, fetchedPerson)
 		assert.EqualValues(t, expectedPeople, returnedPeople)
 	})
+
 }
 
 func TestGetPersonByUuid(t *testing.T) {
