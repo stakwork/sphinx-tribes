@@ -45,7 +45,6 @@ type Tribe struct {
 	Preview         string         `json:"preview"`
 	ProfileFilters  string         `json:"profile_filters"` // "twitter,github"
 	Badges          pq.StringArray `gorm:"type:text[]" json:"badges"`
-	Tsv             string         `gorm:"type:tsvector"`
 }
 
 // Bot struct
