@@ -206,7 +206,76 @@ func TestGetFeaturesByWorkspaceUuid(t *testing.T) {
 }
 
 func TestGetWorkspaceFeaturesCount(t *testing.T) {
+	teardownSuite := SetupSuite(t)
+	defer teardownSuite(t)
 
+	oHandler := NewFeatureHandler(db.TestDB)
+
+	person := db.Person{
+		Uuid:        "uuid",
+		OwnerAlias:  "alias",
+		UniqueName:  "unique_name",
+		OwnerPubKey: "pubkey",
+		PriceToMeet: 0,
+		Description: "description",
+	}
+	db.TestDB.CreateOrEditPerson(person)
+
+	workspace := db.Workspace{
+		Uuid:        "workspace_uuid",
+		Name:        "workspace_name",
+		OwnerPubKey: "person.OwnerPubkey",
+		Github:      "gtihub",
+		Website:     "website",
+		Description: "description",
+	}
+	db.TestDB.CreateOrEditWorkspace(workspace)
+
+	feature := db.WorkspaceFeatures{
+		Uuid:          "feature_uuid",
+		WorkspaceUuid: workspace.Uuid,
+		Name:          "feature_name",
+		Url:           "feature_url",
+		Priority:      0,
+	}
+	db.TestDB.CreateOrEditFeature(feature)
+
+	ctx := context.WithValue(context.Background(), auth.ContextKey, workspace.OwnerPubKey)
+
+	t.Run("Should test that it throws a 401 error if a user is not authorized", func(t *testing.T) {
+		rctx := chi.NewRouteContext()
+		rctx.URLParams.Add("uuid", workspace.Uuid)
+		req, err := http.NewRequestWithContext(context.WithValue(context.Background(), chi.RouteCtxKey, rctx), http.MethodGet, "/workspace/count/"+workspace.Uuid, nil)
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		rr := httptest.NewRecorder()
+		http.HandlerFunc(oHandler.GetWorkspaceFeaturesCount).ServeHTTP(rr, req)
+
+		assert.Equal(t, http.StatusUnauthorized, rr.Code)
+	})
+
+	t.Run("Should test that the features count returned from the API response for the workspace is equal to the number of features created for the workspace", func(t *testing.T) {
+		rctx := chi.NewRouteContext()
+		rctx.URLParams.Add("uuid", workspace.Uuid)
+		req, err := http.NewRequestWithContext(context.WithValue(ctx, chi.RouteCtxKey, rctx), http.MethodGet, "/workspace/count/"+workspace.Uuid, nil)
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		rr := httptest.NewRecorder()
+		http.HandlerFunc(oHandler.GetWorkspaceFeaturesCount).ServeHTTP(rr, req)
+
+		var returnedWorkspaceFeatures int64
+		err = json.Unmarshal(rr.Body.Bytes(), &returnedWorkspaceFeatures)
+		assert.NoError(t, err)
+
+		featureCount := db.TestDB.GetWorkspaceFeaturesCount(workspace.Uuid)
+
+		assert.Equal(t, returnedWorkspaceFeatures, featureCount)
+		assert.Equal(t, http.StatusOK, rr.Code)
+	})
 }
 
 func TestGetFeatureByUuid(t *testing.T) {
