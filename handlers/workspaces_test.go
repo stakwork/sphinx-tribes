@@ -856,7 +856,74 @@ func TestAddUserRoles(t *testing.T) {
 }
 
 func TestGetUserRoles(t *testing.T) {
+	teardownSuite := SetupSuite(t)
+	defer teardownSuite(t)
+	oHandler := NewWorkspaceHandler(db.TestDB)
 
+	person := db.Person{
+		Uuid:        uuid.New().String(),
+		OwnerAlias:  "alias",
+		UniqueName:  "unique_name",
+		OwnerPubKey: "pubkey",
+		PriceToMeet: 0,
+		Description: "description",
+	}
+
+	person2 := db.Person{
+		Uuid:        uuid.New().String(),
+		OwnerAlias:  "alias2",
+		UniqueName:  "unique_name2",
+		OwnerPubKey: "pubkey2",
+		PriceToMeet: 0,
+		Description: "description2",
+	}
+	db.TestDB.CreateOrEditPerson(person)
+	db.TestDB.CreateOrEditPerson(person2)
+
+	workspace := db.Workspace{
+		Uuid:        uuid.New().String(),
+		Name:        uuid.New().String(),
+		OwnerPubKey: person2.OwnerPubKey,
+		Github:      "gtihub",
+		Website:     "website",
+		Description: "description",
+	}
+	db.TestDB.CreateOrEditWorkspace(workspace)
+
+	userRoles := []db.WorkspaceUserRoles{
+		db.WorkspaceUserRoles{
+			WorkspaceUuid: workspace.Uuid,
+			OwnerPubKey:   person2.OwnerPubKey,
+			Role:          "ADD BOUNTY",
+		},
+	}
+
+	db.TestDB.CreateUserRoles(userRoles, workspace.Uuid, person2.OwnerPubKey)
+
+	t.Run("Should test that the ADD BOUNTY role is returned for person2 from the API call response and the API response array length is 1", func(t *testing.T) {
+
+		ctx := context.WithValue(context.Background(), auth.ContextKey, "pub-key")
+
+		rctx := chi.NewRouteContext()
+		rctx.URLParams.Add("uuid", workspace.Uuid)
+		rctx.URLParams.Add("user", person2.OwnerPubKey)
+		req, err := http.NewRequestWithContext(context.WithValue(ctx, chi.RouteCtxKey, rctx), http.MethodGet, "/users/role/"+workspace.Uuid+"/"+person2.OwnerPubKey, nil)
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		rr := httptest.NewRecorder()
+		http.HandlerFunc(oHandler.GetUserRoles).ServeHTTP(rr, req)
+
+		var returnedUserRole []db.WorkspaceUserRoles
+		err = json.Unmarshal(rr.Body.Bytes(), &returnedUserRole)
+		assert.NoError(t, err)
+
+		assert.Equal(t, http.StatusOK, rr.Code)
+		assert.Equal(t, userRoles[0].Role, returnedUserRole[0].Role)
+		assert.Equal(t, 1, len(returnedUserRole))
+
+	})
 }
 
 func TestCreateWorkspaceUser(t *testing.T) {

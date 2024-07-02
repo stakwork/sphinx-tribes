@@ -96,6 +96,7 @@ type Database interface {
 	DeleteWorkspaceUser(orgUser WorkspaceUsersData, org string) WorkspaceUsersData
 	GetBountyRoles() []BountyRoles
 	CreateUserRoles(roles []WorkspaceUserRoles, uuid string, pubkey string) []WorkspaceUserRoles
+	GetUserRoles(uuid string, pubkey string) []WorkspaceUserRoles
 	GetUserCreatedWorkspaces(pubkey string) []Workspace
 	GetUserAssignedWorkspaces(pubkey string) []WorkspaceUsers
 	AddBudgetHistory(budget BudgetHistory) BudgetHistory
