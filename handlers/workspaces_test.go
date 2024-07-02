@@ -1408,5 +1408,77 @@ func TestGetWorkspaceRepoByWorkspaceUuidAndRepoUuid(t *testing.T) {
 }
 
 func TestDeleteWorkspaceRepository(t *testing.T) {
+	teardownSuite := SetupSuite(t)
+	defer teardownSuite(t)
 
+	oHandler := NewWorkspaceHandler(db.TestDB)
+
+	person := db.Person{
+		Uuid:        "uuid",
+		OwnerAlias:  "alias",
+		UniqueName:  "unique_name",
+		OwnerPubKey: "pubkey",
+		PriceToMeet: 0,
+		Description: "description",
+	}
+	db.TestDB.CreateOrEditPerson(person)
+
+	workspace := db.Workspace{
+		Uuid:        "workspace_uuid",
+		Name:        "workspace_name",
+		OwnerPubKey: "person.OwnerPubkey",
+		Github:      "gtihub",
+		Website:     "website",
+		Description: "description",
+	}
+	db.TestDB.CreateOrEditWorkspace(workspace)
+
+	repository := db.WorkspaceRepositories{
+		Uuid:          "repo_uuid",
+		WorkspaceUuid: workspace.Uuid,
+		Name:          "repo_name",
+		Url:           "repo_url",
+	}
+	db.TestDB.CreateOrEditWorkspaceRepository(repository)
+
+	ctx := context.WithValue(context.Background(), auth.ContextKey, workspace.OwnerPubKey)
+
+	t.Run("Should test that it throws a 401 error if a user is not authorized", func(t *testing.T) {
+		rctx := chi.NewRouteContext()
+		rctx.URLParams.Add("uuid", repository.Uuid)
+		rctx.URLParams.Add("workspace_uuid", workspace.Uuid)
+		req, err := http.NewRequestWithContext(context.WithValue(context.Background(), chi.RouteCtxKey, rctx), http.MethodDelete, "/"+workspace.Uuid+"/repository/"+repository.Uuid, nil)
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		rr := httptest.NewRecorder()
+		http.HandlerFunc(oHandler.DeleteWorkspaceRepository).ServeHTTP(rr, req)
+
+		assert.Equal(t, http.StatusUnauthorized, rr.Code)
+	})
+
+	t.Run("Should test that the repository is deleted after the Delete API request is successful", func(t *testing.T) {
+		workspaceRepo, err := db.TestDB.GetWorkspaceRepoByWorkspaceUuidAndRepoUuid(workspace.Uuid, repository.Uuid)
+		if err != nil {
+			t.Fatal(err)
+		}
+		assert.NotEmpty(t, workspaceRepo)
+
+		rctx := chi.NewRouteContext()
+		rctx.URLParams.Add("uuid", repository.Uuid)
+		rctx.URLParams.Add("workspace_uuid", workspace.Uuid)
+		req, err := http.NewRequestWithContext(context.WithValue(ctx, chi.RouteCtxKey, rctx), http.MethodDelete, "/"+workspace.Uuid+"/repository/"+repository.Uuid, nil)
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		rr := httptest.NewRecorder()
+		http.HandlerFunc(oHandler.DeleteWorkspaceRepository).ServeHTTP(rr, req)
+
+		_, err = db.TestDB.GetWorkspaceRepoByWorkspaceUuidAndRepoUuid(workspace.Uuid, repository.Uuid)
+		assert.Error(t, err)
+		assert.Equal(t, "workspace repository not found", err.Error())
+		assert.Equal(t, http.StatusOK, rr.Code)
+	})
 }
