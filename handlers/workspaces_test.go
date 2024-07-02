@@ -1407,10 +1407,6 @@ func TestGetWorkspaceRepoByWorkspaceUuidAndRepoUuid(t *testing.T) {
 	})
 }
 
-func GetFeaturesByWorkspaceUuid(t *testing.T) {
-
-}
-
 func TestDeleteWorkspaceRepository(t *testing.T) {
 
 }
