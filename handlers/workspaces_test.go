@@ -5,7 +5,6 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"github.com/stretchr/testify/require"
 	"math/rand"
 	"net/http"
 	"net/http/httptest"
@@ -657,7 +656,7 @@ func TestAddUserRoles(t *testing.T) {
 	oHandler := NewWorkspaceHandler(db.TestDB)
 
 	person := db.Person{
-		Uuid:        "uuid",
+		Uuid:        uuid.New().String(),
 		OwnerAlias:  "alias",
 		UniqueName:  "unique_name",
 		OwnerPubKey: "pubkey",
@@ -666,7 +665,7 @@ func TestAddUserRoles(t *testing.T) {
 	}
 
 	person2 := db.Person{
-		Uuid:        "uuid2",
+		Uuid:        uuid.New().String(),
 		OwnerAlias:  "alias2",
 		UniqueName:  "unique_name2",
 		OwnerPubKey: "pubkey2",
@@ -677,7 +676,7 @@ func TestAddUserRoles(t *testing.T) {
 	db.TestDB.CreateOrEditPerson(person2)
 
 	workspace := db.Workspace{
-		Uuid:        "workspace_uuid",
+		Uuid:        uuid.New().String(),
 		Name:        "workspace_name",
 		OwnerPubKey: person2.OwnerPubKey,
 		Github:      "gtihub",
@@ -701,38 +700,6 @@ func TestAddUserRoles(t *testing.T) {
 	}
 
 	db.TestDB.CreateWorkspaceUser(workspaceUser)
-
-	t.Run("Should test that when the right conditions are met a user can be added to a workspace", func(t *testing.T) {
-		handlerUserHasAccess := func(pubKeyFromAuth string, uuid string, role string) bool {
-			return true
-		}
-		oHandler.userHasAccess = handlerUserHasAccess
-
-		ctx := context.WithValue(context.Background(), auth.ContextKey, "pub-key")
-
-		requestBody, _ := json.Marshal(userRoles)
-		rctx := chi.NewRouteContext()
-		rctx.URLParams.Add("uuid", workspace.Uuid)
-		rctx.URLParams.Add("user", person2.OwnerPubKey)
-		req, err := http.NewRequestWithContext(context.WithValue(ctx, chi.RouteCtxKey, rctx), http.MethodPost, "/users/role/"+workspace.Uuid+"/"+person2.OwnerPubKey, bytes.NewReader(requestBody))
-		if err != nil {
-			t.Fatal(err)
-		}
-
-		fetchedWorkspaceUser := db.TestDB.GetWorkspaceUser(person2.OwnerPubKey, workspace.Uuid)
-		fetchedUserRole := db.TestDB.GetUserRoles(workspace.Uuid, person2.OwnerPubKey)
-
-		rr := httptest.NewRecorder()
-		http.HandlerFunc(oHandler.AddUserRoles).ServeHTTP(rr, req)
-		t.Log("Response code:", rr.Code, "Response body:", rr.Body.String())
-		assert.Equal(t, http.StatusOK, rr.Code)
-		assert.Equal(t, person2.OwnerPubKey, fetchedWorkspaceUser.OwnerPubKey)
-
-		require.NotEmpty(t, fetchedUserRole, "No roles fetched for user %s in workspace %s", person2.OwnerPubKey, workspace.Uuid)
-
-		assert.Equal(t, userRoles[0].Role, fetchedUserRole[0].Role)
-
-	})
 
 	t.Run("Should test that when an unauthorized user hits the endpoint it returns a 401 error", func(t *testing.T) {
 		workspaceUUID := workspace.Uuid
@@ -855,6 +822,35 @@ func TestAddUserRoles(t *testing.T) {
 		http.HandlerFunc(oHandler.AddUserRoles).ServeHTTP(rr, req)
 
 		assert.Equal(t, http.StatusUnauthorized, rr.Code)
+	})
+
+	t.Run("Should test that when the right conditions are met a user can be added to a workspace", func(t *testing.T) {
+		handlerUserHasAccess := func(pubKeyFromAuth string, uuid string, role string) bool {
+			return true
+		}
+		oHandler.userHasAccess = handlerUserHasAccess
+
+		ctx := context.WithValue(context.Background(), auth.ContextKey, "pub-key")
+
+		requestBody, _ := json.Marshal(userRoles)
+		rctx := chi.NewRouteContext()
+		rctx.URLParams.Add("uuid", workspace.Uuid)
+		rctx.URLParams.Add("user", person2.OwnerPubKey)
+		req, err := http.NewRequestWithContext(context.WithValue(ctx, chi.RouteCtxKey, rctx), http.MethodPost, "/users/role/"+workspace.Uuid+"/"+person2.OwnerPubKey, bytes.NewReader(requestBody))
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		fetchedWorkspaceUser := db.TestDB.GetWorkspaceUser(person2.OwnerPubKey, workspace.Uuid)
+
+		rr := httptest.NewRecorder()
+		http.HandlerFunc(oHandler.AddUserRoles).ServeHTTP(rr, req)
+
+		fetchedUserRole := db.TestDB.GetUserRoles(workspace.Uuid, person2.OwnerPubKey)
+		assert.Equal(t, http.StatusOK, rr.Code)
+		assert.Equal(t, person2.OwnerPubKey, fetchedWorkspaceUser.OwnerPubKey)
+		assert.Equal(t, userRoles[0].Role, fetchedUserRole[0].Role)
+
 	})
 
 }
