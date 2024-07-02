@@ -31,7 +31,7 @@ func WorkspaceRoutes() chi.Router {
 
 		r.Get("/foruser/{uuid}", handlers.GetWorkspaceUser)
 		r.Get("/bounty/roles", handlers.GetBountyRoles)
-		r.Get("/users/role/{uuid}/{user}", handlers.GetUserRoles)
+		r.Get("/users/role/{uuid}/{user}", workspaceHandlers.GetUserRoles)
 		r.Get("/budget/{uuid}", workspaceHandlers.GetWorkspaceBudget)
 		r.Get("/budget/history/{uuid}", workspaceHandlers.GetWorkspaceBudgetHistory)
 		r.Get("/payments/{uuid}", handlers.GetPaymentHistory)

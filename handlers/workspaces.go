@@ -444,11 +444,11 @@ func (oh *workspaceHandler) AddUserRoles(w http.ResponseWriter, r *http.Request)
 	json.NewEncoder(w).Encode(insertRoles)
 }
 
-func GetUserRoles(w http.ResponseWriter, r *http.Request) {
+func (oh *workspaceHandler) GetUserRoles(w http.ResponseWriter, r *http.Request) {
 	uuid := chi.URLParam(r, "uuid")
 	user := chi.URLParam(r, "user")
 
-	userRoles := db.DB.GetUserRoles(uuid, user)
+	userRoles := oh.db.GetUserRoles(uuid, user)
 
 	w.WriteHeader(http.StatusOK)
 	json.NewEncoder(w).Encode(userRoles)
