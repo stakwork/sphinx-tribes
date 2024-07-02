@@ -18,7 +18,7 @@ func WorkspaceRoutes() chi.Router {
 		r.Get("/users/{uuid}/count", handlers.GetWorkspaceUsersCount)
 		r.Get("/bounties/{uuid}", workspaceHandlers.GetWorkspaceBounties)
 		r.Get("/bounties/{uuid}/count", workspaceHandlers.GetWorkspaceBountiesCount)
-		r.Get("/user/{userId}", handlers.GetUserWorkspaces)
+		r.Get("/user/{userId}", workspaceHandlers.GetUserWorkspaces)
 		r.Get("/user/dropdown/{userId}", workspaceHandlers.GetUserDropdownWorkspaces)
 	})
 	r.Group(func(r chi.Router) {
@@ -38,7 +38,7 @@ func WorkspaceRoutes() chi.Router {
 		r.Get("/poll/invoices/{uuid}", workspaceHandlers.PollBudgetInvoices)
 		r.Get("/poll/user/invoices", workspaceHandlers.PollUserWorkspacesBudget)
 		r.Get("/invoices/count/{uuid}", handlers.GetInvoicesCount)
-		r.Get("/user/invoices/count", handlers.GetAllUserInvoicesCount)
+		r.Get("/user/invoices/count", workspaceHandlers.GetAllUserInvoicesCount)
 		r.Delete("/delete/{uuid}", workspaceHandlers.DeleteWorkspace)
 
 		r.Post("/mission", workspaceHandlers.UpdateWorkspace)

@@ -1394,6 +1394,16 @@ func (db database) GetPerson(id uint) Person {
 	return m
 }
 
+func (db database) DeleteWorkSpaceAllData() error {
+	tables := []string{"workspace_user_roles", "workspaces"}
+	for _, table := range tables {
+		if err := db.db.Exec("DELETE FROM " + table).Error; err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
 func (db database) GetPersonByPubkey(pubkey string) Person {
 	m := Person{}
 	db.db.Where("owner_pub_key = ? AND (deleted = false OR deleted is null)", pubkey).Find(&m)

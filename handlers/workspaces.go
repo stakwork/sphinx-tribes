@@ -454,7 +454,7 @@ func GetUserRoles(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(userRoles)
 }
 
-func GetUserWorkspaces(w http.ResponseWriter, r *http.Request) {
+func (oh *workspaceHandler) GetUserWorkspaces(w http.ResponseWriter, r *http.Request) {
 	userIdParam := chi.URLParam(r, "userId")
 	userId, _ := utils.ConvertStringToUint(userIdParam)
 
@@ -464,9 +464,9 @@ func GetUserWorkspaces(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	user := db.DB.GetPerson(userId)
+	user := oh.db.GetPerson(userId)
 	// get the user workspaces
-	workspaces := GetAllUserWorkspaces(user.OwnerPubKey)
+	workspaces := oh.GetAllUserWorkspaces(user.OwnerPubKey)
 
 	w.WriteHeader(http.StatusOK)
 	json.NewEncoder(w).Encode(workspaces)
@@ -482,23 +482,23 @@ func (oh *workspaceHandler) GetUserDropdownWorkspaces(w http.ResponseWriter, r *
 		return
 	}
 
-	user := db.DB.GetPerson(userId)
+	user := oh.db.GetPerson(userId)
 
 	// get the workspaces created by the user, then get all the workspaces
 	// the user has been added to, loop through to get the workspace
-	workspaces := GetCreatedWorkspaces(user.OwnerPubKey)
-	assignedWorkspaces := db.DB.GetUserAssignedWorkspaces(user.OwnerPubKey)
+	workspaces := oh.GetCreatedWorkspaces(user.OwnerPubKey)
+	assignedWorkspaces := oh.db.GetUserAssignedWorkspaces(user.OwnerPubKey)
 	for _, value := range assignedWorkspaces {
 		uuid := value.WorkspaceUuid
-		workspace := db.DB.GetWorkspaceByUuid(uuid)
-		bountyCount := db.DB.GetWorkspaceBountyCount(uuid)
-		hasRole := db.UserHasAccess(user.OwnerPubKey, uuid, db.ViewReport)
+		workspace := oh.db.GetWorkspaceByUuid(uuid)
+		bountyCount := oh.db.GetWorkspaceBountyCount(uuid)
+		hasRole := oh.userHasAccess(user.OwnerPubKey, uuid, db.ViewReport)
 		hasBountyRoles := oh.userHasManageBountyRoles(user.OwnerPubKey, uuid)
 
 		// don't add deleted workspaces to the list
 		if !workspace.Deleted && hasBountyRoles {
 			if hasRole {
-				budget := db.DB.GetWorkspaceBudget(uuid)
+				budget := oh.db.GetWorkspaceBudget(uuid)
 				workspace.Budget = budget.TotalBudget
 			} else {
 				workspace.Budget = 0
@@ -512,16 +512,16 @@ func (oh *workspaceHandler) GetUserDropdownWorkspaces(w http.ResponseWriter, r *
 	json.NewEncoder(w).Encode(workspaces)
 }
 
-func GetCreatedWorkspaces(pubkey string) []db.Workspace {
-	workspaces := db.DB.GetUserCreatedWorkspaces(pubkey)
+func (oh *workspaceHandler) GetCreatedWorkspaces(pubkey string) []db.Workspace {
+	workspaces := oh.db.GetUserCreatedWorkspaces(pubkey)
 	// add bounty count to the workspace
 	for index, value := range workspaces {
 		uuid := value.Uuid
-		bountyCount := db.DB.GetWorkspaceBountyCount(uuid)
-		hasRole := db.UserHasAccess(pubkey, uuid, db.ViewReport)
+		bountyCount := oh.db.GetWorkspaceBountyCount(uuid)
+		hasRole := oh.userHasAccess(pubkey, uuid, db.ViewReport)
 
 		if hasRole {
-			budget := db.DB.GetWorkspaceBudget(uuid)
+			budget := oh.db.GetWorkspaceBudget(uuid)
 			workspaces[index].Budget = budget.TotalBudget
 		} else {
 			workspaces[index].Budget = 0
@@ -687,7 +687,7 @@ func (oh *workspaceHandler) PollUserWorkspacesBudget(w http.ResponseWriter, r *h
 	}
 
 	// get the user workspaces
-	workspaces := GetAllUserWorkspaces(pubKeyFromAuth)
+	workspaces := oh.GetAllUserWorkspaces(pubKeyFromAuth)
 	// loop through the worksppaces and get each workspace invoice
 	for _, space := range workspaces {
 		// get all workspace invoice
@@ -737,7 +737,7 @@ func GetInvoicesCount(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(invoiceCount)
 }
 
-func GetAllUserInvoicesCount(w http.ResponseWriter, r *http.Request) {
+func (oh *workspaceHandler) GetAllUserInvoicesCount(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 	pubKeyFromAuth, _ := ctx.Value(auth.ContextKey).(string)
 
@@ -748,9 +748,9 @@ func GetAllUserInvoicesCount(w http.ResponseWriter, r *http.Request) {
 	}
 
 	allCount := int64(0)
-	workspaces := GetAllUserWorkspaces(pubKeyFromAuth)
+	workspaces := oh.GetAllUserWorkspaces(pubKeyFromAuth)
 	for _, space := range workspaces {
-		invoiceCount := db.DB.GetWorkspaceInvoicesCount(space.Uuid)
+		invoiceCount := oh.db.GetWorkspaceInvoicesCount(space.Uuid)
 		allCount += invoiceCount
 	}
 	w.WriteHeader(http.StatusOK)
@@ -995,20 +995,20 @@ func (oh *workspaceHandler) GetFeaturesByWorkspaceUuid(w http.ResponseWriter, r 
 	json.NewEncoder(w).Encode(workspaceFeatures)
 }
 
-func GetAllUserWorkspaces(pubkey string) []db.Workspace {
+func (oh *workspaceHandler) GetAllUserWorkspaces(pubkey string) []db.Workspace {
 	// get the workspaces created by the user, then get all the workspaces
 	// the user has been added to, loop through to get the workspace
-	workspaces := GetCreatedWorkspaces(pubkey)
-	assignedWorkspaces := db.DB.GetUserAssignedWorkspaces(pubkey)
+	workspaces := oh.GetCreatedWorkspaces(pubkey)
+	assignedWorkspaces := oh.db.GetUserAssignedWorkspaces(pubkey)
 	for _, value := range assignedWorkspaces {
 		uuid := value.WorkspaceUuid
-		workspace := db.DB.GetWorkspaceByUuid(uuid)
-		bountyCount := db.DB.GetWorkspaceBountyCount(uuid)
+		workspace := oh.db.GetWorkspaceByUuid(uuid)
+		bountyCount := oh.db.GetWorkspaceBountyCount(uuid)
 		hasRole := db.UserHasAccess(pubkey, uuid, db.ViewReport)
 		// don't add deleted workspaces to the list
 		if !workspace.Deleted {
 			if hasRole {
-				budget := db.DB.GetWorkspaceBudget(uuid)
+				budget := oh.db.GetWorkspaceBudget(uuid)
 				workspace.Budget = budget.TotalBudget
 			} else {
 				workspace.Budget = 0
