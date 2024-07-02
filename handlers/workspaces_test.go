@@ -650,6 +650,209 @@ func TestGetWorkspaceBountiesCount(t *testing.T) {
 
 func TestAddUserRoles(t *testing.T) {
 
+	teardownSuite := SetupSuite(t)
+	defer teardownSuite(t)
+
+	oHandler := NewWorkspaceHandler(db.TestDB)
+
+	person := db.Person{
+		Uuid:        uuid.New().String(),
+		OwnerAlias:  "alias",
+		UniqueName:  "unique_name",
+		OwnerPubKey: "pubkey",
+		PriceToMeet: 0,
+		Description: "description",
+	}
+
+	person2 := db.Person{
+		Uuid:        uuid.New().String(),
+		OwnerAlias:  "alias2",
+		UniqueName:  "unique_name2",
+		OwnerPubKey: "pubkey2",
+		PriceToMeet: 0,
+		Description: "description2",
+	}
+	db.TestDB.CreateOrEditPerson(person)
+	db.TestDB.CreateOrEditPerson(person2)
+
+	workspace := db.Workspace{
+		Uuid:        uuid.New().String(),
+		Name:        "workspace_name",
+		OwnerPubKey: person2.OwnerPubKey,
+		Github:      "gtihub",
+		Website:     "website",
+		Description: "description",
+	}
+	db.TestDB.CreateOrEditWorkspace(workspace)
+
+	userRoles := []db.WorkspaceUserRoles{
+		db.WorkspaceUserRoles{
+			WorkspaceUuid: workspace.Uuid,
+			OwnerPubKey:   person2.OwnerPubKey,
+			Role:          "ADD BOUNTY",
+		},
+	}
+
+	workspaceUser := db.WorkspaceUsers{
+		OwnerPubKey:   person2.OwnerPubKey,
+		OrgUuid:       workspace.Uuid,
+		WorkspaceUuid: workspace.Uuid,
+	}
+
+	db.TestDB.CreateWorkspaceUser(workspaceUser)
+
+	t.Run("Should test that when the right conditions are met a user can be added to a workspace", func(t *testing.T) {
+		handlerUserHasAccess := func(pubKeyFromAuth string, uuid string, role string) bool {
+			return true
+		}
+		oHandler.userHasAccess = handlerUserHasAccess
+
+		ctx := context.WithValue(context.Background(), auth.ContextKey, "pub-key")
+
+		requestBody, _ := json.Marshal(userRoles)
+		rctx := chi.NewRouteContext()
+		rctx.URLParams.Add("uuid", workspace.Uuid)
+		rctx.URLParams.Add("user", person2.OwnerPubKey)
+		req, err := http.NewRequestWithContext(context.WithValue(ctx, chi.RouteCtxKey, rctx), http.MethodPost, "/users/role/"+workspace.Uuid+"/"+person2.OwnerPubKey, bytes.NewReader(requestBody))
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		fetchedWorkspaceUser := db.TestDB.GetWorkspaceUser(person2.OwnerPubKey, workspace.Uuid)
+
+		rr := httptest.NewRecorder()
+		http.HandlerFunc(oHandler.AddUserRoles).ServeHTTP(rr, req)
+
+		fetchedUserRole := db.TestDB.GetUserRoles(workspace.Uuid, person2.OwnerPubKey)
+		assert.Equal(t, http.StatusOK, rr.Code)
+		assert.Equal(t, person2.OwnerPubKey, fetchedWorkspaceUser.OwnerPubKey)
+		assert.Equal(t, userRoles[0].Role, fetchedUserRole[0].Role)
+
+	})
+
+	t.Run("Should test that when an unauthorized user hits the endpoint it returns a 401 error", func(t *testing.T) {
+		workspaceUUID := workspace.Uuid
+
+		requestBody, _ := json.Marshal(userRoles)
+		rctx := chi.NewRouteContext()
+		rctx.URLParams.Add("uuid", workspaceUUID)
+		rctx.URLParams.Add("user", person2.OwnerPubKey)
+		req, err := http.NewRequestWithContext(context.WithValue(context.Background(), chi.RouteCtxKey, rctx), http.MethodPost, "/users/role/"+workspaceUUID+"/"+person2.OwnerPubKey, bytes.NewReader(requestBody))
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		rr := httptest.NewRecorder()
+		http.HandlerFunc(oHandler.AddUserRoles).ServeHTTP(rr, req)
+
+		assert.Equal(t, http.StatusUnauthorized, rr.Code)
+	})
+
+	t.Run("Should test that if a user or uuid parameters are not passed it returns a 401 error", func(t *testing.T) {
+
+		requestBody, _ := json.Marshal(userRoles)
+		rctx := chi.NewRouteContext()
+		rctx.URLParams.Add("uuid", "")
+		rctx.URLParams.Add("user", "")
+		req, err := http.NewRequestWithContext(context.WithValue(context.Background(), chi.RouteCtxKey, rctx), http.MethodPost, "/users/role/"+""+"/"+"", bytes.NewReader(requestBody))
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		rr := httptest.NewRecorder()
+		http.HandlerFunc(oHandler.AddUserRoles).ServeHTTP(rr, req)
+
+		assert.Equal(t, http.StatusUnauthorized, rr.Code)
+	})
+
+	t.Run("Should test that when a wrong body data is sent to the endpoint it returns a 406 error", func(t *testing.T) {
+		workspaceUUID := workspace.Uuid
+
+		InvalidJson := []byte(`{"key": "value"`)
+		requestBody, _ := json.Marshal(InvalidJson)
+		rctx := chi.NewRouteContext()
+		rctx.URLParams.Add("uuid", workspaceUUID)
+		rctx.URLParams.Add("user", person2.OwnerPubKey)
+		req, err := http.NewRequestWithContext(context.WithValue(context.Background(), chi.RouteCtxKey, rctx), http.MethodPost, "/users/role/"+workspaceUUID+"/"+person2.OwnerPubKey, bytes.NewReader(requestBody))
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		rr := httptest.NewRecorder()
+		http.HandlerFunc(oHandler.AddUserRoles).ServeHTTP(rr, req)
+
+		assert.Equal(t, http.StatusNotAcceptable, rr.Code)
+	})
+
+	t.Run("Should test that if a user is not the creator of the workspace or does not have an ADD USER ROLE it returns a 401 error", func(t *testing.T) {
+		workspaceUUID := workspace.Uuid
+
+		handlerUserHasAccess := func(pubKeyFromAuth string, uuid string, role string) bool {
+			return false
+		}
+		oHandler.userHasAccess = handlerUserHasAccess
+		userRoles[0].OwnerPubKey = person.OwnerPubKey
+		requestBody, _ := json.Marshal(userRoles)
+		rctx := chi.NewRouteContext()
+		rctx.URLParams.Add("uuid", workspaceUUID)
+		rctx.URLParams.Add("user", person.OwnerPubKey)
+		req, err := http.NewRequestWithContext(context.WithValue(context.Background(), chi.RouteCtxKey, rctx), http.MethodPost, "/users/role/"+workspaceUUID+"/"+person.OwnerPubKey, bytes.NewReader(requestBody))
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		rr := httptest.NewRecorder()
+		http.HandlerFunc(oHandler.AddUserRoles).ServeHTTP(rr, req)
+
+		assert.Equal(t, http.StatusUnauthorized, rr.Code)
+	})
+
+	t.Run("Should test that when the pubkey from URL param does not match the pubkey from JWT AUTH claims it returns a 401 error", func(t *testing.T) {
+		workspaceUUID := workspace.Uuid
+
+		ctx := context.WithValue(context.Background(), auth.ContextKey, "mismatching_pubkey")
+
+		requestBody, _ := json.Marshal(userRoles)
+		rctx := chi.NewRouteContext()
+		rctx.URLParams.Add("uuid", workspaceUUID)
+		rctx.URLParams.Add("user", person2.OwnerPubKey)
+		req, err := http.NewRequestWithContext(context.WithValue(ctx, chi.RouteCtxKey, rctx), http.MethodPost, "/users/role/"+workspaceUUID+"/"+person2.OwnerPubKey, bytes.NewReader(requestBody))
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		rr := httptest.NewRecorder()
+		http.HandlerFunc(oHandler.AddUserRoles).ServeHTTP(rr, req)
+
+		assert.Equal(t, http.StatusUnauthorized, rr.Code)
+	})
+
+	t.Run("Should test that if user doesn't exists in workspace it returns a 401 error", func(t *testing.T) {
+		workspaceUUID := workspace.Uuid
+
+		handlerUserHasAccess := func(pubKeyFromAuth string, uuid string, role string) bool {
+			return true
+		}
+		oHandler.userHasAccess = handlerUserHasAccess
+		ctx := context.WithValue(context.Background(), auth.ContextKey, workspace.OwnerPubKey)
+
+		userRoles[0].OwnerPubKey = person.OwnerPubKey
+		requestBody, _ := json.Marshal(userRoles)
+		rctx := chi.NewRouteContext()
+		rctx.URLParams.Add("uuid", workspaceUUID)
+		rctx.URLParams.Add("user", person.OwnerPubKey)
+
+		req, err := http.NewRequestWithContext(context.WithValue(ctx, chi.RouteCtxKey, rctx), http.MethodPost, "/users/role/"+workspaceUUID+"/"+person.OwnerPubKey, bytes.NewReader(requestBody))
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		rr := httptest.NewRecorder()
+		http.HandlerFunc(oHandler.AddUserRoles).ServeHTTP(rr, req)
+
+		assert.Equal(t, http.StatusUnauthorized, rr.Code)
+	})
+
 }
 
 func TestGetUserRoles(t *testing.T) {
