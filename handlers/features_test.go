@@ -2,7 +2,7 @@ package handlers
 
 import (
 	"context"
-  	"encoding/json"
+	"encoding/json"
 	"net/http"
 	"net/http/httptest"
 	"testing"
@@ -12,9 +12,6 @@ import (
 	"github.com/stakwork/sphinx-tribes/auth"
 	"github.com/stakwork/sphinx-tribes/db"
 	"github.com/stretchr/testify/assert"
-	"net/http"
-	"net/http/httptest"
-	"testing"
 )
 
 func TestCreateOrEditFeatures(t *testing.T) {
