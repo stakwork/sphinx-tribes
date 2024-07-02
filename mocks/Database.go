@@ -5357,6 +5357,55 @@ func (_c *Database_GetUserInvoiceData_Call) RunAndReturn(run func(string) db.Use
 	return _c
 }
 
+// GetUserRoles provides a mock function with given fields: uuid, pubkey
+func (_m *Database) GetUserRoles(uuid string, pubkey string) []db.WorkspaceUserRoles {
+	ret := _m.Called(uuid, pubkey)
+
+	if len(ret) == 0 {
+		panic("no return value specified for GetUserRoles")
+	}
+
+	var r0 []db.WorkspaceUserRoles
+	if rf, ok := ret.Get(0).(func(string, string) []db.WorkspaceUserRoles); ok {
+		r0 = rf(uuid, pubkey)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).([]db.WorkspaceUserRoles)
+		}
+	}
+
+	return r0
+}
+
+// Database_GetUserRoles_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'GetUserRoles'
+type Database_GetUserRoles_Call struct {
+	*mock.Call
+}
+
+// GetUserRoles is a helper method to define mock.On call
+//   - uuid string
+//   - pubkey string
+func (_e *Database_Expecter) GetUserRoles(uuid interface{}, pubkey interface{}) *Database_GetUserRoles_Call {
+	return &Database_GetUserRoles_Call{Call: _e.mock.On("GetUserRoles", uuid, pubkey)}
+}
+
+func (_c *Database_GetUserRoles_Call) Run(run func(uuid string, pubkey string)) *Database_GetUserRoles_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(string), args[1].(string))
+	})
+	return _c
+}
+
+func (_c *Database_GetUserRoles_Call) Return(_a0 []db.WorkspaceUserRoles) *Database_GetUserRoles_Call {
+	_c.Call.Return(_a0)
+	return _c
+}
+
+func (_c *Database_GetUserRoles_Call) RunAndReturn(run func(string, string) []db.WorkspaceUserRoles) *Database_GetUserRoles_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
 // GetWorkspaceBounties provides a mock function with given fields: r, workspace_uuid
 func (_m *Database) GetWorkspaceBounties(r *http.Request, workspace_uuid string) []db.NewBounty {
 	ret := _m.Called(r, workspace_uuid)
