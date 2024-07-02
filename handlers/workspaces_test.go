@@ -687,7 +687,7 @@ func TestAddUserRoles(t *testing.T) {
 	db.TestDB.CreateOrEditWorkspace(workspace)
 
 	userRoles := []db.WorkspaceUserRoles{
-		{
+		db.WorkspaceUserRoles{
 			WorkspaceUuid: workspace.Uuid,
 			OwnerPubKey:   person2.OwnerPubKey,
 			Role:          "ADD BOUNTY",
