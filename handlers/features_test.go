@@ -279,7 +279,84 @@ func TestGetWorkspaceFeaturesCount(t *testing.T) {
 }
 
 func TestGetFeatureByUuid(t *testing.T) {
+	teardownSuite := SetupSuite(t)
+	defer teardownSuite(t)
 
+	fHandler := NewFeatureHandler(db.TestDB)
+
+	person := db.Person{
+		Uuid:        uuid.New().String(),
+		OwnerAlias:  "test-alias",
+		UniqueName:  "test-unique-name",
+		OwnerPubKey: "test-pubkey",
+		PriceToMeet: 0,
+		Description: "test-description",
+	}
+	db.TestDB.CreateOrEditPerson(person)
+
+	workspace := db.Workspace{
+		Uuid:        uuid.New().String(),
+		Name:        "test-workspace" + uuid.New().String(),
+		OwnerPubKey: person.OwnerPubKey,
+		Github:      "https://github.com/test",
+		Website:     "https://www.testwebsite.com",
+		Description: "test-description",
+	}
+	db.TestDB.CreateOrEditWorkspace(workspace)
+	workspace = db.TestDB.GetWorkspaceByUuid(workspace.Uuid)
+
+	feature := db.WorkspaceFeatures{
+		Uuid:          uuid.New().String(),
+		WorkspaceUuid: workspace.Uuid,
+		Name:          "test-feature",
+		Url:           "https://github.com/test-feature",
+		Priority:      0,
+	}
+	db.TestDB.CreateOrEditFeature(feature)
+	feature = db.TestDB.GetFeatureByUuid(feature.Uuid)
+
+	t.Run("should return error if not authorized", func(t *testing.T) {
+		featureUUID := feature.Uuid
+		rr := httptest.NewRecorder()
+		handler := http.HandlerFunc(fHandler.GetFeatureByUuid)
+
+		rctx := chi.NewRouteContext()
+		rctx.URLParams.Add("uuid", featureUUID)
+		req, err := http.NewRequestWithContext(context.WithValue(context.Background(), chi.RouteCtxKey, rctx), http.MethodGet, "/features/"+featureUUID, nil)
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		handler.ServeHTTP(rr, req)
+
+		assert.Equal(t, http.StatusUnauthorized, rr.Code)
+	})
+
+	t.Run("should return feature if user is authorized", func(t *testing.T) {
+		featureUUID := feature.Uuid
+
+		rr := httptest.NewRecorder()
+		handler := http.HandlerFunc(fHandler.GetFeatureByUuid)
+
+		rctx := chi.NewRouteContext()
+		rctx.URLParams.Add("uuid", featureUUID)
+		ctx := context.WithValue(context.Background(), auth.ContextKey, person.OwnerPubKey)
+		req, err := http.NewRequestWithContext(context.WithValue(ctx, chi.RouteCtxKey, rctx), http.MethodGet, "/features/"+featureUUID, nil)
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		handler.ServeHTTP(rr, req)
+
+		assert.Equal(t, http.StatusOK, rr.Code)
+
+		var returnedFeature db.WorkspaceFeatures
+		err = json.Unmarshal(rr.Body.Bytes(), &returnedFeature)
+		assert.NoError(t, err)
+		assert.Equal(t, feature.Name, returnedFeature.Name)
+		assert.Equal(t, feature.Url, returnedFeature.Url)
+		assert.Equal(t, feature.Priority, returnedFeature.Priority)
+	})
 }
 
 func TestCreateOrEditFeaturePhase(t *testing.T) {
