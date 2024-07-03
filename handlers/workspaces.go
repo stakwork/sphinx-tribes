@@ -492,7 +492,7 @@ func (oh *workspaceHandler) GetUserDropdownWorkspaces(w http.ResponseWriter, r *
 		uuid := value.WorkspaceUuid
 		workspace := oh.db.GetWorkspaceByUuid(uuid)
 		bountyCount := oh.db.GetWorkspaceBountyCount(uuid)
-		hasRole := oh.userHasAccess(user.OwnerPubKey, uuid, db.ViewReport)
+		hasRole := oh.db.UserHasAccess(user.OwnerPubKey, uuid, db.ViewReport)
 		hasBountyRoles := oh.userHasManageBountyRoles(user.OwnerPubKey, uuid)
 
 		// don't add deleted workspaces to the list

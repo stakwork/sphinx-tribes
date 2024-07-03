@@ -1207,7 +1207,6 @@ func TestGetUserDropdownWorkspaces(t *testing.T) {
 	db.TestDB.DeleteWorkSpaceAllData()
 
 	oHandler := NewWorkspaceHandler(db.TestDB)
-	oHandler.userHasAccess = db.TestDB.DeleteWorkSpaceUserAccessData
 
 	person := db.Person{
 		Uuid:        uuid.New().String(),
@@ -1245,6 +1244,7 @@ func TestGetUserDropdownWorkspaces(t *testing.T) {
 		{WorkspaceUuid: workspace.Uuid, OwnerPubKey: person2.OwnerPubKey, Role: "UPDATE BOUNTY"},
 		{WorkspaceUuid: workspace.Uuid, OwnerPubKey: person2.OwnerPubKey, Role: "DELETE BOUNTY"},
 		{WorkspaceUuid: workspace.Uuid, OwnerPubKey: person2.OwnerPubKey, Role: "PAY BOUNTY"},
+		{WorkspaceUuid: workspace.Uuid, OwnerPubKey: person2.OwnerPubKey, Role: "VIEW REPORT"},
 	}
 	db.TestDB.CreateUserRoles(roles, workspace.Uuid, person2.OwnerPubKey)
 
