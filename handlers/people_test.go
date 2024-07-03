@@ -442,6 +442,7 @@ func TestGetListedPeople(t *testing.T) {
 		PriceToMeet:  0,
 		Description:  "This is test user 2",
 		Unlisted:     false,
+		Deleted:      false,
 		Tags:         pq.StringArray{},
 		GithubIssues: db.PropertyMap{},
 		Extras:       db.PropertyMap{"coding_languages": "Golang"},
