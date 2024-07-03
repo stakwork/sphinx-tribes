@@ -440,7 +440,132 @@ func TestGetFeatureByUuid(t *testing.T) {
 }
 
 func TestCreateOrEditFeaturePhase(t *testing.T) {
+	teardownSuite := SetupSuite(t)
+	defer teardownSuite(t)
 
+	fHandler := NewFeatureHandler(db.TestDB)
+
+	person := db.Person{
+		Uuid:        "uuid",
+		OwnerAlias:  "alias",
+		UniqueName:  "unique_name",
+		OwnerPubKey: "pubkey",
+		PriceToMeet: 0,
+		Description: "description",
+	}
+	db.TestDB.CreateOrEditPerson(person)
+
+	workspace := db.Workspace{
+		Uuid:        "workspace_uuid",
+		Name:        "workspace_name",
+		OwnerPubKey: "person.OwnerPubkey",
+		Github:      "gtihub",
+		Website:     "website",
+		Description: "description",
+	}
+	db.TestDB.CreateOrEditWorkspace(workspace)
+
+	feature := db.WorkspaceFeatures{
+		Uuid:          "feature_uuid",
+		WorkspaceUuid: workspace.Uuid,
+		Name:          "feature_name",
+		Url:           "feature_url",
+		Priority:      0,
+	}
+	db.TestDB.CreateOrEditFeature(feature)
+
+	t.Run("should return 401 error if not authorized", func(t *testing.T) {
+		rr := httptest.NewRecorder()
+		handler := http.HandlerFunc(fHandler.CreateOrEditFeaturePhase)
+
+		featurePhase := db.FeaturePhase{
+			Uuid:        "feature_phase_uuid",
+			FeatureUuid: feature.Uuid,
+			Name:        "feature_phase_name",
+			Priority:    0,
+		}
+
+		requestBody, _ := json.Marshal(featurePhase)
+		req, err := http.NewRequest(http.MethodPost, "/features/phase", bytes.NewReader(requestBody))
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		handler.ServeHTTP(rr, req)
+
+		assert.Equal(t, http.StatusUnauthorized, rr.Code)
+	})
+
+	t.Run("should return 406 error if body is not a valid json", func(t *testing.T) {
+		rr := httptest.NewRecorder()
+		handler := http.HandlerFunc(fHandler.CreateOrEditFeaturePhase)
+
+		invalidJson := []byte(`{"key": "value"`)
+
+		ctx := context.WithValue(context.Background(), auth.ContextKey, workspace.OwnerPubKey)
+		req, err := http.NewRequestWithContext(ctx, http.MethodPost, "/features/phase", bytes.NewReader(invalidJson))
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		handler.ServeHTTP(rr, req)
+
+		assert.Equal(t, http.StatusNotAcceptable, rr.Code)
+	})
+
+	t.Run("should return 401 error if a Feature UUID that does not exist Is passed to the API body", func(t *testing.T) {
+		rr := httptest.NewRecorder()
+		handler := http.HandlerFunc(fHandler.CreateOrEditFeaturePhase)
+
+		featurePhase := db.FeaturePhase{
+			Uuid:        "feature_phase_uuid",
+			FeatureUuid: "non-existent-uuid",
+			Name:        "feature_phase_name",
+			Priority:    0,
+		}
+
+		requestBody, _ := json.Marshal(featurePhase)
+
+		ctx := context.WithValue(context.Background(), auth.ContextKey, workspace.OwnerPubKey)
+		req, err := http.NewRequestWithContext(ctx, http.MethodPost, "/features/phase", bytes.NewReader(requestBody))
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		handler.ServeHTTP(rr, req)
+
+		assert.Equal(t, http.StatusUnauthorized, rr.Code)
+	})
+
+	t.Run("should successfully user can add a feature phase when the right conditions are met", func(t *testing.T) {
+		rr := httptest.NewRecorder()
+		handler := http.HandlerFunc(fHandler.CreateOrEditFeaturePhase)
+
+		featurePhase := db.FeaturePhase{
+			Uuid:        "feature_phase_uuid",
+			FeatureUuid: feature.Uuid,
+			Name:        "feature_phase_name",
+			Priority:    0,
+		}
+
+		requestBody, _ := json.Marshal(featurePhase)
+
+		ctx := context.WithValue(context.Background(), auth.ContextKey, workspace.OwnerPubKey)
+		req, err := http.NewRequestWithContext(ctx, http.MethodPost, "/features/phase", bytes.NewReader(requestBody))
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		handler.ServeHTTP(rr, req)
+
+		assert.Equal(t, http.StatusCreated, rr.Code)
+
+		createdFeaturePhase, _ := db.TestDB.GetFeaturePhaseByUuid(feature.Uuid, featurePhase.Uuid)
+
+		assert.Equal(t, featurePhase.Name, createdFeaturePhase.Name)
+		assert.Equal(t, featurePhase.FeatureUuid, createdFeaturePhase.FeatureUuid)
+		assert.Equal(t, featurePhase.Priority, createdFeaturePhase.Priority)
+	})
 }
 
 func TestGetFeaturePhases(t *testing.T) {
