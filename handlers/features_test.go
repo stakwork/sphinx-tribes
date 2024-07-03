@@ -540,7 +540,102 @@ func TestDeleteFeaturePhase(t *testing.T) {
 }
 
 func TestCreateOrEditStory(t *testing.T) {
+	teardownSuite := SetupSuite(t)
+	defer teardownSuite(t)
 
+	fHandler := NewFeatureHandler(db.TestDB)
+
+	person := db.Person{
+		Uuid:        uuid.New().String(),
+		OwnerAlias:  "test-alias",
+		UniqueName:  "test-unique-name",
+		OwnerPubKey: "test-pubkey",
+		PriceToMeet: 0,
+		Description: "test-description",
+	}
+	db.TestDB.CreateOrEditPerson(person)
+
+	workspace := db.Workspace{
+		Uuid:        uuid.New().String(),
+		Name:        "test-workspace" + uuid.New().String(),
+		OwnerPubKey: person.OwnerPubKey,
+		Github:      "https://github.com/test",
+		Website:     "https://www.testwebsite.com",
+		Description: "test-description",
+	}
+	db.TestDB.CreateOrEditWorkspace(workspace)
+	workspace = db.TestDB.GetWorkspaceByUuid(workspace.Uuid)
+
+	feature := db.WorkspaceFeatures{
+		Uuid:          uuid.New().String(),
+		WorkspaceUuid: workspace.Uuid,
+		Name:          "test-feature",
+		Url:           "https://github.com/test-feature",
+		Priority:      0,
+	}
+	db.TestDB.CreateOrEditFeature(feature)
+
+	featureStory := db.FeatureStory{
+		Uuid:        uuid.New().String(),
+		FeatureUuid: feature.Uuid,
+		Description: "test-description",
+		Priority:    0,
+	}
+
+	t.Run("should return 401 error if not authorized", func(t *testing.T) {
+		rr := httptest.NewRecorder()
+		handler := http.HandlerFunc(fHandler.CreateOrEditStory)
+
+		requestBody, _ := json.Marshal(featureStory)
+		req, err := http.NewRequest(http.MethodPost, "/features/story", bytes.NewReader(requestBody))
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		handler.ServeHTTP(rr, req)
+
+		assert.Equal(t, http.StatusUnauthorized, rr.Code)
+	})
+
+	t.Run("should return 406 error if body is not a valid json", func(t *testing.T) {
+		rr := httptest.NewRecorder()
+		handler := http.HandlerFunc(fHandler.CreateOrEditStory)
+
+		invalidJson := []byte(`{"key": "value"`)
+
+		ctx := context.WithValue(context.Background(), auth.ContextKey, person.OwnerPubKey)
+		req, err := http.NewRequestWithContext(ctx, http.MethodPost, "/features/story", bytes.NewReader(invalidJson))
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		handler.ServeHTTP(rr, req)
+
+		assert.Equal(t, http.StatusNotAcceptable, rr.Code)
+	})
+
+	t.Run("should successfully add feature story if request is valid", func(t *testing.T) {
+		rr := httptest.NewRecorder()
+		handler := http.HandlerFunc(fHandler.CreateOrEditStory)
+
+		requestBody, _ := json.Marshal(featureStory)
+
+		ctx := context.WithValue(context.Background(), auth.ContextKey, person.OwnerPubKey)
+		req, err := http.NewRequestWithContext(ctx, http.MethodPost, "/features/story", bytes.NewReader(requestBody))
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		handler.ServeHTTP(rr, req)
+
+		assert.Equal(t, http.StatusCreated, rr.Code)
+
+		createdStory, err := db.TestDB.GetFeatureStoryByUuid(featureStory.FeatureUuid, featureStory.Uuid)
+		assert.NoError(t, err)
+		assert.Equal(t, featureStory.Description, createdStory.Description)
+		assert.Equal(t, featureStory.Priority, createdStory.Priority)
+		assert.Equal(t, featureStory.FeatureUuid, createdStory.FeatureUuid)
+	})
 }
 
 func TestGetStoriesByFeatureUuid(t *testing.T) {
