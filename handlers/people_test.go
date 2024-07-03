@@ -478,8 +478,8 @@ func TestGetListedPeople(t *testing.T) {
 		assert.NoError(t, err)
 
 		expectedPeople := []db.Person{
-			fetchedPerson2,
 			fetchedPerson3,
+			fetchedPerson2,
 		}
 
 		handler.ServeHTTP(rr, req)
