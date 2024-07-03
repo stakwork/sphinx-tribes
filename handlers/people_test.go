@@ -479,8 +479,8 @@ func TestGetListedPeople(t *testing.T) {
 		assert.NoError(t, err)
 
 		expectedPeople := []db.Person{
-			fetchedPerson3,
 			fetchedPerson2,
+			fetchedPerson3,
 		}
 
 		handler.ServeHTTP(rr, req)
@@ -521,16 +521,17 @@ func TestGetListedPeople(t *testing.T) {
 		handler := http.HandlerFunc(pHandler.GetListedPeople)
 
 		rctx := chi.NewRouteContext()
+		languages := person2.Extras["coding_languages"].(string)
 		req, err := http.NewRequestWithContext(
 			context.WithValue(context.Background(), chi.RouteCtxKey, rctx),
 			http.MethodGet,
-			"/?page=1&limit=10&languages="+person3.Extras["coding_languages"].(string),
+			"page=1&limit=10&languages="+languages,
 			nil,
 		)
 		assert.NoError(t, err)
 
 		expectedPeople := []db.Person{
-			fetchedPerson3,
+			fetchedPerson2,
 		}
 
 		handler.ServeHTTP(rr, req)
@@ -539,7 +540,7 @@ func TestGetListedPeople(t *testing.T) {
 		err = json.Unmarshal(rr.Body.Bytes(), &returnedPeople)
 		assert.NoError(t, err)
 		assert.Equal(t, http.StatusOK, rr.Code)
-		assert.EqualValues(t, person3, fetchedPerson3)
+		assert.EqualValues(t, person2, fetchedPerson2)
 		assert.EqualValues(t, expectedPeople, returnedPeople)
 	})
 
