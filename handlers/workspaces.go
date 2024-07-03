@@ -338,7 +338,7 @@ func GetBountyRoles(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(roles)
 }
 
-func AddUserRoles(w http.ResponseWriter, r *http.Request) {
+func (oh *workspaceHandler) AddUserRoles(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 	pubKeyFromAuth, _ := ctx.Value(auth.ContextKey).(string)
 	uuid := chi.URLParam(r, "uuid")
@@ -376,7 +376,7 @@ func AddUserRoles(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// if not the orgnization admin
-	hasRole := db.UserHasAccess(pubKeyFromAuth, uuid, db.AddRoles)
+	hasRole := oh.userHasAccess(pubKeyFromAuth, uuid, db.AddRoles)
 	isUser := db.CheckUser(roles, pubKeyFromAuth)
 
 	if isUser {
@@ -415,7 +415,7 @@ func AddUserRoles(w http.ResponseWriter, r *http.Request) {
 		}
 
 		// check if the user has the role he his trying to add to another user
-		okUser := db.UserHasAccess(pubKeyFromAuth, uuid, role.Role)
+		okUser := oh.userHasAccess(pubKeyFromAuth, uuid, role.Role)
 		// if the user does not have any of the roles he wants to add return an error
 		if !okUser {
 			w.WriteHeader(http.StatusUnauthorized)
@@ -429,7 +429,7 @@ func AddUserRoles(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// check if user already exists
-	userExists := db.DB.GetWorkspaceUser(user, uuid)
+	userExists := oh.db.GetWorkspaceUser(user, uuid)
 
 	// if not the workspace admin
 	if userExists.OwnerPubKey != user || userExists.WorkspaceUuid != uuid {
@@ -438,17 +438,17 @@ func AddUserRoles(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	db.DB.CreateUserRoles(insertRoles, uuid, user)
+	oh.db.CreateUserRoles(insertRoles, uuid, user)
 
 	w.WriteHeader(http.StatusOK)
 	json.NewEncoder(w).Encode(insertRoles)
 }
 
-func GetUserRoles(w http.ResponseWriter, r *http.Request) {
+func (oh *workspaceHandler) GetUserRoles(w http.ResponseWriter, r *http.Request) {
 	uuid := chi.URLParam(r, "uuid")
 	user := chi.URLParam(r, "user")
 
-	userRoles := db.DB.GetUserRoles(uuid, user)
+	userRoles := oh.db.GetUserRoles(uuid, user)
 
 	w.WriteHeader(http.StatusOK)
 	json.NewEncoder(w).Encode(userRoles)
