@@ -465,8 +465,10 @@ func TestGetListedPeople(t *testing.T) {
 	db.TestDB.CreateOrEditPerson(person2)
 	db.TestDB.CreateOrEditPerson(person3)
 
-	fetchedPerson := db.TestDB.GetPerson(person2.ID)
-	fetchedPerson2 := db.TestDB.GetPerson(person3.ID)
+	fetchedPerson2 := db.TestDB.GetPerson(person2.ID)
+	fetchedPerson3 := db.TestDB.GetPerson(person3.ID)
+	person2.ID = fetchedPerson2.ID
+	person3.ID = fetchedPerson3.ID
 
 	t.Run("should return all listed users", func(t *testing.T) {
 		rr := httptest.NewRecorder()
@@ -477,8 +479,8 @@ func TestGetListedPeople(t *testing.T) {
 		assert.NoError(t, err)
 
 		expectedPeople := []db.Person{
-			fetchedPerson,
 			fetchedPerson2,
+			fetchedPerson3,
 		}
 
 		handler.ServeHTTP(rr, req)
@@ -487,8 +489,8 @@ func TestGetListedPeople(t *testing.T) {
 		err = json.Unmarshal(rr.Body.Bytes(), &returnedPeople)
 		assert.NoError(t, err)
 		assert.Equal(t, http.StatusOK, rr.Code)
-		assert.EqualValues(t, person2, fetchedPerson)
-		assert.EqualValues(t, person3, fetchedPerson2)
+		assert.EqualValues(t, person2, fetchedPerson2)
+		assert.EqualValues(t, person3, fetchedPerson3)
 		assert.EqualValues(t, expectedPeople, returnedPeople)
 	})
 
@@ -501,7 +503,7 @@ func TestGetListedPeople(t *testing.T) {
 		assert.NoError(t, err)
 
 		expectedPeople := []db.Person{
-			fetchedPerson,
+			fetchedPerson2,
 		}
 
 		handler.ServeHTTP(rr, req)
@@ -510,7 +512,7 @@ func TestGetListedPeople(t *testing.T) {
 		err = json.Unmarshal(rr.Body.Bytes(), &returnedPeople)
 		assert.NoError(t, err)
 		assert.Equal(t, http.StatusOK, rr.Code)
-		assert.EqualValues(t, person2, fetchedPerson)
+		assert.EqualValues(t, person2, fetchedPerson2)
 		assert.EqualValues(t, expectedPeople, returnedPeople)
 	})
 
@@ -519,16 +521,17 @@ func TestGetListedPeople(t *testing.T) {
 		handler := http.HandlerFunc(pHandler.GetListedPeople)
 
 		rctx := chi.NewRouteContext()
+		languages := person2.Extras["coding_languages"].(string)
 		req, err := http.NewRequestWithContext(
 			context.WithValue(context.Background(), chi.RouteCtxKey, rctx),
 			http.MethodGet,
-			"page=1&limit=10&languages="+person2.Extras["coding_languages"].(string),
+			"page=1&limit=10&languages="+languages,
 			nil,
 		)
 		assert.NoError(t, err)
 
 		expectedPeople := []db.Person{
-			fetchedPerson,
+			fetchedPerson2,
 		}
 
 		handler.ServeHTTP(rr, req)
@@ -537,7 +540,7 @@ func TestGetListedPeople(t *testing.T) {
 		err = json.Unmarshal(rr.Body.Bytes(), &returnedPeople)
 		assert.NoError(t, err)
 		assert.Equal(t, http.StatusOK, rr.Code)
-		assert.EqualValues(t, person2, fetchedPerson)
+		assert.EqualValues(t, person2, fetchedPerson2)
 		assert.EqualValues(t, expectedPeople, returnedPeople)
 	})
 
