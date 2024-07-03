@@ -491,7 +491,7 @@ func TestGetFeaturePhases(t *testing.T) {
 	t.Run("Should test that it throws a 401 error if a user is not authorized", func(t *testing.T) {
 		rctx := chi.NewRouteContext()
 		rctx.URLParams.Add("feature_uuid", feature.Uuid)
-		req, err := http.NewRequestWithContext(context.WithValue(context.Background(), chi.RouteCtxKey, rctx), http.MethodGet, "/features/"+feature.Uuid+"/phase"+workspace.Uuid, nil)
+		req, err := http.NewRequestWithContext(context.WithValue(context.Background(), chi.RouteCtxKey, rctx), http.MethodGet, "/features/"+feature.Uuid+"/phase", nil)
 		if err != nil {
 			t.Fatal(err)
 		}
@@ -505,7 +505,7 @@ func TestGetFeaturePhases(t *testing.T) {
 	t.Run("Should test that the workspace features phases array returned from the API has the feature phases created", func(t *testing.T) {
 		rctx := chi.NewRouteContext()
 		rctx.URLParams.Add("feature_uuid", feature.Uuid)
-		req, err := http.NewRequestWithContext(context.WithValue(ctx, chi.RouteCtxKey, rctx), http.MethodGet, "/features/"+feature.Uuid+"/phase"+workspace.Uuid, nil)
+		req, err := http.NewRequestWithContext(context.WithValue(ctx, chi.RouteCtxKey, rctx), http.MethodGet, "/features/"+feature.Uuid+"/phase", nil)
 		if err != nil {
 			t.Fatal(err)
 		}
