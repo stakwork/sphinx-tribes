@@ -265,7 +265,7 @@ func (oh *featureHandler) CreateOrEditStory(w http.ResponseWriter, r *http.Reque
 	decoder := json.NewDecoder(r.Body)
 	err := decoder.Decode(&newStory)
 	if err != nil {
-		w.WriteHeader(http.StatusBadRequest)
+		w.WriteHeader(http.StatusNotAcceptable)
 		fmt.Fprintf(w, "Error decoding request body: %v", err)
 		return
 	}
