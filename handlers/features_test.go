@@ -7,6 +7,7 @@ import (
 	"net/http"
 	"net/http/httptest"
 	"testing"
+	"time"
 
 	"github.com/go-chi/chi"
 	"github.com/google/uuid"
@@ -443,7 +444,91 @@ func TestCreateOrEditFeaturePhase(t *testing.T) {
 }
 
 func TestGetFeaturePhases(t *testing.T) {
+	teardownSuite := SetupSuite(t)
+	defer teardownSuite(t)
 
+	oHandler := NewFeatureHandler(db.TestDB)
+
+	person := db.Person{
+		Uuid:        "uuid",
+		OwnerAlias:  "alias",
+		UniqueName:  "unique_name",
+		OwnerPubKey: "pubkey",
+		PriceToMeet: 0,
+		Description: "description",
+	}
+	db.TestDB.CreateOrEditPerson(person)
+
+	workspace := db.Workspace{
+		Uuid:        "workspace_uuid",
+		Name:        "workspace_name",
+		OwnerPubKey: "person.OwnerPubkey",
+		Github:      "gtihub",
+		Website:     "website",
+		Description: "description",
+	}
+	db.TestDB.CreateOrEditWorkspace(workspace)
+
+	feature := db.WorkspaceFeatures{
+		Uuid:          "feature_uuid",
+		WorkspaceUuid: workspace.Uuid,
+		Name:          "feature_name",
+		Url:           "feature_url",
+		Priority:      0,
+	}
+	db.TestDB.CreateOrEditFeature(feature)
+
+	featurePhase := db.FeaturePhase{
+		Uuid:        "feature_phase_uuid",
+		FeatureUuid: feature.Uuid,
+		Name:        "feature_phase_name",
+		Priority:    0,
+	}
+	db.TestDB.CreateOrEditFeaturePhase(featurePhase)
+
+	ctx := context.WithValue(context.Background(), auth.ContextKey, workspace.OwnerPubKey)
+
+	t.Run("Should test that it throws a 401 error if a user is not authorized", func(t *testing.T) {
+		rctx := chi.NewRouteContext()
+		rctx.URLParams.Add("feature_uuid", feature.Uuid)
+		req, err := http.NewRequestWithContext(context.WithValue(context.Background(), chi.RouteCtxKey, rctx), http.MethodGet, "/features/"+feature.Uuid+"/phase"+workspace.Uuid, nil)
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		rr := httptest.NewRecorder()
+		http.HandlerFunc(oHandler.GetFeaturePhases).ServeHTTP(rr, req)
+
+		assert.Equal(t, http.StatusUnauthorized, rr.Code)
+	})
+
+	t.Run("Should test that the workspace features phases array returned from the API has the feature phases created", func(t *testing.T) {
+		rctx := chi.NewRouteContext()
+		rctx.URLParams.Add("feature_uuid", feature.Uuid)
+		req, err := http.NewRequestWithContext(context.WithValue(ctx, chi.RouteCtxKey, rctx), http.MethodGet, "/features/"+feature.Uuid+"/phase"+workspace.Uuid, nil)
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		rr := httptest.NewRecorder()
+		http.HandlerFunc(oHandler.GetFeaturePhases).ServeHTTP(rr, req)
+
+		var returnedFeaturePhases []db.FeaturePhase
+		err = json.Unmarshal(rr.Body.Bytes(), &returnedFeaturePhases)
+		assert.NoError(t, err)
+
+		updatedFeaturePhases := db.TestDB.GetPhasesByFeatureUuid(feature.Uuid)
+
+		for i := range updatedFeaturePhases {
+			created := updatedFeaturePhases[i].Created.In(time.UTC)
+			updated := updatedFeaturePhases[i].Updated.In(time.UTC)
+			updatedFeaturePhases[i].Created = &created
+			updatedFeaturePhases[i].Updated = &updated
+		}
+
+		assert.Equal(t, returnedFeaturePhases, updatedFeaturePhases)
+		assert.Equal(t, http.StatusOK, rr.Code)
+	})
 }
 
 func TestGetFeaturePhaseByUUID(t *testing.T) {
