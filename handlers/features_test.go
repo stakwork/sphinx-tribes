@@ -202,6 +202,85 @@ func TestDeleteFeature(t *testing.T) {
 }
 
 func TestGetFeaturesByWorkspaceUuid(t *testing.T) {
+	teardownSuite := SetupSuite(t)
+	defer teardownSuite(t)
+
+	oHandler := NewWorkspaceHandler(db.TestDB)
+
+	t.Run("should return error if a user is not authorized", func(t *testing.T) {
+		rr := httptest.NewRecorder()
+		handler := http.HandlerFunc(oHandler.GetFeaturesByWorkspaceUuid)
+
+		ctx := context.WithValue(context.Background(), auth.ContextKey, "")
+		req, err := http.NewRequestWithContext(ctx, http.MethodGet, "/forworkspace/"+workspace.Uuid, nil)
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		handler.ServeHTTP(rr, req)
+
+		assert.Equal(t, http.StatusUnauthorized, rr.Code)
+	})
+
+	t.Run("created feature should be present in the returned array", func(t *testing.T) {
+		rr := httptest.NewRecorder()
+		handler := http.HandlerFunc(oHandler.GetFeaturesByWorkspaceUuid)
+
+		person := db.Person{
+			Uuid:        uuid.New().String(),
+			OwnerAlias:  "alias",
+			UniqueName:  "unique_name",
+			OwnerPubKey: "pubkey",
+			PriceToMeet: 0,
+			Description: "description",
+		}
+		db.TestDB.CreateOrEditPerson(person)
+		workspace := db.Workspace{
+			Uuid:        uuid.New().String(),
+			Name:        "unique_workspace_name" + uuid.New().String(),
+			OwnerPubKey: person.OwnerPubKey,
+			Github:      "gtihub",
+			Website:     "website",
+			Description: "description",
+		}
+		db.TestDB.CreateOrEditWorkspace(workspace)
+		feature := db.WorkspaceFeatures{
+			Uuid:          uuid.New().String(),
+			WorkspaceUuid: workspace.Uuid,
+			Name:          "feature_name",
+			Url:           "https://www.bountieswebsite.com",
+			Priority:      0,
+		}
+		db.TestDB.CreateOrEditFeature(feature)
+
+		rctx := chi.NewRouteContext()
+		rctx.URLParams.Add("workspace_uuid", workspace.Uuid)
+		ctx := context.WithValue(context.Background(), auth.ContextKey, person.OwnerPubKey)
+		req, err := http.NewRequestWithContext(context.WithValue(ctx, chi.RouteCtxKey, rctx), http.MethodGet, "/forworkspace/"+workspace.Uuid, nil)
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		handler.ServeHTTP(rr, req)
+
+		var returnedWorkspaceFeatures []db.WorkspaceFeatures
+		err = json.Unmarshal(rr.Body.Bytes(), &returnedWorkspaceFeatures)
+		assert.NoError(t, err)
+
+		assert.Equal(t, http.StatusOK, rr.Code)
+		// Verify that the created feature is present in the returned array
+		found := false
+		for _, f := range returnedWorkspaceFeatures {
+			if f.Uuid == feature.Uuid {
+				assert.Equal(t, feature.Name, f.Name)
+				assert.Equal(t, feature.Url, f.Url)
+				assert.Equal(t, feature.Priority, f.Priority)
+				found = true
+				break
+			}
+		}
+		assert.True(t, found, "The created feature should be present in the returned array")
+	})
 
 }
 
