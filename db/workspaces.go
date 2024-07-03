@@ -20,7 +20,7 @@ func (db database) GetWorkspaces(r *http.Request) []Workspace {
 		query.Offset(offset).Limit(limit).Order(sortBy + " " + direction + " ")
 	}
 
-	query.Find(&ms)
+	query.Order("name ASC").Find(&ms)
 	return ms
 }
 
