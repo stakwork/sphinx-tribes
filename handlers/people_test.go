@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"context"
 	"encoding/json"
+	"math/rand"
 	"net/http"
 	"net/http/httptest"
 	"strconv"
@@ -421,7 +422,7 @@ func TestGetListedPeople(t *testing.T) {
 	db.CleanDB()
 
 	person := db.Person{
-		ID:           101,
+		ID:           uint(rand.Intn(1000)),
 		Uuid:         "person_101_uuid",
 		OwnerAlias:   "person101",
 		UniqueName:   "person101",
@@ -434,7 +435,7 @@ func TestGetListedPeople(t *testing.T) {
 		Extras:       db.PropertyMap{"coding_languages": "Typescript"},
 	}
 	person2 := db.Person{
-		ID:           102,
+		ID:           uint(rand.Intn(1000)),
 		Uuid:         "person_102_uuid",
 		OwnerAlias:   "person102",
 		UniqueName:   "person102",
@@ -442,13 +443,12 @@ func TestGetListedPeople(t *testing.T) {
 		PriceToMeet:  0,
 		Description:  "This is test user 2",
 		Unlisted:     false,
-		Deleted:      false,
 		Tags:         pq.StringArray{},
 		GithubIssues: db.PropertyMap{},
 		Extras:       db.PropertyMap{"coding_languages": "Golang"},
 	}
 	person3 := db.Person{
-		ID:           103,
+		ID:           uint(rand.Intn(1000)),
 		Uuid:         "person_103_uuid",
 		OwnerAlias:   "person103",
 		UniqueName:   "person103",
@@ -524,13 +524,13 @@ func TestGetListedPeople(t *testing.T) {
 		req, err := http.NewRequestWithContext(
 			context.WithValue(context.Background(), chi.RouteCtxKey, rctx),
 			http.MethodGet,
-			"page=1&limit=10&languages="+person2.Extras["coding_languages"].(string),
+			"/?page=1&limit=10&languages="+person3.Extras["coding_languages"].(string),
 			nil,
 		)
 		assert.NoError(t, err)
 
 		expectedPeople := []db.Person{
-			fetchedPerson2,
+			fetchedPerson3,
 		}
 
 		handler.ServeHTTP(rr, req)
@@ -539,7 +539,7 @@ func TestGetListedPeople(t *testing.T) {
 		err = json.Unmarshal(rr.Body.Bytes(), &returnedPeople)
 		assert.NoError(t, err)
 		assert.Equal(t, http.StatusOK, rr.Code)
-		assert.EqualValues(t, person2, fetchedPerson2)
+		assert.EqualValues(t, person3, fetchedPerson3)
 		assert.EqualValues(t, expectedPeople, returnedPeople)
 	})
 
