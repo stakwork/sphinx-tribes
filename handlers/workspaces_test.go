@@ -1207,6 +1207,7 @@ func TestGetUserDropdownWorkspaces(t *testing.T) {
 	db.TestDB.DeleteWorkSpaceAllData()
 
 	oHandler := NewWorkspaceHandler(db.TestDB)
+	oHandler.userHasAccess = db.TestDB.DeleteWorkSpaceUserAccessData
 
 	person := db.Person{
 		Uuid:        uuid.New().String(),
@@ -1249,42 +1250,34 @@ func TestGetUserDropdownWorkspaces(t *testing.T) {
 
 	dbPerson := db.TestDB.GetPersonByUuid(person2.Uuid)
 
-	handlerUserHasAccess := func(pubKeyFromAuth string, uuid string, role string) bool {
-		return true
-	}
-	oHandler.userHasAccess = handlerUserHasAccess
+	t.Run("should return user dropdown workspaces", func(t *testing.T) {
+		rr := httptest.NewRecorder()
+		rctx := chi.NewRouteContext()
+		rctx.URLParams.Add("userId", strconv.Itoa(int(dbPerson.ID)))
+		req, err := http.NewRequestWithContext(context.WithValue(ctx, chi.RouteCtxKey, rctx), http.MethodGet, "/user/dropdown/"+strconv.Itoa(int(dbPerson.ID)), nil)
+		if err != nil {
+			t.Fatal(err)
+		}
 
-	handlerUserHasManageBountyRoles := func(pubKeyFromAuth string, uuid string) bool {
-		return true
-	}
-	oHandler.userHasManageBountyRoles = handlerUserHasManageBountyRoles
+		handler := http.HandlerFunc(oHandler.GetUserDropdownWorkspaces)
+		handler.ServeHTTP(rr, req)
 
-	rr := httptest.NewRecorder()
-	rctx := chi.NewRouteContext()
-	rctx.URLParams.Add("userId", strconv.Itoa(int(dbPerson.ID)))
-	req, err := http.NewRequestWithContext(context.WithValue(ctx, chi.RouteCtxKey, rctx), http.MethodGet, "/user/dropdown/"+strconv.Itoa(int(dbPerson.ID)), nil)
-	if err != nil {
-		t.Fatal(err)
-	}
+		assert.Equal(t, http.StatusOK, rr.Code)
 
-	handler := http.HandlerFunc(oHandler.GetUserDropdownWorkspaces)
-	handler.ServeHTTP(rr, req)
+		var responseWorkspaces []db.Workspace
+		err = json.Unmarshal(rr.Body.Bytes(), &responseWorkspaces)
+		if err != nil {
+			t.Fatal(err)
+		}
 
-	assert.Equal(t, http.StatusOK, rr.Code)
-
-	var responseWorkspaces []db.Workspace
-	err = json.Unmarshal(rr.Body.Bytes(), &responseWorkspaces)
-	if err != nil {
-		t.Fatal(err)
-	}
-
-	assert.NotEmpty(t, responseWorkspaces)
-	assert.Equal(t, workspace.Uuid, responseWorkspaces[0].Uuid)
-	assert.Equal(t, workspace.Name, responseWorkspaces[0].Name)
-	assert.Equal(t, workspace.OwnerPubKey, responseWorkspaces[0].OwnerPubKey)
-	assert.Equal(t, workspace.Github, responseWorkspaces[0].Github)
-	assert.Equal(t, workspace.Website, responseWorkspaces[0].Website)
-	assert.Equal(t, workspace.Description, responseWorkspaces[0].Description)
+		assert.NotEmpty(t, responseWorkspaces)
+		assert.Equal(t, workspace.Uuid, responseWorkspaces[0].Uuid)
+		assert.Equal(t, workspace.Name, responseWorkspaces[0].Name)
+		assert.Equal(t, workspace.OwnerPubKey, responseWorkspaces[0].OwnerPubKey)
+		assert.Equal(t, workspace.Github, responseWorkspaces[0].Github)
+		assert.Equal(t, workspace.Website, responseWorkspaces[0].Website)
+		assert.Equal(t, workspace.Description, responseWorkspaces[0].Description)
+	})
 }
 
 func TestCreateOrEditWorkspaceRepository(t *testing.T) {

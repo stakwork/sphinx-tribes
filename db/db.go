@@ -1404,6 +1404,10 @@ func (db database) DeleteWorkSpaceAllData() error {
 	return nil
 }
 
+func (db database) DeleteWorkSpaceUserAccessData(pubKeyFromAuth string, uuid string, role string) bool {
+	return true
+}
+
 func (db database) GetPersonByPubkey(pubkey string) Person {
 	m := Person{}
 	db.db.Where("owner_pub_key = ? AND (deleted = false OR deleted is null)", pubkey).Find(&m)
