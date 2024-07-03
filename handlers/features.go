@@ -163,7 +163,7 @@ func (oh *featureHandler) CreateOrEditFeaturePhase(w http.ResponseWriter, r *htt
 	decoder := json.NewDecoder(r.Body)
 	err := decoder.Decode(&newPhase)
 	if err != nil {
-		w.WriteHeader(http.StatusBadRequest)
+		w.WriteHeader(http.StatusNotAcceptable)
 		fmt.Fprintf(w, "Error decoding request body: %v", err)
 		return
 	}
