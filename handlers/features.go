@@ -361,16 +361,22 @@ func (oh *featureHandler) GetBountiesByFeatureAndPhaseUuid(w http.ResponseWriter
 	featureUuid := chi.URLParam(r, "feature_uuid")
 	phaseUuid := chi.URLParam(r, "phase_uuid")
 
+	ctx := r.Context()
+	pubKeyFromAuth, _ := ctx.Value(auth.ContextKey).(string)
+	if pubKeyFromAuth == "" {
+		fmt.Println("no pubkey from auth")
+		w.WriteHeader(http.StatusUnauthorized)
+		return
+	}
+
 	bounties, err := oh.db.GetBountiesByFeatureAndPhaseUuid(featureUuid, phaseUuid, r)
 	if err != nil {
 		w.WriteHeader(http.StatusNotFound)
 		return
 	}
 
-	var bountyResponse []db.BountyResponse = oh.generateBountyHandler(bounties)
-
 	w.WriteHeader(http.StatusOK)
-	json.NewEncoder(w).Encode(bountyResponse)
+	json.NewEncoder(w).Encode(bounties)
 }
 
 func (oh *featureHandler) GetBountiesCountByFeatureAndPhaseUuid(w http.ResponseWriter, r *http.Request) {
