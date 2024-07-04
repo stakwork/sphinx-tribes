@@ -1226,8 +1226,10 @@ func TestGetUserDropdownWorkspaces(t *testing.T) {
 	db.TestDB.CreateOrEditPerson(person)
 	db.TestDB.CreateOrEditPerson(person2)
 
+	workspaceUuid := "workspace_uuid"
+
 	workspace := db.Workspace{
-		Uuid:        "workspace_uuid",
+		Uuid:        workspaceUuid,
 		Name:        "workspace_name",
 		OwnerPubKey: "person.OwnerPubkey",
 		Github:      "gtihub",
@@ -1285,7 +1287,9 @@ func TestGetUserDropdownWorkspaces(t *testing.T) {
 			t.Fatal(err)
 		}
 
-		updatedWorkspace := db.TestDB.GetWorkspaceByUuid(workspace.Uuid)
+		fmt.Println("workspaceUuid: ", workspaceUuid)
+
+		updatedWorkspace := db.TestDB.GetWorkspaceByUuid(workspaceUuid)
 		updatedWorkspaces := []db.Workspace{updatedWorkspace}
 
 		assert.NotEmpty(t, responseWorkspaces)
