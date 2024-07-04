@@ -542,7 +542,7 @@ func (oh *workspaceHandler) GetCreatedWorkspaces(pubkey string) []db.Workspace {
 	for index, value := range workspaces {
 		uuid := value.Uuid
 		bountyCount := oh.db.GetWorkspaceBountyCount(uuid)
-		hasRole := oh.db.UserHasAccess(pubkey, uuid, db.ViewReport)
+		hasRole := oh.configUserHasAccess(pubkey, uuid, db.ViewReport)
 
 		if hasRole {
 			budget := oh.db.GetWorkspaceBudget(uuid)
