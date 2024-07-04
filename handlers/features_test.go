@@ -1114,6 +1114,100 @@ func TestDeleteStory(t *testing.T) {
 }
 
 func TestGetBountiesByFeatureAndPhaseUuid(t *testing.T) {
+	teardownSuite := SetupSuite(t)
+	defer teardownSuite(t)
+
+	fHandler := NewFeatureHandler(db.TestDB)
+
+	person := db.Person{
+		Uuid:        uuid.New().String(),
+		OwnerAlias:  "test-alias",
+		UniqueName:  "test-unique-name",
+		OwnerPubKey: "test-pubkey",
+		PriceToMeet: 0,
+		Description: "test-description",
+	}
+	db.TestDB.CreateOrEditPerson(person)
+
+	workspace := db.Workspace{
+		Uuid:        uuid.New().String(),
+		Name:        "test-workspace" + uuid.New().String(),
+		OwnerPubKey: person.OwnerPubKey,
+		Github:      "https://github.com/test",
+		Website:     "https://www.testwebsite.com",
+		Description: "test-description",
+	}
+	db.TestDB.CreateOrEditWorkspace(workspace)
+	workspace = db.TestDB.GetWorkspaceByUuid(workspace.Uuid)
+
+	feature := db.WorkspaceFeatures{
+		Uuid:          uuid.New().String(),
+		WorkspaceUuid: workspace.Uuid,
+		Name:          "test-feature",
+		Url:           "https://github.com/test-feature",
+		Priority:      0,
+	}
+	db.TestDB.CreateOrEditFeature(feature)
+
+	featurePhase := db.FeaturePhase{
+		Uuid:        uuid.New().String(),
+		FeatureUuid: feature.Uuid,
+		Name:        "test-feature-phase",
+		Priority:    0,
+	}
+	db.TestDB.CreateOrEditFeaturePhase(featurePhase)
+
+	bounty := db.NewBounty{
+		OwnerID:       person.OwnerPubKey,
+		WorkspaceUuid: workspace.Uuid,
+		Title:         "test-bounty",
+		PhaseUuid:     featurePhase.Uuid,
+		Description:   "test-description",
+		Price:         1000,
+		Type:          "coding_task",
+		Assignee:      "",
+	}
+	db.TestDB.CreateOrEditBounty(bounty)
+
+	ctx := context.WithValue(context.Background(), auth.ContextKey, workspace.OwnerPubKey)
+
+	t.Run("should return 401 error if not authorized", func(t *testing.T) {
+		rctx := chi.NewRouteContext()
+		rctx.URLParams.Add("feature_uuid", feature.Uuid)
+		rctx.URLParams.Add("phase_uuid", featurePhase.Uuid)
+		req, err := http.NewRequestWithContext(context.WithValue(context.Background(), chi.RouteCtxKey, rctx), http.MethodGet, "/features/"+feature.Uuid+"/phase/"+featurePhase.Uuid+"/bounty", nil)
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		rr := httptest.NewRecorder()
+		http.HandlerFunc(fHandler.GetBountiesByFeatureAndPhaseUuid).ServeHTTP(rr, req)
+
+		assert.Equal(t, http.StatusUnauthorized, rr.Code)
+	})
+
+	t.Run("should return the correct bounty count if user is authorized", func(t *testing.T) {
+		rctx := chi.NewRouteContext()
+		rctx.URLParams.Add("feature_uuid", feature.Uuid)
+		rctx.URLParams.Add("phase_uuid", featurePhase.Uuid)
+		req, err := http.NewRequestWithContext(context.WithValue(ctx, chi.RouteCtxKey, rctx), http.MethodGet, "/features/"+feature.Uuid+"/phase/"+featurePhase.Uuid+"/bounty", nil)
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		rr := httptest.NewRecorder()
+		http.HandlerFunc(fHandler.GetBountiesByFeatureAndPhaseUuid).ServeHTTP(rr, req)
+
+		var returnedBounty []db.NewBounty
+		err = json.Unmarshal(rr.Body.Bytes(), &returnedBounty)
+		assert.NoError(t, err)
+
+		bounty.ID = returnedBounty[0].ID
+
+		assert.Equal(t, http.StatusOK, rr.Code)
+		assert.Equal(t, bounty, returnedBounty[0])
+
+	})
 
 }
 
