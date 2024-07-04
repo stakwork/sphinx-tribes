@@ -1154,7 +1154,7 @@ func TestDeleteStory(t *testing.T) {
 	}
 	db.TestDB.CreateOrEditFeatureStory(featureStory)
 
-	t.Run("should return 401 error if not authorized", func(t *testing.T) {
+	t.Run("should return 401 error if user not authorized", func(t *testing.T) {
 		rr := httptest.NewRecorder()
 		handler := http.HandlerFunc(fHandler.DeleteStory)
 
@@ -1168,7 +1168,7 @@ func TestDeleteStory(t *testing.T) {
 		assert.Equal(t, http.StatusUnauthorized, rr.Code)
 	})
 
-	t.Run("should successfully add feature story if request is valid", func(t *testing.T) {
+	t.Run("should successfully delete feature story if request is valid", func(t *testing.T) {
 		rr := httptest.NewRecorder()
 		handler := http.HandlerFunc(fHandler.DeleteStory)
 
