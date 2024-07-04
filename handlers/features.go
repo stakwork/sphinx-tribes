@@ -361,6 +361,14 @@ func (oh *featureHandler) GetBountiesCountByFeatureAndPhaseUuid(w http.ResponseW
 	featureUuid := chi.URLParam(r, "feature_uuid")
 	phaseUuid := chi.URLParam(r, "phase_uuid")
 
+	ctx := r.Context()
+	pubKeyFromAuth, _ := ctx.Value(auth.ContextKey).(string)
+	if pubKeyFromAuth == "" {
+		fmt.Println("no pubkey from auth")
+		w.WriteHeader(http.StatusUnauthorized)
+		return
+	}
+
 	bountiesCount := oh.db.GetBountiesCountByFeatureAndPhaseUuid(featureUuid, phaseUuid, r)
 
 	w.WriteHeader(http.StatusOK)
