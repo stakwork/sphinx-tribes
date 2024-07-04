@@ -21,17 +21,20 @@ type workspaceHandler struct {
 	generateBountyHandler    func(bounties []db.NewBounty) []db.BountyResponse
 	getLightningInvoice      func(payment_request string) (db.InvoiceResult, db.InvoiceError)
 	userHasAccess            func(pubKeyFromAuth string, uuid string, role string) bool
+	configUserHasAccess      func(pubKeyFromAuth string, uuid string, role string) bool
 	userHasManageBountyRoles func(pubKeyFromAuth string, uuid string) bool
 }
 
 func NewWorkspaceHandler(database db.Database) *workspaceHandler {
 	bHandler := NewBountyHandler(http.DefaultClient, database)
 	dbConf := db.NewDatabaseConfig(&gorm.DB{})
+	configHandler := db.NewConfigHandler(database)
 	return &workspaceHandler{
 		db:                       database,
 		generateBountyHandler:    bHandler.GenerateBountyResponse,
 		getLightningInvoice:      bHandler.GetLightningInvoice,
 		userHasAccess:            dbConf.UserHasAccess,
+		configUserHasAccess:      configHandler.UserHasAccess,
 		userHasManageBountyRoles: dbConf.UserHasManageBountyRoles,
 	}
 }
@@ -492,7 +495,7 @@ func (oh *workspaceHandler) GetUserDropdownWorkspaces(w http.ResponseWriter, r *
 		uuid := value.WorkspaceUuid
 		workspace := oh.db.GetWorkspaceByUuid(uuid)
 		bountyCount := oh.db.GetWorkspaceBountyCount(uuid)
-		hasRole := oh.db.UserHasAccess(user.OwnerPubKey, uuid, db.ViewReport)
+		hasRole := oh.configUserHasAccess(user.OwnerPubKey, uuid, db.ViewReport)
 		hasBountyRoles := oh.userHasManageBountyRoles(user.OwnerPubKey, uuid)
 
 		// don't add deleted workspaces to the list
@@ -518,7 +521,7 @@ func (oh *workspaceHandler) GetCreatedWorkspaces(pubkey string) []db.Workspace {
 	for index, value := range workspaces {
 		uuid := value.Uuid
 		bountyCount := oh.db.GetWorkspaceBountyCount(uuid)
-		hasRole := oh.userHasAccess(pubkey, uuid, db.ViewReport)
+		hasRole := oh.configUserHasAccess(pubkey, uuid, db.ViewReport)
 
 		if hasRole {
 			budget := oh.db.GetWorkspaceBudget(uuid)

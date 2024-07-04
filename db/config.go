@@ -10,6 +10,16 @@ import (
 	"gorm.io/gorm"
 )
 
+type configHandler struct {
+	db Database
+}
+
+func NewConfigHandler(database Database) *configHandler {
+	return &configHandler{
+		db: database,
+	}
+}
+
 type database struct {
 	db                 *gorm.DB
 	getWorkspaceByUuid func(uuid string) Workspace
@@ -383,6 +393,17 @@ func (db database) UserHasAccess(pubKeyFromAuth string, uuid string, role string
 	var hasRole bool = false
 	if pubKeyFromAuth != org.OwnerPubKey {
 		userRoles := db.getUserRoles(uuid, pubKeyFromAuth)
+		hasRole = RolesCheck(userRoles, role)
+		return hasRole
+	}
+	return true
+}
+
+func (ch configHandler) UserHasAccess(pubKeyFromAuth string, uuid string, role string) bool {
+	org := ch.db.GetWorkspaceByUuid(uuid)
+	var hasRole bool = false
+	if pubKeyFromAuth != org.OwnerPubKey {
+		userRoles := ch.db.GetUserRoles(uuid, pubKeyFromAuth)
 		hasRole = RolesCheck(userRoles, role)
 		return hasRole
 	}
