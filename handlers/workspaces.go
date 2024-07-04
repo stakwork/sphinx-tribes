@@ -1007,7 +1007,7 @@ func (oh *workspaceHandler) GetAllUserWorkspaces(pubkey string) []db.Workspace {
 		uuid := value.WorkspaceUuid
 		workspace := oh.db.GetWorkspaceByUuid(uuid)
 		bountyCount := oh.db.GetWorkspaceBountyCount(uuid)
-		hasRole := db.UserHasAccess(pubkey, uuid, db.ViewReport)
+		hasRole := oh.configUserHasAccess(pubkey, uuid, db.ViewReport)
 		// don't add deleted workspaces to the list
 		if !workspace.Deleted {
 			if hasRole {
