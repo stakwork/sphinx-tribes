@@ -17,22 +17,27 @@ import (
 )
 
 type workspaceHandler struct {
-	db                       db.Database
-	generateBountyHandler    func(bounties []db.NewBounty) []db.BountyResponse
-	getLightningInvoice      func(payment_request string) (db.InvoiceResult, db.InvoiceError)
-	userHasAccess            func(pubKeyFromAuth string, uuid string, role string) bool
-	userHasManageBountyRoles func(pubKeyFromAuth string, uuid string) bool
+	db                             db.Database
+	generateBountyHandler          func(bounties []db.NewBounty) []db.BountyResponse
+	getLightningInvoice            func(payment_request string) (db.InvoiceResult, db.InvoiceError)
+	userHasAccess                  func(pubKeyFromAuth string, uuid string, role string) bool
+	configUserHasAccess            func(pubKeyFromAuth string, uuid string, role string) bool
+	configUserHasManageBountyRoles func(pubKeyFromAuth string, uuid string) bool
+	userHasManageBountyRoles       func(pubKeyFromAuth string, uuid string) bool
 }
 
 func NewWorkspaceHandler(database db.Database) *workspaceHandler {
 	bHandler := NewBountyHandler(http.DefaultClient, database)
 	dbConf := db.NewDatabaseConfig(&gorm.DB{})
+	configHandler := db.NewConfigHandler(database)
 	return &workspaceHandler{
-		db:                       database,
-		generateBountyHandler:    bHandler.GenerateBountyResponse,
-		getLightningInvoice:      bHandler.GetLightningInvoice,
-		userHasAccess:            dbConf.UserHasAccess,
-		userHasManageBountyRoles: dbConf.UserHasManageBountyRoles,
+		db:                             database,
+		generateBountyHandler:          bHandler.GenerateBountyResponse,
+		getLightningInvoice:            bHandler.GetLightningInvoice,
+		userHasAccess:                  dbConf.UserHasAccess,
+		configUserHasAccess:            configHandler.UserHasAccess,
+		configUserHasManageBountyRoles: configHandler.UserHasManageBountyRoles,
+		userHasManageBountyRoles:       dbConf.UserHasManageBountyRoles,
 	}
 }
 
@@ -482,23 +487,23 @@ func (oh *workspaceHandler) GetUserDropdownWorkspaces(w http.ResponseWriter, r *
 		return
 	}
 
-	user := db.DB.GetPerson(userId)
+	user := oh.db.GetPerson(userId)
 
 	// get the workspaces created by the user, then get all the workspaces
 	// the user has been added to, loop through to get the workspace
-	workspaces := GetCreatedWorkspaces(user.OwnerPubKey)
-	assignedWorkspaces := db.DB.GetUserAssignedWorkspaces(user.OwnerPubKey)
+	workspaces := oh.GetCreatedWorkspaces(user.OwnerPubKey)
+	assignedWorkspaces := oh.db.GetUserAssignedWorkspaces(user.OwnerPubKey)
 	for _, value := range assignedWorkspaces {
 		uuid := value.WorkspaceUuid
-		workspace := db.DB.GetWorkspaceByUuid(uuid)
-		bountyCount := db.DB.GetWorkspaceBountyCount(uuid)
-		hasRole := db.UserHasAccess(user.OwnerPubKey, uuid, db.ViewReport)
-		hasBountyRoles := oh.userHasManageBountyRoles(user.OwnerPubKey, uuid)
+		workspace := oh.db.GetWorkspaceByUuid(uuid)
+		bountyCount := oh.db.GetWorkspaceBountyCount(uuid)
+		hasRole := oh.configUserHasAccess(user.OwnerPubKey, uuid, db.ViewReport)
+		hasBountyRoles := oh.configUserHasManageBountyRoles(user.OwnerPubKey, uuid)
 
 		// don't add deleted workspaces to the list
 		if !workspace.Deleted && hasBountyRoles {
 			if hasRole {
-				budget := db.DB.GetWorkspaceBudget(uuid)
+				budget := oh.db.GetWorkspaceBudget(uuid)
 				workspace.Budget = budget.TotalBudget
 			} else {
 				workspace.Budget = 0
@@ -522,6 +527,25 @@ func GetCreatedWorkspaces(pubkey string) []db.Workspace {
 
 		if hasRole {
 			budget := db.DB.GetWorkspaceBudget(uuid)
+			workspaces[index].Budget = budget.TotalBudget
+		} else {
+			workspaces[index].Budget = 0
+		}
+		workspaces[index].BountyCount = bountyCount
+	}
+	return workspaces
+}
+
+func (oh *workspaceHandler) GetCreatedWorkspaces(pubkey string) []db.Workspace {
+	workspaces := oh.db.GetUserCreatedWorkspaces(pubkey)
+	// add bounty count to the workspace
+	for index, value := range workspaces {
+		uuid := value.Uuid
+		bountyCount := oh.db.GetWorkspaceBountyCount(uuid)
+		hasRole := oh.db.UserHasAccess(pubkey, uuid, db.ViewReport)
+
+		if hasRole {
+			budget := oh.db.GetWorkspaceBudget(uuid)
 			workspaces[index].Budget = budget.TotalBudget
 		} else {
 			workspaces[index].Budget = 0

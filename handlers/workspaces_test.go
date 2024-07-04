@@ -8,6 +8,7 @@ import (
 	"math/rand"
 	"net/http"
 	"net/http/httptest"
+	"strconv"
 	"strings"
 	"testing"
 	"time"
@@ -1200,7 +1201,96 @@ func TestGetWorkspaceUsers(t *testing.T) {
 }
 
 func TestGetUserDropdownWorkspaces(t *testing.T) {
+	teardownSuite := SetupSuite(t)
+	defer teardownSuite(t)
 
+	oHandler := NewWorkspaceHandler(db.TestDB)
+
+	person := db.Person{
+		Uuid:        "uuid",
+		OwnerAlias:  "alias",
+		UniqueName:  "unique_name",
+		OwnerPubKey: "pubkey",
+		PriceToMeet: 0,
+		Description: "description",
+	}
+
+	person2 := db.Person{
+		Uuid:        "uuid2",
+		OwnerAlias:  "alias2",
+		UniqueName:  "unique_name2",
+		OwnerPubKey: "pubkey2",
+		PriceToMeet: 0,
+		Description: "description2",
+	}
+	db.TestDB.CreateOrEditPerson(person)
+	db.TestDB.CreateOrEditPerson(person2)
+
+	workspace := db.Workspace{
+		Uuid:        "workspace_uuid",
+		Name:        "workspace_name",
+		OwnerPubKey: "person.OwnerPubkey",
+		Github:      "gtihub",
+		Website:     "website",
+		Description: "description",
+	}
+	db.TestDB.CreateOrEditWorkspace(workspace)
+
+	roles := []db.WorkspaceUserRoles{
+		db.WorkspaceUserRoles{
+			WorkspaceUuid: workspace.Uuid,
+			OwnerPubKey:   person2.OwnerPubKey,
+			Role:          "ADD BOUNTY",
+		},
+		db.WorkspaceUserRoles{
+			WorkspaceUuid: workspace.Uuid,
+			OwnerPubKey:   person2.OwnerPubKey,
+			Role:          "UPDATE BOUNTY",
+		},
+		db.WorkspaceUserRoles{
+			WorkspaceUuid: workspace.Uuid,
+			OwnerPubKey:   person2.OwnerPubKey,
+			Role:          "DELETE BOUNTY",
+		},
+		db.WorkspaceUserRoles{
+			WorkspaceUuid: workspace.Uuid,
+			OwnerPubKey:   person2.OwnerPubKey,
+			Role:          "PAY BOUNTY",
+		},
+	}
+
+	db.TestDB.CreateUserRoles(roles, workspace.Uuid, person2.OwnerPubKey)
+
+	dbPerson := db.TestDB.GetPersonByUuid(person2.Uuid)
+
+	ctx := context.WithValue(context.Background(), auth.ContextKey, workspace.OwnerPubKey)
+
+	t.Run("should return user dropdown workspaces", func(t *testing.T) {
+		rr := httptest.NewRecorder()
+		rctx := chi.NewRouteContext()
+		rctx.URLParams.Add("userId", strconv.Itoa(int(dbPerson.ID)))
+		req, err := http.NewRequestWithContext(context.WithValue(ctx, chi.RouteCtxKey, rctx), http.MethodGet, "/user/dropdown/"+strconv.Itoa(int(dbPerson.ID)), nil)
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		handler := http.HandlerFunc(oHandler.GetUserDropdownWorkspaces)
+		handler.ServeHTTP(rr, req)
+
+		assert.Equal(t, http.StatusOK, rr.Code)
+
+		var responseWorkspaces []db.Workspace
+		err = json.Unmarshal(rr.Body.Bytes(), &responseWorkspaces)
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		updatedWorkspace := db.TestDB.GetWorkspaceByUuid(workspace.Uuid)
+		updatedWorkspaces := []db.Workspace{updatedWorkspace}
+
+		assert.NotEmpty(t, responseWorkspaces)
+		assert.Equal(t, updatedWorkspaces, responseWorkspaces)
+	})
 }
 
 func TestCreateOrEditWorkspaceRepository(t *testing.T) {
