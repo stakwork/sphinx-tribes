@@ -317,6 +317,14 @@ func (oh *featureHandler) GetStoryByUuid(w http.ResponseWriter, r *http.Request)
 	featureUuid := chi.URLParam(r, "feature_uuid")
 	storyUuid := chi.URLParam(r, "story_uuid")
 
+	ctx := r.Context()
+	pubKeyFromAuth, _ := ctx.Value(auth.ContextKey).(string)
+	if pubKeyFromAuth == "" {
+		fmt.Println("no pubkey from auth")
+		w.WriteHeader(http.StatusUnauthorized)
+		return
+	}
+
 	story, err := oh.db.GetFeatureStoryByUuid(featureUuid, storyUuid)
 	if err != nil {
 		w.WriteHeader(http.StatusNotFound)
