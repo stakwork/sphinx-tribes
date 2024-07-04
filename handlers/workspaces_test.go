@@ -1206,6 +1206,8 @@ func TestGetUserDropdownWorkspaces(t *testing.T) {
 
 	oHandler := NewWorkspaceHandler(db.TestDB)
 
+	db.TestDB.DeleteWorkspace()
+
 	person := db.Person{
 		Uuid:        "uuid",
 		OwnerAlias:  "alias",
