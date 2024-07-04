@@ -58,6 +58,14 @@ func (db database) CreateOrEditWorkspace(m Workspace) (Workspace, error) {
 	return m, nil
 }
 
+func (db database) DeleteWorkspace() (bool, error) {
+	result := db.db.Exec("DELETE FROM workspaces")
+	if result.Error != nil {
+		return false, result.Error
+	}
+	return true, nil
+}
+
 func (db database) CreateOrEditWorkspaceRepository(m WorkspaceRepositories) (WorkspaceRepositories, error) {
 	m.Name = strings.TrimSpace(m.Name)
 	m.Url = strings.TrimSpace(m.Url)
