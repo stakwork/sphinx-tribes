@@ -732,11 +732,16 @@ func TestGetFeaturePhaseByUUID(t *testing.T) {
 		err = json.Unmarshal(rr.Body.Bytes(), &returnedFeaturePhases)
 		assert.NoError(t, err)
 
-		featurePhase.Created = returnedFeaturePhases.Created
-		featurePhase.Updated = returnedFeaturePhases.Updated
+		updatedFeaturePhase, err := db.TestDB.GetFeaturePhaseByUuid(feature.Uuid, featurePhase.Uuid)
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		updatedFeaturePhase.Created = returnedFeaturePhases.Created
+		updatedFeaturePhase.Updated = returnedFeaturePhases.Updated
 
 		assert.Equal(t, http.StatusOK, rr.Code)
-		assert.Equal(t, featurePhase, returnedFeaturePhases)
+		assert.Equal(t, updatedFeaturePhase, returnedFeaturePhases)
 	})
 
 }
