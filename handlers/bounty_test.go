@@ -1208,9 +1208,6 @@ func TestMakeBountyPayment(t *testing.T) {
 	now := time.Now().Unix()
 	bountyOwnerId := "owner_pubkey"
 
-	db.TestDB.DeleteWorkspaceBudget()
-	db.TestDB.DeleteBounty(bountyOwnerId, strconv.FormatInt(now, 10))
-
 	person := db.Person{
 		Uuid:        "uuid",
 		OwnerAlias:  "alias",
@@ -1395,6 +1392,12 @@ func TestMakeBountyPayment(t *testing.T) {
 
 		assert.Equal(t, http.StatusOK, rr.Code)
 		mockHttpClient.AssertExpectations(t)
+
+		updatedBounty := db.TestDB.GetBounty(bountyId)
+		assert.True(t, updatedBounty.Paid, "Expected bounty to be marked as paid")
+
+		updatedWorkspaceBudget := db.TestDB.GetWorkspaceBudget(bounty.WorkspaceUuid)
+		assert.Equal(t, budgetAmount-bountyAmount, updatedWorkspaceBudget.TotalBudget, "Expected workspace budget to be reduced by bounty amount")
 	})
 
 	t.Run("405 when trying to pay an already-paid bounty", func(t *testing.T) {
