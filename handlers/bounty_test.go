@@ -1177,7 +1177,10 @@ func MockNewWSServer(t *testing.T) (*httptest.Server, *websocket.Conn) {
 
 func TestMakeBountyPayment(t *testing.T) {
 	ctx := context.Background()
-	mockDb := &dbMocks.Database{}
+
+	teardownSuite := SetupSuite(t)
+	defer teardownSuite(t)
+
 	mockHttpClient := &mocks.HttpClient{}
 	mockUserHasAccessTrue := func(pubKeyFromAuth string, uuid string, role string) bool {
 		return true
@@ -1197,22 +1200,67 @@ func TestMakeBountyPayment(t *testing.T) {
 
 		return mockClient, nil
 	}
-	bHandler := NewBountyHandler(mockHttpClient, mockDb)
-
-	unauthorizedCtx := context.WithValue(ctx, auth.ContextKey, "")
-	authorizedCtx := context.WithValue(ctx, auth.ContextKey, "valid-key")
+	bHandler := NewBountyHandler(mockHttpClient, db.TestDB)
 
 	var mutex sync.Mutex
 	var processingTimes []time.Time
 
-	bountyID := uint(1)
-	bounty := db.NewBounty{
-		ID:            bountyID,
-		OrgUuid:       "org-1",
-		WorkspaceUuid: "work-1",
-		Assignee:      "assignee-1",
-		Price:         uint(1000),
+	now := time.Now().Unix()
+	bountyOwnerId := "owner_pubkey"
+
+	person := db.Person{
+		Uuid:        "uuid",
+		OwnerAlias:  "alias",
+		UniqueName:  "unique_name",
+		OwnerPubKey: "pubkey",
+		PriceToMeet: 0,
+		Description: "description",
 	}
+
+	db.TestDB.CreateOrEditPerson(person)
+
+	workspace := db.Workspace{
+		Uuid:        "workspace_uuid",
+		Name:        "workspace_name",
+		OwnerPubKey: person.OwnerPubKey,
+		Github:      "gtihub",
+		Website:     "website",
+		Description: "description",
+	}
+	db.TestDB.CreateOrEditWorkspace(workspace)
+
+	budgetAmount := uint(5000)
+	bountyBudget := db.NewBountyBudget{
+		WorkspaceUuid: workspace.Uuid,
+		TotalBudget:   budgetAmount,
+	}
+	db.TestDB.CreateWorkspaceBudget(bountyBudget)
+
+	bountyAmount := uint(3000)
+	bounty := db.NewBounty{
+		OwnerID:       bountyOwnerId,
+		Price:         bountyAmount,
+		Created:       now,
+		Type:          "coding",
+		Title:         "bountyTitle",
+		Description:   "bountyDescription",
+		Assignee:      person.OwnerPubKey,
+		Show:          true,
+		WorkspaceUuid: workspace.Uuid,
+		Paid:          false,
+	}
+	db.TestDB.CreateOrEditBounty(bounty)
+
+	dbBounty, err := db.TestDB.GetBountyDataByCreated(strconv.FormatInt(bounty.Created, 10))
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	bountyId := dbBounty[0].ID
+	bountyIdStr := strconv.FormatInt(int64(bountyId), 10)
+
+	unauthorizedCtx := context.WithValue(ctx, auth.ContextKey, "")
+	authorizedCtx := context.WithValue(ctx, auth.ContextKey, person.OwnerPubKey)
 
 	t.Run("mutex lock ensures sequential access", func(t *testing.T) {
 		server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
@@ -1250,7 +1298,7 @@ func TestMakeBountyPayment(t *testing.T) {
 		r.Post("/gobounties/pay/{id}", bHandler.MakeBountyPayment)
 
 		rr := httptest.NewRecorder()
-		req, err := http.NewRequestWithContext(unauthorizedCtx, http.MethodPost, "/gobounties/pay/1", nil)
+		req, err := http.NewRequestWithContext(unauthorizedCtx, http.MethodPost, "/gobounties/pay/"+bountyIdStr, nil)
 
 		if err != nil {
 			t.Fatal(err)
@@ -1259,52 +1307,16 @@ func TestMakeBountyPayment(t *testing.T) {
 		r.ServeHTTP(rr, req)
 
 		assert.Equal(t, http.StatusUnauthorized, rr.Code, "Expected 401 Unauthorized for unauthorized access")
-		mockDb.AssertExpectations(t)
-	})
-
-	t.Run("405 when trying to pay an already-paid bounty", func(t *testing.T) {
-		mockDb.ExpectedCalls = nil
-		mockDb.On("GetBounty", mock.AnythingOfType("uint")).Return(db.NewBounty{
-			ID:            1,
-			Price:         1000,
-			OrgUuid:       "org-1",
-			WorkspaceUuid: "work-1",
-			Assignee:      "assignee-1",
-			Paid:          true,
-		}, nil)
-
-		r := chi.NewRouter()
-		r.Post("/gobounties/pay/{id}", bHandler.MakeBountyPayment)
-
-		requestBody := bytes.NewBuffer([]byte("{}"))
-		rr := httptest.NewRecorder()
-		req, err := http.NewRequestWithContext(authorizedCtx, http.MethodPost, "/gobounties/pay/1", requestBody)
-		if err != nil {
-			t.Fatal(err)
-		}
-
-		r.ServeHTTP(rr, req)
-		assert.Equal(t, http.StatusMethodNotAllowed, rr.Code, "Expected 405 Method Not Allowed for an already-paid bounty")
-		mockDb.AssertExpectations(t)
 	})
 
 	t.Run("401 error if user not workspace admin or does not have PAY BOUNTY role", func(t *testing.T) {
 		bHandler.userHasAccess = mockUserHasAccessFalse
 
-		mockDb.On("GetBounty", mock.AnythingOfType("uint")).Return(db.NewBounty{
-			ID:            1,
-			Price:         1000,
-			OrgUuid:       "org-1",
-			WorkspaceUuid: "work-1",
-			Assignee:      "assignee-1",
-			Paid:          false,
-		}, nil)
-
 		r := chi.NewRouter()
 		r.Post("/gobounties/pay/{id}", bHandler.MakeBountyPayment)
 
 		rr := httptest.NewRecorder()
-		req, err := http.NewRequestWithContext(unauthorizedCtx, http.MethodPost, "/gobounties/pay/1", bytes.NewBufferString(`{}`))
+		req, err := http.NewRequestWithContext(unauthorizedCtx, http.MethodPost, "/gobounties/pay/"+bountyIdStr, bytes.NewBufferString(`{}`))
 		if err != nil {
 			t.Fatal(err)
 		}
@@ -1315,94 +1327,15 @@ func TestMakeBountyPayment(t *testing.T) {
 
 	})
 
-	t.Run("403 error when amount exceeds workspace's budget balance", func(t *testing.T) {
-		ctx := context.WithValue(context.Background(), auth.ContextKey, "valid-key")
-
-		mockDb := dbMocks.NewDatabase(t)
-		mockHttpClient := mocks.NewHttpClient(t)
-		bHandler := NewBountyHandler(mockHttpClient, mockDb)
-		bHandler.userHasAccess = mockUserHasAccessTrue
-		mockDb.On("GetBounty", mock.AnythingOfType("uint")).Return(db.NewBounty{
-			ID:            1,
-			Price:         1000,
-			OrgUuid:       "org-1",
-			WorkspaceUuid: "work-1",
-			Assignee:      "assignee-1",
-			Paid:          false,
-		}, nil)
-		mockDb.On("GetWorkspaceBudget", "work-1").Return(db.NewBountyBudget{
-			TotalBudget: 500,
-		}, nil)
-
-		r := chi.NewRouter()
-		r.Post("/gobounties/pay/{id}", bHandler.MakeBountyPayment)
-
-		rr := httptest.NewRecorder()
-		req, err := http.NewRequestWithContext(ctx, http.MethodPost, "/gobounties/pay/1", nil)
-		if err != nil {
-			t.Fatal(err)
-		}
-
-		r.ServeHTTP(rr, req)
-
-		assert.Equal(t, http.StatusForbidden, rr.Code, "Expected 403 Forbidden when the payment exceeds the workspace's budget")
-
-	})
-
-	t.Run("Should test that a successful WebSocket message is sent if the payment is successful", func(t *testing.T) {
-		mockDb.ExpectedCalls = nil
-		bHandler.getSocketConnections = mockGetSocketConnections
-		bHandler.userHasAccess = mockUserHasAccessTrue
-
-		mockDb.On("GetBounty", bountyID).Return(bounty, nil)
-		mockDb.On("GetWorkspaceBudget", bounty.WorkspaceUuid).Return(db.NewBountyBudget{TotalBudget: 2000}, nil)
-		mockDb.On("GetPersonByPubkey", bounty.Assignee).Return(db.Person{OwnerPubKey: "assignee-1", OwnerRouteHint: "OwnerRouteHint"}, nil)
-		mockDb.On("ProcessBountyPayment", mock.AnythingOfType("db.NewPaymentHistory"), mock.AnythingOfType("db.NewBounty")).Return(nil)
-
-		expectedUrl := fmt.Sprintf("%s/payment", config.RelayUrl)
-		expectedBody := `{"amount": 1000, "destination_key": "assignee-1", "route_hint": "OwnerRouteHint", "text": "memotext added for notification"}`
-
-		r := io.NopCloser(bytes.NewReader([]byte(`{"success": true, "response": { "sumAmount": "1"}}`)))
-		mockHttpClient.On("Do", mock.MatchedBy(func(req *http.Request) bool {
-			bodyByt, _ := io.ReadAll(req.Body)
-			return req.Method == http.MethodPost && expectedUrl == req.URL.String() && req.Header.Get("x-user-token") == config.RelayAuthKey && expectedBody == string(bodyByt)
-		})).Return(&http.Response{
-			StatusCode: 200,
-			Body:       r,
-		}, nil).Once()
-
-		ro := chi.NewRouter()
-		ro.Post("/gobounties/pay/{id}", bHandler.MakeBountyPayment)
-
-		requestBody := bytes.NewBuffer([]byte("{}"))
-		rr := httptest.NewRecorder()
-		req, err := http.NewRequestWithContext(authorizedCtx, http.MethodPost, "/gobounties/pay/1", requestBody)
-		if err != nil {
-			t.Fatal(err)
-		}
-
-		ro.ServeHTTP(rr, req)
-
-		assert.Equal(t, http.StatusOK, rr.Code)
-		mockDb.AssertExpectations(t)
-		mockHttpClient.AssertExpectations(t)
-	})
-
 	t.Run("Should test that an error WebSocket message is sent if the payment fails", func(t *testing.T) {
-		mockDb2 := &dbMocks.Database{}
 		mockHttpClient2 := &mocks.HttpClient{}
-		mockDb2.ExpectedCalls = nil
 
-		bHandler2 := NewBountyHandler(mockHttpClient2, mockDb2)
+		bHandler2 := NewBountyHandler(mockHttpClient2, db.TestDB)
 		bHandler2.getSocketConnections = mockGetSocketConnections
 		bHandler2.userHasAccess = mockUserHasAccessTrue
 
-		mockDb2.On("GetBounty", bountyID).Return(bounty, nil)
-		mockDb2.On("GetWorkspaceBudget", bounty.WorkspaceUuid).Return(db.NewBountyBudget{TotalBudget: 2000}, nil)
-		mockDb2.On("GetPersonByPubkey", bounty.Assignee).Return(db.Person{OwnerPubKey: "assignee-1", OwnerRouteHint: "OwnerRouteHint"}, nil)
-
 		expectedUrl := fmt.Sprintf("%s/payment", config.RelayUrl)
-		expectedBody := `{"amount": 1000, "destination_key": "assignee-1", "route_hint": "OwnerRouteHint", "text": "memotext added for notification"}`
+		expectedBody := fmt.Sprintf(`{"amount": %d, "destination_key": "%s", "text": "memotext added for notification"}`, bountyAmount, person.OwnerPubKey)
 
 		r := io.NopCloser(bytes.NewReader([]byte(`"internal server error"`)))
 		mockHttpClient2.On("Do", mock.MatchedBy(func(req *http.Request) bool {
@@ -1418,7 +1351,7 @@ func TestMakeBountyPayment(t *testing.T) {
 
 		requestBody := bytes.NewBuffer([]byte("{}"))
 		rr := httptest.NewRecorder()
-		req, err := http.NewRequestWithContext(authorizedCtx, http.MethodPost, "/gobounties/pay/1", requestBody)
+		req, err := http.NewRequestWithContext(authorizedCtx, http.MethodPost, "/gobounties/pay/"+bountyIdStr, requestBody)
 		if err != nil {
 			t.Fatal(err)
 		}
@@ -1426,8 +1359,92 @@ func TestMakeBountyPayment(t *testing.T) {
 		ro.ServeHTTP(rr, req)
 
 		assert.Equal(t, http.StatusOK, rr.Code)
-		mockDb2.AssertExpectations(t)
 		mockHttpClient2.AssertExpectations(t)
+	})
+
+	t.Run("Should test that a successful WebSocket message is sent if the payment is successful", func(t *testing.T) {
+		bHandler.getSocketConnections = mockGetSocketConnections
+		bHandler.userHasAccess = mockUserHasAccessTrue
+
+		expectedUrl := fmt.Sprintf("%s/payment", config.RelayUrl)
+		expectedBody := fmt.Sprintf(`{"amount": %d, "destination_key": "%s", "text": "memotext added for notification"}`, bountyAmount, person.OwnerPubKey)
+
+		r := io.NopCloser(bytes.NewReader([]byte(`{"success": true, "response": { "sumAmount": "1"}}`)))
+		mockHttpClient.On("Do", mock.MatchedBy(func(req *http.Request) bool {
+			bodyByt, _ := io.ReadAll(req.Body)
+			return req.Method == http.MethodPost && expectedUrl == req.URL.String() && req.Header.Get("x-user-token") == config.RelayAuthKey && expectedBody == string(bodyByt)
+		})).Return(&http.Response{
+			StatusCode: 200,
+			Body:       r,
+		}, nil).Once()
+
+		ro := chi.NewRouter()
+		ro.Post("/gobounties/pay/{id}", bHandler.MakeBountyPayment)
+
+		requestBody := bytes.NewBuffer([]byte("{}"))
+		rr := httptest.NewRecorder()
+		req, err := http.NewRequestWithContext(authorizedCtx, http.MethodPost, "/gobounties/pay/"+bountyIdStr, requestBody)
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		ro.ServeHTTP(rr, req)
+
+		assert.Equal(t, http.StatusOK, rr.Code)
+		mockHttpClient.AssertExpectations(t)
+
+		updatedBounty := db.TestDB.GetBounty(bountyId)
+		assert.True(t, updatedBounty.Paid, "Expected bounty to be marked as paid")
+
+		updatedWorkspaceBudget := db.TestDB.GetWorkspaceBudget(bounty.WorkspaceUuid)
+		assert.Equal(t, budgetAmount-bountyAmount, updatedWorkspaceBudget.TotalBudget, "Expected workspace budget to be reduced by bounty amount")
+	})
+
+	t.Run("405 when trying to pay an already-paid bounty", func(t *testing.T) {
+		r := chi.NewRouter()
+		r.Post("/gobounties/pay/{id}", bHandler.MakeBountyPayment)
+
+		requestBody := bytes.NewBuffer([]byte("{}"))
+		rr := httptest.NewRecorder()
+		req, err := http.NewRequestWithContext(authorizedCtx, http.MethodPost, "/gobounties/pay/"+bountyIdStr, requestBody)
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		r.ServeHTTP(rr, req)
+		assert.Equal(t, http.StatusMethodNotAllowed, rr.Code, "Expected 405 Method Not Allowed for an already-paid bounty")
+	})
+
+	t.Run("403 error when amount exceeds workspace's budget balance", func(t *testing.T) {
+		db.TestDB.DeleteBounty(bountyOwnerId, strconv.FormatInt(now, 10))
+		bounty.Paid = false
+		db.TestDB.CreateOrEditBounty(bounty)
+
+		dbBounty, err := db.TestDB.GetBountyDataByCreated(strconv.FormatInt(bounty.Created, 10))
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		bountyId := dbBounty[0].ID
+		bountyIdStr := strconv.FormatInt(int64(bountyId), 10)
+
+		mockHttpClient := mocks.NewHttpClient(t)
+		bHandler := NewBountyHandler(mockHttpClient, db.TestDB)
+		bHandler.userHasAccess = mockUserHasAccessTrue
+
+		r := chi.NewRouter()
+		r.Post("/gobounties/pay/{id}", bHandler.MakeBountyPayment)
+
+		requestBody := bytes.NewBuffer([]byte("{}"))
+		rr := httptest.NewRecorder()
+		req, err := http.NewRequestWithContext(authorizedCtx, http.MethodPost, "/gobounties/pay/"+bountyIdStr, requestBody)
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		r.ServeHTTP(rr, req)
+
+		assert.Equal(t, http.StatusForbidden, rr.Code, "Expected 403 Forbidden when the payment exceeds the workspace's budget")
 	})
 }
 
