@@ -1241,7 +1241,7 @@ func TestMakeBountyPayment(t *testing.T) {
 
 	bountyAmount := uint(3000)
 	bounty := db.NewBounty{
-		OwnerID:       "owner_pubkey",
+		OwnerID:       bountyOwnerId,
 		Price:         bountyAmount,
 		Created:       now,
 		Type:          "coding",
