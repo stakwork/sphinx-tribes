@@ -207,6 +207,11 @@ func (db database) GetWorkspaceBudget(workspace_uuid string) NewBountyBudget {
 	return ms
 }
 
+func (db database) DeleteWorkspaceBudget() error {
+	err := db.db.Unscoped().Where("1 = 1").Delete(&NewBountyBudget{}).Error
+	return err
+}
+
 func (db database) GetWorkspaceStatusBudget(workspace_uuid string) StatusBudget {
 	workspaceBudget := db.GetWorkspaceBudget(workspace_uuid)
 
