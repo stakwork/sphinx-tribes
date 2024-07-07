@@ -20,6 +20,7 @@ import (
 	"github.com/stakwork/sphinx-tribes/utils"
 
 	"github.com/go-chi/chi"
+	"github.com/google/uuid"
 	"github.com/stakwork/sphinx-tribes/auth"
 	"github.com/stakwork/sphinx-tribes/config"
 	"github.com/stakwork/sphinx-tribes/db"
@@ -1449,18 +1450,49 @@ func TestMakeBountyPayment(t *testing.T) {
 }
 
 func TestBountyBudgetWithdraw(t *testing.T) {
+	teardownSuite := SetupSuite(t)
+	defer teardownSuite(t)
+
 	ctx := context.Background()
-	mockDb := dbMocks.NewDatabase(t)
 	mockHttpClient := mocks.NewHttpClient(t)
-	mockUserHasAccessTrue := func(pubKeyFromAuth string, uuid string, role string) bool {
+	bHandler := NewBountyHandler(mockHttpClient, db.TestDB)
+	handlerUserHasAccess := func(pubKeyFromAuth string, uuid string, role string) bool {
 		return true
 	}
-	mockUserHasAccessFalse := func(pubKeyFromAuth string, uuid string, role string) bool {
+
+	handlerUserNotAccess := func(pubKeyFromAuth string, uuid string, role string) bool {
 		return false
 	}
-	bHandler := NewBountyHandler(mockHttpClient, mockDb)
+
+	person := db.Person{
+		Uuid:        uuid.New().String(),
+		OwnerAlias:  "test-alias",
+		UniqueName:  "test-unique-name",
+		OwnerPubKey: "test-pubkey",
+		PriceToMeet: 0,
+		Description: "test-description",
+	}
+	db.TestDB.CreateOrEditPerson(person)
+
+	workspace := db.Workspace{
+		Uuid:        uuid.New().String(),
+		Name:        "test-workspace" + uuid.New().String(),
+		OwnerPubKey: person.OwnerPubKey,
+		Github:      "https://github.com/test",
+		Website:     "https://www.testwebsite.com",
+		Description: "test-description",
+	}
+	db.TestDB.CreateOrEditWorkspace(workspace)
+
+	budgetAmount := uint(5000)
+	budget := db.NewBountyBudget{
+		WorkspaceUuid: workspace.Uuid,
+		TotalBudget:   budgetAmount,
+	}
+	db.TestDB.CreateWorkspaceBudget(budget)
+
 	unauthorizedCtx := context.WithValue(context.Background(), auth.ContextKey, "")
-	authorizedCtx := context.WithValue(ctx, auth.ContextKey, "valid-key")
+	authorizedCtx := context.WithValue(ctx, auth.ContextKey, person.OwnerPubKey)
 
 	t.Run("401 error if user is unauthorized", func(t *testing.T) {
 		rr := httptest.NewRecorder()
@@ -1491,12 +1523,12 @@ func TestBountyBudgetWithdraw(t *testing.T) {
 	})
 
 	t.Run("401 error if user is not the workspace admin or does not have WithdrawBudget role", func(t *testing.T) {
-		bHandler.userHasAccess = mockUserHasAccessFalse
+		bHandler.userHasAccess = handlerUserNotAccess
 
 		rr := httptest.NewRecorder()
 		handler := http.HandlerFunc(bHandler.BountyBudgetWithdraw)
 
-		validData := []byte(`{"orgUuid": "org-1", "paymentRequest": "invoice"}`)
+		validData := []byte(`{"orgUuid": "workspace-uuid", "paymentRequest": "invoice"}`)
 		req, err := http.NewRequestWithContext(authorizedCtx, http.MethodPost, "/budget/withdraw", bytes.NewReader(validData))
 		if err != nil {
 			t.Fatal(err)
@@ -1509,26 +1541,20 @@ func TestBountyBudgetWithdraw(t *testing.T) {
 	})
 
 	t.Run("403 error when amount exceeds workspace's budget", func(t *testing.T) {
-		ctxs := context.WithValue(context.Background(), auth.ContextKey, "valid-key")
-		mockDb := dbMocks.NewDatabase(t)
-		mockHttpClient := mocks.NewHttpClient(t)
-		bHandler := NewBountyHandler(mockHttpClient, mockDb)
-		bHandler.userHasAccess = mockUserHasAccessTrue
 
-		mockDb.On("GetWorkspaceBudget", "org-1").Return(db.NewBountyBudget{
-			TotalBudget: 500,
-		}, nil)
-		invoice := "lnbc15u1p3xnhl2pp5jptserfk3zk4qy42tlucycrfwxhydvlemu9pqr93tuzlv9cc7g3sdqsvfhkcap3xyhx7un8cqzpgxqzjcsp5f8c52y2stc300gl6s4xswtjpc37hrnnr3c9wvtgjfuvqmpm35evq9qyyssqy4lgd8tj637qcjp05rdpxxykjenthxftej7a2zzmwrmrl70fyj9hvj0rewhzj7jfyuwkwcg9g2jpwtk3wkjtwnkdks84hsnu8xps5vsq4gj5hs"
+		bHandler.userHasAccess = handlerUserHasAccess
+
+		invoice := "lnbc100u1png0l8ypp5hna5vnd2hcskpf69rt5y9dly2p202lejcacj53md32wx87vc2mnqdqzvscqzpgxqyz5vqrzjqwnw5tv745sjpvft6e3f9w62xqk826vrm3zaev4nvj6xr3n065aukqqqqyqqpmgqqyqqqqqqqqqqqqqqqqsp5cdg0c2qhuewz4j8680pf5va0l9a382qa5sakg4uga4nv4wnuf5qs9qrssqpdddmqtflxz3553gm5xq8ptdpl2t3ew49hgjnta0v0eyz747drkkhmnk5yxg676kvmgyugm35cts9dmrnt9mcgejg64kwk9nwxqg43cqcvxm44"
 
 		amount := utils.GetInvoiceAmount(invoice)
-		assert.Equal(t, uint(1500), amount)
+		assert.Equal(t, uint(10000), amount)
 
 		withdrawRequest := db.WithdrawBudgetRequest{
 			PaymentRequest: invoice,
-			OrgUuid:        "org-1",
+			OrgUuid:        workspace.Uuid,
 		}
 		requestBody, _ := json.Marshal(withdrawRequest)
-		req, _ := http.NewRequestWithContext(ctxs, http.MethodPost, "/budget/withdraw", bytes.NewReader(requestBody))
+		req, _ := http.NewRequestWithContext(authorizedCtx, http.MethodPost, "/budget/withdraw", bytes.NewReader(requestBody))
 
 		rr := httptest.NewRecorder()
 
@@ -1539,54 +1565,44 @@ func TestBountyBudgetWithdraw(t *testing.T) {
 	})
 
 	t.Run("budget invoices get paid if amount is lesser than workspace's budget", func(t *testing.T) {
-		ctxs := context.WithValue(context.Background(), auth.ContextKey, "valid-key")
-		mockDb := dbMocks.NewDatabase(t)
 		mockHttpClient := mocks.NewHttpClient(t)
-		bHandler := NewBountyHandler(mockHttpClient, mockDb)
-		bHandler.userHasAccess = mockUserHasAccessTrue
-
-		paymentAmount := uint(1500)
-
-		mockDb.On("GetWorkspaceBudget", "org-1").Return(db.NewBountyBudget{
-			TotalBudget: 5000,
-		}, nil)
-		mockDb.On("WithdrawBudget", "valid-key", "org-1", paymentAmount).Return(nil)
+		bHandler := NewBountyHandler(mockHttpClient, db.TestDB)
+		bHandler.userHasAccess = handlerUserHasAccess
+		rr := httptest.NewRecorder()
+		handler := http.HandlerFunc(bHandler.BountyBudgetWithdraw)
+		paymentAmount := uint(300)
+		initialBudget := budget.TotalBudget
+		expectedFinalBudget := initialBudget - paymentAmount
+		budget.TotalBudget = expectedFinalBudget
 		mockHttpClient.On("Do", mock.AnythingOfType("*http.Request")).Return(&http.Response{
 			StatusCode: 200,
 			Body:       io.NopCloser(bytes.NewBufferString(`{"success": true}`)),
 		}, nil)
 
-		invoice := "lnbc15u1p3xnhl2pp5jptserfk3zk4qy42tlucycrfwxhydvlemu9pqr93tuzlv9cc7g3sdqsvfhkcap3xyhx7un8cqzpgxqzjcsp5f8c52y2stc300gl6s4xswtjpc37hrnnr3c9wvtgjfuvqmpm35evq9qyyssqy4lgd8tj637qcjp05rdpxxykjenthxftej7a2zzmwrmrl70fyj9hvj0rewhzj7jfyuwkwcg9g2jpwtk3wkjtwnkdks84hsnu8xps5vsq4gj5hs"
+		invoice := "lnbc3u1pngsqv8pp5vl6ep8llmg3f9sfu8j7ctcnphylpnjduuyljqf3sc30z6ejmrunqdqzvscqzpgxqyz5vqrzjqwnw5tv745sjpvft6e3f9w62xqk826vrm3zaev4nvj6xr3n065aukqqqqyqqz9gqqyqqqqqqqqqqqqqqqqsp5n9hrrw6pr89qn3c82vvhy697wp45zdsyhm7tnu536ga77ytvxxaq9qrssqqqhenjtquz8wz5tym8v830h9gjezynjsazystzj6muhw4rd9ccc40p8sazjuk77hhcj0xn72lfyee3tsfl7lucxkx5xgtfaqya9qldcqr3072z"
 
 		withdrawRequest := db.WithdrawBudgetRequest{
 			PaymentRequest: invoice,
-			OrgUuid:        "org-1",
+			OrgUuid:        workspace.Uuid,
 		}
+
 		requestBody, _ := json.Marshal(withdrawRequest)
-		req, _ := http.NewRequestWithContext(ctxs, http.MethodPost, "/budget/withdraw", bytes.NewReader(requestBody))
+		req, _ := http.NewRequestWithContext(authorizedCtx, http.MethodPost, "/budget/withdraw", bytes.NewReader(requestBody))
 
-		rr := httptest.NewRecorder()
+		handler.ServeHTTP(rr, req)
 
-		bHandler.BountyBudgetWithdraw(rr, req)
 		assert.Equal(t, http.StatusOK, rr.Code)
 		var response db.InvoicePaySuccess
 		err := json.Unmarshal(rr.Body.Bytes(), &response)
 		assert.NoError(t, err)
 		assert.True(t, response.Success, "Expected invoice payment to succeed")
 
-		mockDb.AssertCalled(t, "WithdrawBudget", "valid-key", "org-1", paymentAmount)
+		finalBudget := db.TestDB.GetWorkspaceBudget(workspace.Uuid)
+		assert.Equal(t, expectedFinalBudget, finalBudget.TotalBudget, "The workspace's final budget should reflect the deductions from the successful withdrawals")
 	})
 
 	t.Run("400 BadRequest error if there is an error with invoice payment", func(t *testing.T) {
-		ctxs := context.WithValue(context.Background(), auth.ContextKey, "valid-key")
-		mockDb := dbMocks.NewDatabase(t)
-		mockHttpClient := mocks.NewHttpClient(t)
-		bHandler := NewBountyHandler(mockHttpClient, mockDb)
-		bHandler.userHasAccess = mockUserHasAccessTrue
 
-		mockDb.On("GetWorkspaceBudget", "org-1").Return(db.NewBountyBudget{
-			TotalBudget: 5000,
-		}, nil)
 		mockHttpClient.On("Do", mock.AnythingOfType("*http.Request")).Return(&http.Response{
 			StatusCode: 400,
 			Body:       io.NopCloser(bytes.NewBufferString(`{"success": false, "error": "Payment error"}`)),
@@ -1596,10 +1612,10 @@ func TestBountyBudgetWithdraw(t *testing.T) {
 
 		withdrawRequest := db.WithdrawBudgetRequest{
 			PaymentRequest: invoice,
-			OrgUuid:        "org-1",
+			OrgUuid:        workspace.Uuid,
 		}
 		requestBody, _ := json.Marshal(withdrawRequest)
-		req, _ := http.NewRequestWithContext(ctxs, http.MethodPost, "/budget/withdraw", bytes.NewReader(requestBody))
+		req, _ := http.NewRequestWithContext(authorizedCtx, http.MethodPost, "/budget/withdraw", bytes.NewReader(requestBody))
 
 		rr := httptest.NewRecorder()
 
@@ -1615,28 +1631,17 @@ func TestBountyBudgetWithdraw(t *testing.T) {
 	})
 
 	t.Run("Should test that an Workspace's Budget Total Amount is accurate after three (3) successful 'Budget Withdrawal Requests'", func(t *testing.T) {
-		ctxs := context.WithValue(context.Background(), auth.ContextKey, "valid-key")
-		mockDb := dbMocks.NewDatabase(t)
-		mockHttpClient := mocks.NewHttpClient(t)
-		bHandler := NewBountyHandler(mockHttpClient, mockDb)
-		bHandler.userHasAccess = mockUserHasAccessTrue
 
 		paymentAmount := uint(1500)
-		initialBudget := uint(5000)
+		initialBudget := budget.TotalBudget
 		invoice := "lnbc15u1p3xnhl2pp5jptserfk3zk4qy42tlucycrfwxhydvlemu9pqr93tuzlv9cc7g3sdqsvfhkcap3xyhx7un8cqzpgxqzjcsp5f8c52y2stc300gl6s4xswtjpc37hrnnr3c9wvtgjfuvqmpm35evq9qyyssqy4lgd8tj637qcjp05rdpxxykjenthxftej7a2zzmwrmrl70fyj9hvj0rewhzj7jfyuwkwcg9g2jpwtk3wkjtwnkdks84hsnu8xps5vsq4gj5hs"
+		bHandler.userHasAccess = handlerUserHasAccess
 
 		for i := 0; i < 3; i++ {
-			expectedFinalBudget := initialBudget - (paymentAmount * uint(i))
-
-			mockDb.ExpectedCalls = nil
-			mockDb.Calls = nil
+			expectedFinalBudget := initialBudget - (paymentAmount * uint(i+1))
 			mockHttpClient.ExpectedCalls = nil
 			mockHttpClient.Calls = nil
 
-			mockDb.On("GetWorkspaceBudget", "org-1").Return(db.NewBountyBudget{
-				TotalBudget: expectedFinalBudget,
-			}, nil)
-			mockDb.On("WithdrawBudget", "valid-key", "org-1", paymentAmount).Return(nil)
 			mockHttpClient.On("Do", mock.AnythingOfType("*http.Request")).Return(&http.Response{
 				StatusCode: 200,
 				Body:       io.NopCloser(bytes.NewBufferString(`{"success": true}`)),
@@ -1644,10 +1649,10 @@ func TestBountyBudgetWithdraw(t *testing.T) {
 
 			withdrawRequest := db.WithdrawBudgetRequest{
 				PaymentRequest: invoice,
-				OrgUuid:        "org-1",
+				OrgUuid:        workspace.Uuid,
 			}
 			requestBody, _ := json.Marshal(withdrawRequest)
-			req, _ := http.NewRequestWithContext(ctxs, http.MethodPost, "/budget/withdraw", bytes.NewReader(requestBody))
+			req, _ := http.NewRequestWithContext(authorizedCtx, http.MethodPost, "/budget/withdraw", bytes.NewReader(requestBody))
 
 			rr := httptest.NewRecorder()
 
@@ -1657,16 +1662,14 @@ func TestBountyBudgetWithdraw(t *testing.T) {
 			err := json.Unmarshal(rr.Body.Bytes(), &response)
 			assert.NoError(t, err)
 			assert.True(t, response.Success, "Expected invoice payment to succeed")
-			finalBudget := mockDb.GetWorkspaceBudget("org-1")
+
+			finalBudget := db.TestDB.GetWorkspaceBudget(workspace.Uuid)
 			assert.Equal(t, expectedFinalBudget, finalBudget.TotalBudget, "The workspace's final budget should reflect the deductions from the successful withdrawals")
 
 		}
 	})
 
 	t.Run("Should test that the BountyBudgetWithdraw handler gets locked by go mutex when it is called i.e. the handler has to be fully executed before it processes another request.", func(t *testing.T) {
-		mockDb := dbMocks.NewDatabase(t)
-		mockHttpClient := mocks.NewHttpClient(t)
-		bHandler := NewBountyHandler(mockHttpClient, mockDb)
 
 		var processingTimes []time.Time
 		var mutex sync.Mutex
