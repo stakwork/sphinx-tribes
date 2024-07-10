@@ -232,6 +232,7 @@ func returnUserMap(p db.Person) map[string]interface{} {
 	user := make(map[string]interface{})
 
 	user["id"] = p.ID
+	user["uuid"] = p.Uuid
 	user["created"] = p.Created
 	user["owner_pubkey"] = p.OwnerPubKey
 	user["owner_alias"] = p.OwnerAlias
