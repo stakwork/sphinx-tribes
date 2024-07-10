@@ -750,8 +750,12 @@ func (db database) GetWorkspaceBountiesCount(r *http.Request, workspace_uuid str
 }
 
 func (db database) GetAssignedBounties(r *http.Request) ([]NewBounty, error) {
-	offset, limit, sortBy, direction, _ := utils.GetPaginationParams(r)
 	uuid := chi.URLParam(r, "uuid")
+	if uuid == "" {
+		return []NewBounty{}, nil
+	}
+
+	offset, limit, sortBy, direction, _ := utils.GetPaginationParams(r)
 	person := db.GetPersonByUuid(uuid)
 	pubkey := person.OwnerPubKey
 	keys := r.URL.Query()
@@ -799,8 +803,12 @@ func (db database) GetAssignedBounties(r *http.Request) ([]NewBounty, error) {
 }
 
 func (db database) GetCreatedBounties(r *http.Request) ([]NewBounty, error) {
-	offset, limit, sortBy, direction, _ := utils.GetPaginationParams(r)
 	uuid := chi.URLParam(r, "uuid")
+	if uuid == "" {
+		return []NewBounty{}, nil
+	}
+
+	offset, limit, sortBy, direction, _ := utils.GetPaginationParams(r)
 	person := db.GetPersonByUuid(uuid)
 	pubkey := person.OwnerPubKey
 	keys := r.URL.Query()
