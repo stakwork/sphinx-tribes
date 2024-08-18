@@ -23,6 +23,9 @@ var RelayUrl string
 var MemeUrl string
 var RelayAuthKey string
 var RelayNodeKey string
+var V2AuthKey string
+var V2NodeKey string
+var V2Url string
 var SuperAdmins []string = []string{""}
 
 // these are constants for the store
@@ -45,6 +48,8 @@ func InitConfig() {
 	RelayUrl = os.Getenv("RELAY_URL")
 	MemeUrl = os.Getenv("MEME_URL")
 	RelayAuthKey = os.Getenv("RELAY_AUTH_KEY")
+	V2AuthKey = os.Getenv("V2_BOT_TOKEN")
+	V2Url = os.Getenv("V2_BOT_URL")
 	AdminStrings = os.Getenv("ADMINS")
 	AwsSecret := os.Getenv("AWS_SECRET_ACCESS")
 	AwsAccess := os.Getenv("AWS_ACCESS_KEY_ID")
@@ -71,11 +76,14 @@ func InitConfig() {
 	S3Client = s3.NewFromConfig(awsConfig)
 	PresignClient = s3.NewPresignClient(S3Client)
 
-	// only make this call if there is a Relay auth key
+	if RelayAuthKey == "" && V2AuthKey == "" {
+		panic("No relay or v2 auth key set")
+	}
 	if RelayAuthKey != "" {
 		RelayNodeKey = GetNodePubKey()
-	} else {
-		panic("No relay auth key set")
+	}
+	if V2AuthKey != "" {
+		V2NodeKey = GetV2NodePubKey()
 	}
 
 	if Host == "" {
@@ -314,4 +322,9 @@ func GetNodePubKey() string {
 		pubkey = nodeInfo.Response.IdentityPubkey
 	}
 	return pubkey
+}
+
+func GetV2NodePubKey() string {
+	// fetch v2 pubky here
+	return ""
 }
