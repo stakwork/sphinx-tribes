@@ -566,85 +566,180 @@ func (h *bountyHandler) MakeBountyPayment(w http.ResponseWriter, r *http.Request
 		return
 	}
 
-	url := fmt.Sprintf("%s/payment", config.RelayUrl)
-
+	// Get Bounty Assignee
 	assignee := h.db.GetPersonByPubkey(bounty.Assignee)
-	bodyData := utils.BuildKeysendBodyData(amount, assignee.OwnerPubKey, assignee.OwnerRouteHint)
 
-	jsonBody := []byte(bodyData)
+	// If the v2contactkey is present
+	if config.V2ContactKey != "" {
+		url := fmt.Sprintf("%s/pay", config.V2BotUrl)
 
-	req, _ := http.NewRequest(http.MethodPost, url, bytes.NewBuffer(jsonBody))
-	req.Header.Set("x-user-token", config.RelayAuthKey)
-	req.Header.Set("Content-Type", "application/json")
-	log.Printf("[bounty] Making Bounty Payment: amount: %d, pubkey: %s, route_hint: %s", amount, assignee.OwnerPubKey, assignee.OwnerRouteHint)
-	res, err := h.httpClient.Do(req)
+		// Build v2 keysend payment data
+		bodyData := utils.BuildV2KeysendBodyData(amount, assignee.OwnerPubKey, assignee.OwnerRouteHint)
+		jsonBody := []byte(bodyData)
 
-	if err != nil {
-		log.Printf("[bounty] Request Failed: %s", err)
-		h.m.Unlock()
-		return
-	}
-
-	defer res.Body.Close()
-	body, err = io.ReadAll(res.Body)
-	if err != nil {
-		fmt.Println("[read body]", err)
-		w.WriteHeader(http.StatusNotAcceptable)
-		h.m.Unlock()
-		return
-	}
-
-	msg := make(map[string]interface{})
-
-	// payment is successful add to payment history
-	// and reduce workspaces budget
-	if res.StatusCode == 200 {
-		// Unmarshal result
-		keysendRes := db.KeysendSuccess{}
-		err = json.Unmarshal(body, &keysendRes)
+		req, _ := http.NewRequest(http.MethodPost, url, bytes.NewBuffer(jsonBody))
+		req.Header.Set("x-admin-token", config.V2BotToken)
+		req.Header.Set("Content-Type", "application/json")
+		log.Printf("[bounty] Making Bounty V2 Payment: amount: %d, pubkey: %s, route_hint: %s", amount, assignee.OwnerPubKey, assignee.OwnerRouteHint)
+		res, err := h.httpClient.Do(req)
 
 		if err != nil {
-			fmt.Println("[Unmarshal]", err)
+			log.Printf("[bounty] Request Failed: %s", err)
+			h.m.Unlock()
+			return
+		}
+
+		defer res.Body.Close()
+		body, err = io.ReadAll(res.Body)
+		if err != nil {
+			fmt.Println("[read body]", err)
 			w.WriteHeader(http.StatusNotAcceptable)
 			h.m.Unlock()
 			return
 		}
 
-		now := time.Now()
+		msg := make(map[string]interface{})
+		// payment is successful add to payment history
+		// and reduce workspaces budget
+		if res.StatusCode == 200 {
+			// Unmarshal result
+			v2KeysendRes := db.V2SendOnionRes{}
+			err = json.Unmarshal(body, &v2KeysendRes)
 
-		paymentHistory := db.NewPaymentHistory{
-			Amount:         amount,
-			SenderPubKey:   pubKeyFromAuth,
-			ReceiverPubKey: assignee.OwnerPubKey,
-			WorkspaceUuid:  bounty.WorkspaceUuid,
-			BountyId:       id,
-			Created:        &now,
-			Updated:        &now,
-			Status:         true,
-			PaymentType:    "payment",
+			if err != nil {
+				fmt.Println("[Unmarshal]", err)
+				w.WriteHeader(http.StatusNotAcceptable)
+				h.m.Unlock()
+				return
+			}
+
+			// if the payment has a completed status
+			if v2KeysendRes.Status == db.PaymentComplete {
+				now := time.Now()
+
+				paymentHistory := db.NewPaymentHistory{
+					Amount:         amount,
+					SenderPubKey:   pubKeyFromAuth,
+					ReceiverPubKey: assignee.OwnerPubKey,
+					WorkspaceUuid:  bounty.WorkspaceUuid,
+					BountyId:       id,
+					Created:        &now,
+					Updated:        &now,
+					Status:         true,
+					PaymentType:    "payment",
+				}
+
+				bounty.Paid = true
+				bounty.PaidDate = &now
+				bounty.Completed = true
+				bounty.CompletionDate = &now
+
+				h.db.ProcessBountyPayment(paymentHistory, bounty)
+
+				msg["msg"] = "keysend_success"
+				msg["invoice"] = ""
+
+				socket, err := h.getSocketConnections(request.Websocket_token)
+				if err == nil {
+					socket.Conn.WriteJSON(msg)
+				}
+			} else { // Send payment status
+				msg["msg"] = v2KeysendRes.Status
+				msg["invoice"] = ""
+
+				socket, err := h.getSocketConnections(request.Websocket_token)
+				if err == nil {
+					socket.Conn.WriteJSON(msg)
+				}
+			}
+		} else { // Send Payment error
+			msg["msg"] = "keysend_error"
+			msg["invoice"] = ""
+
+			socket, err := h.getSocketConnections(request.Websocket_token)
+			if err == nil {
+				socket.Conn.WriteJSON(msg)
+			}
+		}
+	} else { // Process v1 payment
+		url := fmt.Sprintf("%s/payment", config.RelayUrl)
+
+		bodyData := utils.BuildKeysendBodyData(amount, assignee.OwnerPubKey, assignee.OwnerRouteHint)
+		jsonBody := []byte(bodyData)
+
+		req, _ := http.NewRequest(http.MethodPost, url, bytes.NewBuffer(jsonBody))
+		req.Header.Set("x-user-token", config.RelayAuthKey)
+		req.Header.Set("Content-Type", "application/json")
+		log.Printf("[bounty] Making Bounty Payment: amount: %d, pubkey: %s, route_hint: %s", amount, assignee.OwnerPubKey, assignee.OwnerRouteHint)
+		res, err := h.httpClient.Do(req)
+
+		if err != nil {
+			log.Printf("[bounty] Request Failed: %s", err)
+			h.m.Unlock()
+			return
 		}
 
-		bounty.Paid = true
-		bounty.PaidDate = &now
-		bounty.Completed = true
-		bounty.CompletionDate = &now
-
-		h.db.ProcessBountyPayment(paymentHistory, bounty)
-
-		msg["msg"] = "keysend_success"
-		msg["invoice"] = ""
-
-		socket, err := h.getSocketConnections(request.Websocket_token)
-		if err == nil {
-			socket.Conn.WriteJSON(msg)
+		defer res.Body.Close()
+		body, err = io.ReadAll(res.Body)
+		if err != nil {
+			fmt.Println("[read body]", err)
+			w.WriteHeader(http.StatusNotAcceptable)
+			h.m.Unlock()
+			return
 		}
-	} else {
-		msg["msg"] = "keysend_error"
-		msg["invoice"] = ""
 
-		socket, err := h.getSocketConnections(request.Websocket_token)
-		if err == nil {
-			socket.Conn.WriteJSON(msg)
+		msg := make(map[string]interface{})
+
+		// payment is successful add to payment history
+		// and reduce workspaces budget
+		if res.StatusCode == 200 {
+			// Unmarshal result
+			keysendRes := db.KeysendSuccess{}
+			err = json.Unmarshal(body, &keysendRes)
+
+			if err != nil {
+				fmt.Println("[Unmarshal]", err)
+				w.WriteHeader(http.StatusNotAcceptable)
+				h.m.Unlock()
+				return
+			}
+
+			now := time.Now()
+
+			paymentHistory := db.NewPaymentHistory{
+				Amount:         amount,
+				SenderPubKey:   pubKeyFromAuth,
+				ReceiverPubKey: assignee.OwnerPubKey,
+				WorkspaceUuid:  bounty.WorkspaceUuid,
+				BountyId:       id,
+				Created:        &now,
+				Updated:        &now,
+				Status:         true,
+				PaymentType:    "payment",
+			}
+
+			bounty.Paid = true
+			bounty.PaidDate = &now
+			bounty.Completed = true
+			bounty.CompletionDate = &now
+
+			h.db.ProcessBountyPayment(paymentHistory, bounty)
+
+			msg["msg"] = "keysend_success"
+			msg["invoice"] = ""
+
+			socket, err := h.getSocketConnections(request.Websocket_token)
+			if err == nil {
+				socket.Conn.WriteJSON(msg)
+			}
+		} else {
+			msg["msg"] = "keysend_error"
+			msg["invoice"] = ""
+
+			socket, err := h.getSocketConnections(request.Websocket_token)
+			if err == nil {
+				socket.Conn.WriteJSON(msg)
+			}
 		}
 	}
 
