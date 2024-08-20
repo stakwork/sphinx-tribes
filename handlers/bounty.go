@@ -944,12 +944,64 @@ func (h *bountyHandler) GetLightningInvoice(payment_request string) (db.InvoiceR
 	}
 }
 
+func (h *bountyHandler) GetV2LightningInvoice(payment_request string) (db.V2InvoiceResponse, db.InvoiceError) {
+	url := fmt.Sprintf("%s/check_invoice", config.V2BotUrl)
+
+	invoiceBody := db.V2InvoiceBody{
+		PaymentHash: payment_request,
+	}
+
+	jsonBody, _ := json.Marshal(invoiceBody)
+
+	req, err := http.NewRequest(http.MethodPost, url, bytes.NewBuffer(jsonBody))
+	req.Header.Set("x-admin-token", config.V2BotToken)
+	req.Header.Set("Content-Type", "application/json")
+	res, _ := h.httpClient.Do(req)
+
+	if err != nil {
+		log.Printf("[bounty] Request Failed: %s", err)
+		return db.V2InvoiceResponse{}, db.InvoiceError{}
+	}
+
+	defer res.Body.Close()
+
+	body, err := io.ReadAll(res.Body)
+
+	if res.StatusCode != 200 {
+		// Unmarshal result
+		invoiceErr := db.InvoiceError{}
+		err = json.Unmarshal(body, &invoiceErr)
+
+		if err != nil {
+			log.Printf("[bounty] Reading Invoice body failed: %s", err)
+			return db.V2InvoiceResponse{}, invoiceErr
+		}
+
+		return db.V2InvoiceResponse{}, invoiceErr
+	} else {
+		// Unmarshal result
+		invoiceRes := db.V2InvoiceResponse{}
+		err = json.Unmarshal(body, &invoiceRes)
+
+		if err != nil {
+			log.Printf("[bounty] Reading Invoice body failed: %s", err)
+			return invoiceRes, db.InvoiceError{}
+		}
+
+		return invoiceRes, db.InvoiceError{}
+	}
+}
+
 func (h *bountyHandler) PayLightningInvoice(payment_request string) (db.InvoicePaySuccess, db.InvoicePayError) {
 	url := fmt.Sprintf("%s/invoices", config.RelayUrl)
 	bodyData := fmt.Sprintf(`{"payment_request": "%s"}`, payment_request)
 	jsonBody := []byte(bodyData)
 
 	req, err := http.NewRequest(http.MethodPut, url, bytes.NewBuffer(jsonBody))
+
+	if err != nil {
+		log.Printf("Error paying invoice: %s", err)
+	}
 
 	req.Header.Set("x-user-token", config.RelayAuthKey)
 	req.Header.Set("Content-Type", "application/json")
@@ -963,6 +1015,61 @@ func (h *bountyHandler) PayLightningInvoice(payment_request string) (db.InvoiceP
 	defer res.Body.Close()
 
 	body, err := io.ReadAll(res.Body)
+
+	if err != nil {
+		log.Printf("Error could not read body: %s", err)
+	}
+
+	if res.StatusCode != 200 {
+		invoiceError := db.InvoicePayError{}
+		err = json.Unmarshal(body, &invoiceError)
+
+		if err != nil {
+			log.Printf("[bounty] Reading Invoice pay error body failed: %s", err)
+			return db.InvoicePaySuccess{}, db.InvoicePayError{}
+		}
+
+		return db.InvoicePaySuccess{}, invoiceError
+	} else {
+		invoiceSuccess := db.InvoicePaySuccess{}
+		err = json.Unmarshal(body, &invoiceSuccess)
+
+		if err != nil {
+			log.Printf("[bounty] Reading Invoice pay success body failed: %s", err)
+			return db.InvoicePaySuccess{}, db.InvoicePayError{}
+		}
+
+		return invoiceSuccess, db.InvoicePayError{}
+	}
+}
+
+func (h *bountyHandler) PayV2LightningInvoice(payment_request string) (db.InvoicePaySuccess, db.InvoicePayError) {
+	url := fmt.Sprintf("%s/invoices", config.RelayUrl)
+	bodyData := fmt.Sprintf(`{"payment_request": "%s"}`, payment_request)
+	jsonBody := []byte(bodyData)
+
+	req, err := http.NewRequest(http.MethodPut, url, bytes.NewBuffer(jsonBody))
+
+	if err != nil {
+		log.Printf("Error paying invoice: %s", err)
+	}
+
+	req.Header.Set("x-user-token", config.RelayAuthKey)
+	req.Header.Set("Content-Type", "application/json")
+	res, err := h.httpClient.Do(req)
+
+	if err != nil {
+		log.Printf("[bounty] Request Failed: %s", err)
+		return db.InvoicePaySuccess{}, db.InvoicePayError{}
+	}
+
+	defer res.Body.Close()
+
+	body, err := io.ReadAll(res.Body)
+
+	if err != nil {
+		log.Printf("Error could not read body: %s", err)
+	}
 
 	if res.StatusCode != 200 {
 		invoiceError := db.InvoicePayError{}

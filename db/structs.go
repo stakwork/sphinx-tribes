@@ -303,6 +303,12 @@ type InvoicePayError struct {
 	Error   string `json:"error"`
 }
 
+const (
+	InvoicePaid    = "paid"
+	InvoiceExpired = "expired"
+	InvoicePending = "pending"
+)
+
 type InvoiceSuccessResponse struct {
 	Success  bool                     `json:"success"`
 	Response InvoiceSuccessPaymentReq `json:"response"`
@@ -337,14 +343,6 @@ const (
 	PaymentFailed   = "FAILED"
 	PaymentPending  = "PENDING"
 )
-
-type V2SendOnionRes struct {
-	Status      string `json:"status"` // "COMPLETE", "PENDING", or "FAILED"
-	Tag         string `json:"tag"`
-	Preimage    string `json:"preimage"`
-	PaymentHash string `json:"payment_hash"`
-	Message     string `json:"message"`
-}
 
 type LnHost struct {
 	Msg  string `json:"msg"`
