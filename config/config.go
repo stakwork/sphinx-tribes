@@ -39,6 +39,10 @@ var AdminStrings string
 var S3Client *s3.Client
 var PresignClient *s3.PresignClient
 
+var V2BotUrl string
+var V2BotToken string
+var V2ContactKey string
+
 func InitConfig() {
 	Host = os.Getenv("LN_SERVER_BASE_URL")
 	JwtKey = os.Getenv("LN_JWT_KEY")
@@ -54,6 +58,8 @@ func InitConfig() {
 	S3Url = os.Getenv("S3_URL")
 	AdminCheck = os.Getenv("ADMIN_CHECK")
 	Connection_Auth = os.Getenv("CONNECTION_AUTH")
+	V2BotUrl = os.Getenv("V2_BOT_URL")
+	V2BotToken = os.Getenv("V2_BOT_TOKEN")
 
 	// Add to super admins
 	SuperAdmins = StripSuperAdmins(AdminStrings)
@@ -76,6 +82,11 @@ func InitConfig() {
 		RelayNodeKey = GetNodePubKey()
 	} else {
 		panic("No relay auth key set")
+	}
+
+	if V2BotUrl != "" && V2BotToken != "" {
+		contact_key := GetV2ContactKey()
+		V2ContactKey = contact_key
 	}
 
 	if Host == "" {
@@ -172,6 +183,13 @@ type NodeGetInfo struct {
 	Response NodeGetInfoResponse `json:"response"`
 }
 
+type V2AccountInfo struct {
+	ContactInfo string `json:"contact_info"`
+	Alias       string `json:"alias"`
+	Img         string `json:"img"`
+	Network     string `json:"network"`
+}
+
 type Contact struct {
 	Id                uint   `json:"id"`
 	RouteHint         string `json:"route_hint"`
@@ -257,6 +275,44 @@ type ContactResponse struct {
 type ProxyContacts struct {
 	Success  bool            `json:"success"`
 	Response ContactResponse `json:"response"`
+}
+
+func GetV2ContactKey() string {
+	url := fmt.Sprintf("%s/account", V2BotUrl)
+
+	client := &http.Client{}
+	req, err := http.NewRequest(http.MethodGet, url, nil)
+
+	if err != nil {
+		log.Printf("Get Contact Request Failed: %s", err)
+	}
+
+	req.Header.Set("x-admin-token", V2BotToken)
+	req.Header.Set("Content-Type", "application/json")
+	res, err := client.Do(req)
+
+	if err != nil {
+		log.Printf("Get Contact Request Failed: %s", err)
+		return ""
+	}
+
+	defer res.Body.Close()
+	body, err := io.ReadAll(res.Body)
+
+	if err != nil {
+		log.Printf("Get Contact Body Read Failed: %s", err)
+	}
+
+	accountInfo := V2AccountInfo{}
+
+	// Unmarshal result
+	err = json.Unmarshal(body, &accountInfo)
+	if err != nil {
+		log.Printf("Reading Relay Node Info body failed: %s", err)
+	}
+
+	contact_key := accountInfo.ContactInfo
+	return contact_key
 }
 
 func GetNodePubKey() string {
