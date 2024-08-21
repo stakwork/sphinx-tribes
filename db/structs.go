@@ -303,12 +303,6 @@ type InvoicePayError struct {
 	Error   string `json:"error"`
 }
 
-const (
-	InvoicePaid    = "paid"
-	InvoiceExpired = "expired"
-	InvoicePending = "pending"
-)
-
 type InvoiceSuccessResponse struct {
 	Success  bool                     `json:"success"`
 	Response InvoiceSuccessPaymentReq `json:"response"`
@@ -337,12 +331,6 @@ type KeysendError struct {
 	Success bool   `json:"success"`
 	Error   string `json:"error"`
 }
-
-const (
-	PaymentComplete = "COMPLETE"
-	PaymentFailed   = "FAILED"
-	PaymentPending  = "PENDING"
-)
 
 type LnHost struct {
 	Msg  string `json:"msg"`
