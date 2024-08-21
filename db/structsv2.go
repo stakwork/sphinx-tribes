@@ -1,5 +1,17 @@
 package db
 
+const (
+	InvoicePaid    = "paid"
+	InvoiceExpired = "expired"
+	InvoicePending = "pending"
+)
+
+const (
+	PaymentComplete = "COMPLETE"
+	PaymentFailed   = "FAILED"
+	PaymentPending  = "PENDING"
+)
+
 type V2InvoiceResponse struct {
 	Status    string `json:"status"`
 	Timestamp string `json:"timestamp"`
@@ -8,6 +20,7 @@ type V2InvoiceResponse struct {
 
 type V2InvoiceBody struct {
 	PaymentHash string `json:"payment_hash"`
+	Bolt11      string `json:"bolt11"`
 }
 
 type V2SendOnionRes struct {
