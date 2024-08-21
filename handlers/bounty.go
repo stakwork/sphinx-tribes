@@ -902,6 +902,14 @@ func formatPayError(errorMsg string) db.InvoicePayError {
 }
 
 func (h *bountyHandler) GetLightningInvoice(payment_request string) (db.InvoiceResult, db.InvoiceError) {
+	if config.V2ContactKey != "" {
+		return h.GetV2LightningInvoice(payment_request)
+	} else {
+		return h.GetV1LightningInvoice(payment_request)
+	}
+}
+
+func (h *bountyHandler) GetV1LightningInvoice(payment_request string) (db.InvoiceResult, db.InvoiceError) {
 	url := fmt.Sprintf("%s/invoice?payment_request=%s", config.RelayUrl, payment_request)
 
 	req, err := http.NewRequest(http.MethodGet, url, nil)
@@ -918,6 +926,11 @@ func (h *bountyHandler) GetLightningInvoice(payment_request string) (db.InvoiceR
 	defer res.Body.Close()
 
 	body, err := io.ReadAll(res.Body)
+
+	if err != nil {
+		log.Printf("Error reading: %s", err)
+		return db.InvoiceResult{}, db.InvoiceError{Success: false, Error: err.Error()}
+	}
 
 	if res.StatusCode != 200 {
 		// Unmarshal result
@@ -944,11 +957,11 @@ func (h *bountyHandler) GetLightningInvoice(payment_request string) (db.InvoiceR
 	}
 }
 
-func (h *bountyHandler) GetV2LightningInvoice(payment_request string) (db.V2InvoiceResponse, db.InvoiceError) {
+func (h *bountyHandler) GetV2LightningInvoice(payment_request string) (db.InvoiceResult, db.InvoiceError) {
 	url := fmt.Sprintf("%s/check_invoice", config.V2BotUrl)
 
 	invoiceBody := db.V2InvoiceBody{
-		PaymentHash: payment_request,
+		Bolt11: payment_request,
 	}
 
 	jsonBody, _ := json.Marshal(invoiceBody)
@@ -960,12 +973,17 @@ func (h *bountyHandler) GetV2LightningInvoice(payment_request string) (db.V2Invo
 
 	if err != nil {
 		log.Printf("[bounty] Request Failed: %s", err)
-		return db.V2InvoiceResponse{}, db.InvoiceError{}
+		return db.InvoiceResult{}, db.InvoiceError{Success: false, Error: err.Error()}
 	}
 
 	defer res.Body.Close()
 
 	body, err := io.ReadAll(res.Body)
+
+	if err != nil {
+		log.Printf("[bounty] Reading Invoice body failed: %s", err)
+		return db.InvoiceResult{}, db.InvoiceError{Success: false, Error: err.Error()}
+	}
 
 	if res.StatusCode != 200 {
 		// Unmarshal result
@@ -973,11 +991,11 @@ func (h *bountyHandler) GetV2LightningInvoice(payment_request string) (db.V2Invo
 		err = json.Unmarshal(body, &invoiceErr)
 
 		if err != nil {
-			log.Printf("[bounty] Reading Invoice body failed: %s", err)
-			return db.V2InvoiceResponse{}, invoiceErr
+			log.Printf("[bounty] Unmarshalling Invoice body failed: %s", err)
+			return db.InvoiceResult{}, invoiceErr
 		}
 
-		return db.V2InvoiceResponse{}, invoiceErr
+		return db.InvoiceResult{}, invoiceErr
 	} else {
 		// Unmarshal result
 		invoiceRes := db.V2InvoiceResponse{}
@@ -985,10 +1003,25 @@ func (h *bountyHandler) GetV2LightningInvoice(payment_request string) (db.V2Invo
 
 		if err != nil {
 			log.Printf("[bounty] Reading Invoice body failed: %s", err)
-			return invoiceRes, db.InvoiceError{}
+			return db.InvoiceResult{}, db.InvoiceError{}
 		}
 
-		return invoiceRes, db.InvoiceError{}
+		invoiceResult := db.InvoiceResult{
+			Success: false,
+			Response: db.InvoiceCheckResponse{
+				Settled:         false,
+				Payment_request: payment_request,
+				Payment_hash:    "",
+				Preimage:        "",
+			},
+		}
+
+		if invoiceRes.Status == db.PaymentComplete {
+			invoiceResult.Success = true
+			invoiceResult.Response.Settled = true
+			return invoiceResult, db.InvoiceError{}
+		}
+		return invoiceResult, db.InvoiceError{}
 	}
 }
 
