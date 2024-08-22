@@ -709,10 +709,11 @@ func (th *tribeHandler) GenerateV2BudgetInvoice(w http.ResponseWriter, r *http.R
 	}
 
 	// Unmarshal result
-	invoiceRes := db.V2CreateInvoiceResponse{}
+	v2InvoiceRes := db.V2CreateInvoiceResponse{}
 
-	err = json.Unmarshal(body, &invoiceRes)
+	err = json.Unmarshal(body, &v2InvoiceRes)
 
+	fmt.Println("V2 invoice ===", v2InvoiceRes)
 	if err != nil {
 		log.Printf("Json Unmarshal failed: %s", err)
 		return
@@ -732,7 +733,7 @@ func (th *tribeHandler) GenerateV2BudgetInvoice(w http.ResponseWriter, r *http.R
 	}
 
 	newInvoice := db.NewInvoiceList{
-		PaymentRequest: invoiceRes.Bolt11,
+		PaymentRequest: v2InvoiceRes.Bolt11,
 		Type:           db.InvoiceType("BUDGET"),
 		OwnerPubkey:    invoice.SenderPubKey,
 		WorkspaceUuid:  invoice.WorkspaceUuid,
@@ -742,6 +743,13 @@ func (th *tribeHandler) GenerateV2BudgetInvoice(w http.ResponseWriter, r *http.R
 	}
 
 	th.db.ProcessBudgetInvoice(paymentHistory, newInvoice)
+
+	invoiceRes := db.InvoiceResponse{
+		Succcess: true,
+		Response: db.Invoice{
+			Invoice: v2InvoiceRes.Bolt11,
+		},
+	}
 
 	w.WriteHeader(http.StatusOK)
 	json.NewEncoder(w).Encode(invoiceRes)
