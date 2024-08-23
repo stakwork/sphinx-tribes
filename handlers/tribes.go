@@ -713,7 +713,6 @@ func (th *tribeHandler) GenerateV2BudgetInvoice(w http.ResponseWriter, r *http.R
 
 	err = json.Unmarshal(body, &v2InvoiceRes)
 
-	fmt.Println("V2 invoice ===", v2InvoiceRes)
 	if err != nil {
 		log.Printf("Json Unmarshal failed: %s", err)
 		return

@@ -43,3 +43,10 @@ type V2CreateInvoiceResponse struct {
 	Bolt11      string `json:"bolt11"`
 	PaymentHash string `json:"payment_hash"`
 }
+
+type V2PayInvoiceResponse struct {
+	Tag         string `json:"tags"`
+	Msat        string `json:"msat"`
+	Timestamp   string `json:"timestamp"`
+	PaymentHash string `json:"payment_hash"`
+}

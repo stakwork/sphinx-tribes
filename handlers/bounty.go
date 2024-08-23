@@ -1016,7 +1016,7 @@ func (h *bountyHandler) GetV2LightningInvoice(payment_request string) (db.Invoic
 			},
 		}
 
-		if invoiceRes.Status == db.PaymentComplete {
+		if invoiceRes.Status == db.InvoicePaid {
 			invoiceResult.Success = true
 			invoiceResult.Response.Settled = true
 			return invoiceResult, db.InvoiceError{}
@@ -1026,6 +1026,14 @@ func (h *bountyHandler) GetV2LightningInvoice(payment_request string) (db.Invoic
 }
 
 func (h *bountyHandler) PayLightningInvoice(payment_request string) (db.InvoicePaySuccess, db.InvoicePayError) {
+	if config.V2ContactKey != "" {
+		return h.PayV2LightningInvoice(payment_request)
+	} else {
+		return h.PayV1LightningInvoice(payment_request)
+	}
+}
+
+func (h *bountyHandler) PayV1LightningInvoice(payment_request string) (db.InvoicePaySuccess, db.InvoicePayError) {
 	url := fmt.Sprintf("%s/invoices", config.RelayUrl)
 	bodyData := fmt.Sprintf(`{"payment_request": "%s"}`, payment_request)
 	jsonBody := []byte(bodyData)
@@ -1077,17 +1085,17 @@ func (h *bountyHandler) PayLightningInvoice(payment_request string) (db.InvoiceP
 }
 
 func (h *bountyHandler) PayV2LightningInvoice(payment_request string) (db.InvoicePaySuccess, db.InvoicePayError) {
-	url := fmt.Sprintf("%s/invoices", config.RelayUrl)
-	bodyData := fmt.Sprintf(`{"payment_request": "%s"}`, payment_request)
+	url := fmt.Sprintf("%s/pay_invoice", config.V2BotUrl)
+	bodyData := fmt.Sprintf(`{"bolt11": "%s", "wait": true}`, payment_request)
 	jsonBody := []byte(bodyData)
 
-	req, err := http.NewRequest(http.MethodPut, url, bytes.NewBuffer(jsonBody))
+	req, err := http.NewRequest(http.MethodPost, url, bytes.NewBuffer(jsonBody))
 
 	if err != nil {
 		log.Printf("Error paying invoice: %s", err)
 	}
 
-	req.Header.Set("x-user-token", config.RelayAuthKey)
+	req.Header.Set("x-admin-token", config.V2BotToken)
 	req.Header.Set("Content-Type", "application/json")
 	res, err := h.httpClient.Do(req)
 
@@ -1115,15 +1123,31 @@ func (h *bountyHandler) PayV2LightningInvoice(payment_request string) (db.Invoic
 
 		return db.InvoicePaySuccess{}, invoiceError
 	} else {
-		invoiceSuccess := db.InvoicePaySuccess{}
-		err = json.Unmarshal(body, &invoiceSuccess)
+		invoiceRes := db.V2InvoiceResponse{}
+		err = json.Unmarshal(body, &invoiceRes)
 
 		if err != nil {
 			log.Printf("[bounty] Reading Invoice pay success body failed: %s", err)
 			return db.InvoicePaySuccess{}, db.InvoicePayError{}
 		}
 
-		return invoiceSuccess, db.InvoicePayError{}
+		invoiceResult := db.InvoicePaySuccess{
+			Success: false,
+			Response: db.InvoiceCheckResponse{
+				Settled:         false,
+				Payment_request: payment_request,
+				Payment_hash:    "",
+				Preimage:        "",
+			},
+		}
+
+		if invoiceRes.Status == db.PaymentComplete {
+			invoiceResult.Success = true
+			invoiceResult.Response.Settled = true
+			return invoiceResult, db.InvoicePayError{}
+		}
+
+		return invoiceResult, db.InvoicePayError{}
 	}
 }
 
