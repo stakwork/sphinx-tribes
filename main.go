@@ -9,6 +9,7 @@ import (
 	"time"
 
 	"github.com/joho/godotenv"
+	"github.com/robfig/cron"
 	"github.com/stakwork/sphinx-tribes/auth"
 	"github.com/stakwork/sphinx-tribes/config"
 	"github.com/stakwork/sphinx-tribes/db"
@@ -45,12 +46,18 @@ func main() {
 		go handlers.ProcessGithubIssuesLoop()
 	}
 
+	runCron()
 	run()
+}
+
+func runCron() {
+	c := cron.New()
+	c.AddFunc("@every 00h30m00s", handlers.InitV2PaymentsCron)
+	c.Start()
 }
 
 // Start the MQTT plugin
 func run() {
-
 	router := routes.NewRouter()
 
 	shutdownSignal := make(chan os.Signal)

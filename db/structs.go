@@ -730,6 +730,8 @@ type NewPaymentHistory struct {
 	WorkspaceUuid  string      `json:"workspace_uuid,omitempty"`
 	SenderPubKey   string      `json:"sender_pubkey"`
 	ReceiverPubKey string      `json:"receiver_pubkey"`
+	Tag            string      `json:"tag,omitempty"`
+	PaymentStatus  string      `json:"payment_status,omitempty"`
 	Created        *time.Time  `json:"created"`
 	Updated        *time.Time  `json:"updated"`
 	Status         bool        `json:"status"`

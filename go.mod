@@ -74,6 +74,7 @@ require (
 	github.com/ory/dockertest/v3 v3.10.0 // indirect
 	github.com/patrickmn/go-cache v2.1.0+incompatible
 	github.com/redis/go-redis/v9 v9.3.0
+	github.com/robfig/cron v1.2.0 // indirect
 	github.com/rs/cors v1.10.1
 	github.com/rs/xid v1.5.0
 	github.com/snowflakedb/gosnowflake v1.6.3 // indirect
