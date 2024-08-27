@@ -1095,10 +1095,12 @@ func (h *bountyHandler) PayV2LightningInvoice(payment_request string) (db.Invoic
 
 	if err != nil {
 		log.Printf("Error paying invoice: %s", err)
+		return db.InvoicePaySuccess{}, db.InvoicePayError{}
 	}
 
 	req.Header.Set("x-admin-token", config.V2BotToken)
 	req.Header.Set("Content-Type", "application/json")
+
 	res, err := h.httpClient.Do(req)
 
 	if err != nil {

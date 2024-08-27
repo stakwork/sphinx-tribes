@@ -32,9 +32,10 @@ func BountyRoutes() chi.Router {
 
 	})
 	r.Group(func(r chi.Router) {
+		r.Post("/budget/withdraw", bountyHandler.BountyBudgetWithdraw)
+
 		r.Use(auth.PubKeyContext)
 		r.Post("/pay/{id}", bountyHandler.MakeBountyPayment)
-		r.Post("/budget/withdraw", bountyHandler.BountyBudgetWithdraw)
 		r.Post("/budget_workspace/withdraw", bountyHandler.NewBountyBudgetWithdraw)
 
 		r.Post("/", bountyHandler.CreateOrEditBounty)
