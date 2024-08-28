@@ -1680,15 +1680,17 @@ func TestBountyBudgetWithdraw(t *testing.T) {
 		mockHttpClient := mocks.NewHttpClient(t)
 		bHandler := NewBountyHandler(mockHttpClient, db.TestDB)
 		bHandler.userHasAccess = handlerUserHasAccess
+
 		rr := httptest.NewRecorder()
 		handler := http.HandlerFunc(bHandler.BountyBudgetWithdraw)
 		paymentAmount := uint(300)
 		initialBudget := budget.TotalBudget
 		expectedFinalBudget := initialBudget - paymentAmount
 		budget.TotalBudget = expectedFinalBudget
+
 		mockHttpClient.On("Do", mock.AnythingOfType("*http.Request")).Return(&http.Response{
 			StatusCode: 200,
-			Body:       io.NopCloser(bytes.NewBufferString(`{"success": true}`)),
+			Body:       io.NopCloser(bytes.NewBufferString(`{"status": "COMPLETE", "amt_msat": "1000", "timestamp": "" }`)),
 		}, nil)
 
 		invoice := "lnbc3u1pngsqv8pp5vl6ep8llmg3f9sfu8j7ctcnphylpnjduuyljqf3sc30z6ejmrunqdqzvscqzpgxqyz5vqrzjqwnw5tv745sjpvft6e3f9w62xqk826vrm3zaev4nvj6xr3n065aukqqqqyqqz9gqqyqqqqqqqqqqqqqqqqsp5n9hrrw6pr89qn3c82vvhy697wp45zdsyhm7tnu536ga77ytvxxaq9qrssqqqhenjtquz8wz5tym8v830h9gjezynjsazystzj6muhw4rd9ccc40p8sazjuk77hhcj0xn72lfyee3tsfl7lucxkx5xgtfaqya9qldcqr3072z"
@@ -1720,7 +1722,7 @@ func TestBountyBudgetWithdraw(t *testing.T) {
 			Body:       io.NopCloser(bytes.NewBufferString(`{"success": false, "error": "Payment error"}`)),
 		}, nil)
 
-		invoice := "lnbc15u1p3xnhl2pp5jptserfk3zk4qy42tlucycrfwxhydvlemu9pqr93tuzlv9cc7g3sdqsvfhkcap3xyhx7un8cqzpgxqzjcsp5f8c52y2stc300gl6s4xswtjpc37hrnnr3c9wvtgjfuvqmpm35evq9qyyssqy4lgd8tj637qcjp05rdpxxykjenthxftej7a2zzmwrmrl70fyj9hvj0rewhzj7jfyuwkwcg9g2jpwtk3wkjtwnkdks84hsnu8xps5vsq4gj5hs"
+		invoice := "lnbcrt1u1pnv5ejzdqad9h8vmmfvdjjqen0wgsrzvpsxqcrqpp58xyhvymlhc8q05z930fknk2vdl8wnpm5zlx5lgp4ev9u8h7yd4kssp5nu652c5y0epuxeawn8szcgdrjxwk7pfkdh9tsu44r7hacg52nfgq9qrsgqcqpjxqrrssrzjqgtzc5n3vcmlhqfq4vpxreqskxzay6xhdrxx7c38ckqs95v5459uyqqqqyqq9ggqqsqqqqqqqqqqqqqq9gwyffzjpnrwt6yswwd4znt2xqnwjwxgq63qxudru95a8pqeer2r7sduurtstz5x60y4e7m4y9nx6rqy5sr9k08vtwv6s37xh0z5pdwpgqxeqdtv"
 
 		withdrawRequest := db.WithdrawBudgetRequest{
 			PaymentRequest: invoice,
@@ -1744,9 +1746,9 @@ func TestBountyBudgetWithdraw(t *testing.T) {
 
 	t.Run("Should test that an Workspace's Budget Total Amount is accurate after three (3) successful 'Budget Withdrawal Requests'", func(t *testing.T) {
 
-		paymentAmount := uint(1500)
+		paymentAmount := uint(1000)
 		initialBudget := budget.TotalBudget
-		invoice := "lnbc15u1p3xnhl2pp5jptserfk3zk4qy42tlucycrfwxhydvlemu9pqr93tuzlv9cc7g3sdqsvfhkcap3xyhx7un8cqzpgxqzjcsp5f8c52y2stc300gl6s4xswtjpc37hrnnr3c9wvtgjfuvqmpm35evq9qyyssqy4lgd8tj637qcjp05rdpxxykjenthxftej7a2zzmwrmrl70fyj9hvj0rewhzj7jfyuwkwcg9g2jpwtk3wkjtwnkdks84hsnu8xps5vsq4gj5hs"
+		invoice := "lnbcrt10u1pnv7nz6dqld9h8vmmfvdjjqen0wgsrzvpsxqcrqvqpp54v0synj4q3j2usthzt8g5umteky6d2apvgtaxd7wkepkygxgqdyssp5lhv2878qjas3azv3nnu8r6g3tlgejl7mu7cjzc9q5haygrpapd4s9qrsgqcqpjxqrrssrzjqgtzc5n3vcmlhqfq4vpxreqskxzay6xhdrxx7c38ckqs95v5459uyqqqqyqqtwsqqgqqqqqqqqqqqqqq9gea2fjj7q302ncprk2pawk4zdtayycvm0wtjpprml96h9vujvmqdp0n5z8v7lqk44mq9620jszwaevj0mws7rwd2cegxvlmfszwgpgfqp2xafjf"
 		bHandler.userHasAccess = handlerUserHasAccess
 
 		for i := 0; i < 3; i++ {
@@ -1756,7 +1758,7 @@ func TestBountyBudgetWithdraw(t *testing.T) {
 
 			mockHttpClient.On("Do", mock.AnythingOfType("*http.Request")).Return(&http.Response{
 				StatusCode: 200,
-				Body:       io.NopCloser(bytes.NewBufferString(`{"success": true}`)),
+				Body:       io.NopCloser(bytes.NewBufferString(`{"status": "COMPLETE", "amt_msat": "1000", "timestamp": "" }`)),
 			}, nil)
 
 			withdrawRequest := db.WithdrawBudgetRequest{
@@ -1777,7 +1779,6 @@ func TestBountyBudgetWithdraw(t *testing.T) {
 
 			finalBudget := db.TestDB.GetWorkspaceBudget(workspace.Uuid)
 			assert.Equal(t, expectedFinalBudget, finalBudget.TotalBudget, "The workspace's final budget should reflect the deductions from the successful withdrawals")
-
 		}
 	})
 
