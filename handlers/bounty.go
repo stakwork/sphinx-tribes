@@ -793,6 +793,7 @@ func (h *bountyHandler) BountyBudgetWithdraw(w http.ResponseWriter, r *http.Requ
 	}
 
 	amount := utils.GetInvoiceAmount(request.PaymentRequest)
+
 	if amount > 0 {
 		// check if the workspace bounty balance
 		// is greater than the amount
