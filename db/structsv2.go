@@ -28,7 +28,6 @@ type V2SendOnionRes struct {
 	Tag         string `json:"tag"`
 	Preimage    string `json:"preimage"`
 	PaymentHash string `json:"payment_hash"`
-	Message     string `json:"message"`
 }
 
 type V2PayInvoiceBody struct {

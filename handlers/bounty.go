@@ -581,6 +581,7 @@ func (h *bountyHandler) MakeBountyPayment(w http.ResponseWriter, r *http.Request
 		req.Header.Set("x-admin-token", config.V2BotToken)
 		req.Header.Set("Content-Type", "application/json")
 		log.Printf("[bounty] Making Bounty V2 Payment: amount: %d, pubkey: %s, route_hint: %s", amount, assignee.OwnerPubKey, assignee.OwnerRouteHint)
+
 		res, err := h.httpClient.Do(req)
 
 		if err != nil {
