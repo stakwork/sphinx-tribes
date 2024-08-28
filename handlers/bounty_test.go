@@ -1827,7 +1827,10 @@ func TestPollInvoice(t *testing.T) {
 	mockHttpClient := &mocks.HttpClient{}
 	bHandler := NewBountyHandler(mockHttpClient, db.TestDB)
 
-	paymentRequest := "DummyPayReq"
+	paymentRequest := "lnbcrt10u1pnv7nz6dqld9h8vmmfvdjjqen0wgsrzvpsxqcrqvqpp54v0synj4q3j2usthzt8g5umteky6d2apvgtaxd7wkepkygxgqdyssp5lhv2878qjas3azv3nnu8r6g3tlgejl7mu7cjzc9q5haygrpapd4s9qrsgqcqpjxqrrssrzjqgtzc5n3vcmlhqfq4vpxreqskxzay6xhdrxx7c38ckqs95v5459uyqqqqyqqtwsqqgqqqqqqqqqqqqqq9gea2fjj7q302ncprk2pawk4zdtayycvm0wtjpprml96h9vujvmqdp0n5z8v7lqk44mq9620jszwaevj0mws7rwd2cegxvlmfszwgpgfqp2xafj"
+
+	botURL := os.Getenv("V2_BOT_URL")
+	botToken := os.Getenv("V2_BOT_TOKEN")
 
 	now := time.Now()
 	bountyAmount := uint(5000)
@@ -1835,7 +1838,7 @@ func TestPollInvoice(t *testing.T) {
 		PaymentRequest: paymentRequest,
 		Status:         false,
 		Type:           "KEYSEND",
-		OwnerPubkey:    "owner_pubkey",
+		OwnerPubkey:    "03b2205df68d90f8f9913650bc3161761b61d743e615a9faa7ffecea3380a93fc1",
 		WorkspaceUuid:  "workspace_uuid",
 		Created:        &now,
 	}
@@ -1846,6 +1849,7 @@ func TestPollInvoice(t *testing.T) {
 		Amount:         bountyAmount,
 		UserPubkey:     invoice.OwnerPubkey,
 		Created:        int(now.Unix()),
+		RouteHint:      "02162c52716637fb8120ab0261e410b185d268d768cc6f6227c58102d194ad0bc2_1099607703554",
 	}
 	db.TestDB.AddUserInvoiceData(invoiceData)
 
@@ -1856,7 +1860,7 @@ func TestPollInvoice(t *testing.T) {
 		Type:        "coding",
 		Title:       "bountyTitle",
 		Description: "bountyDescription",
-		Assignee:    "assigneePubkey",
+		Assignee:    "03b2205df68d90f8f9913650bc3161761b61d743e615a9faa7ffecea3380a93fc1",
 		Show:        true,
 		Paid:        false,
 	}
@@ -1883,13 +1887,25 @@ func TestPollInvoice(t *testing.T) {
 	t.Run("Should test that a 403 error is returned if there is an invoice error", func(t *testing.T) {
 		expectedUrl := fmt.Sprintf("%s/invoice?payment_request=%s", config.RelayUrl, invoice.PaymentRequest)
 
+		expectedV2Url := fmt.Sprintf("%s/check_invoice", botURL)
+
 		r := io.NopCloser(bytes.NewReader([]byte(`{"success": false, "error": "Internel server error"}`)))
-		mockHttpClient.On("Do", mock.MatchedBy(func(req *http.Request) bool {
-			return req.Method == http.MethodGet && expectedUrl == req.URL.String() && req.Header.Get("x-user-token") == config.RelayAuthKey
-		})).Return(&http.Response{
-			StatusCode: 500,
-			Body:       r,
-		}, nil).Once()
+
+		if botURL != "" && botToken != "" {
+			mockHttpClient.On("Do", mock.MatchedBy(func(req *http.Request) bool {
+				return req.Method == http.MethodPost && expectedV2Url == req.URL.String() && req.Header.Get("x-admin-token") == botToken
+			})).Return(&http.Response{
+				StatusCode: 500,
+				Body:       r,
+			}, nil).Once()
+		} else {
+			mockHttpClient.On("Do", mock.MatchedBy(func(req *http.Request) bool {
+				return req.Method == http.MethodGet && expectedUrl == req.URL.String() && req.Header.Get("x-user-token") == config.RelayAuthKey
+			})).Return(&http.Response{
+				StatusCode: 500,
+				Body:       r,
+			}, nil).Once()
+		}
 
 		ro := chi.NewRouter()
 		ro.Post("/poll/invoice/{paymentRequest}", bHandler.PollInvoice)
@@ -1910,25 +1926,56 @@ func TestPollInvoice(t *testing.T) {
 		expectedUrl := fmt.Sprintf("%s/invoice?payment_request=%s", config.RelayUrl, invoice.PaymentRequest)
 		expectedBody := fmt.Sprintf(`{"success": true, "response": { "settled": true, "payment_request": "%s", "payment_hash": "payment_hash", "preimage": "preimage", "Amount": %d}}`, invoice.OwnerPubkey, bountyAmount)
 
+		expectedV2Url := fmt.Sprintf("%s/check_invoice", botURL)
+		expectedV2InvoiceBody := `{"status": "paid", "amt_msat": "", "timestamp": ""}`
+
 		r := io.NopCloser(bytes.NewReader([]byte(expectedBody)))
-		mockHttpClient.On("Do", mock.MatchedBy(func(req *http.Request) bool {
-			return req.Method == http.MethodGet && expectedUrl == req.URL.String() && req.Header.Get("x-user-token") == config.RelayAuthKey
-		})).Return(&http.Response{
-			StatusCode: 200,
-			Body:       r,
-		}, nil).Once()
+		rv2 := io.NopCloser(bytes.NewReader([]byte(expectedV2InvoiceBody)))
+
+		if botURL != "" && botToken != "" {
+			mockHttpClient.On("Do", mock.MatchedBy(func(req *http.Request) bool {
+				return req.Method == http.MethodPost && expectedV2Url == req.URL.String() && req.Header.Get("x-admin-token") == botToken
+			})).Return(&http.Response{
+				StatusCode: 200,
+				Body:       rv2,
+			}, nil).Once()
+		} else {
+			mockHttpClient.On("Do", mock.MatchedBy(func(req *http.Request) bool {
+				return req.Method == http.MethodGet && expectedUrl == req.URL.String() && req.Header.Get("x-user-token") == config.RelayAuthKey
+			})).Return(&http.Response{
+				StatusCode: 200,
+				Body:       r,
+			}, nil).Once()
+		}
 
 		expectedPaymentUrl := fmt.Sprintf("%s/payment", config.RelayUrl)
+		expectedV2PaymentUrl := fmt.Sprintf("%s/pay", botURL)
+
 		expectedPaymentBody := fmt.Sprintf(`{"amount": %d, "destination_key": "%s", "text": "memotext added for notification"}`, bountyAmount, invoice.OwnerPubkey)
 
+		expectedV2PaymentBody :=
+			fmt.Sprintf(`{"amt_msat": %d, "dest": "%s", "route_hint": "%s", "wait": true}`, bountyAmount*1000, invoice.OwnerPubkey, invoiceData.RouteHint)
+
 		r2 := io.NopCloser(bytes.NewReader([]byte(`{"success": true, "response": { "sumAmount": "1"}}`)))
-		mockHttpClient.On("Do", mock.MatchedBy(func(req *http.Request) bool {
-			bodyByt, _ := io.ReadAll(req.Body)
-			return req.Method == http.MethodPost && expectedPaymentUrl == req.URL.String() && req.Header.Get("x-user-token") == config.RelayAuthKey && expectedPaymentBody == string(bodyByt)
-		})).Return(&http.Response{
-			StatusCode: 200,
-			Body:       r2,
-		}, nil).Once()
+		r3 := io.NopCloser(bytes.NewReader([]byte(`{"status": "COMPLETE", "amt_msat": "", "timestamp": "" }`)))
+
+		if botURL != "" && botToken != "" {
+			mockHttpClient.On("Do", mock.MatchedBy(func(req *http.Request) bool {
+				bodyByt, _ := io.ReadAll(req.Body)
+				return req.Method == http.MethodPost && expectedV2PaymentUrl == req.URL.String() && req.Header.Get("x-admin-token") == botToken && expectedV2PaymentBody == string(bodyByt)
+			})).Return(&http.Response{
+				StatusCode: 200,
+				Body:       r3,
+			}, nil).Once()
+		} else {
+			mockHttpClient.On("Do", mock.MatchedBy(func(req *http.Request) bool {
+				bodyByt, _ := io.ReadAll(req.Body)
+				return req.Method == http.MethodPost && expectedPaymentUrl == req.URL.String() && req.Header.Get("x-user-token") == config.RelayAuthKey && expectedPaymentBody == string(bodyByt)
+			})).Return(&http.Response{
+				StatusCode: 200,
+				Body:       r2,
+			}, nil).Once()
+		}
 
 		ro := chi.NewRouter()
 		ro.Post("/poll/invoice/{paymentRequest}", bHandler.PollInvoice)
@@ -1974,13 +2021,27 @@ func TestPollInvoice(t *testing.T) {
 		expectedUrl := fmt.Sprintf("%s/invoice?payment_request=%s", config.RelayUrl, invoice.PaymentRequest)
 		expectedBody := fmt.Sprintf(`{"success": true, "response": { "settled": true, "payment_request": "%s", "payment_hash": "payment_hash", "preimage": "preimage", "Amount": %d}}`, invoice.OwnerPubkey, bountyAmount)
 
+		expectedV2Url := fmt.Sprintf("%s/check_invoice", botURL)
+		expectedV2InvoiceBody := `{"status": "paid", "amt_msat": "", "timestamp": ""}`
+
 		r := io.NopCloser(bytes.NewReader([]byte(expectedBody)))
-		mockHttpClient.On("Do", mock.MatchedBy(func(req *http.Request) bool {
-			return req.Method == http.MethodGet && expectedUrl == req.URL.String() && req.Header.Get("x-user-token") == config.RelayAuthKey
-		})).Return(&http.Response{
-			StatusCode: 200,
-			Body:       r,
-		}, nil).Once()
+		rv2 := io.NopCloser(bytes.NewReader([]byte(expectedV2InvoiceBody)))
+
+		if botURL != "" && botToken != "" {
+			mockHttpClient.On("Do", mock.MatchedBy(func(req *http.Request) bool {
+				return req.Method == http.MethodPost && expectedV2Url == req.URL.String() && req.Header.Get("x-admin-token") == botToken
+			})).Return(&http.Response{
+				StatusCode: 200,
+				Body:       rv2,
+			}, nil).Once()
+		} else {
+			mockHttpClient.On("Do", mock.MatchedBy(func(req *http.Request) bool {
+				return req.Method == http.MethodGet && expectedUrl == req.URL.String() && req.Header.Get("x-user-token") == config.RelayAuthKey
+			})).Return(&http.Response{
+				StatusCode: 200,
+				Body:       r,
+			}, nil).Once()
+		}
 
 		ro := chi.NewRouter()
 		ro.Post("/poll/invoice/{paymentRequest}", bHandler.PollInvoice)

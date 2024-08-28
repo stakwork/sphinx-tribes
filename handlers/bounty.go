@@ -1199,53 +1199,113 @@ func (h *bountyHandler) PollInvoice(w http.ResponseWriter, r *http.Request) {
 
 		// Make any change only if the invoice has not been settled
 		if !dbInvoice.Status {
+			amount := invData.Amount
 			if invoice.Type == "BUDGET" {
 				h.db.AddAndUpdateBudget(invoice)
 			} else if invoice.Type == "KEYSEND" {
-				url := fmt.Sprintf("%s/payment", config.RelayUrl)
+				if config.V2ContactKey != "" {
+					url := fmt.Sprintf("%s/pay", config.V2BotUrl)
 
-				amount := invData.Amount
+					// Build v2 keysend payment data
+					bodyData := utils.BuildV2KeysendBodyData(amount, invData.UserPubkey, invData.RouteHint)
+					jsonBody := []byte(bodyData)
 
-				bodyData := utils.BuildKeysendBodyData(amount, invData.UserPubkey, invData.RouteHint)
+					req, _ := http.NewRequest(http.MethodPost, url, bytes.NewBuffer(jsonBody))
+					req.Header.Set("x-admin-token", config.V2BotToken)
+					req.Header.Set("Content-Type", "application/json")
+					log.Printf("[bounty] Making Bounty V2 Payment PollInvoice: amount: %d, pubkey: %s, route_hint: %s", amount, invData.UserPubkey, invData.RouteHint)
 
-				jsonBody := []byte(bodyData)
-
-				req, _ := http.NewRequest(http.MethodPost, url, bytes.NewBuffer(jsonBody))
-
-				req.Header.Set("x-user-token", config.RelayAuthKey)
-				req.Header.Set("Content-Type", "application/json")
-				res, _ := h.httpClient.Do(req)
-
-				defer res.Body.Close()
-
-				body, _ := io.ReadAll(res.Body)
-
-				if res.StatusCode == 200 {
-					// Unmarshal result
-					keysendRes := db.KeysendSuccess{}
-					err = json.Unmarshal(body, &keysendRes)
+					res, err := h.httpClient.Do(req)
 
 					if err != nil {
-						w.WriteHeader(http.StatusForbidden)
-						json.NewEncoder(w).Encode("Could not decode keysend response")
+						log.Printf("[bounty] Request Failed: %s", err)
+						h.m.Unlock()
 						return
 					}
 
-					bounty, err := h.db.GetBountyByCreated(uint(invData.Created))
-					if err == nil {
-						now := time.Now()
-						bounty.Paid = true
-						bounty.PaidDate = &now
-						bounty.Completed = true
-						bounty.CompletionDate = &now
+					defer res.Body.Close()
+					body, err := io.ReadAll(res.Body)
+					if err != nil {
+						fmt.Println("[read body]", err)
+						w.WriteHeader(http.StatusNotAcceptable)
+						h.m.Unlock()
+						return
 					}
 
-					h.db.UpdateBounty(bounty)
-				} else {
 					// Unmarshal result
-					keysendError := db.KeysendError{}
-					err = json.Unmarshal(body, &keysendError)
-					log.Printf("[bounty] Keysend Payment to %s Failed, with Error: %s", invData.UserPubkey, err)
+					v2KeysendRes := db.V2SendOnionRes{}
+					err = json.Unmarshal(body, &v2KeysendRes)
+
+					if err != nil {
+						fmt.Println("[Unmarshal]", err)
+						w.WriteHeader(http.StatusNotAcceptable)
+						h.m.Unlock()
+						return
+					}
+
+					if res.StatusCode == 200 {
+						fmt.Println("V2 Status Code Is 200")
+						// if the payment has a completed status
+						if v2KeysendRes.Status == db.PaymentComplete {
+							fmt.Println("V2 Payment Is Completed")
+							bounty, err := h.db.GetBountyByCreated(uint(invData.Created))
+							if err == nil {
+								now := time.Now()
+								bounty.Paid = true
+								bounty.PaidDate = &now
+								bounty.Completed = true
+								bounty.CompletionDate = &now
+							}
+
+							h.db.UpdateBounty(bounty)
+						}
+					} else {
+						log.Printf("[bounty] V2 Keysend Payment to %s Failed, with Error: %s", invData.UserPubkey, err)
+					}
+				} else {
+					url := fmt.Sprintf("%s/payment", config.RelayUrl)
+
+					bodyData := utils.BuildKeysendBodyData(amount, invData.UserPubkey, invData.RouteHint)
+
+					jsonBody := []byte(bodyData)
+
+					req, _ := http.NewRequest(http.MethodPost, url, bytes.NewBuffer(jsonBody))
+
+					req.Header.Set("x-user-token", config.RelayAuthKey)
+					req.Header.Set("Content-Type", "application/json")
+					res, _ := h.httpClient.Do(req)
+
+					defer res.Body.Close()
+
+					body, _ := io.ReadAll(res.Body)
+
+					if res.StatusCode == 200 {
+						// Unmarshal result
+						keysendRes := db.KeysendSuccess{}
+						err = json.Unmarshal(body, &keysendRes)
+
+						if err != nil {
+							w.WriteHeader(http.StatusForbidden)
+							json.NewEncoder(w).Encode("Could not decode keysend response")
+							return
+						}
+
+						bounty, err := h.db.GetBountyByCreated(uint(invData.Created))
+						if err == nil {
+							now := time.Now()
+							bounty.Paid = true
+							bounty.PaidDate = &now
+							bounty.Completed = true
+							bounty.CompletionDate = &now
+						}
+
+						h.db.UpdateBounty(bounty)
+					} else {
+						// Unmarshal result
+						keysendError := db.KeysendError{}
+						err = json.Unmarshal(body, &keysendError)
+						log.Printf("[bounty] Keysend Payment to %s Failed, with Error: %s", invData.UserPubkey, err)
+					}
 				}
 			}
 			// Update the invoice status
