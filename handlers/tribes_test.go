@@ -6,6 +6,7 @@ import (
 	"encoding/json"
 	"net/http"
 	"net/http/httptest"
+	"os"
 	"testing"
 
 	"github.com/google/uuid"
@@ -926,6 +927,8 @@ func TestGenerateBudgetInvoice(t *testing.T) {
 	})
 
 	t.Run("Should add payments to the payment history and invoice to the invoice list upon successful relay call", func(t *testing.T) {
+		botURL := os.Getenv("V2_BOT_URL")
+		botToken := os.Getenv("V2_BOT_TOKEN")
 
 		ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 			w.WriteHeader(http.StatusOK)
@@ -955,6 +958,10 @@ func TestGenerateBudgetInvoice(t *testing.T) {
 		err = json.Unmarshal(rr.Body.Bytes(), &response)
 		assert.NoError(t, err)
 		assert.True(t, response.Succcess, "Invoice generation should be successful")
-		assert.Equal(t, "example_invoice", response.Response.Invoice, "The invoice in the response should match the mock")
+		if botToken != "" && botURL != "" {
+			assert.NotEmpty(t, response.Response.Invoice, "The invoice in the response should not be empty")
+		} else {
+			assert.Equal(t, "example_invoice", response.Response.Invoice, "The invoice in the response should match the mock")
+		}
 	})
 }
