@@ -19,13 +19,11 @@ jobs:
         run: |
           git clone https://github.com/stakwork/sphinx-stack.git stack;
 
-      - uses: actions/checkout@v2
       - name: Run Stack V2
         # uses: nick-fields/retry@v2
         # with:
         #   timeout_minutes: 10
         #   max_attempts: 3
-        working-directory: ./stack
         run: |
           GITACTION_ENV=gitactionenv docker compose -f ./stack/alts/v2.yml --project-directory . up -d;
           sleep 240;
