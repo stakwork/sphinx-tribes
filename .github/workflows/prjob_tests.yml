@@ -19,6 +19,7 @@ jobs:
         run: |
           git clone https://github.com/stakwork/sphinx-stack.git stack;
 
+      - uses: actions/checkout@v2
       - name: Run Stack V2
         # uses: nick-fields/retry@v2
         # with:
