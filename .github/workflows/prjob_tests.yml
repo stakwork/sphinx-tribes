@@ -29,7 +29,7 @@ jobs:
           timeout_minutes: 10
           max_attempts: 3
           command: |
-            GITACTION_ENV=gitactionenv docker-compose -f ./alts/v2.yml --project-directory . up -d;
+            GITACTION_ENV=gitactionenv docker compose -f ./alts/v2.yml --project-directory . up -d;
             sleep 240;
             docker ps
             docker logs alice.sphinx
