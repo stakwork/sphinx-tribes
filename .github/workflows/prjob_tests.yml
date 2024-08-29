@@ -19,15 +19,12 @@ jobs:
         run: |
           git clone https://github.com/stakwork/sphinx-stack.git stack
 
-      - name: Give Permissions to Stack
-        working-directory: ./stack
-        run: |
-
       - name: Run Stack V2
         uses: nick-fields/retry@v2
         with:
           timeout_minutes: 10
           max_attempts: 3
+          working-directory: ./stack
           command: |
             GITACTION_ENV=gitactionenv docker compose -f ./alts/v2.yml --project-directory . up -d;
             sleep 240;
