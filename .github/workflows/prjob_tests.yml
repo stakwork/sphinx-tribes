@@ -21,25 +21,12 @@ jobs:
 
       - name: Run Stack V2
         run: |
-          GITACTION_ENV=gitactionenv docker compose -f ./stack/alts/v2.yml --project-directory ./stack . up -d;
+          GITACTION_ENV=gitactionenv docker compose -f ./stack/alts/v2.yml --project-directory ./stack up -d;
           sleep 240;
           docker ps
           docker logs alice.sphinx
           docker logs bob.sphinx
           docker wait sphinx-tribes-v2setup-1
-
-      # - name: Run Stack V2
-      #   uses: nick-fields/retry@v2
-      #   with:
-      #     timeout_minutes: 10
-      #     max_attempts: 3
-      #     command: |
-      #       GITACTION_ENV=gitactionenv docker compose -f ./stack/alts/v2.yml --project-directory ./stack up -d;
-      #       sleep 240;
-      #       docker ps
-      #       docker logs alice.sphinx
-      #       docker logs bob.sphinx
-      #       docker wait sphinx-tribes-v2setup-1
 
       - name: Starting DB
         run: docker compose -f ./docker/testdb-docker-compose.yml -p test_db  up -d
