@@ -28,11 +28,24 @@ jobs:
       #     docker logs bob.sphinx
       #     docker wait sphinx-tribes-v2setup-1
 
-      # - name: Starting DB
-      #   run: docker compose -f ./docker/testdb-docker-compose.yml -p test_db  up -d
+      - name: Run Stack V2
+        uses: nick-fields/retry@v2
+        with:
+          timeout_minutes: 10
+          max_attempts: 3
+          command: |
+            GITACTION_ENV=gitactionenv docker-compose -f ./stack/alts/v2.yml --project-dir ./stack up -d;
+            sleep 240;
+            docker ps
+            docker logs alice.sphinx
+            docker logs bob.sphinx
+            docker wait sphinx-tribes-v2setup-1
 
-      # - name: Install cover
-      #   run: go get golang.org/x/tools/cmd/cover
+      - name: Starting DB
+        run: docker compose -f ./docker/testdb-docker-compose.yml -p test_db  up -d
+
+      - name: Install cover
+        run: go get golang.org/x/tools/cmd/cover
 
       - name: Tests
         run: V2_BOT_URL=http://localhost:3001 V2_BOT_TOKEN=xyzxyzxyz go test ./... -race -v -coverprofile=coverage.out && ./cover-check.sh coverage.out 8.4
