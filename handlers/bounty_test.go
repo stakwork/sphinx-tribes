@@ -1139,7 +1139,7 @@ func TestGetBountyIndexById(t *testing.T) {
 		rr := httptest.NewRecorder()
 		handler := http.HandlerFunc(bHandler.GetBountyIndexById)
 
-		now := time.Now().Unix()
+		now := time.Now().UnixMilli()
 		bounty := db.NewBounty{
 			ID:            1,
 			Type:          "coding",

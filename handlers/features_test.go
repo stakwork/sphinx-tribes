@@ -645,8 +645,8 @@ func TestGetFeaturePhases(t *testing.T) {
 		updatedFeaturePhases := db.TestDB.GetPhasesByFeatureUuid(feature.Uuid)
 
 		for i := range updatedFeaturePhases {
-			created := updatedFeaturePhases[i].Created.In(time.UTC)
-			updated := updatedFeaturePhases[i].Updated.In(time.UTC)
+			created := updatedFeaturePhases[i].Created.In(time.Local)
+			updated := updatedFeaturePhases[i].Updated.In(time.Local)
 			updatedFeaturePhases[i].Created = &created
 			updatedFeaturePhases[i].Updated = &updated
 		}
@@ -1011,8 +1011,8 @@ func TestGetStoriesByFeatureUuid(t *testing.T) {
 		}
 
 		for i := range updatedFeatureStory {
-			created := updatedFeatureStory[i].Created.In(time.UTC)
-			updated := updatedFeatureStory[i].Updated.In(time.UTC)
+			created := updatedFeatureStory[i].Created.In(time.Local)
+			updated := updatedFeatureStory[i].Updated.In(time.Local)
 			updatedFeatureStory[i].Created = &created
 			updatedFeatureStory[i].Updated = &updated
 		}
