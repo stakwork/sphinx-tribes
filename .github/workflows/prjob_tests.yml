@@ -31,7 +31,8 @@ jobs:
             docker ps
             docker logs alice.sphinx
             docker logs bob.sphinx
-            docker wait sphinx-stack-v2setup-1
+            docker wait alice.sphinx
+            docker wait bob.sphinx
 
       - name: Starting DB
         run: docker compose -f ./docker/testdb-docker-compose.yml -p test_db  up -d
