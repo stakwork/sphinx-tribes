@@ -41,7 +41,7 @@ var PresignClient *s3.PresignClient
 
 var V2BotUrl string
 var V2BotToken string
-var V2ContactKey string
+var IsV2Payment bool = false
 
 func InitConfig() {
 	Host = os.Getenv("LN_SERVER_BASE_URL")
@@ -83,8 +83,8 @@ func InitConfig() {
 	}
 
 	if V2BotUrl != "" && V2BotToken != "" {
-		contact_key := GetV2ContactKey()
-		V2ContactKey = contact_key
+		// contact_key := GetV2ContactKey()
+		IsV2Payment = true
 	}
 
 	if Host == "" {

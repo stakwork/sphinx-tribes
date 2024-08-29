@@ -570,7 +570,7 @@ func (h *bountyHandler) MakeBountyPayment(w http.ResponseWriter, r *http.Request
 	assignee := h.db.GetPersonByPubkey(bounty.Assignee)
 
 	// If the v2contactkey is present
-	if config.V2ContactKey != "" {
+	if config.IsV2Payment {
 		url := fmt.Sprintf("%s/pay", config.V2BotUrl)
 
 		// Build v2 keysend payment data
@@ -906,7 +906,7 @@ func formatPayError(errorMsg string) db.InvoicePayError {
 }
 
 func (h *bountyHandler) GetLightningInvoice(payment_request string) (db.InvoiceResult, db.InvoiceError) {
-	if config.V2ContactKey != "" {
+	if config.IsV2Payment {
 		return h.GetV2LightningInvoice(payment_request)
 	} else {
 		return h.GetV1LightningInvoice(payment_request)
@@ -1030,7 +1030,7 @@ func (h *bountyHandler) GetV2LightningInvoice(payment_request string) (db.Invoic
 }
 
 func (h *bountyHandler) PayLightningInvoice(payment_request string) (db.InvoicePaySuccess, db.InvoicePayError) {
-	if config.V2ContactKey != "" {
+	if config.IsV2Payment {
 		return h.PayV2LightningInvoice(payment_request)
 	} else {
 		return h.PayV1LightningInvoice(payment_request)
@@ -1203,7 +1203,7 @@ func (h *bountyHandler) PollInvoice(w http.ResponseWriter, r *http.Request) {
 			if invoice.Type == "BUDGET" {
 				h.db.AddAndUpdateBudget(invoice)
 			} else if invoice.Type == "KEYSEND" {
-				if config.V2ContactKey != "" {
+				if config.IsV2Payment {
 					url := fmt.Sprintf("%s/pay", config.V2BotUrl)
 
 					// Build v2 keysend payment data

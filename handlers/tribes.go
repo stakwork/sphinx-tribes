@@ -554,7 +554,7 @@ func GenerateInvoice(w http.ResponseWriter, r *http.Request) {
 }
 
 func (th *tribeHandler) GenerateBudgetInvoice(w http.ResponseWriter, r *http.Request) {
-	if config.V2ContactKey != "" {
+	if config.IsV2Payment {
 		th.GenerateV2BudgetInvoice(w, r)
 	} else {
 		th.GenerateV1BudgetInvoice(w, r)
