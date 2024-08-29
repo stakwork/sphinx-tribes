@@ -26,13 +26,11 @@ jobs:
           max_attempts: 3
           working-directory: ./stack
           command: |
-            GITACTION_ENV=gitactionenv docker compose -f ./stack/alts/v2.yml --project-directory . up -d;
+            GITACTION_ENV=gitactionenv docker compose -f ./alts/v2.yml --project-directory . up -d;
             sleep 240;
             docker ps
             docker logs alice.sphinx
             docker logs bob.sphinx
-            docker wait alice.sphinx
-            docker wait bob.sphinx
 
       - name: Starting DB
         run: docker compose -f ./docker/testdb-docker-compose.yml -p test_db  up -d
