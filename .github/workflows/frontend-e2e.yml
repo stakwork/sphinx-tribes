@@ -25,14 +25,14 @@ jobs:
 
       - name: Clone Stack
         run: |
-          git clone https://github.com/stakwork/sphinx-stack.git stack
+          git clone https://github.com/stakwork/sphinx-stack.git stackv1
 
       - name: Clone Sphinx Tribes Frontend
         run: |
           git clone https://github.com/stakwork/sphinx-tribes-frontend.git tribes-frontend
 
       - name: Give Permissions to Stack
-        working-directory: ./stack
+        working-directory: ./stackv1
         run: |
           chmod 777 ./bitcoind;    
           chmod 777 -R ./relay;
@@ -46,13 +46,13 @@ jobs:
           timeout_minutes: 10
           max_attempts: 3
           command: |
-            GITACTION_ENV=gitactionenv docker compose -f ./stack/alts/proxy.yml --project-directory ./stack up -d;
+            GITACTION_ENV=gitactionenv docker compose -f ./stackv1/alts/proxy.yml --project-directory ./stackv1 up -d;
             sleep 240;
             docker ps
             docker logs meme.sphinx
             docker logs dave.sphinx
-            docker wait stack_relaysetup_1
-            cat stack/relay/NODES.json;
+            docker wait stackv1_relaysetup_1
+            cat stackv1/relay/NODES.json;
 
       - name: Copy Node.json
         uses: canastro/copy-file-action@master
@@ -82,5 +82,5 @@ jobs:
           path: tribes-frontend/cypress/videos
 
       - name: Stop Stack
-        working-directory: ./stack
+        working-directory: ./stackv1
         run: docker compose down
