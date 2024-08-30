@@ -25,14 +25,14 @@ jobs:
 
       - name: Clone Stack
         run: |
-          git clone https://github.com/stakwork/sphinx-stack.git stackv1
+          git clone https://github.com/stakwork/sphinx-stack.git stack
 
       - name: Clone Sphinx Tribes Frontend
         run: |
           git clone https://github.com/stakwork/sphinx-tribes-frontend.git tribes-frontend
 
       - name: Give Permissions to Stack
-        working-directory: ./stackv1
+        working-directory: ./stack
         run: |
           chmod 777 ./bitcoind;    
           chmod 777 -R ./relay;
@@ -46,18 +46,18 @@ jobs:
           timeout_minutes: 10
           max_attempts: 3
           command: |
-            GITACTION_ENV=gitactionenv docker compose -f ./stackv1/alts/proxy.yml --project-directory ./stackv1 up -d;
+            GITACTION_ENV=gitactionenv docker compose -f ./stack/alts/proxy.yml --project-directory ./stack up -d;
             sleep 240;
             docker ps
             docker logs meme.sphinx
             docker logs dave.sphinx
-            docker wait stackv1-relaysetup-1
-            cat stackv1/relay/NODES.json;
+            docker wait stack_relaysetup_1
+            cat stack/relay/NODES.json;
 
       - name: Copy Node.json
         uses: canastro/copy-file-action@master
         with:
-          source: "stackv1/relay/NODES.json"
+          source: "stack/relay/NODES.json"
           target: "tribes-frontend/cypress/fixtures/nodes.json"
 
       - name: Install Frontend Dependencies
@@ -79,8 +79,8 @@ jobs:
         uses: actions/upload-artifact@v2
         with:
           name: cypress-logs
-          path: tribes-frontend/cypress/screenshots
+          path: tribes-frontend/cypress/videos
 
       - name: Stop Stack
-        working-directory: ./stackv1
+        working-directory: ./stack
         run: docker compose down

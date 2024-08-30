@@ -15,23 +15,6 @@ jobs:
 
       - uses: actions/checkout@v2
 
-      - name: Clone Stack
-        run: |
-          git clone https://github.com/stakwork/sphinx-stack.git stackv2;
-
-      - name: Run Stack V2
-        uses: nick-fields/retry@v2
-        with:
-          timeout_minutes: 10
-          max_attempts: 3
-          command: |
-            GITACTION_ENV=gitactionenv docker compose -f ./stackv2/alts/v2.yml --project-directory ./stackv2 up -d;
-            sleep 240;
-            docker ps
-            docker logs alice.sphinx
-            docker logs bob.sphinx
-            docker wait stackv2-v2setup-1
-
       - name: Starting DB
         run: docker compose -f ./docker/testdb-docker-compose.yml -p test_db  up -d
 
@@ -41,9 +24,5 @@ jobs:
       - name: Tests
         run: sudo V2_BOT_URL=http://localhost:3001 V2_BOT_TOKEN=xyzxyzxyz go test ./... -race -v -coverprofile=coverage.out && ./cover-check.sh coverage.out 8.4
 
-      - name: Droping DB with docker compose
+      - name: Droping with docker compose
         run: docker compose -f ./docker/testdb-docker-compose.yml -p test_db down
-
-      - name: Stop Stack
-        working-directory: ./stackv2
-        run: docker compose down
