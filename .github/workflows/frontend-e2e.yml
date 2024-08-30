@@ -46,7 +46,7 @@ jobs:
           timeout_minutes: 10
           max_attempts: 3
           command: |
-            GITACTION_ENV=gitactionenv docker-compose -f ./stack/alts/proxy.yml --project-dir ./stack up -d;
+            GITACTION_ENV=gitactionenv docker compose -f ./stack/alts/proxy.yml --project-dir ./stack up -d;
             sleep 240;
             docker ps
             docker logs meme.sphinx
@@ -83,4 +83,4 @@ jobs:
 
       - name: Stop Stack
         working-directory: ./stack
-        run: docker-compose down
+        run: docker compose down
