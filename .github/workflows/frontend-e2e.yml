@@ -7,9 +7,6 @@ on:
 jobs:
   cypress-run:
     runs-on: ubuntu-latest
-    env:
-      V2_BOT_URL: http://localhost:3001
-      V2_BOT_TOKEN: xyzxyzxyz
     steps:
       - name: Enable docker.host.internal for Ubuntu
         run: |
@@ -57,9 +54,6 @@ jobs:
             docker wait stackv1-relaysetup-1
             cat stackv1/relay/NODES.json;
 
-      - name: List stackv1/relay directory
-        run: ls -la stackv1/relay
-
       - name: Copy Node.json
         uses: canastro/copy-file-action@master
         with:
@@ -74,20 +68,6 @@ jobs:
         working-directory: ./tribes-frontend
         run: yarn run start:cypress &
 
-      - name: Check Service Availability
-        run: |
-          echo "Checking service availability..."
-          until curl -s http://localhost:3007/bounties; do
-            echo "Waiting for service to be available..."
-            sleep 5
-          done
-          echo "Service is available."
-
-      - name: Log Environment Variables
-        run: |
-          echo "V2_BOT_URL: $V2_BOT_URL"
-          echo "V2_BOT_TOKEN: $V2_BOT_TOKEN"
-
       - name: Run Cypress Test
         working-directory: ./tribes-frontend
         run: |
@@ -99,7 +79,7 @@ jobs:
         uses: actions/upload-artifact@v2
         with:
           name: cypress-logs
-          path: tribes-frontend/cypress/videos
+          path: tribes-frontend/cypress/screenshots
 
       - name: Stop Stack
         working-directory: ./stackv1
