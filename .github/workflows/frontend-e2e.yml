@@ -79,7 +79,7 @@ jobs:
         uses: actions/upload-artifact@v2
         with:
           name: cypress-logs
-          path: tribes-frontend/cypress/videos
+          path: tribes-frontend/cypress/screenshots
 
       - name: Stop Stack
         working-directory: ./stackv1
