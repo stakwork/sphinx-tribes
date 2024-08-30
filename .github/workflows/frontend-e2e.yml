@@ -54,6 +54,9 @@ jobs:
             docker wait stackv1-relaysetup-1
             cat stackv1/relay/NODES.json;
 
+      - name: List stackv1/relay directory
+        run: ls -la stackv1/relay
+
       - name: Copy Node.json
         uses: canastro/copy-file-action@master
         with:
@@ -67,6 +70,15 @@ jobs:
       - name: Start Server
         working-directory: ./tribes-frontend
         run: yarn run start:cypress &
+
+      - name: Check Service Availability
+        run: |
+          echo "Checking service availability..."
+          until curl -s http://localhost:3007/bounties; do
+            echo "Waiting for service to be available..."
+            sleep 5
+          done
+          echo "Service is available."
 
       - name: Run Cypress Test
         working-directory: ./tribes-frontend

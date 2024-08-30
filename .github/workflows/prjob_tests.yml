@@ -6,8 +6,7 @@ on:
 jobs:
   test-go:
     name: Go
-    runs-on:
-      - ubuntu-latest
+    runs-on: ubuntu-latest
     steps:
       - name: Enable docker.host.internal for Ubuntu
         run: |
@@ -38,8 +37,20 @@ jobs:
       - name: Install cover
         run: go get golang.org/x/tools/cmd/cover
 
+      - name: Check Service Availability
+        run: |
+          echo "Checking service availability..."
+          until curl -s http://localhost:3001/bounties; do
+            echo "Waiting for service to be available..."
+            sleep 5
+          done
+          echo "Service is available."
+
       - name: Tests
-        run: sudo V2_BOT_URL=http://localhost:3001 V2_BOT_TOKEN=xyzxyzxyz go test ./... -race -v -coverprofile=coverage.out && ./cover-check.sh coverage.out 8.4
+        run: |
+          echo "V2_BOT_URL: $V2_BOT_URL"
+          echo "V2_BOT_TOKEN: $V2_BOT_TOKEN"
+          sudo V2_BOT_URL=http://localhost:3001 V2_BOT_TOKEN=xyzxyzxyz go test ./... -race -v -coverprofile=coverage.out && ./cover-check.sh coverage.out 8.4
 
       - name: Droping DB with docker compose
         run: docker compose -f ./docker/testdb-docker-compose.yml -p test_db down
