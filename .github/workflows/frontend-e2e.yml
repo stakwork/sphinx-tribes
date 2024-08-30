@@ -80,6 +80,11 @@ jobs:
           done
           echo "Service is available."
 
+      - name: Log Environment Variables
+        run: |
+          echo "V2_BOT_URL: $V2_BOT_URL"
+          echo "V2_BOT_TOKEN: $V2_BOT_TOKEN"
+
       - name: Run Cypress Test
         working-directory: ./tribes-frontend
         run: |
