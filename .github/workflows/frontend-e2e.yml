@@ -57,7 +57,7 @@ jobs:
       - name: Copy Node.json
         uses: canastro/copy-file-action@master
         with:
-          source: "stack/relay/NODES.json"
+          source: "stackv1/relay/NODES.json"
           target: "tribes-frontend/cypress/fixtures/nodes.json"
 
       - name: Install Frontend Dependencies
