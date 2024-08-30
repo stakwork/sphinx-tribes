@@ -51,7 +51,7 @@ jobs:
             docker ps
             docker logs meme.sphinx
             docker logs dave.sphinx
-            docker wait stackv1_relaysetup_1
+            docker wait stackv1-relaysetup_1
             cat stackv1/relay/NODES.json;
 
       - name: Copy Node.json
