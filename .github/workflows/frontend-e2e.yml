@@ -7,6 +7,9 @@ on:
 jobs:
   cypress-run:
     runs-on: ubuntu-latest
+    env:
+      V2_BOT_URL: http://localhost:3001
+      V2_BOT_TOKEN: xyzxyzxyz
     steps:
       - name: Enable docker.host.internal for Ubuntu
         run: |

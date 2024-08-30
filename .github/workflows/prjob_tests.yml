@@ -7,6 +7,9 @@ jobs:
   test-go:
     name: Go
     runs-on: ubuntu-latest
+    env:
+      V2_BOT_URL: http://localhost:3001
+      V2_BOT_TOKEN: xyzxyzxyz
     steps:
       - name: Enable docker.host.internal for Ubuntu
         run: |
@@ -50,7 +53,7 @@ jobs:
         run: |
           echo "V2_BOT_URL: $V2_BOT_URL"
           echo "V2_BOT_TOKEN: $V2_BOT_TOKEN"
-          sudo V2_BOT_URL=http://localhost:3001 V2_BOT_TOKEN=xyzxyzxyz go test ./... -race -v -coverprofile=coverage.out && ./cover-check.sh coverage.out 8.4
+          sudo V2_BOT_URL=$V2_BOT_URL V2_BOT_TOKEN=$V2_BOT_TOKEN go test ./... -race -v -coverprofile=coverage.out && ./cover-check.sh coverage.out 8.4
 
       - name: Droping DB with docker compose
         run: docker compose -f ./docker/testdb-docker-compose.yml -p test_db down
