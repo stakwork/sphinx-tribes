@@ -25,7 +25,7 @@ jobs:
 
       - name: Clone Stack
         run: |
-          git clone https://github.com/stakwork/sphinx-stack.git stackv1
+          git clone --single-branch --branch change_v2_ports https://github.com/stakwork/sphinx-stack.git stackv1
 
       - name: Clone Sphinx Tribes Frontend
         run: |
