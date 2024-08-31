@@ -44,6 +44,6 @@ jobs:
       - name: Droping DB with docker compose
         run: docker compose -f ./docker/testdb-docker-compose.yml -p test_db down
 
-      - name: Stop Stack
-        working-directory: ./stackv2
-        run: docker compose down
+      # - name: Stop Stack
+      #   working-directory: ./stackv2
+      #   run: docker compose down
