@@ -17,6 +17,23 @@ import (
 	"google.golang.org/api/youtube/v3"
 )
 
+func simulateGetGenericFeed(url string) {
+    feed, err := feeds.ParseFeed(url, false)
+    if err != nil {
+        fmt.Printf("Error parsing feed: %v\n", err)
+        return
+    }
+
+    // Simulate the JSON encoding
+    jsonData, err := json.MarshalIndent(feed, "", "  ")
+    if err != nil {
+        fmt.Printf("Error encoding JSON: %v\n", err)
+        return
+    }
+
+    fmt.Println(string(jsonData))
+}
+
 func GetGenericFeed(w http.ResponseWriter, r *http.Request) {
 	url := r.URL.Query().Get("url")
 

@@ -5,6 +5,7 @@ import (
 	"io"
 	"net/http"
 	"strings"
+	"fmt"
 )
 
 const (
@@ -14,48 +15,41 @@ const (
 )
 
 func ParseFeed(url string, fulltext bool) (*Feed, error) {
+    gen, bod, err := FindGenerator(url)
+    if err != nil {
+        return nil, err
+    }
 
-	gen, bod, err := FindGenerator(url)
-	if err != nil {
-		return nil, err
-	}
+    var f *Feed
+    var parserUsed string
 
-	if strings.Contains(url, "https://medium.com/") || gen == GeneratorWordpress {
-		f, err := ParseMediumFeed(url, bod)
-		if err != nil {
-			return nil, err
-		}
-		return f, nil
-	}
-	if strings.Contains(url, ".substack.com/feed") {
-		f, err := ParseSubstackFeed(url, bod)
-		if err != nil {
-			return nil, err
-		}
-		return f, nil
-	}
-	if strings.Contains(url, "youtube.com/feeds/videos.xml") {
-		f, err := ParseYoutubeFeed(url, bod)
-		if err != nil {
-			return nil, err
-		}
-		return f, nil
-	}
-	if strings.Contains(url, "bitcointv.com/feeds/videos.xml") {
-		f, err := ParseBitcoinTVFeed(url, bod)
-		if err != nil {
-			return nil, err
-		}
-		return f, nil
-	}
-	f, err := ParsePodcastFeed(url, fulltext)
-	if err != nil {
-		f, err = ParseSubstackFeed(url, bod) // this one is quite generic
-		if err != nil {
-			return nil, err
-		}
-	}
-	return f, nil
+    if strings.Contains(url, "https://medium.com/") || gen == GeneratorWordpress {
+        f, err = ParseMediumFeed(url, bod)
+        parserUsed = "Medium"
+    } else if strings.Contains(url, ".substack.com/feed") {
+        f, err = ParseSubstackFeed(url, bod)
+        parserUsed = "Substack"
+    } else if strings.Contains(url, "youtube.com/feeds/videos.xml") {
+        f, err = ParseYoutubeFeed(url, bod)
+        parserUsed = "YouTube"
+    } else if strings.Contains(url, "bitcointv.com/feeds/videos.xml") {
+        f, err = ParseBitcoinTVFeed(url, bod)
+        parserUsed = "BitcoinTV"
+    } else {
+        f, err = ParsePodcastFeed(url, fulltext)
+        parserUsed = "Podcast"
+        if err != nil {
+            f, err = ParseSubstackFeed(url, bod) // this one is quite generic
+            parserUsed = "Generic (Substack)"
+        }
+    }
+
+    if err != nil {
+        return nil, err
+    }
+
+    fmt.Printf("Parser used: %s\n", parserUsed)
+    return f, nil
 }
 
 func AddedValue(value *Value, tribeOwnerPubkey string) *Value {
