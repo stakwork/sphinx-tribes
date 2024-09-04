@@ -18,7 +18,7 @@ func main() {
 
     url := os.Getenv("FEED_URL")
     if url == "" {
-        url = "https://fixthefood.substack.com/feed" // Default URL if not provided
+        url = "https://newsletter.languagemodels.co/feed" // Default URL if not provided
     }
 
     fmt.Printf("Simulating GET /feeds?url=%s\n", url)
