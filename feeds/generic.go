@@ -48,6 +48,13 @@ func ParseFeed(url string, fulltext bool) (*Feed, error) {
 		}
 		return f, nil
 	}
+	if gen == FeedTypePodcast {
+		f, err := ParseSubstackFeed(url, bod)
+		if err != nil {
+			return nil, err
+		}
+		return f, nil
+	}
 	f, err := ParsePodcastFeed(url, fulltext)
 	if err != nil {
 		f, err = ParseSubstackFeed(url, bod) // this one is quite generic
