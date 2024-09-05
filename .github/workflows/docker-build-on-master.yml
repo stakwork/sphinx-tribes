@@ -15,11 +15,11 @@ jobs:
       ACTIONS_ALLOW_UNSECURE_COMMANDS: true
     steps:
       - name: Check out from Git
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
       - name: Login to Docker Hub
         run: echo "${{ secrets.DOCKER_PASSWORD }}" | docker login -u "${{ secrets.DOCKER_USERNAME }}" --password-stdin
       - name: Checkout project
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
       - name: Setup Docker buildx action
         uses: crazy-max/ghaction-docker-buildx@v1
         id: buildx
@@ -29,7 +29,7 @@ jobs:
       - name: Show available buildx platforms
         run: echo ${{ steps.buildx.outputs.platforms }}
       - name: Cache Docker layers
-        uses: actions/cache@v2
+        uses: actions/cache@v4
         id: cache
         with:
           path: /tmp/.buildx-cache
