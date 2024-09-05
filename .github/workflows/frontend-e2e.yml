@@ -76,7 +76,7 @@ jobs:
 
       - name: Upload Cypress logs
         if: failure()
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v4
         with:
           name: cypress-logs
           path: tribes-frontend/cypress/videos
