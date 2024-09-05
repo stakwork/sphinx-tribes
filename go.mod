@@ -1,61 +1,109 @@
 module github.com/stakwork/sphinx-tribes
 
-go 1.2
+go 1.20
 
 require (
-	github.com/Azure/go-ansiterm v0.0.0-20230124172434-306776ec8161 // indirect
-	github.com/Azure/go-autorest/autorest/adal v0.9.16 // indirect
-	github.com/ClickHouse/clickhouse-go v1.4.3 // indirect
 	github.com/DATA-DOG/go-sqlmock v1.5.1
-	github.com/Microsoft/go-winio v0.6.1 // indirect
-	github.com/ambelovsky/go-structs v1.1.0
-	github.com/apache/arrow/go/arrow v0.0.0-20211013220434-5962184e7a30 // indirect
 	github.com/araddon/dateparse v0.0.0-20210429162001-6b43995a97de
-	github.com/aws/aws-sdk-go-v2 v1.25.2 // indirect
-	github.com/aws/aws-sdk-go-v2/config v1.27.4 // indirect
-	github.com/aws/aws-sdk-go-v2/credentials v1.17.4 // indirect
-	github.com/aws/aws-sdk-go-v2/feature/s3/manager v1.5.4 // indirect
-	github.com/aws/aws-sdk-go-v2/service/s3 v1.51.1 // indirect
-	github.com/btcsuite/btcd v0.23.5-0.20230905170901-80f5a0ffdf36 // indirect
+	github.com/aws/aws-sdk-go-v2 v1.25.2
+	github.com/aws/aws-sdk-go-v2/config v1.27.4
+	github.com/aws/aws-sdk-go-v2/credentials v1.17.4
+	github.com/aws/aws-sdk-go-v2/service/s3 v1.51.1
 	github.com/btcsuite/btcd/btcec/v2 v2.3.2
-	github.com/btcsuite/btcd/btcutil v1.1.4-0.20230904040416-d4f519f5dc05 // indirect
 	github.com/btcsuite/btcd/chaincfg/chainhash v1.0.3
-	github.com/btcsuite/btcwallet v0.16.10-0.20230804184612-07be54bc22cf // indirect
-	github.com/cockroachdb/cockroach-go/v2 v2.1.1 // indirect
-	github.com/cznic/mathutil v0.0.0-20180504122225-ca4c9f2c1369 // indirect
-	github.com/decred/dcrd/dcrec/secp256k1 v1.0.4 // indirect
-	github.com/dhui/dktest v0.3.16 // indirect
-	github.com/docker/go-units v0.5.0 // indirect
-	github.com/edsrzf/mmap-go v0.0.0-20170320065105-0bce6a688712 // indirect
-	github.com/fatih/structs v1.1.0 // indirect
+	github.com/fatih/structs v1.1.0
 	github.com/fiatjaf/go-lnurl v1.13.0
 	github.com/form3tech-oss/jwt-go v3.2.5+incompatible
-	github.com/fsnotify/fsnotify v1.5.4 // indirect
-	github.com/fsouza/fake-gcs-server v1.17.0 // indirect
-	github.com/gabriel-vasile/mimetype v1.4.0 // indirect
 	github.com/go-chi/chi v1.5.5
 	github.com/go-chi/jwtauth v1.2.0
 	github.com/go-co-op/gocron v1.37.0
-	github.com/go-playground/universal-translator v0.18.1 // indirect
 	github.com/gobuffalo/packr/v2 v2.8.3
-	github.com/gocql/gocql v0.0.0-20210515062232-b7ef815b4556 // indirect
 	github.com/google/go-github/v39 v39.2.0
-	github.com/gorilla/mux v1.7.4 // indirect
+	github.com/google/uuid v1.4.0
 	github.com/gorilla/websocket v1.5.1
 	github.com/h2non/gock v1.2.0
-	github.com/hashicorp/errwrap v1.1.0 // indirect
-	github.com/hashicorp/go-multierror v1.1.1 // indirect
 	github.com/imroc/req v0.3.2
 	github.com/jinzhu/gorm v1.9.16
 	github.com/joho/godotenv v1.5.1
-	github.com/kardianos/osext v0.0.0-20190222173326-2bc1f35cddc0 // indirect
-	github.com/ktrysmt/go-bitbucket v0.6.4 // indirect
-	github.com/leodido/go-urn v1.2.4 // indirect
 	github.com/lib/pq v1.10.9
+	github.com/nbd-wtf/ln-decodepay v1.11.1
+	github.com/patrickmn/go-cache v2.1.0+incompatible
+	github.com/redis/go-redis/v9 v9.3.0
+	github.com/rs/cors v1.10.1
+	github.com/rs/xid v1.5.0
+	github.com/stretchr/testify v1.8.4
+	github.com/tuan78/jsonconv v1.0.2
+	golang.org/x/oauth2 v0.15.0
+	google.golang.org/api v0.153.0
+	gopkg.in/go-playground/validator.v9 v9.31.0
+	gorm.io/driver/postgres v1.5.4
+	gorm.io/gorm v1.25.5
+)
+
+require (
+	cloud.google.com/go/compute/metadata v0.5.0 // indirect
+	github.com/aead/siphash v1.0.1 // indirect
+	github.com/aws/aws-sdk-go-v2/aws/protocol/eventstream v1.6.1 // indirect
+	github.com/aws/aws-sdk-go-v2/feature/ec2/imds v1.15.2 // indirect
+	github.com/aws/aws-sdk-go-v2/internal/configsources v1.3.2 // indirect
+	github.com/aws/aws-sdk-go-v2/internal/endpoints/v2 v2.6.2 // indirect
+	github.com/aws/aws-sdk-go-v2/internal/ini v1.8.0 // indirect
+	github.com/aws/aws-sdk-go-v2/internal/v4a v1.3.2 // indirect
+	github.com/aws/aws-sdk-go-v2/service/internal/accept-encoding v1.11.1 // indirect
+	github.com/aws/aws-sdk-go-v2/service/internal/checksum v1.3.2 // indirect
+	github.com/aws/aws-sdk-go-v2/service/internal/presigned-url v1.11.2 // indirect
+	github.com/aws/aws-sdk-go-v2/service/internal/s3shared v1.17.2 // indirect
+	github.com/aws/aws-sdk-go-v2/service/sso v1.20.1 // indirect
+	github.com/aws/aws-sdk-go-v2/service/ssooidc v1.23.1 // indirect
+	github.com/aws/aws-sdk-go-v2/service/sts v1.28.1 // indirect
+	github.com/aws/smithy-go v1.20.1 // indirect
+	github.com/btcsuite/btcd v0.23.5-0.20230905170901-80f5a0ffdf36 // indirect
+	github.com/btcsuite/btcd/btcutil v1.1.4-0.20230904040416-d4f519f5dc05 // indirect
+	github.com/btcsuite/btcd/btcutil/psbt v1.1.8 // indirect
+	github.com/btcsuite/btclog v0.0.0-20170628155309-84c8d2346e9f // indirect
+	github.com/btcsuite/btcwallet v0.16.10-0.20230804184612-07be54bc22cf // indirect
+	github.com/btcsuite/btcwallet/wallet/txauthor v1.3.2 // indirect
+	github.com/btcsuite/btcwallet/wallet/txrules v1.2.0 // indirect
+	github.com/btcsuite/btcwallet/wallet/txsizes v1.2.3 // indirect
+	github.com/btcsuite/btcwallet/walletdb v1.4.0 // indirect
+	github.com/btcsuite/btcwallet/wtxmgr v1.5.0 // indirect
+	github.com/btcsuite/go-socks v0.0.0-20170105172521-4720035b7bfd // indirect
+	github.com/btcsuite/websocket v0.0.0-20150119174127-31079b680792 // indirect
+	github.com/cespare/xxhash/v2 v2.2.0 // indirect
+	github.com/davecgh/go-spew v1.1.1 // indirect
+	github.com/decred/dcrd/crypto/blake256 v1.0.0 // indirect
+	github.com/decred/dcrd/dcrec/secp256k1/v4 v4.0.1 // indirect
+	github.com/decred/dcrd/lru v1.0.0 // indirect
+	github.com/dgryski/go-rendezvous v0.0.0-20200823014737-9f7001d12a5f // indirect
+	github.com/go-errors/errors v1.0.1 // indirect
+	github.com/go-playground/locales v0.14.1 // indirect
+	github.com/go-playground/universal-translator v0.18.1 // indirect
+	github.com/go-sql-driver/mysql v1.6.0 // indirect
+	github.com/goccy/go-json v0.3.5 // indirect
+	github.com/golang/groupcache v0.0.0-20210331224755-41bb18bfe9da // indirect
+	github.com/golang/protobuf v1.5.3 // indirect
+	github.com/google/go-querystring v1.1.0 // indirect
+	github.com/google/s2a-go v0.1.7 // indirect
+	github.com/googleapis/enterprise-certificate-proxy v0.3.2 // indirect
+	github.com/googleapis/gax-go/v2 v2.12.0 // indirect
+	github.com/h2non/parth v0.0.0-20190131123155-b4df798d6542 // indirect
+	github.com/jackc/pgpassfile v1.0.0 // indirect
+	github.com/jackc/pgservicefile v0.0.0-20221227161230-091c0ba34f0a // indirect
+	github.com/jackc/pgx/v5 v5.4.3 // indirect
+	github.com/jinzhu/inflection v1.0.0 // indirect
+	github.com/jinzhu/now v1.1.5 // indirect
+	github.com/kkdai/bstream v1.0.0 // indirect
+	github.com/leodido/go-urn v1.2.4 // indirect
+	github.com/lestrrat-go/backoff/v2 v2.0.7 // indirect
+	github.com/lestrrat-go/httpcc v1.0.0 // indirect
+	github.com/lestrrat-go/iter v1.0.0 // indirect
+	github.com/lestrrat-go/jwx v1.1.0 // indirect
+	github.com/lestrrat-go/option v1.0.0 // indirect
+	github.com/lightninglabs/gozmq v0.0.0-20191113021534-d20a764486bf // indirect
 	github.com/lightninglabs/neutrino v0.16.0 // indirect
+	github.com/lightninglabs/neutrino/cache v1.1.1 // indirect
 	github.com/lightningnetwork/lightning-onion v1.2.1-0.20230823005744-06182b1d7d2f // indirect
 	github.com/lightningnetwork/lnd v0.16.4-beta.rc1 // indirect
-	github.com/lightningnetwork/lnd/cert v1.2.2 // indirect
 	github.com/lightningnetwork/lnd/clock v1.1.1 // indirect
 	github.com/lightningnetwork/lnd/healthcheck v1.2.3 // indirect
 	github.com/lightningnetwork/lnd/kvdb v1.4.4 // indirect
@@ -63,42 +111,29 @@ require (
 	github.com/lightningnetwork/lnd/ticker v1.1.1 // indirect
 	github.com/lightningnetwork/lnd/tlv v1.1.1 // indirect
 	github.com/lightningnetwork/lnd/tor v1.1.2 // indirect
-	github.com/markbates/pkger v0.15.1 // indirect
-	github.com/microsoft/go-mssqldb v1.0.0 // indirect
-	github.com/moby/term v0.5.0 // indirect
-	github.com/mutecomm/go-sqlcipher/v4 v4.4.0 // indirect
-	github.com/nakagami/firebirdsql v0.0.0-20190310045651-3c02a58cfed8 // indirect
-	github.com/nbd-wtf/ln-decodepay v1.11.1
-	github.com/neo4j/neo4j-go-driver v1.8.1-0.20200803113522-b626aa943eba // indirect
-	github.com/onsi/gomega v1.26.0 // indirect
-	github.com/ory/dockertest/v3 v3.10.0 // indirect
-	github.com/patrickmn/go-cache v2.1.0+incompatible
-	github.com/redis/go-redis/v9 v9.3.0
-	github.com/rs/cors v1.10.1
-	github.com/rs/xid v1.5.0
-	github.com/snowflakedb/gosnowflake v1.6.3 // indirect
-	github.com/stretchr/testify v1.8.4
-	github.com/test-go/testify v1.1.4 // indirect
-	github.com/tuan78/jsonconv v1.0.2
-	github.com/xanzy/go-gitlab v0.15.0 // indirect
-	github.com/xdg-go/scram v1.1.1 // indirect
-	gitlab.com/nyarla/go-crypt v0.0.0-20160106005555-d9a5dc2b789b // indirect
-	go.mongodb.org/mongo-driver v1.7.5 // indirect
+	github.com/mattn/go-sqlite3 v1.14.16 // indirect
+	github.com/miekg/dns v1.1.43 // indirect
+	github.com/pkg/errors v0.9.1 // indirect
+	github.com/pmezard/go-difflib v1.0.0 // indirect
+	github.com/robfig/cron/v3 v3.0.1 // indirect
+	github.com/stretchr/objx v0.5.0 // indirect
+	github.com/tidwall/gjson v1.9.3 // indirect
+	github.com/tidwall/match v1.1.1 // indirect
+	github.com/tidwall/pretty v1.2.0 // indirect
+	go.etcd.io/bbolt v1.3.7 // indirect
+	go.opencensus.io v0.24.0 // indirect
+	go.uber.org/atomic v1.9.0 // indirect
+	golang.org/x/crypto v0.16.0 // indirect
 	golang.org/x/exp v0.0.0-20230315142452-642cacee5cc0 // indirect
-	golang.org/x/oauth2 v0.15.0
-	golang.org/x/tools/cmd/cover v0.1.0-deprecated // indirect
-	google.golang.org/api v0.153.0
-	gopkg.in/go-playground/validator.v9 v9.31.0 // indirect
-	gorm.io/driver/postgres v1.5.4
-	gorm.io/gorm v1.25.5
-	modernc.org/b v1.0.0 // indirect
-	modernc.org/db v1.0.0 // indirect
-	modernc.org/file v1.0.0 // indirect
-	modernc.org/fileutil v1.0.0 // indirect
-	modernc.org/golex v1.0.0 // indirect
-	modernc.org/internal v1.0.0 // indirect
-	modernc.org/lldb v1.0.0 // indirect
-	modernc.org/ql v1.0.0 // indirect
-	modernc.org/sortutil v1.1.0 // indirect
-	modernc.org/zappy v1.0.0 // indirect
+	golang.org/x/net v0.19.0 // indirect
+	golang.org/x/sync v0.5.0 // indirect
+	golang.org/x/sys v0.22.0 // indirect
+	golang.org/x/term v0.15.0 // indirect
+	golang.org/x/text v0.14.0 // indirect
+	google.golang.org/appengine v1.6.7 // indirect
+	google.golang.org/genproto/googleapis/rpc v0.0.0-20231120223509-83a465c0220f // indirect
+	google.golang.org/grpc v1.59.0 // indirect
+	google.golang.org/protobuf v1.31.0 // indirect
+	gopkg.in/go-playground/assert.v1 v1.2.1 // indirect
+	gopkg.in/yaml.v3 v3.0.1 // indirect
 )
