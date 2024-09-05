@@ -27,7 +27,7 @@ func ParseFeed(url string, fulltext bool) (*Feed, error) {
 		}
 		return f, nil
 	}
-	if strings.Contains(url, ".substack.com/feed") || strings.Contains(url, ".languagemodels.co/feed") {
+	if strings.Contains(url, ".substack.com/feed") {
 		f, err := ParseSubstackFeed(url, bod)
 		if err != nil {
 			return nil, err
@@ -43,6 +43,13 @@ func ParseFeed(url string, fulltext bool) (*Feed, error) {
 	}
 	if strings.Contains(url, "bitcointv.com/feeds/videos.xml") {
 		f, err := ParseBitcoinTVFeed(url, bod)
+		if err != nil {
+			return nil, err
+		}
+		return f, nil
+	}
+	if gen == FeedTypePodcast {
+		f, err := ParseSubstackFeed(url, bod)
 		if err != nil {
 			return nil, err
 		}
