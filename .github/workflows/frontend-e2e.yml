@@ -29,7 +29,7 @@ jobs:
 
       - name: Clone Sphinx Tribes Frontend
         run: |
-          git clone https://github.com/stakwork/sphinx-tribes-frontend.git tribes-frontend
+          git clone --single-branch --branch feat/v2_payments_cypress_test https://github.com/stakwork/sphinx-tribes-frontend.git tribes-frontend
 
       - name: Give Permissions to Stack
         working-directory: ./stack
