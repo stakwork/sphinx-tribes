@@ -19,15 +19,6 @@ jobs:
         run: |
           git clone https://github.com/stakwork/sphinx-stack.git stack;
 
-      # - name: Run Stack V2
-      #   run: |
-      #     GITACTION_ENV=gitactionenv docker compose -f ./stack/alts/v2.yml --project-directory ./stack up -d;
-      #     sleep 240;
-      #     docker ps
-      #     docker logs alice.sphinx
-      #     docker logs bob.sphinx
-      #     docker wait stack-v2setup-1
-
       - name: Run Stack V2
         uses: nick-fields/retry@v2
         with:
