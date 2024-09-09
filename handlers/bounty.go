@@ -573,6 +573,8 @@ func (h *bountyHandler) MakeBountyPayment(w http.ResponseWriter, r *http.Request
 	if config.IsV2Payment {
 		url := fmt.Sprintf("%s/pay", config.V2BotUrl)
 
+		fmt.Println("IS V@ PAYMENT ====")
+
 		// Build v2 keysend payment data
 		bodyData := utils.BuildV2KeysendBodyData(amount, assignee.OwnerPubKey, assignee.OwnerRouteHint)
 		jsonBody := []byte(bodyData)

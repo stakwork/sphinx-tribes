@@ -84,6 +84,7 @@ func InitConfig() {
 
 	if V2BotUrl != "" && V2BotToken != "" {
 		// contact_key := GetV2ContactKey()
+		fmt.Println("DEBUG == IT IS V2")
 		IsV2Payment = true
 	}
 
