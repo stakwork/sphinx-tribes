@@ -208,6 +208,8 @@ func (db database) MigrateTablesWithOrgUuid() {
 		} else {
 			db.db.AutoMigrate(&NewPaymentHistory{})
 		}
+	} else {
+		db.db.AutoMigrate(&NewPaymentHistory{})
 	}
 	if !db.db.Migrator().HasTable("invoice_list") {
 		if !db.db.Migrator().HasColumn(InvoiceList{}, "workspace_uuid") {
