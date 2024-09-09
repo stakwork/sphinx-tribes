@@ -442,23 +442,25 @@ func (db database) ProcessBountyPayment(payment NewPaymentHistory, bounty NewBou
 		return err
 	}
 
-	// get Workspace budget and subtract payment from total budget
-	WorkspaceBudget := db.GetWorkspaceBudget(payment.WorkspaceUuid)
-	totalBudget := WorkspaceBudget.TotalBudget
+	if payment.PaymentStatus != PaymentFailed {
+		// get Workspace budget and subtract payment from total budget
+		WorkspaceBudget := db.GetWorkspaceBudget(payment.WorkspaceUuid)
+		totalBudget := WorkspaceBudget.TotalBudget
 
-	// update budget
-	WorkspaceBudget.TotalBudget = totalBudget - payment.Amount
-	if err = tx.Model(&NewBountyBudget{}).Where("workspace_uuid = ?", payment.WorkspaceUuid).Updates(map[string]interface{}{
-		"total_budget": WorkspaceBudget.TotalBudget,
-	}).Error; err != nil {
-		tx.Rollback()
-		return err
-	}
+		// update budget
+		WorkspaceBudget.TotalBudget = totalBudget - payment.Amount
+		if err = tx.Model(&NewBountyBudget{}).Where("workspace_uuid = ?", payment.WorkspaceUuid).Updates(map[string]interface{}{
+			"total_budget": WorkspaceBudget.TotalBudget,
+		}).Error; err != nil {
+			tx.Rollback()
+			return err
+		}
 
-	// updatge bounty status
-	if err = tx.Where("created", bounty.Created).Updates(&bounty).Error; err != nil {
-		tx.Rollback()
-		return err
+		// updatge bounty status
+		if err = tx.Where("created", bounty.Created).Updates(&bounty).Error; err != nil {
+			tx.Rollback()
+			return err
+		}
 	}
 
 	return tx.Commit().Error
@@ -476,6 +478,20 @@ func (db database) GetPaymentHistory(workspace_uuid string, r *http.Request) []N
 
 	db.db.Raw(query + " " + limitQuery).Find(&payment)
 	return payment
+}
+
+func (db database) GetPendingPaymentHistory() []NewPaymentHistory {
+	paymentHistories := []NewPaymentHistory{}
+
+	query := `SELECT * FROM payment_histories WHERE payment_status = '` + PaymentPending + `' AND status = true ORDER BY created DESC`
+
+	db.db.Raw(query).Find(&paymentHistories)
+	return paymentHistories
+}
+
+func (db database) SetPaymentAsComplete(tag string) bool {
+	db.db.Model(NewPaymentHistory{}).Where("tag = ?", tag).Update("payment_status", PaymentComplete)
+	return true
 }
 
 func (db database) GetWorkspaceInvoices(workspace_uuid string) []NewInvoiceList {

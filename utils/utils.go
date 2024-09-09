@@ -69,9 +69,9 @@ func BuildV2KeysendBodyData(amount uint, receiver_pubkey string, route_hint stri
 	amountMsat := amount * 1000
 	var bodyData string
 	if route_hint != "" {
-		bodyData = fmt.Sprintf(`{"amt_msat": %d, "dest": "%s", "route_hint": "%s", "wait": false}`, amountMsat, receiver_pubkey, route_hint)
+		bodyData = fmt.Sprintf(`{"amt_msat": %d, "dest": "%s", "route_hint": "%s", "wait": true}`, amountMsat, receiver_pubkey, route_hint)
 	} else {
-		bodyData = fmt.Sprintf(`{amt_msat": %d, "dest": "%s", "route_hint": "", "wait": false}`, amountMsat, receiver_pubkey)
+		bodyData = fmt.Sprintf(`{amt_msat": %d, "dest": "%s", "route_hint": "", "wait": true}`, amountMsat, receiver_pubkey)
 	}
 
 	return bodyData

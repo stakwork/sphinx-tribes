@@ -45,8 +45,15 @@ type V2CreateInvoiceResponse struct {
 }
 
 type V2PayInvoiceResponse struct {
-	Tag         string `json:"tags"`
+	Tag         string `json:"tag"`
 	Msat        string `json:"msat"`
 	Timestamp   string `json:"timestamp"`
 	PaymentHash string `json:"payment_hash"`
+}
+
+type V2TagRes struct {
+	Tag    string `json:"tag"`
+	Ts     uint64 `json:"ts"`
+	Status string `json:"status"` // "COMPLETE", "PENDING", or "FAILED"
+	Error  string `json:"error"`
 }

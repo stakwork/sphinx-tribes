@@ -627,6 +627,8 @@ func (h *bountyHandler) MakeBountyPayment(w http.ResponseWriter, r *http.Request
 					Updated:        &now,
 					Status:         true,
 					PaymentType:    "payment",
+					Tag:            v2KeysendRes.Tag,
+					PaymentStatus:  v2KeysendRes.Status,
 				}
 
 				bounty.Paid = true
