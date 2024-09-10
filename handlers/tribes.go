@@ -681,9 +681,13 @@ func (th *tribeHandler) GenerateV2BudgetInvoice(w http.ResponseWriter, r *http.R
 
 	url := fmt.Sprintf("%s/invoice", config.V2BotUrl)
 
+	fmt.Println("BOT URL ====", url)
+
 	amountMsat := invoice.Amount * 1000
 
 	bodyData := fmt.Sprintf(`{"amt_msat": %d}`, amountMsat)
+
+	fmt.Println("Invoice BODY DATA ===", bodyData)
 
 	jsonBody := []byte(bodyData)
 
@@ -692,10 +696,10 @@ func (th *tribeHandler) GenerateV2BudgetInvoice(w http.ResponseWriter, r *http.R
 
 	req.Header.Set("x-admin-token", config.V2BotToken)
 	req.Header.Set("Content-Type", "application/json")
-	res, _ := client.Do(req)
+	res, err := client.Do(req)
 
 	if err != nil {
-		log.Printf("Request Failed: %s", err)
+		log.Printf("Client Request Failed: %s", err)
 		return
 	}
 
