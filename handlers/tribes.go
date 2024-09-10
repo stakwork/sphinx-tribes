@@ -681,13 +681,9 @@ func (th *tribeHandler) GenerateV2BudgetInvoice(w http.ResponseWriter, r *http.R
 
 	url := fmt.Sprintf("%s/invoice", config.V2BotUrl)
 
-	fmt.Println("BOT URL ====", url)
-
 	amountMsat := invoice.Amount * 1000
 
 	bodyData := fmt.Sprintf(`{"amt_msat": %d}`, amountMsat)
-
-	fmt.Println("Invoice BODY DATA ===", bodyData)
 
 	jsonBody := []byte(bodyData)
 
