@@ -121,6 +121,7 @@ func GetLnurlAuth(w http.ResponseWriter, r *http.Request) {
 	responseData["encode"] = encodeData.Encode
 
 	w.WriteHeader(http.StatusOK)
+
 	json.NewEncoder(w).Encode(responseData)
 }
 
