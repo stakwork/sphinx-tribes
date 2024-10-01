@@ -37,6 +37,13 @@ func (ph *peopleHandler) CreateOrEditPerson(w http.ResponseWriter, r *http.Reque
 
 	person := db.Person{}
 	body, err := io.ReadAll(r.Body)
+
+	if err != nil {
+		w.WriteHeader(http.StatusBadRequest)
+		json.NewEncoder(w).Encode("Sent wrong body data")
+		return
+	}
+
 	r.Body.Close()
 	err = json.Unmarshal(body, &person)
 	if err != nil {
@@ -62,12 +69,6 @@ func (ph *peopleHandler) CreateOrEditPerson(w http.ResponseWriter, r *http.Reque
 
 	existing := ph.db.GetPersonByPubkey(pubKeyFromAuth)
 	if existing.ID == 0 {
-		if person.ID != 0 {
-			// cant try to "edit" if not exists already
-			fmt.Println("cant edit non existing")
-			w.WriteHeader(http.StatusUnauthorized)
-			return
-		}
 		person.UniqueName, _ = ph.db.PersonUniqueNameFromName(person.OwnerAlias)
 		person.Created = &now
 		person.Uuid = xid.New().String()
@@ -80,13 +81,9 @@ func (ph *peopleHandler) CreateOrEditPerson(w http.ResponseWriter, r *http.Reque
 				person.ReferredBy = referral.ID
 			}
 		}
-	} else { // editing! needs ID
-		if person.ID == 0 { // can't create if already exists
-			fmt.Println("can't create, already existing")
-			w.WriteHeader(http.StatusUnauthorized)
-			return
-		}
-		if person.ID != existing.ID { // can't edit someone else's
+	} else {
+		if person.OwnerPubKey != existing.OwnerPubKey {
+			// can't edit someone else's
 			fmt.Println("cant edit someone else")
 			w.WriteHeader(http.StatusUnauthorized)
 			return
@@ -120,6 +117,13 @@ func (ph *peopleHandler) CreateOrEditPerson(w http.ResponseWriter, r *http.Reque
 func (ph *peopleHandler) UpsertLogin(w http.ResponseWriter, r *http.Request) {
 	person := db.Person{}
 	body, err := io.ReadAll(r.Body)
+
+	if err != nil {
+		w.WriteHeader(http.StatusBadRequest)
+		json.NewEncoder(w).Encode("Sent wrong body data")
+		return
+	}
+
 	r.Body.Close()
 	err = json.Unmarshal(body, &person)
 	if err != nil {
@@ -582,6 +586,7 @@ func GetAssetList(pubkey string) ([]db.AssetListData, error) {
 
 	var r []db.AssetListData
 	body, err := io.ReadAll(resp.Body)
+
 	err = json.Unmarshal(body, &r)
 	if err != nil {
 		fmt.Println("json unmarshall error", err)
