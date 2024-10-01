@@ -82,7 +82,7 @@ func (ph *peopleHandler) CreateOrEditPerson(w http.ResponseWriter, r *http.Reque
 			}
 		}
 	} else {
-		if person.OwnerPubKey != existing.OwnerPubKey {
+		if person.OwnerPubKey != existing.OwnerPubKey && person.OwnerAlias != existing.OwnerAlias {
 			// can't edit someone else's
 			fmt.Println("cant edit someone else")
 			w.WriteHeader(http.StatusUnauthorized)
