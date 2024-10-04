@@ -1418,12 +1418,14 @@ func TestMakeBountyPayment(t *testing.T) {
 		bHandler2.getSocketConnections = mockGetSocketConnections
 		bHandler2.userHasAccess = mockUserHasAccessTrue
 
+		memoText := fmt.Sprintf("Payment For: %ss", bounty.Title)
+
 		expectedUrl := fmt.Sprintf("%s/payment", config.RelayUrl)
-		expectedBody := fmt.Sprintf(`{"amount": %d, "destination_key": "%s", "text": "memotext added for notification"}`, bountyAmount, person.OwnerPubKey)
+		expectedBody := fmt.Sprintf(`{"amount": %d, "destination_key": "%s", "text": "memotext added for notification", "data": "%s"}`, bountyAmount, person.OwnerPubKey, memoText)
 
 		expectedV2Url := fmt.Sprintf("%s/pay", botURL)
 		expectedV2Body :=
-			fmt.Sprintf(`{"amt_msat": %d, "dest": "%s", "route_hint": "%s", "wait": true}`, bountyAmount*1000, person.OwnerPubKey, person.OwnerRouteHint)
+			fmt.Sprintf(`{"amt_msat": %d, "dest": "%s", "route_hint": "%s", "data": "%s", "wait": true}`, bountyAmount*1000, person.OwnerPubKey, person.OwnerRouteHint, memoText)
 
 		r := io.NopCloser(bytes.NewReader([]byte(`"internal server error"`)))
 		if botURL != "" && botToken != "" {
@@ -1464,12 +1466,14 @@ func TestMakeBountyPayment(t *testing.T) {
 		bHandler.getSocketConnections = mockGetSocketConnections
 		bHandler.userHasAccess = mockUserHasAccessTrue
 
+		memoText := fmt.Sprintf("Payment For: %ss", bounty.Title)
+
 		expectedUrl := fmt.Sprintf("%s/payment", config.RelayUrl)
-		expectedBody := fmt.Sprintf(`{"amount": %d, "destination_key": "%s", "text": "memotext added for notification"}`, bountyAmount, person.OwnerPubKey)
+		expectedBody := fmt.Sprintf(`{"amount": %d, "destination_key": "%s", "text": "memotext added for notification", "data": "%s"}`, bountyAmount, person.OwnerPubKey, memoText)
 
 		expectedV2Url := fmt.Sprintf("%s/pay", botURL)
 		expectedV2Body :=
-			fmt.Sprintf(`{"amt_msat": %d, "dest": "%s", "route_hint": "%s", "wait": true}`, bountyAmount*1000, person.OwnerPubKey, person.OwnerRouteHint)
+			fmt.Sprintf(`{"amt_msat": %d, "dest": "%s", "route_hint": "%s", "data": "%s", "wait": true}`, bountyAmount*1000, person.OwnerPubKey, person.OwnerRouteHint, memoText)
 
 		if botURL != "" && botToken != "" {
 			rv2 := io.NopCloser(bytes.NewReader([]byte(`{"status": "COMPLETE", "tag": "", "preimage": "", "payment_hash": "" }`)))
@@ -1951,10 +1955,10 @@ func TestPollInvoice(t *testing.T) {
 		expectedPaymentUrl := fmt.Sprintf("%s/payment", config.RelayUrl)
 		expectedV2PaymentUrl := fmt.Sprintf("%s/pay", botURL)
 
-		expectedPaymentBody := fmt.Sprintf(`{"amount": %d, "destination_key": "%s", "text": "memotext added for notification"}`, bountyAmount, invoice.OwnerPubkey)
+		expectedPaymentBody := fmt.Sprintf(`{"amount": %d, "destination_key": "%s", "text": "memotext added for notification", "data": ""}`, bountyAmount, invoice.OwnerPubkey)
 
 		expectedV2PaymentBody :=
-			fmt.Sprintf(`{"amt_msat": %d, "dest": "%s", "route_hint": "%s", "wait": true}`, bountyAmount*1000, invoice.OwnerPubkey, invoiceData.RouteHint)
+			fmt.Sprintf(`{"amt_msat": %d, "dest": "%s", "route_hint": "%s", "data": "", "wait": true}`, bountyAmount*1000, invoice.OwnerPubkey, invoiceData.RouteHint)
 
 		r2 := io.NopCloser(bytes.NewReader([]byte(`{"success": true, "response": { "sumAmount": "1"}}`)))
 		r3 := io.NopCloser(bytes.NewReader([]byte(`{"status": "COMPLETE", "amt_msat": "", "timestamp": "" }`)))

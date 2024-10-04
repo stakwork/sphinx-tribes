@@ -569,14 +569,16 @@ func (h *bountyHandler) MakeBountyPayment(w http.ResponseWriter, r *http.Request
 	// Get Bounty Assignee
 	assignee := h.db.GetPersonByPubkey(bounty.Assignee)
 
+	memoText := fmt.Sprintf("Payment For: %ss", bounty.Title)
+
 	// If the v2contactkey is present
 	if config.IsV2Payment {
 		url := fmt.Sprintf("%s/pay", config.V2BotUrl)
 
-		fmt.Println("IS V@ PAYMENT ====")
+		fmt.Println("IS V2 PAYMENT ====")
 
 		// Build v2 keysend payment data
-		bodyData := utils.BuildV2KeysendBodyData(amount, assignee.OwnerPubKey, assignee.OwnerRouteHint)
+		bodyData := utils.BuildV2KeysendBodyData(amount, assignee.OwnerPubKey, assignee.OwnerRouteHint, memoText)
 		jsonBody := []byte(bodyData)
 
 		req, _ := http.NewRequest(http.MethodPost, url, bytes.NewBuffer(jsonBody))
@@ -669,7 +671,7 @@ func (h *bountyHandler) MakeBountyPayment(w http.ResponseWriter, r *http.Request
 	} else { // Process v1 payment
 		url := fmt.Sprintf("%s/payment", config.RelayUrl)
 
-		bodyData := utils.BuildKeysendBodyData(amount, assignee.OwnerPubKey, assignee.OwnerRouteHint)
+		bodyData := utils.BuildKeysendBodyData(amount, assignee.OwnerPubKey, assignee.OwnerRouteHint, memoText)
 		jsonBody := []byte(bodyData)
 
 		req, _ := http.NewRequest(http.MethodPost, url, bytes.NewBuffer(jsonBody))
@@ -1209,7 +1211,7 @@ func (h *bountyHandler) PollInvoice(w http.ResponseWriter, r *http.Request) {
 					url := fmt.Sprintf("%s/pay", config.V2BotUrl)
 
 					// Build v2 keysend payment data
-					bodyData := utils.BuildV2KeysendBodyData(amount, invData.UserPubkey, invData.RouteHint)
+					bodyData := utils.BuildV2KeysendBodyData(amount, invData.UserPubkey, invData.RouteHint, "")
 					jsonBody := []byte(bodyData)
 
 					req, _ := http.NewRequest(http.MethodPost, url, bytes.NewBuffer(jsonBody))
@@ -1267,7 +1269,7 @@ func (h *bountyHandler) PollInvoice(w http.ResponseWriter, r *http.Request) {
 				} else {
 					url := fmt.Sprintf("%s/payment", config.RelayUrl)
 
-					bodyData := utils.BuildKeysendBodyData(amount, invData.UserPubkey, invData.RouteHint)
+					bodyData := utils.BuildKeysendBodyData(amount, invData.UserPubkey, invData.RouteHint, "")
 
 					jsonBody := []byte(bodyData)
 
