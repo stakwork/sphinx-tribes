@@ -1758,6 +1758,11 @@ func (db database) ProcessAddInvoice(invoice NewInvoiceList, userData UserInvoic
 		return err
 	}
 
+	if invoice.WorkspaceUuid == "" {
+		tx.Rollback()
+		return errors.New("cannot create invoice")
+	}
+
 	if err = tx.Create(&invoice).Error; err != nil {
 		tx.Rollback()
 	}
@@ -1781,6 +1786,11 @@ func (db database) ProcessBudgetInvoice(paymentHistory NewPaymentHistory, newInv
 
 	if err = tx.Error; err != nil {
 		return err
+	}
+
+	if paymentHistory.WorkspaceUuid == "" {
+		tx.Rollback()
+		return errors.New("cannot create invoice")
 	}
 
 	if err = tx.Create(&paymentHistory).Error; err != nil {
