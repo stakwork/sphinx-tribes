@@ -283,6 +283,10 @@ func (db database) ProcessUpdateBudget(invoice NewInvoiceList) error {
 	created := invoice.Created
 	workspace_uuid := invoice.WorkspaceUuid
 
+	if workspace_uuid == "" {
+		return errors.New("cannot Create a Workspace Without a Workspace uuid")
+	}
+
 	// Get payment history and update budget
 	paymentHistory := db.GetPaymentHistoryByCreated(created, workspace_uuid)
 	if paymentHistory.WorkspaceUuid != "" && paymentHistory.Amount != 0 {
