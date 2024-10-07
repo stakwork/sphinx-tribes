@@ -714,6 +714,7 @@ func (oh *workspaceHandler) PollUserWorkspacesBudget(w http.ResponseWriter, r *h
 	workspaces := GetAllUserWorkspaces(pubKeyFromAuth)
 	// loop through the worksppaces and get each workspace invoice
 	for _, space := range workspaces {
+
 		// get all workspace invoice
 		workInvoices := oh.db.GetWorkspaceInvoices(space.Uuid)
 
