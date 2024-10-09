@@ -797,9 +797,10 @@ func (h *bountyHandler) UpdateBountyPaymentStatus(w http.ResponseWriter, r *http
 		return
 	}
 
-	payment := h.db.GetPendingPaymentByBountyId(bounty.ID)
+	payment := h.db.GetPaymentByBountyId(bounty.ID)
 
 	tag := payment.Tag
+
 	tagResult := h.getInvoiceStatusByTag(tag)
 
 	msg := map[string]string{
@@ -807,7 +808,10 @@ func (h *bountyHandler) UpdateBountyPaymentStatus(w http.ResponseWriter, r *http
 	}
 
 	if tagResult.Status == db.PaymentComplete {
-		h.db.SetPaymentAsComplete(tag)
+		// Update only if it is still pending
+		if payment.PaymentStatus == db.PaymentPending {
+			h.db.SetPaymentAsComplete(tag)
+		}
 
 		now := time.Now()
 

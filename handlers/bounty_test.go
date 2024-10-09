@@ -1575,10 +1575,12 @@ func TestUpdateBountyPaymentStatus(t *testing.T) {
 
 	bHandler := NewBountyHandler(mockHttpClient, db.TestDB)
 
+	paymentTag := "update_tag"
+
 	mockPendingGetInvoiceStatusByTag := func(tag string) db.V2TagRes {
 		return db.V2TagRes{
 			Status: db.PaymentPending,
-			Tag:    tag,
+			Tag:    paymentTag,
 			Error:  "",
 		}
 
@@ -1586,7 +1588,7 @@ func TestUpdateBountyPaymentStatus(t *testing.T) {
 	mockCompleteGetInvoiceStatusByTag := func(tag string) db.V2TagRes {
 		return db.V2TagRes{
 			Status: db.PaymentComplete,
-			Tag:    tag,
+			Tag:    paymentTag,
 			Error:  "",
 		}
 	}
@@ -1610,7 +1612,7 @@ func TestUpdateBountyPaymentStatus(t *testing.T) {
 	db.TestDB.CreateOrEditPerson(person)
 
 	workspace := db.Workspace{
-		Uuid:        "update+workspace_uuid",
+		Uuid:        "update_workspace_uuid",
 		Name:        "update_workspace_name",
 		OwnerPubKey: person.OwnerPubKey,
 		Github:      "gtihub",
@@ -1658,7 +1660,7 @@ func TestUpdateBountyPaymentStatus(t *testing.T) {
 		PaymentType:    db.Payment,
 		SenderPubKey:   person.OwnerPubKey,
 		ReceiverPubKey: person.OwnerPubKey,
-		Tag:            "update_tag",
+		Tag:            paymentTag,
 		Status:         true,
 		Created:        &paymentTime,
 		Updated:        &paymentTime,
@@ -1758,8 +1760,11 @@ func TestUpdateBountyPaymentStatus(t *testing.T) {
 		assert.Equal(t, http.StatusOK, rr.Code)
 		mockHttpClient.AssertExpectations(t)
 
+		payment := db.TestDB.GetPaymentByBountyId(payment.BountyId)
+
 		updatedBounty := db.TestDB.GetBounty(bountyId)
 		assert.True(t, updatedBounty.Paid, "Expected bounty to be marked as paid")
+		assert.Equal(t, payment.PaymentStatus, db.PaymentComplete, "Expected Payment Status To be Complete")
 	})
 
 	t.Run("405 when trying to update an already-paid bounty", func(t *testing.T) {

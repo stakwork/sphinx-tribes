@@ -4156,6 +4156,52 @@ func (_c *Database_GetOpenGithubIssues_Call) RunAndReturn(run func(*http.Request
 	return _c
 }
 
+// GetPaymentByBountyId provides a mock function with given fields: bountyId
+func (_m *Database) GetPaymentByBountyId(bountyId uint) db.NewPaymentHistory {
+	ret := _m.Called(bountyId)
+
+	if len(ret) == 0 {
+		panic("no return value specified for GetPaymentByBountyId")
+	}
+
+	var r0 db.NewPaymentHistory
+	if rf, ok := ret.Get(0).(func(uint) db.NewPaymentHistory); ok {
+		r0 = rf(bountyId)
+	} else {
+		r0 = ret.Get(0).(db.NewPaymentHistory)
+	}
+
+	return r0
+}
+
+// Database_GetPaymentByBountyId_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'GetPaymentByBountyId'
+type Database_GetPaymentByBountyId_Call struct {
+	*mock.Call
+}
+
+// GetPaymentByBountyId is a helper method to define mock.On call
+//   - bountyId uint
+func (_e *Database_Expecter) GetPaymentByBountyId(bountyId interface{}) *Database_GetPaymentByBountyId_Call {
+	return &Database_GetPaymentByBountyId_Call{Call: _e.mock.On("GetPaymentByBountyId", bountyId)}
+}
+
+func (_c *Database_GetPaymentByBountyId_Call) Run(run func(bountyId uint)) *Database_GetPaymentByBountyId_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(uint))
+	})
+	return _c
+}
+
+func (_c *Database_GetPaymentByBountyId_Call) Return(_a0 db.NewPaymentHistory) *Database_GetPaymentByBountyId_Call {
+	_c.Call.Return(_a0)
+	return _c
+}
+
+func (_c *Database_GetPaymentByBountyId_Call) RunAndReturn(run func(uint) db.NewPaymentHistory) *Database_GetPaymentByBountyId_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
 // GetPaymentHistory provides a mock function with given fields: workspace_uuid, r
 func (_m *Database) GetPaymentHistory(workspace_uuid string, r *http.Request) []db.NewPaymentHistory {
 	ret := _m.Called(workspace_uuid, r)
@@ -4248,52 +4294,6 @@ func (_c *Database_GetPaymentHistoryByCreated_Call) Return(_a0 db.NewPaymentHist
 }
 
 func (_c *Database_GetPaymentHistoryByCreated_Call) RunAndReturn(run func(*time.Time, string) db.NewPaymentHistory) *Database_GetPaymentHistoryByCreated_Call {
-	_c.Call.Return(run)
-	return _c
-}
-
-// GetPendingPaymentByBountyId provides a mock function with given fields: bountyId
-func (_m *Database) GetPendingPaymentByBountyId(bountyId uint) db.NewPaymentHistory {
-	ret := _m.Called(bountyId)
-
-	if len(ret) == 0 {
-		panic("no return value specified for GetPendingPaymentByBountyId")
-	}
-
-	var r0 db.NewPaymentHistory
-	if rf, ok := ret.Get(0).(func(uint) db.NewPaymentHistory); ok {
-		r0 = rf(bountyId)
-	} else {
-		r0 = ret.Get(0).(db.NewPaymentHistory)
-	}
-
-	return r0
-}
-
-// Database_GetPendingPaymentByBountyId_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'GetPendingPaymentByBountyId'
-type Database_GetPendingPaymentByBountyId_Call struct {
-	*mock.Call
-}
-
-// GetPendingPaymentByBountyId is a helper method to define mock.On call
-//   - bountyId uint
-func (_e *Database_Expecter) GetPendingPaymentByBountyId(bountyId interface{}) *Database_GetPendingPaymentByBountyId_Call {
-	return &Database_GetPendingPaymentByBountyId_Call{Call: _e.mock.On("GetPendingPaymentByBountyId", bountyId)}
-}
-
-func (_c *Database_GetPendingPaymentByBountyId_Call) Run(run func(bountyId uint)) *Database_GetPendingPaymentByBountyId_Call {
-	_c.Call.Run(func(args mock.Arguments) {
-		run(args[0].(uint))
-	})
-	return _c
-}
-
-func (_c *Database_GetPendingPaymentByBountyId_Call) Return(_a0 db.NewPaymentHistory) *Database_GetPendingPaymentByBountyId_Call {
-	_c.Call.Return(_a0)
-	return _c
-}
-
-func (_c *Database_GetPendingPaymentByBountyId_Call) RunAndReturn(run func(uint) db.NewPaymentHistory) *Database_GetPendingPaymentByBountyId_Call {
 	_c.Call.Return(run)
 	return _c
 }

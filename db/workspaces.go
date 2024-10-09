@@ -493,12 +493,13 @@ func (db database) GetPendingPaymentHistory() []NewPaymentHistory {
 	return paymentHistories
 }
 
-func (db database) GetPendingPaymentByBountyId(bountyId uint) NewPaymentHistory {
+func (db database) GetPaymentByBountyId(bountyId uint) NewPaymentHistory {
 	paymentHistories := NewPaymentHistory{}
 
-	query := fmt.Sprintf("SELECT * FROM payment_histories WHERE payment_status = %s AND bounty_id = %d AND status = true ORDER BY created DESC", PaymentPending, bountyId)
+	query := fmt.Sprintf("SELECT * FROM payment_histories WHERE bounty_id = %d AND status = true ORDER BY created DESC", bountyId)
 
 	db.db.Raw(query).Find(&paymentHistories)
+
 	return paymentHistories
 }
 

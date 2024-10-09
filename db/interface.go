@@ -170,6 +170,6 @@ type Database interface {
 	GetBountiesByPhaseUuid(phaseUuid string) []Bounty
 	GetFeaturePhasesBountiesCount(bountyType string, phaseUuid string) int64
 	GetPendingPaymentHistory() []NewPaymentHistory
-	GetPendingPaymentByBountyId(bountyId uint) NewPaymentHistory
+	GetPaymentByBountyId(bountyId uint) NewPaymentHistory
 	SetPaymentAsComplete(tag string) bool
 }
