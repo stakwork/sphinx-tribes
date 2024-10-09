@@ -1575,14 +1575,27 @@ func TestUpdateBountyPaymentStatus(t *testing.T) {
 
 	bHandler := NewBountyHandler(mockHttpClient, db.TestDB)
 
+	mockPendingGetInvoiceStatusByTag := func(tag string) db.V2TagRes {
+		return db.V2TagRes{
+			Status: db.PaymentPending,
+			Tag:    tag,
+			Error:  "",
+		}
+
+	}
+	mockCompleteGetInvoiceStatusByTag := func(tag string) db.V2TagRes {
+		return db.V2TagRes{
+			Status: db.PaymentComplete,
+			Tag:    tag,
+			Error:  "",
+		}
+	}
+
 	var processingTimes []time.Time
 	var mutex sync.Mutex
 
 	now := time.Now().UnixMilli()
 	bountyOwnerId := "owner_pubkey"
-
-	botURL := os.Getenv("V2_BOT_URL")
-	botToken := os.Getenv("V2_BOT_TOKEN")
 
 	person := db.Person{
 		Uuid:           "update_payment_uuid",
@@ -1706,24 +1719,15 @@ func TestUpdateBountyPaymentStatus(t *testing.T) {
 	t.Run("Should test that a PENDING payment_status is sent if the payment is not successful", func(t *testing.T) {
 		mockHttpClient := &mocks.HttpClient{}
 
-		bHandler2 := NewBountyHandler(mockHttpClient, db.TestDB)
-
-		expectedV2Url := fmt.Sprintf("%s/sends/%s", botURL, payment.Tag)
-		r := io.NopCloser(bytes.NewReader([]byte(`{"status": "PENDING", "tag": "update_tag", "ts": 1223444, "error": "" }`)))
-
-		mockHttpClient.On("Do", mock.MatchedBy(func(req *http.Request) bool {
-			return req.Method == http.MethodGet && expectedV2Url == req.URL.String() && req.Header.Get("x-admin-token") == botToken
-		})).Return(&http.Response{
-			StatusCode: 406,
-			Body:       r,
-		}, nil).Once()
+		bHandler := NewBountyHandler(mockHttpClient, db.TestDB)
+		bHandler.getInvoiceStatusByTag = mockPendingGetInvoiceStatusByTag
 
 		ro := chi.NewRouter()
-		ro.Post("/gobounties/payment/status/{id}", bHandler2.UpdateBountyPaymentStatus)
+		ro.Put("/gobounties/payment/status/{id}", bHandler.UpdateBountyPaymentStatus)
 
-		requestBody := bytes.NewBuffer([]byte("{}"))
 		rr := httptest.NewRecorder()
-		req, err := http.NewRequestWithContext(authorizedCtx, http.MethodPost, "/gobounties/payment/status/"+bountyIdStr, requestBody)
+		requestBody := bytes.NewBuffer([]byte("{}"))
+		req, err := http.NewRequestWithContext(authorizedCtx, http.MethodPut, "/gobounties/payment/status/"+bountyIdStr, requestBody)
 		if err != nil {
 			t.Fatal(err)
 		}
@@ -1734,23 +1738,17 @@ func TestUpdateBountyPaymentStatus(t *testing.T) {
 	})
 
 	t.Run("Should test that a COMPLETE payment_status is sent if the payment is successful", func(t *testing.T) {
+		mockHttpClient := &mocks.HttpClient{}
 
-		expectedV2Url := fmt.Sprintf("%s/sends/%s", botURL, payment.Tag)
-		r := io.NopCloser(bytes.NewReader([]byte(`{"status": "COMPLETE", "tag": "update_tag", "ts": 1223444, "error": "" }`)))
-
-		mockHttpClient.On("Do", mock.MatchedBy(func(req *http.Request) bool {
-			return req.Method == http.MethodGet && expectedV2Url == req.URL.String() && req.Header.Get("x-admin-token") == botToken
-		})).Return(&http.Response{
-			StatusCode: 200,
-			Body:       r,
-		}, nil).Once()
+		bHandler := NewBountyHandler(mockHttpClient, db.TestDB)
+		bHandler.getInvoiceStatusByTag = mockCompleteGetInvoiceStatusByTag
 
 		ro := chi.NewRouter()
-		ro.Post("/gobounties/payment/status/{id}", bHandler.UpdateBountyPaymentStatus)
+		ro.Put("/gobounties/payment/status/{id}", bHandler.UpdateBountyPaymentStatus)
 
 		requestBody := bytes.NewBuffer([]byte("{}"))
 		rr := httptest.NewRecorder()
-		req, err := http.NewRequestWithContext(authorizedCtx, http.MethodPost, "/gobounties/payment/status/"+bountyIdStr, requestBody)
+		req, err := http.NewRequestWithContext(authorizedCtx, http.MethodPut, "/gobounties/payment/status/"+bountyIdStr, requestBody)
 		if err != nil {
 			t.Fatal(err)
 		}
@@ -1766,11 +1764,11 @@ func TestUpdateBountyPaymentStatus(t *testing.T) {
 
 	t.Run("405 when trying to update an already-paid bounty", func(t *testing.T) {
 		r := chi.NewRouter()
-		r.Post("/gobounties/payment/status/{id}", bHandler.UpdateBountyPaymentStatus)
+		r.Put("/gobounties/payment/status/{id}", bHandler.UpdateBountyPaymentStatus)
 
 		requestBody := bytes.NewBuffer([]byte("{}"))
 		rr := httptest.NewRecorder()
-		req, err := http.NewRequestWithContext(authorizedCtx, http.MethodPost, "/gobounties/payment/status/"+bountyIdStr, requestBody)
+		req, err := http.NewRequestWithContext(authorizedCtx, http.MethodPut, "/gobounties/payment/status/"+bountyIdStr, requestBody)
 		if err != nil {
 			t.Fatal(err)
 		}

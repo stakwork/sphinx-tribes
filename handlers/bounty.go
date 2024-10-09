@@ -25,6 +25,7 @@ type bountyHandler struct {
 	getSocketConnections     func(host string) (db.Client, error)
 	generateBountyResponse   func(bounties []db.NewBounty) []db.BountyResponse
 	userHasAccess            func(pubKeyFromAuth string, uuid string, role string) bool
+	getInvoiceStatusByTag    func(tag string) db.V2TagRes
 	userHasManageBountyRoles func(pubKeyFromAuth string, uuid string) bool
 	m                        sync.Mutex
 }
@@ -37,6 +38,7 @@ func NewBountyHandler(httpClient HttpClient, database db.Database) *bountyHandle
 		db:                       database,
 		getSocketConnections:     db.Store.GetSocketConnections,
 		userHasAccess:            dbConf.UserHasAccess,
+		getInvoiceStatusByTag:    GetInvoiceStatusByTag,
 		userHasManageBountyRoles: dbConf.UserHasManageBountyRoles,
 	}
 }
@@ -796,8 +798,9 @@ func (h *bountyHandler) UpdateBountyPaymentStatus(w http.ResponseWriter, r *http
 	}
 
 	payment := h.db.GetPendingPaymentByBountyId(bounty.ID)
+
 	tag := payment.Tag
-	tagResult := GetInvoiceStatusByTag(tag)
+	tagResult := h.getInvoiceStatusByTag(tag)
 
 	msg := map[string]string{
 		"paymet_status": db.PaymentComplete,
