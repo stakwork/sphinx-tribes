@@ -4252,6 +4252,99 @@ func (_c *Database_GetPaymentHistoryByCreated_Call) RunAndReturn(run func(*time.
 	return _c
 }
 
+// GetPendingPaymentByBountyId provides a mock function with given fields: bountyId
+func (_m *Database) GetPendingPaymentByBountyId(bountyId uint) db.NewPaymentHistory {
+	ret := _m.Called(bountyId)
+
+	if len(ret) == 0 {
+		panic("no return value specified for GetPendingPaymentByBountyId")
+	}
+
+	var r0 db.NewPaymentHistory
+	if rf, ok := ret.Get(0).(func(uint) db.NewPaymentHistory); ok {
+		r0 = rf(bountyId)
+	} else {
+		r0 = ret.Get(0).(db.NewPaymentHistory)
+	}
+
+	return r0
+}
+
+// Database_GetPendingPaymentByBountyId_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'GetPendingPaymentByBountyId'
+type Database_GetPendingPaymentByBountyId_Call struct {
+	*mock.Call
+}
+
+// GetPendingPaymentByBountyId is a helper method to define mock.On call
+//   - bountyId uint
+func (_e *Database_Expecter) GetPendingPaymentByBountyId(bountyId interface{}) *Database_GetPendingPaymentByBountyId_Call {
+	return &Database_GetPendingPaymentByBountyId_Call{Call: _e.mock.On("GetPendingPaymentByBountyId", bountyId)}
+}
+
+func (_c *Database_GetPendingPaymentByBountyId_Call) Run(run func(bountyId uint)) *Database_GetPendingPaymentByBountyId_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(uint))
+	})
+	return _c
+}
+
+func (_c *Database_GetPendingPaymentByBountyId_Call) Return(_a0 db.NewPaymentHistory) *Database_GetPendingPaymentByBountyId_Call {
+	_c.Call.Return(_a0)
+	return _c
+}
+
+func (_c *Database_GetPendingPaymentByBountyId_Call) RunAndReturn(run func(uint) db.NewPaymentHistory) *Database_GetPendingPaymentByBountyId_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
+// GetPendingPaymentHistory provides a mock function with given fields:
+func (_m *Database) GetPendingPaymentHistory() []db.NewPaymentHistory {
+	ret := _m.Called()
+
+	if len(ret) == 0 {
+		panic("no return value specified for GetPendingPaymentHistory")
+	}
+
+	var r0 []db.NewPaymentHistory
+	if rf, ok := ret.Get(0).(func() []db.NewPaymentHistory); ok {
+		r0 = rf()
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).([]db.NewPaymentHistory)
+		}
+	}
+
+	return r0
+}
+
+// Database_GetPendingPaymentHistory_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'GetPendingPaymentHistory'
+type Database_GetPendingPaymentHistory_Call struct {
+	*mock.Call
+}
+
+// GetPendingPaymentHistory is a helper method to define mock.On call
+func (_e *Database_Expecter) GetPendingPaymentHistory() *Database_GetPendingPaymentHistory_Call {
+	return &Database_GetPendingPaymentHistory_Call{Call: _e.mock.On("GetPendingPaymentHistory")}
+}
+
+func (_c *Database_GetPendingPaymentHistory_Call) Run(run func()) *Database_GetPendingPaymentHistory_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run()
+	})
+	return _c
+}
+
+func (_c *Database_GetPendingPaymentHistory_Call) Return(_a0 []db.NewPaymentHistory) *Database_GetPendingPaymentHistory_Call {
+	_c.Call.Return(_a0)
+	return _c
+}
+
+func (_c *Database_GetPendingPaymentHistory_Call) RunAndReturn(run func() []db.NewPaymentHistory) *Database_GetPendingPaymentHistory_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
 // GetPeopleBySearch provides a mock function with given fields: r
 func (_m *Database) GetPeopleBySearch(r *http.Request) []db.Person {
 	ret := _m.Called(r)
@@ -6829,6 +6922,52 @@ func (_c *Database_SearchTribes_Call) Return(_a0 []db.Tribe) *Database_SearchTri
 }
 
 func (_c *Database_SearchTribes_Call) RunAndReturn(run func(string) []db.Tribe) *Database_SearchTribes_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
+// SetPaymentAsComplete provides a mock function with given fields: tag
+func (_m *Database) SetPaymentAsComplete(tag string) bool {
+	ret := _m.Called(tag)
+
+	if len(ret) == 0 {
+		panic("no return value specified for SetPaymentAsComplete")
+	}
+
+	var r0 bool
+	if rf, ok := ret.Get(0).(func(string) bool); ok {
+		r0 = rf(tag)
+	} else {
+		r0 = ret.Get(0).(bool)
+	}
+
+	return r0
+}
+
+// Database_SetPaymentAsComplete_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'SetPaymentAsComplete'
+type Database_SetPaymentAsComplete_Call struct {
+	*mock.Call
+}
+
+// SetPaymentAsComplete is a helper method to define mock.On call
+//   - tag string
+func (_e *Database_Expecter) SetPaymentAsComplete(tag interface{}) *Database_SetPaymentAsComplete_Call {
+	return &Database_SetPaymentAsComplete_Call{Call: _e.mock.On("SetPaymentAsComplete", tag)}
+}
+
+func (_c *Database_SetPaymentAsComplete_Call) Run(run func(tag string)) *Database_SetPaymentAsComplete_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(string))
+	})
+	return _c
+}
+
+func (_c *Database_SetPaymentAsComplete_Call) Return(_a0 bool) *Database_SetPaymentAsComplete_Call {
+	_c.Call.Return(_a0)
+	return _c
+}
+
+func (_c *Database_SetPaymentAsComplete_Call) RunAndReturn(run func(string) bool) *Database_SetPaymentAsComplete_Call {
 	_c.Call.Return(run)
 	return _c
 }
