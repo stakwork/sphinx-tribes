@@ -1565,6 +1565,224 @@ func TestMakeBountyPayment(t *testing.T) {
 	})
 }
 
+func TestUpdateBountyPaymentStatus(t *testing.T) {
+	ctx := context.Background()
+
+	teardownSuite := SetupSuite(t)
+	defer teardownSuite(t)
+
+	mockHttpClient := &mocks.HttpClient{}
+
+	bHandler := NewBountyHandler(mockHttpClient, db.TestDB)
+
+	paymentTag := "update_tag"
+
+	mockPendingGetInvoiceStatusByTag := func(tag string) db.V2TagRes {
+		return db.V2TagRes{
+			Status: db.PaymentPending,
+			Tag:    paymentTag,
+			Error:  "",
+		}
+
+	}
+	mockCompleteGetInvoiceStatusByTag := func(tag string) db.V2TagRes {
+		return db.V2TagRes{
+			Status: db.PaymentComplete,
+			Tag:    paymentTag,
+			Error:  "",
+		}
+	}
+
+	var processingTimes []time.Time
+	var mutex sync.Mutex
+
+	now := time.Now().UnixMilli()
+	bountyOwnerId := "owner_pubkey"
+
+	person := db.Person{
+		Uuid:           "update_payment_uuid",
+		OwnerAlias:     "update_alias",
+		UniqueName:     "update_unique_name",
+		OwnerPubKey:    "03b2205df68d90f8f9913650bc3161761b61d743e615a9faa7ffecea3380a99fg1",
+		OwnerRouteHint: "02162c52716637fb8120ab0261e410b185d268d768cc6f6227c58102d194ad0bc2_1088607703554",
+		PriceToMeet:    0,
+		Description:    "update_description",
+	}
+
+	db.TestDB.CreateOrEditPerson(person)
+
+	workspace := db.Workspace{
+		Uuid:        "update_workspace_uuid",
+		Name:        "update_workspace_name",
+		OwnerPubKey: person.OwnerPubKey,
+		Github:      "gtihub",
+		Website:     "website",
+		Description: "update_description",
+	}
+	db.TestDB.CreateOrEditWorkspace(workspace)
+
+	budgetAmount := uint(10000)
+	bountyBudget := db.NewBountyBudget{
+		WorkspaceUuid: workspace.Uuid,
+		TotalBudget:   budgetAmount,
+	}
+	db.TestDB.CreateWorkspaceBudget(bountyBudget)
+
+	bountyAmount := uint(3000)
+	bounty := db.NewBounty{
+		OwnerID:       bountyOwnerId,
+		Price:         bountyAmount,
+		Created:       now,
+		Type:          "coding",
+		Title:         "updateBountyTitle",
+		Description:   "updateBountyDescription",
+		Assignee:      person.OwnerPubKey,
+		Show:          true,
+		WorkspaceUuid: workspace.Uuid,
+		Paid:          false,
+	}
+	db.TestDB.CreateOrEditBounty(bounty)
+
+	dbBounty, err := db.TestDB.GetBountyDataByCreated(strconv.FormatInt(bounty.Created, 10))
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	bountyId := dbBounty[0].ID
+	bountyIdStr := strconv.FormatInt(int64(bountyId), 10)
+
+	paymentTime := time.Now()
+
+	payment := db.NewPaymentHistory{
+		BountyId:       bountyId,
+		PaymentStatus:  db.PaymentPending,
+		WorkspaceUuid:  workspace.Uuid,
+		PaymentType:    db.Payment,
+		SenderPubKey:   person.OwnerPubKey,
+		ReceiverPubKey: person.OwnerPubKey,
+		Tag:            paymentTag,
+		Status:         true,
+		Created:        &paymentTime,
+		Updated:        &paymentTime,
+	}
+
+	db.TestDB.AddPaymentHistory(payment)
+
+	unauthorizedCtx := context.WithValue(ctx, auth.ContextKey, "")
+	authorizedCtx := context.WithValue(ctx, auth.ContextKey, person.OwnerPubKey)
+
+	t.Run("mutex lock ensures sequential access", func(t *testing.T) {
+		server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			mutex.Lock()
+			processingTimes = append(processingTimes, time.Now())
+			time.Sleep(10 * time.Millisecond)
+			mutex.Unlock()
+
+			bHandler.UpdateBountyPaymentStatus(w, r)
+		}))
+		defer server.Close()
+
+		var wg sync.WaitGroup
+		for i := 0; i < 3; i++ {
+			wg.Add(1)
+			go func() {
+				defer wg.Done()
+				_, err := http.Get(server.URL)
+				if err != nil {
+					t.Errorf("Failed to send request: %v", err)
+				}
+			}()
+		}
+		wg.Wait()
+
+		for i := 1; i < len(processingTimes); i++ {
+			assert.True(t, processingTimes[i].After(processingTimes[i-1]),
+				"Expected processing times to be sequential, indicating mutex is locking effectively.")
+		}
+	})
+
+	t.Run("401 unauthorized error when unauthorized user hits endpoint", func(t *testing.T) {
+
+		r := chi.NewRouter()
+		r.Post("/gobounties/payment/status/{id}", bHandler.UpdateBountyPaymentStatus)
+
+		rr := httptest.NewRecorder()
+		req, err := http.NewRequestWithContext(unauthorizedCtx, http.MethodPost, "/gobounties/payment/status/"+bountyIdStr, nil)
+
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		r.ServeHTTP(rr, req)
+
+		assert.Equal(t, http.StatusUnauthorized, rr.Code, "Expected 401 Unauthorized for unauthorized access")
+	})
+
+	t.Run("Should test that a PENDING payment_status is sent if the payment is not successful", func(t *testing.T) {
+		mockHttpClient := &mocks.HttpClient{}
+
+		bHandler := NewBountyHandler(mockHttpClient, db.TestDB)
+		bHandler.getInvoiceStatusByTag = mockPendingGetInvoiceStatusByTag
+
+		ro := chi.NewRouter()
+		ro.Put("/gobounties/payment/status/{id}", bHandler.UpdateBountyPaymentStatus)
+
+		rr := httptest.NewRecorder()
+		requestBody := bytes.NewBuffer([]byte("{}"))
+		req, err := http.NewRequestWithContext(authorizedCtx, http.MethodPut, "/gobounties/payment/status/"+bountyIdStr, requestBody)
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		ro.ServeHTTP(rr, req)
+		assert.Equal(t, http.StatusNotModified, rr.Code)
+		mockHttpClient.AssertExpectations(t)
+	})
+
+	t.Run("Should test that a COMPLETE payment_status is sent if the payment is successful", func(t *testing.T) {
+		mockHttpClient := &mocks.HttpClient{}
+
+		bHandler := NewBountyHandler(mockHttpClient, db.TestDB)
+		bHandler.getInvoiceStatusByTag = mockCompleteGetInvoiceStatusByTag
+
+		ro := chi.NewRouter()
+		ro.Put("/gobounties/payment/status/{id}", bHandler.UpdateBountyPaymentStatus)
+
+		requestBody := bytes.NewBuffer([]byte("{}"))
+		rr := httptest.NewRecorder()
+		req, err := http.NewRequestWithContext(authorizedCtx, http.MethodPut, "/gobounties/payment/status/"+bountyIdStr, requestBody)
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		ro.ServeHTTP(rr, req)
+
+		assert.Equal(t, http.StatusOK, rr.Code)
+		mockHttpClient.AssertExpectations(t)
+
+		payment := db.TestDB.GetPaymentByBountyId(payment.BountyId)
+
+		updatedBounty := db.TestDB.GetBounty(bountyId)
+		assert.True(t, updatedBounty.Paid, "Expected bounty to be marked as paid")
+		assert.Equal(t, payment.PaymentStatus, db.PaymentComplete, "Expected Payment Status To be Complete")
+	})
+
+	t.Run("405 when trying to update an already-paid bounty", func(t *testing.T) {
+		r := chi.NewRouter()
+		r.Put("/gobounties/payment/status/{id}", bHandler.UpdateBountyPaymentStatus)
+
+		requestBody := bytes.NewBuffer([]byte("{}"))
+		rr := httptest.NewRecorder()
+		req, err := http.NewRequestWithContext(authorizedCtx, http.MethodPut, "/gobounties/payment/status/"+bountyIdStr, requestBody)
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		r.ServeHTTP(rr, req)
+		assert.Equal(t, http.StatusMethodNotAllowed, rr.Code, "Expected 405 Method Not Allowed for an already-paid bounty")
+	})
+}
+
 func TestBountyBudgetWithdraw(t *testing.T) {
 	teardownSuite := SetupSuite(t)
 	defer teardownSuite(t)

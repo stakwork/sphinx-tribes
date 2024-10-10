@@ -493,6 +493,16 @@ func (db database) GetPendingPaymentHistory() []NewPaymentHistory {
 	return paymentHistories
 }
 
+func (db database) GetPaymentByBountyId(bountyId uint) NewPaymentHistory {
+	paymentHistories := NewPaymentHistory{}
+
+	query := fmt.Sprintf("SELECT * FROM payment_histories WHERE bounty_id = %d AND status = true ORDER BY created DESC", bountyId)
+
+	db.db.Raw(query).Find(&paymentHistories)
+
+	return paymentHistories
+}
+
 func (db database) SetPaymentAsComplete(tag string) bool {
 	db.db.Model(NewPaymentHistory{}).Where("tag = ?", tag).Update("payment_status", PaymentComplete)
 	return true
