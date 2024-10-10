@@ -842,7 +842,7 @@ func (h *bountyHandler) UpdateBountyPaymentStatus(w http.ResponseWriter, r *http
 	tagResult := h.getInvoiceStatusByTag(tag)
 
 	msg := map[string]string{
-		"paymet_status": db.PaymentComplete,
+		"payment_status": db.PaymentComplete,
 	}
 
 	if tagResult.Status == db.PaymentComplete {
