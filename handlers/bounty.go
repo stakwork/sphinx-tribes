@@ -755,6 +755,46 @@ func (h *bountyHandler) MakeBountyPayment(w http.ResponseWriter, r *http.Request
 	h.m.Unlock()
 }
 
+func (h *bountyHandler) GetBountyPaymentStatus(w http.ResponseWriter, r *http.Request) {
+	h.m.Lock()
+
+	ctx := r.Context()
+	pubKeyFromAuth, _ := ctx.Value(auth.ContextKey).(string)
+	idParam := chi.URLParam(r, "id")
+
+	id, err := utils.ConvertStringToUint(idParam)
+	if err != nil {
+		fmt.Println("[bounty] could not parse id")
+		w.WriteHeader(http.StatusForbidden)
+		h.m.Unlock()
+		return
+	}
+
+	if pubKeyFromAuth == "" {
+		fmt.Println("[bounty] no pubkey from auth")
+		w.WriteHeader(http.StatusUnauthorized)
+		h.m.Unlock()
+		return
+	}
+
+	bounty := h.db.GetBounty(id)
+
+	// check if the bounty has been paid already to avoid double payment
+	if bounty.Paid {
+		w.WriteHeader(http.StatusMethodNotAllowed)
+		json.NewEncoder(w).Encode("Bounty has already been paid")
+		h.m.Unlock()
+		return
+	}
+
+	payment := h.db.GetPaymentByBountyId(bounty.ID)
+
+	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode(payment)
+
+	h.m.Unlock()
+}
+
 func (h *bountyHandler) UpdateBountyPaymentStatus(w http.ResponseWriter, r *http.Request) {
 	h.m.Lock()
 
@@ -804,7 +844,7 @@ func (h *bountyHandler) UpdateBountyPaymentStatus(w http.ResponseWriter, r *http
 	tagResult := h.getInvoiceStatusByTag(tag)
 
 	msg := map[string]string{
-		"paymet_status": db.PaymentComplete,
+		"payment_status": db.PaymentComplete,
 	}
 
 	if tagResult.Status == db.PaymentComplete {
@@ -824,6 +864,8 @@ func (h *bountyHandler) UpdateBountyPaymentStatus(w http.ResponseWriter, r *http
 
 		w.WriteHeader(http.StatusOK)
 		json.NewEncoder(w).Encode(msg)
+
+		h.m.Unlock()
 
 		return
 	}
