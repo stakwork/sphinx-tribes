@@ -789,8 +789,10 @@ func (h *bountyHandler) GetBountyPaymentStatus(w http.ResponseWriter, r *http.Re
 
 	payment := h.db.GetPaymentByBountyId(bounty.ID)
 
-	w.WriteHeader(http.StatusNotModified)
+	w.WriteHeader(http.StatusOK)
 	json.NewEncoder(w).Encode(payment)
+
+	h.m.Unlock()
 }
 
 func (h *bountyHandler) UpdateBountyPaymentStatus(w http.ResponseWriter, r *http.Request) {
