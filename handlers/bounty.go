@@ -865,6 +865,8 @@ func (h *bountyHandler) UpdateBountyPaymentStatus(w http.ResponseWriter, r *http
 		w.WriteHeader(http.StatusOK)
 		json.NewEncoder(w).Encode(msg)
 
+		h.m.Unlock()
+
 		return
 	}
 
