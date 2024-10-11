@@ -789,6 +789,17 @@ func (h *bountyHandler) GetBountyPaymentStatus(w http.ResponseWriter, r *http.Re
 
 	payment := h.db.GetPaymentByBountyId(bounty.ID)
 
+	if payment.Tag == "" {
+		w.WriteHeader(http.StatusBadRequest)
+		res := db.NewPaymentHistory{
+			Status:        false,
+			PaymentStatus: db.PaymentNotFound,
+		}
+		json.NewEncoder(w).Encode(res)
+		h.m.Unlock()
+		return
+	}
+
 	w.WriteHeader(http.StatusOK)
 	json.NewEncoder(w).Encode(payment)
 
@@ -867,13 +878,12 @@ func (h *bountyHandler) UpdateBountyPaymentStatus(w http.ResponseWriter, r *http
 			json.NewEncoder(w).Encode(msg)
 
 			h.m.Unlock()
-
 			return
 		}
 	}
 
 	msg := map[string]string{
-		"payment_status": "No payment",
+		"payment_status": db.PaymentNotFound,
 	}
 
 	w.WriteHeader(http.StatusBadRequest)
