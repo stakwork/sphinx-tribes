@@ -839,38 +839,44 @@ func (h *bountyHandler) UpdateBountyPaymentStatus(w http.ResponseWriter, r *http
 
 	payment := h.db.GetPaymentByBountyId(bounty.ID)
 
-	tag := payment.Tag
+	if payment.Tag != "" {
+		tag := payment.Tag
 
-	tagResult := h.getInvoiceStatusByTag(tag)
+		tagResult := h.getInvoiceStatusByTag(tag)
 
-	msg := map[string]string{
-		"payment_status": db.PaymentComplete,
-	}
-
-	if tagResult.Status == db.PaymentComplete {
-		// Update only if it is still pending
-		if payment.PaymentStatus == db.PaymentPending {
-			h.db.SetPaymentAsComplete(tag)
+		msg := map[string]string{
+			"payment_status": tagResult.Status,
 		}
 
-		now := time.Now()
+		if tagResult.Status == db.PaymentComplete {
+			// Update only if it is still pending
+			if payment.PaymentStatus == db.PaymentPending {
+				h.db.SetPaymentAsComplete(tag)
+			}
 
-		bounty.Paid = true
-		bounty.PaidDate = &now
-		bounty.Completed = true
-		bounty.CompletionDate = &now
+			now := time.Now()
 
-		h.db.UpdateBounty(bounty)
+			bounty.Paid = true
+			bounty.PaidDate = &now
+			bounty.Completed = true
+			bounty.CompletionDate = &now
 
-		w.WriteHeader(http.StatusOK)
-		json.NewEncoder(w).Encode(msg)
+			h.db.UpdateBounty(bounty)
 
-		h.m.Unlock()
+			w.WriteHeader(http.StatusOK)
+			json.NewEncoder(w).Encode(msg)
 
-		return
+			h.m.Unlock()
+
+			return
+		}
 	}
 
-	w.WriteHeader(http.StatusNotModified)
+	msg := map[string]string{
+		"payment_status": "No payment",
+	}
+
+	w.WriteHeader(http.StatusBadRequest)
 	json.NewEncoder(w).Encode(msg)
 
 	h.m.Unlock()
