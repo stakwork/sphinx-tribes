@@ -10,6 +10,7 @@ const (
 	PaymentComplete = "COMPLETE"
 	PaymentFailed   = "FAILED"
 	PaymentPending  = "PENDING"
+	PaymentNotFound = "NOTPAID"
 )
 
 type V2InvoiceResponse struct {
