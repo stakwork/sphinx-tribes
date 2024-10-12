@@ -658,7 +658,7 @@ func (h *bountyHandler) MakeBountyPayment(w http.ResponseWriter, r *http.Request
 				}
 			} else { // Send payment status
 				log.Println("Keysend payment not completed ===")
-				msg["msg"] = v2KeysendRes.Status
+				msg["msg"] = "keysend_error"
 				msg["invoice"] = ""
 
 				socket, err := h.getSocketConnections(request.Websocket_token)
