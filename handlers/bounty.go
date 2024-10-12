@@ -596,14 +596,18 @@ func (h *bountyHandler) MakeBountyPayment(w http.ResponseWriter, r *http.Request
 			return
 		}
 
+		log.Printf("[bounty] After Making Bounty V2 Payment: amount: %d, pubkey: %s, route_hint: %s", amount, assignee.OwnerPubKey, assignee.OwnerRouteHint)
+
 		defer res.Body.Close()
 		body, err = io.ReadAll(res.Body)
 		if err != nil {
-			fmt.Println("[read body]", err)
+			log.Println("[read body failed]", err)
 			w.WriteHeader(http.StatusNotAcceptable)
 			h.m.Unlock()
 			return
 		}
+
+		log.Println("[bounty] After Reading Keysend V2 Payment Body ===")
 
 		msg := make(map[string]interface{})
 		// payment is successful add to payment history
@@ -614,7 +618,7 @@ func (h *bountyHandler) MakeBountyPayment(w http.ResponseWriter, r *http.Request
 			err = json.Unmarshal(body, &v2KeysendRes)
 
 			if err != nil {
-				fmt.Println("[Unmarshal]", err)
+				fmt.Println("[Unmarshal failed]", err)
 				w.WriteHeader(http.StatusNotAcceptable)
 				h.m.Unlock()
 				return
@@ -653,6 +657,7 @@ func (h *bountyHandler) MakeBountyPayment(w http.ResponseWriter, r *http.Request
 					socket.Conn.WriteJSON(msg)
 				}
 			} else { // Send payment status
+				log.Println("Keysend payment not completed ===")
 				msg["msg"] = v2KeysendRes.Status
 				msg["invoice"] = ""
 
@@ -660,8 +665,11 @@ func (h *bountyHandler) MakeBountyPayment(w http.ResponseWriter, r *http.Request
 				if err == nil {
 					socket.Conn.WriteJSON(msg)
 				}
+				h.m.Unlock()
+				return
 			}
 		} else { // Send Payment error
+			log.Println("Keysend payment error ===")
 			msg["msg"] = "keysend_error"
 			msg["invoice"] = ""
 
@@ -669,6 +677,9 @@ func (h *bountyHandler) MakeBountyPayment(w http.ResponseWriter, r *http.Request
 			if err == nil {
 				socket.Conn.WriteJSON(msg)
 			}
+
+			h.m.Unlock()
+			return
 		}
 	} else { // Process v1 payment
 		url := fmt.Sprintf("%s/payment", config.RelayUrl)
@@ -741,6 +752,8 @@ func (h *bountyHandler) MakeBountyPayment(w http.ResponseWriter, r *http.Request
 			if err == nil {
 				socket.Conn.WriteJSON(msg)
 			}
+			h.m.Unlock()
+			return
 		} else {
 			msg["msg"] = "keysend_error"
 			msg["invoice"] = ""
@@ -749,6 +762,9 @@ func (h *bountyHandler) MakeBountyPayment(w http.ResponseWriter, r *http.Request
 			if err == nil {
 				socket.Conn.WriteJSON(msg)
 			}
+
+			h.m.Unlock()
+			return
 		}
 	}
 
