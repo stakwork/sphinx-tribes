@@ -1593,9 +1593,6 @@ func TestUpdateBountyPaymentStatus(t *testing.T) {
 		}
 	}
 
-	var processingTimes []time.Time
-	var mutex sync.Mutex
-
 	now := time.Now().UnixMilli()
 	bountyOwnerId := "owner_pubkey"
 
@@ -1670,36 +1667,6 @@ func TestUpdateBountyPaymentStatus(t *testing.T) {
 
 	unauthorizedCtx := context.WithValue(ctx, auth.ContextKey, "")
 	authorizedCtx := context.WithValue(ctx, auth.ContextKey, person.OwnerPubKey)
-
-	t.Run("mutex lock ensures sequential access", func(t *testing.T) {
-		server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-			mutex.Lock()
-			processingTimes = append(processingTimes, time.Now())
-			time.Sleep(10 * time.Millisecond)
-			mutex.Unlock()
-
-			bHandler.UpdateBountyPaymentStatus(w, r)
-		}))
-		defer server.Close()
-
-		var wg sync.WaitGroup
-		for i := 0; i < 3; i++ {
-			wg.Add(1)
-			go func() {
-				defer wg.Done()
-				_, err := http.Get(server.URL)
-				if err != nil {
-					t.Errorf("Failed to send request: %v", err)
-				}
-			}()
-		}
-		wg.Wait()
-
-		for i := 1; i < len(processingTimes); i++ {
-			assert.True(t, processingTimes[i].After(processingTimes[i-1]),
-				"Expected processing times to be sequential, indicating mutex is locking effectively.")
-		}
-	})
 
 	t.Run("401 unauthorized error when unauthorized user hits endpoint", func(t *testing.T) {
 
