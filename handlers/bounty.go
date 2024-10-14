@@ -624,24 +624,25 @@ func (h *bountyHandler) MakeBountyPayment(w http.ResponseWriter, r *http.Request
 				return
 			}
 
+			log.Printf("[bounty] V2 Status After Making Bounty V2 Payment: amount: %d, pubkey: %s, route_hint: %s is : %s", amount, assignee.OwnerPubKey, assignee.OwnerRouteHint, v2KeysendRes.Status)
+
+			now := time.Now()
+			paymentHistory := db.NewPaymentHistory{
+				Amount:         amount,
+				SenderPubKey:   pubKeyFromAuth,
+				ReceiverPubKey: assignee.OwnerPubKey,
+				WorkspaceUuid:  bounty.WorkspaceUuid,
+				BountyId:       id,
+				Created:        &now,
+				Updated:        &now,
+				Status:         true,
+				PaymentType:    "payment",
+				Tag:            v2KeysendRes.Tag,
+				PaymentStatus:  v2KeysendRes.Status,
+			}
+
 			// if the payment has a completed status
 			if v2KeysendRes.Status == db.PaymentComplete {
-				now := time.Now()
-
-				paymentHistory := db.NewPaymentHistory{
-					Amount:         amount,
-					SenderPubKey:   pubKeyFromAuth,
-					ReceiverPubKey: assignee.OwnerPubKey,
-					WorkspaceUuid:  bounty.WorkspaceUuid,
-					BountyId:       id,
-					Created:        &now,
-					Updated:        &now,
-					Status:         true,
-					PaymentType:    "payment",
-					Tag:            v2KeysendRes.Tag,
-					PaymentStatus:  v2KeysendRes.Status,
-				}
-
 				bounty.Paid = true
 				bounty.PaidDate = &now
 				bounty.Completed = true
@@ -656,7 +657,12 @@ func (h *bountyHandler) MakeBountyPayment(w http.ResponseWriter, r *http.Request
 				if err == nil {
 					socket.Conn.WriteJSON(msg)
 				}
-			} else { // Send payment status
+			} else {
+				// Send payment status
+				log.Printf("[bounty] V2 Status Was not completed:  %s", v2KeysendRes.Status)
+
+				h.db.AddPaymentHistory(paymentHistory)
+
 				log.Println("Keysend payment not completed ===")
 				msg["msg"] = "keysend_error"
 				msg["invoice"] = ""
@@ -669,7 +675,7 @@ func (h *bountyHandler) MakeBountyPayment(w http.ResponseWriter, r *http.Request
 				return
 			}
 		} else { // Send Payment error
-			log.Println("Keysend payment error ===")
+			log.Println("Keysend payment error: Failed to send ===")
 			msg["msg"] = "keysend_error"
 			msg["invoice"] = ""
 
