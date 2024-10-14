@@ -627,6 +627,7 @@ func (h *bountyHandler) MakeBountyPayment(w http.ResponseWriter, r *http.Request
 			log.Printf("[bounty] V2 Status After Making Bounty V2 Payment: amount: %d, pubkey: %s, route_hint: %s is : %s", amount, assignee.OwnerPubKey, assignee.OwnerRouteHint, v2KeysendRes.Status)
 
 			now := time.Now()
+
 			paymentHistory := db.NewPaymentHistory{
 				Amount:         amount,
 				SenderPubKey:   pubKeyFromAuth,
@@ -778,8 +779,6 @@ func (h *bountyHandler) MakeBountyPayment(w http.ResponseWriter, r *http.Request
 }
 
 func (h *bountyHandler) GetBountyPaymentStatus(w http.ResponseWriter, r *http.Request) {
-	h.m.Lock()
-
 	ctx := r.Context()
 	pubKeyFromAuth, _ := ctx.Value(auth.ContextKey).(string)
 	idParam := chi.URLParam(r, "id")
@@ -788,14 +787,12 @@ func (h *bountyHandler) GetBountyPaymentStatus(w http.ResponseWriter, r *http.Re
 	if err != nil {
 		fmt.Println("[bounty] could not parse id")
 		w.WriteHeader(http.StatusForbidden)
-		h.m.Unlock()
 		return
 	}
 
 	if pubKeyFromAuth == "" {
 		fmt.Println("[bounty] no pubkey from auth")
 		w.WriteHeader(http.StatusUnauthorized)
-		h.m.Unlock()
 		return
 	}
 
@@ -805,7 +802,6 @@ func (h *bountyHandler) GetBountyPaymentStatus(w http.ResponseWriter, r *http.Re
 	if bounty.Paid {
 		w.WriteHeader(http.StatusMethodNotAllowed)
 		json.NewEncoder(w).Encode("Bounty has already been paid")
-		h.m.Unlock()
 		return
 	}
 
@@ -818,19 +814,14 @@ func (h *bountyHandler) GetBountyPaymentStatus(w http.ResponseWriter, r *http.Re
 			PaymentStatus: db.PaymentNotFound,
 		}
 		json.NewEncoder(w).Encode(res)
-		h.m.Unlock()
 		return
 	}
 
 	w.WriteHeader(http.StatusOK)
 	json.NewEncoder(w).Encode(payment)
-
-	h.m.Unlock()
 }
 
 func (h *bountyHandler) UpdateBountyPaymentStatus(w http.ResponseWriter, r *http.Request) {
-	h.m.Lock()
-
 	ctx := r.Context()
 	pubKeyFromAuth, _ := ctx.Value(auth.ContextKey).(string)
 	idParam := chi.URLParam(r, "id")
@@ -839,14 +830,12 @@ func (h *bountyHandler) UpdateBountyPaymentStatus(w http.ResponseWriter, r *http
 	if err != nil {
 		fmt.Println("[bounty] could not parse id")
 		w.WriteHeader(http.StatusForbidden)
-		h.m.Unlock()
 		return
 	}
 
 	if pubKeyFromAuth == "" {
 		fmt.Println("[bounty] no pubkey from auth")
 		w.WriteHeader(http.StatusUnauthorized)
-		h.m.Unlock()
 		return
 	}
 
@@ -858,7 +847,6 @@ func (h *bountyHandler) UpdateBountyPaymentStatus(w http.ResponseWriter, r *http
 
 	if bounty.ID != id {
 		w.WriteHeader(http.StatusNotFound)
-		h.m.Unlock()
 		return
 	}
 
@@ -866,7 +854,6 @@ func (h *bountyHandler) UpdateBountyPaymentStatus(w http.ResponseWriter, r *http
 	if bounty.Paid {
 		w.WriteHeader(http.StatusMethodNotAllowed)
 		json.NewEncoder(w).Encode("Bounty has already been paid")
-		h.m.Unlock()
 		return
 	}
 
@@ -898,8 +885,6 @@ func (h *bountyHandler) UpdateBountyPaymentStatus(w http.ResponseWriter, r *http
 
 			w.WriteHeader(http.StatusOK)
 			json.NewEncoder(w).Encode(msg)
-
-			h.m.Unlock()
 			return
 		}
 	}
@@ -910,8 +895,6 @@ func (h *bountyHandler) UpdateBountyPaymentStatus(w http.ResponseWriter, r *http
 
 	w.WriteHeader(http.StatusBadRequest)
 	json.NewEncoder(w).Encode(msg)
-
-	h.m.Unlock()
 }
 
 func (h *bountyHandler) BountyBudgetWithdraw(w http.ResponseWriter, r *http.Request) {
