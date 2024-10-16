@@ -58,5 +58,11 @@ func GetInvoiceStatusByTag(tag string) db.V2TagRes {
 		log.Printf("Could not unmarshall get tag result: %s", err)
 	}
 
-	return tagRes[0]
+	resultLength := len(tagRes)
+
+	if resultLength > 0 {
+		return tagRes[0]
+	}
+
+	return db.V2TagRes{}
 }
