@@ -4933,6 +4933,98 @@ func (_c *Database_GetPreviousWorkspaceBountyByCreated_Call) RunAndReturn(run fu
 	return _c
 }
 
+// GetSumOfDeposits provides a mock function with given fields: workspace_uuid
+func (_m *Database) GetSumOfDeposits(workspace_uuid string) uint {
+	ret := _m.Called(workspace_uuid)
+
+	if len(ret) == 0 {
+		panic("no return value specified for GetSumOfDeposits")
+	}
+
+	var r0 uint
+	if rf, ok := ret.Get(0).(func(string) uint); ok {
+		r0 = rf(workspace_uuid)
+	} else {
+		r0 = ret.Get(0).(uint)
+	}
+
+	return r0
+}
+
+// Database_GetSumOfDeposits_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'GetSumOfDeposits'
+type Database_GetSumOfDeposits_Call struct {
+	*mock.Call
+}
+
+// GetSumOfDeposits is a helper method to define mock.On call
+//   - workspace_uuid string
+func (_e *Database_Expecter) GetSumOfDeposits(workspace_uuid interface{}) *Database_GetSumOfDeposits_Call {
+	return &Database_GetSumOfDeposits_Call{Call: _e.mock.On("GetSumOfDeposits", workspace_uuid)}
+}
+
+func (_c *Database_GetSumOfDeposits_Call) Run(run func(workspace_uuid string)) *Database_GetSumOfDeposits_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(string))
+	})
+	return _c
+}
+
+func (_c *Database_GetSumOfDeposits_Call) Return(_a0 uint) *Database_GetSumOfDeposits_Call {
+	_c.Call.Return(_a0)
+	return _c
+}
+
+func (_c *Database_GetSumOfDeposits_Call) RunAndReturn(run func(string) uint) *Database_GetSumOfDeposits_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
+// GetSumOfWithdrawal provides a mock function with given fields: workspace_uuid
+func (_m *Database) GetSumOfWithdrawal(workspace_uuid string) uint {
+	ret := _m.Called(workspace_uuid)
+
+	if len(ret) == 0 {
+		panic("no return value specified for GetSumOfWithdrawal")
+	}
+
+	var r0 uint
+	if rf, ok := ret.Get(0).(func(string) uint); ok {
+		r0 = rf(workspace_uuid)
+	} else {
+		r0 = ret.Get(0).(uint)
+	}
+
+	return r0
+}
+
+// Database_GetSumOfWithdrawal_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'GetSumOfWithdrawal'
+type Database_GetSumOfWithdrawal_Call struct {
+	*mock.Call
+}
+
+// GetSumOfWithdrawal is a helper method to define mock.On call
+//   - workspace_uuid string
+func (_e *Database_Expecter) GetSumOfWithdrawal(workspace_uuid interface{}) *Database_GetSumOfWithdrawal_Call {
+	return &Database_GetSumOfWithdrawal_Call{Call: _e.mock.On("GetSumOfWithdrawal", workspace_uuid)}
+}
+
+func (_c *Database_GetSumOfWithdrawal_Call) Run(run func(workspace_uuid string)) *Database_GetSumOfWithdrawal_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(string))
+	})
+	return _c
+}
+
+func (_c *Database_GetSumOfWithdrawal_Call) Return(_a0 uint) *Database_GetSumOfWithdrawal_Call {
+	_c.Call.Return(_a0)
+	return _c
+}
+
+func (_c *Database_GetSumOfWithdrawal_Call) RunAndReturn(run func(string) uint) *Database_GetSumOfWithdrawal_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
 // GetTribe provides a mock function with given fields: uuid
 func (_m *Database) GetTribe(uuid string) db.Tribe {
 	ret := _m.Called(uuid)
