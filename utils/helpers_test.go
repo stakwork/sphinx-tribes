@@ -89,3 +89,11 @@ func TestConvertTimeToTimestamp(t *testing.T) {
 	assert.Greater(t, dateTimestamp1, 7000000)
 	assert.Greater(t, dateTimestamp2, 7000000)
 }
+
+func TestGetHoursDifference(t *testing.T) {
+	time1 := time.Now().Unix()
+	time2 := time.Now().Add(time.Hour * 1)
+
+	hourDiff := GetHoursDifference(time1, &time2)
+	assert.Equal(t, hourDiff, int64(1))
+}
