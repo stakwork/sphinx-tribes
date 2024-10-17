@@ -487,7 +487,7 @@ func (db database) GetPaymentHistory(workspace_uuid string, r *http.Request) []N
 func (db database) GetPendingPaymentHistory() []NewPaymentHistory {
 	paymentHistories := []NewPaymentHistory{}
 
-	query := `SELECT * FROM payment_histories WHERE payment_status = '` + PaymentPending + `' AND status = true ORDER BY created DESC`
+	query := `SELECT * FROM payment_histories WHERE payment_status = '` + PaymentPending + `' AND status = true AND payment_type = 'payment' ORDER BY created DESC`
 
 	db.db.Raw(query).Find(&paymentHistories)
 	return paymentHistories
@@ -610,6 +610,26 @@ func (db database) DeleteAllUsersFromWorkspace(workspace_uuid string) error {
 	}
 
 	return nil
+}
+
+func (db database) GetLastWithdrawal(workspace_uuid string) NewPaymentHistory {
+	p := NewPaymentHistory{}
+	db.db.Model(&NewPaymentHistory{}).Where("workspace_uuid", workspace_uuid).Where("payment_type", "withdraw").Order("created DESC").Limit(1).Find(&p)
+	return p
+}
+
+func (db database) GetSumOfDeposits(workspace_uuid string) uint {
+	var depositAmount uint
+	db.db.Model(&NewPaymentHistory{}).Where("workspace_uuid = ?", workspace_uuid).Where("status = ?", true).Where("payment_status = ?", "deposit").Select("SUM(amount)").Row().Scan(&depositAmount)
+
+	return depositAmount
+}
+
+func (db database) GetSumOfWithdrawal(workspace_uuid string) uint {
+	var depositAmount uint
+	db.db.Model(&NewPaymentHistory{}).Where("workspace_uuid = ?", workspace_uuid).Where("status = ?", true).Where("payment_status = ?", "withdraw").Select("SUM(amount)").Row().Scan(&depositAmount)
+
+	return depositAmount
 }
 
 func (db database) GetFeaturePhasesBountiesCount(bountyType string, phaseUuid string) int64 {
