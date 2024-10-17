@@ -5,6 +5,7 @@ import (
 	"encoding/base32"
 	"fmt"
 	"strconv"
+	"strings"
 	"time"
 
 	decodepay "github.com/nbd-wtf/ln-decodepay"
@@ -71,9 +72,37 @@ func GetInvoiceExpired(paymentRequest string) bool {
 	}
 }
 
+func ConvertTimeToTimestamp(date string) int {
+	format := "2006-01-02 15:04:05"
+
+	dateTouse := date
+
+	if strings.Contains(date, "+") {
+		dateSplit := strings.Split(date, "+")
+		dateTouse = dateSplit[0]
+	}
+
+	t, err := time.Parse(format, dateTouse)
+	if err != nil {
+		fmt.Println(err)
+	} else {
+		t = t.Add(time.Hour * 100)
+		fmt.Println(t.Unix())
+		return int(t.Unix())
+	}
+	return 0
+}
+
 func GetDateDaysDifference(createdDate int64, paidDate *time.Time) int64 {
 	firstDate := time.Unix(createdDate, 0)
-	difference := paidDate.Sub(*&firstDate)
+	difference := paidDate.Sub(firstDate)
 	days := int64(difference.Hours() / 24)
 	return days
+}
+
+func GetHoursDifference(createdDate int64, paidDate *time.Time) int64 {
+	firstDate := time.Unix(createdDate, 0)
+	difference := paidDate.Sub(firstDate)
+	hours := int64(difference.Hours())
+	return hours
 }
