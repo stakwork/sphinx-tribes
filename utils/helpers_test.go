@@ -78,3 +78,14 @@ func TestGetInvoiceExpired(t *testing.T) {
 	isInvoiceExpired := GetInvoiceExpired(expiredInvoice)
 	assert.Equal(t, true, isInvoiceExpired)
 }
+
+func TestConvertTimeToTimestamp(t *testing.T) {
+	dateWithPlus := "2024-10-16 09:21:21.743327+00"
+	dateWithoutPlus := "2024-10-16 09:21:21.743327"
+
+	dateTimestamp1 := ConvertTimeToTimestamp(dateWithPlus)
+	dateTimestamp2 := ConvertTimeToTimestamp(dateWithoutPlus)
+
+	assert.Greater(t, dateTimestamp1, 7000000)
+	assert.Greater(t, dateTimestamp2, 7000000)
+}

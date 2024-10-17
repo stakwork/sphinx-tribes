@@ -487,7 +487,7 @@ func (db database) GetPaymentHistory(workspace_uuid string, r *http.Request) []N
 func (db database) GetPendingPaymentHistory() []NewPaymentHistory {
 	paymentHistories := []NewPaymentHistory{}
 
-	query := `SELECT * FROM payment_histories WHERE payment_status = '` + PaymentPending + `' AND status = true ORDER BY created DESC`
+	query := `SELECT * FROM payment_histories WHERE payment_status = '` + PaymentPending + `' AND status = true AND payment_type = 'payment' ORDER BY created DESC`
 
 	db.db.Raw(query).Find(&paymentHistories)
 	return paymentHistories
