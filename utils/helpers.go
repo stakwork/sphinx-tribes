@@ -86,7 +86,7 @@ func ConvertTimeToTimestamp(date string) int {
 	if err != nil {
 		fmt.Println(err)
 	} else {
-		t = t.Add(time.Hour * 100)
+		t = t.Add(time.Hour * 1)
 		fmt.Println(t.Unix())
 		return int(t.Unix())
 	}
