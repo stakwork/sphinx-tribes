@@ -3587,6 +3587,52 @@ func (_c *Database_GetInvoice_Call) RunAndReturn(run func(string) db.NewInvoiceL
 	return _c
 }
 
+// GetLastWithdrawal provides a mock function with given fields: workspace_uuid
+func (_m *Database) GetLastWithdrawal(workspace_uuid string) db.NewPaymentHistory {
+	ret := _m.Called(workspace_uuid)
+
+	if len(ret) == 0 {
+		panic("no return value specified for GetLastWithdrawal")
+	}
+
+	var r0 db.NewPaymentHistory
+	if rf, ok := ret.Get(0).(func(string) db.NewPaymentHistory); ok {
+		r0 = rf(workspace_uuid)
+	} else {
+		r0 = ret.Get(0).(db.NewPaymentHistory)
+	}
+
+	return r0
+}
+
+// Database_GetLastWithdrawal_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'GetLastWithdrawal'
+type Database_GetLastWithdrawal_Call struct {
+	*mock.Call
+}
+
+// GetLastWithdrawal is a helper method to define mock.On call
+//   - workspace_uuid string
+func (_e *Database_Expecter) GetLastWithdrawal(workspace_uuid interface{}) *Database_GetLastWithdrawal_Call {
+	return &Database_GetLastWithdrawal_Call{Call: _e.mock.On("GetLastWithdrawal", workspace_uuid)}
+}
+
+func (_c *Database_GetLastWithdrawal_Call) Run(run func(workspace_uuid string)) *Database_GetLastWithdrawal_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(string))
+	})
+	return _c
+}
+
+func (_c *Database_GetLastWithdrawal_Call) Return(_a0 db.NewPaymentHistory) *Database_GetLastWithdrawal_Call {
+	_c.Call.Return(_a0)
+	return _c
+}
+
+func (_c *Database_GetLastWithdrawal_Call) RunAndReturn(run func(string) db.NewPaymentHistory) *Database_GetLastWithdrawal_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
 // GetLeaderBoard provides a mock function with given fields: uuid
 func (_m *Database) GetLeaderBoard(uuid string) []db.LeaderBoard {
 	ret := _m.Called(uuid)

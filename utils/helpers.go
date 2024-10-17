@@ -106,9 +106,9 @@ func GetDateDaysDifference(createdDate int64, paidDate *time.Time) int64 {
 	return days
 }
 
-func GetHoursDifference(createdDate int64, paidDate *time.Time) int64 {
+func GetHoursDifference(createdDate int64, endDate *time.Time) int64 {
 	firstDate := time.Unix(createdDate, 0)
-	difference := paidDate.Sub(firstDate)
+	difference := endDate.Sub(firstDate)
 	hours := int64(difference.Hours())
 	return hours
 }

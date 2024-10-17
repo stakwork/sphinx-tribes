@@ -126,6 +126,7 @@ type Database interface {
 	ChangeWorkspaceDeleteStatus(workspace_uuid string, status bool) Workspace
 	UpdateWorkspaceForDeletion(uuid string) error
 	ProcessDeleteWorkspace(workspace_uuid string) error
+	GetLastWithdrawal(workspace_uuid string) NewPaymentHistory
 	DeleteAllUsersFromWorkspace(uuid string) error
 	GetFilterStatusCount() FilterStattuCount
 	UserHasManageBountyRoles(pubKeyFromAuth string, uuid string) bool

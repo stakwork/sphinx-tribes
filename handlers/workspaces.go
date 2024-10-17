@@ -1021,7 +1021,20 @@ func (oh *workspaceHandler) GetFeaturesByWorkspaceUuid(w http.ResponseWriter, r 
 }
 
 func (oh *workspaceHandler) GetLastWithdrawal(w http.ResponseWriter, r *http.Request) {
+	ctx := r.Context()
+	pubKeyFromAuth, _ := ctx.Value(auth.ContextKey).(string)
+	if pubKeyFromAuth == "" {
+		fmt.Println("[workspaces] no pubkey from auth")
+		w.WriteHeader(http.StatusUnauthorized)
+		return
+	}
 
+	workspace_uuid := chi.URLParam(r, "workspace_uuid")
+	lastWithdrawal := oh.db.GetLastWithdrawal(workspace_uuid)
+
+	now := time.Now().Unix()
+	withdrawTime := lastWithdrawal.Created
+	utils.GetHoursDifference(now, withdrawTime)
 }
 
 func GetAllUserWorkspaces(pubkey string) []db.Workspace {

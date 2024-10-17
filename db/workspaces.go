@@ -612,6 +612,12 @@ func (db database) DeleteAllUsersFromWorkspace(workspace_uuid string) error {
 	return nil
 }
 
+func (db database) GetLastWithdrawal(workspace_uuid string) NewPaymentHistory {
+	p := NewPaymentHistory{}
+	db.db.Model(&NewPaymentHistory{}).Where("workspace_uuid", workspace_uuid).Where("payment_type", "withdraw").Order("created DESC").Limit(1).Find(&p)
+	return p
+}
+
 func (db database) GetFeaturePhasesBountiesCount(bountyType string, phaseUuid string) int64 {
 	var count int64
 
