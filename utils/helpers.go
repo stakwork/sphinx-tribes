@@ -74,7 +74,6 @@ func GetInvoiceExpired(paymentRequest string) bool {
 
 func ConvertTimeToTimestamp(date string) int {
 	format := "2006-01-02 15:04:05"
-
 	dateTouse := date
 
 	if strings.Contains(date, "+") {
@@ -84,13 +83,20 @@ func ConvertTimeToTimestamp(date string) int {
 
 	t, err := time.Parse(format, dateTouse)
 	if err != nil {
-		fmt.Println(err)
+		fmt.Println("Parse string to timestamp", err)
 	} else {
-		t = t.Add(time.Hour * 1)
-		fmt.Println(t.Unix())
 		return int(t.Unix())
 	}
 	return 0
+}
+
+func AddHoursToTimestamp(timestamp int, hours int) int {
+	tm := time.Unix(int64(timestamp), 0)
+
+	dur := int(time.Hour.Hours()) * hours
+	tm = tm.Add(time.Hour * time.Duration(dur))
+
+	return int(tm.Unix())
 }
 
 func GetDateDaysDifference(createdDate int64, paidDate *time.Time) int64 {
