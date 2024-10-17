@@ -1034,7 +1034,10 @@ func (oh *workspaceHandler) GetLastWithdrawal(w http.ResponseWriter, r *http.Req
 
 	now := time.Now().Unix()
 	withdrawTime := lastWithdrawal.Created
-	utils.GetHoursDifference(now, withdrawTime)
+	hoursDiff := utils.GetHoursDifference(now, withdrawTime)
+
+	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode(hoursDiff)
 }
 
 func GetAllUserWorkspaces(pubkey string) []db.Workspace {
