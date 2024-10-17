@@ -929,17 +929,20 @@ func (h *bountyHandler) BountyBudgetWithdraw(w http.ResponseWriter, r *http.Requ
 
 	lastWithdrawal := h.db.GetLastWithdrawal(request.OrgUuid)
 
-	now := time.Now().Unix()
-	withdrawTime := lastWithdrawal.Created
-	hoursDiff := utils.GetHoursDifference(now, withdrawTime)
+	if lastWithdrawal.ID > 0 {
 
-	// Check that last withdraw time is greater than 1
-	if hoursDiff < 1 {
-		w.WriteHeader(http.StatusUnauthorized)
-		errMsg := formatPayError("Your last withdrawal is  not more than an hour ago")
-		json.NewEncoder(w).Encode(errMsg)
-		h.m.Unlock()
-		return
+		now := time.Now().Unix()
+		withdrawTime := lastWithdrawal.Created
+		hoursDiff := utils.GetHoursDifference(now, withdrawTime)
+
+		// Check that last withdraw time is greater than 1
+		if hoursDiff < 1 {
+			w.WriteHeader(http.StatusUnauthorized)
+			errMsg := formatPayError("Your last withdrawal is  not more than an hour ago")
+			json.NewEncoder(w).Encode(errMsg)
+			h.m.Unlock()
+			return
+		}
 	}
 
 	log.Printf("[bounty] [BountyBudgetWithdraw] Logging body: workspace_uuid: %s, pubkey: %s, invoice: %s", request.OrgUuid, pubKeyFromAuth, request.PaymentRequest)
