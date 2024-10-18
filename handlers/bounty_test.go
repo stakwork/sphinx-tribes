@@ -1757,12 +1757,17 @@ func TestBountyBudgetWithdraw(t *testing.T) {
 	ctx := context.Background()
 	mockHttpClient := mocks.NewHttpClient(t)
 	bHandler := NewBountyHandler(mockHttpClient, db.TestDB)
+
 	handlerUserHasAccess := func(pubKeyFromAuth string, uuid string, role string) bool {
 		return true
 	}
 
 	handlerUserNotAccess := func(pubKeyFromAuth string, uuid string, role string) bool {
 		return false
+	}
+
+	getHoursDifference := func(createdDate int64, endDate *time.Time) int64 {
+		return 2
 	}
 
 	person := db.Person{
@@ -1786,6 +1791,23 @@ func TestBountyBudgetWithdraw(t *testing.T) {
 	db.TestDB.CreateOrEditWorkspace(workspace)
 
 	budgetAmount := uint(5000)
+
+	paymentTime := time.Now()
+
+	payment := db.NewPaymentHistory{
+		Amount:         budgetAmount,
+		WorkspaceUuid:  workspace.Uuid,
+		PaymentType:    db.Deposit,
+		SenderPubKey:   person.OwnerPubKey,
+		ReceiverPubKey: person.OwnerPubKey,
+		Tag:            "test_deposit",
+		Status:         true,
+		Created:        &paymentTime,
+		Updated:        &paymentTime,
+	}
+
+	db.TestDB.AddPaymentHistory(payment)
+
 	budget := db.NewBountyBudget{
 		WorkspaceUuid: workspace.Uuid,
 		TotalBudget:   budgetAmount,
@@ -1829,7 +1851,7 @@ func TestBountyBudgetWithdraw(t *testing.T) {
 		rr := httptest.NewRecorder()
 		handler := http.HandlerFunc(bHandler.BountyBudgetWithdraw)
 
-		validData := []byte(`{"orgUuid": "workspace-uuid", "paymentRequest": "invoice"}`)
+		validData := []byte(`{"workspace_uuid": "workspace-uuid", "paymentRequest": "invoice"}`)
 		req, err := http.NewRequestWithContext(authorizedCtx, http.MethodPost, "/budget/withdraw", bytes.NewReader(validData))
 		if err != nil {
 			t.Fatal(err)
@@ -1850,9 +1872,9 @@ func TestBountyBudgetWithdraw(t *testing.T) {
 		amount := utils.GetInvoiceAmount(invoice)
 		assert.Equal(t, uint(10000), amount)
 
-		withdrawRequest := db.WithdrawBudgetRequest{
+		withdrawRequest := db.NewWithdrawBudgetRequest{
 			PaymentRequest: invoice,
-			OrgUuid:        workspace.Uuid,
+			WorkspaceUuid:  workspace.Uuid,
 		}
 		requestBody, _ := json.Marshal(withdrawRequest)
 		req, _ := http.NewRequestWithContext(authorizedCtx, http.MethodPost, "/budget/withdraw", bytes.NewReader(requestBody))
@@ -1884,9 +1906,9 @@ func TestBountyBudgetWithdraw(t *testing.T) {
 
 		invoice := "lnbc3u1pngsqv8pp5vl6ep8llmg3f9sfu8j7ctcnphylpnjduuyljqf3sc30z6ejmrunqdqzvscqzpgxqyz5vqrzjqwnw5tv745sjpvft6e3f9w62xqk826vrm3zaev4nvj6xr3n065aukqqqqyqqz9gqqyqqqqqqqqqqqqqqqqsp5n9hrrw6pr89qn3c82vvhy697wp45zdsyhm7tnu536ga77ytvxxaq9qrssqqqhenjtquz8wz5tym8v830h9gjezynjsazystzj6muhw4rd9ccc40p8sazjuk77hhcj0xn72lfyee3tsfl7lucxkx5xgtfaqya9qldcqr3072z"
 
-		withdrawRequest := db.WithdrawBudgetRequest{
+		withdrawRequest := db.NewWithdrawBudgetRequest{
 			PaymentRequest: invoice,
-			OrgUuid:        workspace.Uuid,
+			WorkspaceUuid:  workspace.Uuid,
 		}
 
 		requestBody, _ := json.Marshal(withdrawRequest)
@@ -1905,6 +1927,7 @@ func TestBountyBudgetWithdraw(t *testing.T) {
 	})
 
 	t.Run("400 BadRequest error if there is an error with invoice payment", func(t *testing.T) {
+		bHandler.getHoursDifference = getHoursDifference
 
 		mockHttpClient.On("Do", mock.AnythingOfType("*http.Request")).Return(&http.Response{
 			StatusCode: 400,
@@ -1913,9 +1936,9 @@ func TestBountyBudgetWithdraw(t *testing.T) {
 
 		invoice := "lnbcrt1u1pnv5ejzdqad9h8vmmfvdjjqen0wgsrzvpsxqcrqpp58xyhvymlhc8q05z930fknk2vdl8wnpm5zlx5lgp4ev9u8h7yd4kssp5nu652c5y0epuxeawn8szcgdrjxwk7pfkdh9tsu44r7hacg52nfgq9qrsgqcqpjxqrrssrzjqgtzc5n3vcmlhqfq4vpxreqskxzay6xhdrxx7c38ckqs95v5459uyqqqqyqq9ggqqsqqqqqqqqqqqqqq9gwyffzjpnrwt6yswwd4znt2xqnwjwxgq63qxudru95a8pqeer2r7sduurtstz5x60y4e7m4y9nx6rqy5sr9k08vtwv6s37xh0z5pdwpgqxeqdtv"
 
-		withdrawRequest := db.WithdrawBudgetRequest{
+		withdrawRequest := db.NewWithdrawBudgetRequest{
 			PaymentRequest: invoice,
-			OrgUuid:        workspace.Uuid,
+			WorkspaceUuid:  workspace.Uuid,
 		}
 		requestBody, _ := json.Marshal(withdrawRequest)
 		req, _ := http.NewRequestWithContext(authorizedCtx, http.MethodPost, "/budget/withdraw", bytes.NewReader(requestBody))
@@ -1934,25 +1957,30 @@ func TestBountyBudgetWithdraw(t *testing.T) {
 	})
 
 	t.Run("Should test that an Workspace's Budget Total Amount is accurate after three (3) successful 'Budget Withdrawal Requests'", func(t *testing.T) {
-
 		paymentAmount := uint(1000)
 		initialBudget := budget.TotalBudget
 		invoice := "lnbcrt10u1pnv7nz6dqld9h8vmmfvdjjqen0wgsrzvpsxqcrqvqpp54v0synj4q3j2usthzt8g5umteky6d2apvgtaxd7wkepkygxgqdyssp5lhv2878qjas3azv3nnu8r6g3tlgejl7mu7cjzc9q5haygrpapd4s9qrsgqcqpjxqrrssrzjqgtzc5n3vcmlhqfq4vpxreqskxzay6xhdrxx7c38ckqs95v5459uyqqqqyqqtwsqqgqqqqqqqqqqqqqq9gea2fjj7q302ncprk2pawk4zdtayycvm0wtjpprml96h9vujvmqdp0n5z8v7lqk44mq9620jszwaevj0mws7rwd2cegxvlmfszwgpgfqp2xafjf"
+
 		bHandler.userHasAccess = handlerUserHasAccess
+		bHandler.getHoursDifference = getHoursDifference
 
 		for i := 0; i < 3; i++ {
 			expectedFinalBudget := initialBudget - (paymentAmount * uint(i+1))
 			mockHttpClient.ExpectedCalls = nil
 			mockHttpClient.Calls = nil
 
+			// add a zero amount withdrawal with a time lesser than 2 + loop index hours to beat the 1 hour withdrawal timer
+			dur := int(time.Hour.Hours())*2 + i + 1
+			paymentTime = time.Now().Add(-time.Hour * time.Duration(dur))
+
 			mockHttpClient.On("Do", mock.AnythingOfType("*http.Request")).Return(&http.Response{
 				StatusCode: 200,
 				Body:       io.NopCloser(bytes.NewBufferString(`{"status": "COMPLETE", "amt_msat": "1000", "timestamp": "" }`)),
 			}, nil)
 
-			withdrawRequest := db.WithdrawBudgetRequest{
+			withdrawRequest := db.NewWithdrawBudgetRequest{
 				PaymentRequest: invoice,
-				OrgUuid:        workspace.Uuid,
+				WorkspaceUuid:  workspace.Uuid,
 			}
 			requestBody, _ := json.Marshal(withdrawRequest)
 			req, _ := http.NewRequestWithContext(authorizedCtx, http.MethodPost, "/budget/withdraw", bytes.NewReader(requestBody))
@@ -1968,6 +1996,7 @@ func TestBountyBudgetWithdraw(t *testing.T) {
 
 			finalBudget := db.TestDB.GetWorkspaceBudget(workspace.Uuid)
 			assert.Equal(t, expectedFinalBudget, finalBudget.TotalBudget, "The workspace's final budget should reflect the deductions from the successful withdrawals")
+
 		}
 	})
 
@@ -2108,85 +2137,6 @@ func TestPollInvoice(t *testing.T) {
 		ro.ServeHTTP(rr, req)
 
 		assert.Equal(t, http.StatusForbidden, rr.Code, "Expected 403 error if there is an invoice error")
-		mockHttpClient.AssertExpectations(t)
-	})
-
-	t.Run("Should mock relay payment is successful update the bounty associated with the invoice and set the paid as true", func(t *testing.T) {
-		expectedUrl := fmt.Sprintf("%s/invoice?payment_request=%s", config.RelayUrl, invoice.PaymentRequest)
-		expectedBody := fmt.Sprintf(`{"success": true, "response": { "settled": true, "payment_request": "%s", "payment_hash": "payment_hash", "preimage": "preimage", "Amount": %d}}`, invoice.OwnerPubkey, bountyAmount)
-
-		expectedV2Url := fmt.Sprintf("%s/check_invoice", botURL)
-		expectedV2InvoiceBody := `{"status": "paid", "amt_msat": "", "timestamp": ""}`
-
-		r := io.NopCloser(bytes.NewReader([]byte(expectedBody)))
-		rv2 := io.NopCloser(bytes.NewReader([]byte(expectedV2InvoiceBody)))
-
-		if botURL != "" && botToken != "" {
-			mockHttpClient.On("Do", mock.MatchedBy(func(req *http.Request) bool {
-				return req.Method == http.MethodPost && expectedV2Url == req.URL.String() && req.Header.Get("x-admin-token") == botToken
-			})).Return(&http.Response{
-				StatusCode: 200,
-				Body:       rv2,
-			}, nil).Once()
-		} else {
-			mockHttpClient.On("Do", mock.MatchedBy(func(req *http.Request) bool {
-				return req.Method == http.MethodGet && expectedUrl == req.URL.String() && req.Header.Get("x-user-token") == config.RelayAuthKey
-			})).Return(&http.Response{
-				StatusCode: 200,
-				Body:       r,
-			}, nil).Once()
-		}
-
-		expectedPaymentUrl := fmt.Sprintf("%s/payment", config.RelayUrl)
-		expectedV2PaymentUrl := fmt.Sprintf("%s/pay", botURL)
-
-		expectedPaymentBody := fmt.Sprintf(`{"amount": %d, "destination_key": "%s", "text": "memotext added for notification", "data": ""}`, bountyAmount, invoice.OwnerPubkey)
-
-		expectedV2PaymentBody :=
-			fmt.Sprintf(`{"amt_msat": %d, "dest": "%s", "route_hint": "%s", "data": "", "wait": true}`, bountyAmount*1000, invoice.OwnerPubkey, invoiceData.RouteHint)
-
-		r2 := io.NopCloser(bytes.NewReader([]byte(`{"success": true, "response": { "sumAmount": "1"}}`)))
-		r3 := io.NopCloser(bytes.NewReader([]byte(`{"status": "COMPLETE", "amt_msat": "", "timestamp": "" }`)))
-
-		if botURL != "" && botToken != "" {
-			mockHttpClient.On("Do", mock.MatchedBy(func(req *http.Request) bool {
-				bodyByt, _ := io.ReadAll(req.Body)
-				return req.Method == http.MethodPost && expectedV2PaymentUrl == req.URL.String() && req.Header.Get("x-admin-token") == botToken && expectedV2PaymentBody == string(bodyByt)
-			})).Return(&http.Response{
-				StatusCode: 200,
-				Body:       r3,
-			}, nil).Once()
-		} else {
-			mockHttpClient.On("Do", mock.MatchedBy(func(req *http.Request) bool {
-				bodyByt, _ := io.ReadAll(req.Body)
-				return req.Method == http.MethodPost && expectedPaymentUrl == req.URL.String() && req.Header.Get("x-user-token") == config.RelayAuthKey && expectedPaymentBody == string(bodyByt)
-			})).Return(&http.Response{
-				StatusCode: 200,
-				Body:       r2,
-			}, nil).Once()
-		}
-
-		ro := chi.NewRouter()
-		ro.Post("/poll/invoice/{paymentRequest}", bHandler.PollInvoice)
-
-		rr := httptest.NewRecorder()
-		req, err := http.NewRequestWithContext(authorizedCtx, http.MethodPost, "/poll/invoice/"+invoice.PaymentRequest, bytes.NewBufferString(`{}`))
-		if err != nil {
-			t.Fatal(err)
-		}
-
-		ro.ServeHTTP(rr, req)
-
-		invData := db.TestDB.GetUserInvoiceData(invoice.PaymentRequest)
-		updatedBounty, err := db.TestDB.GetBountyByCreated(uint(invData.Created))
-		if err != nil {
-			t.Fatal(err)
-		}
-		updatedInvoice := db.TestDB.GetInvoice(invoice.PaymentRequest)
-
-		assert.True(t, updatedBounty.Paid, "Expected bounty to be marked as paid")
-		assert.True(t, updatedInvoice.Status, "Expected invoice status to be true")
-		assert.Equal(t, http.StatusOK, rr.Code)
 		mockHttpClient.AssertExpectations(t)
 	})
 
