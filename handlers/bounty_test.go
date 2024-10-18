@@ -1939,6 +1939,8 @@ func TestBountyBudgetWithdraw(t *testing.T) {
 
 		db.TestDB.AddPaymentHistory(payment)
 
+		time.Sleep(2 * time.Second)
+
 		mockHttpClient.On("Do", mock.AnythingOfType("*http.Request")).Return(&http.Response{
 			StatusCode: 400,
 			Body:       io.NopCloser(bytes.NewBufferString(`{"success": false, "error": "Payment error"}`)),
@@ -1973,27 +1975,32 @@ func TestBountyBudgetWithdraw(t *testing.T) {
 		invoice := "lnbcrt10u1pnv7nz6dqld9h8vmmfvdjjqen0wgsrzvpsxqcrqvqpp54v0synj4q3j2usthzt8g5umteky6d2apvgtaxd7wkepkygxgqdyssp5lhv2878qjas3azv3nnu8r6g3tlgejl7mu7cjzc9q5haygrpapd4s9qrsgqcqpjxqrrssrzjqgtzc5n3vcmlhqfq4vpxreqskxzay6xhdrxx7c38ckqs95v5459uyqqqqyqqtwsqqgqqqqqqqqqqqqqq9gea2fjj7q302ncprk2pawk4zdtayycvm0wtjpprml96h9vujvmqdp0n5z8v7lqk44mq9620jszwaevj0mws7rwd2cegxvlmfszwgpgfqp2xafjf"
 		bHandler.userHasAccess = handlerUserHasAccess
 
-		// add a zero amount withdrawal with a time lesser than 2 hours to beat the 1 hour withdrawal timer
-		paymentTime := time.Now().Add(-time.Hour * 2)
-
-		payment := db.NewPaymentHistory{
-			Amount:         0,
-			WorkspaceUuid:  workspace.Uuid,
-			PaymentType:    db.Withdraw,
-			SenderPubKey:   person.OwnerPubKey,
-			ReceiverPubKey: person.OwnerPubKey,
-			Tag:            "test_withdraw_before_loop",
-			Status:         true,
-			Created:        &paymentTime,
-			Updated:        &paymentTime,
-		}
-
-		db.TestDB.AddPaymentHistory(payment)
-
 		for i := 0; i < 3; i++ {
 			expectedFinalBudget := initialBudget - (paymentAmount * uint(i+1))
 			mockHttpClient.ExpectedCalls = nil
 			mockHttpClient.Calls = nil
+
+			// add a zero amount withdrawal with a time lesser than 2 + loop index hours to beat the 1 hour withdrawal timer
+			dur := int(time.Hour.Hours())*2 + i + 1
+			paymentTime = time.Now().Add(-time.Hour * time.Duration(dur))
+
+			tag := fmt.Sprintf("test_withdraw:%d", i)
+
+			payment := db.NewPaymentHistory{
+				Amount:         0,
+				WorkspaceUuid:  workspace.Uuid,
+				PaymentType:    db.Withdraw,
+				SenderPubKey:   person.OwnerPubKey,
+				ReceiverPubKey: person.OwnerPubKey,
+				Tag:            tag,
+				Status:         true,
+				Created:        &paymentTime,
+				Updated:        &paymentTime,
+			}
+
+			db.TestDB.AddPaymentHistory(payment)
+
+			time.Sleep(2 * time.Second)
 
 			mockHttpClient.On("Do", mock.AnythingOfType("*http.Request")).Return(&http.Response{
 				StatusCode: 200,
@@ -2019,25 +2026,6 @@ func TestBountyBudgetWithdraw(t *testing.T) {
 			finalBudget := db.TestDB.GetWorkspaceBudget(workspace.Uuid)
 			assert.Equal(t, expectedFinalBudget, finalBudget.TotalBudget, "The workspace's final budget should reflect the deductions from the successful withdrawals")
 
-			// add a zero amount withdrawal with a time lesser than 2 + loop index hours to beat the 1 hour withdrawal timer
-			dur := int(time.Hour.Hours())*2 + i
-			paymentTime = time.Now().Add(-time.Hour * time.Duration(dur))
-
-			tag := fmt.Sprintf("test_withdraw:%d", i)
-
-			payment := db.NewPaymentHistory{
-				Amount:         0,
-				WorkspaceUuid:  workspace.Uuid,
-				PaymentType:    db.Withdraw,
-				SenderPubKey:   person.OwnerPubKey,
-				ReceiverPubKey: person.OwnerPubKey,
-				Tag:            tag,
-				Status:         true,
-				Created:        &paymentTime,
-				Updated:        &paymentTime,
-			}
-
-			db.TestDB.AddPaymentHistory(payment)
 		}
 	})
 
