@@ -963,11 +963,11 @@ func (h *bountyHandler) BountyBudgetWithdraw(w http.ResponseWriter, r *http.Requ
 	if amount > 0 {
 		// Check that the deposit is more than the withdrawal plus amount to withdraw
 		sumOfWithdrawals := h.db.GetSumOfWithdrawal(request.OrgUuid)
-		sumOfDeposits := h.db.GetSumOfWithdrawal(request.OrgUuid)
+		sumOfDeposits := h.db.GetSumOfDeposits(request.OrgUuid)
 
 		if sumOfDeposits < sumOfWithdrawals+amount {
 			w.WriteHeader(http.StatusUnauthorized)
-			errMsg := formatPayError("Your deposits is lesser than your withdral")
+			errMsg := formatPayError("Your deposits is lesser than your withdrawal")
 			json.NewEncoder(w).Encode(errMsg)
 			h.m.Unlock()
 			return
