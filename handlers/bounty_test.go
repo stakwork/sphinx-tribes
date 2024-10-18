@@ -1804,7 +1804,7 @@ func TestBountyBudgetWithdraw(t *testing.T) {
 	db.TestDB.AddPaymentHistory(payment)
 
 	// add a zero amount withdrawal with a time lesser than 2 hours to beat the 1 hour withdrawal timer
-	paymentWTime := time.Now().Add(-time.Hour * 2)
+	paymentWTime := time.Now().Add(time.Hour * 3)
 
 	payment = db.NewPaymentHistory{
 		Amount:         0,
