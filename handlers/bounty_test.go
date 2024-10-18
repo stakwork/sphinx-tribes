@@ -1787,7 +1787,7 @@ func TestBountyBudgetWithdraw(t *testing.T) {
 
 	budgetAmount := uint(5000)
 
-	paymentTime := time.Now()
+	paymentTime := time.Now().Add(-time.Hour * 2)
 
 	payment := db.NewPaymentHistory{
 		Amount:         budgetAmount,

@@ -940,7 +940,7 @@ func (h *bountyHandler) BountyBudgetWithdraw(w http.ResponseWriter, r *http.Requ
 		if hoursDiff < 1 {
 			w.WriteHeader(http.StatusForbidden)
 			errMsg := formatPayError("Your last withdrawal is not more than an hour ago")
-			log.Println("Your last withdrawal is not more than an hour ago", hoursDiff, lastWithdrawal.Created)
+			log.Println("Your last withdrawal is not more than an hour ago", hoursDiff, lastWithdrawal.Created, request.OrgUuid)
 			json.NewEncoder(w).Encode(errMsg)
 			h.m.Unlock()
 			return
