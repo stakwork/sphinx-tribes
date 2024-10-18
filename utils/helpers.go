@@ -78,7 +78,7 @@ func ConvertTimeToTimestamp(date string) int {
 
 	if strings.Contains(date, "+") {
 		dateSplit := strings.Split(date, "+")
-		dateTouse = dateSplit[0]
+		dateTouse = strings.Trim(dateSplit[0], " ")
 	}
 
 	t, err := time.Parse(format, dateTouse)
@@ -109,6 +109,7 @@ func GetDateDaysDifference(createdDate int64, paidDate *time.Time) int64 {
 func GetHoursDifference(createdDate int64, endDate *time.Time) int64 {
 	firstDate := time.Unix(createdDate, 0)
 	difference := endDate.Sub(firstDate)
+
 	hours := int64(difference.Hours())
 	return hours
 }

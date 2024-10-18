@@ -931,14 +931,16 @@ func (h *bountyHandler) BountyBudgetWithdraw(w http.ResponseWriter, r *http.Requ
 
 	if lastWithdrawal.ID > 0 {
 
-		now := time.Now().Unix()
-		withdrawTime := lastWithdrawal.Created
-		hoursDiff := utils.GetHoursDifference(now, withdrawTime)
+		now := time.Now()
+		withdrawCreated := lastWithdrawal.Created
+		withdrawTime := utils.ConvertTimeToTimestamp(withdrawCreated.String())
+		hoursDiff := utils.GetHoursDifference(int64(withdrawTime), &now)
 
 		// Check that last withdraw time is greater than 1
 		if hoursDiff < 1 {
-			w.WriteHeader(http.StatusUnauthorized)
-			errMsg := formatPayError("Your last withdrawal is  not more than an hour ago")
+			w.WriteHeader(http.StatusForbidden)
+			errMsg := formatPayError("Your last withdrawal is not more than an hour ago")
+			log.Println("Your last withdrawal is not more than an hour ago", hoursDiff, lastWithdrawal.Created)
 			json.NewEncoder(w).Encode(errMsg)
 			h.m.Unlock()
 			return
@@ -961,18 +963,6 @@ func (h *bountyHandler) BountyBudgetWithdraw(w http.ResponseWriter, r *http.Requ
 	amount := utils.GetInvoiceAmount(request.PaymentRequest)
 
 	if amount > 0 {
-		// Check that the deposit is more than the withdrawal plus amount to withdraw
-		sumOfWithdrawals := h.db.GetSumOfWithdrawal(request.OrgUuid)
-		sumOfDeposits := h.db.GetSumOfDeposits(request.OrgUuid)
-
-		if sumOfDeposits < sumOfWithdrawals+amount {
-			w.WriteHeader(http.StatusUnauthorized)
-			errMsg := formatPayError("Your deposits is lesser than your withdrawal")
-			json.NewEncoder(w).Encode(errMsg)
-			h.m.Unlock()
-			return
-		}
-
 		// check if the workspace bounty balance
 		// is greater than the amount
 		orgBudget := h.db.GetWorkspaceBudget(request.OrgUuid)
@@ -983,6 +973,21 @@ func (h *bountyHandler) BountyBudgetWithdraw(w http.ResponseWriter, r *http.Requ
 			h.m.Unlock()
 			return
 		}
+
+		// Check that the deposit is more than the withdrawal plus amount to withdraw
+		sumOfWithdrawals := h.db.GetSumOfWithdrawal(request.OrgUuid)
+		sumOfDeposits := h.db.GetSumOfDeposits(request.OrgUuid)
+
+		if sumOfDeposits < sumOfWithdrawals+amount {
+			w.WriteHeader(http.StatusForbidden)
+
+			log.Printf("Sum of deposits is lesser than withdrawal: %d : %d", sumOfDeposits, sumOfWithdrawals)
+			errMsg := formatPayError("Your deposits is lesser than your withdrawal")
+			json.NewEncoder(w).Encode(errMsg)
+			h.m.Unlock()
+			return
+		}
+
 		paymentSuccess, paymentError := h.PayLightningInvoice(request.PaymentRequest)
 		if paymentSuccess.Success {
 			// withdraw amount from workspace budget
@@ -990,6 +995,7 @@ func (h *bountyHandler) BountyBudgetWithdraw(w http.ResponseWriter, r *http.Requ
 			w.WriteHeader(http.StatusOK)
 			json.NewEncoder(w).Encode(paymentSuccess)
 		} else {
+			log.Printf("Withdrawal payment failed: %s ", paymentError.Error)
 			w.WriteHeader(http.StatusBadRequest)
 			json.NewEncoder(w).Encode(paymentError)
 		}
@@ -1035,9 +1041,10 @@ func (h *bountyHandler) NewBountyBudgetWithdraw(w http.ResponseWriter, r *http.R
 
 	lastWithdrawal := h.db.GetLastWithdrawal(request.WorkspaceUuid)
 
-	now := time.Now().Unix()
-	withdrawTime := lastWithdrawal.Created
-	hoursDiff := utils.GetHoursDifference(now, withdrawTime)
+	now := time.Now()
+	withdrawCreated := lastWithdrawal.Created
+	withdrawTime := utils.ConvertTimeToTimestamp(withdrawCreated.String())
+	hoursDiff := utils.GetHoursDifference(int64(withdrawTime), &now)
 
 	// Check that last withdraw time is greater than 1
 	if hoursDiff < 1 {
@@ -1066,7 +1073,7 @@ func (h *bountyHandler) NewBountyBudgetWithdraw(w http.ResponseWriter, r *http.R
 	if amount > 0 {
 		// Check that the deposit is more than the withdrawal plus amount to withdraw
 		sumOfWithdrawals := h.db.GetSumOfWithdrawal(request.WorkspaceUuid)
-		sumOfDeposits := h.db.GetSumOfWithdrawal(request.WorkspaceUuid)
+		sumOfDeposits := h.db.GetSumOfDeposits(request.WorkspaceUuid)
 
 		if sumOfDeposits < sumOfWithdrawals+amount {
 			w.WriteHeader(http.StatusUnauthorized)
