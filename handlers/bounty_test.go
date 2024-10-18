@@ -1757,6 +1757,7 @@ func TestBountyBudgetWithdraw(t *testing.T) {
 	ctx := context.Background()
 	mockHttpClient := mocks.NewHttpClient(t)
 	bHandler := NewBountyHandler(mockHttpClient, db.TestDB)
+
 	handlerUserHasAccess := func(pubKeyFromAuth string, uuid string, role string) bool {
 		return true
 	}
@@ -1956,12 +1957,12 @@ func TestBountyBudgetWithdraw(t *testing.T) {
 	})
 
 	t.Run("Should test that an Workspace's Budget Total Amount is accurate after three (3) successful 'Budget Withdrawal Requests'", func(t *testing.T) {
-		bHandler.getHoursDifference = getHoursDifference
-
 		paymentAmount := uint(1000)
 		initialBudget := budget.TotalBudget
 		invoice := "lnbcrt10u1pnv7nz6dqld9h8vmmfvdjjqen0wgsrzvpsxqcrqvqpp54v0synj4q3j2usthzt8g5umteky6d2apvgtaxd7wkepkygxgqdyssp5lhv2878qjas3azv3nnu8r6g3tlgejl7mu7cjzc9q5haygrpapd4s9qrsgqcqpjxqrrssrzjqgtzc5n3vcmlhqfq4vpxreqskxzay6xhdrxx7c38ckqs95v5459uyqqqqyqqtwsqqgqqqqqqqqqqqqqq9gea2fjj7q302ncprk2pawk4zdtayycvm0wtjpprml96h9vujvmqdp0n5z8v7lqk44mq9620jszwaevj0mws7rwd2cegxvlmfszwgpgfqp2xafjf"
+
 		bHandler.userHasAccess = handlerUserHasAccess
+		bHandler.getHoursDifference = getHoursDifference
 
 		for i := 0; i < 3; i++ {
 			expectedFinalBudget := initialBudget - (paymentAmount * uint(i+1))
