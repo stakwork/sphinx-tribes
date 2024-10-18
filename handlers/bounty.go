@@ -907,8 +907,9 @@ func (h *bountyHandler) BountyBudgetWithdraw(w http.ResponseWriter, r *http.Requ
 
 	if pubKeyFromAuth == "" {
 		fmt.Println("[bounty] no pubkey from auth")
-		w.WriteHeader(http.StatusUnauthorized)
 		h.m.Unlock()
+
+		w.WriteHeader(http.StatusUnauthorized)
 		return
 	}
 
@@ -917,15 +918,17 @@ func (h *bountyHandler) BountyBudgetWithdraw(w http.ResponseWriter, r *http.Requ
 	r.Body.Close()
 
 	if err != nil {
-		w.WriteHeader(http.StatusNotAcceptable)
 		h.m.Unlock()
+
+		w.WriteHeader(http.StatusNotAcceptable)
 		return
 	}
 
 	err = json.Unmarshal(body, &request)
 	if err != nil {
-		w.WriteHeader(http.StatusNotAcceptable)
 		h.m.Unlock()
+
+		w.WriteHeader(http.StatusNotAcceptable)
 		return
 	}
 
@@ -940,11 +943,12 @@ func (h *bountyHandler) BountyBudgetWithdraw(w http.ResponseWriter, r *http.Requ
 
 		// Check that last withdraw time is greater than 1
 		if hoursDiff < 1 {
+			h.m.Unlock()
+
 			w.WriteHeader(http.StatusUnauthorized)
 			errMsg := formatPayError("Your last withdrawal is  not more than an hour ago")
 			log.Println("Your last withdrawal is not more than an hour ago", hoursDiff, lastWithdrawal.Created, request.WorkspaceUuid)
 			json.NewEncoder(w).Encode(errMsg)
-			h.m.Unlock()
 			return
 		}
 	}
@@ -955,10 +959,11 @@ func (h *bountyHandler) BountyBudgetWithdraw(w http.ResponseWriter, r *http.Requ
 	// or has a withdraw bounty budget role
 	hasRole := h.userHasAccess(pubKeyFromAuth, request.WorkspaceUuid, db.WithdrawBudget)
 	if !hasRole {
+		h.m.Unlock()
+
 		w.WriteHeader(http.StatusUnauthorized)
 		errMsg := formatPayError("You don't have appropriate permissions to withdraw bounty budget")
 		json.NewEncoder(w).Encode(errMsg)
-		h.m.Unlock()
 		return
 	}
 
@@ -969,10 +974,11 @@ func (h *bountyHandler) BountyBudgetWithdraw(w http.ResponseWriter, r *http.Requ
 		// is greater than the amount
 		orgBudget := h.db.GetWorkspaceBudget(request.WorkspaceUuid)
 		if amount > orgBudget.TotalBudget {
+			h.m.Unlock()
+
 			w.WriteHeader(http.StatusForbidden)
 			errMsg := formatPayError("Workspace budget is not enough to withdraw the amount")
 			json.NewEncoder(w).Encode(errMsg)
-			h.m.Unlock()
 			return
 		}
 
@@ -981,10 +987,11 @@ func (h *bountyHandler) BountyBudgetWithdraw(w http.ResponseWriter, r *http.Requ
 		sumOfDeposits := h.db.GetSumOfDeposits(request.WorkspaceUuid)
 
 		if sumOfDeposits < sumOfWithdrawals+amount {
+			h.m.Unlock()
+
 			w.WriteHeader(http.StatusUnauthorized)
 			errMsg := formatPayError("Your deposits is lesser than your withdral")
 			json.NewEncoder(w).Encode(errMsg)
-			h.m.Unlock()
 			return
 		}
 
@@ -992,19 +999,24 @@ func (h *bountyHandler) BountyBudgetWithdraw(w http.ResponseWriter, r *http.Requ
 		if paymentSuccess.Success {
 			// withdraw amount from workspace budget
 			h.db.WithdrawBudget(pubKeyFromAuth, request.WorkspaceUuid, amount)
+
+			h.m.Unlock()
+
 			w.WriteHeader(http.StatusOK)
 			json.NewEncoder(w).Encode(paymentSuccess)
 		} else {
+			h.m.Unlock()
+
 			w.WriteHeader(http.StatusBadRequest)
 			json.NewEncoder(w).Encode(paymentError)
 		}
 	} else {
+		h.m.Unlock()
+
 		w.WriteHeader(http.StatusForbidden)
 		errMsg := formatPayError("Could not pay lightning invoice")
 		json.NewEncoder(w).Encode(errMsg)
 	}
-
-	h.m.Unlock()
 }
 
 func formatPayError(errorMsg string) db.InvoicePayError {
@@ -1281,17 +1293,13 @@ func (h *bountyHandler) GetInvoiceData(w http.ResponseWriter, r *http.Request) {
 }
 
 func (h *bountyHandler) PollInvoice(w http.ResponseWriter, r *http.Request) {
-	h.m.Lock()
-
 	ctx := r.Context()
 	pubKeyFromAuth, _ := ctx.Value(auth.ContextKey).(string)
 	paymentRequest := chi.URLParam(r, "paymentRequest")
-	var err error
 
 	if pubKeyFromAuth == "" {
 		fmt.Println("[bounty] no pubkey from auth")
 		w.WriteHeader(http.StatusUnauthorized)
-		h.m.Unlock()
 		return
 	}
 
@@ -1300,126 +1308,18 @@ func (h *bountyHandler) PollInvoice(w http.ResponseWriter, r *http.Request) {
 	if invoiceErr.Error != "" {
 		w.WriteHeader(http.StatusForbidden)
 		json.NewEncoder(w).Encode(invoiceErr)
-		h.m.Unlock()
 		return
 	}
 
 	if invoiceRes.Response.Settled {
 		// Todo if an invoice is settled
 		invoice := h.db.GetInvoice(paymentRequest)
-		invData := h.db.GetUserInvoiceData(paymentRequest)
 		dbInvoice := h.db.GetInvoice(paymentRequest)
 
 		// Make any change only if the invoice has not been settled
 		if !dbInvoice.Status {
-			amount := invData.Amount
 			if invoice.Type == "BUDGET" {
 				h.db.AddAndUpdateBudget(invoice)
-			} else if invoice.Type == "KEYSEND" {
-				if config.IsV2Payment {
-					url := fmt.Sprintf("%s/pay", config.V2BotUrl)
-
-					// Build v2 keysend payment data
-					bodyData := utils.BuildV2KeysendBodyData(amount, invData.UserPubkey, invData.RouteHint, "")
-					jsonBody := []byte(bodyData)
-
-					req, _ := http.NewRequest(http.MethodPost, url, bytes.NewBuffer(jsonBody))
-					req.Header.Set("x-admin-token", config.V2BotToken)
-					req.Header.Set("Content-Type", "application/json")
-					log.Printf("[bounty] Making Bounty V2 Payment PollInvoice: amount: %d, pubkey: %s, route_hint: %s", amount, invData.UserPubkey, invData.RouteHint)
-
-					res, err := h.httpClient.Do(req)
-
-					if err != nil {
-						log.Printf("[bounty] Request Failed: %s", err)
-						h.m.Unlock()
-						return
-					}
-
-					defer res.Body.Close()
-					body, err := io.ReadAll(res.Body)
-					if err != nil {
-						fmt.Println("[read body]", err)
-						w.WriteHeader(http.StatusNotAcceptable)
-						h.m.Unlock()
-						return
-					}
-
-					// Unmarshal result
-					v2KeysendRes := db.V2SendOnionRes{}
-					err = json.Unmarshal(body, &v2KeysendRes)
-
-					if err != nil {
-						fmt.Println("[Unmarshal]", err)
-						w.WriteHeader(http.StatusNotAcceptable)
-						h.m.Unlock()
-						return
-					}
-
-					if res.StatusCode == 200 {
-						fmt.Println("V2 Status Code Is 200")
-						// if the payment has a completed status
-						if v2KeysendRes.Status == db.PaymentComplete {
-							fmt.Println("V2 Payment Is Completed")
-							bounty, err := h.db.GetBountyByCreated(uint(invData.Created))
-							if err == nil {
-								now := time.Now()
-								bounty.Paid = true
-								bounty.PaidDate = &now
-								bounty.Completed = true
-								bounty.CompletionDate = &now
-							}
-
-							h.db.UpdateBounty(bounty)
-						}
-					} else {
-						log.Printf("[bounty] V2 Keysend Payment to %s Failed, with Error: %s", invData.UserPubkey, err)
-					}
-				} else {
-					url := fmt.Sprintf("%s/payment", config.RelayUrl)
-
-					bodyData := utils.BuildKeysendBodyData(amount, invData.UserPubkey, invData.RouteHint, "")
-
-					jsonBody := []byte(bodyData)
-
-					req, _ := http.NewRequest(http.MethodPost, url, bytes.NewBuffer(jsonBody))
-
-					req.Header.Set("x-user-token", config.RelayAuthKey)
-					req.Header.Set("Content-Type", "application/json")
-					res, _ := h.httpClient.Do(req)
-
-					defer res.Body.Close()
-
-					body, _ := io.ReadAll(res.Body)
-
-					if res.StatusCode == 200 {
-						// Unmarshal result
-						keysendRes := db.KeysendSuccess{}
-						err = json.Unmarshal(body, &keysendRes)
-
-						if err != nil {
-							w.WriteHeader(http.StatusForbidden)
-							json.NewEncoder(w).Encode("Could not decode keysend response")
-							return
-						}
-
-						bounty, err := h.db.GetBountyByCreated(uint(invData.Created))
-						if err == nil {
-							now := time.Now()
-							bounty.Paid = true
-							bounty.PaidDate = &now
-							bounty.Completed = true
-							bounty.CompletionDate = &now
-						}
-
-						h.db.UpdateBounty(bounty)
-					} else {
-						// Unmarshal result
-						keysendError := db.KeysendError{}
-						err = json.Unmarshal(body, &keysendError)
-						log.Printf("[bounty] Keysend Payment to %s Failed, with Error: %s", invData.UserPubkey, err)
-					}
-				}
 			}
 			// Update the invoice status
 			h.db.UpdateInvoice(paymentRequest)
@@ -1435,8 +1335,6 @@ func (h *bountyHandler) PollInvoice(w http.ResponseWriter, r *http.Request) {
 
 	w.WriteHeader(http.StatusOK)
 	json.NewEncoder(w).Encode(invoiceRes)
-
-	h.m.Unlock()
 }
 
 func GetFilterCount(w http.ResponseWriter, r *http.Request) {

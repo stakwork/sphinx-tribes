@@ -6823,17 +6823,17 @@ func (_c *Database_ProcessDeleteWorkspace_Call) RunAndReturn(run func(string) er
 	return _c
 }
 
-// ProcessUpdateBudget provides a mock function with given fields: invoice, getLightningInvoice
-func (_m *Database) ProcessUpdateBudget(invoice db.NewInvoiceList, getLightningInvoice func(string) (db.InvoiceResult, db.InvoiceError)) error {
-	ret := _m.Called(invoice, getLightningInvoice)
+// ProcessUpdateBudget provides a mock function with given fields: invoice
+func (_m *Database) ProcessUpdateBudget(invoice db.NewInvoiceList) error {
+	ret := _m.Called(invoice)
 
 	if len(ret) == 0 {
 		panic("no return value specified for ProcessUpdateBudget")
 	}
 
 	var r0 error
-	if rf, ok := ret.Get(0).(func(db.NewInvoiceList, func(string) (db.InvoiceResult, db.InvoiceError)) error); ok {
-		r0 = rf(invoice, getLightningInvoice)
+	if rf, ok := ret.Get(0).(func(db.NewInvoiceList) error); ok {
+		r0 = rf(invoice)
 	} else {
 		r0 = ret.Error(0)
 	}
@@ -6848,14 +6848,13 @@ type Database_ProcessUpdateBudget_Call struct {
 
 // ProcessUpdateBudget is a helper method to define mock.On call
 //   - invoice db.NewInvoiceList
-//   - getLightningInvoice func(string)(db.InvoiceResult , db.InvoiceError)
-func (_e *Database_Expecter) ProcessUpdateBudget(invoice interface{}, getLightningInvoice interface{}) *Database_ProcessUpdateBudget_Call {
-	return &Database_ProcessUpdateBudget_Call{Call: _e.mock.On("ProcessUpdateBudget", invoice, getLightningInvoice)}
+func (_e *Database_Expecter) ProcessUpdateBudget(invoice interface{}) *Database_ProcessUpdateBudget_Call {
+	return &Database_ProcessUpdateBudget_Call{Call: _e.mock.On("ProcessUpdateBudget", invoice)}
 }
 
-func (_c *Database_ProcessUpdateBudget_Call) Run(run func(invoice db.NewInvoiceList, getLightningInvoice func(string) (db.InvoiceResult, db.InvoiceError))) *Database_ProcessUpdateBudget_Call {
+func (_c *Database_ProcessUpdateBudget_Call) Run(run func(invoice db.NewInvoiceList)) *Database_ProcessUpdateBudget_Call {
 	_c.Call.Run(func(args mock.Arguments) {
-		run(args[0].(db.NewInvoiceList), args[1].(func(string) (db.InvoiceResult, db.InvoiceError)))
+		run(args[0].(db.NewInvoiceList))
 	})
 	return _c
 }
@@ -6865,7 +6864,7 @@ func (_c *Database_ProcessUpdateBudget_Call) Return(_a0 error) *Database_Process
 	return _c
 }
 
-func (_c *Database_ProcessUpdateBudget_Call) RunAndReturn(run func(db.NewInvoiceList, func(string) (db.InvoiceResult, db.InvoiceError)) error) *Database_ProcessUpdateBudget_Call {
+func (_c *Database_ProcessUpdateBudget_Call) RunAndReturn(run func(db.NewInvoiceList) error) *Database_ProcessUpdateBudget_Call {
 	_c.Call.Return(run)
 	return _c
 }

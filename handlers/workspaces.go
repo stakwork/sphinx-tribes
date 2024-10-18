@@ -674,9 +674,18 @@ func (oh *workspaceHandler) PollBudgetInvoices(w http.ResponseWriter, r *http.Re
 
 	workInvoices := oh.db.GetWorkspaceInvoices(uuid)
 	for _, inv := range workInvoices {
-		if !inv.Status && inv.Type == "BUDGET" {
-			oh.db.ProcessUpdateBudget(inv, oh.getLightningInvoice)
+		invoiceRes, invoiceErr := oh.getLightningInvoice(inv.PaymentRequest)
 
+		if invoiceErr.Error != "" {
+			w.WriteHeader(http.StatusForbidden)
+			json.NewEncoder(w).Encode(invoiceErr)
+			return
+		}
+
+		if invoiceRes.Response.Settled {
+			if !inv.Status && inv.Type == "BUDGET" {
+				oh.db.ProcessUpdateBudget(inv)
+			}
 		} else {
 			// Cheeck if time has expired
 			isInvoiceExpired := utils.GetInvoiceExpired(inv.PaymentRequest)
@@ -720,7 +729,7 @@ func (oh *workspaceHandler) PollUserWorkspacesBudget(w http.ResponseWriter, r *h
 
 			if invoiceRes.Response.Settled {
 				if !inv.Status && inv.Type == "BUDGET" {
-					oh.db.ProcessUpdateBudget(inv, oh.getLightningInvoice)
+					oh.db.ProcessUpdateBudget(inv)
 				}
 			} else {
 				// Cheeck if time has expired
