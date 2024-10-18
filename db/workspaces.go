@@ -620,14 +620,14 @@ func (db database) GetLastWithdrawal(workspace_uuid string) NewPaymentHistory {
 
 func (db database) GetSumOfDeposits(workspace_uuid string) uint {
 	var depositAmount uint
-	db.db.Model(&NewPaymentHistory{}).Where("workspace_uuid = ?", workspace_uuid).Where("status = ?", true).Where("payment_status = ?", "deposit").Select("SUM(amount)").Row().Scan(&depositAmount)
+	db.db.Model(&NewPaymentHistory{}).Where("workspace_uuid = ?", workspace_uuid).Where("status = ?", true).Where("payment_type = ?", "deposit").Select("SUM(amount)").Row().Scan(&depositAmount)
 
 	return depositAmount
 }
 
 func (db database) GetSumOfWithdrawal(workspace_uuid string) uint {
 	var depositAmount uint
-	db.db.Model(&NewPaymentHistory{}).Where("workspace_uuid = ?", workspace_uuid).Where("status = ?", true).Where("payment_status = ?", "withdraw").Select("SUM(amount)").Row().Scan(&depositAmount)
+	db.db.Model(&NewPaymentHistory{}).Where("workspace_uuid = ?", workspace_uuid).Where("status = ?", true).Where("payment_type = ?", "withdraw").Select("SUM(amount)").Row().Scan(&depositAmount)
 
 	return depositAmount
 }
