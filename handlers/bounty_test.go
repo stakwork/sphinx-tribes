@@ -1922,6 +1922,22 @@ func TestBountyBudgetWithdraw(t *testing.T) {
 	})
 
 	t.Run("400 BadRequest error if there is an error with invoice payment", func(t *testing.T) {
+		// add a zero amount withdrawal with a time lesser than 2 hours to beat the 1 hour withdrawal timer
+		paymentTime := time.Now().Add(-time.Hour * 2)
+
+		payment := db.NewPaymentHistory{
+			Amount:         0,
+			WorkspaceUuid:  workspace.Uuid,
+			PaymentType:    db.Withdraw,
+			SenderPubKey:   person.OwnerPubKey,
+			ReceiverPubKey: person.OwnerPubKey,
+			Tag:            "test_withdraw_before_400_error",
+			Status:         true,
+			Created:        &paymentTime,
+			Updated:        &paymentTime,
+		}
+
+		db.TestDB.AddPaymentHistory(payment)
 
 		mockHttpClient.On("Do", mock.AnythingOfType("*http.Request")).Return(&http.Response{
 			StatusCode: 400,
@@ -2003,8 +2019,9 @@ func TestBountyBudgetWithdraw(t *testing.T) {
 			finalBudget := db.TestDB.GetWorkspaceBudget(workspace.Uuid)
 			assert.Equal(t, expectedFinalBudget, finalBudget.TotalBudget, "The workspace's final budget should reflect the deductions from the successful withdrawals")
 
-			// add a zero amount withdrawal with a time lesser than 2 hours to beat the 1 hour withdrawal timer
-			paymentTime := time.Now().Add(-time.Hour * 2)
+			// add a zero amount withdrawal with a time lesser than 2 + loop index hours to beat the 1 hour withdrawal timer
+			dur := int(time.Hour.Hours())*2 + i
+			paymentTime = time.Now().Add(-time.Hour * time.Duration(dur))
 
 			tag := fmt.Sprintf("test_withdraw:%d", i)
 
