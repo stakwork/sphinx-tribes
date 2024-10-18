@@ -34,7 +34,6 @@ type bountyHandler struct {
 func NewBountyHandler(httpClient HttpClient, database db.Database) *bountyHandler {
 	dbConf := db.NewDatabaseConfig(&gorm.DB{})
 	return &bountyHandler{
-
 		httpClient:               httpClient,
 		db:                       database,
 		getSocketConnections:     db.Store.GetSocketConnections,
@@ -936,7 +935,7 @@ func (h *bountyHandler) BountyBudgetWithdraw(w http.ResponseWriter, r *http.Requ
 		withdrawCreated := lastWithdrawal.Created
 		withdrawTime := utils.ConvertTimeToTimestamp(withdrawCreated.String())
 
-		hoursDiff := utils.GetHoursDifference(int64(withdrawTime), &now)
+		hoursDiff := h.getHoursDifference(int64(withdrawTime), &now)
 
 		// Check that last withdraw time is greater than 1
 		if hoursDiff < 1 {
