@@ -38,7 +38,6 @@ func BountyRoutes() chi.Router {
 		r.Post("/pay/{id}", bountyHandler.MakeBountyPayment)
 		r.Get("/payment/status/{id}", bountyHandler.GetBountyPaymentStatus)
 		r.Put("/payment/status/{id}", bountyHandler.UpdateBountyPaymentStatus)
-		r.Post("/budget_workspace/withdraw", bountyHandler.NewBountyBudgetWithdraw)
 		r.Get("/payment/status/{id}", bountyHandler.GetBountyPaymentStatus)
 
 		r.Post("/", bountyHandler.CreateOrEditBounty)

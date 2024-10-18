@@ -1851,7 +1851,7 @@ func TestBountyBudgetWithdraw(t *testing.T) {
 		rr := httptest.NewRecorder()
 		handler := http.HandlerFunc(bHandler.BountyBudgetWithdraw)
 
-		validData := []byte(`{"orgUuid": "workspace-uuid", "paymentRequest": "invoice"}`)
+		validData := []byte(`{"workspace_uuid": "workspace-uuid", "paymentRequest": "invoice"}`)
 		req, err := http.NewRequestWithContext(authorizedCtx, http.MethodPost, "/budget/withdraw", bytes.NewReader(validData))
 		if err != nil {
 			t.Fatal(err)
@@ -1872,9 +1872,9 @@ func TestBountyBudgetWithdraw(t *testing.T) {
 		amount := utils.GetInvoiceAmount(invoice)
 		assert.Equal(t, uint(10000), amount)
 
-		withdrawRequest := db.WithdrawBudgetRequest{
+		withdrawRequest := db.NewWithdrawBudgetRequest{
 			PaymentRequest: invoice,
-			OrgUuid:        workspace.Uuid,
+			WorkspaceUuid:  workspace.Uuid,
 		}
 		requestBody, _ := json.Marshal(withdrawRequest)
 		req, _ := http.NewRequestWithContext(authorizedCtx, http.MethodPost, "/budget/withdraw", bytes.NewReader(requestBody))
@@ -1906,9 +1906,9 @@ func TestBountyBudgetWithdraw(t *testing.T) {
 
 		invoice := "lnbc3u1pngsqv8pp5vl6ep8llmg3f9sfu8j7ctcnphylpnjduuyljqf3sc30z6ejmrunqdqzvscqzpgxqyz5vqrzjqwnw5tv745sjpvft6e3f9w62xqk826vrm3zaev4nvj6xr3n065aukqqqqyqqz9gqqyqqqqqqqqqqqqqqqqsp5n9hrrw6pr89qn3c82vvhy697wp45zdsyhm7tnu536ga77ytvxxaq9qrssqqqhenjtquz8wz5tym8v830h9gjezynjsazystzj6muhw4rd9ccc40p8sazjuk77hhcj0xn72lfyee3tsfl7lucxkx5xgtfaqya9qldcqr3072z"
 
-		withdrawRequest := db.WithdrawBudgetRequest{
+		withdrawRequest := db.NewWithdrawBudgetRequest{
 			PaymentRequest: invoice,
-			OrgUuid:        workspace.Uuid,
+			WorkspaceUuid:  workspace.Uuid,
 		}
 
 		requestBody, _ := json.Marshal(withdrawRequest)
@@ -1936,9 +1936,9 @@ func TestBountyBudgetWithdraw(t *testing.T) {
 
 		invoice := "lnbcrt1u1pnv5ejzdqad9h8vmmfvdjjqen0wgsrzvpsxqcrqpp58xyhvymlhc8q05z930fknk2vdl8wnpm5zlx5lgp4ev9u8h7yd4kssp5nu652c5y0epuxeawn8szcgdrjxwk7pfkdh9tsu44r7hacg52nfgq9qrsgqcqpjxqrrssrzjqgtzc5n3vcmlhqfq4vpxreqskxzay6xhdrxx7c38ckqs95v5459uyqqqqyqq9ggqqsqqqqqqqqqqqqqq9gwyffzjpnrwt6yswwd4znt2xqnwjwxgq63qxudru95a8pqeer2r7sduurtstz5x60y4e7m4y9nx6rqy5sr9k08vtwv6s37xh0z5pdwpgqxeqdtv"
 
-		withdrawRequest := db.WithdrawBudgetRequest{
+		withdrawRequest := db.NewWithdrawBudgetRequest{
 			PaymentRequest: invoice,
-			OrgUuid:        workspace.Uuid,
+			WorkspaceUuid:  workspace.Uuid,
 		}
 		requestBody, _ := json.Marshal(withdrawRequest)
 		req, _ := http.NewRequestWithContext(authorizedCtx, http.MethodPost, "/budget/withdraw", bytes.NewReader(requestBody))
@@ -1978,9 +1978,9 @@ func TestBountyBudgetWithdraw(t *testing.T) {
 				Body:       io.NopCloser(bytes.NewBufferString(`{"status": "COMPLETE", "amt_msat": "1000", "timestamp": "" }`)),
 			}, nil)
 
-			withdrawRequest := db.WithdrawBudgetRequest{
+			withdrawRequest := db.NewWithdrawBudgetRequest{
 				PaymentRequest: invoice,
-				OrgUuid:        workspace.Uuid,
+				WorkspaceUuid:  workspace.Uuid,
 			}
 			requestBody, _ := json.Marshal(withdrawRequest)
 			req, _ := http.NewRequestWithContext(authorizedCtx, http.MethodPost, "/budget/withdraw", bytes.NewReader(requestBody))
