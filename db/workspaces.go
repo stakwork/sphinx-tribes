@@ -292,13 +292,11 @@ func (db database) ProcessUpdateBudget(invoice NewInvoiceList, getLightningInvoi
 
 	if invoiceErr.Error != "" {
 		tx.Rollback()
-
 		return errors.New("could not check invoice")
 	}
 
 	if !invoiceRes.Response.Settled {
 		tx.Rollback()
-
 		return errors.New("invoice has not been settled")
 	}
 
