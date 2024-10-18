@@ -684,7 +684,7 @@ func (oh *workspaceHandler) PollBudgetInvoices(w http.ResponseWriter, r *http.Re
 
 		if invoiceRes.Response.Settled {
 			if !inv.Status && inv.Type == "BUDGET" {
-				oh.db.ProcessUpdateBudget(inv)
+				oh.db.ProcessUpdateBudget(inv, oh.getLightningInvoice)
 			}
 		} else {
 			// Cheeck if time has expired
@@ -729,7 +729,7 @@ func (oh *workspaceHandler) PollUserWorkspacesBudget(w http.ResponseWriter, r *h
 
 			if invoiceRes.Response.Settled {
 				if !inv.Status && inv.Type == "BUDGET" {
-					oh.db.ProcessUpdateBudget(inv)
+					oh.db.ProcessUpdateBudget(inv, oh.getLightningInvoice)
 				}
 			} else {
 				// Cheeck if time has expired
@@ -1032,9 +1032,11 @@ func (oh *workspaceHandler) GetLastWithdrawal(w http.ResponseWriter, r *http.Req
 	workspace_uuid := chi.URLParam(r, "workspace_uuid")
 	lastWithdrawal := oh.db.GetLastWithdrawal(workspace_uuid)
 
-	now := time.Now().Unix()
-	withdrawTime := lastWithdrawal.Created
-	hoursDiff := utils.GetHoursDifference(now, withdrawTime)
+	now := time.Now()
+	withdrawCreated := lastWithdrawal.Created
+	withdrawTime := utils.ConvertTimeToTimestamp(withdrawCreated.String())
+
+	hoursDiff := utils.GetHoursDifference(int64(withdrawTime), &now)
 
 	w.WriteHeader(http.StatusOK)
 	json.NewEncoder(w).Encode(hoursDiff)

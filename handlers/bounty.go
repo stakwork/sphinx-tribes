@@ -898,119 +898,8 @@ func (h *bountyHandler) UpdateBountyPaymentStatus(w http.ResponseWriter, r *http
 	json.NewEncoder(w).Encode(msg)
 }
 
+// Todo: change back to BountyBudgetWithdraw
 func (h *bountyHandler) BountyBudgetWithdraw(w http.ResponseWriter, r *http.Request) {
-	h.m.Lock()
-
-	ctx := r.Context()
-	pubKeyFromAuth, _ := ctx.Value(auth.ContextKey).(string)
-
-	if pubKeyFromAuth == "" {
-		fmt.Println("[bounty] no pubkey from auth")
-		w.WriteHeader(http.StatusUnauthorized)
-		h.m.Unlock()
-		return
-	}
-
-	request := db.WithdrawBudgetRequest{}
-	body, err := io.ReadAll(r.Body)
-	r.Body.Close()
-
-	if err != nil {
-		w.WriteHeader(http.StatusNotAcceptable)
-		h.m.Unlock()
-		return
-	}
-
-	err = json.Unmarshal(body, &request)
-	if err != nil {
-		w.WriteHeader(http.StatusNotAcceptable)
-		h.m.Unlock()
-		return
-	}
-
-	lastWithdrawal := h.db.GetLastWithdrawal(request.OrgUuid)
-
-	if lastWithdrawal.ID > 0 {
-		now := time.Now()
-		withdrawCreated := lastWithdrawal.Created
-		withdrawTime := utils.ConvertTimeToTimestamp(withdrawCreated.String())
-
-		hoursDiff := h.getHoursDifference(int64(withdrawTime), &now)
-
-		// Check that last withdraw time is greater than 1
-		if hoursDiff < 1 {
-			w.WriteHeader(http.StatusForbidden)
-			errMsg := formatPayError("Your last withdrawal is not more than an hour ago")
-			log.Println("Your last withdrawal is not more than an hour ago", hoursDiff, lastWithdrawal.Created, request.OrgUuid)
-			json.NewEncoder(w).Encode(errMsg)
-			h.m.Unlock()
-			return
-		}
-	}
-
-	log.Printf("[bounty] [BountyBudgetWithdraw] Logging body: workspace_uuid: %s, pubkey: %s, invoice: %s", request.OrgUuid, pubKeyFromAuth, request.PaymentRequest)
-
-	// check if user is the admin of the workspace
-	// or has a withdraw bounty budget role
-	hasRole := h.userHasAccess(pubKeyFromAuth, request.OrgUuid, db.WithdrawBudget)
-	if !hasRole {
-		w.WriteHeader(http.StatusUnauthorized)
-		errMsg := formatPayError("You don't have appropriate permissions to withdraw bounty budget")
-		json.NewEncoder(w).Encode(errMsg)
-		h.m.Unlock()
-		return
-	}
-
-	amount := utils.GetInvoiceAmount(request.PaymentRequest)
-
-	if amount > 0 {
-		// check if the workspace bounty balance
-		// is greater than the amount
-		orgBudget := h.db.GetWorkspaceBudget(request.OrgUuid)
-		if amount > orgBudget.TotalBudget {
-			w.WriteHeader(http.StatusForbidden)
-			errMsg := formatPayError("Workspace budget is not enough to withdraw the amount")
-			json.NewEncoder(w).Encode(errMsg)
-			h.m.Unlock()
-			return
-		}
-
-		// Check that the deposit is more than the withdrawal plus amount to withdraw
-		sumOfWithdrawals := h.db.GetSumOfWithdrawal(request.OrgUuid)
-		sumOfDeposits := h.db.GetSumOfDeposits(request.OrgUuid)
-
-		if sumOfDeposits < sumOfWithdrawals+amount {
-			w.WriteHeader(http.StatusForbidden)
-
-			log.Printf("Sum of deposits is lesser than withdrawal: %d : %d", sumOfDeposits, sumOfWithdrawals)
-			errMsg := formatPayError("Your deposits is lesser than your withdrawal")
-			json.NewEncoder(w).Encode(errMsg)
-			h.m.Unlock()
-			return
-		}
-
-		paymentSuccess, paymentError := h.PayLightningInvoice(request.PaymentRequest)
-		if paymentSuccess.Success {
-			// withdraw amount from workspace budget
-			h.db.WithdrawBudget(pubKeyFromAuth, request.OrgUuid, amount)
-			w.WriteHeader(http.StatusOK)
-			json.NewEncoder(w).Encode(paymentSuccess)
-		} else {
-			log.Printf("Withdrawal payment failed: %s ", paymentError.Error)
-			w.WriteHeader(http.StatusBadRequest)
-			json.NewEncoder(w).Encode(paymentError)
-		}
-	} else {
-		w.WriteHeader(http.StatusForbidden)
-		errMsg := formatPayError("Could not pay lightning invoice")
-		json.NewEncoder(w).Encode(errMsg)
-	}
-
-	h.m.Unlock()
-}
-
-// Todo: change back to NewBountyBudgetWithdraw
-func (h *bountyHandler) NewBountyBudgetWithdraw(w http.ResponseWriter, r *http.Request) {
 	h.m.Lock()
 
 	ctx := r.Context()
@@ -1042,18 +931,22 @@ func (h *bountyHandler) NewBountyBudgetWithdraw(w http.ResponseWriter, r *http.R
 
 	lastWithdrawal := h.db.GetLastWithdrawal(request.WorkspaceUuid)
 
-	now := time.Now()
-	withdrawCreated := lastWithdrawal.Created
-	withdrawTime := utils.ConvertTimeToTimestamp(withdrawCreated.String())
-	hoursDiff := h.getHoursDifference(int64(withdrawTime), &now)
+	if lastWithdrawal.ID > 0 {
+		now := time.Now()
+		withdrawCreated := lastWithdrawal.Created
+		withdrawTime := utils.ConvertTimeToTimestamp(withdrawCreated.String())
 
-	// Check that last withdraw time is greater than 1
-	if hoursDiff < 1 {
-		w.WriteHeader(http.StatusUnauthorized)
-		errMsg := formatPayError("Your last withdrawal is  not more than an hour ago")
-		json.NewEncoder(w).Encode(errMsg)
-		h.m.Unlock()
-		return
+		hoursDiff := h.getHoursDifference(int64(withdrawTime), &now)
+
+		// Check that last withdraw time is greater than 1
+		if hoursDiff < 1 {
+			w.WriteHeader(http.StatusUnauthorized)
+			errMsg := formatPayError("Your last withdrawal is  not more than an hour ago")
+			log.Println("Your last withdrawal is not more than an hour ago", hoursDiff, lastWithdrawal.Created, request.WorkspaceUuid)
+			json.NewEncoder(w).Encode(errMsg)
+			h.m.Unlock()
+			return
+		}
 	}
 
 	log.Printf("[bounty] [BountyBudgetWithdraw] Logging body: workspace_uuid: %s, pubkey: %s, invoice: %s", request.WorkspaceUuid, pubKeyFromAuth, request.PaymentRequest)
@@ -1072,6 +965,17 @@ func (h *bountyHandler) NewBountyBudgetWithdraw(w http.ResponseWriter, r *http.R
 	amount := utils.GetInvoiceAmount(request.PaymentRequest)
 
 	if amount > 0 {
+		// check if the workspace bounty balance
+		// is greater than the amount
+		orgBudget := h.db.GetWorkspaceBudget(request.WorkspaceUuid)
+		if amount > orgBudget.TotalBudget {
+			w.WriteHeader(http.StatusForbidden)
+			errMsg := formatPayError("Workspace budget is not enough to withdraw the amount")
+			json.NewEncoder(w).Encode(errMsg)
+			h.m.Unlock()
+			return
+		}
+
 		// Check that the deposit is more than the withdrawal plus amount to withdraw
 		sumOfWithdrawals := h.db.GetSumOfWithdrawal(request.WorkspaceUuid)
 		sumOfDeposits := h.db.GetSumOfDeposits(request.WorkspaceUuid)
@@ -1084,16 +988,6 @@ func (h *bountyHandler) NewBountyBudgetWithdraw(w http.ResponseWriter, r *http.R
 			return
 		}
 
-		// check if the workspace bounty balance
-		// is greater than the amount
-		orgBudget := h.db.GetWorkspaceBudget(request.WorkspaceUuid)
-		if amount > orgBudget.TotalBudget {
-			w.WriteHeader(http.StatusForbidden)
-			errMsg := formatPayError("Workspace budget is not enough to withdraw the amount")
-			json.NewEncoder(w).Encode(errMsg)
-			h.m.Unlock()
-			return
-		}
 		paymentSuccess, paymentError := h.PayLightningInvoice(request.PaymentRequest)
 		if paymentSuccess.Success {
 			// withdraw amount from workspace budget
@@ -1387,6 +1281,8 @@ func (h *bountyHandler) GetInvoiceData(w http.ResponseWriter, r *http.Request) {
 }
 
 func (h *bountyHandler) PollInvoice(w http.ResponseWriter, r *http.Request) {
+	h.m.Lock()
+
 	ctx := r.Context()
 	pubKeyFromAuth, _ := ctx.Value(auth.ContextKey).(string)
 	paymentRequest := chi.URLParam(r, "paymentRequest")
@@ -1395,6 +1291,7 @@ func (h *bountyHandler) PollInvoice(w http.ResponseWriter, r *http.Request) {
 	if pubKeyFromAuth == "" {
 		fmt.Println("[bounty] no pubkey from auth")
 		w.WriteHeader(http.StatusUnauthorized)
+		h.m.Unlock()
 		return
 	}
 
@@ -1403,6 +1300,7 @@ func (h *bountyHandler) PollInvoice(w http.ResponseWriter, r *http.Request) {
 	if invoiceErr.Error != "" {
 		w.WriteHeader(http.StatusForbidden)
 		json.NewEncoder(w).Encode(invoiceErr)
+		h.m.Unlock()
 		return
 	}
 
@@ -1537,6 +1435,8 @@ func (h *bountyHandler) PollInvoice(w http.ResponseWriter, r *http.Request) {
 
 	w.WriteHeader(http.StatusOK)
 	json.NewEncoder(w).Encode(invoiceRes)
+
+	h.m.Unlock()
 }
 
 func GetFilterCount(w http.ResponseWriter, r *http.Request) {

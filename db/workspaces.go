@@ -264,7 +264,7 @@ func (db database) GetWorkspaceBudgetHistory(workspace_uuid string) []BudgetHist
 	return budgetHistory
 }
 
-func (db database) ProcessUpdateBudget(invoice NewInvoiceList) error {
+func (db database) ProcessUpdateBudget(invoice NewInvoiceList, getLightningInvoice func(payment_request string) (InvoiceResult, InvoiceError)) error {
 	// Start db transaction
 	tx := db.db.Begin()
 
@@ -282,6 +282,25 @@ func (db database) ProcessUpdateBudget(invoice NewInvoiceList) error {
 
 	created := invoice.Created
 	workspace_uuid := invoice.WorkspaceUuid
+
+	if invoice.Status {
+		tx.Rollback()
+		return errors.New("cannot process already paid invoice")
+	}
+
+	invoiceRes, invoiceErr := getLightningInvoice(invoice.PaymentRequest)
+
+	if invoiceErr.Error != "" {
+		tx.Rollback()
+
+		return errors.New("could not check invoice")
+	}
+
+	if !invoiceRes.Response.Settled {
+		tx.Rollback()
+
+		return errors.New("invoice has not been settled")
+	}
 
 	if workspace_uuid == "" {
 		return errors.New("cannot Create a Workspace Without a Workspace uuid")
