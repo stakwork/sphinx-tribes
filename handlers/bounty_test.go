@@ -1939,7 +1939,7 @@ func TestBountyBudgetWithdraw(t *testing.T) {
 
 		db.TestDB.AddPaymentHistory(payment)
 
-		time.Sleep(2 * time.Second)
+		time.Sleep(1 * time.Second)
 
 		mockHttpClient.On("Do", mock.AnythingOfType("*http.Request")).Return(&http.Response{
 			StatusCode: 400,
@@ -2000,7 +2000,7 @@ func TestBountyBudgetWithdraw(t *testing.T) {
 
 			db.TestDB.AddPaymentHistory(payment)
 
-			time.Sleep(2 * time.Second)
+			time.Sleep(1 * time.Second)
 
 			mockHttpClient.On("Do", mock.AnythingOfType("*http.Request")).Return(&http.Response{
 				StatusCode: 200,
