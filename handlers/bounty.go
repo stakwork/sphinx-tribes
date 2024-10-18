@@ -26,6 +26,7 @@ type bountyHandler struct {
 	generateBountyResponse   func(bounties []db.NewBounty) []db.BountyResponse
 	userHasAccess            func(pubKeyFromAuth string, uuid string, role string) bool
 	getInvoiceStatusByTag    func(tag string) db.V2TagRes
+	getHoursDifference       func(createdDate int64, endDate *time.Time) int64
 	userHasManageBountyRoles func(pubKeyFromAuth string, uuid string) bool
 	m                        sync.Mutex
 }
@@ -39,6 +40,7 @@ func NewBountyHandler(httpClient HttpClient, database db.Database) *bountyHandle
 		getSocketConnections:     db.Store.GetSocketConnections,
 		userHasAccess:            dbConf.UserHasAccess,
 		getInvoiceStatusByTag:    GetInvoiceStatusByTag,
+		getHoursDifference:       utils.GetHoursDifference,
 		userHasManageBountyRoles: dbConf.UserHasManageBountyRoles,
 	}
 }
@@ -930,10 +932,10 @@ func (h *bountyHandler) BountyBudgetWithdraw(w http.ResponseWriter, r *http.Requ
 	lastWithdrawal := h.db.GetLastWithdrawal(request.OrgUuid)
 
 	if lastWithdrawal.ID > 0 {
-
 		now := time.Now()
 		withdrawCreated := lastWithdrawal.Created
 		withdrawTime := utils.ConvertTimeToTimestamp(withdrawCreated.String())
+
 		hoursDiff := utils.GetHoursDifference(int64(withdrawTime), &now)
 
 		// Check that last withdraw time is greater than 1
@@ -1044,7 +1046,7 @@ func (h *bountyHandler) NewBountyBudgetWithdraw(w http.ResponseWriter, r *http.R
 	now := time.Now()
 	withdrawCreated := lastWithdrawal.Created
 	withdrawTime := utils.ConvertTimeToTimestamp(withdrawCreated.String())
-	hoursDiff := utils.GetHoursDifference(int64(withdrawTime), &now)
+	hoursDiff := h.getHoursDifference(int64(withdrawTime), &now)
 
 	// Check that last withdraw time is greater than 1
 	if hoursDiff < 1 {

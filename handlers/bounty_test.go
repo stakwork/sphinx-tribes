@@ -1765,6 +1765,10 @@ func TestBountyBudgetWithdraw(t *testing.T) {
 		return false
 	}
 
+	getHoursDifference := func(createdDate int64, endDate *time.Time) int64 {
+		return 2
+	}
+
 	person := db.Person{
 		Uuid:        uuid.New().String(),
 		OwnerAlias:  "test-alias",
@@ -1802,25 +1806,6 @@ func TestBountyBudgetWithdraw(t *testing.T) {
 	}
 
 	db.TestDB.AddPaymentHistory(payment)
-
-	// add a zero amount withdrawal with a time lesser than 2 hours to beat the 1 hour withdrawal timer
-	paymentWTime := time.Now().Add(-time.Hour * 3)
-
-	payment = db.NewPaymentHistory{
-		Amount:         0,
-		WorkspaceUuid:  workspace.Uuid,
-		PaymentType:    db.Withdraw,
-		SenderPubKey:   person.OwnerPubKey,
-		ReceiverPubKey: person.OwnerPubKey,
-		Tag:            "test_withdraw__time",
-		Status:         true,
-		Created:        &paymentWTime,
-		Updated:        &paymentWTime,
-	}
-
-	db.TestDB.AddPaymentHistory(payment)
-
-	time.Sleep(1 * time.Second)
 
 	budget := db.NewBountyBudget{
 		WorkspaceUuid: workspace.Uuid,
@@ -1941,6 +1926,8 @@ func TestBountyBudgetWithdraw(t *testing.T) {
 	})
 
 	t.Run("400 BadRequest error if there is an error with invoice payment", func(t *testing.T) {
+		bHandler.getHoursDifference = getHoursDifference
+
 		mockHttpClient.On("Do", mock.AnythingOfType("*http.Request")).Return(&http.Response{
 			StatusCode: 400,
 			Body:       io.NopCloser(bytes.NewBufferString(`{"success": false, "error": "Payment error"}`)),
@@ -1969,6 +1956,7 @@ func TestBountyBudgetWithdraw(t *testing.T) {
 	})
 
 	t.Run("Should test that an Workspace's Budget Total Amount is accurate after three (3) successful 'Budget Withdrawal Requests'", func(t *testing.T) {
+		bHandler.getHoursDifference = getHoursDifference
 
 		paymentAmount := uint(1000)
 		initialBudget := budget.TotalBudget
