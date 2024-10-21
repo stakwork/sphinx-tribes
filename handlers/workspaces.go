@@ -1033,7 +1033,7 @@ func (oh *workspaceHandler) GetLastWithdrawal(w http.ResponseWriter, r *http.Req
 	workspace_uuid := chi.URLParam(r, "workspace_uuid")
 	lastWithdrawal := oh.db.GetLastWithdrawal(workspace_uuid)
 
-	log.Panicln("This workspaces last withdrawal is", workspace_uuid, lastWithdrawal)
+	log.Println("This workspaces last withdrawal is", workspace_uuid, lastWithdrawal)
 
 	hoursDiff := int64(1)
 
@@ -1043,7 +1043,7 @@ func (oh *workspaceHandler) GetLastWithdrawal(w http.ResponseWriter, r *http.Req
 		withdrawTime := utils.ConvertTimeToTimestamp(withdrawCreated.String())
 
 		hoursDiff = utils.GetHoursDifference(int64(withdrawTime), &now)
-		log.Panicln("This workspaces last withdrawal hours difference is", hoursDiff)
+		log.Println("This workspaces last withdrawal hours difference is", hoursDiff)
 	}
 
 	w.WriteHeader(http.StatusOK)
