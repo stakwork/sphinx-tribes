@@ -51,6 +51,8 @@ func WorkspaceRoutes() chi.Router {
 		r.Get("/{workspace_uuid}/features", workspaceHandlers.GetFeaturesByWorkspaceUuid)
 		r.Get("/{workspace_uuid}/repository/{uuid}", workspaceHandlers.GetWorkspaceRepoByWorkspaceUuidAndRepoUuid)
 		r.Delete("/{workspace_uuid}/repository/{uuid}", workspaceHandlers.DeleteWorkspaceRepository)
+
+		r.Get("/{workspace_uuid}/lastwithdrawal", workspaceHandlers.GetLastWithdrawal)
 	})
 	return r
 }
