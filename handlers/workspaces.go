@@ -1020,6 +1020,28 @@ func (oh *workspaceHandler) GetFeaturesByWorkspaceUuid(w http.ResponseWriter, r 
 	json.NewEncoder(w).Encode(workspaceFeatures)
 }
 
+func (oh *workspaceHandler) GetLastWithdrawal(w http.ResponseWriter, r *http.Request) {
+	ctx := r.Context()
+	pubKeyFromAuth, _ := ctx.Value(auth.ContextKey).(string)
+	if pubKeyFromAuth == "" {
+		fmt.Println("[workspaces] no pubkey from auth")
+		w.WriteHeader(http.StatusUnauthorized)
+		return
+	}
+
+	workspace_uuid := chi.URLParam(r, "workspace_uuid")
+	lastWithdrawal := oh.db.GetLastWithdrawal(workspace_uuid)
+
+	now := time.Now()
+	withdrawCreated := lastWithdrawal.Created
+	withdrawTime := utils.ConvertTimeToTimestamp(withdrawCreated.String())
+
+	hoursDiff := utils.GetHoursDifference(int64(withdrawTime), &now)
+
+	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode(hoursDiff)
+}
+
 func GetAllUserWorkspaces(pubkey string) []db.Workspace {
 	// get the workspaces created by the user, then get all the workspaces
 	// the user has been added to, loop through to get the workspace
