@@ -256,13 +256,22 @@ func (h *bountyHandler) CreateOrEditBounty(w http.ResponseWriter, r *http.Reques
 		// get bounty from DB
 		dbBounty := h.db.GetBounty(bounty.ID)
 
+		// check if the bounty has a pending payment
+		if dbBounty.PaymentPending {
+			msg := "You cannot update a bounty with a pending payment"
+			fmt.Println("[bounty]", msg)
+			w.WriteHeader(http.StatusBadRequest)
+			json.NewEncoder(w).Encode(msg)
+			return
+		}
+
 		// trying to update
 		// check if bounty belongs to user
 		if pubKeyFromAuth != dbBounty.OwnerID {
 			if bounty.WorkspaceUuid != "" {
 				hasBountyRoles := h.userHasManageBountyRoles(pubKeyFromAuth, bounty.WorkspaceUuid)
 				if !hasBountyRoles {
-					msg := "You don't have a=the right permission ton update bounty"
+					msg := "You don't have the right permission ton update bounty"
 					fmt.Println("[bounty]", msg)
 					w.WriteHeader(http.StatusBadRequest)
 					json.NewEncoder(w).Encode(msg)
@@ -360,6 +369,12 @@ func UpdatePaymentStatus(w http.ResponseWriter, r *http.Request) {
 	created, _ := strconv.ParseUint(createdParam, 10, 32)
 
 	bounty, _ := db.DB.GetBountyByCreated(uint(created))
+	if bounty.PaymentPending {
+		w.WriteHeader(http.StatusBadGateway)
+		json.NewEncoder(w).Encode("Cannot update a bounty with a pending payment")
+		return
+	}
+
 	if bounty.ID != 0 && bounty.Created == int64(created) {
 		bounty.Paid = !bounty.Paid
 		now := time.Now()
@@ -369,6 +384,7 @@ func UpdatePaymentStatus(w http.ResponseWriter, r *http.Request) {
 			bounty.Completed = true
 			bounty.CompletionDate = &now
 			bounty.MarkAsPaidDate = &now
+
 			if bounty.PaidDate == nil {
 				bounty.PaidDate = &now
 			}
@@ -382,8 +398,14 @@ func UpdatePaymentStatus(w http.ResponseWriter, r *http.Request) {
 func UpdateCompletedStatus(w http.ResponseWriter, r *http.Request) {
 	createdParam := chi.URLParam(r, "created")
 	created, _ := strconv.ParseUint(createdParam, 10, 32)
-
 	bounty, _ := db.DB.GetBountyByCreated(uint(created))
+
+	if bounty.PaymentPending {
+		w.WriteHeader(http.StatusBadGateway)
+		json.NewEncoder(w).Encode("Cannot update a bounty with a pending payment")
+		return
+	}
+
 	if bounty.ID != 0 && bounty.Created == int64(created) {
 		now := time.Now()
 		// set bounty as completed
@@ -436,6 +458,8 @@ func (h *bountyHandler) GenerateBountyResponse(bounties []db.NewBounty) []db.Bou
 				Updated:                 bounty.Updated,
 				CodingLanguages:         bounty.CodingLanguages,
 				Completed:               bounty.Completed,
+				PaymentPending:          bounty.PaymentPending,
+				PaymentFailed:           bounty.PaymentFailed,
 			},
 			Assignee: db.Person{
 				ID:               assignee.ID,
@@ -527,6 +551,13 @@ func (h *bountyHandler) MakeBountyPayment(w http.ResponseWriter, r *http.Request
 	if bounty.Paid {
 		w.WriteHeader(http.StatusMethodNotAllowed)
 		json.NewEncoder(w).Encode("Bounty has already been paid")
+		h.m.Unlock()
+		return
+	}
+
+	if bounty.PaymentPending {
+		w.WriteHeader(http.StatusBadRequest)
+		json.NewEncoder(w).Encode("Bounty payemnt is pending, cannot retry payment")
 		h.m.Unlock()
 		return
 	}
@@ -637,7 +668,7 @@ func (h *bountyHandler) MakeBountyPayment(w http.ResponseWriter, r *http.Request
 				BountyId:       id,
 				Created:        &now,
 				Updated:        &now,
-				Status:         true,
+				Status:         false,
 				PaymentType:    "payment",
 				Tag:            v2KeysendRes.Tag,
 				PaymentStatus:  v2KeysendRes.Status,
@@ -649,6 +680,7 @@ func (h *bountyHandler) MakeBountyPayment(w http.ResponseWriter, r *http.Request
 				bounty.PaidDate = &now
 				bounty.Completed = true
 				bounty.CompletionDate = &now
+				paymentHistory.Status = true
 
 				h.db.ProcessBountyPayment(paymentHistory, bounty)
 
@@ -659,9 +691,41 @@ func (h *bountyHandler) MakeBountyPayment(w http.ResponseWriter, r *http.Request
 				if err == nil {
 					socket.Conn.WriteJSON(msg)
 				}
+
+				h.m.Unlock()
+				return
+			} else if v2KeysendRes.Status == db.PaymentPending {
+				// Send payment status
+				log.Printf("[bounty] V2 Status is pending:  %s", v2KeysendRes.Status)
+				bounty.Paid = false
+				bounty.PaymentPending = true
+				bounty.PaidDate = &now
+				bounty.Completed = true
+				bounty.CompletionDate = &now
+				paymentHistory.Status = true
+
+				h.db.ProcessBountyPayment(paymentHistory, bounty)
+
+				msg["msg"] = "keysend_pending"
+				msg["invoice"] = ""
+
+				socket, err := h.getSocketConnections(request.Websocket_token)
+				if err == nil {
+					socket.Conn.WriteJSON(msg)
+				}
+
+				h.m.Unlock()
+				return
 			} else {
 				// Send payment status
 				log.Printf("[bounty] V2 Status Was not completed:  %s", v2KeysendRes.Status)
+
+				bounty.Paid = false
+				bounty.PaymentPending = false
+				bounty.PaymentFailed = true
+
+				// set the error message
+				paymentHistory.Error = v2KeysendRes.Message
 
 				h.db.AddPaymentHistory(paymentHistory)
 
@@ -775,8 +839,6 @@ func (h *bountyHandler) MakeBountyPayment(w http.ResponseWriter, r *http.Request
 			return
 		}
 	}
-
-	h.m.Unlock()
 }
 
 func (h *bountyHandler) GetBountyPaymentStatus(w http.ResponseWriter, r *http.Request) {
@@ -878,6 +940,7 @@ func (h *bountyHandler) UpdateBountyPaymentStatus(w http.ResponseWriter, r *http
 			now := time.Now()
 
 			bounty.Paid = true
+			bounty.PaymentPending = false
 			bounty.PaidDate = &now
 			bounty.Completed = true
 			bounty.CompletionDate = &now

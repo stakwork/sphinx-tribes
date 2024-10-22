@@ -440,17 +440,6 @@ func (db database) WithdrawBudget(sender_pubkey string, workspace_uuid string, a
 func (db database) AddPaymentHistory(payment NewPaymentHistory) NewPaymentHistory {
 	db.db.Create(&payment)
 
-	// get Workspace budget and subtract payment from total budget
-	WorkspaceBudget := db.GetWorkspaceBudget(payment.WorkspaceUuid)
-	totalBudget := WorkspaceBudget.TotalBudget
-
-	// deduct amount if it's a bounty payment
-	if payment.PaymentType == "payment" {
-		WorkspaceBudget.TotalBudget = totalBudget - payment.Amount
-	}
-
-	db.UpdateWorkspaceBudget(WorkspaceBudget)
-
 	return payment
 }
 
