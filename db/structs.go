@@ -390,6 +390,7 @@ type Bounty struct {
 	CodingLanguages         pq.StringArray `gorm:"type:text[];not null default:'[]'" json:"coding_languages"`
 	PhaseUuid               *string        `json:"phase_uuid"`
 	PhasePriority           *int           `json:"phase_priority"`
+	PaymentPending          bool           `gorm:"default:false" json:"payment_pending"`
 }
 
 // Todo: Change back to Bounty
@@ -427,6 +428,7 @@ type NewBounty struct {
 	CodingLanguages         pq.StringArray `gorm:"type:text[];not null default:'[]'" json:"coding_languages"`
 	PhaseUuid               string         `json:"phase_uuid"`
 	PhasePriority           int            `json:"phase_priority"`
+	PaymentPending          bool           `gorm:"default:false" json:"payment_pending"`
 }
 
 type BountyOwners struct {

@@ -660,10 +660,28 @@ func (h *bountyHandler) MakeBountyPayment(w http.ResponseWriter, r *http.Request
 				if err == nil {
 					socket.Conn.WriteJSON(msg)
 				}
+			} else if v2KeysendRes.Status == db.PaymentPending {
+				// Send payment status
+				log.Printf("[bounty] V2 Status is pending:  %s", v2KeysendRes.Status)
+				bounty.Paid = false
+				bounty.PaymentPending = true
+				bounty.PaidDate = &now
+				bounty.Completed = true
+				bounty.CompletionDate = &now
+				paymentHistory.Status = true
+
+				h.db.ProcessBountyPayment(paymentHistory, bounty)
+
+				msg["msg"] = "keysend_pending"
+				msg["invoice"] = ""
+
+				socket, err := h.getSocketConnections(request.Websocket_token)
+				if err == nil {
+					socket.Conn.WriteJSON(msg)
+				}
 			} else {
 				// Send payment status
 				log.Printf("[bounty] V2 Status Was not completed:  %s", v2KeysendRes.Status)
-				paymentHistory.Status = false
 
 				h.db.AddPaymentHistory(paymentHistory)
 
