@@ -691,6 +691,9 @@ func (h *bountyHandler) MakeBountyPayment(w http.ResponseWriter, r *http.Request
 				if err == nil {
 					socket.Conn.WriteJSON(msg)
 				}
+
+				h.m.Unlock()
+				return
 			} else if v2KeysendRes.Status == db.PaymentPending {
 				// Send payment status
 				log.Printf("[bounty] V2 Status is pending:  %s", v2KeysendRes.Status)
@@ -710,6 +713,9 @@ func (h *bountyHandler) MakeBountyPayment(w http.ResponseWriter, r *http.Request
 				if err == nil {
 					socket.Conn.WriteJSON(msg)
 				}
+
+				h.m.Unlock()
+				return
 			} else {
 				// Send payment status
 				log.Printf("[bounty] V2 Status Was not completed:  %s", v2KeysendRes.Status)
@@ -833,8 +839,6 @@ func (h *bountyHandler) MakeBountyPayment(w http.ResponseWriter, r *http.Request
 			return
 		}
 	}
-
-	h.m.Unlock()
 }
 
 func (h *bountyHandler) GetBountyPaymentStatus(w http.ResponseWriter, r *http.Request) {
