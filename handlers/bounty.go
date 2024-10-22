@@ -446,6 +446,8 @@ func (h *bountyHandler) GenerateBountyResponse(bounties []db.NewBounty) []db.Bou
 				Updated:                 bounty.Updated,
 				CodingLanguages:         bounty.CodingLanguages,
 				Completed:               bounty.Completed,
+				PaymentPending:          bounty.PaymentPending,
+				PaymentFailed:           bounty.PaymentFailed,
 			},
 			Assignee: db.Person{
 				ID:               assignee.ID,
