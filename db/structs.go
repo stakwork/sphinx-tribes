@@ -391,6 +391,7 @@ type Bounty struct {
 	PhaseUuid               *string        `json:"phase_uuid"`
 	PhasePriority           *int           `json:"phase_priority"`
 	PaymentPending          bool           `gorm:"default:false" json:"payment_pending"`
+	PaymentFailed           bool           `gorm:"default:false" json:"payment_failed"`
 }
 
 // Todo: Change back to Bounty
@@ -429,6 +430,7 @@ type NewBounty struct {
 	PhaseUuid               string         `json:"phase_uuid"`
 	PhasePriority           int            `json:"phase_priority"`
 	PaymentPending          bool           `gorm:"default:false" json:"payment_pending"`
+	PaymentFailed           bool           `gorm:"default:false" json:"payment_failed"`
 }
 
 type BountyOwners struct {
@@ -720,6 +722,7 @@ type PaymentHistory struct {
 	ReceiverPubKey string      `json:"receiver_pubkey"`
 	Tag            string      `json:"tag,omitempty"`
 	PaymentStatus  string      `json:"payment_status,omitempty"`
+	Error          string      `json:"error,omitempty"`
 	Created        *time.Time  `json:"created"`
 	Updated        *time.Time  `json:"updated"`
 	Status         bool        `json:"status"`
@@ -736,6 +739,7 @@ type NewPaymentHistory struct {
 	ReceiverPubKey string      `json:"receiver_pubkey"`
 	Tag            string      `json:"tag,omitempty"`
 	PaymentStatus  string      `json:"payment_status,omitempty"`
+	Error          string      `json:"error,omitempty"`
 	Created        *time.Time  `json:"created"`
 	Updated        *time.Time  `json:"updated"`
 	Status         bool        `json:"status"`
