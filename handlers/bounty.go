@@ -369,6 +369,12 @@ func UpdatePaymentStatus(w http.ResponseWriter, r *http.Request) {
 	created, _ := strconv.ParseUint(createdParam, 10, 32)
 
 	bounty, _ := db.DB.GetBountyByCreated(uint(created))
+	if bounty.PaymentPending {
+		w.WriteHeader(http.StatusBadGateway)
+		json.NewEncoder(w).Encode("Cannot update a bounty with a pending payment")
+		return
+	}
+
 	if bounty.ID != 0 && bounty.Created == int64(created) {
 		bounty.Paid = !bounty.Paid
 		now := time.Now()
@@ -392,8 +398,14 @@ func UpdatePaymentStatus(w http.ResponseWriter, r *http.Request) {
 func UpdateCompletedStatus(w http.ResponseWriter, r *http.Request) {
 	createdParam := chi.URLParam(r, "created")
 	created, _ := strconv.ParseUint(createdParam, 10, 32)
-
 	bounty, _ := db.DB.GetBountyByCreated(uint(created))
+
+	if bounty.PaymentPending {
+		w.WriteHeader(http.StatusBadGateway)
+		json.NewEncoder(w).Encode("Cannot update a bounty with a pending payment")
+		return
+	}
+
 	if bounty.ID != 0 && bounty.Created == int64(created) {
 		now := time.Now()
 		// set bounty as completed
