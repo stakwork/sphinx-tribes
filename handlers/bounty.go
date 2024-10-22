@@ -637,7 +637,7 @@ func (h *bountyHandler) MakeBountyPayment(w http.ResponseWriter, r *http.Request
 				BountyId:       id,
 				Created:        &now,
 				Updated:        &now,
-				Status:         true,
+				Status:         false,
 				PaymentType:    "payment",
 				Tag:            v2KeysendRes.Tag,
 				PaymentStatus:  v2KeysendRes.Status,
@@ -649,6 +649,7 @@ func (h *bountyHandler) MakeBountyPayment(w http.ResponseWriter, r *http.Request
 				bounty.PaidDate = &now
 				bounty.Completed = true
 				bounty.CompletionDate = &now
+				paymentHistory.Status = true
 
 				h.db.ProcessBountyPayment(paymentHistory, bounty)
 
@@ -662,6 +663,7 @@ func (h *bountyHandler) MakeBountyPayment(w http.ResponseWriter, r *http.Request
 			} else {
 				// Send payment status
 				log.Printf("[bounty] V2 Status Was not completed:  %s", v2KeysendRes.Status)
+				paymentHistory.Status = false
 
 				h.db.AddPaymentHistory(paymentHistory)
 
