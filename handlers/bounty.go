@@ -693,6 +693,9 @@ func (h *bountyHandler) MakeBountyPayment(w http.ResponseWriter, r *http.Request
 				}
 
 				h.m.Unlock()
+
+				w.WriteHeader(http.StatusOK)
+				json.NewEncoder(w).Encode(msg)
 				return
 			} else if v2KeysendRes.Status == db.PaymentPending {
 				// Send payment status
@@ -715,6 +718,9 @@ func (h *bountyHandler) MakeBountyPayment(w http.ResponseWriter, r *http.Request
 				}
 
 				h.m.Unlock()
+
+				w.WriteHeader(http.StatusOK)
+				json.NewEncoder(w).Encode(msg)
 				return
 			} else {
 				// Send payment status
@@ -737,7 +743,11 @@ func (h *bountyHandler) MakeBountyPayment(w http.ResponseWriter, r *http.Request
 				if err == nil {
 					socket.Conn.WriteJSON(msg)
 				}
+
 				h.m.Unlock()
+
+				w.WriteHeader(http.StatusBadRequest)
+				json.NewEncoder(w).Encode(msg)
 				return
 			}
 		} else { // Send Payment error
@@ -751,6 +761,9 @@ func (h *bountyHandler) MakeBountyPayment(w http.ResponseWriter, r *http.Request
 			}
 
 			h.m.Unlock()
+
+			w.WriteHeader(http.StatusBadRequest)
+			json.NewEncoder(w).Encode(msg)
 			return
 		}
 	} else { // Process v1 payment
