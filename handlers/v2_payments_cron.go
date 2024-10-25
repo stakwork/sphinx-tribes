@@ -40,7 +40,7 @@ func InitV2PaymentsCron() {
 			bounty := db.DB.GetBounty(payment.ID)
 
 			if bounty.ID > 0 {
-				db.DB.SetPaymentStatusByBountyId(bounty.ID, tagResult.Status, tagResult.Error)
+				db.DB.SetPaymentStatusByBountyId(bounty.ID, tagResult)
 
 				bounty.Paid = false
 				bounty.PaymentPending = false
