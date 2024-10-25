@@ -952,11 +952,25 @@ func (h *bountyHandler) UpdateBountyPaymentStatus(w http.ResponseWriter, r *http
 
 			now := time.Now()
 
-			bounty.Paid = true
 			bounty.PaymentPending = false
+			bounty.PaymentFailed = false
+			bounty.Paid = true
 			bounty.PaidDate = &now
 			bounty.Completed = true
 			bounty.CompletionDate = &now
+
+			h.db.UpdateBounty(bounty)
+
+			w.WriteHeader(http.StatusOK)
+			json.NewEncoder(w).Encode(msg)
+			return
+		} else if tagResult.Status == db.PaymentFailed {
+			// Handle failed payments
+			h.db.SetPaymentStatusByBountyId(bounty.ID, tagResult.Status, tagResult.Error)
+
+			bounty.Paid = false
+			bounty.PaymentPending = false
+			bounty.PaymentFailed = true
 
 			h.db.UpdateBounty(bounty)
 

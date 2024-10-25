@@ -175,4 +175,5 @@ type Database interface {
 	GetPendingPaymentHistory() []NewPaymentHistory
 	GetPaymentByBountyId(bountyId uint) NewPaymentHistory
 	SetPaymentAsComplete(tag string) bool
+	SetPaymentStatusByBountyId(bountyId uint, paymentStatus string, errorString string) bool
 }
