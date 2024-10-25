@@ -6,6 +6,7 @@ import (
 	"io"
 	"log"
 	"net/http"
+	"time"
 
 	"github.com/stakwork/sphinx-tribes/config"
 	"github.com/stakwork/sphinx-tribes/db"
@@ -13,12 +14,40 @@ import (
 
 func InitV2PaymentsCron() {
 	paymentHistories := db.DB.GetPendingPaymentHistory()
-	for _, value := range paymentHistories {
-		tag := value.Tag
+	for _, payment := range paymentHistories {
+		tag := payment.Tag
 		tagResult := GetInvoiceStatusByTag(tag)
 
 		if tagResult.Status == db.PaymentComplete {
 			db.DB.SetPaymentAsComplete(tag)
+
+			bounty := db.DB.GetBounty(payment.ID)
+
+			if bounty.ID > 0 {
+				now := time.Now()
+
+				bounty.Paid = true
+				bounty.PaymentPending = false
+				bounty.PaymentFailed = false
+				bounty.PaidDate = &now
+				bounty.Completed = true
+				bounty.CompletionDate = &now
+
+				db.DB.UpdateBounty(bounty)
+			}
+		} else if tagResult.Status == db.PaymentFailed {
+			// Handle failed payments
+			bounty := db.DB.GetBounty(payment.ID)
+
+			if bounty.ID > 0 {
+				db.DB.SetPaymentStatusByBountyId(bounty.ID, tagResult.Status, tagResult.Error)
+
+				bounty.Paid = false
+				bounty.PaymentPending = false
+				bounty.PaymentFailed = true
+
+				db.DB.UpdateBounty(bounty)
+			}
 		}
 	}
 }

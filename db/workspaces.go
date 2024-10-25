@@ -525,6 +525,16 @@ func (db database) SetPaymentAsComplete(tag string) bool {
 	return true
 }
 
+func (db database) SetPaymentStatusByBountyId(bountyId uint, paymentStatus string, errorString string) bool {
+	mapResult := map[string]string{}
+
+	mapResult["payment_status"] = paymentStatus
+	mapResult["error"] = errorString
+
+	db.db.Model(NewPaymentHistory{}).Where("bounty_id = ?", bountyId).Updates(mapResult)
+	return true
+}
+
 func (db database) GetWorkspaceInvoices(workspace_uuid string) []NewInvoiceList {
 	ms := []NewInvoiceList{}
 	db.db.Where("workspace_uuid = ?", workspace_uuid).Where("status", false).Find(&ms)
