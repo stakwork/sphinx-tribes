@@ -525,11 +525,12 @@ func (db database) SetPaymentAsComplete(tag string) bool {
 	return true
 }
 
-func (db database) SetPaymentStatusByBountyId(bountyId uint, paymentStatus string, errorString string) bool {
+func (db database) SetPaymentStatusByBountyId(bountyId uint, tagResult V2TagRes) bool {
 	mapResult := map[string]string{}
 
-	mapResult["payment_status"] = paymentStatus
-	mapResult["error"] = errorString
+	mapResult["payment_status"] = tagResult.Status
+	mapResult["error"] = tagResult.Error
+	mapResult["tag"] = tagResult.Tag
 
 	db.db.Model(NewPaymentHistory{}).Where("bounty_id = ?", bountyId).Updates(mapResult)
 	return true

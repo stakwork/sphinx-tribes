@@ -7110,17 +7110,17 @@ func (_c *Database_SetPaymentAsComplete_Call) RunAndReturn(run func(string) bool
 	return _c
 }
 
-// SetPaymentStatusByBountyId provides a mock function with given fields: bountyId, paymentStatus, errorString
-func (_m *Database) SetPaymentStatusByBountyId(bountyId uint, paymentStatus string, errorString string) bool {
-	ret := _m.Called(bountyId, paymentStatus, errorString)
+// SetPaymentStatusByBountyId provides a mock function with given fields: bountyId, tagResult
+func (_m *Database) SetPaymentStatusByBountyId(bountyId uint, tagResult db.V2TagRes) bool {
+	ret := _m.Called(bountyId, tagResult)
 
 	if len(ret) == 0 {
 		panic("no return value specified for SetPaymentStatusByBountyId")
 	}
 
 	var r0 bool
-	if rf, ok := ret.Get(0).(func(uint, string, string) bool); ok {
-		r0 = rf(bountyId, paymentStatus, errorString)
+	if rf, ok := ret.Get(0).(func(uint, db.V2TagRes) bool); ok {
+		r0 = rf(bountyId, tagResult)
 	} else {
 		r0 = ret.Get(0).(bool)
 	}
@@ -7135,15 +7135,14 @@ type Database_SetPaymentStatusByBountyId_Call struct {
 
 // SetPaymentStatusByBountyId is a helper method to define mock.On call
 //   - bountyId uint
-//   - paymentStatus string
-//   - errorString string
-func (_e *Database_Expecter) SetPaymentStatusByBountyId(bountyId interface{}, paymentStatus interface{}, errorString interface{}) *Database_SetPaymentStatusByBountyId_Call {
-	return &Database_SetPaymentStatusByBountyId_Call{Call: _e.mock.On("SetPaymentStatusByBountyId", bountyId, paymentStatus, errorString)}
+//   - tagResult db.V2TagRes
+func (_e *Database_Expecter) SetPaymentStatusByBountyId(bountyId interface{}, tagResult interface{}) *Database_SetPaymentStatusByBountyId_Call {
+	return &Database_SetPaymentStatusByBountyId_Call{Call: _e.mock.On("SetPaymentStatusByBountyId", bountyId, tagResult)}
 }
 
-func (_c *Database_SetPaymentStatusByBountyId_Call) Run(run func(bountyId uint, paymentStatus string, errorString string)) *Database_SetPaymentStatusByBountyId_Call {
+func (_c *Database_SetPaymentStatusByBountyId_Call) Run(run func(bountyId uint, tagResult db.V2TagRes)) *Database_SetPaymentStatusByBountyId_Call {
 	_c.Call.Run(func(args mock.Arguments) {
-		run(args[0].(uint), args[1].(string), args[2].(string))
+		run(args[0].(uint), args[1].(db.V2TagRes))
 	})
 	return _c
 }
@@ -7153,7 +7152,7 @@ func (_c *Database_SetPaymentStatusByBountyId_Call) Return(_a0 bool) *Database_S
 	return _c
 }
 
-func (_c *Database_SetPaymentStatusByBountyId_Call) RunAndReturn(run func(uint, string, string) bool) *Database_SetPaymentStatusByBountyId_Call {
+func (_c *Database_SetPaymentStatusByBountyId_Call) RunAndReturn(run func(uint, db.V2TagRes) bool) *Database_SetPaymentStatusByBountyId_Call {
 	_c.Call.Return(run)
 	return _c
 }

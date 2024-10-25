@@ -419,6 +419,15 @@ func UpdateCompletedStatus(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(bounty)
 }
 
+func GetPaymentByBountyId(w http.ResponseWriter, r *http.Request) {
+	bountyIdParam := chi.URLParam(r, "bountyId")
+	bountyId, _ := strconv.ParseUint(bountyIdParam, 10, 32)
+	payment := db.DB.GetPaymentByBountyId(uint(bountyId))
+
+	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode(payment)
+}
+
 func (h *bountyHandler) GenerateBountyResponse(bounties []db.NewBounty) []db.BountyResponse {
 	var bountyResponse []db.BountyResponse
 
@@ -966,7 +975,7 @@ func (h *bountyHandler) UpdateBountyPaymentStatus(w http.ResponseWriter, r *http
 			return
 		} else if tagResult.Status == db.PaymentFailed {
 			// Handle failed payments
-			h.db.SetPaymentStatusByBountyId(bounty.ID, tagResult.Status, tagResult.Error)
+			h.db.SetPaymentStatusByBountyId(bounty.ID, tagResult)
 
 			bounty.Paid = false
 			bounty.PaymentPending = false
