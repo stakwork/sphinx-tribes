@@ -525,6 +525,17 @@ func (db database) SetPaymentAsComplete(tag string) bool {
 	return true
 }
 
+func (db database) SetPaymentStatusByBountyId(bountyId uint, tagResult V2TagRes) bool {
+	mapResult := map[string]string{}
+
+	mapResult["payment_status"] = tagResult.Status
+	mapResult["error"] = tagResult.Error
+	mapResult["tag"] = tagResult.Tag
+
+	db.db.Model(NewPaymentHistory{}).Where("bounty_id = ?", bountyId).Updates(mapResult)
+	return true
+}
+
 func (db database) GetWorkspaceInvoices(workspace_uuid string) []NewInvoiceList {
 	ms := []NewInvoiceList{}
 	db.db.Where("workspace_uuid = ?", workspace_uuid).Where("status", false).Find(&ms)
@@ -632,6 +643,12 @@ func (db database) DeleteAllUsersFromWorkspace(workspace_uuid string) error {
 func (db database) GetLastWithdrawal(workspace_uuid string) NewPaymentHistory {
 	p := NewPaymentHistory{}
 	db.db.Model(&NewPaymentHistory{}).Where("workspace_uuid", workspace_uuid).Where("payment_type", "withdraw").Order("created DESC").Limit(1).Find(&p)
+	return p
+}
+
+func (db database) GetWorkspacePendingPayments(workspace_uuid string) []NewPaymentHistory {
+	p := []NewPaymentHistory{}
+	db.db.Model(&NewPaymentHistory{}).Where("workspace_uuid", workspace_uuid).Where("payment_status", "PENDING").Find(&p)
 	return p
 }
 
