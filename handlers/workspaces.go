@@ -662,6 +662,65 @@ func GetPaymentHistory(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(paymentHistoryData)
 }
 
+func UpdateWorkspacePendingPayments(w http.ResponseWriter, r *http.Request) {
+	ctx := r.Context()
+	pubKeyFromAuth, _ := ctx.Value(auth.ContextKey).(string)
+
+	workspace_uuid := chi.URLParam(r, "workspace_uuid")
+
+	if pubKeyFromAuth == "" {
+		fmt.Println("no pubkey from auth")
+		w.WriteHeader(http.StatusUnauthorized)
+		return
+	}
+
+	paymentsHistory := db.DB.GetWorkspacePendingPayments(workspace_uuid)
+
+	for _, payment := range paymentsHistory {
+		tag := payment.Tag
+		tagResult := GetInvoiceStatusByTag(tag)
+
+		if tagResult.Status == db.PaymentComplete {
+			db.DB.SetPaymentAsComplete(tag)
+
+			bounty := db.DB.GetBounty(payment.ID)
+
+			if bounty.ID > 0 {
+				now := time.Now()
+
+				bounty.Paid = true
+				bounty.PaymentPending = false
+				bounty.PaymentFailed = false
+				bounty.PaidDate = &now
+				bounty.Completed = true
+				bounty.CompletionDate = &now
+
+				db.DB.UpdateBounty(bounty)
+			}
+		} else if tagResult.Status == db.PaymentFailed {
+			// Handle failed payments
+			bounty := db.DB.GetBounty(payment.ID)
+
+			if bounty.ID > 0 {
+				db.DB.SetPaymentStatusByBountyId(bounty.ID, tagResult)
+
+				bounty.Paid = false
+				bounty.PaymentPending = false
+				bounty.PaymentFailed = true
+
+				db.DB.UpdateBounty(bounty)
+			}
+		}
+	}
+
+	var msg map[string]string
+
+	msg["msg"] = "Updated Payments Successfully"
+
+	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode(msg)
+}
+
 func (oh *workspaceHandler) PollBudgetInvoices(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 	pubKeyFromAuth, _ := ctx.Value(auth.ContextKey).(string)

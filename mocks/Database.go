@@ -6105,6 +6105,54 @@ func (_c *Database_GetWorkspaceInvoicesCount_Call) RunAndReturn(run func(string)
 	return _c
 }
 
+// GetWorkspacePendingPayments provides a mock function with given fields: workspace_uuid
+func (_m *Database) GetWorkspacePendingPayments(workspace_uuid string) []db.NewPaymentHistory {
+	ret := _m.Called(workspace_uuid)
+
+	if len(ret) == 0 {
+		panic("no return value specified for GetWorkspacePendingPayments")
+	}
+
+	var r0 []db.NewPaymentHistory
+	if rf, ok := ret.Get(0).(func(string) []db.NewPaymentHistory); ok {
+		r0 = rf(workspace_uuid)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).([]db.NewPaymentHistory)
+		}
+	}
+
+	return r0
+}
+
+// Database_GetWorkspacePendingPayments_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'GetWorkspacePendingPayments'
+type Database_GetWorkspacePendingPayments_Call struct {
+	*mock.Call
+}
+
+// GetWorkspacePendingPayments is a helper method to define mock.On call
+//   - workspace_uuid string
+func (_e *Database_Expecter) GetWorkspacePendingPayments(workspace_uuid interface{}) *Database_GetWorkspacePendingPayments_Call {
+	return &Database_GetWorkspacePendingPayments_Call{Call: _e.mock.On("GetWorkspacePendingPayments", workspace_uuid)}
+}
+
+func (_c *Database_GetWorkspacePendingPayments_Call) Run(run func(workspace_uuid string)) *Database_GetWorkspacePendingPayments_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(string))
+	})
+	return _c
+}
+
+func (_c *Database_GetWorkspacePendingPayments_Call) Return(_a0 []db.NewPaymentHistory) *Database_GetWorkspacePendingPayments_Call {
+	_c.Call.Return(_a0)
+	return _c
+}
+
+func (_c *Database_GetWorkspacePendingPayments_Call) RunAndReturn(run func(string) []db.NewPaymentHistory) *Database_GetWorkspacePendingPayments_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
 // GetWorkspaceRepoByWorkspaceUuidAndRepoUuid provides a mock function with given fields: workspace_uuid, uuid
 func (_m *Database) GetWorkspaceRepoByWorkspaceUuidAndRepoUuid(workspace_uuid string, uuid string) (db.WorkspaceRepositories, error) {
 	ret := _m.Called(workspace_uuid, uuid)
