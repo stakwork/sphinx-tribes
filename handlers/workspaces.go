@@ -665,7 +665,6 @@ func GetPaymentHistory(w http.ResponseWriter, r *http.Request) {
 func UpdateWorkspacePendingPayments(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 	pubKeyFromAuth, _ := ctx.Value(auth.ContextKey).(string)
-
 	workspace_uuid := chi.URLParam(r, "workspace_uuid")
 
 	if pubKeyFromAuth == "" {
@@ -713,12 +712,8 @@ func UpdateWorkspacePendingPayments(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
-	var msg map[string]string
-
-	msg["msg"] = "Updated Payments Successfully"
-
 	w.WriteHeader(http.StatusOK)
-	json.NewEncoder(w).Encode(msg)
+	json.NewEncoder(w).Encode("Updated Payments Successfully")
 }
 
 func (oh *workspaceHandler) PollBudgetInvoices(w http.ResponseWriter, r *http.Request) {
