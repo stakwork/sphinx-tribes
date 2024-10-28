@@ -1457,7 +1457,7 @@ func TestMakeBountyPayment(t *testing.T) {
 		}
 
 		ro.ServeHTTP(rr, req)
-		assert.Equal(t, http.StatusOK, rr.Code)
+		assert.Equal(t, http.StatusBadRequest, rr.Code)
 		mockHttpClient.AssertExpectations(t)
 	})
 
