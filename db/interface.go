@@ -176,4 +176,5 @@ type Database interface {
 	GetPaymentByBountyId(bountyId uint) NewPaymentHistory
 	SetPaymentAsComplete(tag string) bool
 	SetPaymentStatusByBountyId(bountyId uint, tagResult V2TagRes) bool
+	GetWorkspacePendingPayments(workspace_uuid string) []NewPaymentHistory
 }

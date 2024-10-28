@@ -646,6 +646,12 @@ func (db database) GetLastWithdrawal(workspace_uuid string) NewPaymentHistory {
 	return p
 }
 
+func (db database) GetWorkspacePendingPayments(workspace_uuid string) []NewPaymentHistory {
+	p := []NewPaymentHistory{}
+	db.db.Model(&NewPaymentHistory{}).Where("workspace_uuid", workspace_uuid).Where("payment_status", "PENDING").Find(&p)
+	return p
+}
+
 func (db database) GetSumOfDeposits(workspace_uuid string) uint {
 	var depositAmount uint
 	db.db.Model(&NewPaymentHistory{}).Where("workspace_uuid = ?", workspace_uuid).Where("status = ?", true).Where("payment_type = ?", "deposit").Select("SUM(amount)").Row().Scan(&depositAmount)
