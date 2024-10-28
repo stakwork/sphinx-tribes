@@ -419,6 +419,15 @@ func UpdateCompletedStatus(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(bounty)
 }
 
+func GetPaymentByBountyId(w http.ResponseWriter, r *http.Request) {
+	bountyIdParam := chi.URLParam(r, "bountyId")
+	bountyId, _ := strconv.ParseUint(bountyIdParam, 10, 32)
+	payment := db.DB.GetPaymentByBountyId(uint(bountyId))
+
+	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode(payment)
+}
+
 func (h *bountyHandler) GenerateBountyResponse(bounties []db.NewBounty) []db.BountyResponse {
 	var bountyResponse []db.BountyResponse
 
@@ -693,6 +702,9 @@ func (h *bountyHandler) MakeBountyPayment(w http.ResponseWriter, r *http.Request
 				}
 
 				h.m.Unlock()
+
+				w.WriteHeader(http.StatusOK)
+				json.NewEncoder(w).Encode(msg)
 				return
 			} else if v2KeysendRes.Status == db.PaymentPending {
 				// Send payment status
@@ -715,6 +727,9 @@ func (h *bountyHandler) MakeBountyPayment(w http.ResponseWriter, r *http.Request
 				}
 
 				h.m.Unlock()
+
+				w.WriteHeader(http.StatusOK)
+				json.NewEncoder(w).Encode(msg)
 				return
 			} else {
 				// Send payment status
@@ -737,7 +752,11 @@ func (h *bountyHandler) MakeBountyPayment(w http.ResponseWriter, r *http.Request
 				if err == nil {
 					socket.Conn.WriteJSON(msg)
 				}
+
 				h.m.Unlock()
+
+				w.WriteHeader(http.StatusBadRequest)
+				json.NewEncoder(w).Encode(msg)
 				return
 			}
 		} else { // Send Payment error
@@ -751,6 +770,9 @@ func (h *bountyHandler) MakeBountyPayment(w http.ResponseWriter, r *http.Request
 			}
 
 			h.m.Unlock()
+
+			w.WriteHeader(http.StatusBadRequest)
+			json.NewEncoder(w).Encode(msg)
 			return
 		}
 	} else { // Process v1 payment
@@ -939,11 +961,25 @@ func (h *bountyHandler) UpdateBountyPaymentStatus(w http.ResponseWriter, r *http
 
 			now := time.Now()
 
-			bounty.Paid = true
 			bounty.PaymentPending = false
+			bounty.PaymentFailed = false
+			bounty.Paid = true
 			bounty.PaidDate = &now
 			bounty.Completed = true
 			bounty.CompletionDate = &now
+
+			h.db.UpdateBounty(bounty)
+
+			w.WriteHeader(http.StatusOK)
+			json.NewEncoder(w).Encode(msg)
+			return
+		} else if tagResult.Status == db.PaymentFailed {
+			// Handle failed payments
+			h.db.SetPaymentStatusByBountyId(bounty.ID, tagResult)
+
+			bounty.Paid = false
+			bounty.PaymentPending = false
+			bounty.PaymentFailed = true
 
 			h.db.UpdateBounty(bounty)
 
