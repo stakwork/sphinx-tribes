@@ -12,6 +12,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/config"
 	"github.com/aws/aws-sdk-go-v2/credentials"
 	"github.com/aws/aws-sdk-go-v2/service/s3"
@@ -64,10 +65,19 @@ func InitConfig() {
 	// Add to super admins
 	SuperAdmins = StripSuperAdmins(AdminStrings)
 
-	awsConfig, err := config.LoadDefaultConfig(context.TODO(),
-		config.WithRegion(AwsRegion),
-		config.WithCredentialsProvider(credentials.NewStaticCredentialsProvider(AwsAccess, AwsSecret, "")),
-	)
+	var awsConfig aws.Config
+	var err error
+
+	if AwsAccess == "" && AwsSecret == "" {
+		awsConfig, err = config.LoadDefaultConfig(context.TODO(),
+			config.WithRegion(AwsRegion),
+			config.WithCredentialsProvider(credentials.NewStaticCredentialsProvider(AwsAccess, AwsSecret, "")),
+		)
+	} else {
+		awsConfig, err = config.LoadDefaultConfig(context.TODO(),
+			config.WithRegion(AwsRegion),
+			config.WithCredentialsProvider(credentials.NewStaticCredentialsProvider("", "", "")))
+	}
 
 	if err != nil {
 		fmt.Println("Could not setup AWS session", err)
