@@ -906,6 +906,8 @@ type FilterStattuCount struct {
 	Assigned  int64 `json:"assigned"`
 	Completed int64 `json:"completed"`
 	Paid      int64 `json:"paid"`
+	Pending   int64 `json:"pending"`
+	Failed    int64 `json:"failed"`
 }
 
 func (Person) TableName() string {

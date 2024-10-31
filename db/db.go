@@ -537,17 +537,23 @@ func (db database) GetFilterStatusCount() FilterStattuCount {
 	var assignedCount int64
 	var completedCount int64
 	var paidCount int64
+	var pendingCount int64
+	var failedCount int64
 
 	db.db.Model(&Bounty{}).Where("show != false").Where("assignee = ''").Where("paid != true").Count(&openCount)
 	db.db.Model(&Bounty{}).Where("show != false").Where("assignee != ''").Where("paid != true").Count(&assignedCount)
 	db.db.Model(&Bounty{}).Where("show != false").Where("assignee != ''").Where("completed = true").Where("paid != true").Count(&completedCount)
 	db.db.Model(&Bounty{}).Where("show != false").Where("assignee != ''").Where("paid = true").Count(&paidCount)
+	db.db.Model(&Bounty{}).Where("show != false").Where("assignee != ''").Where("payment_pending = true").Count(&pendingCount)
+	db.db.Model(&Bounty{}).Where("show != false").Where("assignee != ''").Where("payment_failed = true").Count(&failedCount)
 
 	ms := FilterStattuCount{
 		Open:      openCount,
 		Assigned:  assignedCount,
 		Completed: completedCount,
 		Paid:      paidCount,
+		Pending:   pendingCount,
+		Failed:    failedCount,
 	}
 
 	return ms
