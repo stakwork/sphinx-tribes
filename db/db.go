@@ -447,38 +447,6 @@ func makeExtrasListQuery(columnName string) string {
 	`
 }
 
-func makePersonExtrasListQuery(columnName string) string {
-	// this is safe because columnName is not provided by the user, its hard-coded in db.go
-	return `SELECT 		
-	json_build_object('owner_pubkey', owner_pub_key, 'owner_alias', owner_alias, 'img', img, 'unique_name', unique_name, 'id', id, '` + columnName + `', extras->'` + columnName + `', 'github_issues', github_issues) #>> '{}' as person,
-	arr.item_object as body
-	FROM people,
-	jsonb_array_elements(extras->'` + columnName + `') with ordinality 
-	arr(item_object, position)
-	WHERE arr.item_object->'assignee'->>'owner_pubkey' = ? 
-	AND LOWER(arr.item_object->>'title') LIKE ?
-	AND CASE
-			WHEN arr.item_object->>'show' = 'false' THEN false
-			ELSE true
-		END`
-}
-
-func addNewerThanXDaysToExtrasRawQuery(query string, days int) string {
-	secondsInDay := 86400
-	newerThan := secondsInDay * days
-	t := strconv.Itoa(newerThan)
-	return query + ` AND CAST(arr.item_object->>'created' AS INT) > (extract(epoch from now()) - ` + t + `) `
-}
-
-func addNewerThanTimestampToExtrasRawQuery(query string, timestamp int) string {
-	t := strconv.Itoa(timestamp)
-	return query + ` AND CAST(arr.item_object->>'created' AS INT) > ` + t
-}
-
-func addOrderToExtrasRawQuery(query string) string {
-	return query + `ORDER BY cast(arr.item_object->>'created' as integer) DESC`
-}
-
 func addNotMineToExtrasRawQuery(query string, pubkey string) string {
 	return query + ` AND people.owner_pub_key != ` + pubkey + ` `
 }
@@ -525,44 +493,41 @@ func (db database) GetBountiesCount(r *http.Request) int64 {
 	assingned := keys.Get("Assigned")
 	paid := keys.Get("Paid")
 	completed := keys.Get("Completed")
+	pending := keys.Get("Pending")
+	failed := keys.Get("Failed")
 
-	openQuery := ""
-	assignedQuery := ""
-	paidQuery := ""
-	completedQuery := ""
+	var statusConditions []string
 
-	if open != "" && open == "true" {
-		openQuery = "AND assignee = '' AND paid != true"
-		assignedQuery = ""
+	if open == "true" {
+		statusConditions = append(statusConditions, "assignee = '' AND paid != true")
 	}
-	if assingned != "" && assingned == "true" {
-		if open != "" && open == "true" {
-			assignedQuery = "OR assignee != '' AND paid = false"
-		} else {
-			assignedQuery = "AND assignee != '' AND paid = false"
-		}
+	if assingned == "true" {
+		statusConditions = append(statusConditions, "assignee != '' AND paid = false")
 	}
-	if completed != "" && completed == "true" {
-		if open != "" && open == "true" {
-			completedQuery = "OR assignee != '' AND completed = true AND paid = false"
-		} else {
-			completedQuery = "AND assignee != '' AND completed = true AND paid = false"
-		}
+	if completed == "true" {
+		statusConditions = append(statusConditions, "assignee != '' AND completed = true AND paid = false")
 	}
-	if paid != "" && paid == "true" {
-		if open != "" && open == "true" || assingned != "" && assingned == "true" {
-			paidQuery = "OR paid = true"
-		} else if open != "" && open == "true" && assingned == "" && assingned != "true" {
-			assignedQuery = ""
-		} else {
-			paidQuery = "AND paid = true"
-		}
+	if paid == "true" {
+		statusConditions = append(statusConditions, "paid = true")
+	}
+	if pending == "true" {
+		statusConditions = append(statusConditions, "payment_pending = true")
+	}
+	if failed == "true" {
+		statusConditions = append(statusConditions, "payment_failed = true")
+	}
+
+	var statusQuery string
+	if len(statusConditions) > 0 {
+		statusQuery = " AND (" + strings.Join(statusConditions, " OR ") + ")"
+	} else {
+		statusQuery = ""
 	}
 
 	var count int64
 
 	query := "SELECT COUNT(*) FROM bounty WHERE show != false"
-	allQuery := query + " " + openQuery + " " + assignedQuery + " " + completedQuery + " " + paidQuery
+	allQuery := query + " " + statusQuery
 	db.db.Raw(allQuery).Scan(&count)
 	return count
 }
@@ -596,6 +561,8 @@ func (db database) GetWorkspaceBounties(r *http.Request, workspace_uuid string) 
 	assingned := keys.Get("Assigned")
 	completed := keys.Get("Completed")
 	paid := keys.Get("Paid")
+	pending := keys.Get("Pending")
+	failed := keys.Get("Failed")
 	languages := keys.Get("languages")
 	languageArray := strings.Split(languages, ",")
 	languageLength := len(languageArray)
@@ -635,6 +602,12 @@ func (db database) GetWorkspaceBounties(r *http.Request, workspace_uuid string) 
 	}
 	if paid == "true" {
 		statusConditions = append(statusConditions, "paid = true")
+	}
+	if pending == "true" {
+		statusConditions = append(statusConditions, "payment_pending = true")
+	}
+	if failed == "true" {
+		statusConditions = append(statusConditions, "payment_failed = true")
 	}
 
 	var statusQuery string
@@ -683,6 +656,8 @@ func (db database) GetWorkspaceBountiesCount(r *http.Request, workspace_uuid str
 	assingned := keys.Get("Assigned")
 	completed := keys.Get("Completed")
 	paid := keys.Get("Paid")
+	pending := keys.Get("Pending")
+	failed := keys.Get("Failed")
 	languages := keys.Get("languages")
 	languageArray := strings.Split(languages, ",")
 	languageLength := len(languageArray)
@@ -707,6 +682,12 @@ func (db database) GetWorkspaceBountiesCount(r *http.Request, workspace_uuid str
 	}
 	if paid == "true" {
 		statusConditions = append(statusConditions, "paid = true")
+	}
+	if pending == "true" {
+		statusConditions = append(statusConditions, "payment_pending = true")
+	}
+	if failed == "true" {
+		statusConditions = append(statusConditions, "payment_failed = true")
 	}
 
 	var statusQuery string
@@ -763,6 +744,8 @@ func (db database) GetAssignedBounties(r *http.Request) ([]NewBounty, error) {
 	open := keys.Get("Open")
 	assingned := keys.Get("Assigned")
 	paid := keys.Get("Paid")
+	pending := keys.Get("Pending")
+	failed := keys.Get("Failed")
 
 	orderQuery := ""
 	limitQuery := ""
@@ -777,6 +760,12 @@ func (db database) GetAssignedBounties(r *http.Request) ([]NewBounty, error) {
 	}
 	if paid == "true" {
 		statusConditions = append(statusConditions, "paid = true")
+	}
+	if pending == "true" {
+		statusConditions = append(statusConditions, "payment_pending = true")
+	}
+	if failed == "true" {
+		statusConditions = append(statusConditions, "payment_failed = true")
 	}
 
 	if len(statusConditions) > 0 {
@@ -816,6 +805,8 @@ func (db database) GetCreatedBounties(r *http.Request) ([]NewBounty, error) {
 	open := keys.Get("Open")
 	assingned := keys.Get("Assigned")
 	paid := keys.Get("Paid")
+	pending := keys.Get("Pending")
+	failed := keys.Get("Failed")
 
 	orderQuery := ""
 	limitQuery := ""
@@ -830,6 +821,12 @@ func (db database) GetCreatedBounties(r *http.Request) ([]NewBounty, error) {
 	}
 	if paid == "true" {
 		statusConditions = append(statusConditions, "paid = true")
+	}
+	if pending == "true" {
+		statusConditions = append(statusConditions, "payment_pending = true")
+	}
+	if failed == "true" {
+		statusConditions = append(statusConditions, "payment_failed = true")
 	}
 
 	if len(statusConditions) > 0 {
@@ -872,6 +869,8 @@ func (db database) GetNextBountyByCreated(r *http.Request) (uint, error) {
 	open := keys.Get("Open")
 	assingned := keys.Get("Assigned")
 	paid := keys.Get("Paid")
+	pending := keys.Get("Pending")
+	failed := keys.Get("Failed")
 	languages := keys.Get("languages")
 	languageArray := strings.Split(languages, ",")
 	languageLength := len(languageArray)
@@ -893,6 +892,12 @@ func (db database) GetNextBountyByCreated(r *http.Request) (uint, error) {
 	}
 	if paid == "true" {
 		statusConditions = append(statusConditions, "paid = true")
+	}
+	if pending == "true" {
+		statusConditions = append(statusConditions, "payment_pending = true")
+	}
+	if failed == "true" {
+		statusConditions = append(statusConditions, "payment_failed = true")
 	}
 
 	if len(statusConditions) > 0 {
@@ -934,6 +939,8 @@ func (db database) GetPreviousBountyByCreated(r *http.Request) (uint, error) {
 	assingned := keys.Get("Assigned")
 	completed := keys.Get("Completed")
 	paid := keys.Get("Paid")
+	pending := keys.Get("Pending")
+	failed := keys.Get("Failed")
 	languages := keys.Get("languages")
 	languageArray := strings.Split(languages, ",")
 	languageLength := len(languageArray)
@@ -958,6 +965,12 @@ func (db database) GetPreviousBountyByCreated(r *http.Request) (uint, error) {
 	}
 	if paid == "true" {
 		statusConditions = append(statusConditions, "paid = true")
+	}
+	if pending == "true" {
+		statusConditions = append(statusConditions, "payment_pending = true")
+	}
+	if failed == "true" {
+		statusConditions = append(statusConditions, "payment_failed = true")
 	}
 
 	if len(statusConditions) > 0 {
@@ -1000,6 +1013,8 @@ func (db database) GetNextWorkspaceBountyByCreated(r *http.Request) (uint, error
 	assingned := keys.Get("Assigned")
 	completed := keys.Get("Completed")
 	paid := keys.Get("Paid")
+	pending := keys.Get("Pending")
+	failed := keys.Get("Failed")
 	languages := keys.Get("languages")
 	languageArray := strings.Split(languages, ",")
 	languageLength := len(languageArray)
@@ -1024,6 +1039,12 @@ func (db database) GetNextWorkspaceBountyByCreated(r *http.Request) (uint, error
 	}
 	if paid == "true" {
 		statusConditions = append(statusConditions, "paid = true")
+	}
+	if pending == "true" {
+		statusConditions = append(statusConditions, "payment_pending = true")
+	}
+	if failed == "true" {
+		statusConditions = append(statusConditions, "payment_failed = true")
 	}
 
 	if len(statusConditions) > 0 {
@@ -1066,6 +1087,8 @@ func (db database) GetPreviousWorkspaceBountyByCreated(r *http.Request) (uint, e
 	assingned := keys.Get("Assigned")
 	completed := keys.Get("Completed")
 	paid := keys.Get("Paid")
+	pending := keys.Get("Pending")
+	failed := keys.Get("Failed")
 	languages := keys.Get("languages")
 	languageArray := strings.Split(languages, ",")
 	languageLength := len(languageArray)
@@ -1090,6 +1113,12 @@ func (db database) GetPreviousWorkspaceBountyByCreated(r *http.Request) (uint, e
 	}
 	if paid == "true" {
 		statusConditions = append(statusConditions, "paid = true")
+	}
+	if pending == "true" {
+		statusConditions = append(statusConditions, "payment_pending = true")
+	}
+	if failed == "true" {
+		statusConditions = append(statusConditions, "payment_failed = true")
 	}
 
 	if len(statusConditions) > 0 {
@@ -1146,6 +1175,8 @@ func (db database) GetAllBounties(r *http.Request) []NewBounty {
 	assingned := keys.Get("Assigned")
 	completed := keys.Get("Completed")
 	paid := keys.Get("Paid")
+	pending := keys.Get("Pending")
+	failed := keys.Get("Failed")
 	orgUuid := keys.Get("org_uuid")
 	workspaceUuid := keys.Get("workspace_uuid")
 	languages := keys.Get("languages")
@@ -1201,6 +1232,12 @@ func (db database) GetAllBounties(r *http.Request) []NewBounty {
 	}
 	if paid == "true" {
 		statusConditions = append(statusConditions, "paid = true")
+	}
+	if pending == "true" {
+		statusConditions = append(statusConditions, "payment_pending = true")
+	}
+	if failed == "true" {
+		statusConditions = append(statusConditions, "payment_failed = true")
 	}
 
 	var statusQuery string
