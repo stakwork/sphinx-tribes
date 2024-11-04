@@ -1506,7 +1506,7 @@ func TestGetFeatureStories(t *testing.T) {
 		}
 
 		rr := httptest.NewRecorder()
-		http.HandlerFunc(fHandler.GetBountiesCountByFeatureAndPhaseUuid).ServeHTTP(rr, req)
+		http.HandlerFunc(fHandler.GetFeatureStories).ServeHTTP(rr, req)
 
 		var returnedBountiesCount int64
 		err = json.Unmarshal(rr.Body.Bytes(), &returnedBountiesCount)
@@ -1527,7 +1527,7 @@ func TestGetFeatureStories(t *testing.T) {
 		}
 
 		rr := httptest.NewRecorder()
-		http.HandlerFunc(fHandler.GetBountiesCountByFeatureAndPhaseUuid).ServeHTTP(rr, req)
+		http.HandlerFunc(fHandler.GetFeatureStories).ServeHTTP(rr, req)
 
 		var returnedBountiesCount int64
 		err = json.Unmarshal(rr.Body.Bytes(), &returnedBountiesCount)
