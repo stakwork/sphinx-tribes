@@ -1431,6 +1431,7 @@ func TestGetFeatureStories(t *testing.T) {
 
 	db.TestDB.CreateOrEditFeature(feature)
 	db.TestDB.CreateOrEditFeature(feature2)
+
 	ctx := context.WithValue(context.Background(), auth.ContextKey, workspace.OwnerPubKey)
 
 	story := db.FeatureStories{
@@ -1508,8 +1509,8 @@ func TestGetFeatureStories(t *testing.T) {
 		rr := httptest.NewRecorder()
 		http.HandlerFunc(fHandler.GetFeatureStories).ServeHTTP(rr, req)
 
-		var returnedBountiesCount int64
-		err = json.Unmarshal(rr.Body.Bytes(), &returnedBountiesCount)
+		var featureStoriesReponse string
+		err = json.Unmarshal(rr.Body.Bytes(), &featureStoriesReponse)
 		assert.NoError(t, err)
 
 		featureStories, _ := db.TestDB.GetFeatureStoriesByFeatureUuid(feature.Uuid)
@@ -1529,8 +1530,8 @@ func TestGetFeatureStories(t *testing.T) {
 		rr := httptest.NewRecorder()
 		http.HandlerFunc(fHandler.GetFeatureStories).ServeHTTP(rr, req)
 
-		var returnedBountiesCount int64
-		err = json.Unmarshal(rr.Body.Bytes(), &returnedBountiesCount)
+		var featureStoriesReponse string
+		err = json.Unmarshal(rr.Body.Bytes(), &featureStoriesReponse)
 		assert.NoError(t, err)
 
 		featureStories, _ := db.TestDB.GetFeatureStoriesByFeatureUuid(feature2.Uuid)

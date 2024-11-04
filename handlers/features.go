@@ -409,10 +409,12 @@ func (oh *featureHandler) GetBountiesCountByFeatureAndPhaseUuid(w http.ResponseW
 
 func (oh *featureHandler) GetFeatureStories(w http.ResponseWriter, r *http.Request) {
 	featureStories := db.FeatureStoriesReponse{}
-	featureUuid := featureStories.Output.FeatureUuid
 
 	decoder := json.NewDecoder(r.Body)
 	err := decoder.Decode(&featureStories)
+
+	featureUuid := featureStories.Output.FeatureUuid
+
 	if err != nil {
 		w.WriteHeader(http.StatusNotAcceptable)
 		fmt.Fprintf(w, "Error decoding request body: %v", err)
@@ -444,4 +446,5 @@ func (oh *featureHandler) GetFeatureStories(w http.ResponseWriter, r *http.Reque
 	}
 
 	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode("User stories added successfuly")
 }
