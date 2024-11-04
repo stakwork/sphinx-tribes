@@ -1421,8 +1421,16 @@ func TestGetFeatureStories(t *testing.T) {
 		Priority:      0,
 	}
 
-	db.TestDB.CreateOrEditFeature(feature)
+	feature2 := db.WorkspaceFeatures{
+		Uuid:          uuid.New().String(),
+		WorkspaceUuid: workspace.Uuid,
+		Name:          "test-get-feature-stories-feature-name-2",
+		Url:           "https://github.com/test-get-feature-stories-feature-url-2",
+		Priority:      0,
+	}
 
+	db.TestDB.CreateOrEditFeature(feature)
+	db.TestDB.CreateOrEditFeature(feature2)
 	ctx := context.WithValue(context.Background(), auth.ContextKey, workspace.OwnerPubKey)
 
 	story := db.FeatureStories{
@@ -1443,10 +1451,34 @@ func TestGetFeatureStories(t *testing.T) {
 		Order:     3,
 	}
 
+	story4 := db.FeatureStories{
+		UserStory: "This is a test user story 4",
+		Rationale: "This is a test rationale 4",
+		Order:     4,
+	}
+
+	story5 := db.FeatureStories{
+		UserStory: "This is a test user story 5",
+		Rationale: "This is a test rationale 5",
+		Order:     5,
+	}
+
+	story6 := db.FeatureStories{
+		UserStory: "This is a test user story 6",
+		Rationale: "This is a test rationale 6",
+		Order:     6,
+	}
+
 	stories := []db.FeatureStories{
 		story,
 		story2,
 		story3,
+	}
+
+	stories2 := []db.FeatureStories{
+		story4,
+		story5,
+		story6,
 	}
 
 	featureStories := db.FeatureStoriesReponse{
@@ -1456,9 +1488,17 @@ func TestGetFeatureStories(t *testing.T) {
 		},
 	}
 
-	requestBody, _ := json.Marshal(featureStories)
+	featureStories2 := db.FeatureStoriesReponse{
+		Output: db.FeatureOutput{
+			FeatureUuid: "Fake-feature-uuid",
+			Stories:     stories2,
+		},
+	}
 
-	t.Run("should return the correct bounty count if user is authorized", func(t *testing.T) {
+	requestBody, _ := json.Marshal(featureStories)
+	requestBody2, _ := json.Marshal(featureStories2)
+
+	t.Run("Should add user stories from stakwork to the feature stories table", func(t *testing.T) {
 		rctx := chi.NewRouteContext()
 		req, err := http.NewRequestWithContext(context.WithValue(ctx, chi.RouteCtxKey, rctx), http.MethodPost, "/features/stories", bytes.NewReader(requestBody))
 		if err != nil {
@@ -1476,6 +1516,27 @@ func TestGetFeatureStories(t *testing.T) {
 		featureStoriesCount := len(featureStories)
 
 		assert.Equal(t, int64(featureStoriesCount), int64(3))
+		assert.Equal(t, http.StatusOK, rr.Code)
+	})
+
+	t.Run("Should not add user stories from stakwork to the feature stories table if the feature uuid is not found", func(t *testing.T) {
+		rctx := chi.NewRouteContext()
+		req, err := http.NewRequestWithContext(context.WithValue(ctx, chi.RouteCtxKey, rctx), http.MethodPost, "/features/stories", bytes.NewReader(requestBody2))
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		rr := httptest.NewRecorder()
+		http.HandlerFunc(fHandler.GetBountiesCountByFeatureAndPhaseUuid).ServeHTTP(rr, req)
+
+		var returnedBountiesCount int64
+		err = json.Unmarshal(rr.Body.Bytes(), &returnedBountiesCount)
+		assert.NoError(t, err)
+
+		featureStories, _ := db.TestDB.GetFeatureStoriesByFeatureUuid(feature2.Uuid)
+		featureStoriesCount := len(featureStories)
+
+		assert.Equal(t, int64(featureStoriesCount), int64(0))
 		assert.Equal(t, http.StatusOK, rr.Code)
 	})
 }
