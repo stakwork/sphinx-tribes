@@ -58,3 +58,18 @@ type V2TagRes struct {
 	Status string `json:"status"` // "COMPLETE", "PENDING", or "FAILED"
 	Error  string `json:"error"`
 }
+
+type FeatureStories struct {
+	UserStory string `json:"userStory"`
+	Rationale string `json:"rationale"`
+	Order     uint   `json:"order"`
+}
+
+type FeatureOutput struct {
+	FeatureUuid string           `json:"featureUuid"`
+	Stories     []FeatureStories `json:"stories"`
+}
+
+type FeatureStoriesReponse struct {
+	Output FeatureOutput `json:"feature_output"`
+}

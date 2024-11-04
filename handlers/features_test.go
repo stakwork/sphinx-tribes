@@ -1385,3 +1385,97 @@ func TestGetBountiesCountByFeatureAndPhaseUuid(t *testing.T) {
 		assert.Equal(t, http.StatusOK, rr.Code)
 	})
 }
+
+func TestGetFeatureStories(t *testing.T) {
+	teardownSuite := SetupSuite(t)
+	defer teardownSuite(t)
+
+	fHandler := NewFeatureHandler(db.TestDB)
+
+	person := db.Person{
+		Uuid:        uuid.New().String(),
+		OwnerAlias:  "test-get-feature-stories-alias",
+		UniqueName:  "test-get-feature-stories-unique-name",
+		OwnerPubKey: "test-get-feature-stories-pubkey",
+		PriceToMeet: 0,
+		Description: "test-get-feature-stories-description",
+	}
+	db.TestDB.CreateOrEditPerson(person)
+
+	workspace := db.Workspace{
+		Uuid:        uuid.New().String(),
+		Name:        "test-get-feature-stories-workspace-name",
+		OwnerPubKey: person.OwnerPubKey,
+		Github:      "https://github.com/test",
+		Website:     "https://www.testwebsite.com",
+		Description: "test-get-feature-stories-description",
+	}
+	db.TestDB.CreateOrEditWorkspace(workspace)
+	workspace = db.TestDB.GetWorkspaceByUuid(workspace.Uuid)
+
+	feature := db.WorkspaceFeatures{
+		Uuid:          uuid.New().String(),
+		WorkspaceUuid: workspace.Uuid,
+		Name:          "test-get-feature-stories-feature-name",
+		Url:           "https://github.com/test-get-feature-stories-feature-url",
+		Priority:      0,
+	}
+
+	db.TestDB.CreateOrEditFeature(feature)
+
+	ctx := context.WithValue(context.Background(), auth.ContextKey, workspace.OwnerPubKey)
+
+	story := db.FeatureStories{
+		UserStory: "This is a test user story",
+		Rationale: "This is a test rationale",
+		Order:     1,
+	}
+
+	story2 := db.FeatureStories{
+		UserStory: "This is a test user story 2",
+		Rationale: "This is a test rationale 2",
+		Order:     2,
+	}
+
+	story3 := db.FeatureStories{
+		UserStory: "This is a test user story 3",
+		Rationale: "This is a test rationale 3",
+		Order:     3,
+	}
+
+	stories := []db.FeatureStories{
+		story,
+		story2,
+		story3,
+	}
+
+	featureStories := db.FeatureStoriesReponse{
+		Output: db.FeatureOutput{
+			FeatureUuid: feature.Uuid,
+			Stories:     stories,
+		},
+	}
+
+	requestBody, _ := json.Marshal(featureStories)
+
+	t.Run("should return the correct bounty count if user is authorized", func(t *testing.T) {
+		rctx := chi.NewRouteContext()
+		req, err := http.NewRequestWithContext(context.WithValue(ctx, chi.RouteCtxKey, rctx), http.MethodPost, "/features/stories", bytes.NewReader(requestBody))
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		rr := httptest.NewRecorder()
+		http.HandlerFunc(fHandler.GetBountiesCountByFeatureAndPhaseUuid).ServeHTTP(rr, req)
+
+		var returnedBountiesCount int64
+		err = json.Unmarshal(rr.Body.Bytes(), &returnedBountiesCount)
+		assert.NoError(t, err)
+
+		featureStories, _ := db.TestDB.GetFeatureStoriesByFeatureUuid(feature.Uuid)
+		featureStoriesCount := len(featureStories)
+
+		assert.Equal(t, int64(featureStoriesCount), int64(3))
+		assert.Equal(t, http.StatusOK, rr.Code)
+	})
+}
