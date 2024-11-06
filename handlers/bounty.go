@@ -613,6 +613,7 @@ func (h *bountyHandler) MakeBountyPayment(w http.ResponseWriter, r *http.Request
 	assignee := h.db.GetPersonByPubkey(bounty.Assignee)
 
 	memoText := fmt.Sprintf("Payment For: %ss", bounty.Title)
+	now := time.Now()
 
 	// If the v2contactkey is present
 	if config.IsV2Payment {
@@ -653,6 +654,21 @@ func (h *bountyHandler) MakeBountyPayment(w http.ResponseWriter, r *http.Request
 		msg := make(map[string]interface{})
 		// payment is successful add to payment history
 		// and reduce workspaces budget
+
+		paymentHistory := db.NewPaymentHistory{
+			Amount:         amount,
+			SenderPubKey:   pubKeyFromAuth,
+			ReceiverPubKey: assignee.OwnerPubKey,
+			WorkspaceUuid:  bounty.WorkspaceUuid,
+			BountyId:       id,
+			Created:        &now,
+			Updated:        &now,
+			Status:         false,
+			PaymentType:    "payment",
+			Tag:            "",
+			PaymentStatus:  "FAILED",
+		}
+
 		if res.StatusCode == 200 {
 			// Unmarshal result
 			v2KeysendRes := db.V2SendOnionRes{}
@@ -667,22 +683,6 @@ func (h *bountyHandler) MakeBountyPayment(w http.ResponseWriter, r *http.Request
 
 			log.Printf("[bounty] V2 Status After Making Bounty V2 Payment: amount: %d, pubkey: %s, route_hint: %s is : %s", amount, assignee.OwnerPubKey, assignee.OwnerRouteHint, v2KeysendRes.Status)
 
-			now := time.Now()
-
-			paymentHistory := db.NewPaymentHistory{
-				Amount:         amount,
-				SenderPubKey:   pubKeyFromAuth,
-				ReceiverPubKey: assignee.OwnerPubKey,
-				WorkspaceUuid:  bounty.WorkspaceUuid,
-				BountyId:       id,
-				Created:        &now,
-				Updated:        &now,
-				Status:         false,
-				PaymentType:    "payment",
-				Tag:            v2KeysendRes.Tag,
-				PaymentStatus:  v2KeysendRes.Status,
-			}
-
 			// if the payment has a completed status
 			if v2KeysendRes.Status == db.PaymentComplete {
 				bounty.Paid = true
@@ -690,6 +690,8 @@ func (h *bountyHandler) MakeBountyPayment(w http.ResponseWriter, r *http.Request
 				bounty.Completed = true
 				bounty.CompletionDate = &now
 				paymentHistory.Status = true
+				paymentHistory.PaymentStatus = db.PaymentComplete
+				paymentHistory.Tag = v2KeysendRes.Tag
 
 				h.db.ProcessBountyPayment(paymentHistory, bounty)
 
@@ -715,6 +717,8 @@ func (h *bountyHandler) MakeBountyPayment(w http.ResponseWriter, r *http.Request
 				bounty.Completed = true
 				bounty.CompletionDate = &now
 				paymentHistory.Status = true
+				paymentHistory.PaymentStatus = db.PaymentPending
+				paymentHistory.Tag = v2KeysendRes.Tag
 
 				h.db.ProcessBountyPayment(paymentHistory, bounty)
 
@@ -741,8 +745,11 @@ func (h *bountyHandler) MakeBountyPayment(w http.ResponseWriter, r *http.Request
 
 				// set the error message
 				paymentHistory.Error = v2KeysendRes.Message
+				paymentHistory.PaymentStatus = db.PaymentFailed
+				paymentHistory.Tag = v2KeysendRes.Tag
 
 				h.db.AddPaymentHistory(paymentHistory)
+				h.db.UpdateBounty(bounty)
 
 				log.Println("Keysend payment not completed ===")
 				msg["msg"] = "keysend_error"
@@ -763,6 +770,16 @@ func (h *bountyHandler) MakeBountyPayment(w http.ResponseWriter, r *http.Request
 			log.Println("Keysend payment error: Failed to send ===")
 			msg["msg"] = "keysend_error"
 			msg["invoice"] = ""
+
+			bounty.Paid = false
+			bounty.PaymentPending = false
+			bounty.PaymentFailed = true
+
+			// set the error message
+			paymentHistory.Error = "Payment Request Failed"
+
+			h.db.AddPaymentHistory(paymentHistory)
+			h.db.UpdateBounty(bounty)
 
 			socket, err := h.getSocketConnections(request.Websocket_token)
 			if err == nil {
