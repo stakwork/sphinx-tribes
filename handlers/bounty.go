@@ -7,6 +7,7 @@ import (
 	"io"
 	"log"
 	"net/http"
+	"net/url"
 	"strconv"
 	"sync"
 	"time"
@@ -612,7 +613,8 @@ func (h *bountyHandler) MakeBountyPayment(w http.ResponseWriter, r *http.Request
 	// Get Bounty Assignee
 	assignee := h.db.GetPersonByPubkey(bounty.Assignee)
 
-	memoText := fmt.Sprintf("Payment For: %ss", bounty.Title)
+	memoData := fmt.Sprintf("Payment For: %ss", bounty.Title)
+	memoText := url.QueryEscape(memoData)
 	now := time.Now()
 
 	// If the v2contactkey is present
@@ -624,6 +626,8 @@ func (h *bountyHandler) MakeBountyPayment(w http.ResponseWriter, r *http.Request
 		// Build v2 keysend payment data
 		bodyData := utils.BuildV2KeysendBodyData(amount, assignee.OwnerPubKey, assignee.OwnerRouteHint, memoText)
 		jsonBody := []byte(bodyData)
+
+		log.Println("Payment Body Data", bodyData)
 
 		req, _ := http.NewRequest(http.MethodPost, url, bytes.NewBuffer(jsonBody))
 		req.Header.Set("x-admin-token", config.V2BotToken)
@@ -797,6 +801,8 @@ func (h *bountyHandler) MakeBountyPayment(w http.ResponseWriter, r *http.Request
 
 		bodyData := utils.BuildKeysendBodyData(amount, assignee.OwnerPubKey, assignee.OwnerRouteHint, memoText)
 		jsonBody := []byte(bodyData)
+
+		log.Println("Payment Body Data", bodyData)
 
 		req, _ := http.NewRequest(http.MethodPost, url, bytes.NewBuffer(jsonBody))
 		req.Header.Set("x-user-token", config.RelayAuthKey)
