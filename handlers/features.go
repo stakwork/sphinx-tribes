@@ -4,7 +4,9 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
+	"log"
 	"net/http"
+	"time"
 
 	"github.com/go-chi/chi"
 	"github.com/rs/xid"
@@ -403,4 +405,46 @@ func (oh *featureHandler) GetBountiesCountByFeatureAndPhaseUuid(w http.ResponseW
 
 	w.WriteHeader(http.StatusOK)
 	json.NewEncoder(w).Encode(bountiesCount)
+}
+
+func (oh *featureHandler) GetFeatureStories(w http.ResponseWriter, r *http.Request) {
+	featureStories := db.FeatureStoriesReponse{}
+
+	decoder := json.NewDecoder(r.Body)
+	err := decoder.Decode(&featureStories)
+
+	featureUuid := featureStories.Output.FeatureUuid
+
+	if err != nil {
+		w.WriteHeader(http.StatusNotAcceptable)
+		fmt.Fprintf(w, "Error decoding request body: %v", err)
+		return
+	}
+
+	for _, story := range featureStories.Output.Stories {
+		// check if feature story exists
+		feature := oh.db.GetFeatureByUuid(featureUuid)
+
+		if feature.ID == 0 {
+			log.Println("Feature ID does not exists", featureUuid)
+			continue
+		}
+
+		now := time.Now()
+
+		// Add story to database
+		featureStory := db.FeatureStory{
+			Uuid:        xid.New().String(),
+			Description: story.UserStory,
+			FeatureUuid: featureUuid,
+			Created:     &now,
+			Updated:     &now,
+		}
+
+		oh.db.CreateOrEditFeatureStory(featureStory)
+		log.Println("Created user story for : ", featureStory.FeatureUuid)
+	}
+
+	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode("User stories added successfuly")
 }
