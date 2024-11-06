@@ -625,6 +625,8 @@ func (h *bountyHandler) MakeBountyPayment(w http.ResponseWriter, r *http.Request
 		bodyData := utils.BuildV2KeysendBodyData(amount, assignee.OwnerPubKey, assignee.OwnerRouteHint, memoText)
 		jsonBody := []byte(bodyData)
 
+		fmt.Println("Payment Body Data", bodyData)
+
 		req, _ := http.NewRequest(http.MethodPost, url, bytes.NewBuffer(jsonBody))
 		req.Header.Set("x-admin-token", config.V2BotToken)
 		req.Header.Set("Content-Type", "application/json")
@@ -797,6 +799,8 @@ func (h *bountyHandler) MakeBountyPayment(w http.ResponseWriter, r *http.Request
 
 		bodyData := utils.BuildKeysendBodyData(amount, assignee.OwnerPubKey, assignee.OwnerRouteHint, memoText)
 		jsonBody := []byte(bodyData)
+
+		fmt.Println("Payment Body Data", bodyData)
 
 		req, _ := http.NewRequest(http.MethodPost, url, bytes.NewBuffer(jsonBody))
 		req.Header.Set("x-user-token", config.RelayAuthKey)
