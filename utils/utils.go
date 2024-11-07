@@ -75,3 +75,8 @@ func BuildV2KeysendBodyData(amount uint, receiver_pubkey string, route_hint stri
 
 	return bodyData
 }
+
+func BuildV2ConnectionCodes(amt_msat uint, alias string) string {
+	bodyData := fmt.Sprintf(`{"amt_msat": %d, "alias": "%s"}`, amt_msat, alias)
+	return bodyData
+}

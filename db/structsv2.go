@@ -73,3 +73,11 @@ type FeatureOutput struct {
 type FeatureStoriesReponse struct {
 	Output FeatureOutput `json:"feature_output"`
 }
+
+type InviteReponse struct {
+	Invite string `json:"invite"`
+}
+
+type InviteReponseBody struct {
+	Number uint `json:"number"`
+}

@@ -1,15 +1,18 @@
 package handlers
 
 import (
+	"bytes"
 	"encoding/json"
 	"fmt"
 	"io"
+	"log"
 	"net/http"
 
 	"github.com/form3tech-oss/jwt-go"
 	"github.com/stakwork/sphinx-tribes/auth"
 	"github.com/stakwork/sphinx-tribes/config"
 	"github.com/stakwork/sphinx-tribes/db"
+	"github.com/stakwork/sphinx-tribes/utils"
 )
 
 type authHandler struct {
@@ -53,28 +56,32 @@ func (ah *authHandler) GetIsAdmin(w http.ResponseWriter, r *http.Request) {
 }
 
 func (ah *authHandler) CreateConnectionCode(w http.ResponseWriter, r *http.Request) {
+	codeBody := db.InviteReponseBody{}
 	codeArr := []db.ConnectionCodes{}
-	codeStrArr := []string{}
 
 	body, err := io.ReadAll(r.Body)
+	if err != nil {
+		fmt.Println("ReadAll Error", err)
+	}
 	r.Body.Close()
 
-	err = json.Unmarshal(body, &codeStrArr)
-
-	for _, code := range codeStrArr {
-		code := db.ConnectionCodes{
-			ConnectionString: code,
-			IsUsed:           false,
-		}
-		codeArr = append(codeArr, code)
-	}
+	err = json.Unmarshal(body, &codeBody)
 
 	if err != nil {
-		fmt.Println("[auth]", err)
-		w.WriteHeader(http.StatusNotAcceptable)
-		return
+		fmt.Println("Could not umarshal connection code body")
 	}
 
+	for i := 0; i < int(codeBody.Number); i++ {
+		code := MakeConnectionCodeRequest()
+
+		if code != "" {
+			newCode := db.ConnectionCodes{
+				ConnectionString: code,
+				IsUsed:           false,
+			}
+			codeArr = append(codeArr, newCode)
+		}
+	}
 	_, err = ah.db.CreateConnectionCode(codeArr)
 
 	if err != nil {
@@ -84,6 +91,48 @@ func (ah *authHandler) CreateConnectionCode(w http.ResponseWriter, r *http.Reque
 	}
 	w.WriteHeader(http.StatusOK)
 	json.NewEncoder(w).Encode("Codes created successfully")
+}
+
+func MakeConnectionCodeRequest() string {
+	client := http.Client{}
+	url := fmt.Sprintf("%s/invite", config.V2BotUrl)
+
+	fmt.Println("Creating connection codes ====")
+
+	// Build v2 keysend payment data
+	bodyData := utils.BuildV2ConnectionCodes(100, "")
+	jsonBody := []byte(bodyData)
+
+	log.Println("Payment Body Data", bodyData)
+
+	req, _ := http.NewRequest(http.MethodPost, url, bytes.NewBuffer(jsonBody))
+	req.Header.Set("x-admin-token", config.V2BotToken)
+	req.Header.Set("Content-Type", "application/json")
+
+	res, err := client.Do(req)
+
+	if err != nil {
+		log.Printf("[bounty] Request Failed: %s", err)
+		return ""
+	}
+
+	defer res.Body.Close()
+
+	body, err := io.ReadAll(res.Body)
+
+	if err != nil {
+		log.Printf("Could not read invite body: %s", err)
+	}
+
+	inviteReponse := db.InviteReponse{}
+	err = json.Unmarshal(body, &inviteReponse)
+
+	if err != nil {
+		fmt.Println("Could not get connection code")
+		return ""
+	}
+
+	return inviteReponse.Invite
 }
 
 func (ah *authHandler) GetConnectionCode(w http.ResponseWriter, _ *http.Request) {
