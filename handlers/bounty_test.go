@@ -1201,21 +1201,32 @@ func TestGetAllBounties(t *testing.T) {
 
 	t.Run("Should successfully return all bounties", func(t *testing.T) {
 		now := time.Now().Unix()
-		bounty := db.NewBounty{
+
+		// Create a public bounty
+		publicBounty := db.NewBounty{
 			Type:          "coding",
-			Title:         "Bounty With ID",
-			Description:   "Bounty ID description",
+			Title:         "Public Bounty",
+			Description:   "Public Bounty description",
 			WorkspaceUuid: "",
 			Assignee:      "",
 			OwnerID:       "test-owner",
 			Show:          true,
 			Created:       now,
 		}
-		db.TestDB.CreateOrEditBounty(bounty)
+		db.TestDB.CreateOrEditBounty(publicBounty)
 
-		bountyInDb, err := db.TestDB.GetBountyByCreated(uint(bounty.Created))
-		assert.NoError(t, err)
-		assert.NotNil(t, bountyInDb)
+		// Create a private bounty
+		privateBounty := db.NewBounty{
+			Type:          "coding",
+			Title:         "Private Bounty",
+			Description:   "Private Bounty description",
+			WorkspaceUuid: "",
+			Assignee:      "",
+			OwnerID:       "test-owner",
+			Show:          false,
+			Created:       now + 1,
+		}
+		db.TestDB.CreateOrEditBounty(privateBounty)
 
 		rr := httptest.NewRecorder()
 		handler := http.HandlerFunc(bHandler.GetAllBounties)
@@ -1225,11 +1236,62 @@ func TestGetAllBounties(t *testing.T) {
 
 		handler.ServeHTTP(rr, req)
 
-		var returnedBounty []db.BountyResponse
-		err = json.Unmarshal(rr.Body.Bytes(), &returnedBounty)
+		var returnedBounties []db.BountyResponse
+		err := json.Unmarshal(rr.Body.Bytes(), &returnedBounties)
 		assert.NoError(t, err)
 		assert.Equal(t, http.StatusOK, rr.Code)
-		assert.NotEmpty(t, returnedBounty)
+		assert.NotEmpty(t, returnedBounties)
+
+		// Ensure both bounties are returned
+		assert.Equal(t, 2, len(returnedBounties))
+	})
+
+	t.Run("Should successfully return only public bounties", func(t *testing.T) {
+		now := time.Now().Unix()
+
+		// Create a public bounty
+		publicBounty := db.NewBounty{
+			Type:          "coding",
+			Title:         "Public Bounty",
+			Description:   "Public Bounty description",
+			WorkspaceUuid: "",
+			Assignee:      "",
+			OwnerID:       "test-owner",
+			Show:          true,
+			Created:       now,
+		}
+		db.TestDB.CreateOrEditBounty(publicBounty)
+
+		// Create a private bounty
+		privateBounty := db.NewBounty{
+			Type:          "coding",
+			Title:         "Private Bounty",
+			Description:   "Private Bounty description",
+			WorkspaceUuid: "",
+			Assignee:      "",
+			OwnerID:       "test-owner",
+			Show:          false,
+			Created:       now + 1,
+		}
+		db.TestDB.CreateOrEditBounty(privateBounty)
+
+		rr := httptest.NewRecorder()
+		handler := http.HandlerFunc(bHandler.GetAllBounties)
+
+		rctx := chi.NewRouteContext()
+		req, _ := http.NewRequestWithContext(context.WithValue(context.Background(), chi.RouteCtxKey, rctx), http.MethodGet, "/all", nil)
+
+		handler.ServeHTTP(rr, req)
+
+		var returnedBounties []db.BountyResponse
+		err := json.Unmarshal(rr.Body.Bytes(), &returnedBounties)
+		assert.NoError(t, err)
+		assert.Equal(t, http.StatusOK, rr.Code)
+		assert.NotEmpty(t, returnedBounties)
+
+		// Ensure only the public bounty is returned
+		assert.Equal(t, 1, len(returnedBounties))
+		assert.Equal(t, publicBounty.Title, returnedBounties[0].Bounty.Title)
 	})
 }
 

@@ -1175,7 +1175,7 @@ func (db database) AddBounty(b Bounty) (Bounty, error) {
 
 func (db database) GetAllBounties(r *http.Request) []NewBounty {
 	keys := r.URL.Query()
-	tags := keys.Get("tags") // this is a string of tags separated by commas
+	tags := keys.Get("tags")
 	offset, limit, sortBy, direction, search := utils.GetPaginationParams(r)
 	open := keys.Get("Open")
 	assingned := keys.Get("Assigned")
@@ -1208,7 +1208,7 @@ func (db database) GetAllBounties(r *http.Request) []NewBounty {
 	if sortBy != "" && direction != "" {
 		orderQuery = "ORDER BY " + sortBy + " " + direction
 	} else {
-		orderQuery = "ORDER BY " + sortBy + "" + "DESC"
+		orderQuery = "ORDER BY created DESC"
 	}
 	if limit != 0 {
 		limitQuery = fmt.Sprintf("LIMIT %d  OFFSET %d", limit, offset)
@@ -1270,14 +1270,13 @@ func (db database) GetAllBounties(r *http.Request) []NewBounty {
 		}
 	}
 
-	query := "SELECT * FROM public.bounty WHERE show != false"
+	query := "SELECT * FROM public.bounty"
 
 	allQuery := query + " " + statusQuery + " " + searchQuery + " " + workspaceQuery + " " + languageQuery + " " + phaseUuidQuery + " " + phasePriorityQuery + " " + orderQuery + " " + limitQuery
 
 	theQuery := db.db.Raw(allQuery)
 
 	if tags != "" {
-		// pull out the tags and add them in here
 		t := strings.Split(tags, ",")
 		for _, s := range t {
 			theQuery = theQuery.Where("'" + s + "'" + " = any (tags)")

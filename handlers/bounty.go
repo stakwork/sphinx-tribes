@@ -47,7 +47,15 @@ func NewBountyHandler(httpClient HttpClient, database db.Database) *bountyHandle
 
 func (h *bountyHandler) GetAllBounties(w http.ResponseWriter, r *http.Request) {
 	bounties := h.db.GetAllBounties(r)
-	var bountyResponse []db.BountyResponse = h.GenerateBountyResponse(bounties)
+
+	var publicBounties []db.NewBounty
+	for _, bounty := range bounties {
+		if bounty.Show {
+			publicBounties = append(publicBounties, bounty)
+		}
+	}
+
+	var bountyResponse []db.BountyResponse = h.GenerateBountyResponse(publicBounties)
 
 	w.WriteHeader(http.StatusOK)
 	json.NewEncoder(w).Encode(bountyResponse)
