@@ -1202,6 +1202,8 @@ func TestGetAllBounties(t *testing.T) {
 	t.Run("Should successfully return all bounties", func(t *testing.T) {
 		now := time.Now().Unix()
 
+		db.TestDB.DeleteAllBounties()
+
 		// Create a public bounty
 		publicBounty := db.NewBounty{
 			Type:          "coding",
@@ -1248,6 +1250,8 @@ func TestGetAllBounties(t *testing.T) {
 
 	t.Run("Should successfully return only public bounties", func(t *testing.T) {
 		now := time.Now().Unix()
+
+		db.TestDB.DeleteAllBounties()
 
 		// Create a public bounty
 		publicBounty := db.NewBounty{
