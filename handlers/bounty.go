@@ -690,6 +690,8 @@ func (h *bountyHandler) MakeBountyPayment(w http.ResponseWriter, r *http.Request
 			// if the payment has a completed status
 			if v2KeysendRes.Status == db.PaymentComplete {
 				bounty.Paid = true
+				bounty.PaymentFailed = false
+				bounty.PaymentPending = false
 				bounty.PaidDate = &now
 				bounty.Completed = true
 				bounty.CompletionDate = &now
@@ -717,6 +719,7 @@ func (h *bountyHandler) MakeBountyPayment(w http.ResponseWriter, r *http.Request
 				log.Printf("[bounty] V2 Status is pending:  %s", v2KeysendRes.Status)
 				bounty.Paid = false
 				bounty.PaymentPending = true
+				bounty.PaymentFailed = false
 				bounty.PaidDate = &now
 				bounty.Completed = true
 				bounty.CompletionDate = &now
