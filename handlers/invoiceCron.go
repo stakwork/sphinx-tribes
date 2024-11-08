@@ -75,7 +75,7 @@ func InitInvoiceCron() {
 
 							amount, _ := utils.ConvertStringToUint(inv.Amount)
 
-							bodyData := utils.BuildKeysendBodyData(amount, inv.User_pubkey, inv.Route_hint)
+							bodyData := utils.BuildKeysendBodyData(amount, inv.User_pubkey, inv.Route_hint, "")
 
 							jsonBody := []byte(bodyData)
 

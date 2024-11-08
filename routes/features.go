@@ -10,6 +10,12 @@ import (
 func FeatureRoutes() chi.Router {
 	r := chi.NewRouter()
 	featureHandlers := handlers.NewFeatureHandler(&db.DB)
+
+	r.Group(func(r chi.Router) {
+		r.Post("/stories", featureHandlers.GetFeatureStories)
+
+	})
+
 	r.Group(func(r chi.Router) {
 		r.Use(auth.PubKeyContext)
 

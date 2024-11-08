@@ -10,6 +10,16 @@ import (
 	"gorm.io/gorm"
 )
 
+type configHandler struct {
+	db Database
+}
+
+func NewConfigHandler(database Database) *configHandler {
+	return &configHandler{
+		db: database,
+	}
+}
+
 type database struct {
 	db                 *gorm.DB
 	getWorkspaceByUuid func(uuid string) Workspace
@@ -198,6 +208,8 @@ func (db database) MigrateTablesWithOrgUuid() {
 		} else {
 			db.db.AutoMigrate(&NewPaymentHistory{})
 		}
+	} else {
+		db.db.AutoMigrate(&NewPaymentHistory{})
 	}
 	if !db.db.Migrator().HasTable("invoice_list") {
 		if !db.db.Migrator().HasColumn(InvoiceList{}, "workspace_uuid") {
@@ -385,6 +397,38 @@ func (db database) UserHasAccess(pubKeyFromAuth string, uuid string, role string
 		userRoles := db.getUserRoles(uuid, pubKeyFromAuth)
 		hasRole = RolesCheck(userRoles, role)
 		return hasRole
+	}
+	return true
+}
+
+func (ch configHandler) UserHasAccess(pubKeyFromAuth string, uuid string, role string) bool {
+	org := ch.db.GetWorkspaceByUuid(uuid)
+	var hasRole bool = false
+	if pubKeyFromAuth != org.OwnerPubKey {
+		userRoles := ch.db.GetUserRoles(uuid, pubKeyFromAuth)
+		hasRole = RolesCheck(userRoles, role)
+		return hasRole
+	}
+	return true
+}
+
+func (ch configHandler) UserHasManageBountyRoles(pubKeyFromAuth string, uuid string) bool {
+	var manageRolesCount = len(ManageBountiesGroup)
+	org := ch.db.GetWorkspaceByUuid(uuid)
+	if pubKeyFromAuth != org.OwnerPubKey {
+		userRoles := ch.db.GetUserRoles(uuid, pubKeyFromAuth)
+
+		for _, role := range ManageBountiesGroup {
+			// check for the manage bounty roles
+			hasRole := RolesCheck(userRoles, role)
+			if hasRole {
+				manageRolesCount--
+			}
+		}
+
+		if manageRolesCount != 0 {
+			return false
+		}
 	}
 	return true
 }

@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
+	"log"
 	"net/http"
 	"strings"
 	"time"
@@ -17,22 +18,27 @@ import (
 )
 
 type workspaceHandler struct {
-	db                       db.Database
-	generateBountyHandler    func(bounties []db.NewBounty) []db.BountyResponse
-	getLightningInvoice      func(payment_request string) (db.InvoiceResult, db.InvoiceError)
-	userHasAccess            func(pubKeyFromAuth string, uuid string, role string) bool
-	userHasManageBountyRoles func(pubKeyFromAuth string, uuid string) bool
+	db                             db.Database
+	generateBountyHandler          func(bounties []db.NewBounty) []db.BountyResponse
+	getLightningInvoice            func(payment_request string) (db.InvoiceResult, db.InvoiceError)
+	userHasAccess                  func(pubKeyFromAuth string, uuid string, role string) bool
+	configUserHasAccess            func(pubKeyFromAuth string, uuid string, role string) bool
+	configUserHasManageBountyRoles func(pubKeyFromAuth string, uuid string) bool
+	userHasManageBountyRoles       func(pubKeyFromAuth string, uuid string) bool
 }
 
 func NewWorkspaceHandler(database db.Database) *workspaceHandler {
 	bHandler := NewBountyHandler(http.DefaultClient, database)
 	dbConf := db.NewDatabaseConfig(&gorm.DB{})
+	configHandler := db.NewConfigHandler(database)
 	return &workspaceHandler{
-		db:                       database,
-		generateBountyHandler:    bHandler.GenerateBountyResponse,
-		getLightningInvoice:      bHandler.GetLightningInvoice,
-		userHasAccess:            dbConf.UserHasAccess,
-		userHasManageBountyRoles: dbConf.UserHasManageBountyRoles,
+		db:                             database,
+		generateBountyHandler:          bHandler.GenerateBountyResponse,
+		getLightningInvoice:            bHandler.GetLightningInvoice,
+		userHasAccess:                  dbConf.UserHasAccess,
+		configUserHasAccess:            configHandler.UserHasAccess,
+		configUserHasManageBountyRoles: configHandler.UserHasManageBountyRoles,
+		userHasManageBountyRoles:       dbConf.UserHasManageBountyRoles,
 	}
 }
 
@@ -482,23 +488,23 @@ func (oh *workspaceHandler) GetUserDropdownWorkspaces(w http.ResponseWriter, r *
 		return
 	}
 
-	user := db.DB.GetPerson(userId)
+	user := oh.db.GetPerson(userId)
 
 	// get the workspaces created by the user, then get all the workspaces
 	// the user has been added to, loop through to get the workspace
-	workspaces := GetCreatedWorkspaces(user.OwnerPubKey)
-	assignedWorkspaces := db.DB.GetUserAssignedWorkspaces(user.OwnerPubKey)
+	workspaces := oh.GetCreatedWorkspaces(user.OwnerPubKey)
+	assignedWorkspaces := oh.db.GetUserAssignedWorkspaces(user.OwnerPubKey)
 	for _, value := range assignedWorkspaces {
 		uuid := value.WorkspaceUuid
-		workspace := db.DB.GetWorkspaceByUuid(uuid)
-		bountyCount := db.DB.GetWorkspaceBountyCount(uuid)
-		hasRole := db.UserHasAccess(user.OwnerPubKey, uuid, db.ViewReport)
-		hasBountyRoles := oh.userHasManageBountyRoles(user.OwnerPubKey, uuid)
+		workspace := oh.db.GetWorkspaceByUuid(uuid)
+		bountyCount := oh.db.GetWorkspaceBountyCount(uuid)
+		hasRole := oh.configUserHasAccess(user.OwnerPubKey, uuid, db.ViewReport)
+		hasBountyRoles := oh.configUserHasManageBountyRoles(user.OwnerPubKey, uuid)
 
 		// don't add deleted workspaces to the list
 		if !workspace.Deleted && hasBountyRoles {
 			if hasRole {
-				budget := db.DB.GetWorkspaceBudget(uuid)
+				budget := oh.db.GetWorkspaceBudget(uuid)
 				workspace.Budget = budget.TotalBudget
 			} else {
 				workspace.Budget = 0
@@ -522,6 +528,25 @@ func GetCreatedWorkspaces(pubkey string) []db.Workspace {
 
 		if hasRole {
 			budget := db.DB.GetWorkspaceBudget(uuid)
+			workspaces[index].Budget = budget.TotalBudget
+		} else {
+			workspaces[index].Budget = 0
+		}
+		workspaces[index].BountyCount = bountyCount
+	}
+	return workspaces
+}
+
+func (oh *workspaceHandler) GetCreatedWorkspaces(pubkey string) []db.Workspace {
+	workspaces := oh.db.GetUserCreatedWorkspaces(pubkey)
+	// add bounty count to the workspace
+	for index, value := range workspaces {
+		uuid := value.Uuid
+		bountyCount := oh.db.GetWorkspaceBountyCount(uuid)
+		hasRole := oh.configUserHasAccess(pubkey, uuid, db.ViewReport)
+
+		if hasRole {
+			budget := oh.db.GetWorkspaceBudget(uuid)
 			workspaces[index].Budget = budget.TotalBudget
 		} else {
 			workspaces[index].Budget = 0
@@ -637,6 +662,60 @@ func GetPaymentHistory(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(paymentHistoryData)
 }
 
+func UpdateWorkspacePendingPayments(w http.ResponseWriter, r *http.Request) {
+	ctx := r.Context()
+	pubKeyFromAuth, _ := ctx.Value(auth.ContextKey).(string)
+	workspace_uuid := chi.URLParam(r, "workspace_uuid")
+
+	if pubKeyFromAuth == "" {
+		fmt.Println("no pubkey from auth")
+		w.WriteHeader(http.StatusUnauthorized)
+		return
+	}
+
+	paymentsHistory := db.DB.GetWorkspacePendingPayments(workspace_uuid)
+
+	for _, payment := range paymentsHistory {
+		tag := payment.Tag
+		tagResult := GetInvoiceStatusByTag(tag)
+
+		if tagResult.Status == db.PaymentComplete {
+			db.DB.SetPaymentAsComplete(tag)
+
+			bounty := db.DB.GetBounty(payment.ID)
+
+			if bounty.ID > 0 {
+				now := time.Now()
+
+				bounty.Paid = true
+				bounty.PaymentPending = false
+				bounty.PaymentFailed = false
+				bounty.PaidDate = &now
+				bounty.Completed = true
+				bounty.CompletionDate = &now
+
+				db.DB.UpdateBounty(bounty)
+			}
+		} else if tagResult.Status == db.PaymentFailed {
+			// Handle failed payments
+			bounty := db.DB.GetBounty(payment.ID)
+
+			if bounty.ID > 0 {
+				db.DB.SetPaymentStatusByBountyId(bounty.ID, tagResult)
+
+				bounty.Paid = false
+				bounty.PaymentPending = false
+				bounty.PaymentFailed = true
+
+				db.DB.UpdateBounty(bounty)
+			}
+		}
+	}
+
+	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode("Updated Payments Successfully")
+}
+
 func (oh *workspaceHandler) PollBudgetInvoices(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 	pubKeyFromAuth, _ := ctx.Value(auth.ContextKey).(string)
@@ -690,6 +769,7 @@ func (oh *workspaceHandler) PollUserWorkspacesBudget(w http.ResponseWriter, r *h
 	workspaces := GetAllUserWorkspaces(pubKeyFromAuth)
 	// loop through the worksppaces and get each workspace invoice
 	for _, space := range workspaces {
+
 		// get all workspace invoice
 		workInvoices := oh.db.GetWorkspaceInvoices(space.Uuid)
 
@@ -993,6 +1073,35 @@ func (oh *workspaceHandler) GetFeaturesByWorkspaceUuid(w http.ResponseWriter, r 
 
 	w.WriteHeader(http.StatusOK)
 	json.NewEncoder(w).Encode(workspaceFeatures)
+}
+
+func (oh *workspaceHandler) GetLastWithdrawal(w http.ResponseWriter, r *http.Request) {
+	ctx := r.Context()
+	pubKeyFromAuth, _ := ctx.Value(auth.ContextKey).(string)
+	if pubKeyFromAuth == "" {
+		fmt.Println("[workspaces] no pubkey from auth")
+		w.WriteHeader(http.StatusUnauthorized)
+		return
+	}
+
+	workspace_uuid := chi.URLParam(r, "workspace_uuid")
+	lastWithdrawal := oh.db.GetLastWithdrawal(workspace_uuid)
+
+	log.Println("This workspaces last withdrawal is", workspace_uuid, lastWithdrawal)
+
+	hoursDiff := int64(1)
+
+	if lastWithdrawal.ID > 0 {
+		now := time.Now()
+		withdrawCreated := lastWithdrawal.Created
+		withdrawTime := utils.ConvertTimeToTimestamp(withdrawCreated.String())
+
+		hoursDiff = utils.GetHoursDifference(int64(withdrawTime), &now)
+		log.Println("This workspaces last withdrawal hours difference is", hoursDiff)
+	}
+
+	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode(hoursDiff)
 }
 
 func GetAllUserWorkspaces(pubkey string) []db.Workspace {

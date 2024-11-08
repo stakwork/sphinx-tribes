@@ -33,9 +33,12 @@ func BountyRoutes() chi.Router {
 	})
 	r.Group(func(r chi.Router) {
 		r.Use(auth.PubKeyContext)
-		r.Post("/pay/{id}", bountyHandler.MakeBountyPayment)
+
 		r.Post("/budget/withdraw", bountyHandler.BountyBudgetWithdraw)
-		r.Post("/budget_workspace/withdraw", bountyHandler.NewBountyBudgetWithdraw)
+		r.Post("/pay/{id}", bountyHandler.MakeBountyPayment)
+		r.Get("/payment/status/{id}", bountyHandler.GetBountyPaymentStatus)
+		r.Get("/payment/{bountyId}", handlers.GetPaymentByBountyId)
+		r.Put("/payment/status/{id}", bountyHandler.UpdateBountyPaymentStatus)
 
 		r.Post("/", bountyHandler.CreateOrEditBounty)
 		r.Delete("/assignee", handlers.DeleteBountyAssignee)

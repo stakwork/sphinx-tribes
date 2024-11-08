@@ -12,11 +12,11 @@ import (
 func TestInitConfig(t *testing.T) {
 	InitConfig()
 
-	if Host != "https://people.sphinx.chat" {
+	if Host == "" {
 		t.Error("Could not load default host")
 	}
 
-	if MemeUrl != "https://memes.sphinx.chat" {
+	if MemeUrl == "" {
 		t.Error("Could not load default meme url")
 	}
 

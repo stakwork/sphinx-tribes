@@ -53,13 +53,24 @@ func BuildSearchQuery(key string, term string) (string, string) {
 	return arg1, arg2
 }
 
-func BuildKeysendBodyData(amount uint, receiver_pubkey string, route_hint string) string {
+func BuildKeysendBodyData(amount uint, receiver_pubkey string, route_hint string, memo string) string {
 	var bodyData string
-	memoText := "memotext added for notification"
 	if route_hint != "" {
-		bodyData = fmt.Sprintf(`{"amount": %d, "destination_key": "%s", "route_hint": "%s", "text": "%s"}`, amount, receiver_pubkey, route_hint, memoText)
+		bodyData = fmt.Sprintf(`{"amount": %d, "destination_key": "%s", "route_hint": "%s", "text": "%s", "data": "%s"}`, amount, receiver_pubkey, route_hint, memo, memo)
 	} else {
-		bodyData = fmt.Sprintf(`{"amount": %d, "destination_key": "%s", "text": "%s"}`, amount, receiver_pubkey, memoText)
+		bodyData = fmt.Sprintf(`{"amount": %d, "destination_key": "%s", "text": "%s", "data": "%s"}`, amount, receiver_pubkey, memo, memo)
+	}
+
+	return bodyData
+}
+
+func BuildV2KeysendBodyData(amount uint, receiver_pubkey string, route_hint string, memo string) string {
+	amountMsat := amount * 1000
+	var bodyData string
+	if route_hint != "" {
+		bodyData = fmt.Sprintf(`{"amt_msat": %d, "dest": "%s", "route_hint": "%s", "data": "%s", "wait": true}`, amountMsat, receiver_pubkey, route_hint, memo)
+	} else {
+		bodyData = fmt.Sprintf(`{"amt_msat": %d, "dest": "%s", "route_hint": "", "data": "%s", "wait": true}`, amountMsat, receiver_pubkey, memo)
 	}
 
 	return bodyData

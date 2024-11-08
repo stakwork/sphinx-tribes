@@ -58,6 +58,14 @@ func (db database) CreateOrEditWorkspace(m Workspace) (Workspace, error) {
 	return m, nil
 }
 
+func (db database) DeleteWorkspace() (bool, error) {
+	result := db.db.Exec("DELETE FROM workspaces")
+	if result.Error != nil {
+		return false, result.Error
+	}
+	return true, nil
+}
+
 func (db database) CreateOrEditWorkspaceRepository(m WorkspaceRepositories) (WorkspaceRepositories, error) {
 	m.Name = strings.TrimSpace(m.Name)
 	m.Url = strings.TrimSpace(m.Url)
@@ -199,6 +207,11 @@ func (db database) GetWorkspaceBudget(workspace_uuid string) NewBountyBudget {
 	return ms
 }
 
+func (db database) DeleteWorkspaceBudget() error {
+	err := db.db.Unscoped().Where("1 = 1").Delete(&NewBountyBudget{}).Error
+	return err
+}
+
 func (db database) GetWorkspaceStatusBudget(workspace_uuid string) StatusBudget {
 	workspaceBudget := db.GetWorkspaceBudget(workspace_uuid)
 
@@ -251,7 +264,7 @@ func (db database) GetWorkspaceBudgetHistory(workspace_uuid string) []BudgetHist
 	return budgetHistory
 }
 
-func (db database) ProcessUpdateBudget(invoice NewInvoiceList) error {
+func (db database) ProcessUpdateBudget(non_tx_invoice NewInvoiceList) error {
 	// Start db transaction
 	tx := db.db.Begin()
 
@@ -267,11 +280,25 @@ func (db database) ProcessUpdateBudget(invoice NewInvoiceList) error {
 		return err
 	}
 
-	created := invoice.Created
-	workspace_uuid := invoice.WorkspaceUuid
+	created := non_tx_invoice.Created
+	workspace_uuid := non_tx_invoice.WorkspaceUuid
+
+	invoice := NewInvoiceList{}
+	tx.Where("payment_request = ?", non_tx_invoice.PaymentRequest).Find(&invoice)
+
+	if invoice.Status {
+		tx.Rollback()
+		return errors.New("cannot process already paid invoice")
+	}
+
+	if workspace_uuid == "" {
+		return errors.New("cannot Create a Workspace Without a Workspace uuid")
+	}
 
 	// Get payment history and update budget
-	paymentHistory := db.GetPaymentHistoryByCreated(created, workspace_uuid)
+	paymentHistory := NewPaymentHistory{}
+	tx.Model(&NewPaymentHistory{}).Where("created = ?", created).Where("workspace_uuid = ? ", workspace_uuid).Find(&paymentHistory)
+
 	if paymentHistory.WorkspaceUuid != "" && paymentHistory.Amount != 0 {
 		paymentHistory.Status = true
 
@@ -281,9 +308,10 @@ func (db database) ProcessUpdateBudget(invoice NewInvoiceList) error {
 		}
 
 		// get Workspace budget and add payment to total budget
-		WorkspaceBudget := db.GetWorkspaceBudget(workspace_uuid)
+		workspaceBudget := NewBountyBudget{}
+		tx.Model(&NewBountyBudget{}).Where("workspace_uuid = ?", workspace_uuid).Find(&workspaceBudget)
 
-		if WorkspaceBudget.WorkspaceUuid == "" {
+		if workspaceBudget.WorkspaceUuid == "" {
 			now := time.Now()
 			workBudget := NewBountyBudget{
 				WorkspaceUuid: workspace_uuid,
@@ -296,11 +324,11 @@ func (db database) ProcessUpdateBudget(invoice NewInvoiceList) error {
 				tx.Rollback()
 			}
 		} else {
-			totalBudget := WorkspaceBudget.TotalBudget
-			WorkspaceBudget.TotalBudget = totalBudget + paymentHistory.Amount
+			totalBudget := workspaceBudget.TotalBudget
+			workspaceBudget.TotalBudget = totalBudget + paymentHistory.Amount
 
-			if err = tx.Model(&NewBountyBudget{}).Where("workspace_uuid = ?", WorkspaceBudget.WorkspaceUuid).Updates(map[string]interface{}{
-				"total_budget": WorkspaceBudget.TotalBudget,
+			if err = tx.Model(&NewBountyBudget{}).Where("workspace_uuid = ?", workspaceBudget.WorkspaceUuid).Updates(map[string]interface{}{
+				"total_budget": workspaceBudget.TotalBudget,
 			}).Error; err != nil {
 				tx.Rollback()
 			}
@@ -316,19 +344,24 @@ func (db database) ProcessUpdateBudget(invoice NewInvoiceList) error {
 }
 
 func (db database) AddAndUpdateBudget(invoice NewInvoiceList) NewPaymentHistory {
+	// Start db transaction
+	tx := db.db.Begin()
+
 	created := invoice.Created
 	workspace_uuid := invoice.WorkspaceUuid
 
-	paymentHistory := db.GetPaymentHistoryByCreated(created, workspace_uuid)
+	paymentHistory := NewPaymentHistory{}
+	tx.Model(&NewPaymentHistory{}).Where("created = ?", created).Where("workspace_uuid = ? ", workspace_uuid).Find(&paymentHistory)
 
 	if paymentHistory.WorkspaceUuid != "" && paymentHistory.Amount != 0 {
 		paymentHistory.Status = true
 		db.db.Where("created = ?", created).Where("workspace_uuid = ? ", workspace_uuid).Updates(paymentHistory)
 
 		// get Workspace budget and add payment to total budget
-		WorkspaceBudget := db.GetWorkspaceBudget(workspace_uuid)
+		workspaceBudget := NewBountyBudget{}
+		tx.Model(&NewBountyBudget{}).Where("workspace_uuid = ?", workspace_uuid).Find(&workspaceBudget)
 
-		if WorkspaceBudget.WorkspaceUuid == "" {
+		if workspaceBudget.WorkspaceUuid == "" {
 			now := time.Now()
 			workBudget := NewBountyBudget{
 				WorkspaceUuid: workspace_uuid,
@@ -336,13 +369,25 @@ func (db database) AddAndUpdateBudget(invoice NewInvoiceList) NewPaymentHistory 
 				Created:       &now,
 				Updated:       &now,
 			}
-			db.CreateWorkspaceBudget(workBudget)
+
+			if err := tx.Create(&workBudget).Error; err != nil {
+				tx.Rollback()
+			}
 		} else {
-			totalBudget := WorkspaceBudget.TotalBudget
-			WorkspaceBudget.TotalBudget = totalBudget + paymentHistory.Amount
-			db.UpdateWorkspaceBudget(WorkspaceBudget)
+			totalBudget := workspaceBudget.TotalBudget
+			workspaceBudget.TotalBudget = totalBudget + paymentHistory.Amount
+
+			if err := tx.Model(&NewBountyBudget{}).Where("workspace_uuid = ?", workspaceBudget.WorkspaceUuid).Updates(map[string]interface{}{
+				"total_budget": workspaceBudget.TotalBudget,
+			}).Error; err != nil {
+				tx.Rollback()
+			}
 		}
+	} else {
+		tx.Rollback()
 	}
+
+	tx.Commit()
 
 	return paymentHistory
 }
@@ -395,17 +440,6 @@ func (db database) WithdrawBudget(sender_pubkey string, workspace_uuid string, a
 func (db database) AddPaymentHistory(payment NewPaymentHistory) NewPaymentHistory {
 	db.db.Create(&payment)
 
-	// get Workspace budget and subtract payment from total budget
-	WorkspaceBudget := db.GetWorkspaceBudget(payment.WorkspaceUuid)
-	totalBudget := WorkspaceBudget.TotalBudget
-
-	// deduct amount if it's a bounty payment
-	if payment.PaymentType == "payment" {
-		WorkspaceBudget.TotalBudget = totalBudget - payment.Amount
-	}
-
-	db.UpdateWorkspaceBudget(WorkspaceBudget)
-
 	return payment
 }
 
@@ -429,23 +463,25 @@ func (db database) ProcessBountyPayment(payment NewPaymentHistory, bounty NewBou
 		return err
 	}
 
-	// get Workspace budget and subtract payment from total budget
-	WorkspaceBudget := db.GetWorkspaceBudget(payment.WorkspaceUuid)
-	totalBudget := WorkspaceBudget.TotalBudget
+	if payment.PaymentStatus != PaymentFailed {
+		// get Workspace budget and subtract payment from total budget
+		WorkspaceBudget := db.GetWorkspaceBudget(payment.WorkspaceUuid)
+		totalBudget := WorkspaceBudget.TotalBudget
 
-	// update budget
-	WorkspaceBudget.TotalBudget = totalBudget - payment.Amount
-	if err = tx.Model(&NewBountyBudget{}).Where("workspace_uuid = ?", payment.WorkspaceUuid).Updates(map[string]interface{}{
-		"total_budget": WorkspaceBudget.TotalBudget,
-	}).Error; err != nil {
-		tx.Rollback()
-		return err
-	}
+		// update budget
+		WorkspaceBudget.TotalBudget = totalBudget - payment.Amount
+		if err = tx.Model(&NewBountyBudget{}).Where("workspace_uuid = ?", payment.WorkspaceUuid).Updates(map[string]interface{}{
+			"total_budget": WorkspaceBudget.TotalBudget,
+		}).Error; err != nil {
+			tx.Rollback()
+			return err
+		}
 
-	// updatge bounty status
-	if err = tx.Where("created", bounty.Created).Updates(&bounty).Error; err != nil {
-		tx.Rollback()
-		return err
+		// updatge bounty status
+		if err = tx.Where("created", bounty.Created).Updates(&bounty).Error; err != nil {
+			tx.Rollback()
+			return err
+		}
 	}
 
 	return tx.Commit().Error
@@ -463,6 +499,41 @@ func (db database) GetPaymentHistory(workspace_uuid string, r *http.Request) []N
 
 	db.db.Raw(query + " " + limitQuery).Find(&payment)
 	return payment
+}
+
+func (db database) GetPendingPaymentHistory() []NewPaymentHistory {
+	paymentHistories := []NewPaymentHistory{}
+
+	query := `SELECT * FROM payment_histories WHERE payment_status = '` + PaymentPending + `' AND status = true AND payment_type = 'payment' ORDER BY created DESC`
+
+	db.db.Raw(query).Find(&paymentHistories)
+	return paymentHistories
+}
+
+func (db database) GetPaymentByBountyId(bountyId uint) NewPaymentHistory {
+	paymentHistories := NewPaymentHistory{}
+
+	query := fmt.Sprintf("SELECT * FROM payment_histories WHERE bounty_id = %d AND status = true ORDER BY created DESC", bountyId)
+
+	db.db.Raw(query).Find(&paymentHistories)
+
+	return paymentHistories
+}
+
+func (db database) SetPaymentAsComplete(tag string) bool {
+	db.db.Model(NewPaymentHistory{}).Where("tag = ?", tag).Update("payment_status", PaymentComplete)
+	return true
+}
+
+func (db database) SetPaymentStatusByBountyId(bountyId uint, tagResult V2TagRes) bool {
+	mapResult := map[string]string{}
+
+	mapResult["payment_status"] = tagResult.Status
+	mapResult["error"] = tagResult.Error
+	mapResult["tag"] = tagResult.Tag
+
+	db.db.Model(NewPaymentHistory{}).Where("bounty_id = ?", bountyId).Updates(mapResult)
+	return true
 }
 
 func (db database) GetWorkspaceInvoices(workspace_uuid string) []NewInvoiceList {
@@ -567,6 +638,32 @@ func (db database) DeleteAllUsersFromWorkspace(workspace_uuid string) error {
 	}
 
 	return nil
+}
+
+func (db database) GetLastWithdrawal(workspace_uuid string) NewPaymentHistory {
+	p := NewPaymentHistory{}
+	db.db.Model(&NewPaymentHistory{}).Where("workspace_uuid", workspace_uuid).Where("payment_type", "withdraw").Order("created DESC").Limit(1).Find(&p)
+	return p
+}
+
+func (db database) GetWorkspacePendingPayments(workspace_uuid string) []NewPaymentHistory {
+	p := []NewPaymentHistory{}
+	db.db.Model(&NewPaymentHistory{}).Where("workspace_uuid", workspace_uuid).Where("payment_status", "PENDING").Find(&p)
+	return p
+}
+
+func (db database) GetSumOfDeposits(workspace_uuid string) uint {
+	var depositAmount uint
+	db.db.Model(&NewPaymentHistory{}).Where("workspace_uuid = ?", workspace_uuid).Where("status = ?", true).Where("payment_type = ?", "deposit").Select("SUM(amount)").Row().Scan(&depositAmount)
+
+	return depositAmount
+}
+
+func (db database) GetSumOfWithdrawal(workspace_uuid string) uint {
+	var depositAmount uint
+	db.db.Model(&NewPaymentHistory{}).Where("workspace_uuid = ?", workspace_uuid).Where("status = ?", true).Where("payment_type = ?", "withdraw").Select("SUM(amount)").Row().Scan(&depositAmount)
+
+	return depositAmount
 }
 
 func (db database) GetFeaturePhasesBountiesCount(bountyType string, phaseUuid string) int64 {
