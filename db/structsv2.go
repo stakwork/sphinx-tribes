@@ -78,6 +78,6 @@ type InviteReponse struct {
 	Invite string `json:"invite"`
 }
 
-type InviteReponseBody struct {
+type InviteBody struct {
 	Number uint `json:"number"`
 }
