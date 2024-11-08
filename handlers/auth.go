@@ -69,6 +69,8 @@ func (ah *authHandler) CreateConnectionCode(w http.ResponseWriter, r *http.Reque
 
 	if err != nil {
 		fmt.Println("Could not umarshal connection code body")
+		w.WriteHeader(http.StatusNotAcceptable)
+		return
 	}
 
 	for i := 0; i < int(codeBody.Number); i++ {
@@ -82,6 +84,7 @@ func (ah *authHandler) CreateConnectionCode(w http.ResponseWriter, r *http.Reque
 			codeArr = append(codeArr, newCode)
 		}
 	}
+
 	_, err = ah.db.CreateConnectionCode(codeArr)
 
 	if err != nil {
