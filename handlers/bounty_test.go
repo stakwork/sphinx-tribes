@@ -411,6 +411,7 @@ func TestPayLightningInvoice(t *testing.T) {
 		mockHttpClient := &mocks.HttpClient{}
 		mockDb := &dbMocks.Database{}
 		handler := NewBountyHandler(mockHttpClient, mockDb)
+
 		r := io.NopCloser(bytes.NewReader([]byte(`{"error": "internal server error"}`)))
 
 		if botURL != "" && botToken != "" {
