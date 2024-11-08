@@ -16,16 +16,18 @@ import (
 )
 
 type authHandler struct {
-	db        db.Database
-	decodeJwt func(token string) (jwt.MapClaims, error)
-	encodeJwt func(pubkey string) (string, error)
+	db                        db.Database
+	makeConnectionCodeRequest func() string
+	decodeJwt                 func(token string) (jwt.MapClaims, error)
+	encodeJwt                 func(pubkey string) (string, error)
 }
 
 func NewAuthHandler(db db.Database) *authHandler {
 	return &authHandler{
-		db:        db,
-		decodeJwt: auth.DecodeJwt,
-		encodeJwt: auth.EncodeJwt,
+		db:                        db,
+		makeConnectionCodeRequest: MakeConnectionCodeRequest,
+		decodeJwt:                 auth.DecodeJwt,
+		encodeJwt:                 auth.EncodeJwt,
 	}
 }
 
@@ -56,7 +58,7 @@ func (ah *authHandler) GetIsAdmin(w http.ResponseWriter, r *http.Request) {
 }
 
 func (ah *authHandler) CreateConnectionCode(w http.ResponseWriter, r *http.Request) {
-	codeBody := db.InviteReponseBody{}
+	codeBody := db.InviteBody{}
 	codeArr := []db.ConnectionCodes{}
 
 	body, err := io.ReadAll(r.Body)
@@ -74,7 +76,7 @@ func (ah *authHandler) CreateConnectionCode(w http.ResponseWriter, r *http.Reque
 	}
 
 	for i := 0; i < int(codeBody.Number); i++ {
-		code := MakeConnectionCodeRequest()
+		code := ah.makeConnectionCodeRequest()
 
 		if code != "" {
 			newCode := db.ConnectionCodes{
@@ -97,16 +99,12 @@ func (ah *authHandler) CreateConnectionCode(w http.ResponseWriter, r *http.Reque
 }
 
 func MakeConnectionCodeRequest() string {
-	client := http.Client{}
 	url := fmt.Sprintf("%s/invite", config.V2BotUrl)
-
-	fmt.Println("Creating connection codes ====")
+	client := http.Client{}
 
 	// Build v2 keysend payment data
-	bodyData := utils.BuildV2ConnectionCodes(100, "")
+	bodyData := utils.BuildV2ConnectionCodes(100, "new_user")
 	jsonBody := []byte(bodyData)
-
-	log.Println("Payment Body Data", bodyData)
 
 	req, _ := http.NewRequest(http.MethodPost, url, bytes.NewBuffer(jsonBody))
 	req.Header.Set("x-admin-token", config.V2BotToken)
@@ -115,7 +113,7 @@ func MakeConnectionCodeRequest() string {
 	res, err := client.Do(req)
 
 	if err != nil {
-		log.Printf("[bounty] Request Failed: %s", err)
+		log.Printf("[Invite] Request Failed: %s", err)
 		return ""
 	}
 
