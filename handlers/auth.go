@@ -121,6 +121,7 @@ func GetLnurlAuth(w http.ResponseWriter, r *http.Request) {
 	responseData["encode"] = encodeData.Encode
 
 	w.WriteHeader(http.StatusOK)
+
 	json.NewEncoder(w).Encode(responseData)
 }
 
@@ -232,6 +233,7 @@ func returnUserMap(p db.Person) map[string]interface{} {
 	user := make(map[string]interface{})
 
 	user["id"] = p.ID
+	user["uuid"] = p.Uuid
 	user["created"] = p.Created
 	user["owner_pubkey"] = p.OwnerPubKey
 	user["owner_alias"] = p.OwnerAlias

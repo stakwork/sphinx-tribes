@@ -19,7 +19,7 @@ services:
       - /var/run/docker.sock:/var/run/docker.sock
       - /home/ec2-user/sphinx-deploy/traefik.yaml:/etc/traefik/traefik.yaml
       - /home/ec2-user/letsencrypt:/letsencrypt
-    environment: 
+    environment:
       - AWS_ACCESS_KEY_ID=$AWS_ACCESS_KEY_ID
       - AWS_SECRET_ACCESS_KEY=$AWS_SECRET_ACCESS_KEY
       - AWS_REGION=$AWS_REGION
@@ -44,7 +44,7 @@ services:
       - "traefik.http.routers.auth.tls.certresolver=myresolver"
       - "traefik.http.routers.auth.entrypoints=websecure"
     restart: on-failure
-    environment: 
+    environment:
       - JWT_KEY=$JWT_KEY
       - CLIENT_KEYS=$CLIENT_KEYS
       - OAUTH_TIMEOUT=$OAUTH_TIMEOUT
@@ -62,7 +62,7 @@ services:
       - "traefik.http.routers.tribes.tls.certresolver=myresolver"
       - "traefik.http.routers.tribes.entrypoints=websecure"
     restart: on-failure
-    environment: 
+    environment:
       - DATABASE_URL=$DATABASE_URL
       - PODCAST_INDEX_SECRET=$PODCAST_INDEX_SECRET
       - PODCAST_INDEX_KEY=$PODCAST_INDEX_KEY

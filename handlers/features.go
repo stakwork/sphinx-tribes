@@ -4,12 +4,15 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
+	"io"
+	"log"
+	"net/http"
+	"time"
+
 	"github.com/go-chi/chi"
 	"github.com/rs/xid"
 	"github.com/stakwork/sphinx-tribes/auth"
 	"github.com/stakwork/sphinx-tribes/db"
-	"io"
-	"net/http"
 	"os"
 )
 
@@ -312,6 +315,14 @@ func (oh *featureHandler) CreateOrEditStory(w http.ResponseWriter, r *http.Reque
 }
 
 func (oh *featureHandler) GetStoriesByFeatureUuid(w http.ResponseWriter, r *http.Request) {
+	ctx := r.Context()
+	pubKeyFromAuth, _ := ctx.Value(auth.ContextKey).(string)
+	if pubKeyFromAuth == "" {
+		fmt.Println("no pubkey from auth")
+		w.WriteHeader(http.StatusUnauthorized)
+		return
+	}
+
 	featureUuid := chi.URLParam(r, "feature_uuid")
 	stories, err := oh.db.GetFeatureStoriesByFeatureUuid(featureUuid)
 	if err != nil {
@@ -327,6 +338,14 @@ func (oh *featureHandler) GetStoryByUuid(w http.ResponseWriter, r *http.Request)
 	featureUuid := chi.URLParam(r, "feature_uuid")
 	storyUuid := chi.URLParam(r, "story_uuid")
 
+	ctx := r.Context()
+	pubKeyFromAuth, _ := ctx.Value(auth.ContextKey).(string)
+	if pubKeyFromAuth == "" {
+		fmt.Println("no pubkey from auth")
+		w.WriteHeader(http.StatusUnauthorized)
+		return
+	}
+
 	story, err := oh.db.GetFeatureStoryByUuid(featureUuid, storyUuid)
 	if err != nil {
 		w.WriteHeader(http.StatusNotFound)
@@ -337,6 +356,14 @@ func (oh *featureHandler) GetStoryByUuid(w http.ResponseWriter, r *http.Request)
 	json.NewEncoder(w).Encode(story)
 }
 func (oh *featureHandler) DeleteStory(w http.ResponseWriter, r *http.Request) {
+	ctx := r.Context()
+	pubKeyFromAuth, _ := ctx.Value(auth.ContextKey).(string)
+	if pubKeyFromAuth == "" {
+		fmt.Println("no pubkey from auth")
+		w.WriteHeader(http.StatusUnauthorized)
+		return
+	}
+
 	featureUuid := chi.URLParam(r, "feature_uuid")
 	storyUuid := chi.URLParam(r, "story_uuid")
 
@@ -355,26 +382,82 @@ func (oh *featureHandler) GetBountiesByFeatureAndPhaseUuid(w http.ResponseWriter
 	featureUuid := chi.URLParam(r, "feature_uuid")
 	phaseUuid := chi.URLParam(r, "phase_uuid")
 
+	ctx := r.Context()
+	pubKeyFromAuth, _ := ctx.Value(auth.ContextKey).(string)
+	if pubKeyFromAuth == "" {
+		fmt.Println("no pubkey from auth")
+		w.WriteHeader(http.StatusUnauthorized)
+		return
+	}
+
 	bounties, err := oh.db.GetBountiesByFeatureAndPhaseUuid(featureUuid, phaseUuid, r)
 	if err != nil {
 		w.WriteHeader(http.StatusNotFound)
 		return
 	}
 
-	var bountyResponse []db.BountyResponse = oh.generateBountyHandler(bounties)
-
 	w.WriteHeader(http.StatusOK)
-	json.NewEncoder(w).Encode(bountyResponse)
+	json.NewEncoder(w).Encode(bounties)
 }
 
 func (oh *featureHandler) GetBountiesCountByFeatureAndPhaseUuid(w http.ResponseWriter, r *http.Request) {
 	featureUuid := chi.URLParam(r, "feature_uuid")
 	phaseUuid := chi.URLParam(r, "phase_uuid")
 
+	ctx := r.Context()
+	pubKeyFromAuth, _ := ctx.Value(auth.ContextKey).(string)
+	if pubKeyFromAuth == "" {
+		fmt.Println("no pubkey from auth")
+		w.WriteHeader(http.StatusUnauthorized)
+		return
+	}
+
 	bountiesCount := oh.db.GetBountiesCountByFeatureAndPhaseUuid(featureUuid, phaseUuid, r)
 
 	w.WriteHeader(http.StatusOK)
 	json.NewEncoder(w).Encode(bountiesCount)
+}
+
+func (oh *featureHandler) GetFeatureStories(w http.ResponseWriter, r *http.Request) {
+	featureStories := db.FeatureStoriesReponse{}
+
+	decoder := json.NewDecoder(r.Body)
+	err := decoder.Decode(&featureStories)
+
+	featureUuid := featureStories.Output.FeatureUuid
+
+	if err != nil {
+		w.WriteHeader(http.StatusNotAcceptable)
+		fmt.Fprintf(w, "Error decoding request body: %v", err)
+		return
+	}
+
+	for _, story := range featureStories.Output.Stories {
+		// check if feature story exists
+		feature := oh.db.GetFeatureByUuid(featureUuid)
+
+		if feature.ID == 0 {
+			log.Println("Feature ID does not exists", featureUuid)
+			continue
+		}
+
+		now := time.Now()
+
+		// Add story to database
+		featureStory := db.FeatureStory{
+			Uuid:        xid.New().String(),
+			Description: story.UserStory,
+			FeatureUuid: featureUuid,
+			Created:     &now,
+			Updated:     &now,
+		}
+
+		oh.db.CreateOrEditFeatureStory(featureStory)
+		log.Println("Created user story for : ", featureStory.FeatureUuid)
+	}
+
+	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode("User stories added successfuly")
 }
 
 func (oh *featureHandler) StoriesSend(w http.ResponseWriter, r *http.Request) {

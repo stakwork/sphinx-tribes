@@ -25,11 +25,11 @@ jobs:
 
       - name: Clone Stack
         run: |
-          git clone https://github.com/stakwork/sphinx-stack.git stack
+          git clone --single-branch --branch change_v2_ports https://github.com/stakwork/sphinx-stack.git stack
 
       - name: Clone Sphinx Tribes Frontend
         run: |
-          git clone https://github.com/stakwork/sphinx-tribes-frontend.git tribes-frontend
+          git clone --single-branch --branch feat/v2_payments_cypress_test https://github.com/stakwork/sphinx-tribes-frontend.git tribes-frontend
 
       - name: Give Permissions to Stack
         working-directory: ./stack
@@ -46,19 +46,28 @@ jobs:
           timeout_minutes: 10
           max_attempts: 3
           command: |
-            GITACTION_ENV=gitactionenv docker-compose -f ./stack/alts/proxy.yml --project-dir ./stack up -d;
+            GITACTION_ENV=gitactionenv docker compose -f ./stack/alts/v1v2.yml --project-directory ./stack up -d;
             sleep 240;
             docker ps
             docker logs meme.sphinx
             docker logs dave.sphinx
-            docker wait stack_relaysetup_1
+            docker logs db.sphinx
+            docker logs tribes.sphinx
+            docker wait stack-relaysetup-1
             cat stack/relay/NODES.json;
+            cat stack/relay/V2NODES.json;
 
       - name: Copy Node.json
         uses: canastro/copy-file-action@master
         with:
           source: "stack/relay/NODES.json"
           target: "tribes-frontend/cypress/fixtures/nodes.json"
+
+      - name: Copy V2Node.json
+        uses: canastro/copy-file-action@master
+        with:
+          source: "stack/relay/V2NODES.json"
+          target: "tribes-frontend/cypress/fixtures/v2nodes.json"
 
       - name: Install Frontend Dependencies
         working-directory: ./tribes-frontend
@@ -76,11 +85,11 @@ jobs:
 
       - name: Upload Cypress logs
         if: failure()
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v4
         with:
           name: cypress-logs
-          path: tribes-frontend/cypress/videos
+          path: tribes-frontend/cypress/screenshots
 
       - name: Stop Stack
         working-directory: ./stack
-        run: docker-compose down
+        run: docker compose down

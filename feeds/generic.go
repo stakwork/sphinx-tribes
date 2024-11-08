@@ -26,36 +26,45 @@ func ParseFeed(url string, fulltext bool) (*Feed, error) {
 			return nil, err
 		}
 		return f, nil
-	}
-	if strings.Contains(url, ".substack.com/feed") {
+	} else if strings.Contains(url, ".substack.com/feed") {
 		f, err := ParseSubstackFeed(url, bod)
 		if err != nil {
 			return nil, err
 		}
 		return f, nil
-	}
-	if strings.Contains(url, "youtube.com/feeds/videos.xml") {
+	} else if strings.Contains(url, "youtube.com/feeds/videos.xml") {
 		f, err := ParseYoutubeFeed(url, bod)
 		if err != nil {
 			return nil, err
 		}
 		return f, nil
-	}
-	if strings.Contains(url, "bitcointv.com/feeds/videos.xml") {
+	} else if strings.Contains(url, "bitcointv.com/feeds/videos.xml") {
 		f, err := ParseBitcoinTVFeed(url, bod)
 		if err != nil {
 			return nil, err
 		}
 		return f, nil
-	}
-	f, err := ParsePodcastFeed(url, fulltext)
-	if err != nil {
-		f, err = ParseSubstackFeed(url, bod) // this one is quite generic
+	} else {
+		// For Podcasts
+		f, err := ParsePodcastFeed(url, fulltext)
 		if err != nil {
-			return nil, err
+			f, err = ParseSubstackFeed(url, bod) // this one is quite generic
+			if err != nil {
+				return nil, err
+			}
+			return f, nil
 		}
+
+		// For articles Subdomains
+		if f.ID == "0" && f.Title == "" && f.Url == url {
+			f, err := ParseSubstackFeed(url, bod)
+			if err != nil {
+				return nil, err
+			}
+			return f, nil
+		}
+		return f, nil
 	}
-	return f, nil
 }
 
 func AddedValue(value *Value, tribeOwnerPubkey string) *Value {

@@ -554,6 +554,14 @@ func GenerateInvoice(w http.ResponseWriter, r *http.Request) {
 }
 
 func (th *tribeHandler) GenerateBudgetInvoice(w http.ResponseWriter, r *http.Request) {
+	if config.IsV2Payment {
+		th.GenerateV2BudgetInvoice(w, r)
+	} else {
+		th.GenerateV1BudgetInvoice(w, r)
+	}
+}
+
+func (th *tribeHandler) GenerateV1BudgetInvoice(w http.ResponseWriter, r *http.Request) {
 	invoice := db.BudgetInvoiceRequest{}
 
 	var err error
@@ -640,6 +648,106 @@ func (th *tribeHandler) GenerateBudgetInvoice(w http.ResponseWriter, r *http.Req
 	}
 
 	th.db.ProcessBudgetInvoice(paymentHistory, newInvoice)
+
+	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode(invoiceRes)
+}
+
+func (th *tribeHandler) GenerateV2BudgetInvoice(w http.ResponseWriter, r *http.Request) {
+	invoice := db.BudgetInvoiceRequest{}
+
+	var err error
+	body, err := io.ReadAll(r.Body)
+
+	r.Body.Close()
+
+	if err != nil {
+		fmt.Println(err)
+		w.WriteHeader(http.StatusNotAcceptable)
+		return
+	}
+
+	err = json.Unmarshal(body, &invoice)
+
+	if err != nil {
+		fmt.Println(err)
+		w.WriteHeader(http.StatusNotAcceptable)
+		return
+	}
+
+	if invoice.WorkspaceUuid == "" && invoice.OrgUuid != "" {
+		invoice.WorkspaceUuid = invoice.OrgUuid
+	}
+
+	url := fmt.Sprintf("%s/invoice", config.V2BotUrl)
+
+	amountMsat := invoice.Amount * 1000
+
+	bodyData := fmt.Sprintf(`{"amt_msat": %d}`, amountMsat)
+
+	jsonBody := []byte(bodyData)
+
+	client := &http.Client{}
+	req, _ := http.NewRequest(http.MethodPost, url, bytes.NewBuffer(jsonBody))
+
+	req.Header.Set("x-admin-token", config.V2BotToken)
+	req.Header.Set("Content-Type", "application/json")
+	res, err := client.Do(req)
+
+	if err != nil {
+		log.Printf("Client Request Failed: %s", err)
+		return
+	}
+
+	defer res.Body.Close()
+
+	body, err = io.ReadAll(res.Body)
+
+	if err != nil {
+		log.Printf("Reading body failed: %s", err)
+		return
+	}
+
+	// Unmarshal result
+	v2InvoiceRes := db.V2CreateInvoiceResponse{}
+	err = json.Unmarshal(body, &v2InvoiceRes)
+
+	if err != nil {
+		log.Printf("Json Unmarshal failed: %s", err)
+		return
+	}
+
+	now := time.Now()
+	var paymentHistory = db.NewPaymentHistory{
+		Amount:         invoice.Amount,
+		WorkspaceUuid:  invoice.WorkspaceUuid,
+		PaymentType:    invoice.PaymentType,
+		SenderPubKey:   invoice.SenderPubKey,
+		ReceiverPubKey: "",
+		Created:        &now,
+		Updated:        &now,
+		Status:         false,
+		BountyId:       0,
+	}
+
+	newInvoice := db.NewInvoiceList{
+		PaymentRequest: v2InvoiceRes.Bolt11,
+		Type:           db.InvoiceType("BUDGET"),
+		OwnerPubkey:    invoice.SenderPubKey,
+		WorkspaceUuid:  invoice.WorkspaceUuid,
+		Created:        &now,
+		Updated:        &now,
+		Status:         false,
+	}
+
+	th.db.ProcessBudgetInvoice(paymentHistory, newInvoice)
+
+	invoiceRes := db.InvoiceResponse{
+		Succcess: true,
+		Response: db.Invoice{
+			Invoice: v2InvoiceRes.Bolt11,
+		},
+	}
 
 	w.WriteHeader(http.StatusOK)
 	json.NewEncoder(w).Encode(invoiceRes)

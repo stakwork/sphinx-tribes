@@ -126,6 +126,9 @@ type Database interface {
 	ChangeWorkspaceDeleteStatus(workspace_uuid string, status bool) Workspace
 	UpdateWorkspaceForDeletion(uuid string) error
 	ProcessDeleteWorkspace(workspace_uuid string) error
+	GetLastWithdrawal(workspace_uuid string) NewPaymentHistory
+	GetSumOfDeposits(workspace_uuid string) uint
+	GetSumOfWithdrawal(workspace_uuid string) uint
 	DeleteAllUsersFromWorkspace(uuid string) error
 	GetFilterStatusCount() FilterStattuCount
 	UserHasManageBountyRoles(pubKeyFromAuth string, uuid string) bool
@@ -169,4 +172,9 @@ type Database interface {
 	GetPhaseByUuid(phaseUuid string) (FeaturePhase, error)
 	GetBountiesByPhaseUuid(phaseUuid string) []Bounty
 	GetFeaturePhasesBountiesCount(bountyType string, phaseUuid string) int64
+	GetPendingPaymentHistory() []NewPaymentHistory
+	GetPaymentByBountyId(bountyId uint) NewPaymentHistory
+	SetPaymentAsComplete(tag string) bool
+	SetPaymentStatusByBountyId(bountyId uint, tagResult V2TagRes) bool
+	GetWorkspacePendingPayments(workspace_uuid string) []NewPaymentHistory
 }

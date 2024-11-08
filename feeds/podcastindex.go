@@ -79,6 +79,7 @@ func PodcastIndexHeaders() map[string]string {
 
 func ParsePodcastFeed(url string, fulltext bool) (*Feed, error) {
 	pod, err := PodcastFeed(url, fulltext)
+	fmt.Println("Feed ME ===", pod)
 	if err != nil || pod == nil {
 		return nil, err
 	}

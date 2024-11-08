@@ -732,11 +732,16 @@ func TestGetFeaturePhaseByUUID(t *testing.T) {
 		err = json.Unmarshal(rr.Body.Bytes(), &returnedFeaturePhases)
 		assert.NoError(t, err)
 
-		featurePhase.Created = returnedFeaturePhases.Created
-		featurePhase.Updated = returnedFeaturePhases.Updated
+		updatedFeaturePhase, err := db.TestDB.GetFeaturePhaseByUuid(feature.Uuid, featurePhase.Uuid)
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		updatedFeaturePhase.Created = returnedFeaturePhases.Created
+		updatedFeaturePhase.Updated = returnedFeaturePhases.Updated
 
 		assert.Equal(t, http.StatusOK, rr.Code)
-		assert.Equal(t, featurePhase, returnedFeaturePhases)
+		assert.Equal(t, updatedFeaturePhase, returnedFeaturePhases)
 	})
 
 }
@@ -927,21 +932,612 @@ func TestCreateOrEditStory(t *testing.T) {
 }
 
 func TestGetStoriesByFeatureUuid(t *testing.T) {
+	teardownSuite := SetupSuite(t)
+	defer teardownSuite(t)
 
+	oHandler := NewFeatureHandler(db.TestDB)
+
+	person := db.Person{
+		Uuid:        "uuid",
+		OwnerAlias:  "alias",
+		UniqueName:  "unique_name",
+		OwnerPubKey: "pubkey",
+		PriceToMeet: 0,
+		Description: "description",
+	}
+	db.TestDB.CreateOrEditPerson(person)
+
+	workspace := db.Workspace{
+		Uuid:        "workspace_uuid",
+		Name:        "workspace_name",
+		OwnerPubKey: "person.OwnerPubkey",
+		Github:      "gtihub",
+		Website:     "website",
+		Description: "description",
+	}
+	db.TestDB.CreateOrEditWorkspace(workspace)
+
+	feature := db.WorkspaceFeatures{
+		Uuid:          "feature_uuid",
+		WorkspaceUuid: workspace.Uuid,
+		Name:          "feature_name",
+		Url:           "feature_url",
+		Priority:      0,
+	}
+	db.TestDB.CreateOrEditFeature(feature)
+
+	newStory := db.FeatureStory{
+		Uuid:        "feature_story_uuid",
+		FeatureUuid: feature.Uuid,
+		Description: "feature_story_description",
+		Priority:    0,
+	}
+	db.TestDB.CreateOrEditFeatureStory(newStory)
+
+	ctx := context.WithValue(context.Background(), auth.ContextKey, workspace.OwnerPubKey)
+
+	t.Run("Should test that it throws a 401 error if a user is not authorized", func(t *testing.T) {
+		rctx := chi.NewRouteContext()
+		rctx.URLParams.Add("feature_uuid", feature.Uuid)
+		req, err := http.NewRequestWithContext(context.WithValue(context.Background(), chi.RouteCtxKey, rctx), http.MethodGet, "/"+feature.Uuid+"/story", nil)
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		rr := httptest.NewRecorder()
+		http.HandlerFunc(oHandler.GetStoriesByFeatureUuid).ServeHTTP(rr, req)
+
+		assert.Equal(t, http.StatusUnauthorized, rr.Code)
+	})
+
+	t.Run("Should test that the workspace features stories array returned from the API has the feature stories created", func(t *testing.T) {
+		rctx := chi.NewRouteContext()
+		rctx.URLParams.Add("feature_uuid", feature.Uuid)
+		req, err := http.NewRequestWithContext(context.WithValue(ctx, chi.RouteCtxKey, rctx), http.MethodGet, "/"+feature.Uuid+"/story", nil)
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		rr := httptest.NewRecorder()
+		http.HandlerFunc(oHandler.GetStoriesByFeatureUuid).ServeHTTP(rr, req)
+
+		var returnedFeatureStory []db.FeatureStory
+		err = json.Unmarshal(rr.Body.Bytes(), &returnedFeatureStory)
+		assert.NoError(t, err)
+
+		updatedFeatureStory, err := db.TestDB.GetFeatureStoriesByFeatureUuid(feature.Uuid)
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		for i := range updatedFeatureStory {
+			created := updatedFeatureStory[i].Created.In(time.UTC)
+			updated := updatedFeatureStory[i].Updated.In(time.UTC)
+			updatedFeatureStory[i].Created = &created
+			updatedFeatureStory[i].Updated = &updated
+		}
+
+		assert.Equal(t, returnedFeatureStory, updatedFeatureStory)
+		assert.Equal(t, http.StatusOK, rr.Code)
+	})
 }
 
 func TestGetStoryByUuid(t *testing.T) {
+	teardownSuite := SetupSuite(t)
+	defer teardownSuite(t)
 
+	fHandler := NewFeatureHandler(db.TestDB)
+
+	person := db.Person{
+		Uuid:        uuid.New().String(),
+		OwnerAlias:  "test-alias",
+		UniqueName:  "test-unique-name",
+		OwnerPubKey: "test-pubkey",
+		PriceToMeet: 0,
+		Description: "test-description",
+	}
+	db.TestDB.CreateOrEditPerson(person)
+
+	workspace := db.Workspace{
+		Uuid:        uuid.New().String(),
+		Name:        "test-workspace" + uuid.New().String(),
+		OwnerPubKey: person.OwnerPubKey,
+		Github:      "https://github.com/test",
+		Website:     "https://www.testwebsite.com",
+		Description: "test-description",
+	}
+	db.TestDB.CreateOrEditWorkspace(workspace)
+	workspace = db.TestDB.GetWorkspaceByUuid(workspace.Uuid)
+
+	feature := db.WorkspaceFeatures{
+		Uuid:          uuid.New().String(),
+		WorkspaceUuid: workspace.Uuid,
+		Name:          "test-feature",
+		Url:           "https://github.com/test-feature",
+		Priority:      0,
+	}
+	db.TestDB.CreateOrEditFeature(feature)
+
+	featureStory := db.FeatureStory{
+		Uuid:        uuid.New().String(),
+		FeatureUuid: feature.Uuid,
+		Description: "test-description",
+		Priority:    0,
+	}
+	db.TestDB.CreateOrEditFeatureStory(featureStory)
+
+	t.Run("should return 401 error if not authorized", func(t *testing.T) {
+		rr := httptest.NewRecorder()
+		handler := http.HandlerFunc(fHandler.GetStoryByUuid)
+
+		rctx := chi.NewRouteContext()
+		rctx.URLParams.Add("feature_uuid", feature.Uuid)
+		rctx.URLParams.Add("story_uuid", featureStory.Uuid)
+		req, err := http.NewRequestWithContext(context.WithValue(context.Background(), chi.RouteCtxKey, rctx), http.MethodGet, "/features/"+feature.Uuid+"/story/"+featureStory.Uuid, nil)
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		handler.ServeHTTP(rr, req)
+
+		assert.Equal(t, http.StatusUnauthorized, rr.Code)
+	})
+
+	t.Run("should return feature story if user is authorized", func(t *testing.T) {
+		rr := httptest.NewRecorder()
+		handler := http.HandlerFunc(fHandler.GetStoryByUuid)
+
+		rctx := chi.NewRouteContext()
+		rctx.URLParams.Add("feature_uuid", feature.Uuid)
+		rctx.URLParams.Add("story_uuid", featureStory.Uuid)
+		ctx := context.WithValue(context.Background(), auth.ContextKey, person.OwnerPubKey)
+		req, err := http.NewRequestWithContext(context.WithValue(ctx, chi.RouteCtxKey, rctx), http.MethodGet, "/features/"+feature.Uuid+"/story/"+featureStory.Uuid, nil)
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		handler.ServeHTTP(rr, req)
+
+		assert.Equal(t, http.StatusOK, rr.Code)
+
+		var returnedStory db.FeatureStory
+		err = json.Unmarshal(rr.Body.Bytes(), &returnedStory)
+		assert.NoError(t, err)
+		assert.Equal(t, featureStory.Description, returnedStory.Description)
+		assert.Equal(t, featureStory.Priority, returnedStory.Priority)
+		assert.Equal(t, featureStory.FeatureUuid, returnedStory.FeatureUuid)
+	})
 }
 
 func TestDeleteStory(t *testing.T) {
 
+	teardownSuite := SetupSuite(t)
+	defer teardownSuite(t)
+
+	fHandler := NewFeatureHandler(db.TestDB)
+
+	person := db.Person{
+		Uuid:        uuid.New().String(),
+		OwnerAlias:  "test-alias",
+		UniqueName:  "test-unique-name",
+		OwnerPubKey: "test-pubkey",
+		PriceToMeet: 0,
+		Description: "test-description",
+	}
+	db.TestDB.CreateOrEditPerson(person)
+
+	workspace := db.Workspace{
+		Uuid:        uuid.New().String(),
+		Name:        "test-workspace" + uuid.New().String(),
+		OwnerPubKey: person.OwnerPubKey,
+		Github:      "https://github.com/test",
+		Website:     "https://www.testwebsite.com",
+		Description: "test-description",
+	}
+	db.TestDB.CreateOrEditWorkspace(workspace)
+	workspace = db.TestDB.GetWorkspaceByUuid(workspace.Uuid)
+
+	feature := db.WorkspaceFeatures{
+		Uuid:          uuid.New().String(),
+		WorkspaceUuid: workspace.Uuid,
+		Name:          "test-feature",
+		Url:           "https://github.com/test-feature",
+		Priority:      0,
+	}
+	db.TestDB.CreateOrEditFeature(feature)
+
+	featureStory := db.FeatureStory{
+		Uuid:        uuid.New().String(),
+		FeatureUuid: feature.Uuid,
+		Description: "test-description",
+		Priority:    0,
+	}
+	db.TestDB.CreateOrEditFeatureStory(featureStory)
+
+	t.Run("should return 401 error if user not authorized", func(t *testing.T) {
+		rr := httptest.NewRecorder()
+		handler := http.HandlerFunc(fHandler.DeleteStory)
+
+		req, err := http.NewRequest(http.MethodDelete, "/"+feature.Uuid+"/story/"+featureStory.Uuid, nil)
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		handler.ServeHTTP(rr, req)
+
+		assert.Equal(t, http.StatusUnauthorized, rr.Code)
+	})
+
+	t.Run("should successfully delete feature story if request is valid", func(t *testing.T) {
+		rr := httptest.NewRecorder()
+		handler := http.HandlerFunc(fHandler.DeleteStory)
+
+		ctx := context.WithValue(context.Background(), auth.ContextKey, person.OwnerPubKey)
+		rctx := chi.NewRouteContext()
+		rctx.URLParams.Add("feature_uuid", feature.Uuid)
+		rctx.URLParams.Add("story_uuid", featureStory.Uuid)
+		req, err := http.NewRequestWithContext(context.WithValue(ctx, chi.RouteCtxKey, rctx), http.MethodDelete, "/"+feature.Uuid+"/story/"+featureStory.Uuid, nil)
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		handler.ServeHTTP(rr, req)
+
+		assert.Equal(t, http.StatusOK, rr.Code)
+
+		deletedFeatureStory, _ := db.TestDB.GetFeatureStoryByUuid(feature.Uuid, featureStory.Uuid)
+		assert.Equal(t, db.FeatureStory{}, deletedFeatureStory)
+
+	})
+
 }
 
 func TestGetBountiesByFeatureAndPhaseUuid(t *testing.T) {
+	teardownSuite := SetupSuite(t)
+	defer teardownSuite(t)
+
+	fHandler := NewFeatureHandler(db.TestDB)
+
+	person := db.Person{
+		Uuid:        uuid.New().String(),
+		OwnerAlias:  "test-alias",
+		UniqueName:  "test-unique-name",
+		OwnerPubKey: "test-pubkey",
+		PriceToMeet: 0,
+		Description: "test-description",
+	}
+	db.TestDB.CreateOrEditPerson(person)
+
+	workspace := db.Workspace{
+		Uuid:        uuid.New().String(),
+		Name:        "test-workspace" + uuid.New().String(),
+		OwnerPubKey: person.OwnerPubKey,
+		Github:      "https://github.com/test",
+		Website:     "https://www.testwebsite.com",
+		Description: "test-description",
+	}
+	db.TestDB.CreateOrEditWorkspace(workspace)
+	workspace = db.TestDB.GetWorkspaceByUuid(workspace.Uuid)
+
+	feature := db.WorkspaceFeatures{
+		Uuid:          uuid.New().String(),
+		WorkspaceUuid: workspace.Uuid,
+		Name:          "test-feature",
+		Url:           "https://github.com/test-feature",
+		Priority:      0,
+	}
+	db.TestDB.CreateOrEditFeature(feature)
+
+	featurePhase := db.FeaturePhase{
+		Uuid:        uuid.New().String(),
+		FeatureUuid: feature.Uuid,
+		Name:        "test-feature-phase",
+		Priority:    0,
+	}
+	db.TestDB.CreateOrEditFeaturePhase(featurePhase)
+
+	bounty := db.NewBounty{
+		OwnerID:       person.OwnerPubKey,
+		WorkspaceUuid: workspace.Uuid,
+		Title:         "test-bounty",
+		PhaseUuid:     featurePhase.Uuid,
+		Description:   "test-description",
+		Price:         1000,
+		Type:          "coding_task",
+		Assignee:      "",
+	}
+	db.TestDB.CreateOrEditBounty(bounty)
+
+	ctx := context.WithValue(context.Background(), auth.ContextKey, workspace.OwnerPubKey)
+
+	t.Run("should return 401 error if not authorized", func(t *testing.T) {
+		rctx := chi.NewRouteContext()
+		rctx.URLParams.Add("feature_uuid", feature.Uuid)
+		rctx.URLParams.Add("phase_uuid", featurePhase.Uuid)
+		req, err := http.NewRequestWithContext(context.WithValue(context.Background(), chi.RouteCtxKey, rctx), http.MethodGet, "/features/"+feature.Uuid+"/phase/"+featurePhase.Uuid+"/bounty", nil)
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		rr := httptest.NewRecorder()
+		http.HandlerFunc(fHandler.GetBountiesByFeatureAndPhaseUuid).ServeHTTP(rr, req)
+
+		assert.Equal(t, http.StatusUnauthorized, rr.Code)
+	})
+
+	t.Run("should return the correct bounty count if user is authorized", func(t *testing.T) {
+		rctx := chi.NewRouteContext()
+		rctx.URLParams.Add("feature_uuid", feature.Uuid)
+		rctx.URLParams.Add("phase_uuid", featurePhase.Uuid)
+		req, err := http.NewRequestWithContext(context.WithValue(ctx, chi.RouteCtxKey, rctx), http.MethodGet, "/features/"+feature.Uuid+"/phase/"+featurePhase.Uuid+"/bounty", nil)
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		rr := httptest.NewRecorder()
+		http.HandlerFunc(fHandler.GetBountiesByFeatureAndPhaseUuid).ServeHTTP(rr, req)
+
+		var returnedBounty []db.NewBounty
+		err = json.Unmarshal(rr.Body.Bytes(), &returnedBounty)
+		assert.NoError(t, err)
+
+		bounty.ID = returnedBounty[0].ID
+
+		assert.Equal(t, http.StatusOK, rr.Code)
+		assert.Equal(t, bounty, returnedBounty[0])
+
+	})
 
 }
 
 func TestGetBountiesCountByFeatureAndPhaseUuid(t *testing.T) {
+	teardownSuite := SetupSuite(t)
+	defer teardownSuite(t)
 
+	fHandler := NewFeatureHandler(db.TestDB)
+
+	person := db.Person{
+		Uuid:        uuid.New().String(),
+		OwnerAlias:  "test-alias",
+		UniqueName:  "test-unique-name",
+		OwnerPubKey: "test-pubkey",
+		PriceToMeet: 0,
+		Description: "test-description",
+	}
+	db.TestDB.CreateOrEditPerson(person)
+
+	workspace := db.Workspace{
+		Uuid:        uuid.New().String(),
+		Name:        "test-workspace" + uuid.New().String(),
+		OwnerPubKey: person.OwnerPubKey,
+		Github:      "https://github.com/test",
+		Website:     "https://www.testwebsite.com",
+		Description: "test-description",
+	}
+	db.TestDB.CreateOrEditWorkspace(workspace)
+	workspace = db.TestDB.GetWorkspaceByUuid(workspace.Uuid)
+
+	feature := db.WorkspaceFeatures{
+		Uuid:          uuid.New().String(),
+		WorkspaceUuid: workspace.Uuid,
+		Name:          "test-feature",
+		Url:           "https://github.com/test-feature",
+		Priority:      0,
+	}
+	db.TestDB.CreateOrEditFeature(feature)
+
+	featurePhase := db.FeaturePhase{
+		Uuid:        uuid.New().String(),
+		FeatureUuid: feature.Uuid,
+		Name:        "test-feature-phase",
+		Priority:    0,
+	}
+	db.TestDB.CreateOrEditFeaturePhase(featurePhase)
+
+	bounty := db.NewBounty{
+		OwnerID:       person.OwnerPubKey,
+		WorkspaceUuid: workspace.Uuid,
+		Title:         "test-bounty",
+		PhaseUuid:     featurePhase.Uuid,
+		Description:   "test-description",
+		Price:         1000,
+		Type:          "coding_task",
+		Assignee:      "",
+	}
+	db.TestDB.CreateOrEditBounty(bounty)
+
+	ctx := context.WithValue(context.Background(), auth.ContextKey, workspace.OwnerPubKey)
+
+	t.Run("should return 401 error if not authorized", func(t *testing.T) {
+		rctx := chi.NewRouteContext()
+		rctx.URLParams.Add("feature_uuid", feature.Uuid)
+		rctx.URLParams.Add("phase_uuid", featurePhase.Uuid)
+		req, err := http.NewRequestWithContext(context.WithValue(context.Background(), chi.RouteCtxKey, rctx), http.MethodGet, "/features/"+feature.Uuid+"/phase/"+featurePhase.Uuid+"/bounty/count", nil)
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		rr := httptest.NewRecorder()
+		http.HandlerFunc(fHandler.GetBountiesCountByFeatureAndPhaseUuid).ServeHTTP(rr, req)
+
+		assert.Equal(t, http.StatusUnauthorized, rr.Code)
+	})
+
+	t.Run("should return the correct bounty count if user is authorized", func(t *testing.T) {
+		rctx := chi.NewRouteContext()
+		rctx.URLParams.Add("feature_uuid", feature.Uuid)
+		rctx.URLParams.Add("phase_uuid", featurePhase.Uuid)
+		req, err := http.NewRequestWithContext(context.WithValue(ctx, chi.RouteCtxKey, rctx), http.MethodGet, "/features/"+feature.Uuid+"/phase/"+featurePhase.Uuid+"/bounty/count", nil)
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		rr := httptest.NewRecorder()
+		http.HandlerFunc(fHandler.GetBountiesCountByFeatureAndPhaseUuid).ServeHTTP(rr, req)
+
+		var returnedBountiesCount int64
+		err = json.Unmarshal(rr.Body.Bytes(), &returnedBountiesCount)
+		assert.NoError(t, err)
+
+		bountiesCount := db.TestDB.GetBountiesCountByFeatureAndPhaseUuid(feature.Uuid, featurePhase.Uuid, req)
+
+		assert.Equal(t, returnedBountiesCount, bountiesCount)
+		assert.Equal(t, http.StatusOK, rr.Code)
+	})
+}
+
+func TestGetFeatureStories(t *testing.T) {
+	teardownSuite := SetupSuite(t)
+	defer teardownSuite(t)
+
+	fHandler := NewFeatureHandler(db.TestDB)
+
+	person := db.Person{
+		Uuid:        uuid.New().String(),
+		OwnerAlias:  "test-get-feature-stories-alias",
+		UniqueName:  "test-get-feature-stories-unique-name",
+		OwnerPubKey: "test-get-feature-stories-pubkey",
+		PriceToMeet: 0,
+		Description: "test-get-feature-stories-description",
+	}
+	db.TestDB.CreateOrEditPerson(person)
+
+	workspace := db.Workspace{
+		Uuid:        uuid.New().String(),
+		Name:        "test-get-feature-stories-workspace-name",
+		OwnerPubKey: person.OwnerPubKey,
+		Github:      "https://github.com/test",
+		Website:     "https://www.testwebsite.com",
+		Description: "test-get-feature-stories-description",
+	}
+	db.TestDB.CreateOrEditWorkspace(workspace)
+	workspace = db.TestDB.GetWorkspaceByUuid(workspace.Uuid)
+
+	feature := db.WorkspaceFeatures{
+		Uuid:          uuid.New().String(),
+		WorkspaceUuid: workspace.Uuid,
+		Name:          "test-get-feature-stories-feature-name",
+		Url:           "https://github.com/test-get-feature-stories-feature-url",
+		Priority:      0,
+	}
+
+	feature2 := db.WorkspaceFeatures{
+		Uuid:          uuid.New().String(),
+		WorkspaceUuid: workspace.Uuid,
+		Name:          "test-get-feature-stories-feature-name-2",
+		Url:           "https://github.com/test-get-feature-stories-feature-url-2",
+		Priority:      0,
+	}
+
+	db.TestDB.CreateOrEditFeature(feature)
+	db.TestDB.CreateOrEditFeature(feature2)
+
+	ctx := context.WithValue(context.Background(), auth.ContextKey, workspace.OwnerPubKey)
+
+	story := db.FeatureStories{
+		UserStory: "This is a test user story",
+		Rationale: "This is a test rationale",
+		Order:     1,
+	}
+
+	story2 := db.FeatureStories{
+		UserStory: "This is a test user story 2",
+		Rationale: "This is a test rationale 2",
+		Order:     2,
+	}
+
+	story3 := db.FeatureStories{
+		UserStory: "This is a test user story 3",
+		Rationale: "This is a test rationale 3",
+		Order:     3,
+	}
+
+	story4 := db.FeatureStories{
+		UserStory: "This is a test user story 4",
+		Rationale: "This is a test rationale 4",
+		Order:     4,
+	}
+
+	story5 := db.FeatureStories{
+		UserStory: "This is a test user story 5",
+		Rationale: "This is a test rationale 5",
+		Order:     5,
+	}
+
+	story6 := db.FeatureStories{
+		UserStory: "This is a test user story 6",
+		Rationale: "This is a test rationale 6",
+		Order:     6,
+	}
+
+	stories := []db.FeatureStories{
+		story,
+		story2,
+		story3,
+	}
+
+	stories2 := []db.FeatureStories{
+		story4,
+		story5,
+		story6,
+	}
+
+	featureStories := db.FeatureStoriesReponse{
+		Output: db.FeatureOutput{
+			FeatureUuid: feature.Uuid,
+			Stories:     stories,
+		},
+	}
+
+	featureStories2 := db.FeatureStoriesReponse{
+		Output: db.FeatureOutput{
+			FeatureUuid: "Fake-feature-uuid",
+			Stories:     stories2,
+		},
+	}
+
+	requestBody, _ := json.Marshal(featureStories)
+	requestBody2, _ := json.Marshal(featureStories2)
+
+	t.Run("Should add user stories from stakwork to the feature stories table", func(t *testing.T) {
+		rctx := chi.NewRouteContext()
+		req, err := http.NewRequestWithContext(context.WithValue(ctx, chi.RouteCtxKey, rctx), http.MethodPost, "/features/stories", bytes.NewReader(requestBody))
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		rr := httptest.NewRecorder()
+		http.HandlerFunc(fHandler.GetFeatureStories).ServeHTTP(rr, req)
+
+		var featureStoriesReponse string
+		err = json.Unmarshal(rr.Body.Bytes(), &featureStoriesReponse)
+		assert.NoError(t, err)
+
+		featureStories, _ := db.TestDB.GetFeatureStoriesByFeatureUuid(feature.Uuid)
+		featureStoriesCount := len(featureStories)
+
+		assert.Equal(t, int64(featureStoriesCount), int64(3))
+		assert.Equal(t, http.StatusOK, rr.Code)
+	})
+
+	t.Run("Should not add user stories from stakwork to the feature stories table if the feature uuid is not found", func(t *testing.T) {
+		rctx := chi.NewRouteContext()
+		req, err := http.NewRequestWithContext(context.WithValue(ctx, chi.RouteCtxKey, rctx), http.MethodPost, "/features/stories", bytes.NewReader(requestBody2))
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		rr := httptest.NewRecorder()
+		http.HandlerFunc(fHandler.GetFeatureStories).ServeHTTP(rr, req)
+
+		var featureStoriesReponse string
+		err = json.Unmarshal(rr.Body.Bytes(), &featureStoriesReponse)
+		assert.NoError(t, err)
+
+		featureStories, _ := db.TestDB.GetFeatureStoriesByFeatureUuid(feature2.Uuid)
+		featureStoriesCount := len(featureStories)
+
+		assert.Equal(t, int64(featureStoriesCount), int64(0))
+		assert.Equal(t, http.StatusOK, rr.Code)
+	})
 }

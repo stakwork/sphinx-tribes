@@ -112,7 +112,7 @@ func TestCreateOrEditPerson(t *testing.T) {
 		rr := httptest.NewRecorder()
 		handler := http.HandlerFunc(pHandler.CreateOrEditPerson)
 
-		bodyJson := []byte(`{"owner_pubkey": "test-key", "id": 100}`)
+		bodyJson := []byte(`{"owner_pubkey": "fake-key"}`)
 		ctx := context.WithValue(context.Background(), auth.ContextKey, "test-key")
 		req, err := http.NewRequestWithContext(ctx, http.MethodPost, "/", bytes.NewReader(bodyJson))
 		if err != nil {
@@ -170,7 +170,7 @@ func TestCreateOrEditPerson(t *testing.T) {
 		rr := httptest.NewRecorder()
 		handler := http.HandlerFunc(pHandler.CreateOrEditPerson)
 
-		bodyJson := []byte(`{"owner_pubkey": "test-key", "owner_alias": "test-user", "id": 1}`)
+		bodyJson := []byte(`{"owner_pubkey": "fake-key", "owner_alias": "test-user"}`)
 		ctx := context.WithValue(context.Background(), auth.ContextKey, "test-key")
 		req, err := http.NewRequestWithContext(ctx, http.MethodPost, "/", bytes.NewReader(bodyJson))
 		if err != nil {
@@ -248,7 +248,7 @@ func TestGetPersonById(t *testing.T) {
 		rr := httptest.NewRecorder()
 		handler := http.HandlerFunc(pHandler.GetPersonById)
 		person := db.Person{
-			ID:           100,
+			ID:           300,
 			Uuid:         "perosn_1_uuid",
 			OwnerAlias:   "person",
 			UniqueName:   "person",
@@ -267,6 +267,9 @@ func TestGetPersonById(t *testing.T) {
 
 		db.TestDB.CreateOrEditPerson(person)
 		fetchedPerson := db.TestDB.GetPerson(person.ID)
+
+		person.Created = fetchedPerson.Created
+		person.Updated = fetchedPerson.Updated
 
 		handler.ServeHTTP(rr, req)
 
