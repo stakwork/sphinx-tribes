@@ -1,6 +1,7 @@
 package handlers
 
 import (
+	"bytes"
 	"encoding/json"
 	"fmt"
 	"io"
@@ -12,7 +13,17 @@ import (
 	"github.com/rs/xid"
 	"github.com/stakwork/sphinx-tribes/auth"
 	"github.com/stakwork/sphinx-tribes/db"
+	"os"
 )
+
+type PostData struct {
+	ProductBrief string   `json:"productBrief"`
+	FeatureName  string   `json:"featureName"`
+	Description  string   `json:"description"`
+	Examples     []string `json:"examples"`
+	WebhookURL   string   `json:"webhook_url"`
+	FeatureUUID  string   `json:"featureUUID"`
+}
 
 type featureHandler struct {
 	db                    db.Database
@@ -447,4 +458,71 @@ func (oh *featureHandler) GetFeatureStories(w http.ResponseWriter, r *http.Reque
 
 	w.WriteHeader(http.StatusOK)
 	json.NewEncoder(w).Encode("User stories added successfuly")
+}
+
+func (oh *featureHandler) StoriesSend(w http.ResponseWriter, r *http.Request) {
+
+	body, err := io.ReadAll(r.Body)
+	r.Body.Close()
+	if err != nil {
+		http.Error(w, "Failed to read requests body", http.StatusBadRequest)
+		return
+	}
+
+	var postData PostData
+	err = json.Unmarshal(body, &postData)
+	if err != nil {
+		fmt.Println("[StoriesSend] JSON Unmarshal error:", err)
+		http.Error(w, "Invalid JSON format", http.StatusNotAcceptable)
+		return
+	}
+
+	apiKey := os.Getenv("SWWFKEY")
+	if apiKey == "" {
+		http.Error(w, "API key not set in environment", http.StatusInternalServerError)
+		return
+	}
+
+	stakworkPayload := map[string]interface{}{
+		"name":        "string",
+		"workflow_id": 35080,
+		"workflow_params": map[string]interface{}{
+			"set_var": map[string]interface{}{
+				"attributes": map[string]interface{}{
+					"vars": postData,
+				},
+			},
+		},
+	}
+
+	stakworkPayloadJSON, err := json.Marshal(stakworkPayload)
+	if err != nil {
+		http.Error(w, "Failed to encode payload", http.StatusInternalServerError)
+		return
+	}
+
+	req, err := http.NewRequest("POST", "https://api.stakwork.com/api/v1/projects", bytes.NewBuffer(stakworkPayloadJSON))
+	if err != nil {
+		http.Error(w, "Failed to create request to Stakwork API", http.StatusInternalServerError)
+		return
+	}
+	req.Header.Set("Authorization", "Token token="+apiKey)
+	req.Header.Set("Content-Type", "application/json")
+
+	client := &http.Client{}
+	resp, err := client.Do(req)
+	if err != nil {
+		http.Error(w, "Failed to send request to Stakwork API", http.StatusInternalServerError)
+		return
+	}
+	defer resp.Body.Close()
+
+	respBody, err := io.ReadAll(resp.Body)
+	if err != nil {
+		http.Error(w, "Failed to read response from Stakwork API", http.StatusInternalServerError)
+		return
+	}
+
+	w.WriteHeader(resp.StatusCode)
+	w.Write(respBody)
 }
