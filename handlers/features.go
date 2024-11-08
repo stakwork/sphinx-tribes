@@ -465,7 +465,7 @@ func (oh *featureHandler) StoriesSend(w http.ResponseWriter, r *http.Request) {
 	body, err := io.ReadAll(r.Body)
 	r.Body.Close()
 	if err != nil {
-		http.Error(w, "Failed to read request body", http.StatusBadRequest)
+		http.Error(w, "Failed to read requests body", http.StatusBadRequest)
 		return
 	}
 
