@@ -910,6 +910,16 @@ type FilterStattuCount struct {
 	Failed    int64 `json:"failed"`
 }
 
+type WfRequest struct {
+	ID           uint      `gorm:"primaryKey;autoIncrement" json:"id"`
+	RequestID    string    `gorm:"unique;not null" json:"request_id"`
+	Status       string    `json:"status"`
+	RequestData  JSONB     `json:"request_data"`
+	ResponseData JSONB     `gorm:"type:jsonb" json:"response_data,omitempty"`
+	CreatedAt    time.Time `json:"created_at"`
+	UpdatedAt    time.Time `json:"updated_at"`
+}
+
 func (Person) TableName() string {
 	return "people"
 }
@@ -944,6 +954,10 @@ func (ConnectionCodes) TableName() string {
 
 func (ConnectionCodesShort) TableName() string {
 	return "connectioncodes"
+}
+
+func (WfRequest) TableName() string {
+	return "wf_requests"
 }
 
 // PropertyMap ...
