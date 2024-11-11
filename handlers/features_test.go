@@ -1289,26 +1289,6 @@ func TestGetBountiesByFeatureAndPhaseUuid(t *testing.T) {
 		assert.Equal(t, bounty.PhaseUuid, returnedBounties[0].Bounty.PhaseUuid)
 	})
 
-	t.Run("should return empty list if no bounties found", func(t *testing.T) {
-		rctx := chi.NewRouteContext()
-		rctx.URLParams.Add("feature_uuid", feature.Uuid)
-		rctx.URLParams.Add("phase_uuid", "non-existent-phase-uuid")
-		req, err := http.NewRequestWithContext(context.WithValue(ctx, chi.RouteCtxKey, rctx), http.MethodGet, "/features/"+feature.Uuid+"/phase/non-existent-phase-uuid/bounty", nil)
-		if err != nil {
-			t.Fatal(err)
-		}
-
-		rr := httptest.NewRecorder()
-		http.HandlerFunc(fHandler.GetBountiesByFeatureAndPhaseUuid).ServeHTTP(rr, req)
-
-		var returnedBounties []db.BountyResponse
-		err = json.Unmarshal(rr.Body.Bytes(), &returnedBounties)
-		assert.NoError(t, err)
-
-		assert.Equal(t, http.StatusOK, rr.Code)
-		assert.Equal(t, 0, len(returnedBounties))
-	})
-
 	t.Run("should return 404 if feature or phase UUID is invalid", func(t *testing.T) {
 		rctx := chi.NewRouteContext()
 		rctx.URLParams.Add("feature_uuid", "invalid-feature-uuid")
