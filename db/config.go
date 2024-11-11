@@ -81,6 +81,7 @@ func InitDB() {
 	db.AutoMigrate(&WorkspaceFeatures{})
 	db.AutoMigrate(&FeaturePhase{})
 	db.AutoMigrate(&FeatureStory{})
+	db.AutoMigrate(&WfRequest{})
 
 	DB.MigrateTablesWithOrgUuid()
 	DB.MigrateOrganizationToWorkspace()
