@@ -9,11 +9,12 @@ import (
 	"net/http"
 	"time"
 
+	"os"
+
 	"github.com/go-chi/chi"
 	"github.com/rs/xid"
 	"github.com/stakwork/sphinx-tribes/auth"
 	"github.com/stakwork/sphinx-tribes/db"
-	"os"
 )
 
 type PostData struct {
@@ -396,8 +397,10 @@ func (oh *featureHandler) GetBountiesByFeatureAndPhaseUuid(w http.ResponseWriter
 		return
 	}
 
+	bountyResponses := oh.generateBountyHandler(bounties)
+
 	w.WriteHeader(http.StatusOK)
-	json.NewEncoder(w).Encode(bounties)
+	json.NewEncoder(w).Encode(bountyResponses)
 }
 
 func (oh *featureHandler) GetBountiesCountByFeatureAndPhaseUuid(w http.ResponseWriter, r *http.Request) {
