@@ -11,6 +11,7 @@ import (
 
 	"github.com/go-chi/chi"
 	"github.com/google/uuid"
+	"github.com/lib/pq"
 	"github.com/stakwork/sphinx-tribes/auth"
 	"github.com/stakwork/sphinx-tribes/db"
 	"github.com/stretchr/testify/assert"
@@ -1265,7 +1266,7 @@ func TestGetBountiesByFeatureAndPhaseUuid(t *testing.T) {
 		assert.Equal(t, http.StatusUnauthorized, rr.Code)
 	})
 
-	t.Run("should return the correct bounty count if user is authorized", func(t *testing.T) {
+	t.Run("should return the correct bounty if user is authorized", func(t *testing.T) {
 		rctx := chi.NewRouteContext()
 		rctx.URLParams.Add("feature_uuid", feature.Uuid)
 		rctx.URLParams.Add("phase_uuid", featurePhase.Uuid)
@@ -1277,17 +1278,109 @@ func TestGetBountiesByFeatureAndPhaseUuid(t *testing.T) {
 		rr := httptest.NewRecorder()
 		http.HandlerFunc(fHandler.GetBountiesByFeatureAndPhaseUuid).ServeHTTP(rr, req)
 
-		var returnedBounty []db.NewBounty
-		err = json.Unmarshal(rr.Body.Bytes(), &returnedBounty)
+		var returnedBounties []db.BountyResponse
+		err = json.Unmarshal(rr.Body.Bytes(), &returnedBounties)
 		assert.NoError(t, err)
 
-		bounty.ID = returnedBounty[0].ID
-
 		assert.Equal(t, http.StatusOK, rr.Code)
-		assert.Equal(t, bounty, returnedBounty[0])
-
+		assert.Equal(t, 1, len(returnedBounties))
+		assert.Equal(t, bounty.Title, returnedBounties[0].Bounty.Title)
+		assert.Equal(t, bounty.Description, returnedBounties[0].Bounty.Description)
+		assert.Equal(t, bounty.Price, returnedBounties[0].Bounty.Price)
+		assert.Equal(t, bounty.PhaseUuid, returnedBounties[0].Bounty.PhaseUuid)
 	})
 
+	t.Run("should phase return the correct bounty response structure", func(t *testing.T) {
+		rctx := chi.NewRouteContext()
+		rctx.URLParams.Add("feature_uuid", feature.Uuid)
+		rctx.URLParams.Add("phase_uuid", featurePhase.Uuid)
+		req, err := http.NewRequestWithContext(context.WithValue(ctx, chi.RouteCtxKey, rctx), http.MethodGet, "/features/"+feature.Uuid+"/phase/"+featurePhase.Uuid+"/bounty", nil)
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		rr := httptest.NewRecorder()
+		http.HandlerFunc(fHandler.GetBountiesByFeatureAndPhaseUuid).ServeHTTP(rr, req)
+
+		var returnedBounties []db.BountyResponse
+		err = json.Unmarshal(rr.Body.Bytes(), &returnedBounties)
+		assert.NoError(t, err)
+
+		assert.Equal(t, http.StatusOK, rr.Code)
+		assert.Equal(t, 1, len(returnedBounties))
+
+		expectedBounty := db.BountyResponse{
+			Bounty: db.NewBounty{
+				ID:                      returnedBounties[0].Bounty.ID,
+				OwnerID:                 person.OwnerPubKey,
+				Paid:                    false,
+				Show:                    false,
+				Completed:               false,
+				Type:                    "coding_task",
+				Award:                   "",
+				AssignedHours:           0,
+				CommitmentFee:           0,
+				Price:                   1000,
+				Title:                   "test-bounty",
+				Tribe:                   "",
+				Assignee:                "",
+				TicketUrl:               "",
+				OrgUuid:                 workspace.Uuid,
+				WorkspaceUuid:           workspace.Uuid,
+				Description:             "test-description",
+				WantedType:              "",
+				Deliverables:            "",
+				GithubDescription:       false,
+				OneSentenceSummary:      "",
+				EstimatedSessionLength:  "",
+				EstimatedCompletionDate: "",
+				Created:                 0,
+				Updated:                 nil,
+				PhaseUuid:               featurePhase.Uuid,
+				PhasePriority:           0,
+				PaymentPending:          false,
+				PaymentFailed:           false,
+			},
+			Assignee: db.Person{},
+			Owner: db.Person{
+				ID:          returnedBounties[0].Owner.ID,
+				Uuid:        person.Uuid,
+				OwnerPubKey: person.OwnerPubKey,
+				OwnerAlias:  person.OwnerAlias,
+				UniqueName:  person.UniqueName,
+				Description: person.Description,
+				Tags:        pq.StringArray{},
+				Img:         "",
+			},
+			Organization: db.WorkspaceShort{
+				Uuid: workspace.Uuid,
+				Name: workspace.Name,
+				Img:  "",
+			},
+			Workspace: db.WorkspaceShort{
+				Uuid: workspace.Uuid,
+				Name: workspace.Name,
+				Img:  "",
+			},
+		}
+
+		assert.Equal(t, expectedBounty, returnedBounties[0])
+	})
+
+	t.Run("should return 404 if feature or phase UUID is invalid", func(t *testing.T) {
+		rctx := chi.NewRouteContext()
+		rctx.URLParams.Add("feature_uuid", "invalid-feature-uuid")
+		rctx.URLParams.Add("phase_uuid", "invalid-phase-uuid")
+		req, err := http.NewRequestWithContext(context.WithValue(ctx, chi.RouteCtxKey, rctx), http.MethodGet, "/features/invalid-feature-uuid/phase/invalid-phase-uuid/bounty", nil)
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		rr := httptest.NewRecorder()
+		http.HandlerFunc(fHandler.GetBountiesByFeatureAndPhaseUuid).ServeHTTP(rr, req)
+
+		assert.Equal(t, http.StatusNotFound, rr.Code)
+	})
 }
 
 func TestGetBountiesCountByFeatureAndPhaseUuid(t *testing.T) {
