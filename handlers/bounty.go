@@ -720,8 +720,8 @@ func (h *bountyHandler) MakeBountyPayment(w http.ResponseWriter, r *http.Request
 				// Send payment status
 				log.Printf("[bounty] V2 Status is pending:  %s", v2KeysendRes.Status)
 				bounty.Paid = false
-				bounty.PaymentPending = true
 				bounty.PaymentFailed = false
+				bounty.PaymentPending = true
 				bounty.PaidDate = &now
 				bounty.Completed = true
 				bounty.CompletionDate = &now
@@ -761,7 +761,7 @@ func (h *bountyHandler) MakeBountyPayment(w http.ResponseWriter, r *http.Request
 				h.db.UpdateBounty(bounty)
 
 				log.Println("Keysend payment not completed ===")
-				msg["msg"] = "keysend_error"
+				msg["msg"] = "keysend_failed"
 				msg["invoice"] = ""
 
 				socket, err := h.getSocketConnections(request.Websocket_token)
@@ -967,6 +967,12 @@ func (h *bountyHandler) UpdateBountyPaymentStatus(w http.ResponseWriter, r *http
 	if bounty.Paid {
 		w.WriteHeader(http.StatusMethodNotAllowed)
 		json.NewEncoder(w).Encode("Bounty has already been paid")
+		return
+	}
+
+	if bounty.PaymentFailed {
+		w.WriteHeader(http.StatusMethodNotAllowed)
+		json.NewEncoder(w).Encode("Bounty payment has failed, have to make payment again")
 		return
 	}
 
