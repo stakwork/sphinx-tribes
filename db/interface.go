@@ -182,7 +182,7 @@ type Database interface {
 	GetWorkflowRequestByID(requestID string) (*WfRequest, error)
 	GetWorkflowRequestsByStatus(status WfRequestStatus) ([]WfRequest, error)
 	GetWorkflowRequest(requestID string) (*WfRequest, error)
-	UpdateWorkflowRequestStatus(requestID string, status WfRequestStatus, responseData JSONB) error
+	UpdateWorkflowRequestStatusAndResponse(requestID string, status WfRequestStatus, responseData JSONB) error
 	GetWorkflowRequestsByWorkflowID(workflowID string) ([]WfRequest, error)
 	GetPendingWorkflowRequests(limit int) ([]WfRequest, error)
 	DeleteWorkflowRequest(requestID string) error
