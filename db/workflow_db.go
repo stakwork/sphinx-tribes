@@ -82,7 +82,7 @@ func (db database) GetWorkflowRequest(requestID string) (*WfRequest, error) {
 	return &req, result.Error
 }
 
-func (db database) UpdateWorkflowRequestStatus(requestID string, status WfRequestStatus, responseData JSONB) error {
+func (db database) UpdateWorkflowRequestStatusAndResponse(requestID string, status WfRequestStatus, responseData JSONB) error {
 	if requestID == "" {
 		return errors.New("request ID cannot be empty")
 	}

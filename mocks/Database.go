@@ -8629,7 +8629,7 @@ func (_m *Database) GetWorkflowRequest(requestID string) (*db.WfRequest, error) 
 }
 
 // UpdateWorkflowRequestStatus provides a mock function with given fields: requestID, status, responseData
-func (_m *Database) UpdateWorkflowRequestStatus(requestID string, status db.WfRequestStatus, responseData db.JSONB) error {
+func (_m *Database) UpdateWorkflowRequestStatusAndResponse(requestID string, status db.WfRequestStatus, responseData db.JSONB) error {
     ret := _m.Called(requestID, status, responseData)
     var r0 error
     if rf, ok := ret.Get(0).(func(string, db.WfRequestStatus, db.JSONB) error); ok {
