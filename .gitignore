@@ -16,3 +16,4 @@ yarn.lock
 
 frontend/app/coverage
 cypress/screenshots
+coverage.out
