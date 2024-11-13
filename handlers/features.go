@@ -437,7 +437,7 @@ func (oh *featureHandler) GetFeatureStories(w http.ResponseWriter, r *http.Reque
 		return
 	}
 
-	log.Panicf("Webhook Feature Output", featureStories.Output)
+	log.Println("Webhook Feature Output", featureStories.Output)
 
 	log.Println("Webhook Feature Stories === ", featureStories.Output.Stories)
 
