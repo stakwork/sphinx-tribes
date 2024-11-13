@@ -429,11 +429,17 @@ func (oh *featureHandler) GetFeatureStories(w http.ResponseWriter, r *http.Reque
 
 	featureUuid := featureStories.Output.FeatureUuid
 
+	log.Println("Webhook Feature Uuid", featureUuid)
+
 	if err != nil {
 		w.WriteHeader(http.StatusNotAcceptable)
-		fmt.Fprintf(w, "Error decoding request body: %v", err)
+		log.Printf("Error decoding request body: %v", err)
 		return
 	}
+
+	log.Panicf("Webhook Feature Output", featureStories.Output)
+
+	log.Println("Webhook Feature Stories === ", featureStories.Output.Stories)
 
 	for _, story := range featureStories.Output.Stories {
 		// check if feature story exists
@@ -460,7 +466,7 @@ func (oh *featureHandler) GetFeatureStories(w http.ResponseWriter, r *http.Reque
 	}
 
 	w.WriteHeader(http.StatusOK)
-	json.NewEncoder(w).Encode("User stories added successfuly")
+	json.NewEncoder(w).Encode("User stories added successfully")
 }
 
 func (oh *featureHandler) StoriesSend(w http.ResponseWriter, r *http.Request) {
