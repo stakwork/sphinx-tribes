@@ -1577,15 +1577,17 @@ func TestGetFeatureStories(t *testing.T) {
 
 	featureStories := db.FeatureStoriesReponse{
 		Output: db.FeatureOutput{
-			FeatureUuid: feature.Uuid,
-			Stories:     stories,
+			FeatureUuid:    feature.Uuid,
+			FeatureContext: "Feature Context",
+			Stories:        stories,
 		},
 	}
 
 	featureStories2 := db.FeatureStoriesReponse{
 		Output: db.FeatureOutput{
-			FeatureUuid: "Fake-feature-uuid",
-			Stories:     stories2,
+			FeatureUuid:    "Fake-feature-uuid",
+			FeatureContext: "Feature Context",
+			Stories:        stories2,
 		},
 	}
 
@@ -1631,6 +1633,6 @@ func TestGetFeatureStories(t *testing.T) {
 		featureStoriesCount := len(featureStories)
 
 		assert.Equal(t, int64(featureStoriesCount), int64(0))
-		assert.Equal(t, http.StatusOK, rr.Code)
+		assert.Equal(t, http.StatusNotAcceptable, rr.Code)
 	})
 }

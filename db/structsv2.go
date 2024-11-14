@@ -66,12 +66,13 @@ type FeatureStories struct {
 }
 
 type FeatureOutput struct {
-	FeatureUuid string           `json:"featureUuid"`
-	Stories     []FeatureStories `json:"stories"`
+	FeatureContext string           `json:"featureContext"`
+	FeatureUuid    string           `json:"featureUuid"`
+	Stories        []FeatureStories `json:"stories"`
 }
 
 type FeatureStoriesReponse struct {
-	Output FeatureOutput `json:"feature_output"`
+	Output FeatureOutput `json:"output"`
 }
 
 type InviteReponse struct {
