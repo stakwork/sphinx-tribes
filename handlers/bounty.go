@@ -1008,14 +1008,12 @@ func (h *bountyHandler) UpdateBountyPaymentStatus(w http.ResponseWriter, r *http
 			json.NewEncoder(w).Encode(msg)
 			return
 		} else if tagResult.Status == db.PaymentFailed {
-			// Handle failed payments
-			h.db.SetPaymentStatusByBountyId(bounty.ID, tagResult)
 
-			bounty.Paid = false
-			bounty.PaymentPending = false
-			bounty.PaymentFailed = true
+			err = h.db.ProcessReversePayments(payment.ID)
 
-			h.db.UpdateBounty(bounty)
+			if err != nil {
+				log.Printf("Could not reverse bounty payment : Bounty ID - %d, Payment ID - %d, Error - %s", bounty.ID, payment.ID, err)
+			}
 
 			w.WriteHeader(http.StatusOK)
 			json.NewEncoder(w).Encode(msg)
