@@ -21,7 +21,7 @@ func InitV2PaymentsCron() {
 		if tagResult.Status == db.PaymentComplete {
 			db.DB.SetPaymentAsComplete(tag)
 
-			bounty := db.DB.GetBounty(payment.ID)
+			bounty := db.DB.GetBounty(payment.BountyId)
 
 			if bounty.ID > 0 {
 				now := time.Now()
@@ -37,16 +37,13 @@ func InitV2PaymentsCron() {
 			}
 		} else if tagResult.Status == db.PaymentFailed {
 			// Handle failed payments
-			bounty := db.DB.GetBounty(payment.ID)
+			bounty := db.DB.GetBounty(payment.BountyId)
 
 			if bounty.ID > 0 {
-				db.DB.SetPaymentStatusByBountyId(bounty.ID, tagResult)
-
-				bounty.Paid = false
-				bounty.PaymentPending = false
-				bounty.PaymentFailed = true
-
-				db.DB.UpdateBounty(bounty)
+				err := db.DB.ProcessReversePayments(payment.ID)
+				if err != nil {
+					log.Printf("Could not reverse bounty payment : Bounty ID - %d, Payment ID - %d, Error - %s", bounty.ID, payment.ID, err)
+				}
 			}
 		}
 	}

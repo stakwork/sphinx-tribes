@@ -6871,6 +6871,52 @@ func (_c *Database_ProcessDeleteWorkspace_Call) RunAndReturn(run func(string) er
 	return _c
 }
 
+// ProcessReversePayments provides a mock function with given fields: paymentId
+func (_m *Database) ProcessReversePayments(paymentId uint) error {
+	ret := _m.Called(paymentId)
+
+	if len(ret) == 0 {
+		panic("no return value specified for ProcessReversePayments")
+	}
+
+	var r0 error
+	if rf, ok := ret.Get(0).(func(uint) error); ok {
+		r0 = rf(paymentId)
+	} else {
+		r0 = ret.Error(0)
+	}
+
+	return r0
+}
+
+// Database_ProcessReversePayments_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'ProcessReversePayments'
+type Database_ProcessReversePayments_Call struct {
+	*mock.Call
+}
+
+// ProcessReversePayments is a helper method to define mock.On call
+//   - paymentId uint
+func (_e *Database_Expecter) ProcessReversePayments(paymentId interface{}) *Database_ProcessReversePayments_Call {
+	return &Database_ProcessReversePayments_Call{Call: _e.mock.On("ProcessReversePayments", paymentId)}
+}
+
+func (_c *Database_ProcessReversePayments_Call) Run(run func(paymentId uint)) *Database_ProcessReversePayments_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(uint))
+	})
+	return _c
+}
+
+func (_c *Database_ProcessReversePayments_Call) Return(_a0 error) *Database_ProcessReversePayments_Call {
+	_c.Call.Return(_a0)
+	return _c
+}
+
+func (_c *Database_ProcessReversePayments_Call) RunAndReturn(run func(uint) error) *Database_ProcessReversePayments_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
 // ProcessUpdateBudget provides a mock function with given fields: invoice
 func (_m *Database) ProcessUpdateBudget(invoice db.NewInvoiceList) error {
 	ret := _m.Called(invoice)
