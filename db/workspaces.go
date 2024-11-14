@@ -683,3 +683,94 @@ func (db database) GetFeaturePhasesBountiesCount(bountyType string, phaseUuid st
 	query.Count(&count)
 	return count
 }
+
+func (db database) ProcessReversePayments(paymentId uint) error {
+	// Start db transaction
+	tx := db.db.Begin()
+
+	var err error
+
+	defer func() {
+		if r := recover(); r != nil {
+			tx.Rollback()
+		}
+	}()
+
+	if err = tx.Error; err != nil {
+		return err
+	}
+
+	// Get payment history and update budget
+	paymentHistory := NewPaymentHistory{}
+	tx.Model(&NewPaymentHistory{}).Where("id = ?", paymentId).Find(&paymentHistory)
+
+	bounty_id := paymentHistory.BountyId
+
+	if bounty_id == 0 {
+		tx.Rollback()
+		return errors.New("not a valid bounty payment")
+	}
+
+	if paymentHistory.WorkspaceUuid != "" && paymentHistory.Amount != 0 {
+		paymentHistory.PaymentStatus = PaymentFailed
+
+		workspace_uuid := paymentHistory.WorkspaceUuid
+
+		// check that the sum of budget withdrawals and payments is not greater than deposits
+
+		var depositAmount uint
+		tx.Model(&NewPaymentHistory{}).Where("workspace_uuid = ?", workspace_uuid).Where("status = ?", true).Where("payment_type = ?", "deposit").Select("SUM(amount)").Row().Scan(&depositAmount)
+
+		var withdrawalAmount uint
+		tx.Model(&NewPaymentHistory{}).Where("workspace_uuid = ?", workspace_uuid).Where("status = ?", true).Where("payment_type != ?", "deposit").Select("SUM(amount)").Row().Scan(&withdrawalAmount)
+
+		if withdrawalAmount > depositAmount {
+			tx.Rollback()
+			return errors.New("cannot perform this reversal")
+		}
+
+		// Update payment history
+		if err = tx.Where("id = ?", paymentId).Where("workspace_uuid = ?", workspace_uuid).Updates(paymentHistory).Error; err != nil {
+			tx.Rollback()
+		}
+
+		// get Workspace budget and add payment to total budget
+		workspaceBudget := NewBountyBudget{}
+		tx.Model(&NewBountyBudget{}).Where("workspace_uuid = ?", workspace_uuid).Find(&workspaceBudget)
+
+		// roleback transaction if there is no workspace budget
+		if workspaceBudget.WorkspaceUuid == "" {
+			tx.Rollback()
+		} else {
+			totalBudget := workspaceBudget.TotalBudget
+			workspaceBudget.TotalBudget = totalBudget + paymentHistory.Amount
+
+			if err = tx.Model(&NewBountyBudget{}).Where("workspace_uuid = ?", workspaceBudget.WorkspaceUuid).Updates(map[string]interface{}{
+				"total_budget": workspaceBudget.TotalBudget,
+			}).Error; err != nil {
+				tx.Rollback()
+			}
+		}
+	}
+
+	var bounty NewBounty
+
+	// Get bounty
+	if err = tx.Model(&NewBounty{}).Where("id = ?", bounty_id).Find(&bounty).Error; err != nil {
+		tx.Rollback()
+	}
+
+	bounty.PaymentPending = false
+	bounty.Paid = false
+	bounty.PaymentFailed = true
+
+	if err = tx.Model(&NewBounty{}).Where("id = ?", bounty_id).Updates(map[string]interface{}{
+		"paid":            bounty.Paid,
+		"payment_pending": bounty.PaymentPending,
+		"payment_failed":  bounty.PaymentFailed,
+	}).Error; err != nil {
+		tx.Rollback()
+	}
+
+	return tx.Commit().Error
+}

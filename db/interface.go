@@ -191,4 +191,5 @@ type Database interface {
 	GetProcessingMapByKey(processType, processKey string) (*WfProcessingMap, error)
 	GetProcessingMapsByType(processType string) ([]WfProcessingMap, error)
 	DeleteProcessingMap(id uint) error
+	ProcessReversePayments(paymentId uint) error
 }
