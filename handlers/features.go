@@ -429,26 +429,28 @@ func (oh *featureHandler) GetFeatureStories(w http.ResponseWriter, r *http.Reque
 
 	featureUuid := featureStories.Output.FeatureUuid
 
-	log.Println("Webhook Feature Uuid", featureUuid)
-
 	if err != nil {
 		w.WriteHeader(http.StatusNotAcceptable)
 		log.Printf("Error decoding request body: %v", err)
 		return
 	}
 
-	log.Println("Webhook Feature Output", featureStories.Output)
+	log.Println("Webhook Feature Uuid", featureUuid)
 
 	log.Println("Webhook Feature Stories === ", featureStories.Output.Stories)
 
-	for _, story := range featureStories.Output.Stories {
-		// check if feature story exists
-		feature := oh.db.GetFeatureByUuid(featureUuid)
+	// check if feature story exists
+	feature := oh.db.GetFeatureByUuid(featureUuid)
 
-		if feature.ID == 0 {
-			log.Println("Feature ID does not exists", featureUuid)
-			continue
-		}
+	if feature.ID == 0 {
+		msg := "Feature ID does not exists"
+		log.Println(msg, featureUuid)
+		w.WriteHeader(http.StatusNotAcceptable)
+		json.NewEncoder(w).Encode(msg)
+		return
+	}
+
+	for _, story := range featureStories.Output.Stories {
 
 		now := time.Now()
 
