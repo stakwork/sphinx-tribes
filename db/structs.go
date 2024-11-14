@@ -919,10 +919,25 @@ const (
 	StatusFailed    WfRequestStatus = "FAILED"
 )
 
+type WfProcessingMap struct {
+	ID                 uint      `gorm:"primaryKey;autoIncrement" json:"id"`
+	Type               string    `gorm:"index;not null" json:"type"`
+	ProcessKey         string    `gorm:"index;not null" json:"process_key"`
+	RequiresProcessing bool      `gorm:"default:false" json:"requires_processing"`
+	HandlerFunc        string    `json:"handler_func,omitempty"`
+	Config             JSONB     `gorm:"type:jsonb" json:"config,omitempty"`
+	CreatedAt          time.Time `json:"created_at"`
+	UpdatedAt          time.Time `json:"updated_at"`
+}
+
 type WfRequest struct {
 	ID           uint            `gorm:"primaryKey;autoIncrement" json:"id"`
 	RequestID    string          `gorm:"unique;not null" json:"request_id"`
+	WorkflowID   string          `gorm:"index" json:"workflow_id"`
+	Source       string          `gorm:"index" json:"source"`
+	Action       string          `gorm:"index" json:"action"`
 	Status       WfRequestStatus `json:"status"`
+	ProjectID    string          `json:"project_id,omitempty"`
 	RequestData  JSONB           `gorm:"type:jsonb" json:"request_data"`
 	ResponseData JSONB           `gorm:"type:jsonb" json:"response_data,omitempty"`
 	CreatedAt    time.Time       `json:"created_at"`
@@ -963,6 +978,10 @@ func (ConnectionCodes) TableName() string {
 
 func (ConnectionCodesShort) TableName() string {
 	return "connectioncodes"
+}
+
+func (WfProcessingMap) TableName() string {
+	return "wf_processing_maps"
 }
 
 func (WfRequest) TableName() string {

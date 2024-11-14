@@ -177,4 +177,18 @@ type Database interface {
 	SetPaymentAsComplete(tag string) bool
 	SetPaymentStatusByBountyId(bountyId uint, tagResult V2TagRes) bool
 	GetWorkspacePendingPayments(workspace_uuid string) []NewPaymentHistory
+	CreateWorkflowRequest(req *WfRequest) error
+	UpdateWorkflowRequest(req *WfRequest) error
+	GetWorkflowRequestByID(requestID string) (*WfRequest, error)
+	GetWorkflowRequestsByStatus(status WfRequestStatus) ([]WfRequest, error)
+	GetWorkflowRequest(requestID string) (*WfRequest, error)
+	UpdateWorkflowRequestStatusAndResponse(requestID string, status WfRequestStatus, responseData JSONB) error
+	GetWorkflowRequestsByWorkflowID(workflowID string) ([]WfRequest, error)
+	GetPendingWorkflowRequests(limit int) ([]WfRequest, error)
+	DeleteWorkflowRequest(requestID string) error
+	CreateProcessingMap(pm *WfProcessingMap) error
+	UpdateProcessingMap(pm *WfProcessingMap) error
+	GetProcessingMapByKey(processType, processKey string) (*WfProcessingMap, error)
+	GetProcessingMapsByType(processType string) ([]WfProcessingMap, error)
+	DeleteProcessingMap(id uint) error
 }
