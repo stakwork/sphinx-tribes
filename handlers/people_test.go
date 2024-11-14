@@ -344,46 +344,82 @@ func TestGetPeopleBySearch(t *testing.T) {
 	defer teardownSuite(t)
 	pHandler := NewPeopleHandler(db.TestDB)
 
-	person := db.Person{
-		ID:           102,
-		Uuid:         "perosn_102_uuid",
-		OwnerAlias:   "person102",
-		UniqueName:   "person102",
-		OwnerPubKey:  "person_102_pubkey",
-		PriceToMeet:  0,
-		Description:  "This is test user 102",
-		Tags:         pq.StringArray{},
-		Extras:       db.PropertyMap{},
-		GithubIssues: db.PropertyMap{},
-	}
-	person2 := db.Person{
-		ID:           103,
-		Uuid:         "perosn_103_uuid",
-		OwnerAlias:   "person103",
-		UniqueName:   "person103",
-		OwnerPubKey:  "person_103_pubkey",
-		PriceToMeet:  0,
-		Description:  "This is test user 103",
-		Tags:         pq.StringArray{},
-		Extras:       db.PropertyMap{},
-		GithubIssues: db.PropertyMap{},
-	}
-	db.TestDB.CreateOrEditPerson(person)
-	db.TestDB.CreateOrEditPerson(person2)
+	db.CleanDB()
 
-	t.Run("should return users that match the search text", func(t *testing.T) {
+	personV1 := db.Person{
+		ID:             102,
+		Uuid:           "perosn_102_uuid",
+		OwnerAlias:     "person102",
+		UniqueName:     "person102",
+		OwnerPubKey:    "person_102_pubkey",
+		OwnerRouteHint: "03a6ea2d9ead2120b12bd66292bb4a302c756983dc45dcb2b364b461c66fd53bcb:1099527159809",
+		PriceToMeet:    0,
+		Description:    "This is test user 102",
+		Tags:           pq.StringArray{},
+		Extras:         db.PropertyMap{},
+		GithubIssues:   db.PropertyMap{},
+	}
+	personV2 := db.Person{
+		ID:             103,
+		Uuid:           "perosn_103_uuid",
+		OwnerAlias:     "person103",
+		UniqueName:     "person103",
+		OwnerPubKey:    "person_103_pubkey",
+		OwnerRouteHint: "034bcc332390470cc4f9ef7491af1da2ffceefccd39ceb6acd87c83920543013d7_529771090604130310",
+		PriceToMeet:    0,
+		Description:    "This is test user 103",
+		Tags:           pq.StringArray{},
+		Extras:         db.PropertyMap{},
+		GithubIssues:   db.PropertyMap{},
+	}
+	db.TestDB.CreateOrEditPerson(personV1)
+	db.TestDB.CreateOrEditPerson(personV2)
+
+	t.Run("should return users that V2 pubkeys person and not return V1 pubkeys person", func(t *testing.T) {
 		rr := httptest.NewRecorder()
 		handler := http.HandlerFunc(pHandler.GetPeopleBySearch)
 
 		rctx := chi.NewRouteContext()
-		req, err := http.NewRequestWithContext(context.WithValue(context.Background(), chi.RouteCtxKey, rctx), http.MethodGet, "/search?search="+person.OwnerAlias, nil)
+		req, err := http.NewRequestWithContext(context.WithValue(context.Background(), chi.RouteCtxKey, rctx),
+			http.MethodGet, "/search?search=person", nil)
 		assert.NoError(t, err)
 
-		fetchedPerson := db.TestDB.GetPerson(person.ID)
-		fetchedPerson2 := db.TestDB.GetPerson(person2.ID)
+		fetchedPersonV1 := db.TestDB.GetPerson(personV1.ID)
+		fetchedPersonV2 := db.TestDB.GetPerson(personV2.ID)
+
+		// Verify both people exist in the database
+		assert.NotEmpty(t, fetchedPersonV1)
+		assert.NotEmpty(t, fetchedPersonV2)
+
+		handler.ServeHTTP(rr, req)
+
+		var returnedPeople []db.Person
+		err = json.Unmarshal(rr.Body.Bytes(), &returnedPeople)
+		assert.NoError(t, err)
+		assert.Equal(t, http.StatusOK, rr.Code)
+
+		// Verify only V2 person is returned
+		assert.Equal(t, 1, len(returnedPeople))
+		assert.Equal(t, fetchedPersonV2.ID, returnedPeople[0].ID)
+
+		// Explicitly verify V1 person is not in the results
+		for _, person := range returnedPeople {
+			assert.NotEqual(t, fetchedPersonV1.ID, person.ID)
+		}
+	})
+
+	t.Run("should return users that match the search text (only V2 pubkeys)", func(t *testing.T) {
+		rr := httptest.NewRecorder()
+		handler := http.HandlerFunc(pHandler.GetPeopleBySearch)
+
+		rctx := chi.NewRouteContext()
+		req, err := http.NewRequestWithContext(context.WithValue(context.Background(), chi.RouteCtxKey, rctx), http.MethodGet, "/search?search="+personV2.OwnerAlias, nil)
+		assert.NoError(t, err)
+
+		fetchedPersonV2 := db.TestDB.GetPerson(personV2.ID)
 
 		expectedPeople := []db.Person{
-			fetchedPerson,
+			fetchedPersonV2,
 		}
 
 		handler.ServeHTTP(rr, req)
@@ -392,8 +428,7 @@ func TestGetPeopleBySearch(t *testing.T) {
 		err = json.Unmarshal(rr.Body.Bytes(), &returnedPeople)
 		assert.NoError(t, err)
 		assert.Equal(t, http.StatusOK, rr.Code)
-		assert.EqualValues(t, person, fetchedPerson)
-		assert.EqualValues(t, person2, fetchedPerson2)
+		assert.EqualValues(t, personV2, fetchedPersonV2)
 		assert.EqualValues(t, expectedPeople, returnedPeople)
 	})
 
