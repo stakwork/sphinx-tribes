@@ -1000,6 +1000,7 @@ func (h *bountyHandler) UpdateBountyPaymentStatus(w http.ResponseWriter, r *http
 			bounty.PaymentPending = false
 			bounty.PaymentFailed = false
 			bounty.Paid = true
+
 			bounty.PaidDate = &now
 			bounty.Completed = true
 			bounty.CompletionDate = &now
