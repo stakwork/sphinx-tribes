@@ -477,8 +477,17 @@ func (db database) ProcessBountyPayment(payment NewPaymentHistory, bounty NewBou
 			return err
 		}
 
+		bountyUpdates := map[string]interface{}{
+			"paid":            bounty.Paid,
+			"payment_pending": bounty.PaymentPending,
+			"payment_failed":  bounty.PaymentFailed,
+			"completed":       bounty.Completed,
+			"paid_date":       bounty.PaidDate,
+			"completion_date": bounty.CompletionDate,
+		}
+
 		// updatge bounty status
-		if err = tx.Where("created", bounty.Created).Updates(&bounty).Error; err != nil {
+		if err = tx.Model(&NewBounty{}).Where("created", bounty.Created).Updates(bountyUpdates).Error; err != nil {
 			tx.Rollback()
 			return err
 		}
