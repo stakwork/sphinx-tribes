@@ -26,14 +26,15 @@ func InitV2PaymentsCron() {
 			if bounty.ID > 0 {
 				now := time.Now()
 
-				bounty.Paid = true
 				bounty.PaymentPending = false
 				bounty.PaymentFailed = false
+				bounty.Paid = true
+
 				bounty.PaidDate = &now
 				bounty.Completed = true
 				bounty.CompletionDate = &now
 
-				db.DB.UpdateBounty(bounty)
+				db.DB.UpdateBountyPaymentStatuses(bounty)
 			}
 		} else if tagResult.Status == db.PaymentFailed {
 			// Handle failed payments
