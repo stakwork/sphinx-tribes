@@ -1337,6 +1337,21 @@ func (db database) GetBounty(id uint) NewBounty {
 	return b
 }
 
+func (db database) UpdateBountyPaymentStatuses(bounty NewBounty) (NewBounty, error) {
+
+	bountyUpdates := map[string]interface{}{
+		"paid":            bounty.Paid,
+		"payment_pending": bounty.PaymentPending,
+		"payment_failed":  bounty.PaymentFailed,
+		"completed":       bounty.Completed,
+		"paid_date":       bounty.PaidDate,
+		"completion_date": bounty.CompletionDate,
+	}
+
+	db.db.Where("created", bounty.Created).Updates(bountyUpdates)
+	return bounty, nil
+}
+
 func (db database) UpdateBounty(b NewBounty) (NewBounty, error) {
 	db.db.Where("created", b.Created).Updates(&b)
 	return b, nil

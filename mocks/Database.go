@@ -1322,6 +1322,52 @@ func (_c *Database_CreateOrEditWorkspaceRepository_Call) RunAndReturn(run func(d
 	return _c
 }
 
+// CreateProcessingMap provides a mock function with given fields: pm
+func (_m *Database) CreateProcessingMap(pm *db.WfProcessingMap) error {
+	ret := _m.Called(pm)
+
+	if len(ret) == 0 {
+		panic("no return value specified for CreateProcessingMap")
+	}
+
+	var r0 error
+	if rf, ok := ret.Get(0).(func(*db.WfProcessingMap) error); ok {
+		r0 = rf(pm)
+	} else {
+		r0 = ret.Error(0)
+	}
+
+	return r0
+}
+
+// Database_CreateProcessingMap_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'CreateProcessingMap'
+type Database_CreateProcessingMap_Call struct {
+	*mock.Call
+}
+
+// CreateProcessingMap is a helper method to define mock.On call
+//   - pm *db.WfProcessingMap
+func (_e *Database_Expecter) CreateProcessingMap(pm interface{}) *Database_CreateProcessingMap_Call {
+	return &Database_CreateProcessingMap_Call{Call: _e.mock.On("CreateProcessingMap", pm)}
+}
+
+func (_c *Database_CreateProcessingMap_Call) Run(run func(pm *db.WfProcessingMap)) *Database_CreateProcessingMap_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(*db.WfProcessingMap))
+	})
+	return _c
+}
+
+func (_c *Database_CreateProcessingMap_Call) Return(_a0 error) *Database_CreateProcessingMap_Call {
+	_c.Call.Return(_a0)
+	return _c
+}
+
+func (_c *Database_CreateProcessingMap_Call) RunAndReturn(run func(*db.WfProcessingMap) error) *Database_CreateProcessingMap_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
 // CreateUserRoles provides a mock function with given fields: roles, uuid, pubkey
 func (_m *Database) CreateUserRoles(roles []db.WorkspaceUserRoles, uuid string, pubkey string) []db.WorkspaceUserRoles {
 	ret := _m.Called(roles, uuid, pubkey)
@@ -1368,6 +1414,52 @@ func (_c *Database_CreateUserRoles_Call) Return(_a0 []db.WorkspaceUserRoles) *Da
 }
 
 func (_c *Database_CreateUserRoles_Call) RunAndReturn(run func([]db.WorkspaceUserRoles, string, string) []db.WorkspaceUserRoles) *Database_CreateUserRoles_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
+// CreateWorkflowRequest provides a mock function with given fields: req
+func (_m *Database) CreateWorkflowRequest(req *db.WfRequest) error {
+	ret := _m.Called(req)
+
+	if len(ret) == 0 {
+		panic("no return value specified for CreateWorkflowRequest")
+	}
+
+	var r0 error
+	if rf, ok := ret.Get(0).(func(*db.WfRequest) error); ok {
+		r0 = rf(req)
+	} else {
+		r0 = ret.Error(0)
+	}
+
+	return r0
+}
+
+// Database_CreateWorkflowRequest_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'CreateWorkflowRequest'
+type Database_CreateWorkflowRequest_Call struct {
+	*mock.Call
+}
+
+// CreateWorkflowRequest is a helper method to define mock.On call
+//   - req *db.WfRequest
+func (_e *Database_Expecter) CreateWorkflowRequest(req interface{}) *Database_CreateWorkflowRequest_Call {
+	return &Database_CreateWorkflowRequest_Call{Call: _e.mock.On("CreateWorkflowRequest", req)}
+}
+
+func (_c *Database_CreateWorkflowRequest_Call) Run(run func(req *db.WfRequest)) *Database_CreateWorkflowRequest_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(*db.WfRequest))
+	})
+	return _c
+}
+
+func (_c *Database_CreateWorkflowRequest_Call) Return(_a0 error) *Database_CreateWorkflowRequest_Call {
+	_c.Call.Return(_a0)
+	return _c
+}
+
+func (_c *Database_CreateWorkflowRequest_Call) RunAndReturn(run func(*db.WfRequest) error) *Database_CreateWorkflowRequest_Call {
 	_c.Call.Return(run)
 	return _c
 }
@@ -1753,6 +1845,52 @@ func (_c *Database_DeleteInvoice_Call) RunAndReturn(run func(string) db.NewInvoi
 	return _c
 }
 
+// DeleteProcessingMap provides a mock function with given fields: id
+func (_m *Database) DeleteProcessingMap(id uint) error {
+	ret := _m.Called(id)
+
+	if len(ret) == 0 {
+		panic("no return value specified for DeleteProcessingMap")
+	}
+
+	var r0 error
+	if rf, ok := ret.Get(0).(func(uint) error); ok {
+		r0 = rf(id)
+	} else {
+		r0 = ret.Error(0)
+	}
+
+	return r0
+}
+
+// Database_DeleteProcessingMap_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'DeleteProcessingMap'
+type Database_DeleteProcessingMap_Call struct {
+	*mock.Call
+}
+
+// DeleteProcessingMap is a helper method to define mock.On call
+//   - id uint
+func (_e *Database_Expecter) DeleteProcessingMap(id interface{}) *Database_DeleteProcessingMap_Call {
+	return &Database_DeleteProcessingMap_Call{Call: _e.mock.On("DeleteProcessingMap", id)}
+}
+
+func (_c *Database_DeleteProcessingMap_Call) Run(run func(id uint)) *Database_DeleteProcessingMap_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(uint))
+	})
+	return _c
+}
+
+func (_c *Database_DeleteProcessingMap_Call) Return(_a0 error) *Database_DeleteProcessingMap_Call {
+	_c.Call.Return(_a0)
+	return _c
+}
+
+func (_c *Database_DeleteProcessingMap_Call) RunAndReturn(run func(uint) error) *Database_DeleteProcessingMap_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
 // DeleteUserInvoiceData provides a mock function with given fields: payment_request
 func (_m *Database) DeleteUserInvoiceData(payment_request string) db.UserInvoiceData {
 	ret := _m.Called(payment_request)
@@ -1795,6 +1933,52 @@ func (_c *Database_DeleteUserInvoiceData_Call) Return(_a0 db.UserInvoiceData) *D
 }
 
 func (_c *Database_DeleteUserInvoiceData_Call) RunAndReturn(run func(string) db.UserInvoiceData) *Database_DeleteUserInvoiceData_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
+// DeleteWorkflowRequest provides a mock function with given fields: requestID
+func (_m *Database) DeleteWorkflowRequest(requestID string) error {
+	ret := _m.Called(requestID)
+
+	if len(ret) == 0 {
+		panic("no return value specified for DeleteWorkflowRequest")
+	}
+
+	var r0 error
+	if rf, ok := ret.Get(0).(func(string) error); ok {
+		r0 = rf(requestID)
+	} else {
+		r0 = ret.Error(0)
+	}
+
+	return r0
+}
+
+// Database_DeleteWorkflowRequest_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'DeleteWorkflowRequest'
+type Database_DeleteWorkflowRequest_Call struct {
+	*mock.Call
+}
+
+// DeleteWorkflowRequest is a helper method to define mock.On call
+//   - requestID string
+func (_e *Database_Expecter) DeleteWorkflowRequest(requestID interface{}) *Database_DeleteWorkflowRequest_Call {
+	return &Database_DeleteWorkflowRequest_Call{Call: _e.mock.On("DeleteWorkflowRequest", requestID)}
+}
+
+func (_c *Database_DeleteWorkflowRequest_Call) Run(run func(requestID string)) *Database_DeleteWorkflowRequest_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(string))
+	})
+	return _c
+}
+
+func (_c *Database_DeleteWorkflowRequest_Call) Return(_a0 error) *Database_DeleteWorkflowRequest_Call {
+	_c.Call.Return(_a0)
+	return _c
+}
+
+func (_c *Database_DeleteWorkflowRequest_Call) RunAndReturn(run func(string) error) *Database_DeleteWorkflowRequest_Call {
 	_c.Call.Return(run)
 	return _c
 }
@@ -4391,6 +4575,64 @@ func (_c *Database_GetPendingPaymentHistory_Call) RunAndReturn(run func() []db.N
 	return _c
 }
 
+// GetPendingWorkflowRequests provides a mock function with given fields: limit
+func (_m *Database) GetPendingWorkflowRequests(limit int) ([]db.WfRequest, error) {
+	ret := _m.Called(limit)
+
+	if len(ret) == 0 {
+		panic("no return value specified for GetPendingWorkflowRequests")
+	}
+
+	var r0 []db.WfRequest
+	var r1 error
+	if rf, ok := ret.Get(0).(func(int) ([]db.WfRequest, error)); ok {
+		return rf(limit)
+	}
+	if rf, ok := ret.Get(0).(func(int) []db.WfRequest); ok {
+		r0 = rf(limit)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).([]db.WfRequest)
+		}
+	}
+
+	if rf, ok := ret.Get(1).(func(int) error); ok {
+		r1 = rf(limit)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
+// Database_GetPendingWorkflowRequests_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'GetPendingWorkflowRequests'
+type Database_GetPendingWorkflowRequests_Call struct {
+	*mock.Call
+}
+
+// GetPendingWorkflowRequests is a helper method to define mock.On call
+//   - limit int
+func (_e *Database_Expecter) GetPendingWorkflowRequests(limit interface{}) *Database_GetPendingWorkflowRequests_Call {
+	return &Database_GetPendingWorkflowRequests_Call{Call: _e.mock.On("GetPendingWorkflowRequests", limit)}
+}
+
+func (_c *Database_GetPendingWorkflowRequests_Call) Run(run func(limit int)) *Database_GetPendingWorkflowRequests_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(int))
+	})
+	return _c
+}
+
+func (_c *Database_GetPendingWorkflowRequests_Call) Return(_a0 []db.WfRequest, _a1 error) *Database_GetPendingWorkflowRequests_Call {
+	_c.Call.Return(_a0, _a1)
+	return _c
+}
+
+func (_c *Database_GetPendingWorkflowRequests_Call) RunAndReturn(run func(int) ([]db.WfRequest, error)) *Database_GetPendingWorkflowRequests_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
 // GetPeopleBySearch provides a mock function with given fields: r
 func (_m *Database) GetPeopleBySearch(r *http.Request) []db.Person {
 	ret := _m.Called(r)
@@ -4929,6 +5171,123 @@ func (_c *Database_GetPreviousWorkspaceBountyByCreated_Call) Return(_a0 uint, _a
 }
 
 func (_c *Database_GetPreviousWorkspaceBountyByCreated_Call) RunAndReturn(run func(*http.Request) (uint, error)) *Database_GetPreviousWorkspaceBountyByCreated_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
+// GetProcessingMapByKey provides a mock function with given fields: processType, processKey
+func (_m *Database) GetProcessingMapByKey(processType string, processKey string) (*db.WfProcessingMap, error) {
+	ret := _m.Called(processType, processKey)
+
+	if len(ret) == 0 {
+		panic("no return value specified for GetProcessingMapByKey")
+	}
+
+	var r0 *db.WfProcessingMap
+	var r1 error
+	if rf, ok := ret.Get(0).(func(string, string) (*db.WfProcessingMap, error)); ok {
+		return rf(processType, processKey)
+	}
+	if rf, ok := ret.Get(0).(func(string, string) *db.WfProcessingMap); ok {
+		r0 = rf(processType, processKey)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(*db.WfProcessingMap)
+		}
+	}
+
+	if rf, ok := ret.Get(1).(func(string, string) error); ok {
+		r1 = rf(processType, processKey)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
+// Database_GetProcessingMapByKey_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'GetProcessingMapByKey'
+type Database_GetProcessingMapByKey_Call struct {
+	*mock.Call
+}
+
+// GetProcessingMapByKey is a helper method to define mock.On call
+//   - processType string
+//   - processKey string
+func (_e *Database_Expecter) GetProcessingMapByKey(processType interface{}, processKey interface{}) *Database_GetProcessingMapByKey_Call {
+	return &Database_GetProcessingMapByKey_Call{Call: _e.mock.On("GetProcessingMapByKey", processType, processKey)}
+}
+
+func (_c *Database_GetProcessingMapByKey_Call) Run(run func(processType string, processKey string)) *Database_GetProcessingMapByKey_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(string), args[1].(string))
+	})
+	return _c
+}
+
+func (_c *Database_GetProcessingMapByKey_Call) Return(_a0 *db.WfProcessingMap, _a1 error) *Database_GetProcessingMapByKey_Call {
+	_c.Call.Return(_a0, _a1)
+	return _c
+}
+
+func (_c *Database_GetProcessingMapByKey_Call) RunAndReturn(run func(string, string) (*db.WfProcessingMap, error)) *Database_GetProcessingMapByKey_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
+// GetProcessingMapsByType provides a mock function with given fields: processType
+func (_m *Database) GetProcessingMapsByType(processType string) ([]db.WfProcessingMap, error) {
+	ret := _m.Called(processType)
+
+	if len(ret) == 0 {
+		panic("no return value specified for GetProcessingMapsByType")
+	}
+
+	var r0 []db.WfProcessingMap
+	var r1 error
+	if rf, ok := ret.Get(0).(func(string) ([]db.WfProcessingMap, error)); ok {
+		return rf(processType)
+	}
+	if rf, ok := ret.Get(0).(func(string) []db.WfProcessingMap); ok {
+		r0 = rf(processType)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).([]db.WfProcessingMap)
+		}
+	}
+
+	if rf, ok := ret.Get(1).(func(string) error); ok {
+		r1 = rf(processType)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
+// Database_GetProcessingMapsByType_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'GetProcessingMapsByType'
+type Database_GetProcessingMapsByType_Call struct {
+	*mock.Call
+}
+
+// GetProcessingMapsByType is a helper method to define mock.On call
+//   - processType string
+func (_e *Database_Expecter) GetProcessingMapsByType(processType interface{}) *Database_GetProcessingMapsByType_Call {
+	return &Database_GetProcessingMapsByType_Call{Call: _e.mock.On("GetProcessingMapsByType", processType)}
+}
+
+func (_c *Database_GetProcessingMapsByType_Call) Run(run func(processType string)) *Database_GetProcessingMapsByType_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(string))
+	})
+	return _c
+}
+
+func (_c *Database_GetProcessingMapsByType_Call) Return(_a0 []db.WfProcessingMap, _a1 error) *Database_GetProcessingMapsByType_Call {
+	_c.Call.Return(_a0, _a1)
+	return _c
+}
+
+func (_c *Database_GetProcessingMapsByType_Call) RunAndReturn(run func(string) ([]db.WfProcessingMap, error)) *Database_GetProcessingMapsByType_Call {
 	_c.Call.Return(run)
 	return _c
 }
@@ -5633,6 +5992,238 @@ func (_c *Database_GetUserRoles_Call) Return(_a0 []db.WorkspaceUserRoles) *Datab
 }
 
 func (_c *Database_GetUserRoles_Call) RunAndReturn(run func(string, string) []db.WorkspaceUserRoles) *Database_GetUserRoles_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
+// GetWorkflowRequest provides a mock function with given fields: requestID
+func (_m *Database) GetWorkflowRequest(requestID string) (*db.WfRequest, error) {
+	ret := _m.Called(requestID)
+
+	if len(ret) == 0 {
+		panic("no return value specified for GetWorkflowRequest")
+	}
+
+	var r0 *db.WfRequest
+	var r1 error
+	if rf, ok := ret.Get(0).(func(string) (*db.WfRequest, error)); ok {
+		return rf(requestID)
+	}
+	if rf, ok := ret.Get(0).(func(string) *db.WfRequest); ok {
+		r0 = rf(requestID)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(*db.WfRequest)
+		}
+	}
+
+	if rf, ok := ret.Get(1).(func(string) error); ok {
+		r1 = rf(requestID)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
+// Database_GetWorkflowRequest_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'GetWorkflowRequest'
+type Database_GetWorkflowRequest_Call struct {
+	*mock.Call
+}
+
+// GetWorkflowRequest is a helper method to define mock.On call
+//   - requestID string
+func (_e *Database_Expecter) GetWorkflowRequest(requestID interface{}) *Database_GetWorkflowRequest_Call {
+	return &Database_GetWorkflowRequest_Call{Call: _e.mock.On("GetWorkflowRequest", requestID)}
+}
+
+func (_c *Database_GetWorkflowRequest_Call) Run(run func(requestID string)) *Database_GetWorkflowRequest_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(string))
+	})
+	return _c
+}
+
+func (_c *Database_GetWorkflowRequest_Call) Return(_a0 *db.WfRequest, _a1 error) *Database_GetWorkflowRequest_Call {
+	_c.Call.Return(_a0, _a1)
+	return _c
+}
+
+func (_c *Database_GetWorkflowRequest_Call) RunAndReturn(run func(string) (*db.WfRequest, error)) *Database_GetWorkflowRequest_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
+// GetWorkflowRequestByID provides a mock function with given fields: requestID
+func (_m *Database) GetWorkflowRequestByID(requestID string) (*db.WfRequest, error) {
+	ret := _m.Called(requestID)
+
+	if len(ret) == 0 {
+		panic("no return value specified for GetWorkflowRequestByID")
+	}
+
+	var r0 *db.WfRequest
+	var r1 error
+	if rf, ok := ret.Get(0).(func(string) (*db.WfRequest, error)); ok {
+		return rf(requestID)
+	}
+	if rf, ok := ret.Get(0).(func(string) *db.WfRequest); ok {
+		r0 = rf(requestID)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(*db.WfRequest)
+		}
+	}
+
+	if rf, ok := ret.Get(1).(func(string) error); ok {
+		r1 = rf(requestID)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
+// Database_GetWorkflowRequestByID_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'GetWorkflowRequestByID'
+type Database_GetWorkflowRequestByID_Call struct {
+	*mock.Call
+}
+
+// GetWorkflowRequestByID is a helper method to define mock.On call
+//   - requestID string
+func (_e *Database_Expecter) GetWorkflowRequestByID(requestID interface{}) *Database_GetWorkflowRequestByID_Call {
+	return &Database_GetWorkflowRequestByID_Call{Call: _e.mock.On("GetWorkflowRequestByID", requestID)}
+}
+
+func (_c *Database_GetWorkflowRequestByID_Call) Run(run func(requestID string)) *Database_GetWorkflowRequestByID_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(string))
+	})
+	return _c
+}
+
+func (_c *Database_GetWorkflowRequestByID_Call) Return(_a0 *db.WfRequest, _a1 error) *Database_GetWorkflowRequestByID_Call {
+	_c.Call.Return(_a0, _a1)
+	return _c
+}
+
+func (_c *Database_GetWorkflowRequestByID_Call) RunAndReturn(run func(string) (*db.WfRequest, error)) *Database_GetWorkflowRequestByID_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
+// GetWorkflowRequestsByStatus provides a mock function with given fields: status
+func (_m *Database) GetWorkflowRequestsByStatus(status db.WfRequestStatus) ([]db.WfRequest, error) {
+	ret := _m.Called(status)
+
+	if len(ret) == 0 {
+		panic("no return value specified for GetWorkflowRequestsByStatus")
+	}
+
+	var r0 []db.WfRequest
+	var r1 error
+	if rf, ok := ret.Get(0).(func(db.WfRequestStatus) ([]db.WfRequest, error)); ok {
+		return rf(status)
+	}
+	if rf, ok := ret.Get(0).(func(db.WfRequestStatus) []db.WfRequest); ok {
+		r0 = rf(status)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).([]db.WfRequest)
+		}
+	}
+
+	if rf, ok := ret.Get(1).(func(db.WfRequestStatus) error); ok {
+		r1 = rf(status)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
+// Database_GetWorkflowRequestsByStatus_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'GetWorkflowRequestsByStatus'
+type Database_GetWorkflowRequestsByStatus_Call struct {
+	*mock.Call
+}
+
+// GetWorkflowRequestsByStatus is a helper method to define mock.On call
+//   - status db.WfRequestStatus
+func (_e *Database_Expecter) GetWorkflowRequestsByStatus(status interface{}) *Database_GetWorkflowRequestsByStatus_Call {
+	return &Database_GetWorkflowRequestsByStatus_Call{Call: _e.mock.On("GetWorkflowRequestsByStatus", status)}
+}
+
+func (_c *Database_GetWorkflowRequestsByStatus_Call) Run(run func(status db.WfRequestStatus)) *Database_GetWorkflowRequestsByStatus_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(db.WfRequestStatus))
+	})
+	return _c
+}
+
+func (_c *Database_GetWorkflowRequestsByStatus_Call) Return(_a0 []db.WfRequest, _a1 error) *Database_GetWorkflowRequestsByStatus_Call {
+	_c.Call.Return(_a0, _a1)
+	return _c
+}
+
+func (_c *Database_GetWorkflowRequestsByStatus_Call) RunAndReturn(run func(db.WfRequestStatus) ([]db.WfRequest, error)) *Database_GetWorkflowRequestsByStatus_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
+// GetWorkflowRequestsByWorkflowID provides a mock function with given fields: workflowID
+func (_m *Database) GetWorkflowRequestsByWorkflowID(workflowID string) ([]db.WfRequest, error) {
+	ret := _m.Called(workflowID)
+
+	if len(ret) == 0 {
+		panic("no return value specified for GetWorkflowRequestsByWorkflowID")
+	}
+
+	var r0 []db.WfRequest
+	var r1 error
+	if rf, ok := ret.Get(0).(func(string) ([]db.WfRequest, error)); ok {
+		return rf(workflowID)
+	}
+	if rf, ok := ret.Get(0).(func(string) []db.WfRequest); ok {
+		r0 = rf(workflowID)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).([]db.WfRequest)
+		}
+	}
+
+	if rf, ok := ret.Get(1).(func(string) error); ok {
+		r1 = rf(workflowID)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
+// Database_GetWorkflowRequestsByWorkflowID_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'GetWorkflowRequestsByWorkflowID'
+type Database_GetWorkflowRequestsByWorkflowID_Call struct {
+	*mock.Call
+}
+
+// GetWorkflowRequestsByWorkflowID is a helper method to define mock.On call
+//   - workflowID string
+func (_e *Database_Expecter) GetWorkflowRequestsByWorkflowID(workflowID interface{}) *Database_GetWorkflowRequestsByWorkflowID_Call {
+	return &Database_GetWorkflowRequestsByWorkflowID_Call{Call: _e.mock.On("GetWorkflowRequestsByWorkflowID", workflowID)}
+}
+
+func (_c *Database_GetWorkflowRequestsByWorkflowID_Call) Run(run func(workflowID string)) *Database_GetWorkflowRequestsByWorkflowID_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(string))
+	})
+	return _c
+}
+
+func (_c *Database_GetWorkflowRequestsByWorkflowID_Call) Return(_a0 []db.WfRequest, _a1 error) *Database_GetWorkflowRequestsByWorkflowID_Call {
+	_c.Call.Return(_a0, _a1)
+	return _c
+}
+
+func (_c *Database_GetWorkflowRequestsByWorkflowID_Call) RunAndReturn(run func(string) ([]db.WfRequest, error)) *Database_GetWorkflowRequestsByWorkflowID_Call {
 	_c.Call.Return(run)
 	return _c
 }
@@ -7786,6 +8377,62 @@ func (_c *Database_UpdateBountyPayment_Call) RunAndReturn(run func(db.NewBounty)
 	return _c
 }
 
+// UpdateBountyPaymentStatuses provides a mock function with given fields: bounty
+func (_m *Database) UpdateBountyPaymentStatuses(bounty db.NewBounty) (db.NewBounty, error) {
+	ret := _m.Called(bounty)
+
+	if len(ret) == 0 {
+		panic("no return value specified for UpdateBountyPaymentStatuses")
+	}
+
+	var r0 db.NewBounty
+	var r1 error
+	if rf, ok := ret.Get(0).(func(db.NewBounty) (db.NewBounty, error)); ok {
+		return rf(bounty)
+	}
+	if rf, ok := ret.Get(0).(func(db.NewBounty) db.NewBounty); ok {
+		r0 = rf(bounty)
+	} else {
+		r0 = ret.Get(0).(db.NewBounty)
+	}
+
+	if rf, ok := ret.Get(1).(func(db.NewBounty) error); ok {
+		r1 = rf(bounty)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
+// Database_UpdateBountyPaymentStatuses_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'UpdateBountyPaymentStatuses'
+type Database_UpdateBountyPaymentStatuses_Call struct {
+	*mock.Call
+}
+
+// UpdateBountyPaymentStatuses is a helper method to define mock.On call
+//   - bounty db.NewBounty
+func (_e *Database_Expecter) UpdateBountyPaymentStatuses(bounty interface{}) *Database_UpdateBountyPaymentStatuses_Call {
+	return &Database_UpdateBountyPaymentStatuses_Call{Call: _e.mock.On("UpdateBountyPaymentStatuses", bounty)}
+}
+
+func (_c *Database_UpdateBountyPaymentStatuses_Call) Run(run func(bounty db.NewBounty)) *Database_UpdateBountyPaymentStatuses_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(db.NewBounty))
+	})
+	return _c
+}
+
+func (_c *Database_UpdateBountyPaymentStatuses_Call) Return(_a0 db.NewBounty, _a1 error) *Database_UpdateBountyPaymentStatuses_Call {
+	_c.Call.Return(_a0, _a1)
+	return _c
+}
+
+func (_c *Database_UpdateBountyPaymentStatuses_Call) RunAndReturn(run func(db.NewBounty) (db.NewBounty, error)) *Database_UpdateBountyPaymentStatuses_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
 // UpdateChannel provides a mock function with given fields: id, u
 func (_m *Database) UpdateChannel(id uint, u map[string]interface{}) bool {
 	ret := _m.Called(id, u)
@@ -8042,6 +8689,52 @@ func (_c *Database_UpdatePerson_Call) RunAndReturn(run func(uint, map[string]int
 	return _c
 }
 
+// UpdateProcessingMap provides a mock function with given fields: pm
+func (_m *Database) UpdateProcessingMap(pm *db.WfProcessingMap) error {
+	ret := _m.Called(pm)
+
+	if len(ret) == 0 {
+		panic("no return value specified for UpdateProcessingMap")
+	}
+
+	var r0 error
+	if rf, ok := ret.Get(0).(func(*db.WfProcessingMap) error); ok {
+		r0 = rf(pm)
+	} else {
+		r0 = ret.Error(0)
+	}
+
+	return r0
+}
+
+// Database_UpdateProcessingMap_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'UpdateProcessingMap'
+type Database_UpdateProcessingMap_Call struct {
+	*mock.Call
+}
+
+// UpdateProcessingMap is a helper method to define mock.On call
+//   - pm *db.WfProcessingMap
+func (_e *Database_Expecter) UpdateProcessingMap(pm interface{}) *Database_UpdateProcessingMap_Call {
+	return &Database_UpdateProcessingMap_Call{Call: _e.mock.On("UpdateProcessingMap", pm)}
+}
+
+func (_c *Database_UpdateProcessingMap_Call) Run(run func(pm *db.WfProcessingMap)) *Database_UpdateProcessingMap_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(*db.WfProcessingMap))
+	})
+	return _c
+}
+
+func (_c *Database_UpdateProcessingMap_Call) Return(_a0 error) *Database_UpdateProcessingMap_Call {
+	_c.Call.Return(_a0)
+	return _c
+}
+
+func (_c *Database_UpdateProcessingMap_Call) RunAndReturn(run func(*db.WfProcessingMap) error) *Database_UpdateProcessingMap_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
 // UpdateTribe provides a mock function with given fields: uuid, u
 func (_m *Database) UpdateTribe(uuid string, u map[string]interface{}) bool {
 	ret := _m.Called(uuid, u)
@@ -8153,6 +8846,100 @@ func (_c *Database_UpdateTwitterConfirmed_Call) Return() *Database_UpdateTwitter
 }
 
 func (_c *Database_UpdateTwitterConfirmed_Call) RunAndReturn(run func(uint, bool)) *Database_UpdateTwitterConfirmed_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
+// UpdateWorkflowRequest provides a mock function with given fields: req
+func (_m *Database) UpdateWorkflowRequest(req *db.WfRequest) error {
+	ret := _m.Called(req)
+
+	if len(ret) == 0 {
+		panic("no return value specified for UpdateWorkflowRequest")
+	}
+
+	var r0 error
+	if rf, ok := ret.Get(0).(func(*db.WfRequest) error); ok {
+		r0 = rf(req)
+	} else {
+		r0 = ret.Error(0)
+	}
+
+	return r0
+}
+
+// Database_UpdateWorkflowRequest_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'UpdateWorkflowRequest'
+type Database_UpdateWorkflowRequest_Call struct {
+	*mock.Call
+}
+
+// UpdateWorkflowRequest is a helper method to define mock.On call
+//   - req *db.WfRequest
+func (_e *Database_Expecter) UpdateWorkflowRequest(req interface{}) *Database_UpdateWorkflowRequest_Call {
+	return &Database_UpdateWorkflowRequest_Call{Call: _e.mock.On("UpdateWorkflowRequest", req)}
+}
+
+func (_c *Database_UpdateWorkflowRequest_Call) Run(run func(req *db.WfRequest)) *Database_UpdateWorkflowRequest_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(*db.WfRequest))
+	})
+	return _c
+}
+
+func (_c *Database_UpdateWorkflowRequest_Call) Return(_a0 error) *Database_UpdateWorkflowRequest_Call {
+	_c.Call.Return(_a0)
+	return _c
+}
+
+func (_c *Database_UpdateWorkflowRequest_Call) RunAndReturn(run func(*db.WfRequest) error) *Database_UpdateWorkflowRequest_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
+// UpdateWorkflowRequestStatusAndResponse provides a mock function with given fields: requestID, status, responseData
+func (_m *Database) UpdateWorkflowRequestStatusAndResponse(requestID string, status db.WfRequestStatus, responseData db.JSONB) error {
+	ret := _m.Called(requestID, status, responseData)
+
+	if len(ret) == 0 {
+		panic("no return value specified for UpdateWorkflowRequestStatusAndResponse")
+	}
+
+	var r0 error
+	if rf, ok := ret.Get(0).(func(string, db.WfRequestStatus, db.JSONB) error); ok {
+		r0 = rf(requestID, status, responseData)
+	} else {
+		r0 = ret.Error(0)
+	}
+
+	return r0
+}
+
+// Database_UpdateWorkflowRequestStatusAndResponse_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'UpdateWorkflowRequestStatusAndResponse'
+type Database_UpdateWorkflowRequestStatusAndResponse_Call struct {
+	*mock.Call
+}
+
+// UpdateWorkflowRequestStatusAndResponse is a helper method to define mock.On call
+//   - requestID string
+//   - status db.WfRequestStatus
+//   - responseData db.JSONB
+func (_e *Database_Expecter) UpdateWorkflowRequestStatusAndResponse(requestID interface{}, status interface{}, responseData interface{}) *Database_UpdateWorkflowRequestStatusAndResponse_Call {
+	return &Database_UpdateWorkflowRequestStatusAndResponse_Call{Call: _e.mock.On("UpdateWorkflowRequestStatusAndResponse", requestID, status, responseData)}
+}
+
+func (_c *Database_UpdateWorkflowRequestStatusAndResponse_Call) Run(run func(requestID string, status db.WfRequestStatus, responseData db.JSONB)) *Database_UpdateWorkflowRequestStatusAndResponse_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(string), args[1].(db.WfRequestStatus), args[2].(db.JSONB))
+	})
+	return _c
+}
+
+func (_c *Database_UpdateWorkflowRequestStatusAndResponse_Call) Return(_a0 error) *Database_UpdateWorkflowRequestStatusAndResponse_Call {
+	_c.Call.Return(_a0)
+	return _c
+}
+
+func (_c *Database_UpdateWorkflowRequestStatusAndResponse_Call) RunAndReturn(run func(string, db.WfRequestStatus, db.JSONB) error) *Database_UpdateWorkflowRequestStatusAndResponse_Call {
 	_c.Call.Return(run)
 	return _c
 }
@@ -8391,354 +9178,4 @@ func NewDatabase(t interface {
 	t.Cleanup(func() { mock.AssertExpectations(t) })
 
 	return mock
-}
-
-
-// CreateWorkflowRequest provides a mock function with given fields: req
-func (_m *Database) CreateWorkflowRequest(req *db.WfRequest) error {
-	ret := _m.Called(req)
-	var r0 error
-	if rf, ok := ret.Get(0).(func(*db.WfRequest) error); ok {
-		r0 = rf(req)
-	} else {
-		r0 = ret.Error(0)
-	}
-	return r0
-}
-
-type Database_CreateWorkflowRequest_Call struct {
-	*mock.Call
-}
-
-func (_e *Database_Expecter) CreateWorkflowRequest(req interface{}) *Database_CreateWorkflowRequest_Call {
-	return &Database_CreateWorkflowRequest_Call{Call: _e.mock.On("CreateWorkflowRequest", req)}
-}
-
-func (_c *Database_CreateWorkflowRequest_Call) Run(run func(req *db.WfRequest)) *Database_CreateWorkflowRequest_Call {
-	_c.Call.Run(func(args mock.Arguments) {
-		run(args[0].(*db.WfRequest))
-	})
-	return _c
-}
-
-func (_c *Database_CreateWorkflowRequest_Call) Return(err error) *Database_CreateWorkflowRequest_Call {
-	_c.Call.Return(err)
-	return _c
-}
-
-// UpdateWorkflowRequest provides a mock function with given fields: req
-func (_m *Database) UpdateWorkflowRequest(req *db.WfRequest) error {
-	ret := _m.Called(req)
-	var r0 error
-	if rf, ok := ret.Get(0).(func(*db.WfRequest) error); ok {
-		r0 = rf(req)
-	} else {
-		r0 = ret.Error(0)
-	}
-	return r0
-}
-
-type Database_UpdateWorkflowRequest_Call struct {
-	*mock.Call
-}
-
-func (_e *Database_Expecter) UpdateWorkflowRequest(req interface{}) *Database_UpdateWorkflowRequest_Call {
-	return &Database_UpdateWorkflowRequest_Call{Call: _e.mock.On("UpdateWorkflowRequest", req)}
-}
-
-func (_c *Database_UpdateWorkflowRequest_Call) Run(run func(req *db.WfRequest)) *Database_UpdateWorkflowRequest_Call {
-	_c.Call.Run(func(args mock.Arguments) {
-		run(args[0].(*db.WfRequest))
-	})
-	return _c
-}
-
-func (_c *Database_UpdateWorkflowRequest_Call) Return(err error) *Database_UpdateWorkflowRequest_Call {
-	_c.Call.Return(err)
-	return _c
-}
-
-// GetWorkflowRequestByID provides a mock function with given fields: requestID
-func (_m *Database) GetWorkflowRequestByID(requestID string) (*db.WfRequest, error) {
-	ret := _m.Called(requestID)
-	var r0 *db.WfRequest
-	var r1 error
-	if rf, ok := ret.Get(0).(func(string) (*db.WfRequest, error)); ok {
-		return rf(requestID)
-	}
-	if ret.Get(0) != nil {
-		r0 = ret.Get(0).(*db.WfRequest)
-	}
-	r1 = ret.Error(1)
-	return r0, r1
-}
-
-type Database_GetWorkflowRequestByID_Call struct {
-	*mock.Call
-}
-
-func (_e *Database_Expecter) GetWorkflowRequestByID(requestID interface{}) *Database_GetWorkflowRequestByID_Call {
-	return &Database_GetWorkflowRequestByID_Call{Call: _e.mock.On("GetWorkflowRequestByID", requestID)}
-}
-
-func (_c *Database_GetWorkflowRequestByID_Call) Run(run func(requestID string)) *Database_GetWorkflowRequestByID_Call {
-	_c.Call.Run(func(args mock.Arguments) {
-		run(args[0].(string))
-	})
-	return _c
-}
-
-func (_c *Database_GetWorkflowRequestByID_Call) Return(result *db.WfRequest, err error) *Database_GetWorkflowRequestByID_Call {
-	_c.Call.Return(result, err)
-	return _c
-}
-
-// GetWorkflowRequestsByStatus provides a mock function with given fields: status
-func (_m *Database) GetWorkflowRequestsByStatus(status db.WfRequestStatus) ([]db.WfRequest, error) {
-	ret := _m.Called(status)
-	var r0 []db.WfRequest
-	var r1 error
-	if rf, ok := ret.Get(0).(func(db.WfRequestStatus) ([]db.WfRequest, error)); ok {
-		return rf(status)
-	}
-	if ret.Get(0) != nil {
-		r0 = ret.Get(0).([]db.WfRequest)
-	}
-	r1 = ret.Error(1)
-	return r0, r1
-}
-
-type Database_GetWorkflowRequestsByStatus_Call struct {
-	*mock.Call
-}
-
-func (_e *Database_Expecter) GetWorkflowRequestsByStatus(status interface{}) *Database_GetWorkflowRequestsByStatus_Call {
-	return &Database_GetWorkflowRequestsByStatus_Call{Call: _e.mock.On("GetWorkflowRequestsByStatus", status)}
-}
-
-func (_c *Database_GetWorkflowRequestsByStatus_Call) Run(run func(status db.WfRequestStatus)) *Database_GetWorkflowRequestsByStatus_Call {
-	_c.Call.Run(func(args mock.Arguments) {
-		run(args[0].(db.WfRequestStatus))
-	})
-	return _c
-}
-
-func (_c *Database_GetWorkflowRequestsByStatus_Call) Return(result []db.WfRequest, err error) *Database_GetWorkflowRequestsByStatus_Call {
-	_c.Call.Return(result, err)
-	return _c
-}
-
-// CreateProcessingMap provides a mock function with given fields: pm
-func (_m *Database) CreateProcessingMap(pm *db.WfProcessingMap) error {
-	ret := _m.Called(pm)
-	var r0 error
-	if rf, ok := ret.Get(0).(func(*db.WfProcessingMap) error); ok {
-		r0 = rf(pm)
-	} else {
-		r0 = ret.Error(0)
-	}
-	return r0
-}
-
-type Database_CreateProcessingMap_Call struct {
-	*mock.Call
-}
-
-func (_e *Database_Expecter) CreateProcessingMap(pm interface{}) *Database_CreateProcessingMap_Call {
-	return &Database_CreateProcessingMap_Call{Call: _e.mock.On("CreateProcessingMap", pm)}
-}
-
-func (_c *Database_CreateProcessingMap_Call) Run(run func(pm *db.WfProcessingMap)) *Database_CreateProcessingMap_Call {
-	_c.Call.Run(func(args mock.Arguments) {
-		run(args[0].(*db.WfProcessingMap))
-	})
-	return _c
-}
-
-func (_c *Database_CreateProcessingMap_Call) Return(err error) *Database_CreateProcessingMap_Call {
-	_c.Call.Return(err)
-	return _c
-}
-
-// UpdateProcessingMap provides a mock function with given fields: pm
-func (_m *Database) UpdateProcessingMap(pm *db.WfProcessingMap) error {
-	ret := _m.Called(pm)
-	var r0 error
-	if rf, ok := ret.Get(0).(func(*db.WfProcessingMap) error); ok {
-		r0 = rf(pm)
-	} else {
-		r0 = ret.Error(0)
-	}
-	return r0
-}
-
-type Database_UpdateProcessingMap_Call struct {
-	*mock.Call
-}
-
-func (_e *Database_Expecter) UpdateProcessingMap(pm interface{}) *Database_UpdateProcessingMap_Call {
-	return &Database_UpdateProcessingMap_Call{Call: _e.mock.On("UpdateProcessingMap", pm)}
-}
-
-func (_c *Database_UpdateProcessingMap_Call) Run(run func(pm *db.WfProcessingMap)) *Database_UpdateProcessingMap_Call {
-	_c.Call.Run(func(args mock.Arguments) {
-		run(args[0].(*db.WfProcessingMap))
-	})
-	return _c
-}
-
-func (_c *Database_UpdateProcessingMap_Call) Return(err error) *Database_UpdateProcessingMap_Call {
-	_c.Call.Return(err)
-	return _c
-}
-
-// GetProcessingMapByKey provides a mock function with given fields: processType, processKey
-func (_m *Database) GetProcessingMapByKey(processType string, processKey string) (*db.WfProcessingMap, error) {
-	ret := _m.Called(processType, processKey)
-	var r0 *db.WfProcessingMap
-	var r1 error
-	if rf, ok := ret.Get(0).(func(string, string) (*db.WfProcessingMap, error)); ok {
-		return rf(processType, processKey)
-	}
-	if ret.Get(0) != nil {
-		r0 = ret.Get(0).(*db.WfProcessingMap)
-	}
-	r1 = ret.Error(1)
-	return r0, r1
-}
-
-type Database_GetProcessingMapByKey_Call struct {
-	*mock.Call
-}
-
-func (_e *Database_Expecter) GetProcessingMapByKey(processType interface{}, processKey interface{}) *Database_GetProcessingMapByKey_Call {
-	return &Database_GetProcessingMapByKey_Call{Call: _e.mock.On("GetProcessingMapByKey", processType, processKey)}
-}
-
-func (_c *Database_GetProcessingMapByKey_Call) Run(run func(processType string, processKey string)) *Database_GetProcessingMapByKey_Call {
-	_c.Call.Run(func(args mock.Arguments) {
-		run(args[0].(string), args[1].(string))
-	})
-	return _c
-}
-
-func (_c *Database_GetProcessingMapByKey_Call) Return(result *db.WfProcessingMap, err error) *Database_GetProcessingMapByKey_Call {
-	_c.Call.Return(result, err)
-	return _c
-}
-
-// DeleteProcessingMap provides a mock function with given fields: id
-func (_m *Database) DeleteProcessingMap(id uint) error {
-	ret := _m.Called(id)
-	var r0 error
-	if rf, ok := ret.Get(0).(func(uint) error); ok {
-		r0 = rf(id)
-	} else {
-		r0 = ret.Error(0)
-	}
-	return r0
-}
-
-type Database_DeleteProcessingMap_Call struct {
-	*mock.Call
-}
-
-func (_e *Database_Expecter) DeleteProcessingMap(id interface{}) *Database_DeleteProcessingMap_Call {
-	return &Database_DeleteProcessingMap_Call{Call: _e.mock.On("DeleteProcessingMap", id)}
-}
-
-func (_c *Database_DeleteProcessingMap_Call) Run(run func(id uint)) *Database_DeleteProcessingMap_Call {
-	_c.Call.Run(func(args mock.Arguments) {
-		run(args[0].(uint))
-	})
-	return _c
-}
-
-func (_c *Database_DeleteProcessingMap_Call) Return(err error) *Database_DeleteProcessingMap_Call {
-	_c.Call.Return(err)
-	return _c
-}
-
-// GetWorkflowRequest provides a mock function with given fields: requestID
-func (_m *Database) GetWorkflowRequest(requestID string) (*db.WfRequest, error) {
-    ret := _m.Called(requestID)
-    var r0 *db.WfRequest
-    var r1 error
-    if rf, ok := ret.Get(0).(func(string) (*db.WfRequest, error)); ok {
-        return rf(requestID)
-    }
-    if ret.Get(0) != nil {
-        r0 = ret.Get(0).(*db.WfRequest)
-    }
-    r1 = ret.Error(1)
-    return r0, r1
-}
-
-// UpdateWorkflowRequestStatus provides a mock function with given fields: requestID, status, responseData
-func (_m *Database) UpdateWorkflowRequestStatusAndResponse(requestID string, status db.WfRequestStatus, responseData db.JSONB) error {
-    ret := _m.Called(requestID, status, responseData)
-    var r0 error
-    if rf, ok := ret.Get(0).(func(string, db.WfRequestStatus, db.JSONB) error); ok {
-        r0 = rf(requestID, status, responseData)
-    } else {
-        r0 = ret.Error(0)
-    }
-    return r0
-}
-
-// GetWorkflowRequestsByWorkflowID provides a mock function with given fields: workflowID
-func (_m *Database) GetWorkflowRequestsByWorkflowID(workflowID string) ([]db.WfRequest, error) {
-    ret := _m.Called(workflowID)
-    var r0 []db.WfRequest
-    var r1 error
-    if rf, ok := ret.Get(0).(func(string) ([]db.WfRequest, error)); ok {
-        return rf(workflowID)
-    }
-    if ret.Get(0) != nil {
-        r0 = ret.Get(0).([]db.WfRequest)
-    }
-    r1 = ret.Error(1)
-    return r0, r1
-}
-
-// GetPendingWorkflowRequests provides a mock function with given fields: limit
-func (_m *Database) GetPendingWorkflowRequests(limit int) ([]db.WfRequest, error) {
-    ret := _m.Called(limit)
-    var r0 []db.WfRequest
-    var r1 error
-    if rf, ok := ret.Get(0).(func(int) ([]db.WfRequest, error)); ok {
-        return rf(limit)
-    }
-    if ret.Get(0) != nil {
-        r0 = ret.Get(0).([]db.WfRequest)
-    }
-    r1 = ret.Error(1)
-    return r0, r1
-}
-
-// DeleteWorkflowRequest provides a mock function with given fields: requestID
-func (_m *Database) DeleteWorkflowRequest(requestID string) error {
-    ret := _m.Called(requestID)
-    var r0 error
-    if rf, ok := ret.Get(0).(func(string) error); ok {
-        r0 = rf(requestID)
-    } else {
-        r0 = ret.Error(0)
-    }
-    return r0
-}
-
-// GetProcessingMapsByType provides a mock function with given fields: processType
-func (_m *Database) GetProcessingMapsByType(processType string) ([]db.WfProcessingMap, error) {
-    ret := _m.Called(processType)
-    var r0 []db.WfProcessingMap
-    var r1 error
-    if rf, ok := ret.Get(0).(func(string) ([]db.WfProcessingMap, error)); ok {
-        return rf(processType)
-    }
-    if ret.Get(0) != nil {
-        r0 = ret.Get(0).([]db.WfProcessingMap)
-    }
-    r1 = ret.Error(1)
-    return r0, r1
 }

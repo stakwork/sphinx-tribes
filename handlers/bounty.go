@@ -691,12 +691,13 @@ func (h *bountyHandler) MakeBountyPayment(w http.ResponseWriter, r *http.Request
 
 			// if the payment has a completed status
 			if v2KeysendRes.Status == db.PaymentComplete {
-				bounty.Paid = true
 				bounty.PaymentFailed = false
 				bounty.PaymentPending = false
+				bounty.Paid = true
 				bounty.PaidDate = &now
 				bounty.Completed = true
 				bounty.CompletionDate = &now
+
 				paymentHistory.Status = true
 				paymentHistory.PaymentStatus = db.PaymentComplete
 				paymentHistory.Tag = v2KeysendRes.Tag
@@ -725,6 +726,7 @@ func (h *bountyHandler) MakeBountyPayment(w http.ResponseWriter, r *http.Request
 				bounty.PaidDate = &now
 				bounty.Completed = true
 				bounty.CompletionDate = &now
+
 				paymentHistory.Status = true
 				paymentHistory.PaymentStatus = db.PaymentPending
 				paymentHistory.Tag = v2KeysendRes.Tag
@@ -1002,7 +1004,7 @@ func (h *bountyHandler) UpdateBountyPaymentStatus(w http.ResponseWriter, r *http
 			bounty.Completed = true
 			bounty.CompletionDate = &now
 
-			h.db.UpdateBounty(bounty)
+			h.db.UpdateBountyPaymentStatuses(bounty)
 
 			w.WriteHeader(http.StatusOK)
 			json.NewEncoder(w).Encode(msg)

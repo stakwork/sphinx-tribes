@@ -51,6 +51,7 @@ type Database interface {
 	GetBountyByCreated(created uint) (NewBounty, error)
 	GetBounty(id uint) NewBounty
 	UpdateBounty(b NewBounty) (NewBounty, error)
+	UpdateBountyPaymentStatuses(bounty NewBounty) (NewBounty, error)
 	UpdateBountyPayment(b NewBounty) (NewBounty, error)
 	GetListedOffers(r *http.Request) ([]PeopleExtra, error)
 	UpdateBot(uuid string, u map[string]interface{}) bool
