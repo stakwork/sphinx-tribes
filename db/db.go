@@ -419,8 +419,13 @@ func (db database) GetPeopleBySearch(r *http.Request) []Person {
 
 	// if search is empty, returns all
 
-	// return if like owner_alias, unique_name, or equals pubkey
-	db.db.Offset(offset).Limit(limit).Order(sortBy+" "+direction+" NULLS LAST").Where("(unlisted = 'f' OR unlisted is null) AND (deleted = 'f' OR deleted is null)").Where("LOWER(owner_alias) LIKE ?", "%"+search+"%").Or("LOWER(unique_name) LIKE ?", "%"+search+"%").Or("LOWER(owner_pub_key) = ?", search).Find(&ms)
+	// return if like owner_alias, unique_name, or equals pubkey AND owner_pub_key contains "_" (V2 pubkey)
+	db.db.Offset(offset).Limit(limit).Order(sortBy+" "+direction+" NULLS LAST").
+		Where("(unlisted = 'f' OR unlisted is null) AND (deleted = 'f' OR deleted is null)").
+		Where("owner_route_hint LIKE ? AND owner_route_hint NOT LIKE ?", "%_%", "%:%").
+		Where("(LOWER(owner_alias) LIKE ? OR LOWER(unique_name) LIKE ? OR LOWER(owner_pub_key) = ?)",
+			"%"+search+"%", "%"+search+"%", search).
+		Find(&ms)
 	return ms
 }
 
