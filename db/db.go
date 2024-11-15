@@ -1348,7 +1348,7 @@ func (db database) UpdateBountyPaymentStatuses(bounty NewBounty) (NewBounty, err
 		"completion_date": bounty.CompletionDate,
 	}
 
-	db.db.Where("created", bounty.Created).Updates(bountyUpdates)
+	db.db.Model(&NewBounty{}).Where("created", bounty.Created).Updates(bountyUpdates)
 	return bounty, nil
 }
 
