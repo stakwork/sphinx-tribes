@@ -82,7 +82,7 @@ func (db database) GetWorkflowRequest(requestID string) (*WfRequest, error) {
 	return &req, result.Error
 }
 
-func (db database) UpdateWorkflowRequestStatusAndResponse(requestID string, status WfRequestStatus, responseData JSONB) error {
+func (db database) UpdateWorkflowRequestStatusAndResponse(requestID string, status WfRequestStatus, responseData PropertyMap) error {
 	if requestID == "" {
 		return errors.New("request ID cannot be empty")
 	}
@@ -190,6 +190,17 @@ func (db database) GetProcessingMapByKey(processType, processKey string) (*WfPro
 	}
 
 	return &pm, result.Error
+}
+
+func (db database) DeleteProcessingMapByKey(processType, processKey string) error {
+	if processType == "" || processKey == "" {
+		return errors.New("process type and key cannot be empty")
+	}
+
+	result := db.db.Where("type = ? AND process_key = ?", processType, processKey).
+		Delete(&WfProcessingMap{})
+
+	return result.Error
 }
 
 func (db database) GetProcessingMapsByType(processType string) ([]WfProcessingMap, error) {

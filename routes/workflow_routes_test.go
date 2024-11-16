@@ -13,10 +13,34 @@ func TestWorkflowRoutes(t *testing.T) {
 	r := chi.NewRouter()
 	r.Mount("/workflows", WorkflowRoutes())
 
-	req := httptest.NewRequest("POST", "/workflows/request", nil)
-	w := httptest.NewRecorder()
+	testCases := []struct {
+		name           string
+		method         string
+		path           string
+		expectedStatus int
+	}{
+		{
+			name:           "workflow request endpoint",
+			method:         "POST",
+			path:           "/workflows/request",
+			expectedStatus: http.StatusOK,
+		},
+		{
+			name:           "workflow response endpoint",
+			method:         "POST",
+			path:           "/workflows/response",
+			expectedStatus: http.StatusOK,
+		},
+	}
 
-	r.ServeHTTP(w, req)
+	for _, tc := range testCases {
+		t.Run(tc.name, func(t *testing.T) {
+			req := httptest.NewRequest(tc.method, tc.path, nil)
+			w := httptest.NewRecorder()
 
-	assert.NotEqual(t, http.StatusNotFound, w.Code)
+			r.ServeHTTP(w, req)
+
+			assert.NotEqual(t, http.StatusNotFound, w.Code, "Route should exist")
+		})
+	}
 }
