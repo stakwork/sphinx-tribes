@@ -26,7 +26,8 @@ func PersonRoutes() chi.Router {
 	r.Group(func(r chi.Router) {
 		r.Use(auth.PubKeyContext)
 
-		r.Post("/", peopleHandler.CreateOrEditPerson)
+		r.Post("/", peopleHandler.CreatePerson)
+		r.Put("/", peopleHandler.UpdatePerson)
 		r.Delete("/{id}", peopleHandler.DeletePerson)
 	})
 	return r

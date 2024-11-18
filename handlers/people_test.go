@@ -9,6 +9,7 @@ import (
 	"net/http/httptest"
 	"strconv"
 	"testing"
+	"time"
 
 	"github.com/go-chi/chi"
 	"github.com/google/uuid"
@@ -55,14 +56,25 @@ func TestGetPersonByPuKey(t *testing.T) {
 	})
 }
 
-func TestCreateOrEditPerson(t *testing.T) {
+func TestCreatePerson(t *testing.T) {
 	teardownSuite := SetupSuite(t)
 	defer teardownSuite(t)
 	pHandler := NewPeopleHandler(db.TestDB)
 
+	person := db.Person{
+		OwnerAlias:   "person",
+		OwnerPubKey:  uuid.New().String(),
+		PriceToMeet:  0,
+		Description:  "this is test user 1",
+		Tags:         pq.StringArray{},
+		Extras:       db.PropertyMap{},
+		GithubIssues: db.PropertyMap{},
+		Img:          "img-url",
+	}
+
 	t.Run("should return error if body is not a valid json", func(t *testing.T) {
 		rr := httptest.NewRecorder()
-		handler := http.HandlerFunc(pHandler.CreateOrEditPerson)
+		handler := http.HandlerFunc(pHandler.CreatePerson)
 
 		invalidJson := []byte(`{"key": "value"`)
 		ctx := context.WithValue(context.Background(), auth.ContextKey, "test-key")
@@ -78,7 +90,7 @@ func TestCreateOrEditPerson(t *testing.T) {
 
 	t.Run("should return error if auth pub key not present", func(t *testing.T) {
 		rr := httptest.NewRecorder()
-		handler := http.HandlerFunc(pHandler.CreateOrEditPerson)
+		handler := http.HandlerFunc(pHandler.CreatePerson)
 
 		bodyJson := []byte(`{"key": "value"}`)
 		ctx := context.WithValue(context.Background(), auth.ContextKey, "test-key")
@@ -94,7 +106,7 @@ func TestCreateOrEditPerson(t *testing.T) {
 
 	t.Run("should return error if pub key from auth is different than person", func(t *testing.T) {
 		rr := httptest.NewRecorder()
-		handler := http.HandlerFunc(pHandler.CreateOrEditPerson)
+		handler := http.HandlerFunc(pHandler.CreatePerson)
 
 		bodyJson := []byte(`{"owner_pubkey": "other-key"}`)
 		ctx := context.WithValue(context.Background(), auth.ContextKey, "test-key")
@@ -108,44 +120,9 @@ func TestCreateOrEditPerson(t *testing.T) {
 		assert.Equal(t, http.StatusUnauthorized, rr.Code, "invalid status received")
 	})
 
-	t.Run("should return error if trying to update non-existing user", func(t *testing.T) {
-		rr := httptest.NewRecorder()
-		handler := http.HandlerFunc(pHandler.CreateOrEditPerson)
-
-		bodyJson := []byte(`{"owner_pubkey": "fake-key"}`)
-		ctx := context.WithValue(context.Background(), auth.ContextKey, "test-key")
-		req, err := http.NewRequestWithContext(ctx, http.MethodPost, "/", bytes.NewReader(bodyJson))
-		if err != nil {
-			t.Fatal(err)
-		}
-
-		handler.ServeHTTP(rr, req)
-
-		assert.Equal(t, http.StatusUnauthorized, rr.Code, "invalid status received")
-	})
-
 	t.Run("should create user with unique name from owner_alias", func(t *testing.T) {
 		rr := httptest.NewRecorder()
-		handler := http.HandlerFunc(pHandler.CreateOrEditPerson)
-
-		person := db.Person{
-			Uuid:         uuid.New().String(),
-			OwnerAlias:   "person",
-			UniqueName:   "person",
-			OwnerPubKey:  uuid.New().String(),
-			PriceToMeet:  0,
-			Description:  "this is test user 1",
-			Tags:         pq.StringArray{},
-			Extras:       db.PropertyMap{},
-			GithubIssues: db.PropertyMap{},
-			Img:          "img-url",
-		}
-
-		db.TestDB.CreateOrEditPerson(person)
-
-		fetchedUpdatedPerson := db.TestDB.GetPersonByUuid(person.Uuid)
-
-		person.ID = fetchedUpdatedPerson.ID
+		handler := http.HandlerFunc(pHandler.CreatePerson)
 
 		requestBody, _ := json.Marshal(person)
 
@@ -156,23 +133,91 @@ func TestCreateOrEditPerson(t *testing.T) {
 			t.Fatal(err)
 		}
 
+		handler.ServeHTTP(rr, req)
+
+		fetchedUpdatedPerson := db.TestDB.GetPersonByPubkey(person.OwnerPubKey)
+
+		person.ID = fetchedUpdatedPerson.ID
+
 		person.Created = fetchedUpdatedPerson.Created
 		person.Updated = fetchedUpdatedPerson.Updated
-
-		handler.ServeHTTP(rr, req)
+		person.UniqueName = fetchedUpdatedPerson.UniqueName
+		person.Uuid = fetchedUpdatedPerson.Uuid
 
 		assert.Equal(t, http.StatusOK, rr.Code, "invalid status received")
 
 		assert.EqualValues(t, person, fetchedUpdatedPerson)
 	})
 
+	t.Run("Should return a 200 status code when existing user hits the endpoint", func(t *testing.T) {
+		rr := httptest.NewRecorder()
+		handler := http.HandlerFunc(pHandler.CreatePerson)
+
+		requestBody, _ := json.Marshal(person)
+
+		ctx := context.WithValue(context.Background(), auth.ContextKey, person.OwnerPubKey)
+
+		req, err := http.NewRequestWithContext(ctx, http.MethodPost, "/", bytes.NewReader(requestBody))
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		handler.ServeHTTP(rr, req)
+
+		fetchedUpdatedPerson := db.TestDB.GetPersonByPubkey(person.OwnerPubKey)
+
+		assert.Equal(t, http.StatusOK, rr.Code, "invalid status received")
+
+		assert.Equal(t, person.Description, fetchedUpdatedPerson.Description)
+		assert.Equal(t, person.OwnerAlias, fetchedUpdatedPerson.OwnerAlias)
+		assert.Equal(t, person.PriceToMeet, fetchedUpdatedPerson.PriceToMeet)
+	})
+}
+
+func TestUpdatePerson(t *testing.T) {
+	teardownSuite := SetupSuite(t)
+	defer teardownSuite(t)
+	pHandler := NewPeopleHandler(db.TestDB)
+
+	t.Run("should return error if trying to update non-existing user", func(t *testing.T) {
+		rr := httptest.NewRecorder()
+		handler := http.HandlerFunc(pHandler.UpdatePerson)
+
+		bodyJson := []byte(`{"owner_pubkey": "test-key"}`)
+		ctx := context.WithValue(context.Background(), auth.ContextKey, "test-key")
+		req, err := http.NewRequestWithContext(ctx, http.MethodPut, "/", bytes.NewReader(bodyJson))
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		handler.ServeHTTP(rr, req)
+
+		assert.Equal(t, http.StatusNotFound, rr.Code, "invalid status received")
+	})
+
+	t.Run("should return error if trying to update with user keys not matching", func(t *testing.T) {
+		rr := httptest.NewRecorder()
+		handler := http.HandlerFunc(pHandler.UpdatePerson)
+
+		bodyJson := []byte(`{"owner_pubkey": "fake-key"}`)
+		ctx := context.WithValue(context.Background(), auth.ContextKey, "test-key")
+		req, err := http.NewRequestWithContext(ctx, http.MethodPut, "/", bytes.NewReader(bodyJson))
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		handler.ServeHTTP(rr, req)
+
+		assert.Equal(t, http.StatusUnauthorized, rr.Code, "invalid status received")
+	})
+
 	t.Run("should return error if trying to update other user", func(t *testing.T) {
 		rr := httptest.NewRecorder()
-		handler := http.HandlerFunc(pHandler.CreateOrEditPerson)
+		handler := http.HandlerFunc(pHandler.UpdatePerson)
 
 		bodyJson := []byte(`{"owner_pubkey": "fake-key", "owner_alias": "test-user"}`)
 		ctx := context.WithValue(context.Background(), auth.ContextKey, "test-key")
-		req, err := http.NewRequestWithContext(ctx, http.MethodPost, "/", bytes.NewReader(bodyJson))
+		req, err := http.NewRequestWithContext(ctx, http.MethodPut, "/", bytes.NewReader(bodyJson))
 		if err != nil {
 			t.Fatal(err)
 		}
@@ -184,17 +229,26 @@ func TestCreateOrEditPerson(t *testing.T) {
 
 	t.Run("should update user successfully", func(t *testing.T) {
 		rr := httptest.NewRecorder()
-		handler := http.HandlerFunc(pHandler.CreateOrEditPerson)
+		handler := http.HandlerFunc(pHandler.UpdatePerson)
+
+		now := time.Now()
 
 		// First, create a person
 		person := db.Person{
-			Uuid:        uuid.New().String(),
-			OwnerAlias:  "person",
-			UniqueName:  "person",
-			OwnerPubKey: uuid.New().String(),
-			Description: "this is a test user",
-			Img:         "img-url",
+			Uuid:         uuid.New().String(),
+			OwnerAlias:   "person-update",
+			UniqueName:   "person-update",
+			OwnerPubKey:  uuid.New().String(),
+			Description:  "this is a update test user",
+			Img:          "img-url",
+			Tags:         pq.StringArray{},
+			Extras:       db.PropertyMap{},
+			GithubIssues: db.PropertyMap{},
+			PriceToMeet:  40,
+			Created:      &now,
+			Updated:      &now,
 		}
+
 		createdPerson, err := db.TestDB.CreateOrEditPerson(person)
 		if err != nil {
 			t.Fatal(err)
@@ -204,37 +258,39 @@ func TestCreateOrEditPerson(t *testing.T) {
 		updatePerson := db.Person{
 			ID:           createdPerson.ID,
 			Uuid:         createdPerson.Uuid,
-			OwnerAlias:   "person",
-			UniqueName:   "person",
+			OwnerAlias:   "person-update-after",
+			UniqueName:   "person-update-affer",
 			OwnerPubKey:  createdPerson.OwnerPubKey,
-			Description:  "this is updated test user",
+			Description:  "this is after updated test user",
 			Tags:         pq.StringArray{},
 			Extras:       db.PropertyMap{},
 			GithubIssues: db.PropertyMap{},
 			Img:          "img-url",
 			PriceToMeet:  100,
 		}
-		requestBody, _ := json.Marshal(updatePerson)
 
-		db.TestDB.CreateOrEditPerson(updatePerson)
+		requestBody, _ := json.Marshal(updatePerson)
 
 		ctx := context.WithValue(context.Background(), auth.ContextKey, updatePerson.OwnerPubKey)
 
-		req, err := http.NewRequestWithContext(ctx, http.MethodPost, "/", bytes.NewReader(requestBody))
+		req, err := http.NewRequestWithContext(ctx, http.MethodPut, "/", bytes.NewReader(requestBody))
 		if err != nil {
 			t.Fatal(err)
 		}
 
-		fetchedUpdatedPerson := db.TestDB.GetPersonByUuid(updatePerson.Uuid)
-
-		updatePerson.ID = fetchedUpdatedPerson.ID
-		updatePerson.Created = fetchedUpdatedPerson.Created
-		updatePerson.Updated = fetchedUpdatedPerson.Updated
-
 		handler.ServeHTTP(rr, req)
 
+		fetchedUpdatedPerson := db.TestDB.GetPersonByUuid(updatePerson.Uuid)
+
 		assert.Equal(t, http.StatusOK, rr.Code, "invalid status received")
-		assert.EqualValues(t, updatePerson, fetchedUpdatedPerson)
+
+		assert.NotEqual(t, fetchedUpdatedPerson.OwnerAlias, person.OwnerAlias)
+		assert.NotEqual(t, fetchedUpdatedPerson.UniqueName, person.UniqueName)
+		assert.NotEqual(t, fetchedUpdatedPerson.Description, person.Description)
+
+		assert.Equal(t, fetchedUpdatedPerson.OwnerAlias, updatePerson.OwnerAlias)
+		assert.Equal(t, fetchedUpdatedPerson.UniqueName, updatePerson.UniqueName)
+		assert.Equal(t, fetchedUpdatedPerson.Description, updatePerson.Description)
 	})
 }
 
@@ -247,6 +303,7 @@ func TestGetPersonById(t *testing.T) {
 	t.Run("successful retrieval", func(t *testing.T) {
 		rr := httptest.NewRecorder()
 		handler := http.HandlerFunc(pHandler.GetPersonById)
+
 		person := db.Person{
 			ID:           300,
 			Uuid:         "perosn_1_uuid",
