@@ -26,6 +26,14 @@ type PostData struct {
 	FeatureUUID  string   `json:"featureUUID"`
 }
 
+type FeatureBriefRequest struct {
+	Output struct {
+		FeatureBrief string `json:"featureBrief"`
+		AudioLink    string `json:"audioLink"`
+		FeatureUUID  string `json:"featureUUID"`
+	} `json:"output"`
+}
+
 type featureHandler struct {
 	db                    db.Database
 	generateBountyHandler func(bounties []db.NewBounty) []db.BountyResponse
@@ -162,6 +170,71 @@ func (oh *featureHandler) GetFeatureByUuid(w http.ResponseWriter, r *http.Reques
 
 	w.WriteHeader(http.StatusOK)
 	json.NewEncoder(w).Encode(workspaceFeature)
+}
+
+func (oh *featureHandler) UpdateFeatureBrief(w http.ResponseWriter, r *http.Request) {
+	ctx := r.Context()
+	pubKeyFromAuth, _ := ctx.Value(auth.ContextKey).(string)
+	if pubKeyFromAuth == "" {
+		fmt.Println("no pubkey from auth")
+		w.WriteHeader(http.StatusUnauthorized)
+		return
+	}
+
+	var req FeatureBriefRequest
+	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
+		w.WriteHeader(http.StatusBadRequest)
+		fmt.Fprintf(w, "Invalid request payload")
+		return
+	}
+
+	featureUUID := req.Output.FeatureUUID
+	newFeatureBrief := req.Output.FeatureBrief
+
+	if featureUUID == "" || newFeatureBrief == "" {
+		w.WriteHeader(http.StatusBadRequest)
+		fmt.Fprintf(w, "Missing required fields")
+		return
+	}
+
+	prevFeatureBrief := oh.db.GetFeatureByUuid(featureUUID)
+
+	if prevFeatureBrief.Uuid == "" {
+		w.WriteHeader(http.StatusNotFound)
+		fmt.Fprintf(w, "Feature not found")
+		return
+	}
+
+	var updatedFeatureBrief string
+	if prevFeatureBrief.Brief == "" {
+		updatedFeatureBrief = newFeatureBrief
+	} else {
+
+		updatedFeatureBrief = prevFeatureBrief.Brief + "\n\n* Generated Feature Brief *\n\n" + newFeatureBrief
+	}
+
+	featureToUpdate := db.WorkspaceFeatures{
+		Uuid:                   featureUUID,
+		WorkspaceUuid:          prevFeatureBrief.WorkspaceUuid,
+		Name:                   prevFeatureBrief.Name,
+		Brief:                  updatedFeatureBrief,
+		Requirements:           prevFeatureBrief.Requirements,
+		Architecture:           prevFeatureBrief.Architecture,
+		Url:                    prevFeatureBrief.Url,
+		Priority:               prevFeatureBrief.Priority,
+		BountiesCountCompleted: prevFeatureBrief.BountiesCountCompleted,
+		BountiesCountAssigned:  prevFeatureBrief.BountiesCountAssigned,
+		BountiesCountOpen:      prevFeatureBrief.BountiesCountOpen,
+	}
+
+	p, err := oh.db.CreateOrEditFeature(featureToUpdate)
+	if err != nil {
+		w.WriteHeader(http.StatusBadRequest)
+		return
+	}
+
+	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode(p)
 }
 
 func (oh *featureHandler) CreateOrEditFeaturePhase(w http.ResponseWriter, r *http.Request) {
