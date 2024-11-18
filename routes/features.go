@@ -2,7 +2,6 @@ package routes
 
 import (
 	"github.com/go-chi/chi"
-	"github.com/stakwork/sphinx-tribes/auth"
 	"github.com/stakwork/sphinx-tribes/db"
 	"github.com/stakwork/sphinx-tribes/handlers"
 )
@@ -17,9 +16,10 @@ func FeatureRoutes() chi.Router {
 	})
 
 	r.Group(func(r chi.Router) {
-		r.Use(auth.PubKeyContext)
+		//r.Use(auth.PubKeyContext)
 
 		r.Post("/", featureHandlers.CreateOrEditFeatures)
+		r.Post("/brief", featureHandlers.UpdateFeatureBrief)
 		r.Get("/{uuid}", featureHandlers.GetFeatureByUuid)
 		// Old route for to getting features for workspace uuid
 		r.Get("/forworkspace/{workspace_uuid}", featureHandlers.GetFeaturesByWorkspaceUuid)
