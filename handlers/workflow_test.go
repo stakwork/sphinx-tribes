@@ -17,15 +17,11 @@ func TestHandleWorkflowRequest(t *testing.T) {
 	wh := NewWorkFlowHandler(db.TestDB)
 
 	t.Run("successful workflow request", func(t *testing.T) {
-		requestData := db.PropertyMap{
-			"test_key": "test_value",
-		}
 
 		request := &db.WfRequest{
-			Source:      "test_source_1",
-			Action:      "test_action_1",
-			WorkflowID:  "test_workflow",
-			RequestData: requestData,
+			Source:     "test_source_1",
+			Action:     "test_action_1",
+			WorkflowID: "test_workflow",
 		}
 
 		body, _ := json.Marshal(request)
