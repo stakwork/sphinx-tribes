@@ -173,13 +173,6 @@ func (oh *featureHandler) GetFeatureByUuid(w http.ResponseWriter, r *http.Reques
 }
 
 func (oh *featureHandler) UpdateFeatureBrief(w http.ResponseWriter, r *http.Request) {
-	ctx := r.Context()
-	pubKeyFromAuth, _ := ctx.Value(auth.ContextKey).(string)
-	if pubKeyFromAuth == "" {
-		fmt.Println("No pubkey from auth")
-		w.WriteHeader(http.StatusUnauthorized)
-		return
-	}
 
 	var req FeatureBriefRequest
 	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
