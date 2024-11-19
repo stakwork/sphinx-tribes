@@ -26,7 +26,7 @@ func TestHandleWorkflowRequest(t *testing.T) {
 		}
 		body, _ := json.Marshal(request)
 
-		req := httptest.NewRequest(http.MethodPost, "/workflow/request", bytes.NewBuffer(body))
+		req := httptest.NewRequest(http.MethodPost, "/workflows/request", bytes.NewBuffer(body))
 		req.Header.Set("Content-Type", "application/json")
 		w := httptest.NewRecorder()
 
@@ -41,7 +41,7 @@ func TestHandleWorkflowRequest(t *testing.T) {
 	})
 
 	t.Run("invalid JSON format", func(t *testing.T) {
-		req := httptest.NewRequest(http.MethodPost, "/workflow/request", bytes.NewBuffer([]byte("invalid-json")))
+		req := httptest.NewRequest(http.MethodPost, "/workflows/request", bytes.NewBuffer([]byte("invalid-json")))
 		req.Header.Set("Content-Type", "application/json")
 		w := httptest.NewRecorder()
 
@@ -57,7 +57,7 @@ func TestHandleWorkflowRequest(t *testing.T) {
 		}
 		body, _ := json.Marshal(request)
 
-		req := httptest.NewRequest(http.MethodPost, "/workflow/request", bytes.NewBuffer(body))
+		req := httptest.NewRequest(http.MethodPost, "/workflows/request", bytes.NewBuffer(body))
 		req.Header.Set("Content-Type", "application/json")
 		w := httptest.NewRecorder()
 
