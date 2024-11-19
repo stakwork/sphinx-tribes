@@ -19,11 +19,18 @@ func TestHandleWorkflowRequest(t *testing.T) {
 	wh := NewWorkFlowHandler(db.TestDB)
 
 	t.Run("successful workflow request", func(t *testing.T) {
-		request := db.WfRequest{
-			WorkflowID: uuid.New().String(),
-			Source:     "test_source",
-			RequestID:  uuid.New().String(),
+		requestData := db.PropertyMap{
+			"test_key": "test_value",
 		}
+
+		request := db.WfRequest{
+			Source:      "test_source",
+			Action:      "test_action",
+			WorkflowID:  "workflow_id",
+			ProjectID:   uuid.New().String(),
+			RequestData: requestData,
+		}
+
 		body, _ := json.Marshal(request)
 
 		req := httptest.NewRequest(http.MethodPost, "/workflows/request", bytes.NewBuffer(body))
