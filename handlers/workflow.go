@@ -42,8 +42,8 @@ func (wh *workflowHandler) HandleWorkflowRequest(w http.ResponseWriter, r *http.
 		return
 	}
 
-	request.Status = db.StatusNew
 	request.RequestID = processedRequestID
+	request.Status = db.StatusNew
 
 	if err := wh.db.CreateWorkflowRequest(&request); err != nil {
 		http.Error(w, "Failed to create workflow request", http.StatusInternalServerError)
