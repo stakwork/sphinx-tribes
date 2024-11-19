@@ -3,13 +3,11 @@ package handlers
 import (
 	"bytes"
 	"encoding/json"
+	"github.com/stakwork/sphinx-tribes/db"
+	"github.com/stretchr/testify/assert"
 	"net/http"
 	"net/http/httptest"
 	"testing"
-
-	"github.com/google/uuid"
-	"github.com/stakwork/sphinx-tribes/db"
-	"github.com/stretchr/testify/assert"
 )
 
 func TestHandleWorkflowRequest(t *testing.T) {
@@ -23,11 +21,10 @@ func TestHandleWorkflowRequest(t *testing.T) {
 			"test_key": "test_value",
 		}
 
-		request := db.WfRequest{
-			Source:      "test_source",
-			Action:      "test_action",
-			WorkflowID:  "workflow_id",
-			ProjectID:   uuid.New().String(),
+		request := &db.WfRequest{
+			Source:      "test_source_1",
+			Action:      "test_action_1",
+			WorkflowID:  "test_workflow",
 			RequestData: requestData,
 		}
 
@@ -40,6 +37,7 @@ func TestHandleWorkflowRequest(t *testing.T) {
 		wh.HandleWorkflowRequest(w, req)
 
 		assert.Equal(t, http.StatusCreated, w.Code)
+
 		var respBody map[string]string
 		err := json.NewDecoder(w.Body).Decode(&respBody)
 		assert.NoError(t, err)
