@@ -176,7 +176,7 @@ func (oh *featureHandler) UpdateFeatureBrief(w http.ResponseWriter, r *http.Requ
 	ctx := r.Context()
 	pubKeyFromAuth, _ := ctx.Value(auth.ContextKey).(string)
 	if pubKeyFromAuth == "" {
-		fmt.Println("no pubkey from auth")
+		fmt.Println("No pubkey from auth")
 		w.WriteHeader(http.StatusUnauthorized)
 		return
 	}
