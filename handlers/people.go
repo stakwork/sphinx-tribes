@@ -29,7 +29,7 @@ func NewPeopleHandler(db db.Database) *peopleHandler {
 	return &peopleHandler{db: db}
 }
 
-func (ph *peopleHandler) CreateOrEditPerson(w http.ResponseWriter, r *http.Request) {
+func (ph *peopleHandler) CreatePerson(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 	pubKeyFromAuth, _ := ctx.Value(auth.ContextKey).(string)
 	keys := r.URL.Query()
@@ -47,7 +47,7 @@ func (ph *peopleHandler) CreateOrEditPerson(w http.ResponseWriter, r *http.Reque
 	r.Body.Close()
 	err = json.Unmarshal(body, &person)
 	if err != nil {
-		fmt.Println(err)
+		log.Println(err)
 		w.WriteHeader(http.StatusNotAcceptable)
 		return
 	}
@@ -55,20 +55,21 @@ func (ph *peopleHandler) CreateOrEditPerson(w http.ResponseWriter, r *http.Reque
 	now := time.Now()
 
 	if pubKeyFromAuth == "" {
-		fmt.Println("no pubkey from auth")
+		log.Println("no pubkey from auth")
 		w.WriteHeader(http.StatusUnauthorized)
 		return
 	}
 	if pubKeyFromAuth != person.OwnerPubKey {
-		fmt.Println(pubKeyFromAuth)
-		fmt.Println(person.OwnerPubKey)
-		fmt.Println("mismatched pubkey")
+		log.Println(pubKeyFromAuth)
+		log.Println(person.OwnerPubKey)
+		log.Println("mismatched pubkey")
 		w.WriteHeader(http.StatusUnauthorized)
 		return
 	}
 
 	existing := ph.db.GetPersonByPubkey(pubKeyFromAuth)
 	if existing.ID == 0 {
+
 		person.UniqueName, _ = ph.db.PersonUniqueNameFromName(person.OwnerAlias)
 		person.Created = &now
 		person.Uuid = xid.New().String()
@@ -82,6 +83,79 @@ func (ph *peopleHandler) CreateOrEditPerson(w http.ResponseWriter, r *http.Reque
 			}
 		}
 	} else {
+		w.WriteHeader(http.StatusOK)
+		json.NewEncoder(w).Encode(existing)
+		return
+	}
+
+	person.OwnerPubKey = pubKeyFromAuth
+
+	if person.NewTicketTime != 0 {
+		go ph.db.ProcessAlerts(person)
+	}
+
+	b := new(bytes.Buffer)
+	decodeErr := json.NewEncoder(b).Encode(person.Extras)
+
+	if decodeErr != nil {
+		log.Printf("Could not encode extras json data")
+	}
+
+	p, err := ph.db.CreateOrEditPerson(person)
+	if err != nil {
+		w.WriteHeader(http.StatusBadRequest)
+		return
+	}
+
+	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode(p)
+}
+
+func (ph *peopleHandler) UpdatePerson(w http.ResponseWriter, r *http.Request) {
+	ctx := r.Context()
+	pubKeyFromAuth, _ := ctx.Value(auth.ContextKey).(string)
+
+	person := db.Person{}
+	body, err := io.ReadAll(r.Body)
+
+	if err != nil {
+		w.WriteHeader(http.StatusBadRequest)
+		json.NewEncoder(w).Encode("Sent wrong body data")
+		return
+	}
+
+	r.Body.Close()
+	err = json.Unmarshal(body, &person)
+	if err != nil {
+		log.Println(err)
+		w.WriteHeader(http.StatusNotAcceptable)
+		return
+	}
+
+	now := time.Now()
+
+	if pubKeyFromAuth == "" {
+		log.Println("no pubkey from auth")
+		w.WriteHeader(http.StatusUnauthorized)
+		return
+	}
+
+	if pubKeyFromAuth != person.OwnerPubKey {
+		log.Println(pubKeyFromAuth)
+		log.Println(person.OwnerPubKey)
+		log.Println("mismatched pubkey")
+		w.WriteHeader(http.StatusUnauthorized)
+		return
+	}
+
+	existing := ph.db.GetPersonByPubkey(pubKeyFromAuth)
+	if existing.ID == 0 {
+		msg := fmt.Sprintf("User does not exists: %s", pubKeyFromAuth)
+		log.Println(msg)
+		w.WriteHeader(http.StatusNotFound)
+		json.NewEncoder(w).Encode(msg)
+		return
+	} else {
 		if person.OwnerPubKey != existing.OwnerPubKey && person.OwnerAlias != existing.OwnerAlias {
 			// can't edit someone else's
 			fmt.Println("cant edit someone else")
@@ -90,7 +164,6 @@ func (ph *peopleHandler) CreateOrEditPerson(w http.ResponseWriter, r *http.Reque
 		}
 	}
 
-	person.OwnerPubKey = pubKeyFromAuth
 	person.Updated = &now
 
 	if person.NewTicketTime != 0 {
