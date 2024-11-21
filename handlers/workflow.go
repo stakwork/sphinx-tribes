@@ -55,11 +55,8 @@ func (wh *workflowHandler) HandleWorkflowResponse(w http.ResponseWriter, r *http
 	}
 
 	var response struct {
-		RequestID    string             `json:"request_id"`
-		Status       db.WfRequestStatus `json:"status"`
-		ResponseData db.PropertyMap     `json:"response_data"`
-		Action       string             `json:"action,omitempty"`
-		WorkflowID   string             `json:"workflow_id,omitempty"`
+		RequestID    string         `json:"request_id"`
+		ResponseData db.PropertyMap `json:"response_data"`
 	}
 
 	if err := json.Unmarshal(body, &response); err != nil {
@@ -69,14 +66,6 @@ func (wh *workflowHandler) HandleWorkflowResponse(w http.ResponseWriter, r *http
 
 	if response.RequestID == "" {
 		http.Error(w, "Request ID is required", http.StatusBadRequest)
-		return
-	}
-
-	switch response.Status {
-	case db.StatusNew, db.StatusPending, db.StatusCompleted, db.StatusFailed:
-
-	default:
-		http.Error(w, "Invalid status value", http.StatusBadRequest)
 		return
 	}
 
@@ -96,8 +85,7 @@ func (wh *workflowHandler) HandleWorkflowResponse(w http.ResponseWriter, r *http
 		return
 	}
 
-	status := response.Status
-
+	status := db.StatusCompleted
 	if processingMap != nil && processingMap.RequiresProcessing {
 		status = db.StatusPending
 	}
