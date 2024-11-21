@@ -1,10 +1,12 @@
 package handlers
 
 import (
-	"fmt"
-	"github.com/stakwork/sphinx-tribes/db"
+	"encoding/json"
 	"io"
 	"net/http"
+
+	"github.com/google/uuid"
+	"github.com/stakwork/sphinx-tribes/db"
 )
 
 type workflowHandler struct {
@@ -17,14 +19,91 @@ func NewWorkFlowHandler(database db.Database) *workflowHandler {
 	}
 }
 
-func (oh *workflowHandler) HandleWorkflowRequest(w http.ResponseWriter, r *http.Request) {
-
+func (wh *workflowHandler) HandleWorkflowRequest(w http.ResponseWriter, r *http.Request) {
 	body, err := io.ReadAll(r.Body)
 	if err != nil {
-		fmt.Println("Error reading body:", err)
-		w.WriteHeader(http.StatusBadRequest)
+		http.Error(w, "Error reading request body", http.StatusBadRequest)
 		return
 	}
-	fmt.Println("Request Body:", string(body))
 
+	var request db.WfRequest
+	if err := json.Unmarshal(body, &request); err != nil {
+		http.Error(w, "Invalid request format", http.StatusBadRequest)
+		return
+	}
+
+	if request.RequestID == "" {
+		request.RequestID = uuid.New().String()
+	}
+
+	request.Status = db.StatusNew
+
+	if err := wh.db.CreateWorkflowRequest(&request); err != nil {
+		http.Error(w, "Failed to create workflow request", http.StatusInternalServerError)
+		return
+	}
+
+	w.WriteHeader(http.StatusCreated)
+	json.NewEncoder(w).Encode(request)
+}
+
+func (wh *workflowHandler) HandleWorkflowResponse(w http.ResponseWriter, r *http.Request) {
+	body, err := io.ReadAll(r.Body)
+	if err != nil {
+		http.Error(w, "Error reading response body", http.StatusBadRequest)
+		return
+	}
+
+	var response struct {
+		RequestID    string         `json:"request_id"`
+		ResponseData db.PropertyMap `json:"response_data"`
+	}
+
+	if err := json.Unmarshal(body, &response); err != nil {
+		http.Error(w, "Invalid response format", http.StatusBadRequest)
+		return
+	}
+
+	if response.RequestID == "" {
+		http.Error(w, "Request ID is required", http.StatusBadRequest)
+		return
+	}
+
+	request, err := wh.db.GetWorkflowRequest(response.RequestID)
+	if err != nil {
+		http.Error(w, "Failed to retrieve original request", http.StatusInternalServerError)
+		return
+	}
+	if request == nil {
+		http.Error(w, "Original request not found", http.StatusNotFound)
+		return
+	}
+
+	processingMap, err := wh.db.GetProcessingMapByKey(request.Source, request.Action)
+	if err != nil {
+		http.Error(w, "Failed to check processing requirements", http.StatusInternalServerError)
+		return
+	}
+
+	status := db.StatusCompleted
+	if processingMap != nil && processingMap.RequiresProcessing {
+		status = db.StatusPending
+	}
+
+	err = wh.db.UpdateWorkflowRequestStatusAndResponse(
+		response.RequestID,
+		status,
+		response.ResponseData,
+	)
+	if err != nil {
+		http.Error(w, "Failed to update workflow request", http.StatusInternalServerError)
+		return
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode(map[string]string{
+		"status":     "success",
+		"request_id": response.RequestID,
+	})
 }

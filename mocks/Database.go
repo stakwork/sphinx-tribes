@@ -8897,7 +8897,7 @@ func (_c *Database_UpdateWorkflowRequest_Call) RunAndReturn(run func(*db.WfReque
 }
 
 // UpdateWorkflowRequestStatusAndResponse provides a mock function with given fields: requestID, status, responseData
-func (_m *Database) UpdateWorkflowRequestStatusAndResponse(requestID string, status db.WfRequestStatus, responseData db.JSONB) error {
+func (_m *Database) UpdateWorkflowRequestStatusAndResponse(requestID string, status db.WfRequestStatus, responseData db.PropertyMap) error {
 	ret := _m.Called(requestID, status, responseData)
 
 	if len(ret) == 0 {
@@ -8905,7 +8905,7 @@ func (_m *Database) UpdateWorkflowRequestStatusAndResponse(requestID string, sta
 	}
 
 	var r0 error
-	if rf, ok := ret.Get(0).(func(string, db.WfRequestStatus, db.JSONB) error); ok {
+	if rf, ok := ret.Get(0).(func(string, db.WfRequestStatus, db.PropertyMap) error); ok {
 		r0 = rf(requestID, status, responseData)
 	} else {
 		r0 = ret.Error(0)
@@ -8988,6 +8988,45 @@ func (_c *Database_UpdateWorkspaceBudget_Call) Return(_a0 db.NewBountyBudget) *D
 func (_c *Database_UpdateWorkspaceBudget_Call) RunAndReturn(run func(db.NewBountyBudget) db.NewBountyBudget) *Database_UpdateWorkspaceBudget_Call {
 	_c.Call.Return(run)
 	return _c
+}
+
+// DeleteProcessingMapByKey provides a mock function with given fields: processType, processKey
+func (_m *Database) DeleteProcessingMapByKey(processType string, processKey string) error {
+    ret := _m.Called(processType, processKey)
+
+    var r0 error
+    if rf, ok := ret.Get(0).(func(string, string) error); ok {
+        r0 = rf(processType, processKey)
+    } else {
+        r0 = ret.Error(0)
+    }
+
+    return r0
+}
+
+type Database_DeleteProcessingMapByKey_Call struct {
+    *mock.Call
+}
+
+func (_e *Database_Expecter) DeleteProcessingMapByKey(processType interface{}, processKey interface{}) *Database_DeleteProcessingMapByKey_Call {
+    return &Database_DeleteProcessingMapByKey_Call{Call: _e.mock.On("DeleteProcessingMapByKey", processType, processKey)}
+}
+
+func (_c *Database_DeleteProcessingMapByKey_Call) Run(run func(processType string, processKey string)) *Database_DeleteProcessingMapByKey_Call {
+    _c.Call.Run(func(args mock.Arguments) {
+        run(args[0].(string), args[1].(string))
+    })
+    return _c
+}
+
+func (_c *Database_DeleteProcessingMapByKey_Call) Return(_a0 error) *Database_DeleteProcessingMapByKey_Call {
+    _c.Call.Return(_a0)
+    return _c
+}
+
+func (_c *Database_DeleteProcessingMapByKey_Call) RunAndReturn(run func(string, string) error) *Database_DeleteProcessingMapByKey_Call {
+    _c.Call.Return(run)
+    return _c
 }
 
 // UpdateWorkspaceForDeletion provides a mock function with given fields: uuid

@@ -920,14 +920,14 @@ const (
 )
 
 type WfProcessingMap struct {
-	ID                 uint      `gorm:"primaryKey;autoIncrement" json:"id"`
-	Type               string    `gorm:"index;not null" json:"type"`
-	ProcessKey         string    `gorm:"index;not null" json:"process_key"`
-	RequiresProcessing bool      `gorm:"default:false" json:"requires_processing"`
-	HandlerFunc        string    `json:"handler_func,omitempty"`
-	Config             JSONB     `gorm:"type:jsonb" json:"config,omitempty"`
-	CreatedAt          time.Time `json:"created_at"`
-	UpdatedAt          time.Time `json:"updated_at"`
+	ID                 uint        `gorm:"primaryKey;autoIncrement" json:"id"`
+	Type               string      `gorm:"index;not null" json:"type"`
+	ProcessKey         string      `gorm:"index;not null" json:"process_key"`
+	RequiresProcessing bool        `gorm:"default:false" json:"requires_processing"`
+	HandlerFunc        string      `json:"handler_func,omitempty"`
+	Config             PropertyMap `gorm:"type:jsonb" json:"config,omitempty"`
+	CreatedAt          time.Time   `json:"created_at"`
+	UpdatedAt          time.Time   `json:"updated_at"`
 }
 
 type WfRequest struct {
@@ -938,8 +938,8 @@ type WfRequest struct {
 	Action       string          `gorm:"index" json:"action"`
 	Status       WfRequestStatus `json:"status"`
 	ProjectID    string          `json:"project_id,omitempty"`
-	RequestData  JSONB           `gorm:"type:jsonb" json:"request_data"`
-	ResponseData JSONB           `gorm:"type:jsonb" json:"response_data,omitempty"`
+	RequestData  PropertyMap     `gorm:"type:jsonb" json:"request_data"`
+	ResponseData PropertyMap     `gorm:"type:jsonb" json:"response_data,omitempty"`
 	CreatedAt    time.Time       `json:"created_at"`
 	UpdatedAt    time.Time       `json:"updated_at"`
 }

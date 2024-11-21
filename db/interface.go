@@ -183,7 +183,7 @@ type Database interface {
 	GetWorkflowRequestByID(requestID string) (*WfRequest, error)
 	GetWorkflowRequestsByStatus(status WfRequestStatus) ([]WfRequest, error)
 	GetWorkflowRequest(requestID string) (*WfRequest, error)
-	UpdateWorkflowRequestStatusAndResponse(requestID string, status WfRequestStatus, responseData JSONB) error
+	UpdateWorkflowRequestStatusAndResponse(requestID string, status WfRequestStatus, responseData PropertyMap) error
 	GetWorkflowRequestsByWorkflowID(workflowID string) ([]WfRequest, error)
 	GetPendingWorkflowRequests(limit int) ([]WfRequest, error)
 	DeleteWorkflowRequest(requestID string) error
@@ -191,6 +191,7 @@ type Database interface {
 	UpdateProcessingMap(pm *WfProcessingMap) error
 	GetProcessingMapByKey(processType, processKey string) (*WfProcessingMap, error)
 	GetProcessingMapsByType(processType string) ([]WfProcessingMap, error)
+	DeleteProcessingMapByKey(processType, processKey string) error
 	DeleteProcessingMap(id uint) error
 	ProcessReversePayments(paymentId uint) error
 }
