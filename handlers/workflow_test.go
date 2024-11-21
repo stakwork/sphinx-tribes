@@ -205,8 +205,7 @@ func TestHandleWorkflowResponse(t *testing.T) {
 		assert.Equal(t, http.StatusOK, w.Code)
 	})
 
-	t.Run("should handle invalid status value", func(t *testing.T) {
-
+	t.Run("should maintain NEW status when processing map exists", func(t *testing.T) {
 		requestData := db.PropertyMap{
 			"test_key": "test_value",
 		}
@@ -222,13 +221,20 @@ func TestHandleWorkflowResponse(t *testing.T) {
 		err := db.TestDB.CreateWorkflowRequest(workflowRequest)
 		assert.NoError(t, err)
 
+		processingMap := &db.WfProcessingMap{
+			Type:               workflowRequest.Source,
+			ProcessKey:         workflowRequest.Action,
+			RequiresProcessing: true,
+			HandlerFunc:        "test_handler",
+		}
+		err = db.TestDB.CreateProcessingMap(processingMap)
+		assert.NoError(t, err)
+
 		response := struct {
 			RequestID    string         `json:"request_id"`
-			Status       string         `json:"status"`
 			ResponseData db.PropertyMap `json:"response_data"`
 		}{
 			RequestID:    workflowRequest.RequestID,
-			Status:       "INVALID_STATUS",
 			ResponseData: db.PropertyMap{"result": "success"},
 		}
 		payload, _ := json.Marshal(response)
@@ -238,11 +244,12 @@ func TestHandleWorkflowResponse(t *testing.T) {
 
 		wh.HandleWorkflowResponse(w, req)
 
-		assert.Equal(t, http.StatusBadRequest, w.Code)
+		assert.Equal(t, http.StatusOK, w.Code)
 
-		// Verify the request status hasn't changed
+		// Verify the request status is set to PENDING due to processing map
 		updatedReq, err := db.TestDB.GetWorkflowRequest(workflowRequest.RequestID)
 		assert.NoError(t, err)
-		assert.Equal(t, db.StatusNew, updatedReq.Status)
+		assert.Equal(t, db.StatusPending, updatedReq.Status)
+		assert.Equal(t, response.ResponseData, updatedReq.ResponseData)
 	})
 }
