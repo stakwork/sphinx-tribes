@@ -7,6 +7,7 @@ import (
 	"errors"
 	"time"
 
+	"github.com/google/uuid"
 	"github.com/gorilla/websocket"
 	"github.com/lib/pq"
 	"gorm.io/gorm"
@@ -942,6 +943,28 @@ type WfRequest struct {
 	ResponseData PropertyMap     `gorm:"type:jsonb" json:"response_data,omitempty"`
 	CreatedAt    time.Time       `json:"created_at"`
 	UpdatedAt    time.Time       `json:"updated_at"`
+}
+
+type TicketStatus string
+
+const (
+	DraftTicket     TicketStatus = "draft"
+	CompletedTicket TicketStatus = "completed"
+)
+
+type Tickets struct {
+	UUID         uuid.UUID         `gorm:"primaryKey;type:uuid;default:uuid_generate_v4()"`
+	FeatureUUID  string            `gorm:"type:uuid;not null;index:composite_index" json:"feature_uuid" validate:"required"`
+	Features     WorkspaceFeatures `gorm:"foreignKey:FeatureUUID;references:Uuid"`
+	PhaseUUID    string            `gorm:"type:uuid;not null;index:phase_index" json:"phase_uuid" validate:"required"`
+	FeaturePhase FeaturePhase      `gorm:"foreignKey:PhaseUUID;references:Uuid"`
+	Name         string            `gorm:"type:varchar(255);not null"`
+	Sequence     int               `gorm:"type:integer;not null;index:composite_index"`
+	Dependency   []int             `gorm:"type:integer[]"`
+	Description  string            `gorm:"type:text"`
+	Status       TicketStatus      `gorm:"type:varchar(50);not null;default:'draft'"`
+	CreatedAt    time.Time         `gorm:"type:timestamp;not null;default:current_timestamp" json:"created_at"`
+	UpdatedAt    time.Time         `gorm:"type:timestamp;not null;default:current_timestamp" json:"updated_at"`
 }
 
 func (Person) TableName() string {
