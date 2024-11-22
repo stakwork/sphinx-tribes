@@ -2,11 +2,12 @@ package handlers
 
 import (
 	"encoding/json"
+
+	"github.com/stakwork/sphinx-tribes/db"
+	"github.com/stakwork/sphinx-tribes/utils"
+
 	"io"
 	"net/http"
-
-	"github.com/google/uuid"
-	"github.com/stakwork/sphinx-tribes/db"
 )
 
 type workflowHandler struct {
@@ -20,6 +21,7 @@ func NewWorkFlowHandler(database db.Database) *workflowHandler {
 }
 
 func (wh *workflowHandler) HandleWorkflowRequest(w http.ResponseWriter, r *http.Request) {
+
 	body, err := io.ReadAll(r.Body)
 	if err != nil {
 		http.Error(w, "Error reading request body", http.StatusBadRequest)
@@ -32,10 +34,18 @@ func (wh *workflowHandler) HandleWorkflowRequest(w http.ResponseWriter, r *http.
 		return
 	}
 
-	if request.RequestID == "" {
-		request.RequestID = uuid.New().String()
+	if request.WorkflowID == "" || request.Source == "" {
+		http.Error(w, "Missing required fields: workflow_id or source", http.StatusBadRequest)
+		return
 	}
 
+	processedRequestID, err := utils.ProcessWorkflowRequest(request.RequestID, request.Source)
+	if err != nil {
+		http.Error(w, "Failed to process workflow request", http.StatusInternalServerError)
+		return
+	}
+
+	request.RequestID = processedRequestID
 	request.Status = db.StatusNew
 
 	if err := wh.db.CreateWorkflowRequest(&request); err != nil {
@@ -44,7 +54,10 @@ func (wh *workflowHandler) HandleWorkflowRequest(w http.ResponseWriter, r *http.
 	}
 
 	w.WriteHeader(http.StatusCreated)
-	json.NewEncoder(w).Encode(request)
+	json.NewEncoder(w).Encode(map[string]string{
+		"request_id": processedRequestID,
+		"status":     "success",
+	})
 }
 
 func (wh *workflowHandler) HandleWorkflowResponse(w http.ResponseWriter, r *http.Request) {
