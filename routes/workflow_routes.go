@@ -12,6 +12,7 @@ func WorkflowRoutes() chi.Router {
 
 	r.Group(func(r chi.Router) {
 		r.Post("/request", workflowHandlers.HandleWorkflowRequest)
+		r.Post("/response", workflowHandlers.HandleWorkflowResponse)
 
 	})
 	return r
