@@ -26,6 +26,20 @@ type PostData struct {
 	FeatureUUID  string   `json:"featureUUID"`
 }
 
+type FeatureBriefRequest struct {
+	Output struct {
+		FeatureBrief string `json:"featureBrief"`
+		AudioLink    string `json:"audioLink"`
+		FeatureUUID  string `json:"featureUUID"`
+	} `json:"output"`
+}
+type AudioBriefPostData struct {
+	AudioLink   string   `json:"audioLink"`
+	FeatureUUID string   `json:"featureUUID"`
+	Source      string   `json:"source"`
+	Examples    []string `json:"examples"`
+}
+
 type featureHandler struct {
 	db                    db.Database
 	generateBountyHandler func(bounties []db.NewBounty) []db.BountyResponse
@@ -162,6 +176,64 @@ func (oh *featureHandler) GetFeatureByUuid(w http.ResponseWriter, r *http.Reques
 
 	w.WriteHeader(http.StatusOK)
 	json.NewEncoder(w).Encode(workspaceFeature)
+}
+
+func (oh *featureHandler) UpdateFeatureBrief(w http.ResponseWriter, r *http.Request) {
+
+	var req FeatureBriefRequest
+	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
+		w.WriteHeader(http.StatusBadRequest)
+		fmt.Fprintf(w, "Invalid request payload")
+		return
+	}
+
+	featureUUID := req.Output.FeatureUUID
+	newFeatureBrief := req.Output.FeatureBrief
+
+	if featureUUID == "" || newFeatureBrief == "" {
+		w.WriteHeader(http.StatusBadRequest)
+		fmt.Fprintf(w, "Missing required fields")
+		return
+	}
+
+	prevFeatureBrief := oh.db.GetFeatureByUuid(featureUUID)
+
+	if prevFeatureBrief.Uuid == "" {
+		w.WriteHeader(http.StatusNotFound)
+		fmt.Fprintf(w, "Feature not found")
+		return
+	}
+
+	var updatedFeatureBrief string
+	if prevFeatureBrief.Brief == "" {
+		updatedFeatureBrief = newFeatureBrief
+	} else {
+
+		updatedFeatureBrief = prevFeatureBrief.Brief + "\n\n* Generated Feature Brief *\n\n" + newFeatureBrief
+	}
+
+	featureToUpdate := db.WorkspaceFeatures{
+		Uuid:                   featureUUID,
+		WorkspaceUuid:          prevFeatureBrief.WorkspaceUuid,
+		Name:                   prevFeatureBrief.Name,
+		Brief:                  updatedFeatureBrief,
+		Requirements:           prevFeatureBrief.Requirements,
+		Architecture:           prevFeatureBrief.Architecture,
+		Url:                    prevFeatureBrief.Url,
+		Priority:               prevFeatureBrief.Priority,
+		BountiesCountCompleted: prevFeatureBrief.BountiesCountCompleted,
+		BountiesCountAssigned:  prevFeatureBrief.BountiesCountAssigned,
+		BountiesCountOpen:      prevFeatureBrief.BountiesCountOpen,
+	}
+
+	p, err := oh.db.CreateOrEditFeature(featureToUpdate)
+	if err != nil {
+		w.WriteHeader(http.StatusBadRequest)
+		return
+	}
+
+	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode(p)
 }
 
 func (oh *featureHandler) CreateOrEditFeaturePhase(w http.ResponseWriter, r *http.Request) {
@@ -513,6 +585,94 @@ func (oh *featureHandler) StoriesSend(w http.ResponseWriter, r *http.Request) {
 	}
 
 	req, err := http.NewRequest("POST", "https://api.stakwork.com/api/v1/projects", bytes.NewBuffer(stakworkPayloadJSON))
+	if err != nil {
+		http.Error(w, "Failed to create request to Stakwork API", http.StatusInternalServerError)
+		return
+	}
+	req.Header.Set("Authorization", "Token token="+apiKey)
+	req.Header.Set("Content-Type", "application/json")
+
+	client := &http.Client{}
+	resp, err := client.Do(req)
+	if err != nil {
+		http.Error(w, "Failed to send request to Stakwork API", http.StatusInternalServerError)
+		return
+	}
+	defer resp.Body.Close()
+
+	respBody, err := io.ReadAll(resp.Body)
+	if err != nil {
+		http.Error(w, "Failed to read response from Stakwork API", http.StatusInternalServerError)
+		return
+	}
+
+	w.WriteHeader(resp.StatusCode)
+	w.Write(respBody)
+}
+
+func (oh *featureHandler) BriefSend(w http.ResponseWriter, r *http.Request) {
+	ctx := r.Context()
+	pubKeyFromAuth, _ := ctx.Value(auth.ContextKey).(string)
+	if pubKeyFromAuth == "" {
+		fmt.Println("no pubkey from auth")
+		w.WriteHeader(http.StatusUnauthorized)
+		return
+	}
+
+	body, err := io.ReadAll(r.Body)
+	r.Body.Close()
+	if err != nil {
+		http.Error(w, "Failed to read requests body", http.StatusBadRequest)
+		return
+	}
+
+	var postData AudioBriefPostData
+	err = json.Unmarshal(body, &postData)
+	if err != nil {
+		fmt.Println("[BriefSend] JSON Unmarshal error:", err)
+		http.Error(w, "Invalid JSON format", http.StatusNotAcceptable)
+		return
+	}
+
+	host := os.Getenv("HOST")
+	if host == "" {
+		http.Error(w, "HOST environment variable not set", http.StatusInternalServerError)
+		return
+	}
+
+	completePostData := struct {
+		AudioBriefPostData
+		WebhookURL string `json:"webhook_url"`
+	}{
+		AudioBriefPostData: postData,
+		WebhookURL:         fmt.Sprintf("%s/feature/brief", host),
+	}
+
+	apiKey := os.Getenv("SWWFKEY")
+	if apiKey == "" {
+		http.Error(w, "API key not set in environment", http.StatusInternalServerError)
+		return
+	}
+
+	stakworkPayload := map[string]interface{}{
+		"name":        "string",
+		"workflow_id": 36928,
+		"workflow_params": map[string]interface{}{
+			"set_var": map[string]interface{}{
+				"attributes": map[string]interface{}{
+					"vars": completePostData,
+				},
+			},
+		},
+	}
+
+	stakworkPayloadJSON, err := json.Marshal(stakworkPayload)
+	if err != nil {
+		http.Error(w, "Failed to encode payload", http.StatusInternalServerError)
+		return
+	}
+
+	req, err := http.NewRequest(http.MethodPost, "https://api.stakwork.com/api/v1/projects", bytes.NewBuffer(stakworkPayloadJSON))
 	if err != nil {
 		http.Error(w, "Failed to create request to Stakwork API", http.StatusInternalServerError)
 		return

@@ -20,7 +20,9 @@ func FeatureRoutes() chi.Router {
 		r.Use(auth.PubKeyContext)
 
 		r.Post("/", featureHandlers.CreateOrEditFeatures)
+		r.Post("/brief", featureHandlers.UpdateFeatureBrief)
 		r.Get("/{uuid}", featureHandlers.GetFeatureByUuid)
+		r.Post("/brief/send", featureHandlers.BriefSend)
 		// Old route for to getting features for workspace uuid
 		r.Get("/forworkspace/{workspace_uuid}", featureHandlers.GetFeaturesByWorkspaceUuid)
 		r.Get("/workspace/count/{uuid}", featureHandlers.GetWorkspaceFeaturesCount)
