@@ -577,7 +577,7 @@ type WorkspaceRepositories struct {
 
 type WorkspaceFeatures struct {
 	ID                     uint       `json:"id"`
-	Uuid                   string     `gorm:"not null" json:"uuid"`
+	Uuid                   string     `gorm:"unique;not null" json:"uuid"`
 	WorkspaceUuid          string     `gorm:"not null" json:"workspace_uuid"`
 	Name                   string     `gorm:"not null" json:"name"`
 	Brief                  string     `json:"brief"`
@@ -953,7 +953,7 @@ const (
 )
 
 type Tickets struct {
-	UUID         uuid.UUID         `gorm:"primaryKey;type:uuid;default:uuid_generate_v4()"`
+	UUID         uuid.UUID         `gorm:"primaryKey;type:uuid;default:gen_random_uuid()"`
 	FeatureUUID  string            `gorm:"type:uuid;not null;index:composite_index" json:"feature_uuid" validate:"required"`
 	Features     WorkspaceFeatures `gorm:"foreignKey:FeatureUUID;references:Uuid"`
 	PhaseUUID    string            `gorm:"type:uuid;not null;index:phase_index" json:"phase_uuid" validate:"required"`
