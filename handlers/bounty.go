@@ -1021,6 +1021,21 @@ func (h *bountyHandler) UpdateBountyPaymentStatus(w http.ResponseWriter, r *http
 			w.WriteHeader(http.StatusOK)
 			json.NewEncoder(w).Encode(msg)
 			return
+		} else if tagResult.Status == db.PaymentPending {
+			if payment.PaymentStatus == db.PaymentPending {
+				created := utils.ConvertTimeToTimestamp(payment.Created.String())
+
+				now := time.Now()
+				daysDiff := utils.GetDateDaysDifference(int64(created), &now)
+
+				if daysDiff >= 7 {
+
+					err = h.db.ProcessReversePayments(payment.ID)
+					if err != nil {
+						log.Printf("Could not reverse bounty payment after 7 days : Bounty ID - %d, Payment ID - %d, Error - %s", bounty.ID, payment.ID, err)
+					}
+				}
+			}
 		}
 	}
 

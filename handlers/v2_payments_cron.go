@@ -10,6 +10,7 @@ import (
 
 	"github.com/stakwork/sphinx-tribes/config"
 	"github.com/stakwork/sphinx-tribes/db"
+	"github.com/stakwork/sphinx-tribes/utils"
 )
 
 func InitV2PaymentsCron() {
@@ -18,12 +19,13 @@ func InitV2PaymentsCron() {
 		tag := payment.Tag
 		tagResult := GetInvoiceStatusByTag(tag)
 
-		if tagResult.Status == db.PaymentComplete {
-			db.DB.SetPaymentAsComplete(tag)
+		bounty := db.DB.GetBounty(payment.BountyId)
 
-			bounty := db.DB.GetBounty(payment.BountyId)
+		if bounty.ID > 0 {
 
-			if bounty.ID > 0 {
+			if tagResult.Status == db.PaymentComplete {
+				db.DB.SetPaymentAsComplete(tag)
+
 				now := time.Now()
 
 				bounty.PaymentPending = false
@@ -35,17 +37,32 @@ func InitV2PaymentsCron() {
 				bounty.CompletionDate = &now
 
 				db.DB.UpdateBountyPaymentStatuses(bounty)
-			}
-		} else if tagResult.Status == db.PaymentFailed {
-			// Handle failed payments
-			bounty := db.DB.GetBounty(payment.BountyId)
 
-			if bounty.ID > 0 {
+			} else if tagResult.Status == db.PaymentFailed {
+				// Handle failed payments
+
 				err := db.DB.ProcessReversePayments(payment.ID)
 				if err != nil {
 					log.Printf("Could not reverse bounty payment : Bounty ID - %d, Payment ID - %d, Error - %s", bounty.ID, payment.ID, err)
 				}
+
+			} else if tagResult.Status == db.PaymentPending {
+				if payment.PaymentStatus == db.PaymentPending {
+					created := utils.ConvertTimeToTimestamp(payment.Created.String())
+
+					now := time.Now()
+					daysDiff := utils.GetDateDaysDifference(int64(created), &now)
+
+					if daysDiff >= 7 {
+
+						err := db.DB.ProcessReversePayments(payment.ID)
+						if err != nil {
+							log.Printf("Could not reverse bounty payment after 7 days : Bounty ID - %d, Payment ID - %d, Error - %s", bounty.ID, payment.ID, err)
+						}
+					}
+				}
 			}
+
 		}
 	}
 }
