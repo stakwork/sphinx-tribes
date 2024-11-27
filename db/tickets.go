@@ -46,7 +46,7 @@ func (db database) GetTicket(uuid string) (Tickets, error) {
 	}
 
 	if results.RowsAffected == 0 {
-		return Tickets{}, fmt.Errorf("failed to get ticket: %w", results.Error)
+		return Tickets{}, fmt.Errorf("ticket not found")
 	}
 
 	return ticket, nil
