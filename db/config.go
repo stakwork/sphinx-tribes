@@ -83,6 +83,7 @@ func InitDB() {
 	db.AutoMigrate(&FeatureStory{})
 	db.AutoMigrate(&WfRequest{})
 	db.AutoMigrate(&WfProcessingMap{})
+	db.AutoMigrate(&Tickets{})
 
 	DB.MigrateTablesWithOrgUuid()
 	DB.MigrateOrganizationToWorkspace()
