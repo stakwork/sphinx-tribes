@@ -2,6 +2,7 @@ package db
 
 import (
 	"errors"
+	"fmt"
 	"time"
 )
 
@@ -30,4 +31,20 @@ func (db database) CreateOrEditTicket(ticket *Tickets) (Tickets, error) {
 	}
 
 	return *ticket, nil
+}
+
+func (db database) GetTicket(uuid string) (Tickets, error) {
+	ticket := Tickets{}
+
+	results := db.db.Model(&Tickets{}).Where("uuid = ?", uuid).Find(&ticket)
+
+	if results.Error != nil {
+		return Tickets{}, fmt.Errorf("failed to get ticket: %w", results.Error)
+	}
+
+	if results.RowsAffected == 0 {
+		return Tickets{}, fmt.Errorf("failed to get ticket: %w", results.Error)
+	}
+
+	return ticket, nil
 }
