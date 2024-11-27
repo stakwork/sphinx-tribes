@@ -38,6 +38,7 @@ func NewRouter() *http.Server {
 	r.Mount("/metrics", MetricsRoutes())
 	r.Mount("/features", FeatureRoutes())
 	r.Mount("/workflows", WorkflowRoutes())
+	r.Mount("/bounty/ticket", TicketRoutes())
 
 	r.Group(func(r chi.Router) {
 		r.Get("/tribe_by_feed", tribeHandlers.GetFirstTribeByFeed)
