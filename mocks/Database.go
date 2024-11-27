@@ -1154,6 +1154,62 @@ func (_c *Database_CreateOrEditPerson_Call) RunAndReturn(run func(db.Person) (db
 	return _c
 }
 
+// CreateOrEditTicket provides a mock function with given fields: ticket
+func (_m *Database) CreateOrEditTicket(ticket *db.Tickets) (db.Tickets, error) {
+	ret := _m.Called(ticket)
+
+	if len(ret) == 0 {
+		panic("no return value specified for CreateOrEditTicket")
+	}
+
+	var r0 db.Tickets
+	var r1 error
+	if rf, ok := ret.Get(0).(func(*db.Tickets) (db.Tickets, error)); ok {
+		return rf(ticket)
+	}
+	if rf, ok := ret.Get(0).(func(*db.Tickets) db.Tickets); ok {
+		r0 = rf(ticket)
+	} else {
+		r0 = ret.Get(0).(db.Tickets)
+	}
+
+	if rf, ok := ret.Get(1).(func(*db.Tickets) error); ok {
+		r1 = rf(ticket)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
+// Database_CreateOrEditTicket_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'CreateOrEditTicket'
+type Database_CreateOrEditTicket_Call struct {
+	*mock.Call
+}
+
+// CreateOrEditTicket is a helper method to define mock.On call
+//   - ticket *db.Tickets
+func (_e *Database_Expecter) CreateOrEditTicket(ticket interface{}) *Database_CreateOrEditTicket_Call {
+	return &Database_CreateOrEditTicket_Call{Call: _e.mock.On("CreateOrEditTicket", ticket)}
+}
+
+func (_c *Database_CreateOrEditTicket_Call) Run(run func(ticket *db.Tickets)) *Database_CreateOrEditTicket_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(*db.Tickets))
+	})
+	return _c
+}
+
+func (_c *Database_CreateOrEditTicket_Call) Return(_a0 db.Tickets, _a1 error) *Database_CreateOrEditTicket_Call {
+	_c.Call.Return(_a0, _a1)
+	return _c
+}
+
+func (_c *Database_CreateOrEditTicket_Call) RunAndReturn(run func(*db.Tickets) (db.Tickets, error)) *Database_CreateOrEditTicket_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
 // CreateOrEditTribe provides a mock function with given fields: m
 func (_m *Database) CreateOrEditTribe(m db.Tribe) (db.Tribe, error) {
 	ret := _m.Called(m)
@@ -1887,6 +1943,99 @@ func (_c *Database_DeleteProcessingMap_Call) Return(_a0 error) *Database_DeleteP
 }
 
 func (_c *Database_DeleteProcessingMap_Call) RunAndReturn(run func(uint) error) *Database_DeleteProcessingMap_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
+// DeleteProcessingMapByKey provides a mock function with given fields: processType, processKey
+func (_m *Database) DeleteProcessingMapByKey(processType string, processKey string) error {
+	ret := _m.Called(processType, processKey)
+
+	if len(ret) == 0 {
+		panic("no return value specified for DeleteProcessingMapByKey")
+	}
+
+	var r0 error
+	if rf, ok := ret.Get(0).(func(string, string) error); ok {
+		r0 = rf(processType, processKey)
+	} else {
+		r0 = ret.Error(0)
+	}
+
+	return r0
+}
+
+// Database_DeleteProcessingMapByKey_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'DeleteProcessingMapByKey'
+type Database_DeleteProcessingMapByKey_Call struct {
+	*mock.Call
+}
+
+// DeleteProcessingMapByKey is a helper method to define mock.On call
+//   - processType string
+//   - processKey string
+func (_e *Database_Expecter) DeleteProcessingMapByKey(processType interface{}, processKey interface{}) *Database_DeleteProcessingMapByKey_Call {
+	return &Database_DeleteProcessingMapByKey_Call{Call: _e.mock.On("DeleteProcessingMapByKey", processType, processKey)}
+}
+
+func (_c *Database_DeleteProcessingMapByKey_Call) Run(run func(processType string, processKey string)) *Database_DeleteProcessingMapByKey_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(string), args[1].(string))
+	})
+	return _c
+}
+
+func (_c *Database_DeleteProcessingMapByKey_Call) Return(_a0 error) *Database_DeleteProcessingMapByKey_Call {
+	_c.Call.Return(_a0)
+	return _c
+}
+
+func (_c *Database_DeleteProcessingMapByKey_Call) RunAndReturn(run func(string, string) error) *Database_DeleteProcessingMapByKey_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
+// DeleteTicket provides a mock function with given fields: uuid
+func (_m *Database) DeleteTicket(uuid string) error {
+	ret := _m.Called(uuid)
+
+	if len(ret) == 0 {
+		panic("no return value specified for DeleteTicket")
+	}
+
+	var r0 error
+	if rf, ok := ret.Get(0).(func(string) error); ok {
+		r0 = rf(uuid)
+	} else {
+		r0 = ret.Error(0)
+	}
+
+	return r0
+}
+
+// Database_DeleteTicket_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'DeleteTicket'
+type Database_DeleteTicket_Call struct {
+	*mock.Call
+}
+
+// DeleteTicket is a helper method to define mock.On call
+//   - uuid string
+func (_e *Database_Expecter) DeleteTicket(uuid interface{}) *Database_DeleteTicket_Call {
+	return &Database_DeleteTicket_Call{Call: _e.mock.On("DeleteTicket", uuid)}
+}
+
+func (_c *Database_DeleteTicket_Call) Run(run func(uuid string)) *Database_DeleteTicket_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(string))
+	})
+	return _c
+}
+
+func (_c *Database_DeleteTicket_Call) Return(_a0 error) *Database_DeleteTicket_Call {
+	_c.Call.Return(_a0)
+	return _c
+}
+
+func (_c *Database_DeleteTicket_Call) RunAndReturn(run func(string) error) *Database_DeleteTicket_Call {
 	_c.Call.Return(run)
 	return _c
 }
@@ -5384,6 +5533,62 @@ func (_c *Database_GetSumOfWithdrawal_Call) RunAndReturn(run func(string) uint) 
 	return _c
 }
 
+// GetTicket provides a mock function with given fields: uuid
+func (_m *Database) GetTicket(uuid string) (db.Tickets, error) {
+	ret := _m.Called(uuid)
+
+	if len(ret) == 0 {
+		panic("no return value specified for GetTicket")
+	}
+
+	var r0 db.Tickets
+	var r1 error
+	if rf, ok := ret.Get(0).(func(string) (db.Tickets, error)); ok {
+		return rf(uuid)
+	}
+	if rf, ok := ret.Get(0).(func(string) db.Tickets); ok {
+		r0 = rf(uuid)
+	} else {
+		r0 = ret.Get(0).(db.Tickets)
+	}
+
+	if rf, ok := ret.Get(1).(func(string) error); ok {
+		r1 = rf(uuid)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
+// Database_GetTicket_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'GetTicket'
+type Database_GetTicket_Call struct {
+	*mock.Call
+}
+
+// GetTicket is a helper method to define mock.On call
+//   - uuid string
+func (_e *Database_Expecter) GetTicket(uuid interface{}) *Database_GetTicket_Call {
+	return &Database_GetTicket_Call{Call: _e.mock.On("GetTicket", uuid)}
+}
+
+func (_c *Database_GetTicket_Call) Run(run func(uuid string)) *Database_GetTicket_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(string))
+	})
+	return _c
+}
+
+func (_c *Database_GetTicket_Call) Return(_a0 db.Tickets, _a1 error) *Database_GetTicket_Call {
+	_c.Call.Return(_a0, _a1)
+	return _c
+}
+
+func (_c *Database_GetTicket_Call) RunAndReturn(run func(string) (db.Tickets, error)) *Database_GetTicket_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
 // GetTribe provides a mock function with given fields: uuid
 func (_m *Database) GetTribe(uuid string) db.Tribe {
 	ret := _m.Called(uuid)
@@ -8735,6 +8940,62 @@ func (_c *Database_UpdateProcessingMap_Call) RunAndReturn(run func(*db.WfProcess
 	return _c
 }
 
+// UpdateTicket provides a mock function with given fields: ticket
+func (_m *Database) UpdateTicket(ticket db.Tickets) (db.Tickets, error) {
+	ret := _m.Called(ticket)
+
+	if len(ret) == 0 {
+		panic("no return value specified for UpdateTicket")
+	}
+
+	var r0 db.Tickets
+	var r1 error
+	if rf, ok := ret.Get(0).(func(db.Tickets) (db.Tickets, error)); ok {
+		return rf(ticket)
+	}
+	if rf, ok := ret.Get(0).(func(db.Tickets) db.Tickets); ok {
+		r0 = rf(ticket)
+	} else {
+		r0 = ret.Get(0).(db.Tickets)
+	}
+
+	if rf, ok := ret.Get(1).(func(db.Tickets) error); ok {
+		r1 = rf(ticket)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
+// Database_UpdateTicket_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'UpdateTicket'
+type Database_UpdateTicket_Call struct {
+	*mock.Call
+}
+
+// UpdateTicket is a helper method to define mock.On call
+//   - ticket db.Tickets
+func (_e *Database_Expecter) UpdateTicket(ticket interface{}) *Database_UpdateTicket_Call {
+	return &Database_UpdateTicket_Call{Call: _e.mock.On("UpdateTicket", ticket)}
+}
+
+func (_c *Database_UpdateTicket_Call) Run(run func(ticket db.Tickets)) *Database_UpdateTicket_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(db.Tickets))
+	})
+	return _c
+}
+
+func (_c *Database_UpdateTicket_Call) Return(_a0 db.Tickets, _a1 error) *Database_UpdateTicket_Call {
+	_c.Call.Return(_a0, _a1)
+	return _c
+}
+
+func (_c *Database_UpdateTicket_Call) RunAndReturn(run func(db.Tickets) (db.Tickets, error)) *Database_UpdateTicket_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
 // UpdateTribe provides a mock function with given fields: uuid, u
 func (_m *Database) UpdateTribe(uuid string, u map[string]interface{}) bool {
 	ret := _m.Called(uuid, u)
@@ -8922,14 +9183,14 @@ type Database_UpdateWorkflowRequestStatusAndResponse_Call struct {
 // UpdateWorkflowRequestStatusAndResponse is a helper method to define mock.On call
 //   - requestID string
 //   - status db.WfRequestStatus
-//   - responseData db.JSONB
+//   - responseData db.PropertyMap
 func (_e *Database_Expecter) UpdateWorkflowRequestStatusAndResponse(requestID interface{}, status interface{}, responseData interface{}) *Database_UpdateWorkflowRequestStatusAndResponse_Call {
 	return &Database_UpdateWorkflowRequestStatusAndResponse_Call{Call: _e.mock.On("UpdateWorkflowRequestStatusAndResponse", requestID, status, responseData)}
 }
 
-func (_c *Database_UpdateWorkflowRequestStatusAndResponse_Call) Run(run func(requestID string, status db.WfRequestStatus, responseData db.JSONB)) *Database_UpdateWorkflowRequestStatusAndResponse_Call {
+func (_c *Database_UpdateWorkflowRequestStatusAndResponse_Call) Run(run func(requestID string, status db.WfRequestStatus, responseData db.PropertyMap)) *Database_UpdateWorkflowRequestStatusAndResponse_Call {
 	_c.Call.Run(func(args mock.Arguments) {
-		run(args[0].(string), args[1].(db.WfRequestStatus), args[2].(db.JSONB))
+		run(args[0].(string), args[1].(db.WfRequestStatus), args[2].(db.PropertyMap))
 	})
 	return _c
 }
@@ -8939,7 +9200,7 @@ func (_c *Database_UpdateWorkflowRequestStatusAndResponse_Call) Return(_a0 error
 	return _c
 }
 
-func (_c *Database_UpdateWorkflowRequestStatusAndResponse_Call) RunAndReturn(run func(string, db.WfRequestStatus, db.JSONB) error) *Database_UpdateWorkflowRequestStatusAndResponse_Call {
+func (_c *Database_UpdateWorkflowRequestStatusAndResponse_Call) RunAndReturn(run func(string, db.WfRequestStatus, db.PropertyMap) error) *Database_UpdateWorkflowRequestStatusAndResponse_Call {
 	_c.Call.Return(run)
 	return _c
 }
@@ -8988,45 +9249,6 @@ func (_c *Database_UpdateWorkspaceBudget_Call) Return(_a0 db.NewBountyBudget) *D
 func (_c *Database_UpdateWorkspaceBudget_Call) RunAndReturn(run func(db.NewBountyBudget) db.NewBountyBudget) *Database_UpdateWorkspaceBudget_Call {
 	_c.Call.Return(run)
 	return _c
-}
-
-// DeleteProcessingMapByKey provides a mock function with given fields: processType, processKey
-func (_m *Database) DeleteProcessingMapByKey(processType string, processKey string) error {
-    ret := _m.Called(processType, processKey)
-
-    var r0 error
-    if rf, ok := ret.Get(0).(func(string, string) error); ok {
-        r0 = rf(processType, processKey)
-    } else {
-        r0 = ret.Error(0)
-    }
-
-    return r0
-}
-
-type Database_DeleteProcessingMapByKey_Call struct {
-    *mock.Call
-}
-
-func (_e *Database_Expecter) DeleteProcessingMapByKey(processType interface{}, processKey interface{}) *Database_DeleteProcessingMapByKey_Call {
-    return &Database_DeleteProcessingMapByKey_Call{Call: _e.mock.On("DeleteProcessingMapByKey", processType, processKey)}
-}
-
-func (_c *Database_DeleteProcessingMapByKey_Call) Run(run func(processType string, processKey string)) *Database_DeleteProcessingMapByKey_Call {
-    _c.Call.Run(func(args mock.Arguments) {
-        run(args[0].(string), args[1].(string))
-    })
-    return _c
-}
-
-func (_c *Database_DeleteProcessingMapByKey_Call) Return(_a0 error) *Database_DeleteProcessingMapByKey_Call {
-    _c.Call.Return(_a0)
-    return _c
-}
-
-func (_c *Database_DeleteProcessingMapByKey_Call) RunAndReturn(run func(string, string) error) *Database_DeleteProcessingMapByKey_Call {
-    _c.Call.Return(run)
-    return _c
 }
 
 // UpdateWorkspaceForDeletion provides a mock function with given fields: uuid
