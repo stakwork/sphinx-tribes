@@ -7,6 +7,7 @@ import (
 	"errors"
 	"time"
 
+	"github.com/google/uuid"
 	"github.com/gorilla/websocket"
 	"github.com/lib/pq"
 	"gorm.io/gorm"
@@ -952,7 +953,7 @@ const (
 )
 
 type Tickets struct {
-	UUID         string            `gorm:"primaryKey;type:uuid;default:gen_random_uuid()"`
+	UUID         uuid.UUID         `gorm:"primaryKey;type:uuid;default:gen_random_uuid()"`
 	FeatureUUID  string            `gorm:"type:uuid;not null;index:composite_index" json:"feature_uuid" validate:"required"`
 	Features     WorkspaceFeatures `gorm:"foreignKey:FeatureUUID;references:Uuid"`
 	PhaseUUID    string            `gorm:"type:uuid;not null;index:phase_index" json:"phase_uuid" validate:"required"`
