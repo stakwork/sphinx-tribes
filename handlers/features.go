@@ -12,6 +12,7 @@ import (
 	"os"
 
 	"github.com/go-chi/chi"
+	"github.com/google/uuid"
 	"github.com/rs/xid"
 	"github.com/stakwork/sphinx-tribes/auth"
 	"github.com/stakwork/sphinx-tribes/db"
@@ -696,4 +697,46 @@ func (oh *featureHandler) BriefSend(w http.ResponseWriter, r *http.Request) {
 
 	w.WriteHeader(resp.StatusCode)
 	w.Write(respBody)
+}
+
+func (oh *featureHandler) GetTickets(w http.ResponseWriter, r *http.Request) {
+	ctx := r.Context()
+	pubKeyFromAuth, _ := ctx.Value(auth.ContextKey).(string)
+	if pubKeyFromAuth == "" {
+		fmt.Println("no pubkey from auth")
+		w.WriteHeader(http.StatusUnauthorized)
+		return
+	}
+
+	featureUuid := chi.URLParam(r, "feature_uuid")
+	phaseUuid := chi.URLParam(r, "phase_uuid")
+
+	if _, err := uuid.Parse(featureUuid); err != nil {
+		w.WriteHeader(http.StatusBadRequest)
+		json.NewEncoder(w).Encode(map[string]string{"error": "Invalid feature UUID format"})
+		return
+	}
+
+	if _, err := uuid.Parse(phaseUuid); err != nil {
+		w.WriteHeader(http.StatusBadRequest)
+		json.NewEncoder(w).Encode(map[string]string{"error": "Invalid phase UUID format"})
+		return
+	}
+
+	_, err := oh.db.GetFeaturePhaseByUuid(featureUuid, phaseUuid)
+	if err != nil {
+		w.WriteHeader(http.StatusNotFound)
+		json.NewEncoder(w).Encode(map[string]string{"error": "Phase not found"})
+		return
+	}
+
+	tickets, err := oh.db.GetTicketsByPhase(featureUuid, phaseUuid)
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		json.NewEncoder(w).Encode(map[string]string{"error": err.Error()})
+		return
+	}
+
+	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode(tickets)
 }

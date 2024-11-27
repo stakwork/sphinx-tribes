@@ -327,3 +327,17 @@ func (db database) GetBountiesByPhaseUuid(phaseUuid string) []Bounty {
 	db.db.Model(&Bounty{}).Where("phase_uuid = ?", phaseUuid).Find(&bounties)
 	return bounties
 }
+
+func (db database) GetTicketsByPhase(featureUuid string, phaseUuid string) ([]Tickets, error) {
+	var tickets []Tickets
+
+	result := db.db.Where("feature_uuid = ? AND phase_uuid = ?", featureUuid, phaseUuid).
+		Order("sequence ASC").
+		Find(&tickets)
+
+	if result.Error != nil {
+		return nil, fmt.Errorf("failed to fetch tickets for phase: %w", result.Error)
+	}
+
+	return tickets, nil
+}

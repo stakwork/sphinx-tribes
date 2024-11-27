@@ -9440,3 +9440,58 @@ func NewDatabase(t interface {
 
 	return mock
 }
+
+// GetTicketsByPhase provides a mock function with given fields: featureUuid, phaseUuid
+func (_m *Database) GetTicketsByPhase(featureUuid string, phaseUuid string) ([]db.Tickets, error) {
+	ret := _m.Called(featureUuid, phaseUuid)
+
+	if len(ret) == 0 {
+		panic("no return value specified for GetTicketsByPhase")
+	}
+
+	var r0 []db.Tickets
+	var r1 error
+	if rf, ok := ret.Get(0).(func(string, string) ([]db.Tickets, error)); ok {
+		return rf(featureUuid, phaseUuid)
+	}
+	if rf, ok := ret.Get(0).(func(string, string) []db.Tickets); ok {
+		r0 = rf(featureUuid, phaseUuid)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).([]db.Tickets)
+		}
+	}
+
+	if rf, ok := ret.Get(1).(func(string, string) error); ok {
+		r1 = rf(featureUuid, phaseUuid)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
+type Database_GetTicketsByPhase_Call struct {
+	*mock.Call
+}
+
+func (_e *Database_Expecter) GetTicketsByPhase(featureUuid interface{}, phaseUuid interface{}) *Database_GetTicketsByPhase_Call {
+	return &Database_GetTicketsByPhase_Call{Call: _e.mock.On("GetTicketsByPhase", featureUuid, phaseUuid)}
+}
+
+func (_c *Database_GetTicketsByPhase_Call) Run(run func(featureUuid string, phaseUuid string)) *Database_GetTicketsByPhase_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(string), args[1].(string))
+	})
+	return _c
+}
+
+func (_c *Database_GetTicketsByPhase_Call) Return(_a0 []db.Tickets, _a1 error) *Database_GetTicketsByPhase_Call {
+	_c.Call.Return(_a0, _a1)
+	return _c
+}
+
+func (_c *Database_GetTicketsByPhase_Call) RunAndReturn(run func(string, string) ([]db.Tickets, error)) *Database_GetTicketsByPhase_Call {
+	_c.Call.Return(run)
+	return _c
+}

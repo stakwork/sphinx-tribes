@@ -31,6 +31,7 @@ func FeatureRoutes() chi.Router {
 		r.Post("/phase", featureHandlers.CreateOrEditFeaturePhase)
 		r.Get("/{feature_uuid}/phase", featureHandlers.GetFeaturePhases)
 		r.Get("/{feature_uuid}/phase/{phase_uuid}", featureHandlers.GetFeaturePhaseByUUID)
+		r.Get("/{feature_uuid}/phase/{phase_uuid}/tickets", featureHandlers.GetTickets)
 		r.Delete("/{feature_uuid}/phase/{phase_uuid}", featureHandlers.DeleteFeaturePhase)
 
 		r.Post("/story", featureHandlers.CreateOrEditStory)
