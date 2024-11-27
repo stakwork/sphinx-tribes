@@ -56,7 +56,7 @@ func TestCreateOrEditTicket(t *testing.T) {
 	}
 
 	ticket := Tickets{
-		UUID:        uuid.New().String(),
+		UUID:        uuid.New(),
 		FeatureUUID: workspaceFeatures.Uuid,
 		PhaseUUID:   featurePhase.Uuid,
 		Name:        "test ticket",
@@ -79,7 +79,7 @@ func TestCreateOrEditTicket(t *testing.T) {
 	// test that an error is returned if the required fields are missing
 	t.Run("test that an error is returned if the required fields are missing", func(t *testing.T) {
 		ticket := Tickets{
-			UUID:        uuid.New().String(),
+			UUID:        uuid.New(),
 			FeatureUUID: "",
 			PhaseUUID:   "",
 			Name:        "test ticket",
@@ -96,7 +96,7 @@ func TestCreateOrEditTicket(t *testing.T) {
 	// test that an error is thrown if the FeatureUUID, and PhaseUUID does not exists
 	t.Run("test that an error is returned if the required fields are missing", func(t *testing.T) {
 		ticket := Tickets{
-			UUID:        uuid.New().String(),
+			UUID:        uuid.New(),
 			FeatureUUID: "testfeatureuuid",
 			PhaseUUID:   "testphaseuuid",
 			Name:        "test ticket",
@@ -180,7 +180,7 @@ func TestGetTicket(t *testing.T) {
 	TestDB.CreateOrEditFeaturePhase(featurePhase)
 
 	ticket := Tickets{
-		UUID:        uuid.New().String(),
+		UUID:        uuid.New(),
 		FeatureUUID: workspaceFeatures.Uuid,
 		PhaseUUID:   featurePhase.Uuid,
 		Name:        "test get ticket",
@@ -201,7 +201,7 @@ func TestGetTicket(t *testing.T) {
 
 	// should return a ticket if it exists
 	t.Run("should return a ticket if it exists", func(t *testing.T) {
-		result, err := TestDB.GetTicket(ticket.UUID)
+		result, err := TestDB.GetTicket(ticket.UUID.String())
 		if err != nil {
 			t.Errorf("expected no error but got %v", err)
 		}

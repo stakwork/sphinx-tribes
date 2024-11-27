@@ -9218,3 +9218,134 @@ func NewDatabase(t interface {
 
 	return mock
 }
+
+// GetTicket provides a mock function with given fields: uuid
+func (_m *Database) GetTicket(uuid string) (db.Tickets, error) {
+	ret := _m.Called(uuid)
+
+	var r0 db.Tickets
+	if rf, ok := ret.Get(0).(func(string) db.Tickets); ok {
+		r0 = rf(uuid)
+	} else {
+		r0 = ret.Get(0).(db.Tickets)
+	}
+
+	var r1 error
+	if rf, ok := ret.Get(1).(func(string) error); ok {
+		r1 = rf(uuid)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
+// UpdateTicket provides a mock function with given fields: ticket
+func (_m *Database) UpdateTicket(ticket db.Tickets) (db.Tickets, error) {
+	ret := _m.Called(ticket)
+
+	var r0 db.Tickets
+	if rf, ok := ret.Get(0).(func(db.Tickets) db.Tickets); ok {
+		r0 = rf(ticket)
+	} else {
+		r0 = ret.Get(0).(db.Tickets)
+	}
+
+	var r1 error
+	if rf, ok := ret.Get(1).(func(db.Tickets) error); ok {
+		r1 = rf(ticket)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
+// DeleteTicket provides a mock function with given fields: uuid
+func (_m *Database) DeleteTicket(uuid string) error {
+	ret := _m.Called(uuid)
+
+	var r0 error
+	if rf, ok := ret.Get(0).(func(string) error); ok {
+		r0 = rf(uuid)
+	} else {
+		r0 = ret.Error(0)
+	}
+
+	return r0
+}
+
+type Database_GetTicket_Call struct {
+	*mock.Call
+}
+
+func (_e *Database_Expecter) GetTicket(uuid interface{}) *Database_GetTicket_Call {
+	return &Database_GetTicket_Call{Call: _e.mock.On("GetTicket", uuid)}
+}
+
+func (_c *Database_GetTicket_Call) Run(run func(uuid string)) *Database_GetTicket_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(string))
+	})
+	return _c
+}
+
+func (_c *Database_GetTicket_Call) Return(_a0 db.Tickets, _a1 error) *Database_GetTicket_Call {
+	_c.Call.Return(_a0, _a1)
+	return _c
+}
+
+func (_c *Database_GetTicket_Call) RunAndReturn(run func(string) (db.Tickets, error)) *Database_GetTicket_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
+type Database_UpdateTicket_Call struct {
+	*mock.Call
+}
+
+func (_e *Database_Expecter) UpdateTicket(ticket interface{}) *Database_UpdateTicket_Call {
+	return &Database_UpdateTicket_Call{Call: _e.mock.On("UpdateTicket", ticket)}
+}
+
+func (_c *Database_UpdateTicket_Call) Run(run func(ticket db.Tickets)) *Database_UpdateTicket_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(db.Tickets))
+	})
+	return _c
+}
+
+func (_c *Database_UpdateTicket_Call) Return(_a0 db.Tickets, _a1 error) *Database_UpdateTicket_Call {
+	_c.Call.Return(_a0, _a1)
+	return _c
+}
+
+func (_c *Database_UpdateTicket_Call) RunAndReturn(run func(db.Tickets) (db.Tickets, error)) *Database_UpdateTicket_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
+type Database_DeleteTicket_Call struct {
+	*mock.Call
+}
+
+func (_e *Database_Expecter) DeleteTicket(uuid interface{}) *Database_DeleteTicket_Call {
+	return &Database_DeleteTicket_Call{Call: _e.mock.On("DeleteTicket", uuid)}
+}
+
+func (_c *Database_DeleteTicket_Call) Run(run func(uuid string)) *Database_DeleteTicket_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(string))
+	})
+	return _c
+}
+
+func (_c *Database_DeleteTicket_Call) Return(_a0 error) *Database_DeleteTicket_Call {
+	_c.Call.Return(_a0)
+	return _c
+}
+
+func (_c *Database_DeleteTicket_Call) RunAndReturn(run func(string) error) *Database_DeleteTicket_Call {
+	_c.Call.Return(run)
+	return _c
+}
