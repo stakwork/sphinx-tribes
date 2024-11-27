@@ -194,6 +194,7 @@ type Database interface {
 	DeleteProcessingMapByKey(processType, processKey string) error
 	DeleteProcessingMap(id uint) error
 	ProcessReversePayments(paymentId uint) error
+	CreateOrEditTicket(ticket *Tickets) (Tickets, error)
 	GetTicket(uuid string) (Tickets, error)
 	UpdateTicket(ticket Tickets) (Tickets, error)
 	DeleteTicket(uuid string) error
