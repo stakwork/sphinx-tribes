@@ -963,6 +963,7 @@ type Tickets struct {
 	Dependency   []int             `gorm:"type:integer[]"`
 	Description  string            `gorm:"type:text"`
 	Status       TicketStatus      `gorm:"type:varchar(50);not null;default:'draft'"`
+	Version      int               `gorm:"type:integer" json:"version"`
 	CreatedAt    time.Time         `gorm:"type:timestamp;not null;default:current_timestamp" json:"created_at"`
 	UpdatedAt    time.Time         `gorm:"type:timestamp;not null;default:current_timestamp" json:"updated_at"`
 }
