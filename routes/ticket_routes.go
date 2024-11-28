@@ -14,6 +14,7 @@ func TicketRoutes() chi.Router {
 	r.Group(func(r chi.Router) {
 		r.Use(auth.PubKeyContext)
 
+		r.Post("/review/send", ticketHandler.PostTicketDataToStakwork)
 		r.Get("/{uuid}", ticketHandler.GetTicket)
 		r.Put("/{uuid}", ticketHandler.UpdateTicket)
 		r.Delete("/{uuid}", ticketHandler.DeleteTicket)

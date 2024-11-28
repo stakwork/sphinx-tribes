@@ -17,17 +17,17 @@ type ticketHandler struct {
 	db db.Database
 }
 
+type TicketResponse struct {
+	Success  bool     `json:"success"`
+	TicketID string   `json:"ticket_id,omitempty"`
+	Message  string   `json:"message"`
+	Errors   []string `json:"errors,omitempty"`
+}
+
 func NewTicketHandler(database db.Database) *ticketHandler {
 	return &ticketHandler{
 		db: database,
 	}
-}
-
-type TicketReviewRequest struct {
-	FeatureUUID       string `json:"featureUUID" validate:"required"`
-	PhaseUUID         string `json:"phaseUUID" validate:"required"`
-	TicketUUID        string `json:"ticketUUID" validate:"required"`
-	TicketDescription string `json:"ticketDescription" validate:"required"`
 }
 
 func (th *ticketHandler) GetTicket(w http.ResponseWriter, r *http.Request) {
@@ -108,6 +108,62 @@ func (th *ticketHandler) DeleteTicket(w http.ResponseWriter, r *http.Request) {
 	}
 
 	utils.RespondWithJSON(w, http.StatusOK, map[string]string{"status": "success"})
+}
+
+func (th *ticketHandler) PostTicketDataToStakwork(w http.ResponseWriter, r *http.Request) {
+	body, err := io.ReadAll(r.Body)
+	if err != nil {
+		utils.RespondWithJSON(w, http.StatusBadRequest, TicketResponse{
+			Success: false,
+			Message: "Validation failed",
+			Errors:  []string{"Error reading request body"},
+		})
+		return
+	}
+
+	var ticket db.Tickets
+	if err := json.Unmarshal(body, &ticket); err != nil {
+		utils.RespondWithJSON(w, http.StatusBadRequest, TicketResponse{
+			Success: false,
+			Message: "Validation failed",
+			Errors:  []string{"Error parsing request body: " + err.Error()},
+		})
+		return
+	}
+
+	var validationErrors []string
+	if ticket.UUID == uuid.Nil {
+		validationErrors = append(validationErrors, "UUID is required")
+	} else {
+		if _, err := uuid.Parse(ticket.UUID.String()); err != nil {
+			validationErrors = append(validationErrors, "Invalid UUID format")
+		}
+	}
+
+	if ticket.FeatureUUID == "" {
+		validationErrors = append(validationErrors, "FeatureUUID is required")
+	}
+	if ticket.PhaseUUID == "" {
+		validationErrors = append(validationErrors, "PhaseUUID is required")
+	}
+	if ticket.Name == "" {
+		validationErrors = append(validationErrors, "Name is required")
+	}
+
+	if len(validationErrors) > 0 {
+		utils.RespondWithJSON(w, http.StatusBadRequest, TicketResponse{
+			Success: false,
+			Message: "Validation failed",
+			Errors:  validationErrors,
+		})
+		return
+	}
+
+	utils.RespondWithJSON(w, http.StatusOK, TicketResponse{
+		Success:  true,
+		TicketID: ticket.UUID.String(),
+		Message:  "Ticket submission is valid",
+	})
 }
 
 func (th *ticketHandler) ProcessTicketReview(w http.ResponseWriter, r *http.Request) {
