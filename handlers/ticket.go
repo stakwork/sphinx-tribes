@@ -4,11 +4,13 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
+	"log"
 	"net/http"
 
 	"github.com/go-chi/chi"
 	"github.com/google/uuid"
 	"github.com/stakwork/sphinx-tribes/db"
+	"github.com/stakwork/sphinx-tribes/utils"
 )
 
 type ticketHandler struct {
@@ -45,7 +47,7 @@ func (th *ticketHandler) GetTicket(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	respondWithJSON(w, http.StatusOK, ticket)
+	utils.RespondWithJSON(w, http.StatusOK, ticket)
 }
 
 func (th *ticketHandler) UpdateTicket(w http.ResponseWriter, r *http.Request) {
@@ -85,7 +87,7 @@ func (th *ticketHandler) UpdateTicket(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	respondWithJSON(w, http.StatusOK, updatedTicket)
+	utils.RespondWithJSON(w, http.StatusOK, updatedTicket)
 }
 
 func (th *ticketHandler) DeleteTicket(w http.ResponseWriter, r *http.Request) {
@@ -105,13 +107,13 @@ func (th *ticketHandler) DeleteTicket(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	respondWithJSON(w, http.StatusOK, map[string]string{"status": "success"})
+	utils.RespondWithJSON(w, http.StatusOK, map[string]string{"status": "success"})
 }
 
 func (th *ticketHandler) PostTicketDataToStakwork(w http.ResponseWriter, r *http.Request) {
 	body, err := io.ReadAll(r.Body)
 	if err != nil {
-		respondWithJSON(w, http.StatusBadRequest, TicketResponse{
+		utils.RespondWithJSON(w, http.StatusBadRequest, TicketResponse{
 			Success: false,
 			Message: "Validation failed",
 			Errors:  []string{"Error reading request body"},
@@ -121,7 +123,7 @@ func (th *ticketHandler) PostTicketDataToStakwork(w http.ResponseWriter, r *http
 
 	var ticket db.Tickets
 	if err := json.Unmarshal(body, &ticket); err != nil {
-		respondWithJSON(w, http.StatusBadRequest, TicketResponse{
+		utils.RespondWithJSON(w, http.StatusBadRequest, TicketResponse{
 			Success: false,
 			Message: "Validation failed",
 			Errors:  []string{"Error parsing request body: " + err.Error()},
@@ -149,7 +151,7 @@ func (th *ticketHandler) PostTicketDataToStakwork(w http.ResponseWriter, r *http
 	}
 
 	if len(validationErrors) > 0 {
-		respondWithJSON(w, http.StatusBadRequest, TicketResponse{
+		utils.RespondWithJSON(w, http.StatusBadRequest, TicketResponse{
 			Success: false,
 			Message: "Validation failed",
 			Errors:  validationErrors,
@@ -157,15 +159,51 @@ func (th *ticketHandler) PostTicketDataToStakwork(w http.ResponseWriter, r *http
 		return
 	}
 
-	respondWithJSON(w, http.StatusOK, TicketResponse{
+	utils.RespondWithJSON(w, http.StatusOK, TicketResponse{
 		Success:  true,
 		TicketID: ticket.UUID.String(),
 		Message:  "Ticket submission is valid",
 	})
 }
 
-func respondWithJSON(w http.ResponseWriter, code int, payload interface{}) {
-	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(code)
-	json.NewEncoder(w).Encode(payload)
+func (th *ticketHandler) ProcessTicketReview(w http.ResponseWriter, r *http.Request) {
+	body, err := io.ReadAll(r.Body)
+	if err != nil {
+		log.Printf("Error reading request body: %v", err)
+		http.Error(w, "Error reading request body", http.StatusBadRequest)
+		return
+	}
+
+	var reviewReq utils.TicketReviewRequest
+	if err := json.Unmarshal(body, &reviewReq); err != nil {
+		log.Printf("Error parsing request JSON: %v", err)
+		http.Error(w, "Error parsing request body", http.StatusBadRequest)
+		return
+	}
+
+	if err := utils.ValidateTicketReviewRequest(&reviewReq); err != nil {
+		log.Printf("Invalid request data: %v", err)
+		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	}
+
+	ticket, err := th.db.GetTicket(reviewReq.TicketUUID)
+	if err != nil {
+		log.Printf("Error fetching ticket: %v", err)
+		http.Error(w, "Ticket not found", http.StatusNotFound)
+		return
+	}
+
+	ticket.Description = reviewReq.TicketDescription
+
+	updatedTicket, err := th.db.UpdateTicket(ticket)
+	if err != nil {
+		log.Printf("Error updating ticket: %v", err)
+		http.Error(w, "Failed to update ticket", http.StatusInternalServerError)
+		return
+	}
+
+	log.Printf("Successfully updated ticket %s", reviewReq.TicketUUID)
+
+	utils.RespondWithJSON(w, http.StatusOK, updatedTicket)
 }
