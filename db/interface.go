@@ -199,4 +199,5 @@ type Database interface {
 	UpdateTicket(ticket Tickets) (Tickets, error)
 	DeleteTicket(uuid string) error
 	GetTicketsByPhaseUUID(featureUUID string, phaseUUID string) ([]Tickets, error)
+	GetTicketsByPhase(phaseUUID string) ([]Tickets, error)
 }
