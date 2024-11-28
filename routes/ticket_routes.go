@@ -17,6 +17,7 @@ func TicketRoutes() chi.Router {
 		r.Get("/{uuid}", ticketHandler.GetTicket)
 		r.Put("/{uuid}", ticketHandler.UpdateTicket)
 		r.Delete("/{uuid}", ticketHandler.DeleteTicket)
+		r.Post("/review", ticketHandler.ProcessTicketReview)
 	})
 
 	return r
