@@ -198,4 +198,6 @@ type Database interface {
 	GetTicket(uuid string) (Tickets, error)
 	UpdateTicket(ticket Tickets) (Tickets, error)
 	DeleteTicket(uuid string) error
+	GetProductBrief(workspaceUuid string) (string, error)
+	GetFeatureBrief(featureUuid string) (string, error)
 }
