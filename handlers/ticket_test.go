@@ -10,6 +10,7 @@ import (
 
 	"github.com/go-chi/chi"
 	"github.com/google/uuid"
+	"github.com/stakwork/sphinx-tribes/auth"
 	"github.com/stakwork/sphinx-tribes/db"
 	"github.com/stretchr/testify/assert"
 )
@@ -18,7 +19,7 @@ func TestGetTicket(t *testing.T) {
 	teardownSuite := SetupSuite(t)
 	defer teardownSuite(t)
 
-	tHandler := NewTicketHandler(db.TestDB)
+	tHandler := NewTicketHandler(&http.Client{}, db.TestDB)
 
 	person := db.Person{
 		Uuid:        uuid.New().String(),
@@ -129,7 +130,7 @@ func TestUpdateTicket(t *testing.T) {
 	teardownSuite := SetupSuite(t)
 	defer teardownSuite(t)
 
-	tHandler := NewTicketHandler(db.TestDB)
+	tHandler := NewTicketHandler(&http.Client{}, db.TestDB)
 
 	person := db.Person{
 		Uuid:        uuid.New().String(),
@@ -179,6 +180,19 @@ func TestUpdateTicket(t *testing.T) {
 	}
 	createdTicket, _ := db.TestDB.UpdateTicket(ticket)
 
+	t.Run("should return 401 if no auth token", func(t *testing.T) {
+		rr := httptest.NewRecorder()
+		handler := http.HandlerFunc(tHandler.UpdateTicket)
+
+		req, err := http.NewRequest(http.MethodPut, "/tickets/", nil)
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		handler.ServeHTTP(rr, req)
+		assert.Equal(t, http.StatusUnauthorized, rr.Code)
+	})
+
 	t.Run("should return 400 if UUID is empty", func(t *testing.T) {
 		rr := httptest.NewRecorder()
 		handler := http.HandlerFunc(tHandler.UpdateTicket)
@@ -187,6 +201,9 @@ func TestUpdateTicket(t *testing.T) {
 		if err != nil {
 			t.Fatal(err)
 		}
+
+		ctx := context.WithValue(req.Context(), auth.ContextKey, person.OwnerPubKey)
+		req = req.WithContext(ctx)
 
 		handler.ServeHTTP(rr, req)
 		assert.Equal(t, http.StatusBadRequest, rr.Code)
@@ -198,11 +215,14 @@ func TestUpdateTicket(t *testing.T) {
 
 		rctx := chi.NewRouteContext()
 		rctx.URLParams.Add("uuid", "invalid-uuid")
+
 		req, err := http.NewRequest(http.MethodPut, "/tickets/invalid-uuid", bytes.NewReader([]byte("{}")))
 		if err != nil {
 			t.Fatal(err)
 		}
-		req = req.WithContext(context.WithValue(req.Context(), chi.RouteCtxKey, rctx))
+
+		ctx := context.WithValue(req.Context(), auth.ContextKey, person.OwnerPubKey)
+		req = req.WithContext(context.WithValue(ctx, chi.RouteCtxKey, rctx))
 
 		handler.ServeHTTP(rr, req)
 		assert.Equal(t, http.StatusBadRequest, rr.Code)
@@ -219,7 +239,9 @@ func TestUpdateTicket(t *testing.T) {
 		if err != nil {
 			t.Fatal(err)
 		}
-		req = req.WithContext(context.WithValue(req.Context(), chi.RouteCtxKey, rctx))
+
+		ctx := context.WithValue(req.Context(), auth.ContextKey, person.OwnerPubKey)
+		req = req.WithContext(context.WithValue(ctx, chi.RouteCtxKey, rctx))
 
 		handler.ServeHTTP(rr, req)
 		assert.Equal(t, http.StatusBadRequest, rr.Code)
@@ -241,7 +263,9 @@ func TestUpdateTicket(t *testing.T) {
 		if err != nil {
 			t.Fatal(err)
 		}
-		req = req.WithContext(context.WithValue(req.Context(), chi.RouteCtxKey, rctx))
+
+		ctx := context.WithValue(req.Context(), auth.ContextKey, person.OwnerPubKey)
+		req = req.WithContext(context.WithValue(ctx, chi.RouteCtxKey, rctx))
 
 		handler.ServeHTTP(rr, req)
 		assert.Equal(t, http.StatusBadRequest, rr.Code)
@@ -259,11 +283,14 @@ func TestUpdateTicket(t *testing.T) {
 		requestBody, _ := json.Marshal(updatedTicket)
 		rctx := chi.NewRouteContext()
 		rctx.URLParams.Add("uuid", createdTicket.UUID.String())
+
 		req, err := http.NewRequest(http.MethodPut, "/tickets/"+createdTicket.UUID.String(), bytes.NewReader(requestBody))
 		if err != nil {
 			t.Fatal(err)
 		}
-		req = req.WithContext(context.WithValue(req.Context(), chi.RouteCtxKey, rctx))
+
+		ctx := context.WithValue(req.Context(), auth.ContextKey, person.OwnerPubKey)
+		req = req.WithContext(context.WithValue(ctx, chi.RouteCtxKey, rctx))
 
 		handler.ServeHTTP(rr, req)
 
@@ -284,7 +311,7 @@ func TestDeleteTicket(t *testing.T) {
 	teardownSuite := SetupSuite(t)
 	defer teardownSuite(t)
 
-	tHandler := NewTicketHandler(db.TestDB)
+	tHandler := NewTicketHandler(&http.Client{}, db.TestDB)
 
 	person := db.Person{
 		Uuid:        uuid.New().String(),
@@ -334,6 +361,19 @@ func TestDeleteTicket(t *testing.T) {
 	}
 	createdTicket, _ := db.TestDB.UpdateTicket(ticket)
 
+	t.Run("should return 401 if no auth token", func(t *testing.T) {
+		rr := httptest.NewRecorder()
+		handler := http.HandlerFunc(tHandler.DeleteTicket)
+
+		req, err := http.NewRequest(http.MethodDelete, "/tickets/", nil)
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		handler.ServeHTTP(rr, req)
+		assert.Equal(t, http.StatusUnauthorized, rr.Code)
+	})
+
 	t.Run("should return 400 if UUID is empty", func(t *testing.T) {
 		rr := httptest.NewRecorder()
 		handler := http.HandlerFunc(tHandler.DeleteTicket)
@@ -342,6 +382,9 @@ func TestDeleteTicket(t *testing.T) {
 		if err != nil {
 			t.Fatal(err)
 		}
+
+		ctx := context.WithValue(req.Context(), auth.ContextKey, person.OwnerPubKey)
+		req = req.WithContext(ctx)
 
 		handler.ServeHTTP(rr, req)
 		assert.Equal(t, http.StatusBadRequest, rr.Code)
@@ -354,11 +397,14 @@ func TestDeleteTicket(t *testing.T) {
 		nonExistentUUID := uuid.New()
 		rctx := chi.NewRouteContext()
 		rctx.URLParams.Add("uuid", nonExistentUUID.String())
+
 		req, err := http.NewRequest(http.MethodDelete, "/tickets/"+nonExistentUUID.String(), nil)
 		if err != nil {
 			t.Fatal(err)
 		}
-		req = req.WithContext(context.WithValue(req.Context(), chi.RouteCtxKey, rctx))
+
+		ctx := context.WithValue(req.Context(), auth.ContextKey, person.OwnerPubKey)
+		req = req.WithContext(context.WithValue(ctx, chi.RouteCtxKey, rctx))
 
 		handler.ServeHTTP(rr, req)
 		assert.Equal(t, http.StatusNotFound, rr.Code)
@@ -370,11 +416,14 @@ func TestDeleteTicket(t *testing.T) {
 
 		rctx := chi.NewRouteContext()
 		rctx.URLParams.Add("uuid", createdTicket.UUID.String())
+
 		req, err := http.NewRequest(http.MethodDelete, "/tickets/"+createdTicket.UUID.String(), nil)
 		if err != nil {
 			t.Fatal(err)
 		}
-		req = req.WithContext(context.WithValue(req.Context(), chi.RouteCtxKey, rctx))
+
+		ctx := context.WithValue(req.Context(), auth.ContextKey, person.OwnerPubKey)
+		req = req.WithContext(context.WithValue(ctx, chi.RouteCtxKey, rctx))
 
 		handler.ServeHTTP(rr, req)
 
