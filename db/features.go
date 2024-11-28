@@ -342,3 +342,32 @@ func (db database) GetTicketsByPhaseUUID(featureUUID string, phaseUUID string) (
 
 	return tickets, nil
 }
+
+func (db database) GetProductBrief(workspaceUuid string) (string, error) {
+	workspace := Workspace{}
+	result := db.db.Model(&Workspace{}).Where("uuid = ?", workspaceUuid).First(&workspace)
+	if result.Error != nil {
+		return "", fmt.Errorf("error getting workspace: %v", result.Error)
+	}
+
+	productBrief := fmt.Sprintf("Product: %s. Product Brief:\n Mission: %s.\n\n Objectives: %s",
+		workspace.Name,
+		workspace.Mission,
+		workspace.Tactics)
+
+	return productBrief, nil
+}
+
+func (db database) GetFeatureBrief(featureUuid string) (string, error) {
+	feature := WorkspaceFeatures{}
+	result := db.db.Model(&WorkspaceFeatures{}).Where("uuid = ?", featureUuid).First(&feature)
+	if result.Error != nil {
+		return "", fmt.Errorf("error getting feature: %v", result.Error)
+	}
+
+	featureBrief := fmt.Sprintf("Feature: %s. Brief: %s",
+		feature.Name,
+		feature.Brief)
+
+	return featureBrief, nil
+}
