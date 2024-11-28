@@ -2723,6 +2723,92 @@ func (_c *Database_GetBountiesByFeatureAndPhaseUuid_Call) RunAndReturn(run func(
 	return _c
 }
 
+// GetProductBrief provides a mock function with given fields: workspaceUuid
+func (_m *Database) GetProductBrief(workspaceUuid string) (string, error) {
+	ret := _m.Called(workspaceUuid)
+
+	var r0 string
+	if rf, ok := ret.Get(0).(func(string) string); ok {
+		r0 = rf(workspaceUuid)
+	} else {
+		r0 = ret.Get(0).(string)
+	}
+
+	var r1 error
+	if rf, ok := ret.Get(1).(func(string) error); ok {
+		r1 = rf(workspaceUuid)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
+// Database_GetProductBrief_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'GetProductBrief'
+type Database_GetProductBrief_Call struct {
+	*mock.Call
+}
+
+// GetProductBrief is a helper method to define mock.On call
+func (_e *Database_Expecter) GetProductBrief(workspaceUuid interface{}) *Database_GetProductBrief_Call {
+	return &Database_GetProductBrief_Call{Call: _e.mock.On("GetProductBrief", workspaceUuid)}
+}
+
+func (_c *Database_GetProductBrief_Call) Run(run func(workspaceUuid string)) *Database_GetProductBrief_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(string))
+	})
+	return _c
+}
+
+func (_c *Database_GetProductBrief_Call) Return(_a0 string, _a1 error) *Database_GetProductBrief_Call {
+	_c.Call.Return(_a0, _a1)
+	return _c
+}
+
+// GetFeatureBrief provides a mock function with given fields: featureUuid
+func (_m *Database) GetFeatureBrief(featureUuid string) (string, error) {
+	ret := _m.Called(featureUuid)
+
+	var r0 string
+	if rf, ok := ret.Get(0).(func(string) string); ok {
+		r0 = rf(featureUuid)
+	} else {
+		r0 = ret.Get(0).(string)
+	}
+
+	var r1 error
+	if rf, ok := ret.Get(1).(func(string) error); ok {
+		r1 = rf(featureUuid)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
+// Database_GetFeatureBrief_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'GetFeatureBrief'
+type Database_GetFeatureBrief_Call struct {
+	*mock.Call
+}
+
+// GetFeatureBrief is a helper method to define mock.On call
+func (_e *Database_Expecter) GetFeatureBrief(featureUuid interface{}) *Database_GetFeatureBrief_Call {
+	return &Database_GetFeatureBrief_Call{Call: _e.mock.On("GetFeatureBrief", featureUuid)}
+}
+
+func (_c *Database_GetFeatureBrief_Call) Run(run func(featureUuid string)) *Database_GetFeatureBrief_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(string))
+	})
+	return _c
+}
+
+func (_c *Database_GetFeatureBrief_Call) Return(_a0 string, _a1 error) *Database_GetFeatureBrief_Call {
+	_c.Call.Return(_a0, _a1)
+	return _c
+}
+
 // GetBountiesByPhaseUuid provides a mock function with given fields: phaseUuid
 func (_m *Database) GetBountiesByPhaseUuid(phaseUuid string) []db.Bounty {
 	ret := _m.Called(phaseUuid)
