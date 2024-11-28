@@ -1636,3 +1636,197 @@ func TestGetFeatureStories(t *testing.T) {
 		assert.Equal(t, http.StatusNotAcceptable, rr.Code)
 	})
 }
+
+func TestGetTicketsByPhaseUUID(t *testing.T) {
+	teardownSuite := SetupSuite(t)
+	defer teardownSuite(t)
+
+	fHandler := NewFeatureHandler(db.TestDB)
+
+	person := db.Person{
+		Uuid:        uuid.New().String(),
+		OwnerAlias:  "test-alias",
+		UniqueName:  "test-unique-name",
+		OwnerPubKey: "test-pubkey",
+		PriceToMeet: 0,
+		Description: "test-description",
+	}
+	db.TestDB.CreateOrEditPerson(person)
+
+	workspace := db.Workspace{
+		Uuid:        uuid.New().String(),
+		Name:        "test-workspace" + uuid.New().String(),
+		OwnerPubKey: person.OwnerPubKey,
+		Github:      "https://github.com/test",
+		Website:     "https://www.testwebsite.com",
+		Description: "test-description",
+	}
+	db.TestDB.CreateOrEditWorkspace(workspace)
+
+	feature := db.WorkspaceFeatures{
+		Uuid:          uuid.New().String(),
+		WorkspaceUuid: workspace.Uuid,
+		Name:          "test-feature",
+		Url:           "https://github.com/test-feature",
+		Priority:      0,
+	}
+	db.TestDB.CreateOrEditFeature(feature)
+
+	featurePhase := db.FeaturePhase{
+		Uuid:        uuid.New().String(),
+		FeatureUuid: feature.Uuid,
+		Name:        "test-phase",
+		Priority:    0,
+	}
+	db.TestDB.CreateOrEditFeaturePhase(featurePhase)
+
+	ticket := db.Tickets{
+		UUID:        uuid.New(),
+		FeatureUUID: feature.Uuid,
+		PhaseUUID:   featurePhase.Uuid,
+		Name:        "Test Ticket",
+		Sequence:    1,
+		Description: "Test Description",
+		Status:      db.DraftTicket,
+	}
+
+	db.TestDB.UpdateTicket(ticket)
+
+	ctx := context.WithValue(context.Background(), auth.ContextKey, person.OwnerPubKey)
+
+	t.Run("should return 401 if user is not authorized", func(t *testing.T) {
+		rctx := chi.NewRouteContext()
+		rctx.URLParams.Add("feature_uuid", feature.Uuid)
+		rctx.URLParams.Add("phase_uuid", featurePhase.Uuid)
+		req, err := http.NewRequestWithContext(context.Background(), http.MethodGet,
+			"/features/"+feature.Uuid+"/phase/"+featurePhase.Uuid+"/tickets", nil)
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		rr := httptest.NewRecorder()
+		http.HandlerFunc(fHandler.GetTicketsByPhaseUUID).ServeHTTP(rr, req)
+
+		assert.Equal(t, http.StatusUnauthorized, rr.Code)
+	})
+
+	t.Run("should return 400 if feature UUID is invalid", func(t *testing.T) {
+		rctx := chi.NewRouteContext()
+		rctx.URLParams.Add("feature_uuid", "invalid-uuid")
+		rctx.URLParams.Add("phase_uuid", featurePhase.Uuid)
+		req, err := http.NewRequestWithContext(context.WithValue(ctx, chi.RouteCtxKey, rctx),
+			http.MethodGet, "/features/invalid-uuid/phase/"+featurePhase.Uuid+"/tickets", nil)
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		rr := httptest.NewRecorder()
+		http.HandlerFunc(fHandler.GetTicketsByPhaseUUID).ServeHTTP(rr, req)
+
+		assert.Equal(t, http.StatusBadRequest, rr.Code)
+	})
+
+	t.Run("should return 400 if phase UUID is invalid", func(t *testing.T) {
+		rctx := chi.NewRouteContext()
+		rctx.URLParams.Add("feature_uuid", feature.Uuid)
+		rctx.URLParams.Add("phase_uuid", "invalid-uuid")
+		req, err := http.NewRequestWithContext(context.WithValue(ctx, chi.RouteCtxKey, rctx),
+			http.MethodGet, "/features/"+feature.Uuid+"/phase/invalid-uuid/tickets", nil)
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		rr := httptest.NewRecorder()
+		http.HandlerFunc(fHandler.GetTicketsByPhaseUUID).ServeHTTP(rr, req)
+
+		assert.Equal(t, http.StatusBadRequest, rr.Code)
+	})
+
+	t.Run("should return 404 if feature not found", func(t *testing.T) {
+		nonExistentUUID := uuid.New().String()
+		rctx := chi.NewRouteContext()
+		rctx.URLParams.Add("feature_uuid", nonExistentUUID)
+		rctx.URLParams.Add("phase_uuid", featurePhase.Uuid)
+		req, err := http.NewRequestWithContext(context.WithValue(ctx, chi.RouteCtxKey, rctx),
+			http.MethodGet, "/features/"+nonExistentUUID+"/phase/"+featurePhase.Uuid+"/tickets", nil)
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		rr := httptest.NewRecorder()
+		http.HandlerFunc(fHandler.GetTicketsByPhaseUUID).ServeHTTP(rr, req)
+
+		assert.Equal(t, http.StatusNotFound, rr.Code)
+	})
+
+	t.Run("should return 404 if phase not found", func(t *testing.T) {
+		nonExistentUUID := uuid.New().String()
+		rctx := chi.NewRouteContext()
+		rctx.URLParams.Add("feature_uuid", feature.Uuid)
+		rctx.URLParams.Add("phase_uuid", nonExistentUUID)
+		req, err := http.NewRequestWithContext(context.WithValue(ctx, chi.RouteCtxKey, rctx),
+			http.MethodGet, "/features/"+feature.Uuid+"/phase/"+nonExistentUUID+"/tickets", nil)
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		rr := httptest.NewRecorder()
+		http.HandlerFunc(fHandler.GetTicketsByPhaseUUID).ServeHTTP(rr, req)
+
+		assert.Equal(t, http.StatusNotFound, rr.Code)
+	})
+
+	t.Run("should return tickets successfully when authorized", func(t *testing.T) {
+		rctx := chi.NewRouteContext()
+		rctx.URLParams.Add("feature_uuid", feature.Uuid)
+		rctx.URLParams.Add("phase_uuid", featurePhase.Uuid)
+		req, err := http.NewRequestWithContext(context.WithValue(ctx, chi.RouteCtxKey, rctx),
+			http.MethodGet, "/features/"+feature.Uuid+"/phase/"+featurePhase.Uuid+"/tickets", nil)
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		rr := httptest.NewRecorder()
+		http.HandlerFunc(fHandler.GetTicketsByPhaseUUID).ServeHTTP(rr, req)
+
+		assert.Equal(t, http.StatusOK, rr.Code)
+
+		var returnedTickets []db.Tickets
+		err = json.Unmarshal(rr.Body.Bytes(), &returnedTickets)
+		assert.NoError(t, err)
+		assert.Equal(t, 1, len(returnedTickets))
+		assert.Equal(t, ticket.Name, returnedTickets[0].Name)
+		assert.Equal(t, ticket.Description, returnedTickets[0].Description)
+		assert.Equal(t, ticket.Status, returnedTickets[0].Status)
+		assert.Equal(t, ticket.Sequence, returnedTickets[0].Sequence)
+	})
+
+	t.Run("should return empty array when no tickets exist", func(t *testing.T) {
+		emptyPhase := db.FeaturePhase{
+			Uuid:        uuid.New().String(),
+			FeatureUuid: feature.Uuid,
+			Name:        "empty-phase",
+			Priority:    1,
+		}
+		db.TestDB.CreateOrEditFeaturePhase(emptyPhase)
+
+		rctx := chi.NewRouteContext()
+		rctx.URLParams.Add("feature_uuid", feature.Uuid)
+		rctx.URLParams.Add("phase_uuid", emptyPhase.Uuid)
+		req, err := http.NewRequestWithContext(context.WithValue(ctx, chi.RouteCtxKey, rctx),
+			http.MethodGet, "/features/"+feature.Uuid+"/phase/"+emptyPhase.Uuid+"/tickets", nil)
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		rr := httptest.NewRecorder()
+		http.HandlerFunc(fHandler.GetTicketsByPhaseUUID).ServeHTTP(rr, req)
+
+		assert.Equal(t, http.StatusOK, rr.Code)
+
+		var returnedTickets []db.Tickets
+		err = json.Unmarshal(rr.Body.Bytes(), &returnedTickets)
+		assert.NoError(t, err)
+		assert.Equal(t, 0, len(returnedTickets))
+	})
+}
