@@ -9,12 +9,14 @@ import (
 
 	"github.com/go-chi/chi"
 	"github.com/google/uuid"
+	"github.com/stakwork/sphinx-tribes/auth"
 	"github.com/stakwork/sphinx-tribes/db"
 	"github.com/stakwork/sphinx-tribes/utils"
 )
 
 type ticketHandler struct {
-	db db.Database
+	httpClient HttpClient
+	db         db.Database
 }
 
 type TicketResponse struct {
@@ -24,9 +26,10 @@ type TicketResponse struct {
 	Errors   []string `json:"errors,omitempty"`
 }
 
-func NewTicketHandler(database db.Database) *ticketHandler {
+func NewTicketHandler(httpClient HttpClient, database db.Database) *ticketHandler {
 	return &ticketHandler{
-		db: database,
+		httpClient: httpClient,
+		db:         database,
 	}
 }
 
@@ -51,6 +54,15 @@ func (th *ticketHandler) GetTicket(w http.ResponseWriter, r *http.Request) {
 }
 
 func (th *ticketHandler) UpdateTicket(w http.ResponseWriter, r *http.Request) {
+	ctx := r.Context()
+	pubKeyFromAuth, _ := ctx.Value(auth.ContextKey).(string)
+
+	if pubKeyFromAuth == "" {
+		fmt.Println("[ticket] no pubkey from auth")
+		http.Error(w, "Unauthorized", http.StatusUnauthorized)
+		return
+	}
+
 	uuidStr := chi.URLParam(r, "uuid")
 	if uuidStr == "" {
 		http.Error(w, "UUID is required", http.StatusBadRequest)
@@ -68,6 +80,7 @@ func (th *ticketHandler) UpdateTicket(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Error reading request body", http.StatusBadRequest)
 		return
 	}
+	defer r.Body.Close()
 
 	var ticket db.Tickets
 	if err := json.Unmarshal(body, &ticket); err != nil {
@@ -76,6 +89,11 @@ func (th *ticketHandler) UpdateTicket(w http.ResponseWriter, r *http.Request) {
 	}
 
 	ticket.UUID = ticketUUID
+
+	if ticket.Status != "" && !db.IsValidTicketStatus(ticket.Status) {
+		http.Error(w, "Invalid ticket status", http.StatusBadRequest)
+		return
+	}
 
 	updatedTicket, err := th.db.UpdateTicket(ticket)
 	if err != nil {
@@ -89,8 +107,16 @@ func (th *ticketHandler) UpdateTicket(w http.ResponseWriter, r *http.Request) {
 
 	utils.RespondWithJSON(w, http.StatusOK, updatedTicket)
 }
-
 func (th *ticketHandler) DeleteTicket(w http.ResponseWriter, r *http.Request) {
+	ctx := r.Context()
+	pubKeyFromAuth, _ := ctx.Value(auth.ContextKey).(string)
+
+	if pubKeyFromAuth == "" {
+		fmt.Println("[ticket] no pubkey from auth")
+		http.Error(w, "Unauthorized", http.StatusUnauthorized)
+		return
+	}
+
 	uuid := chi.URLParam(r, "uuid")
 	if uuid == "" {
 		http.Error(w, "UUID is required", http.StatusBadRequest)
@@ -111,6 +137,15 @@ func (th *ticketHandler) DeleteTicket(w http.ResponseWriter, r *http.Request) {
 }
 
 func (th *ticketHandler) PostTicketDataToStakwork(w http.ResponseWriter, r *http.Request) {
+	ctx := r.Context()
+	pubKeyFromAuth, _ := ctx.Value(auth.ContextKey).(string)
+
+	if pubKeyFromAuth == "" {
+		fmt.Println("[ticket] no pubkey from auth")
+		http.Error(w, "Unauthorized", http.StatusUnauthorized)
+		return
+	}
+
 	body, err := io.ReadAll(r.Body)
 	if err != nil {
 		utils.RespondWithJSON(w, http.StatusBadRequest, TicketResponse{
@@ -120,6 +155,7 @@ func (th *ticketHandler) PostTicketDataToStakwork(w http.ResponseWriter, r *http
 		})
 		return
 	}
+	defer r.Body.Close()
 
 	var ticket db.Tickets
 	if err := json.Unmarshal(body, &ticket); err != nil {
@@ -167,12 +203,22 @@ func (th *ticketHandler) PostTicketDataToStakwork(w http.ResponseWriter, r *http
 }
 
 func (th *ticketHandler) ProcessTicketReview(w http.ResponseWriter, r *http.Request) {
+	ctx := r.Context()
+	pubKeyFromAuth, _ := ctx.Value(auth.ContextKey).(string)
+
+	if pubKeyFromAuth == "" {
+		fmt.Println("[ticket] no pubkey from auth")
+		http.Error(w, "Unauthorized", http.StatusUnauthorized)
+		return
+	}
+
 	body, err := io.ReadAll(r.Body)
 	if err != nil {
 		log.Printf("Error reading request body: %v", err)
 		http.Error(w, "Error reading request body", http.StatusBadRequest)
 		return
 	}
+	defer r.Body.Close()
 
 	var reviewReq utils.TicketReviewRequest
 	if err := json.Unmarshal(body, &reviewReq); err != nil {
@@ -204,6 +250,5 @@ func (th *ticketHandler) ProcessTicketReview(w http.ResponseWriter, r *http.Requ
 	}
 
 	log.Printf("Successfully updated ticket %s", reviewReq.TicketUUID)
-
 	utils.RespondWithJSON(w, http.StatusOK, updatedTicket)
 }
