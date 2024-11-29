@@ -1,11 +1,13 @@
 package handlers
 
 import (
+	"bytes"
 	"encoding/json"
 	"fmt"
 	"io"
 	"log"
 	"net/http"
+	"os"
 
 	"github.com/go-chi/chi"
 	"github.com/google/uuid"
@@ -175,7 +177,6 @@ func (th *ticketHandler) PostTicketDataToStakwork(w http.ResponseWriter, r *http
 			validationErrors = append(validationErrors, "Invalid UUID format")
 		}
 	}
-
 	if ticket.FeatureUUID == "" {
 		validationErrors = append(validationErrors, "FeatureUUID is required")
 	}
@@ -195,10 +196,125 @@ func (th *ticketHandler) PostTicketDataToStakwork(w http.ResponseWriter, r *http
 		return
 	}
 
-	utils.RespondWithJSON(w, http.StatusOK, TicketResponse{
-		Success:  true,
+	db := th.db
+	feature := db.GetFeatureByUuid(ticket.FeatureUUID)
+	if feature.Uuid == "" {
+		utils.RespondWithJSON(w, http.StatusInternalServerError, TicketResponse{
+			Success: false,
+			Message: "Error retrieving feature details",
+			Errors:  []string{"Feature not found with the provided UUID"},
+		})
+		return
+	}
+
+	productBrief, err := db.GetProductBrief(feature.WorkspaceUuid)
+	if err != nil {
+		utils.RespondWithJSON(w, http.StatusInternalServerError, TicketResponse{
+			Success: false,
+			Message: "Error retrieving product brief",
+			Errors:  []string{err.Error()},
+		})
+		return
+	}
+
+	featureBrief, err := db.GetFeatureBrief(ticket.FeatureUUID)
+	if err != nil {
+		utils.RespondWithJSON(w, http.StatusInternalServerError, TicketResponse{
+			Success: false,
+			Message: "Error retrieving feature brief",
+			Errors:  []string{err.Error()},
+		})
+		return
+	}
+
+	host := os.Getenv("HOST")
+	if host == "" {
+		http.Error(w, "HOST environment variable not set", http.StatusInternalServerError)
+		return
+	}
+
+	webhookURL := fmt.Sprintf("%s/bounty/ticket/review/", host)
+
+	stakworkPayload := map[string]interface{}{
+		"name":        "Hive Ticket Builder",
+		"workflow_id": 37324,
+		"workflow_params": map[string]interface{}{
+			"set_var": map[string]interface{}{
+				"attributes": map[string]interface{}{
+					"vars": map[string]interface{}{
+						"featureUUID":       ticket.FeatureUUID,
+						"phaseUUID":         ticket.PhaseUUID,
+						"ticketUUID":        ticket.UUID.String(),
+						"ticketName":        ticket.Name,
+						"ticketDescription": ticket.Description,
+						"productBrief":      productBrief,
+						"featureBrief":      featureBrief,
+						"examples":          "",
+						"webhook_url":       webhookURL,
+					},
+				},
+			},
+		},
+	}
+
+	stakworkPayloadJSON, err := json.Marshal(stakworkPayload)
+	if err != nil {
+		utils.RespondWithJSON(w, http.StatusInternalServerError, TicketResponse{
+			Success: false,
+			Message: "Error encoding payload",
+			Errors:  []string{err.Error()},
+		})
+		return
+	}
+
+	apiKey := os.Getenv("SWWFKEY")
+	if apiKey == "" {
+		utils.RespondWithJSON(w, http.StatusInternalServerError, TicketResponse{
+			Success: false,
+			Message: "API key not set in environment",
+		})
+		return
+	}
+
+	req, err := http.NewRequest(http.MethodPost, "https://api.stakwork.com/api/v1/projects", bytes.NewBuffer(stakworkPayloadJSON))
+	if err != nil {
+		utils.RespondWithJSON(w, http.StatusInternalServerError, TicketResponse{
+			Success: false,
+			Message: "Error creating request to Stakwork API",
+			Errors:  []string{err.Error()},
+		})
+		return
+	}
+
+	req.Header.Set("Authorization", "Token token="+apiKey)
+	req.Header.Set("Content-Type", "application/json")
+
+	client := &http.Client{}
+	resp, err := client.Do(req)
+	if err != nil {
+		utils.RespondWithJSON(w, http.StatusInternalServerError, TicketResponse{
+			Success: false,
+			Message: "Error sending request to Stakwork API",
+			Errors:  []string{err.Error()},
+		})
+		return
+	}
+	defer resp.Body.Close()
+
+	respBody, err := io.ReadAll(resp.Body)
+	if err != nil {
+		utils.RespondWithJSON(w, http.StatusInternalServerError, TicketResponse{
+			Success: false,
+			Message: "Error reading response from Stakwork API",
+			Errors:  []string{err.Error()},
+		})
+		return
+	}
+
+	utils.RespondWithJSON(w, resp.StatusCode, TicketResponse{
+		Success:  resp.StatusCode == http.StatusOK,
+		Message:  string(respBody),
 		TicketID: ticket.UUID.String(),
-		Message:  "Ticket submission is valid",
 	})
 }
 
