@@ -11,29 +11,47 @@ import (
 
 func (db database) CreateOrEditTicket(ticket *Tickets) (Tickets, error) {
 
-	if ticket.UUID == uuid.Nil || ticket.FeatureUUID == "" || ticket.PhaseUUID == "" || ticket.Name == "" {
-		return Tickets{}, errors.New("required fields are missing")
+	if ticket.UUID == uuid.Nil {
+		return Tickets{}, errors.New("ticket UUID is required")
 	}
 
-	// check if ticket exists and update it
-	if db.db.Model(&Tickets{}).Where("uuid = ?", ticket.UUID).First(&ticket).RowsAffected != 0 {
-		now := time.Now()
-		ticket.UpdatedAt = now
+	if ticket.Status != "" && !IsValidTicketStatus(ticket.Status) {
+		return Tickets{}, errors.New("invalid ticket status")
+	}
 
-		// update ticket
-		if db.db.Model(&ticket).Where("uuid = ?", ticket.UUID).Updates(&ticket).RowsAffected == 0 {
-			return Tickets{}, errors.New("failed to update ticket")
+	var existingTicket Tickets
+	result := db.db.Where("uuid = ?", ticket.UUID).First(&existingTicket)
+
+	now := time.Now()
+	ticket.UpdatedAt = now
+
+	if errors.Is(result.Error, gorm.ErrRecordNotFound) {
+		ticket.CreatedAt = now
+
+		if ticket.Status == "" {
+			ticket.Status = DraftTicket
 		}
 
+		if err := db.db.Create(&ticket).Error; err != nil {
+			return Tickets{}, fmt.Errorf("failed to create ticket: %w", err)
+		}
 		return *ticket, nil
 	}
 
-	// create ticket and return error if it fails
-	if db.db.Create(&ticket).Error != nil {
-		return Tickets{}, db.db.Create(&ticket).Error
+	if result.Error != nil {
+		return Tickets{}, fmt.Errorf("database error: %w", result.Error)
 	}
 
-	return *ticket, nil
+	if err := db.db.Model(&existingTicket).Updates(ticket).Error; err != nil {
+		return Tickets{}, fmt.Errorf("failed to update ticket: %w", err)
+	}
+
+	var updatedTicket Tickets
+	if err := db.db.Where("uuid = ?", ticket.UUID).First(&updatedTicket).Error; err != nil {
+		return Tickets{}, fmt.Errorf("failed to fetch updated ticket: %w", err)
+	}
+
+	return updatedTicket, nil
 }
 
 func (db database) GetTicket(uuid string) (Tickets, error) {
@@ -64,10 +82,6 @@ func IsValidTicketStatus(status TicketStatus) bool {
 func (db database) UpdateTicket(ticket Tickets) (Tickets, error) {
 	if ticket.UUID == uuid.Nil {
 		return Tickets{}, errors.New("ticket UUID is required")
-	}
-
-	if ticket.FeatureUUID == "" || ticket.PhaseUUID == "" || ticket.Name == "" {
-		return Tickets{}, errors.New("feature_uuid, phase_uuid, and name are required")
 	}
 
 	if ticket.Status != "" && !IsValidTicketStatus(ticket.Status) {
