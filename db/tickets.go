@@ -52,6 +52,15 @@ func (db database) GetTicket(uuid string) (Tickets, error) {
 	return ticket, nil
 }
 
+func IsValidTicketStatus(status TicketStatus) bool {
+	switch status {
+	case DraftTicket, ReadyTicket, InProgressTicket, TestTicket, DeployTicket, PayTicket, CompletedTicket:
+		return true
+	default:
+		return false
+	}
+}
+
 func (db database) UpdateTicket(ticket Tickets) (Tickets, error) {
 	if ticket.UUID == uuid.Nil {
 		return Tickets{}, errors.New("ticket UUID is required")
@@ -59,6 +68,10 @@ func (db database) UpdateTicket(ticket Tickets) (Tickets, error) {
 
 	if ticket.FeatureUUID == "" || ticket.PhaseUUID == "" || ticket.Name == "" {
 		return Tickets{}, errors.New("feature_uuid, phase_uuid, and name are required")
+	}
+
+	if ticket.Status != "" && !IsValidTicketStatus(ticket.Status) {
+		return Tickets{}, errors.New("invalid ticket status")
 	}
 
 	var existingTicket Tickets
@@ -70,6 +83,10 @@ func (db database) UpdateTicket(ticket Tickets) (Tickets, error) {
 	if result.Error != nil {
 		if errors.Is(result.Error, gorm.ErrRecordNotFound) {
 			ticket.CreatedAt = now
+
+			if ticket.Status == "" {
+				ticket.Status = DraftTicket
+			}
 			if err := db.db.Create(&ticket).Error; err != nil {
 				return Tickets{}, fmt.Errorf("failed to create ticket: %w", err)
 			}

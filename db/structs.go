@@ -948,8 +948,13 @@ type WfRequest struct {
 type TicketStatus string
 
 const (
-	DraftTicket     TicketStatus = "draft"
-	CompletedTicket TicketStatus = "completed"
+	DraftTicket      TicketStatus = "DRAFT"
+	ReadyTicket      TicketStatus = "READY"
+	InProgressTicket TicketStatus = "IN_PROGRESS"
+	TestTicket       TicketStatus = "TEST"
+	DeployTicket     TicketStatus = "DEPLOY"
+	PayTicket        TicketStatus = "PAY"
+	CompletedTicket  TicketStatus = "COMPLETED"
 )
 
 type Tickets struct {
@@ -962,7 +967,7 @@ type Tickets struct {
 	Sequence     int               `gorm:"type:integer;not null;index:composite_index"`
 	Dependency   []int             `gorm:"type:integer[]"`
 	Description  string            `gorm:"type:text"`
-	Status       TicketStatus      `gorm:"type:varchar(50);not null;default:'draft'"`
+	Status       TicketStatus      `gorm:"type:varchar(50);not null;default:'DRAFT'"`
 	Version      int               `gorm:"type:integer" json:"version"`
 	CreatedAt    time.Time         `gorm:"type:timestamp;not null;default:current_timestamp" json:"created_at"`
 	UpdatedAt    time.Time         `gorm:"type:timestamp;not null;default:current_timestamp" json:"updated_at"`
