@@ -107,7 +107,7 @@ func (th *ticketHandler) UpdateTicket(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	updatedTicket, err := th.db.UpdateTicket(ticket)
+	updatedTicket, err := th.db.CreateOrEditTicket(&ticket)
 	if err != nil {
 		if err.Error() == "feature_uuid, phase_uuid, and name are required" {
 			w.WriteHeader(http.StatusBadRequest)
@@ -199,15 +199,6 @@ func (th *ticketHandler) PostTicketDataToStakwork(w http.ResponseWriter, r *http
 			validationErrors = append(validationErrors, "Invalid UUID format")
 		}
 	}
-	if ticket.FeatureUUID == "" {
-		validationErrors = append(validationErrors, "FeatureUUID is required")
-	}
-	if ticket.PhaseUUID == "" {
-		validationErrors = append(validationErrors, "PhaseUUID is required")
-	}
-	if ticket.Name == "" {
-		validationErrors = append(validationErrors, "Name is required")
-	}
 
 	if len(validationErrors) > 0 {
 		w.WriteHeader(http.StatusBadRequest)
@@ -219,37 +210,41 @@ func (th *ticketHandler) PostTicketDataToStakwork(w http.ResponseWriter, r *http
 		return
 	}
 
-	feature := th.db.GetFeatureByUuid(ticket.FeatureUUID)
-	if feature.Uuid == "" {
-		w.WriteHeader(http.StatusInternalServerError)
-		json.NewEncoder(w).Encode(TicketResponse{
-			Success: false,
-			Message: "Error retrieving feature details",
-			Errors:  []string{"Feature not found with the provided UUID"},
-		})
-		return
-	}
+	var productBrief, featureBrief string
+	if ticket.FeatureUUID != "" {
+		feature := th.db.GetFeatureByUuid(ticket.FeatureUUID)
+		if feature.Uuid == "" {
+			w.WriteHeader(http.StatusInternalServerError)
+			json.NewEncoder(w).Encode(TicketResponse{
+				Success: false,
+				Message: "Error retrieving feature details",
+				Errors:  []string{"Feature not found with the provided UUID"},
+			})
+			return
+		}
 
-	productBrief, err := th.db.GetProductBrief(feature.WorkspaceUuid)
-	if err != nil {
-		w.WriteHeader(http.StatusInternalServerError)
-		json.NewEncoder(w).Encode(TicketResponse{
-			Success: false,
-			Message: "Error retrieving product brief",
-			Errors:  []string{err.Error()},
-		})
-		return
-	}
+		var err error
+		productBrief, err = th.db.GetProductBrief(feature.WorkspaceUuid)
+		if err != nil {
+			w.WriteHeader(http.StatusInternalServerError)
+			json.NewEncoder(w).Encode(TicketResponse{
+				Success: false,
+				Message: "Error retrieving product brief",
+				Errors:  []string{err.Error()},
+			})
+			return
+		}
 
-	featureBrief, err := th.db.GetFeatureBrief(ticket.FeatureUUID)
-	if err != nil {
-		w.WriteHeader(http.StatusInternalServerError)
-		json.NewEncoder(w).Encode(TicketResponse{
-			Success: false,
-			Message: "Error retrieving feature brief",
-			Errors:  []string{err.Error()},
-		})
-		return
+		featureBrief, err = th.db.GetFeatureBrief(ticket.FeatureUUID)
+		if err != nil {
+			w.WriteHeader(http.StatusInternalServerError)
+			json.NewEncoder(w).Encode(TicketResponse{
+				Success: false,
+				Message: "Error retrieving feature brief",
+				Errors:  []string{err.Error()},
+			})
+			return
+		}
 	}
 
 	host := os.Getenv("HOST")

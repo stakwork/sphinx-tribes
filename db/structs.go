@@ -959,18 +959,18 @@ const (
 
 type Tickets struct {
 	UUID         uuid.UUID         `gorm:"primaryKey;type:uuid;default:gen_random_uuid()"`
-	FeatureUUID  string            `gorm:"type:uuid;not null;index:composite_index" json:"feature_uuid" validate:"required"`
+	FeatureUUID  string            `gorm:"type:uuid;index:composite_index" json:"feature_uuid"`
 	Features     WorkspaceFeatures `gorm:"foreignKey:FeatureUUID;references:Uuid"`
-	PhaseUUID    string            `gorm:"type:uuid;not null;index:phase_index" json:"phase_uuid" validate:"required"`
+	PhaseUUID    string            `gorm:"type:uuid;index:phase_index" json:"phase_uuid"`
 	FeaturePhase FeaturePhase      `gorm:"foreignKey:PhaseUUID;references:Uuid"`
-	Name         string            `gorm:"type:varchar(255);not null"`
-	Sequence     int               `gorm:"type:integer;not null;index:composite_index"`
-	Dependency   []int             `gorm:"type:integer[]"`
-	Description  string            `gorm:"type:text"`
-	Status       TicketStatus      `gorm:"type:varchar(50);not null;default:'DRAFT'"`
-	Version      int               `gorm:"type:integer" json:"version"`
-	CreatedAt    time.Time         `gorm:"type:timestamp;not null;default:current_timestamp" json:"created_at"`
-	UpdatedAt    time.Time         `gorm:"type:timestamp;not null;default:current_timestamp" json:"updated_at"`
+	Name         string            `gorm:"type:varchar(255)" json:"name"`
+	Sequence     int               `gorm:"type:integer;index:composite_index;default:0" json:"sequence"`
+	Dependency   []int             `gorm:"type:integer[]" json:"dependency"`
+	Description  string            `gorm:"type:text" json:"description"`
+	Status       TicketStatus      `gorm:"type:varchar(50);default:'DRAFT'" json:"status"`
+	Version      int               `gorm:"type:integer;default:0" json:"version"`
+	CreatedAt    time.Time         `gorm:"type:timestamp;default:current_timestamp" json:"created_at"`
+	UpdatedAt    time.Time         `gorm:"type:timestamp;default:current_timestamp" json:"updated_at"`
 }
 
 func (Person) TableName() string {

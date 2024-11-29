@@ -13,10 +13,6 @@ func TicketRoutes() chi.Router {
 	r := chi.NewRouter()
 	ticketHandler := handlers.NewTicketHandler(http.DefaultClient, db.DB)
 
-	r.Options("/*", func(w http.ResponseWriter, r *http.Request) {
-		w.WriteHeader(http.StatusOK)
-	})
-
 	r.Group(func(r chi.Router) {
 		r.Get("/{uuid}", ticketHandler.GetTicket)
 	})
@@ -27,7 +23,7 @@ func TicketRoutes() chi.Router {
 		r.Post("/review/send", ticketHandler.PostTicketDataToStakwork)
 		r.Post("/review", ticketHandler.ProcessTicketReview)
 
-		r.Put("/{uuid}", ticketHandler.UpdateTicket)
+		r.Post("/{uuid}", ticketHandler.UpdateTicket)
 		r.Delete("/{uuid}", ticketHandler.DeleteTicket)
 	})
 
