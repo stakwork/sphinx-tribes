@@ -5,16 +5,20 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
+	"log"
 	"net/http"
 	"os"
 
 	"github.com/go-chi/chi"
 	"github.com/google/uuid"
+	"github.com/stakwork/sphinx-tribes/auth"
 	"github.com/stakwork/sphinx-tribes/db"
+	"github.com/stakwork/sphinx-tribes/utils"
 )
 
 type ticketHandler struct {
-	db db.Database
+	httpClient HttpClient
+	db         db.Database
 }
 
 type TicketResponse struct {
@@ -24,9 +28,10 @@ type TicketResponse struct {
 	Errors   []string `json:"errors,omitempty"`
 }
 
-func NewTicketHandler(database db.Database) *ticketHandler {
+func NewTicketHandler(httpClient HttpClient, database db.Database) *ticketHandler {
 	return &ticketHandler{
-		db: database,
+		httpClient: httpClient,
+		db:         database,
 	}
 }
 
@@ -47,10 +52,19 @@ func (th *ticketHandler) GetTicket(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	respondWithJSON(w, http.StatusOK, ticket)
+	utils.RespondWithJSON(w, http.StatusOK, ticket)
 }
 
 func (th *ticketHandler) UpdateTicket(w http.ResponseWriter, r *http.Request) {
+	ctx := r.Context()
+	pubKeyFromAuth, _ := ctx.Value(auth.ContextKey).(string)
+
+	if pubKeyFromAuth == "" {
+		fmt.Println("[ticket] no pubkey from auth")
+		http.Error(w, "Unauthorized", http.StatusUnauthorized)
+		return
+	}
+
 	uuidStr := chi.URLParam(r, "uuid")
 	if uuidStr == "" {
 		http.Error(w, "UUID is required", http.StatusBadRequest)
@@ -68,6 +82,7 @@ func (th *ticketHandler) UpdateTicket(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Error reading request body", http.StatusBadRequest)
 		return
 	}
+	defer r.Body.Close()
 
 	var ticket db.Tickets
 	if err := json.Unmarshal(body, &ticket); err != nil {
@@ -76,6 +91,11 @@ func (th *ticketHandler) UpdateTicket(w http.ResponseWriter, r *http.Request) {
 	}
 
 	ticket.UUID = ticketUUID
+
+	if ticket.Status != "" && !db.IsValidTicketStatus(ticket.Status) {
+		http.Error(w, "Invalid ticket status", http.StatusBadRequest)
+		return
+	}
 
 	updatedTicket, err := th.db.UpdateTicket(ticket)
 	if err != nil {
@@ -87,10 +107,18 @@ func (th *ticketHandler) UpdateTicket(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	respondWithJSON(w, http.StatusOK, updatedTicket)
+	utils.RespondWithJSON(w, http.StatusOK, updatedTicket)
 }
-
 func (th *ticketHandler) DeleteTicket(w http.ResponseWriter, r *http.Request) {
+	ctx := r.Context()
+	pubKeyFromAuth, _ := ctx.Value(auth.ContextKey).(string)
+
+	if pubKeyFromAuth == "" {
+		fmt.Println("[ticket] no pubkey from auth")
+		http.Error(w, "Unauthorized", http.StatusUnauthorized)
+		return
+	}
+
 	uuid := chi.URLParam(r, "uuid")
 	if uuid == "" {
 		http.Error(w, "UUID is required", http.StatusBadRequest)
@@ -107,13 +135,22 @@ func (th *ticketHandler) DeleteTicket(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	respondWithJSON(w, http.StatusOK, map[string]string{"status": "success"})
+	utils.RespondWithJSON(w, http.StatusOK, map[string]string{"status": "success"})
 }
 
 func (th *ticketHandler) PostTicketDataToStakwork(w http.ResponseWriter, r *http.Request) {
+	ctx := r.Context()
+	pubKeyFromAuth, _ := ctx.Value(auth.ContextKey).(string)
+
+	if pubKeyFromAuth == "" {
+		fmt.Println("[ticket] no pubkey from auth")
+		http.Error(w, "Unauthorized", http.StatusUnauthorized)
+		return
+	}
+
 	body, err := io.ReadAll(r.Body)
 	if err != nil {
-		respondWithJSON(w, http.StatusBadRequest, TicketResponse{
+		utils.RespondWithJSON(w, http.StatusBadRequest, TicketResponse{
 			Success: false,
 			Message: "Validation failed",
 			Errors:  []string{"Error reading request body"},
@@ -124,7 +161,7 @@ func (th *ticketHandler) PostTicketDataToStakwork(w http.ResponseWriter, r *http
 
 	var ticket db.Tickets
 	if err := json.Unmarshal(body, &ticket); err != nil {
-		respondWithJSON(w, http.StatusBadRequest, TicketResponse{
+		utils.RespondWithJSON(w, http.StatusBadRequest, TicketResponse{
 			Success: false,
 			Message: "Validation failed",
 			Errors:  []string{"Error parsing request body: " + err.Error()},
@@ -151,7 +188,7 @@ func (th *ticketHandler) PostTicketDataToStakwork(w http.ResponseWriter, r *http
 	}
 
 	if len(validationErrors) > 0 {
-		respondWithJSON(w, http.StatusBadRequest, TicketResponse{
+		utils.RespondWithJSON(w, http.StatusBadRequest, TicketResponse{
 			Success: false,
 			Message: "Validation failed",
 			Errors:  validationErrors,
@@ -162,7 +199,7 @@ func (th *ticketHandler) PostTicketDataToStakwork(w http.ResponseWriter, r *http
 	db := th.db
 	feature := db.GetFeatureByUuid(ticket.FeatureUUID)
 	if feature.Uuid == "" {
-		respondWithJSON(w, http.StatusInternalServerError, TicketResponse{
+		utils.RespondWithJSON(w, http.StatusInternalServerError, TicketResponse{
 			Success: false,
 			Message: "Error retrieving feature details",
 			Errors:  []string{"Feature not found with the provided UUID"},
@@ -172,7 +209,7 @@ func (th *ticketHandler) PostTicketDataToStakwork(w http.ResponseWriter, r *http
 
 	productBrief, err := db.GetProductBrief(feature.WorkspaceUuid)
 	if err != nil {
-		respondWithJSON(w, http.StatusInternalServerError, TicketResponse{
+		utils.RespondWithJSON(w, http.StatusInternalServerError, TicketResponse{
 			Success: false,
 			Message: "Error retrieving product brief",
 			Errors:  []string{err.Error()},
@@ -182,7 +219,7 @@ func (th *ticketHandler) PostTicketDataToStakwork(w http.ResponseWriter, r *http
 
 	featureBrief, err := db.GetFeatureBrief(ticket.FeatureUUID)
 	if err != nil {
-		respondWithJSON(w, http.StatusInternalServerError, TicketResponse{
+		utils.RespondWithJSON(w, http.StatusInternalServerError, TicketResponse{
 			Success: false,
 			Message: "Error retrieving feature brief",
 			Errors:  []string{err.Error()},
@@ -222,7 +259,7 @@ func (th *ticketHandler) PostTicketDataToStakwork(w http.ResponseWriter, r *http
 
 	stakworkPayloadJSON, err := json.Marshal(stakworkPayload)
 	if err != nil {
-		respondWithJSON(w, http.StatusInternalServerError, TicketResponse{
+		utils.RespondWithJSON(w, http.StatusInternalServerError, TicketResponse{
 			Success: false,
 			Message: "Error encoding payload",
 			Errors:  []string{err.Error()},
@@ -232,7 +269,7 @@ func (th *ticketHandler) PostTicketDataToStakwork(w http.ResponseWriter, r *http
 
 	apiKey := os.Getenv("SWWFKEY")
 	if apiKey == "" {
-		respondWithJSON(w, http.StatusInternalServerError, TicketResponse{
+		utils.RespondWithJSON(w, http.StatusInternalServerError, TicketResponse{
 			Success: false,
 			Message: "API key not set in environment",
 		})
@@ -241,7 +278,7 @@ func (th *ticketHandler) PostTicketDataToStakwork(w http.ResponseWriter, r *http
 
 	req, err := http.NewRequest(http.MethodPost, "https://api.stakwork.com/api/v1/projects", bytes.NewBuffer(stakworkPayloadJSON))
 	if err != nil {
-		respondWithJSON(w, http.StatusInternalServerError, TicketResponse{
+		utils.RespondWithJSON(w, http.StatusInternalServerError, TicketResponse{
 			Success: false,
 			Message: "Error creating request to Stakwork API",
 			Errors:  []string{err.Error()},
@@ -255,7 +292,7 @@ func (th *ticketHandler) PostTicketDataToStakwork(w http.ResponseWriter, r *http
 	client := &http.Client{}
 	resp, err := client.Do(req)
 	if err != nil {
-		respondWithJSON(w, http.StatusInternalServerError, TicketResponse{
+		utils.RespondWithJSON(w, http.StatusInternalServerError, TicketResponse{
 			Success: false,
 			Message: "Error sending request to Stakwork API",
 			Errors:  []string{err.Error()},
@@ -266,7 +303,7 @@ func (th *ticketHandler) PostTicketDataToStakwork(w http.ResponseWriter, r *http
 
 	respBody, err := io.ReadAll(resp.Body)
 	if err != nil {
-		respondWithJSON(w, http.StatusInternalServerError, TicketResponse{
+		utils.RespondWithJSON(w, http.StatusInternalServerError, TicketResponse{
 			Success: false,
 			Message: "Error reading response from Stakwork API",
 			Errors:  []string{err.Error()},
@@ -274,15 +311,60 @@ func (th *ticketHandler) PostTicketDataToStakwork(w http.ResponseWriter, r *http
 		return
 	}
 
-	respondWithJSON(w, resp.StatusCode, TicketResponse{
+	utils.RespondWithJSON(w, resp.StatusCode, TicketResponse{
 		Success:  resp.StatusCode == http.StatusOK,
 		Message:  string(respBody),
 		TicketID: ticket.UUID.String(),
 	})
 }
 
-func respondWithJSON(w http.ResponseWriter, code int, payload interface{}) {
-	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(code)
-	json.NewEncoder(w).Encode(payload)
+func (th *ticketHandler) ProcessTicketReview(w http.ResponseWriter, r *http.Request) {
+	ctx := r.Context()
+	pubKeyFromAuth, _ := ctx.Value(auth.ContextKey).(string)
+
+	if pubKeyFromAuth == "" {
+		fmt.Println("[ticket] no pubkey from auth")
+		http.Error(w, "Unauthorized", http.StatusUnauthorized)
+		return
+	}
+
+	body, err := io.ReadAll(r.Body)
+	if err != nil {
+		log.Printf("Error reading request body: %v", err)
+		http.Error(w, "Error reading request body", http.StatusBadRequest)
+		return
+	}
+	defer r.Body.Close()
+
+	var reviewReq utils.TicketReviewRequest
+	if err := json.Unmarshal(body, &reviewReq); err != nil {
+		log.Printf("Error parsing request JSON: %v", err)
+		http.Error(w, "Error parsing request body", http.StatusBadRequest)
+		return
+	}
+
+	if err := utils.ValidateTicketReviewRequest(&reviewReq); err != nil {
+		log.Printf("Invalid request data: %v", err)
+		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	}
+
+	ticket, err := th.db.GetTicket(reviewReq.TicketUUID)
+	if err != nil {
+		log.Printf("Error fetching ticket: %v", err)
+		http.Error(w, "Ticket not found", http.StatusNotFound)
+		return
+	}
+
+	ticket.Description = reviewReq.TicketDescription
+
+	updatedTicket, err := th.db.UpdateTicket(ticket)
+	if err != nil {
+		log.Printf("Error updating ticket: %v", err)
+		http.Error(w, "Failed to update ticket", http.StatusInternalServerError)
+		return
+	}
+
+	log.Printf("Successfully updated ticket %s", reviewReq.TicketUUID)
+	utils.RespondWithJSON(w, http.StatusOK, updatedTicket)
 }
