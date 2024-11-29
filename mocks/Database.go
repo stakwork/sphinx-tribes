@@ -5675,6 +5675,64 @@ func (_c *Database_GetTicket_Call) RunAndReturn(run func(string) (db.Tickets, er
 	return _c
 }
 
+// GetTicketsByPhase provides a mock function with given fields: phaseUUID
+func (_m *Database) GetTicketsByPhase(phaseUUID string) ([]db.Tickets, error) {
+	ret := _m.Called(phaseUUID)
+
+	if len(ret) == 0 {
+		panic("no return value specified for GetTicketsByPhase")
+	}
+
+	var r0 []db.Tickets
+	var r1 error
+	if rf, ok := ret.Get(0).(func(string) ([]db.Tickets, error)); ok {
+		return rf(phaseUUID)
+	}
+	if rf, ok := ret.Get(0).(func(string) []db.Tickets); ok {
+		r0 = rf(phaseUUID)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).([]db.Tickets)
+		}
+	}
+
+	if rf, ok := ret.Get(1).(func(string) error); ok {
+		r1 = rf(phaseUUID)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
+// Database_GetTicketsByPhase_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'GetTicketsByPhase'
+type Database_GetTicketsByPhase_Call struct {
+	*mock.Call
+}
+
+// GetTicketsByPhase is a helper method to define mock.On call
+//   - phaseUUID string
+func (_e *Database_Expecter) GetTicketsByPhase(phaseUUID interface{}) *Database_GetTicketsByPhase_Call {
+	return &Database_GetTicketsByPhase_Call{Call: _e.mock.On("GetTicketsByPhase", phaseUUID)}
+}
+
+func (_c *Database_GetTicketsByPhase_Call) Run(run func(phaseUUID string)) *Database_GetTicketsByPhase_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(string))
+	})
+	return _c
+}
+
+func (_c *Database_GetTicketsByPhase_Call) Return(_a0 []db.Tickets, _a1 error) *Database_GetTicketsByPhase_Call {
+	_c.Call.Return(_a0, _a1)
+	return _c
+}
+
+func (_c *Database_GetTicketsByPhase_Call) RunAndReturn(run func(string) ([]db.Tickets, error)) *Database_GetTicketsByPhase_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
 // GetTribe provides a mock function with given fields: uuid
 func (_m *Database) GetTribe(uuid string) db.Tribe {
 	ret := _m.Called(uuid)

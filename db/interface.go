@@ -201,4 +201,5 @@ type Database interface {
 	GetProductBrief(workspaceUuid string) (string, error)
 	GetFeatureBrief(featureUuid string) (string, error)
 	GetTicketsByPhaseUUID(featureUUID string, phaseUUID string) ([]Tickets, error)
+	GetTicketsByPhase(phaseUUID string) ([]Tickets, error)
 }
