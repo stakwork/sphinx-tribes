@@ -1,9 +1,7 @@
 package utils
 
 import (
-	"encoding/json"
 	"errors"
-	"net/http"
 )
 
 type TicketReviewRequest struct {
@@ -27,10 +25,4 @@ func ValidateTicketReviewRequest(req *TicketReviewRequest) error {
 		return errors.New("ticketDescription is required")
 	}
 	return nil
-}
-
-func RespondWithJSON(w http.ResponseWriter, code int, payload interface{}) {
-	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(code)
-	json.NewEncoder(w).Encode(payload)
 }
