@@ -184,7 +184,7 @@ func TestUpdateTicket(t *testing.T) {
 		rr := httptest.NewRecorder()
 		handler := http.HandlerFunc(tHandler.UpdateTicket)
 
-		req, err := http.NewRequest(http.MethodPut, "/tickets/", nil)
+		req, err := http.NewRequest(http.MethodPost, "/tickets/", nil)
 		if err != nil {
 			t.Fatal(err)
 		}
@@ -197,7 +197,7 @@ func TestUpdateTicket(t *testing.T) {
 		rr := httptest.NewRecorder()
 		handler := http.HandlerFunc(tHandler.UpdateTicket)
 
-		req, err := http.NewRequest(http.MethodPut, "/tickets/", nil)
+		req, err := http.NewRequest(http.MethodPost, "/tickets/", nil)
 		if err != nil {
 			t.Fatal(err)
 		}
@@ -216,7 +216,7 @@ func TestUpdateTicket(t *testing.T) {
 		rctx := chi.NewRouteContext()
 		rctx.URLParams.Add("uuid", "invalid-uuid")
 
-		req, err := http.NewRequest(http.MethodPut, "/tickets/invalid-uuid", bytes.NewReader([]byte("{}")))
+		req, err := http.NewRequest(http.MethodPost, "/tickets/invalid-uuid", bytes.NewReader([]byte("{}")))
 		if err != nil {
 			t.Fatal(err)
 		}
@@ -235,7 +235,7 @@ func TestUpdateTicket(t *testing.T) {
 		invalidJson := []byte(`{"key": "value"`)
 		rctx := chi.NewRouteContext()
 		rctx.URLParams.Add("uuid", createdTicket.UUID.String())
-		req, err := http.NewRequest(http.MethodPut, "/tickets/"+createdTicket.UUID.String(), bytes.NewReader(invalidJson))
+		req, err := http.NewRequest(http.MethodPost, "/tickets/"+createdTicket.UUID.String(), bytes.NewReader(invalidJson))
 		if err != nil {
 			t.Fatal(err)
 		}
@@ -247,19 +247,21 @@ func TestUpdateTicket(t *testing.T) {
 		assert.Equal(t, http.StatusBadRequest, rr.Code)
 	})
 
-	t.Run("should return 400 if required fields are missing", func(t *testing.T) {
+	t.Run("should update ticket with only UUID and optional fields", func(t *testing.T) {
 		rr := httptest.NewRecorder()
 		handler := http.HandlerFunc(tHandler.UpdateTicket)
 
-		invalidTicket := db.Tickets{
-			UUID: uuid.New(),
-			// Missing required fields
+		// Create a ticket with only UUID and some optional fields
+		updateTicket := db.Tickets{
+			UUID:        createdTicket.UUID,
+			Description: "Updated description", // Optional field
+			Status:      db.ReadyTicket,        // Optional field
 		}
 
-		requestBody, _ := json.Marshal(invalidTicket)
+		requestBody, _ := json.Marshal(updateTicket)
 		rctx := chi.NewRouteContext()
-		rctx.URLParams.Add("uuid", invalidTicket.UUID.String())
-		req, err := http.NewRequest(http.MethodPut, "/tickets/"+invalidTicket.UUID.String(), bytes.NewReader(requestBody))
+		rctx.URLParams.Add("uuid", updateTicket.UUID.String())
+		req, err := http.NewRequest(http.MethodPost, "/tickets/"+updateTicket.UUID.String(), bytes.NewReader(requestBody))
 		if err != nil {
 			t.Fatal(err)
 		}
@@ -268,7 +270,19 @@ func TestUpdateTicket(t *testing.T) {
 		req = req.WithContext(context.WithValue(ctx, chi.RouteCtxKey, rctx))
 
 		handler.ServeHTTP(rr, req)
-		assert.Equal(t, http.StatusBadRequest, rr.Code)
+		assert.Equal(t, http.StatusOK, rr.Code)
+
+		var returnedTicket db.Tickets
+		err = json.Unmarshal(rr.Body.Bytes(), &returnedTicket)
+		assert.NoError(t, err)
+
+		// Verify that only the provided fields were updated
+		assert.Equal(t, updateTicket.Description, returnedTicket.Description)
+		assert.Equal(t, updateTicket.Status, returnedTicket.Status)
+		// Original fields should remain unchanged
+		assert.Equal(t, createdTicket.FeatureUUID, returnedTicket.FeatureUUID)
+		assert.Equal(t, createdTicket.PhaseUUID, returnedTicket.PhaseUUID)
+		assert.Equal(t, createdTicket.Name, returnedTicket.Name)
 	})
 
 	t.Run("should update ticket successfully", func(t *testing.T) {
