@@ -959,9 +959,9 @@ const (
 
 type Tickets struct {
 	UUID         uuid.UUID         `gorm:"primaryKey;type:uuid"`
-	FeatureUUID  string            `gorm:"type:uuid;index:composite_index" json:"feature_uuid"`
+	FeatureUUID  string            `gorm:"type:varchar(255);index:composite_index" json:"feature_uuid"`
 	Features     WorkspaceFeatures `gorm:"foreignKey:FeatureUUID;references:Uuid"`
-	PhaseUUID    string            `gorm:"type:uuid;index:phase_index" json:"phase_uuid"`
+	PhaseUUID    string            `gorm:"type:varchar(255);index:phase_index" json:"phase_uuid"`
 	FeaturePhase FeaturePhase      `gorm:"foreignKey:PhaseUUID;references:Uuid"`
 	Name         string            `gorm:"type:varchar(255)" json:"name"`
 	Sequence     int               `gorm:"type:integer;index:composite_index;default:0" json:"sequence"`
