@@ -958,7 +958,7 @@ const (
 )
 
 type Tickets struct {
-	UUID         uuid.UUID         `gorm:"primaryKey;type:uuid;default:gen_random_uuid()"`
+	UUID         uuid.UUID         `gorm:"primaryKey;type:uuid"`
 	FeatureUUID  string            `gorm:"type:uuid;index:composite_index" json:"feature_uuid"`
 	Features     WorkspaceFeatures `gorm:"foreignKey:FeatureUUID;references:Uuid"`
 	PhaseUUID    string            `gorm:"type:uuid;index:phase_index" json:"phase_uuid"`
