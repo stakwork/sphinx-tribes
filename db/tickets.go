@@ -32,6 +32,8 @@ func (db database) CreateOrEditTicket(ticket *Tickets) (Tickets, error) {
 			ticket.Status = DraftTicket
 		}
 
+		ticket.UUID = uuid.New()
+
 		if err := db.db.Create(&ticket).Error; err != nil {
 			return Tickets{}, fmt.Errorf("failed to create ticket: %w", err)
 		}
