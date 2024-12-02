@@ -132,18 +132,18 @@ func (db database) DeleteTicket(uuid string) error {
 	return nil
 }
 
-func (db database) GetTicketsByPhase(phaseUUID string) ([]Tickets, error) {
+func (db database) GetTicketsByPhaseUUID(featureUUID string, phaseUUID string) ([]Tickets, error) {
 	var tickets []Tickets
 
-	result := db.db.Where("phase_uuid = ?", phaseUUID).
+	result := db.db.
+		Where("feature_uuid = ? AND phase_uuid = ?", featureUUID, phaseUUID).
 		Order("sequence ASC").
 		Find(&tickets)
 
 	if result.Error != nil {
-		return nil, fmt.Errorf("failed to fetch tickets for phase: %w", result.Error)
+		return nil, fmt.Errorf("failed to fetch tickets: %w", result.Error)
 	}
 
-	// Return empty slice if no tickets found
 	if result.RowsAffected == 0 {
 		return []Tickets{}, nil
 	}
