@@ -358,15 +358,6 @@ func (th *ticketHandler) PostTicketDataToStakwork(w http.ResponseWriter, r *http
 }
 
 func (th *ticketHandler) ProcessTicketReview(w http.ResponseWriter, r *http.Request) {
-	ctx := r.Context()
-	pubKeyFromAuth, _ := ctx.Value(auth.ContextKey).(string)
-
-	if pubKeyFromAuth == "" {
-		fmt.Println("[ticket] no pubkey from auth")
-		w.WriteHeader(http.StatusUnauthorized)
-		json.NewEncoder(w).Encode(map[string]string{"error": "Unauthorized"})
-		return
-	}
 
 	body, err := io.ReadAll(r.Body)
 	if err != nil {
