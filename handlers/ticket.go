@@ -414,3 +414,51 @@ func (th *ticketHandler) ProcessTicketReview(w http.ResponseWriter, r *http.Requ
 	w.WriteHeader(http.StatusOK)
 	json.NewEncoder(w).Encode(updatedTicket)
 }
+
+func (th *ticketHandler) GetTicketsByPhaseUUID(w http.ResponseWriter, r *http.Request) {
+	ctx := r.Context()
+	pubKeyFromAuth, _ := ctx.Value(auth.ContextKey).(string)
+	if pubKeyFromAuth == "" {
+		fmt.Println("no pubkey from auth")
+		w.WriteHeader(http.StatusUnauthorized)
+		return
+	}
+
+	featureUUID := chi.URLParam(r, "feature_uuid")
+	phaseUUID := chi.URLParam(r, "phase_uuid")
+
+	if _, err := uuid.Parse(featureUUID); err != nil {
+		w.WriteHeader(http.StatusBadRequest)
+		json.NewEncoder(w).Encode(map[string]string{"error": "invalid feature UUID format"})
+		return
+	}
+	if _, err := uuid.Parse(phaseUUID); err != nil {
+		w.WriteHeader(http.StatusBadRequest)
+		json.NewEncoder(w).Encode(map[string]string{"error": "invalid phase UUID format"})
+		return
+	}
+
+	feature := th.db.GetFeatureByUuid(featureUUID)
+	if feature.Uuid == "" {
+		w.WriteHeader(http.StatusNotFound)
+		json.NewEncoder(w).Encode(map[string]string{"error": "feature not found"})
+		return
+	}
+
+	_, err := th.db.GetFeaturePhaseByUuid(featureUUID, phaseUUID)
+	if err != nil {
+		w.WriteHeader(http.StatusNotFound)
+		json.NewEncoder(w).Encode(map[string]string{"error": "Phase not found"})
+		return
+	}
+
+	tickets, err := th.db.GetTicketsByPhaseUUID(featureUUID, phaseUUID)
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		json.NewEncoder(w).Encode(map[string]string{"error": err.Error()})
+		return
+	}
+
+	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode(tickets)
+}
