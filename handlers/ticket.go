@@ -257,7 +257,7 @@ func (th *ticketHandler) PostTicketDataToStakwork(w http.ResponseWriter, r *http
 		return
 	}
 
-	webhookURL := fmt.Sprintf("%s/bounties/ticket/review/", host)
+	webhookURL := fmt.Sprintf("%s/bounties/ticket/review", host)
 
 	stakworkPayload := map[string]interface{}{
 		"name":        "Hive Ticket Builder",
