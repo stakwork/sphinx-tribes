@@ -5,15 +5,20 @@ import (
 )
 
 type TicketReviewRequest struct {
-	TicketUUID        string `json:"ticketUUID" validate:"required"`
-	TicketDescription string `json:"ticketDescription" validate:"required"`
+	Value struct {
+		FeatureUUID       string `json:"featureUUID"`
+		PhaseUUID         string `json:"phaseUUID"`
+		TicketUUID        string `json:"ticketUUID" validate:"required"`
+		TicketDescription string `json:"ticketDescription" validate:"required"`
+	} `json:"value"`
+	RequestUUID string `json:"requestUUID"`
 }
 
 func ValidateTicketReviewRequest(req *TicketReviewRequest) error {
-	if req.TicketUUID == "" {
+	if req.Value.TicketUUID == "" {
 		return errors.New("ticketUUID is required")
 	}
-	if req.TicketDescription == "" {
+	if req.Value.TicketDescription == "" {
 		return errors.New("ticketDescription is required")
 	}
 	return nil

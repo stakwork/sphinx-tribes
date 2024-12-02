@@ -8,6 +8,7 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"time"
 
 	"github.com/go-chi/chi"
 	"github.com/google/uuid"
@@ -383,7 +384,7 @@ func (th *ticketHandler) ProcessTicketReview(w http.ResponseWriter, r *http.Requ
 		return
 	}
 
-	ticket, err := th.db.GetTicket(reviewReq.TicketUUID)
+	ticket, err := th.db.GetTicket(reviewReq.Value.TicketUUID)
 	if err != nil {
 		log.Printf("Error fetching ticket: %v", err)
 		w.WriteHeader(http.StatusNotFound)
@@ -391,7 +392,8 @@ func (th *ticketHandler) ProcessTicketReview(w http.ResponseWriter, r *http.Requ
 		return
 	}
 
-	ticket.Description = reviewReq.TicketDescription
+	ticket.Description = reviewReq.Value.TicketDescription
+	ticket.UpdatedAt = time.Now()
 
 	updatedTicket, err := th.db.UpdateTicket(ticket)
 	if err != nil {
@@ -401,7 +403,7 @@ func (th *ticketHandler) ProcessTicketReview(w http.ResponseWriter, r *http.Requ
 		return
 	}
 
-	log.Printf("Successfully updated ticket %s", reviewReq.TicketUUID)
+	log.Printf("Successfully updated ticket %s", reviewReq.Value.TicketUUID)
 	w.WriteHeader(http.StatusOK)
 	json.NewEncoder(w).Encode(updatedTicket)
 }

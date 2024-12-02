@@ -13,12 +13,9 @@ func TicketRoutes() chi.Router {
 	r := chi.NewRouter()
 	ticketHandler := handlers.NewTicketHandler(http.DefaultClient, db.DB)
 
-	r.Options("/*", func(w http.ResponseWriter, r *http.Request) {
-		w.WriteHeader(http.StatusOK)
-	})
-
 	r.Group(func(r chi.Router) {
 		r.Get("/{uuid}", ticketHandler.GetTicket)
+		r.Post("/review", ticketHandler.ProcessTicketReview)
 	})
 
 	r.Group(func(r chi.Router) {
@@ -26,9 +23,8 @@ func TicketRoutes() chi.Router {
 
 		r.Get("/feature/{feature_uuid}/phase/{phase_uuid}", ticketHandler.GetTicketsByPhaseUUID)
 		r.Post("/review/send", ticketHandler.PostTicketDataToStakwork)
-		r.Post("/review", ticketHandler.ProcessTicketReview)
-
 		r.Post("/{uuid}", ticketHandler.UpdateTicket)
+
 		r.Delete("/{uuid}", ticketHandler.DeleteTicket)
 	})
 
