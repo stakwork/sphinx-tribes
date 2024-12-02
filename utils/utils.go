@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"net/http"
 	"strconv"
+	"strings"
 )
 
 func GetPaginationParams(r *http.Request) (int, int, string, string, string) {
@@ -65,7 +66,14 @@ func BuildKeysendBodyData(amount uint, receiver_pubkey string, route_hint string
 }
 
 func BuildV2KeysendBodyData(amount uint, receiver_pubkey string, route_hint string, memo string) string {
+	// convert amount to msat
 	amountMsat := amount * 1000
+
+	// trim the memo
+	memo = strings.TrimSpace(memo)
+	// trim the route hint
+	route_hint = strings.TrimSpace(route_hint)
+
 	var bodyData string
 	if route_hint != "" {
 		bodyData = fmt.Sprintf(`{"amt_msat": %d, "dest": "%s", "route_hint": "%s", "data": "%s", "wait": true}`, amountMsat, receiver_pubkey, route_hint, memo)
