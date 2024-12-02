@@ -418,14 +418,15 @@ func (th *ticketHandler) GetTicketsByPhaseUUID(w http.ResponseWriter, r *http.Re
 	featureUUID := chi.URLParam(r, "feature_uuid")
 	phaseUUID := chi.URLParam(r, "phase_uuid")
 
-	if _, err := uuid.Parse(featureUUID); err != nil {
-		w.WriteHeader(http.StatusBadRequest)
-		json.NewEncoder(w).Encode(map[string]string{"error": "invalid feature UUID format"})
+	if featureUUID == "" {
+		log.Println("feature uuid is missing")
+		http.Error(w, "Missing feature uuid", http.StatusBadRequest)
 		return
 	}
-	if _, err := uuid.Parse(phaseUUID); err != nil {
-		w.WriteHeader(http.StatusBadRequest)
-		json.NewEncoder(w).Encode(map[string]string{"error": "invalid phase UUID format"})
+
+	if phaseUUID == "" {
+		log.Println("phase uuid is missing")
+		http.Error(w, "Missing phase uuid", http.StatusBadRequest)
 		return
 	}
 
