@@ -24,6 +24,7 @@ func TicketRoutes() chi.Router {
 	r.Group(func(r chi.Router) {
 		r.Use(auth.PubKeyContext)
 
+		r.Get("/feature/{feature_uuid}/phase/{phase_uuid}", ticketHandler.GetTicketsByPhaseUUID)
 		r.Post("/review/send", ticketHandler.PostTicketDataToStakwork)
 		r.Post("/review", ticketHandler.ProcessTicketReview)
 

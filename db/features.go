@@ -328,21 +328,6 @@ func (db database) GetBountiesByPhaseUuid(phaseUuid string) []Bounty {
 	return bounties
 }
 
-func (db database) GetTicketsByPhaseUUID(featureUUID string, phaseUUID string) ([]Tickets, error) {
-	var tickets []Tickets
-
-	result := db.db.
-		Where("feature_uuid = ? AND phase_uuid = ?", featureUUID, phaseUUID).
-		Order("sequence ASC").
-		Find(&tickets)
-
-	if result.Error != nil {
-		return nil, fmt.Errorf("failed to fetch tickets: %w", result.Error)
-	}
-
-	return tickets, nil
-}
-
 func (db database) GetProductBrief(workspaceUuid string) (string, error) {
 	workspace := Workspace{}
 	result := db.db.Model(&Workspace{}).Where("uuid = ?", workspaceUuid).First(&workspace)
