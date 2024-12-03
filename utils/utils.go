@@ -52,6 +52,10 @@ func GetPaginationParams(r *http.Request) (int, int, string, string, string) {
 }
 
 func BuildSearchQuery(key string, term string) (string, string) {
+	// trim spaces
+	key = strings.TrimSpace(key)
+	term = strings.TrimSpace(term)
+
 	arg1 := key + " LIKE ?"
 	arg2 := "%" + term + "%"
 	return arg1, arg2
