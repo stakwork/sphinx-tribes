@@ -973,6 +973,30 @@ type Tickets struct {
 	UpdatedAt    time.Time         `gorm:"type:timestamp;default:current_timestamp" json:"updated_at"`
 }
 
+type BroadcastType string
+
+const (
+	PoolBroadcast BroadcastType = "pool"
+
+	DirectBroadcast BroadcastType = "direct"
+)
+
+type ActionType string
+
+const (
+	ProcessAction ActionType = "process"
+
+	MessageAction ActionType = "message"
+)
+
+type TicketMessage struct {
+	BroadcastType   BroadcastType `json:"broadcastType"`
+	SourceSessionID string        `json:"sourceSessionID"`
+	Message         string        `json:"message"`
+	Action          ActionType    `json:"action"`
+	TicketDetails   Tickets       `json:"ticketDetails"`
+}
+
 func (Person) TableName() string {
 	return "people"
 }
