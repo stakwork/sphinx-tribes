@@ -14,10 +14,13 @@ func GetPaginationParams(r *http.Request) (int, int, string, string, string) {
 	}
 
 	keys := r.URL.Query()
-	page := keys.Get("page")
-	limit := keys.Get("limit")
-	sortBy := keys.Get("sortBy")
-	direction := keys.Get("direction")
+	// trim spaces
+	page := strings.TrimSpace(keys.Get("page"))
+	// trim spaces
+	limit := strings.TrimSpace(keys.Get("limit"))
+	// convert to lowercase and trim spaces
+	sortBy := strings.ToLower(strings.TrimSpace(keys.Get("sortBy")))
+	direction := strings.ToLower(strings.TrimSpace(keys.Get("direction")))
 	search := keys.Get("search")
 
 	// convert string to int
@@ -33,7 +36,7 @@ func GetPaginationParams(r *http.Request) (int, int, string, string, string) {
 	if sortBy == "" {
 		sortBy = "created"
 	}
-	if direction == "" {
+	if direction == "" || direction != "asc" {
 		direction = "desc"
 	}
 
