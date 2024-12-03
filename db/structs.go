@@ -990,10 +990,10 @@ const (
 )
 
 type TicketMessage struct {
-	BroadcastType   BroadcastType `gorm:"type:varchar(50)" json:"broadcastType"`
-	SourceSessionID string        `gorm:"type:varchar(50)" json:"sourceSessionID"`
-	Message         string        `gorm:"type:text" json:"message"`
-	Action          ActionType    `gorm:"type:varchar(50)" json:"action"`
+	BroadcastType   BroadcastType `json:"broadcastType"`
+	SourceSessionID string        `json:"sourceSessionID"`
+	Message         string        `json:"message"`
+	Action          ActionType    `json:"action"`
 	TicketDetails   Tickets       `json:"ticketDetails"`
 }
 
