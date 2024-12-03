@@ -2,6 +2,8 @@ package utils
 
 import (
 	"fmt"
+	"net/http"
+	"net/url"
 	"strings"
 	"testing"
 
@@ -96,6 +98,170 @@ func TestBuildV2KeysendBodyData(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			result := BuildV2KeysendBodyData(tt.amount, tt.receiverPubkey, tt.routeHint, tt.memo)
 			assert.JSONEq(t, tt.expected, result)
+		})
+	}
+}
+
+func TestGetPaginationParams(t *testing.T) {
+	tests := []struct {
+		name           string
+		query          string
+		expectedOffset int
+		expectedLimit  int
+		expectedSortBy string
+		expectedDir    string
+		expectedSearch string
+	}{
+		{
+			name:           "Standard Input with All Parameters Present",
+			query:          "page=2&limit=10&sortBy=created&direction=asc&search=test",
+			expectedOffset: 10,
+			expectedLimit:  10,
+			expectedSortBy: "created",
+			expectedDir:    "asc",
+			expectedSearch: "test",
+		},
+		{
+			name:           "Standard Input with Default Parameters",
+			query:          "page=1&limit=5",
+			expectedOffset: 0,
+			expectedLimit:  5,
+			expectedSortBy: "created",
+			expectedDir:    "desc",
+			expectedSearch: "",
+		},
+		{
+			name:           "Minimum Values for Page and Limit",
+			query:          "page=1&limit=1",
+			expectedOffset: 0,
+			expectedLimit:  1,
+			expectedSortBy: "created",
+			expectedDir:    "desc",
+			expectedSearch: "",
+		},
+		{
+			name:           "Zero Values for Page and Limit",
+			query:          "page=0&limit=0",
+			expectedOffset: 0,
+			expectedLimit:  1,
+			expectedSortBy: "created",
+			expectedDir:    "desc",
+			expectedSearch: "",
+		},
+		{
+			name:           "Negative Values for Page and Limit",
+			query:          "page=-1&limit=-10",
+			expectedOffset: 0,
+			expectedLimit:  -10,
+			expectedSortBy: "created",
+			expectedDir:    "desc",
+			expectedSearch: "",
+		},
+		{
+			name:           "Non-Integer Values for Page and Limit",
+			query:          "page=abc&limit=xyz",
+			expectedOffset: 0,
+			expectedLimit:  1,
+			expectedSortBy: "created",
+			expectedDir:    "desc",
+			expectedSearch: "",
+		},
+		{
+			name:           "Null Request",
+			query:          "",
+			expectedOffset: 0,
+			expectedLimit:  1,
+			expectedSortBy: "created",
+			expectedDir:    "desc",
+			expectedSearch: "",
+		},
+		{
+			name:           "Large Values for Page and Limit",
+			query:          "page=10000&limit=1000",
+			expectedOffset: 9999000,
+			expectedLimit:  1000,
+			expectedSortBy: "created",
+			expectedDir:    "desc",
+			expectedSearch: "",
+		},
+		{
+			name:           "Empty Query Parameters",
+			query:          "",
+			expectedOffset: 0,
+			expectedLimit:  1,
+			expectedSortBy: "created",
+			expectedDir:    "desc",
+			expectedSearch: "",
+		},
+		{
+			name:           "Only Search Parameter Present",
+			query:          "search=example",
+			expectedOffset: 0,
+			expectedLimit:  1,
+			expectedSortBy: "created",
+			expectedDir:    "desc",
+			expectedSearch: "example",
+		},
+		{
+			name:           "Invalid Direction Value",
+			query:          "direction=upwards",
+			expectedOffset: 0,
+			expectedLimit:  1,
+			expectedSortBy: "created",
+			expectedDir:    "desc",
+			expectedSearch: "",
+		},
+		{
+			name:           "Invalid SortBy Value",
+			query:          "sortBy=unknown",
+			expectedOffset: 0,
+			expectedLimit:  1,
+			expectedSortBy: "unknown",
+			expectedDir:    "desc",
+			expectedSearch: "",
+		},
+		{
+			name:           "Mixed Valid and Invalid Parameters",
+			query:          "page=3&limit=abc&sortBy=unknown&direction=upwards",
+			expectedOffset: 2,
+			expectedLimit:  1,
+			expectedSortBy: "unknown",
+			expectedDir:    "desc",
+			expectedSearch: "",
+		},
+		{
+			name:           "Whitespace in Parameters",
+			query:          "page= 2 &limit= 10&sortBy= created &direction= asc ",
+			expectedOffset: 10,
+			expectedLimit:  10,
+			expectedSortBy: "created",
+			expectedDir:    "asc",
+			expectedSearch: "",
+		},
+		{
+			name:           "Case Sensitivity in Parameters",
+			query:          "sortBy=CREATED&direction=ASC",
+			expectedOffset: 0,
+			expectedLimit:  1,
+			expectedSortBy: "created",
+			expectedDir:    "asc",
+			expectedSearch: "",
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			req := &http.Request{
+				URL: &url.URL{
+					RawQuery: tt.query,
+				},
+			}
+			offset, limit, sortBy, direction, search := GetPaginationParams(req)
+			assert.Equal(t, tt.expectedOffset, offset)
+			assert.Equal(t, tt.expectedLimit, limit)
+			assert.Equal(t, tt.expectedSortBy, sortBy)
+			assert.Equal(t, tt.expectedDir, direction)
+			assert.Equal(t, tt.expectedSearch, search)
 		})
 	}
 }
