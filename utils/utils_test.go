@@ -265,3 +265,148 @@ func TestGetPaginationParams(t *testing.T) {
 		})
 	}
 }
+
+func TestBuildSearchQuery(t *testing.T) {
+	tests := []struct {
+		name          string
+		key           string
+		term          string
+		expectedQuery string
+		expectedArg   string
+	}{
+		{
+			name:          "Standard Input",
+			key:           "name",
+			term:          "John",
+			expectedQuery: "name LIKE ?",
+			expectedArg:   "%John%",
+		},
+		{
+			name:          "Empty Term",
+			key:           "name",
+			term:          "",
+			expectedQuery: "name LIKE ?",
+			expectedArg:   "%%",
+		},
+		{
+			name:          "Empty Key",
+			key:           "",
+			term:          "John",
+			expectedQuery: " LIKE ?",
+			expectedArg:   "%John%",
+		},
+		{
+			name:          "Both Key and Term Empty",
+			key:           "",
+			term:          "",
+			expectedQuery: " LIKE ?",
+			expectedArg:   "%%",
+		},
+		{
+			name:          "Special Characters in Key",
+			key:           "user@name",
+			term:          "John",
+			expectedQuery: "user@name LIKE ?",
+			expectedArg:   "%John%",
+		},
+		{
+			name:          "Special Characters in Term",
+			key:           "name",
+			term:          "J@hn",
+			expectedQuery: "name LIKE ?",
+			expectedArg:   "%J@hn%",
+		},
+		{
+			name:          "SQL Keywords in Key",
+			key:           "SELECT",
+			term:          "John",
+			expectedQuery: "SELECT LIKE ?",
+			expectedArg:   "%John%",
+		},
+		{
+			name:          "SQL Keywords in Term",
+			key:           "name",
+			term:          "SELECT",
+			expectedQuery: "name LIKE ?",
+			expectedArg:   "%SELECT%",
+		},
+		{
+			name:          "Null Key",
+			key:           "",
+			term:          "John",
+			expectedQuery: " LIKE ?",
+			expectedArg:   "%John%",
+		},
+		{
+			name:          "Null Term",
+			key:           "name",
+			term:          "",
+			expectedQuery: "name LIKE ?",
+			expectedArg:   "%%",
+		},
+		{
+			name:          "Non-String Key",
+			key:           "123",
+			term:          "John",
+			expectedQuery: "123 LIKE ?",
+			expectedArg:   "%John%",
+		},
+		{
+			name:          "Non-String Term",
+			key:           "name",
+			term:          "456",
+			expectedQuery: "name LIKE ?",
+			expectedArg:   "%456%",
+		},
+		{
+			name:          "Very Long Key",
+			key:           string(make([]byte, 1000)),
+			term:          "John",
+			expectedQuery: string(make([]byte, 1000)) + " LIKE ?",
+			expectedArg:   "%John%",
+		},
+		{
+			name:          "Very Long Term",
+			key:           "name",
+			term:          string(make([]byte, 1000)),
+			expectedQuery: "name LIKE ?",
+			expectedArg:   "%" + string(make([]byte, 1000)) + "%",
+		},
+		{
+			name:          "Unicode Characters in Key",
+			key:           "名前",
+			term:          "John",
+			expectedQuery: "名前 LIKE ?",
+			expectedArg:   "%John%",
+		},
+		{
+			name:          "Unicode Characters in Term",
+			key:           "name",
+			term:          "ジョン",
+			expectedQuery: "name LIKE ?",
+			expectedArg:   "%ジョン%",
+		},
+		{
+			name:          "Whitespace in Key",
+			key:           " name ",
+			term:          "John",
+			expectedQuery: "name LIKE ?",
+			expectedArg:   "%John%",
+		},
+		{
+			name:          "Whitespace in Term",
+			key:           "name",
+			term:          " John ",
+			expectedQuery: "name LIKE ?",
+			expectedArg:   "%John%",
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			query, arg := BuildSearchQuery(tt.key, tt.term)
+			assert.Equal(t, tt.expectedQuery, query)
+			assert.Equal(t, tt.expectedArg, arg)
+		})
+	}
+}
