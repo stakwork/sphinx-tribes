@@ -124,3 +124,118 @@ func TestAdminCheck(t *testing.T) {
 		})
 	}
 }
+
+// Mock function to be tested
+func TestIsFreePass(t *testing.T) {
+	t.Setenv("SUPER_ADMINS", "")
+	tests := []struct {
+		name             string
+		superAdmins      []string
+		adminDevFreePass string
+		adminStrings     string
+		expected         bool
+	}{
+		{
+			name:             "Single SuperAdmin with FreePass",
+			superAdmins:      []string{"freepass"},
+			adminDevFreePass: "freepass",
+			adminStrings:     "non-empty",
+			expected:         true,
+		},
+		{
+			name:             "Empty AdminStrings",
+			superAdmins:      []string{"admin"},
+			adminDevFreePass: "freepass",
+			adminStrings:     "",
+			expected:         true,
+		},
+		{
+			name:             "Both Conditions Met",
+			superAdmins:      []string{"freepass"},
+			adminDevFreePass: "freepass",
+			adminStrings:     "",
+			expected:         true,
+		},
+		{
+			name:             "Multiple SuperAdmins",
+			superAdmins:      []string{"freepass", "admin2"},
+			adminDevFreePass: "freepass",
+			adminStrings:     "non-empty",
+			expected:         false,
+		},
+		{
+			name:             "Empty SuperAdmins List",
+			superAdmins:      []string{},
+			adminDevFreePass: "freepass",
+			adminStrings:     "non-empty",
+			expected:         false,
+		},
+		{
+			name:             "Empty SuperAdmins and Empty AdminStrings",
+			superAdmins:      []string{},
+			adminDevFreePass: "freepass",
+			adminStrings:     "",
+			expected:         true,
+		},
+		{
+			name:             "Null SuperAdmins",
+			superAdmins:      nil,
+			adminDevFreePass: "freepass",
+			adminStrings:     "non-empty",
+			expected:         false,
+		},
+		{
+			name:             "Null AdminStrings",
+			superAdmins:      []string{"admin"},
+			adminDevFreePass: "freepass",
+			adminStrings:     "",
+			expected:         true,
+		},
+		{
+			name:             "SuperAdmin with Different FreePass",
+			superAdmins:      []string{"admin"},
+			adminDevFreePass: "freepass",
+			adminStrings:     "non-empty",
+			expected:         false,
+		},
+		{
+			name:             "SuperAdmin with Empty String",
+			superAdmins:      []string{""},
+			adminDevFreePass: "freepass",
+			adminStrings:     "non-empty",
+			expected:         false,
+		},
+		{
+			name:             "Large SuperAdmins List",
+			superAdmins:      make([]string, 1000),
+			adminDevFreePass: "freepass",
+			adminStrings:     "non-empty",
+			expected:         false,
+		},
+		{
+			name:             "SuperAdmin with Null FreePass",
+			superAdmins:      []string{"freepass"},
+			adminDevFreePass: "",
+			adminStrings:     "non-empty",
+			expected:         false,
+		},
+		{
+			name:             "AdminDevFreePass as Empty String",
+			superAdmins:      []string{"freepass"},
+			adminDevFreePass: "",
+			adminStrings:     "non-empty",
+			expected:         false,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			config.SuperAdmins = tt.superAdmins
+			config.AdminDevFreePass = tt.adminDevFreePass
+			config.AdminStrings = tt.adminStrings
+
+			result := IsFreePass()
+			assert.Equal(t, tt.expected, result)
+		})
+	}
+}
