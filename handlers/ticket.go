@@ -201,8 +201,8 @@ func (th *ticketHandler) PostTicketDataToStakwork(w http.ResponseWriter, r *http
 	}
 	defer r.Body.Close()
 
-	var ticket db.Tickets
-	if err := json.Unmarshal(body, &ticket); err != nil {
+	var ticketRequest UpdateTicketRequest
+	if err := json.Unmarshal(body, &ticketRequest); err != nil {
 		w.WriteHeader(http.StatusBadRequest)
 		json.NewEncoder(w).Encode(TicketResponse{
 			Success: false,
@@ -212,13 +212,22 @@ func (th *ticketHandler) PostTicketDataToStakwork(w http.ResponseWriter, r *http
 		return
 	}
 
+	if ticketRequest.Ticket == nil {
+		w.WriteHeader(http.StatusBadRequest)
+		json.NewEncoder(w).Encode(TicketResponse{
+			Success: false,
+			Message: "Validation failed",
+			Errors:  []string{"Ticket data is required"},
+		})
+		return
+	}
+
+	ticket := ticketRequest.Ticket
 	var validationErrors []string
 	if ticket.UUID == uuid.Nil {
 		validationErrors = append(validationErrors, "UUID is required")
-	} else {
-		if _, err := uuid.Parse(ticket.UUID.String()); err != nil {
-			validationErrors = append(validationErrors, "Invalid UUID format")
-		}
+	} else if _, err := uuid.Parse(ticket.UUID.String()); err != nil {
+		validationErrors = append(validationErrors, "Invalid UUID format")
 	}
 
 	if len(validationErrors) > 0 {
@@ -295,6 +304,7 @@ func (th *ticketHandler) PostTicketDataToStakwork(w http.ResponseWriter, r *http
 						"productBrief":      productBrief,
 						"featureBrief":      featureBrief,
 						"examples":          "",
+						"sourceWebsocket":   ticketRequest.Metadata.ID,
 						"webhook_url":       webhookURL,
 					},
 				},
