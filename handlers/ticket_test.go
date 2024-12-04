@@ -251,14 +251,24 @@ func TestUpdateTicket(t *testing.T) {
 		rr := httptest.NewRecorder()
 		handler := http.HandlerFunc(tHandler.UpdateTicket)
 
-		// Create a ticket with only UUID and some optional fields
 		updateTicket := db.Tickets{
 			UUID:        createdTicket.UUID,
 			Description: "Updated description", // Optional field
 			Status:      db.ReadyTicket,        // Optional field
 		}
 
-		requestBody, _ := json.Marshal(updateTicket)
+		updateRequest := UpdateTicketRequest{
+			Metadata: struct {
+				Source string `json:"source"`
+				ID     string `json:"id"`
+			}{
+				Source: "test-source",
+				ID:     "test-id",
+			},
+			Ticket: &updateTicket,
+		}
+
+		requestBody, _ := json.Marshal(updateRequest)
 		rctx := chi.NewRouteContext()
 		rctx.URLParams.Add("uuid", updateTicket.UUID.String())
 		req, err := http.NewRequest(http.MethodPost, "/tickets/"+updateTicket.UUID.String(), bytes.NewReader(requestBody))
@@ -294,11 +304,22 @@ func TestUpdateTicket(t *testing.T) {
 		updatedTicket.Description = "Updated Description"
 		updatedTicket.Status = db.CompletedTicket
 
-		requestBody, _ := json.Marshal(updatedTicket)
+		updateRequest := UpdateTicketRequest{
+			Metadata: struct {
+				Source string `json:"source"`
+				ID     string `json:"id"`
+			}{
+				Source: "test-source",
+				ID:     "test-id",
+			},
+			Ticket: &updatedTicket,
+		}
+
+		requestBody, _ := json.Marshal(updateRequest)
 		rctx := chi.NewRouteContext()
 		rctx.URLParams.Add("uuid", createdTicket.UUID.String())
 
-		req, err := http.NewRequest(http.MethodPut, "/tickets/"+createdTicket.UUID.String(), bytes.NewReader(requestBody))
+		req, err := http.NewRequest(http.MethodPost, "/tickets/"+createdTicket.UUID.String(), bytes.NewReader(requestBody))
 		if err != nil {
 			t.Fatal(err)
 		}
@@ -319,6 +340,7 @@ func TestUpdateTicket(t *testing.T) {
 		assert.Equal(t, updatedTicket.FeatureUUID, returnedTicket.FeatureUUID)
 		assert.Equal(t, updatedTicket.PhaseUUID, returnedTicket.PhaseUUID)
 	})
+
 }
 
 func TestDeleteTicket(t *testing.T) {
