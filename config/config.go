@@ -43,6 +43,7 @@ var PresignClient *s3.PresignClient
 var V2BotUrl string
 var V2BotToken string
 var IsV2Payment bool = false
+var FfWebsocket bool = false
 
 func InitConfig() {
 	Host = os.Getenv("LN_SERVER_BASE_URL")
@@ -61,6 +62,7 @@ func InitConfig() {
 	Connection_Auth = os.Getenv("CONNECTION_AUTH")
 	V2BotUrl = os.Getenv("V2_BOT_URL")
 	V2BotToken = os.Getenv("V2_BOT_TOKEN")
+	FfWebsocket = os.Getenv("FF_WEBSOCKET") == "true"
 
 	// Add to super admins
 	SuperAdmins = StripSuperAdmins(AdminStrings)
