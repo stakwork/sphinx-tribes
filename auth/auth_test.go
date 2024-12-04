@@ -292,4 +292,207 @@ func TestIsFreePass(t *testing.T) {
 }
 
 func TestVerifyTribeUUID(t *testing.T) {
+	mockParser := new(MockParser)
+	mockVerifier := new(MockVerifier)
+
+	auth := &Auth{
+		ParseTokenString: mockParser.ParseTokenString,
+		VerifyAndExtract: mockVerifier.VerifyAndExtract,
+	}
+
+	tests := []struct {
+		name           string
+		uuid           string
+		checkTimestamp bool
+		mockParse      func()
+		mockVerify     func()
+		expectedPubkey string
+		expectedError  error
+	}{
+
+		{
+			name:           "Valid UUID with Timestamp Check",
+			uuid:           "validUUID",
+			checkTimestamp: true,
+			mockParse: func() {
+				mockParser.On("ParseTokenString", "validUUID").Return(uint32(time.Now().Unix()), []byte("timeBuf"), []byte("sigBuf"), nil)
+			},
+			mockVerify: func() {
+				mockVerifier.On("VerifyAndExtract", []byte("timeBuf"), []byte("sigBuf")).Return("validPubkey", true, nil)
+			},
+			expectedPubkey: "validPubkey",
+			expectedError:  nil,
+		},
+		{
+			name:           "Valid UUID without Timestamp Check",
+			uuid:           "validUUID",
+			checkTimestamp: false,
+			mockParse: func() {
+				mockParser.On("ParseTokenString", "validUUID").Return(uint32(time.Now().Unix()), []byte("timeBuf"), []byte("sigBuf"), nil)
+			},
+			mockVerify: func() {
+				mockVerifier.On("VerifyAndExtract", []byte("timeBuf"), []byte("sigBuf")).Return("validPubkey", true, nil)
+			},
+			expectedPubkey: "validPubkey",
+			expectedError:  nil,
+		},
+
+		{
+			name:           "UUID Timestamp Exactly 5 Minutes Ago",
+			uuid:           "exact5MinUUID",
+			checkTimestamp: true,
+			mockParse: func() {
+				mockParser.On("ParseTokenString", "exact5MinUUID").Return(uint32(time.Now().Unix()-300), []byte("timeBuf"), []byte("sigBuf"), nil)
+			},
+			mockVerify: func() {
+				mockVerifier.On("VerifyAndExtract", []byte("timeBuf"), []byte("sigBuf")).Return("validPubkey", true, nil)
+			},
+			expectedPubkey: "validPubkey",
+			expectedError:  nil,
+		},
+
+		{
+			name:           "UUID with Timestamp Just Over 5 Minutes Ago",
+			uuid:           "expiredUUID",
+			checkTimestamp: true,
+			mockParse: func() {
+				mockParser.On("ParseTokenString", "expiredUUID").Return(uint32(time.Now().Unix()-301), []byte("timeBuf"), []byte("sigBuf"), nil)
+			},
+			mockVerify:     func() {},
+			expectedPubkey: "",
+			expectedError:  errors.New("too late"),
+		},
+		{
+			name:           "UUID with Timestamp Exactly at Current Time",
+			uuid:           "currentUUID",
+			checkTimestamp: true,
+			mockParse: func() {
+				mockParser.On("ParseTokenString", "currentUUID").Return(uint32(time.Now().Unix()), []byte("timeBuf"), []byte("sigBuf"), nil)
+			},
+			mockVerify: func() {
+				mockVerifier.On("VerifyAndExtract", []byte("timeBuf"), []byte("sigBuf")).Return("validPubkey", true, nil)
+			},
+			expectedPubkey: "validPubkey",
+			expectedError:  nil,
+		},
+		{
+			name:           "Invalid Signature in UUID",
+			uuid:           "invalidSigUUID",
+			checkTimestamp: true,
+			mockParse: func() {
+				mockParser.On("ParseTokenString", "invalidSigUUID").Return(uint32(time.Now().Unix()), []byte("timeBuf"), []byte("sigBuf"), nil)
+			},
+			mockVerify: func() {
+				mockVerifier.On("VerifyAndExtract", []byte("timeBuf"), []byte("sigBuf")).Return("", false, errors.New("invalid signature or verification failed"))
+			},
+			expectedPubkey: "validPubkey",
+			expectedError:  nil,
+		},
+
+		{
+			name:           "Invalid UUID Format",
+			uuid:           "invalidUUID",
+			checkTimestamp: true,
+			mockParse: func() {
+				mockParser.On("ParseTokenString", "invalidUUID").Return(uint32(0), []byte{}, []byte{}, errors.New("invalid format"))
+			},
+			mockVerify:     func() {},
+			expectedPubkey: "",
+			expectedError:  errors.New("invalid format"),
+		},
+
+		{
+			name:           "Empty UUID String",
+			uuid:           "",
+			checkTimestamp: true,
+			mockParse: func() {
+				mockParser.On("ParseTokenString", "").Return(uint32(0), []byte{}, []byte{}, errors.New("invalid format"))
+			},
+			mockVerify:     func() {},
+			expectedPubkey: "",
+			expectedError:  errors.New("invalid format"),
+		},
+
+		{
+			name:           "UUID with Missing Timestamp",
+			uuid:           "missingTimestampUUID",
+			checkTimestamp: true,
+			mockParse: func() {
+				mockParser.On("ParseTokenString", "missingTimestampUUID").Return(uint32(0), []byte("timeBuf"), []byte("sigBuf"), nil)
+			},
+			mockVerify: func() {
+				mockVerifier.On("VerifyAndExtract", []byte("timeBuf"), []byte("sigBuf")).Return("", false, errors.New("missing timestamp"))
+			},
+			expectedPubkey: "",
+			expectedError:  errors.New("too late"),
+		},
+
+		{
+			name:           "Large UUID String",
+			uuid:           "largeUUID",
+			checkTimestamp: true,
+			mockParse: func() {
+				mockParser.On("ParseTokenString", "largeUUID").Return(uint32(time.Now().Unix()), []byte("largeTimeBuf"), []byte("largeSigBuf"), nil)
+			},
+			mockVerify: func() {
+				mockVerifier.On("VerifyAndExtract", []byte("largeTimeBuf"), []byte("largeSigBuf")).Return("validPubkey", true, nil)
+			},
+			expectedPubkey: "validPubkey",
+			expectedError:  nil,
+		},
+
+		{
+			name:           "UUID with Non-UTF8 Characters",
+			uuid:           "nonUTF8UUID",
+			checkTimestamp: true,
+			mockParse: func() {
+				mockParser.On("ParseTokenString", "nonUTF8UUID").Return(uint32(time.Now().Unix()), []byte("nonUTF8TimeBuf"), []byte("nonUTF8SigBuf"), nil)
+			},
+			mockVerify: func() {
+				mockVerifier.On("VerifyAndExtract", []byte("nonUTF8TimeBuf"), []byte("nonUTF8SigBuf")).Return("validPubkey", true, nil)
+			},
+			expectedPubkey: "validPubkey",
+			expectedError:  nil,
+		},
+
+		{
+			name:           "UUID with Forced UTF8 Signature",
+			uuid:           "forcedUTF8UUID",
+			checkTimestamp: true,
+			mockParse: func() {
+				mockParser.On("ParseTokenString", "forcedUTF8UUID").Return(uint32(time.Now().Unix()), []byte("forcedUTF8TimeBuf"), []byte("forcedUTF8SigBuf"), nil)
+			},
+			mockVerify: func() {
+				mockVerifier.On("VerifyAndExtract", []byte("forcedUTF8TimeBuf"), []byte("forcedUTF8SigBuf")).Return("validPubkey", true, nil)
+			},
+			expectedPubkey: "validPubkey",
+			expectedError:  nil,
+		},
+
+		{
+			name:           "UUID with Future Timestamp",
+			uuid:           "futureUUID",
+			checkTimestamp: true,
+			mockParse: func() {
+				mockParser.On("ParseTokenString", "futureUUID").Return(uint32(time.Now().Unix()+60), []byte("futureTimeBuf"), []byte("futureSigBuf"), nil)
+			},
+			mockVerify: func() {
+				mockVerifier.On("VerifyAndExtract", []byte("futureTimeBuf"), []byte("futureSigBuf")).Return("", false, errors.New("timestamp is in the future"))
+			},
+			expectedPubkey: "",
+			expectedError:  errors.New("timestamp is in the future"),
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			tt.mockParse()
+			tt.mockVerify()
+
+			pubkey, err := auth.VerifyTribeUUID(tt.uuid, tt.checkTimestamp)
+
+			assert.Equal(t, tt.expectedPubkey, pubkey)
+			assert.Equal(t, tt.expectedError, err)
+		})
+	}
 }
