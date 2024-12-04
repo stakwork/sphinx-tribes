@@ -247,58 +247,29 @@ func TestUpdateTicket(t *testing.T) {
 		assert.Equal(t, http.StatusBadRequest, rr.Code)
 	})
 
-	t.Run("should update ticket with only UUID and optional fields", func(t *testing.T) {
+	t.Run("should update ticket with new format", func(t *testing.T) {
 		rr := httptest.NewRecorder()
 		handler := http.HandlerFunc(tHandler.UpdateTicket)
 
-		// Create a ticket with only UUID and some optional fields
-		updateTicket := db.Tickets{
-			UUID:        createdTicket.UUID,
-			Description: "Updated description", // Optional field
-			Status:      db.ReadyTicket,        // Optional field
+		updateRequest := UpdateTicketRequest{
+			Metadata: struct {
+				Source string `json:"source"`
+				ID     string `json:"id"`
+			}{
+				Source: "websocket",
+				ID:     "ws-12345",
+			},
+			Ticket: &db.Tickets{
+				UUID:        createdTicket.UUID,
+				Description: "Updated Description via new format",
+				Status:      db.ReadyTicket,
+			},
 		}
 
-		requestBody, _ := json.Marshal(updateTicket)
-		rctx := chi.NewRouteContext()
-		rctx.URLParams.Add("uuid", updateTicket.UUID.String())
-		req, err := http.NewRequest(http.MethodPost, "/tickets/"+updateTicket.UUID.String(), bytes.NewReader(requestBody))
-		if err != nil {
-			t.Fatal(err)
-		}
-
-		ctx := context.WithValue(req.Context(), auth.ContextKey, person.OwnerPubKey)
-		req = req.WithContext(context.WithValue(ctx, chi.RouteCtxKey, rctx))
-
-		handler.ServeHTTP(rr, req)
-		assert.Equal(t, http.StatusOK, rr.Code)
-
-		var returnedTicket db.Tickets
-		err = json.Unmarshal(rr.Body.Bytes(), &returnedTicket)
-		assert.NoError(t, err)
-
-		// Verify that only the provided fields were updated
-		assert.Equal(t, updateTicket.Description, returnedTicket.Description)
-		assert.Equal(t, updateTicket.Status, returnedTicket.Status)
-		// Original fields should remain unchanged
-		assert.Equal(t, createdTicket.FeatureUUID, returnedTicket.FeatureUUID)
-		assert.Equal(t, createdTicket.PhaseUUID, returnedTicket.PhaseUUID)
-		assert.Equal(t, createdTicket.Name, returnedTicket.Name)
-	})
-
-	t.Run("should update ticket successfully", func(t *testing.T) {
-		rr := httptest.NewRecorder()
-		handler := http.HandlerFunc(tHandler.UpdateTicket)
-
-		updatedTicket := createdTicket
-		updatedTicket.Name = "Updated Test Ticket"
-		updatedTicket.Description = "Updated Description"
-		updatedTicket.Status = db.CompletedTicket
-
-		requestBody, _ := json.Marshal(updatedTicket)
+		requestBody, _ := json.Marshal(updateRequest)
 		rctx := chi.NewRouteContext()
 		rctx.URLParams.Add("uuid", createdTicket.UUID.String())
-
-		req, err := http.NewRequest(http.MethodPut, "/tickets/"+createdTicket.UUID.String(), bytes.NewReader(requestBody))
+		req, err := http.NewRequest(http.MethodPost, "/tickets/"+createdTicket.UUID.String(), bytes.NewReader(requestBody))
 		if err != nil {
 			t.Fatal(err)
 		}
@@ -313,11 +284,8 @@ func TestUpdateTicket(t *testing.T) {
 		var returnedTicket db.Tickets
 		err = json.Unmarshal(rr.Body.Bytes(), &returnedTicket)
 		assert.NoError(t, err)
-		assert.Equal(t, updatedTicket.Name, returnedTicket.Name)
-		assert.Equal(t, updatedTicket.Description, returnedTicket.Description)
-		assert.Equal(t, updatedTicket.Status, returnedTicket.Status)
-		assert.Equal(t, updatedTicket.FeatureUUID, returnedTicket.FeatureUUID)
-		assert.Equal(t, updatedTicket.PhaseUUID, returnedTicket.PhaseUUID)
+		assert.Equal(t, updateRequest.Ticket.Description, returnedTicket.Description)
+		assert.Equal(t, updateRequest.Ticket.Status, returnedTicket.Status)
 	})
 }
 

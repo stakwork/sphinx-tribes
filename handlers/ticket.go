@@ -36,6 +36,14 @@ func NewTicketHandler(httpClient HttpClient, database db.Database) *ticketHandle
 	}
 }
 
+type UpdateTicketRequest struct {
+	Metadata struct {
+		Source string `json:"source"`
+		ID     string `json:"id"`
+	} `json:"metadata"`
+	Ticket *db.Tickets `json:"ticket"`
+}
+
 func (th *ticketHandler) GetTicket(w http.ResponseWriter, r *http.Request) {
 	uuid := chi.URLParam(r, "uuid")
 	if uuid == "" {
@@ -93,22 +101,34 @@ func (th *ticketHandler) UpdateTicket(w http.ResponseWriter, r *http.Request) {
 	}
 	defer r.Body.Close()
 
-	var ticket db.Tickets
-	if err := json.Unmarshal(body, &ticket); err != nil {
+	var updateRequest UpdateTicketRequest
+	if err := json.Unmarshal(body, &updateRequest); err != nil {
+
+		var ticket db.Tickets
+		if err := json.Unmarshal(body, &ticket); err != nil {
+			w.WriteHeader(http.StatusBadRequest)
+			json.NewEncoder(w).Encode(map[string]string{"error": "Error parsing request body"})
+			return
+		}
+
+		updateRequest.Ticket = &ticket
+	}
+
+	if updateRequest.Ticket == nil {
 		w.WriteHeader(http.StatusBadRequest)
-		json.NewEncoder(w).Encode(map[string]string{"error": "Error parsing request body"})
+		json.NewEncoder(w).Encode(map[string]string{"error": "Ticket data is required"})
 		return
 	}
 
-	ticket.UUID = ticketUUID
+	updateRequest.Ticket.UUID = ticketUUID
 
-	if ticket.Status != "" && !db.IsValidTicketStatus(ticket.Status) {
+	if updateRequest.Ticket.Status != "" && !db.IsValidTicketStatus(updateRequest.Ticket.Status) {
 		w.WriteHeader(http.StatusBadRequest)
 		json.NewEncoder(w).Encode(map[string]string{"error": "Invalid ticket status"})
 		return
 	}
 
-	updatedTicket, err := th.db.CreateOrEditTicket(&ticket)
+	updatedTicket, err := th.db.CreateOrEditTicket(updateRequest.Ticket)
 	if err != nil {
 		if err.Error() == "feature_uuid, phase_uuid, and name are required" {
 			w.WriteHeader(http.StatusBadRequest)
