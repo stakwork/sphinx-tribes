@@ -58,3 +58,15 @@ func (pool *Pool) Start() {
 		}
 	}
 }
+
+func (pool *Pool) SendTicketMessage(message TicketMessage) error {
+	if message.BroadcastType == "direct" {
+
+		if client, ok := pool.Clients[message.SourceSessionID]; ok {
+			return client.Client.Conn.WriteJSON(message)
+		}
+		return fmt.Errorf("client not found: %s", message.SourceSessionID)
+	}
+
+	return nil
+}
