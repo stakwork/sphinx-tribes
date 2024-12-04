@@ -26,6 +26,22 @@ type Message struct {
 	Body string `json:"body"`
 }
 
+type TicketMessage struct {
+	Type            int        `json:"type"`
+	BroadcastType   string     `json:"broadcastType"`
+	SourceSessionID string     `json:"sourceSessionID"`
+	Message         string     `json:"message"`
+	Action          string     `json:"action"`
+	TicketDetails   TicketData `json:"ticketDetails"`
+}
+
+type TicketData struct {
+	FeatureUUID       string `json:"featureUUID"`
+	PhaseUUID         string `json:"phaseUUID"`
+	TicketUUID        string `json:"ticketUUID"`
+	TicketDescription string `json:"ticketDescription"`
+}
+
 func (c *Client) Read() {
 	defer func() {
 		c.Pool.Unregister <- c
