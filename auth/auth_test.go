@@ -705,3 +705,135 @@ func TestVerifyArbitrary(t *testing.T) {
 		})
 	}
 }
+
+func TestSign(t *testing.T) {
+
+	privKey, err := btcec.NewPrivateKey()
+	assert.NoError(t, err)
+
+	createExpectedSignature := func(msg []byte) []byte {
+		signedMsg := append(signedMsgPrefix, msg...)
+		digest := chainhash.DoubleHashB(signedMsg)
+		sig, err := btcecdsa.SignCompact(privKey, digest, true)
+		assert.NoError(t, err)
+		return sig
+	}
+
+	expectedPubKeyHex := hex.EncodeToString(privKey.PubKey().SerializeCompressed())
+
+	tests := []struct {
+		name          string
+		msg           []byte
+		privKey       *btcec.PrivateKey
+		expectedError error
+	}{
+		{
+			name:          "Valid message and private key",
+			msg:           []byte("test message"),
+			privKey:       privKey,
+			expectedError: nil,
+		},
+		{
+			name:          "Empty message",
+			msg:           []byte{},
+			privKey:       privKey,
+			expectedError: nil,
+		},
+		{
+			name:          "Nil message",
+			msg:           nil,
+			privKey:       privKey,
+			expectedError: errors.New("no msg"),
+		},
+		{
+			name:          "Nil Private Key with Nil Message",
+			msg:           nil,
+			privKey:       nil,
+			expectedError: errors.New("no msg"),
+		},
+		{
+			name:          "Large message",
+			msg:           bytes.Repeat([]byte("x"), 1000),
+			privKey:       privKey,
+			expectedError: nil,
+		},
+		{
+			name:          "Special characters",
+			msg:           []byte("!@#$%^&*()"),
+			privKey:       privKey,
+			expectedError: nil,
+		},
+		{
+			name:          "UTF-8 message",
+			msg:           []byte("Hello, 世界"),
+			privKey:       privKey,
+			expectedError: nil,
+		},
+		{
+			name:          "Message with null bytes",
+			msg:           []byte("test\x00message"),
+			privKey:       privKey,
+			expectedError: nil,
+		},
+		{
+			name:          "Binary data",
+			msg:           []byte{0x00, 0x01, 0x02, 0x03, 0xFF},
+			privKey:       privKey,
+			expectedError: nil,
+		},
+		{
+			name:          "Maximum length message",
+			msg:           bytes.Repeat([]byte("x"), 1<<16),
+			privKey:       privKey,
+			expectedError: nil,
+		},
+		{
+			name:          "Message with Non-ASCII Characters",
+			msg:           []byte("こんにちは世界"),
+			privKey:       privKey,
+			expectedError: nil,
+		},
+		{
+			name:          "Message with only whitespace",
+			msg:           []byte("   "),
+			privKey:       privKey,
+			expectedError: nil,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			sig, err := Sign(tt.msg, tt.privKey)
+
+			if tt.expectedError != nil {
+				assert.Error(t, err)
+				assert.Equal(t, tt.expectedError.Error(), err.Error())
+				assert.Nil(t, sig)
+			} else {
+				assert.NoError(t, err)
+				assert.NotNil(t, sig)
+
+				assert.Equal(t, 65, len(sig), "Signature should be 65 bytes")
+
+				expectedSig := createExpectedSignature(tt.msg)
+				assert.Equal(t, expectedSig, sig)
+
+				pubKey, valid, verifyErr := VerifyAndExtract(tt.msg, sig)
+				assert.NoError(t, verifyErr)
+				assert.True(t, valid)
+				assert.Equal(t, expectedPubKeyHex, pubKey)
+
+				if tt.msg != nil {
+					signedMsg := append(signedMsgPrefix, tt.msg...)
+					digest := chainhash.DoubleHashB(signedMsg)
+
+					pubKey, _, err := btcecdsa.RecoverCompact(sig, digest)
+					assert.NoError(t, err)
+					assert.Equal(t,
+						hex.EncodeToString(tt.privKey.PubKey().SerializeCompressed()),
+						hex.EncodeToString(pubKey.SerializeCompressed()))
+				}
+			}
+		})
+	}
+}
