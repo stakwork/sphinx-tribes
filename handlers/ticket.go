@@ -15,6 +15,7 @@ import (
 	"github.com/stakwork/sphinx-tribes/auth"
 	"github.com/stakwork/sphinx-tribes/db"
 	"github.com/stakwork/sphinx-tribes/utils"
+	"github.com/stakwork/sphinx-tribes/websocket"
 )
 
 type ticketHandler struct {
@@ -138,6 +139,31 @@ func (th *ticketHandler) UpdateTicket(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusInternalServerError)
 		json.NewEncoder(w).Encode(map[string]string{"error": fmt.Sprintf("Failed to update ticket: %v", err)})
 		return
+	}
+
+	if updateRequest.Metadata.Source == "websocket" && updateRequest.Metadata.ID != "" {
+		ticketMsg := websocket.TicketMessage{
+			BroadcastType:   "direct",
+			SourceSessionID: updateRequest.Metadata.ID,
+			Message:         fmt.Sprintf("Hive has successfully updated your ticket %s", updateRequest.Ticket.Name),
+			Action:          "message",
+			TicketDetails: websocket.TicketData{
+				FeatureUUID:       updateRequest.Ticket.FeatureUUID,
+				PhaseUUID:         updateRequest.Ticket.PhaseUUID,
+				TicketUUID:        updateRequest.Ticket.UUID.String(),
+				TicketDescription: updateRequest.Ticket.Description,
+			},
+		}
+
+		if err := websocket.WebsocketPool.SendTicketMessage(ticketMsg); err != nil {
+			log.Printf("Failed to send websocket message: %v", err)
+			w.WriteHeader(http.StatusOK)
+			json.NewEncoder(w).Encode(map[string]interface{}{
+				"ticket":          updatedTicket,
+				"websocket_error": err.Error(),
+			})
+			return
+		}
 	}
 
 	w.WriteHeader(http.StatusOK)
@@ -378,6 +404,31 @@ func (th *ticketHandler) PostTicketDataToStakwork(w http.ResponseWriter, r *http
 			Errors:  []string{fmt.Sprintf("Stakwork API returned status code: %d", resp.StatusCode)},
 		})
 		return
+	}
+
+	if ticketRequest.Metadata.Source == "websocket" && ticketRequest.Metadata.ID != "" {
+		ticketMsg := websocket.TicketMessage{
+			BroadcastType:   "direct",
+			SourceSessionID: ticketRequest.Metadata.ID,
+			Message:         fmt.Sprintf("I have your updates and I'm rewriting ticket %s now", ticketRequest.Ticket.Name),
+			Action:          "message",
+			TicketDetails: websocket.TicketData{
+				FeatureUUID:       ticketRequest.Ticket.FeatureUUID,
+				PhaseUUID:         ticketRequest.Ticket.PhaseUUID,
+				TicketUUID:        ticketRequest.Ticket.UUID.String(),
+				TicketDescription: ticketRequest.Ticket.Description,
+			},
+		}
+
+		if err := websocket.WebsocketPool.SendTicketMessage(ticketMsg); err != nil {
+			log.Printf("Failed to send websocket message: %v", err)
+			w.WriteHeader(http.StatusOK)
+			json.NewEncoder(w).Encode(map[string]interface{}{
+				"ticket":          ticketRequest,
+				"websocket_error": err.Error(),
+			})
+			return
+		}
 	}
 
 	w.WriteHeader(http.StatusOK)

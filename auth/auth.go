@@ -290,6 +290,11 @@ func DecodeJwt(token string) (jwt.MapClaims, error) {
 }
 
 func EncodeJwt(pubkey string) (string, error) {
+
+	if pubkey == "" || strings.ContainsAny(pubkey, "!@#$%^&*()") {
+		return "", errors.New("invalid public key")
+	}
+
 	exp := ExpireInHours(24 * 7)
 
 	claims := jwt.MapClaims{
