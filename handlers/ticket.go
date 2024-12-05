@@ -486,7 +486,7 @@ func (th *ticketHandler) ProcessTicketReview(w http.ResponseWriter, r *http.Requ
 
 	ticketMsg := websocket.TicketMessage{
 		BroadcastType:   "direct",
-		SourceSessionID: reviewReq.RequestUUID,
+		SourceSessionID: reviewReq.SourceWebsocket,
 		Message:         fmt.Sprintf("Successful update of %s", reviewReq.Value.TicketUUID),
 		Action:          "process",
 		TicketDetails: websocket.TicketData{

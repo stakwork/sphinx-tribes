@@ -11,7 +11,8 @@ type TicketReviewRequest struct {
 		TicketUUID        string `json:"ticketUUID" validate:"required"`
 		TicketDescription string `json:"ticketDescription" validate:"required"`
 	} `json:"value"`
-	RequestUUID string `json:"requestUUID"`
+	RequestUUID     string `json:"requestUUID"`
+	SourceWebsocket string `json:"sourceWebsocket"`
 }
 
 func ValidateTicketReviewRequest(req *TicketReviewRequest) error {
