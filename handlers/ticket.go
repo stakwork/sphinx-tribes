@@ -484,6 +484,29 @@ func (th *ticketHandler) ProcessTicketReview(w http.ResponseWriter, r *http.Requ
 		return
 	}
 
+	ticketMsg := websocket.TicketMessage{
+		BroadcastType:   "direct",
+		SourceSessionID: reviewReq.RequestUUID,
+		Message:         fmt.Sprintf("Successful update of %s", reviewReq.Value.TicketUUID),
+		Action:          "process",
+		TicketDetails: websocket.TicketData{
+			FeatureUUID:       reviewReq.Value.FeatureUUID,
+			PhaseUUID:         reviewReq.Value.PhaseUUID,
+			TicketUUID:        reviewReq.Value.TicketUUID,
+			TicketDescription: reviewReq.Value.TicketDescription,
+		},
+	}
+
+	if err := websocket.WebsocketPool.SendTicketMessage(ticketMsg); err != nil {
+		log.Printf("Failed to send websocket message: %v", err)
+		w.WriteHeader(http.StatusOK)
+		json.NewEncoder(w).Encode(map[string]interface{}{
+			"ticket":          updatedTicket,
+			"websocket_error": err.Error(),
+		})
+		return
+	}
+
 	log.Printf("Successfully updated ticket %s", reviewReq.Value.TicketUUID)
 	w.WriteHeader(http.StatusOK)
 	json.NewEncoder(w).Encode(updatedTicket)
