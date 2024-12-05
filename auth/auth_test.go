@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"encoding/hex"
 	"errors"
+	"fmt"
 	"strings"
 	"testing"
 
@@ -242,6 +243,112 @@ func TestIsFreePass(t *testing.T) {
 
 			result := IsFreePass()
 			assert.Equal(t, tt.expected, result)
+		})
+	}
+}
+
+func generateLargePayload() map[string]interface{} {
+	payload := make(map[string]interface{})
+	for i := 0; i < 1000; i++ {
+		payload[fmt.Sprintf("key%d", i)] = fmt.Sprintf("value%d", i)
+	}
+	return payload
+}
+
+func TestEncodeJwt(t *testing.T) {
+
+	config.InitConfig()
+	InitJwt()
+
+	tests := []struct {
+		name        string
+		publicKey   string
+		payload     interface{}
+		expectError bool
+	}{
+		{
+			name:        "Valid Public Key and Payload",
+			publicKey:   "validPublicKey",
+			payload:     map[string]interface{}{"user": "testUser"},
+			expectError: false,
+		},
+		{
+			name:        "Valid Public Key with Minimal Payload",
+			publicKey:   "validPublicKey",
+			payload:     map[string]interface{}{"id": 1},
+			expectError: false,
+		},
+		{
+			name:        "Empty Payload",
+			publicKey:   "validPublicKey",
+			payload:     map[string]interface{}{},
+			expectError: false,
+		},
+		{
+			name:        "Maximum Size Payload",
+			publicKey:   "validPublicKey",
+			payload:     generateLargePayload(),
+			expectError: false,
+		},
+		{
+			name:        "Boundary Public Key Length",
+			publicKey:   "a",
+			payload:     map[string]interface{}{"user": "testUser"},
+			expectError: false,
+		},
+		{
+			name:        "Invalid Public Key",
+			publicKey:   "invalidPublicKey!",
+			payload:     map[string]interface{}{"user": "testUser"},
+			expectError: true,
+		},
+		{
+			name:        "Null Public Key",
+			publicKey:   "",
+			payload:     map[string]interface{}{"user": "testUser"},
+			expectError: true,
+		},
+		{
+			name:        "Expired Payload",
+			publicKey:   "validPublicKey",
+			payload:     map[string]interface{}{"exp": -1},
+			expectError: false,
+		},
+		{
+			name:        "Future Expiration Date",
+			publicKey:   "validPublicKey",
+			payload:     map[string]interface{}{"exp": 9999999999},
+			expectError: false,
+		},
+		{
+			name:        "Payload with Special Characters",
+			publicKey:   "validPublicKey",
+			payload:     map[string]interface{}{"emoji": "😀"},
+			expectError: false,
+		},
+		{
+			name:        "Payload with Reserved JWT Claims",
+			publicKey:   "validPublicKey",
+			payload:     map[string]interface{}{"iss": "issuer", "sub": "subject"},
+			expectError: false,
+		},
+		{
+			name:        "Payload with Mixed Data Types",
+			publicKey:   "validPublicKey",
+			payload:     map[string]interface{}{"string": "value", "number": 123, "boolean": true},
+			expectError: false,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			jwt, err := EncodeJwt(tt.publicKey)
+			if tt.expectError {
+				assert.Error(t, err)
+			} else {
+				assert.NoError(t, err)
+				assert.NotEmpty(t, jwt)
+			}
 		})
 	}
 }
