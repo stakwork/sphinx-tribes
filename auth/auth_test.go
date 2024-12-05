@@ -2,6 +2,7 @@ package auth
 
 import (
 	"bytes"
+	"encoding/base64"
 	"encoding/hex"
 	"errors"
 	"fmt"
@@ -527,6 +528,179 @@ func TestVerifyAndExtract(t *testing.T) {
 					assert.Equal(t, 65, len(tt.sig),
 						"Valid signature should be 65 bytes (64 bytes signature + 1 byte recovery ID)")
 				}
+			}
+		})
+	}
+}
+
+func TestVerifyArbitrary(t *testing.T) {
+
+	privKey, err := btcec.NewPrivateKey()
+	assert.NoError(t, err)
+
+	createValidSignature := func(msg string) string {
+		signedMsg := append(signedMsgPrefix, []byte(msg)...)
+		digest := chainhash.DoubleHashB(signedMsg)
+		sig, err := btcecdsa.SignCompact(privKey, digest, true)
+		assert.NoError(t, err)
+		return base64.URLEncoding.EncodeToString(sig)
+	}
+
+	expectedPubKeyHex := hex.EncodeToString(privKey.PubKey().SerializeCompressed())
+
+	tests := []struct {
+		name           string
+		sig            string
+		msg            string
+		expectedPubKey string
+		expectedError  error
+	}{
+		{
+			name:           "Valid signature and message",
+			sig:            createValidSignature("validBase64Signature"),
+			msg:            "validBase64Signature",
+			expectedPubKey: expectedPubKeyHex,
+			expectedError:  nil,
+		},
+		{
+			name:           "Empty signature",
+			sig:            "",
+			msg:            "validMessage",
+			expectedPubKey: "",
+			expectedError:  errors.New("invalid compact signature size"),
+		},
+		{
+			name:           "Empty message",
+			sig:            createValidSignature(""),
+			msg:            "",
+			expectedPubKey: expectedPubKeyHex,
+			expectedError:  nil,
+		},
+		{
+			name:           "Empty Signature and Message",
+			sig:            "",
+			msg:            "",
+			expectedPubKey: "",
+			expectedError:  errors.New("invalid compact signature size"),
+		},
+		{
+			name:           "Invalid base64 signature",
+			sig:            "invalid!base64",
+			msg:            "validMessage",
+			expectedPubKey: "",
+			expectedError:  base64.CorruptInputError(7),
+		},
+		{
+			name:           "Invalid Signature After Decoding",
+			sig:            base64.URLEncoding.EncodeToString([]byte("invalid-signature-data")),
+			msg:            "validMessage",
+			expectedPubKey: "",
+			expectedError:  errors.New("invalid compact signature size"),
+		},
+		{
+			name:           "Invalid signature bytes",
+			sig:            base64.URLEncoding.EncodeToString([]byte("invalid signature")),
+			msg:            "test message",
+			expectedPubKey: "",
+			expectedError:  errors.New("invalid compact signature size"),
+		},
+		{
+			name:           "Large message",
+			sig:            createValidSignature(strings.Repeat("x", 1000)),
+			msg:            strings.Repeat("x", 1000),
+			expectedPubKey: expectedPubKeyHex,
+			expectedError:  nil,
+		},
+		{
+			name:           "Large Signature",
+			sig:            base64.URLEncoding.EncodeToString(bytes.Repeat([]byte("x"), 1000)),
+			msg:            "validMessage",
+			expectedPubKey: "",
+			expectedError:  errors.New("invalid compact signature size"),
+		},
+		{
+			name:           "UTF-8 message",
+			sig:            createValidSignature("Hello, 世界"),
+			msg:            "Hello, 世界",
+			expectedPubKey: expectedPubKeyHex,
+			expectedError:  nil,
+		},
+		{
+			name:           "Signature with Special Characters",
+			sig:            createValidSignature("!@#$%^&*()"),
+			msg:            "!@#$%^&*()",
+			expectedPubKey: expectedPubKeyHex,
+			expectedError:  nil,
+		},
+		{
+			name:           "Boundary Length Signature",
+			sig:            createValidSignature(strings.Repeat("x", 64)),
+			msg:            strings.Repeat("x", 64),
+			expectedPubKey: expectedPubKeyHex,
+			expectedError:  nil,
+		},
+		{
+			name:           "Message with null bytes",
+			sig:            createValidSignature("test\x00message"),
+			msg:            "test\x00message",
+			expectedPubKey: expectedPubKeyHex,
+			expectedError:  nil,
+		},
+		{
+			name:           "Maximum length message",
+			sig:            createValidSignature(strings.Repeat("x", 1<<16)),
+			msg:            strings.Repeat("x", 1<<16),
+			expectedPubKey: expectedPubKeyHex,
+			expectedError:  nil,
+		},
+		{
+			name:           "Corrupted signature",
+			sig:            base64.URLEncoding.EncodeToString(append([]byte("invalid"), byte(0x00))),
+			msg:            "test message",
+			expectedPubKey: "",
+			expectedError:  errors.New("invalid compact signature size"),
+		},
+		{
+			name:           "Message with only whitespace",
+			sig:            createValidSignature("   "),
+			msg:            "   ",
+			expectedPubKey: expectedPubKeyHex,
+			expectedError:  nil,
+		},
+		{
+			name:           "Non-ASCII Characters in Message",
+			sig:            createValidSignature("Hello, 世界"),
+			msg:            "Hello, 世界",
+			expectedPubKey: expectedPubKeyHex,
+			expectedError:  nil,
+		},
+		{
+			name:           "Signature with Padding Variations",
+			sig:            createValidSignature("test") + "==",
+			msg:            "test",
+			expectedPubKey: "",
+			expectedError:  base64.CorruptInputError(88),
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			pubKey, err := VerifyArbitrary(tt.sig, tt.msg)
+
+			if tt.expectedError != nil {
+				assert.Error(t, err)
+				if tt.expectedError.Error() != "" {
+					assert.Equal(t, tt.expectedError.Error(), err.Error())
+				}
+			} else {
+				assert.NoError(t, err)
+				assert.Equal(t, tt.expectedPubKey, pubKey)
+			}
+
+			if err == nil {
+
+				_, err := hex.DecodeString(pubKey)
+				assert.NoError(t, err, "Public key should be valid hex")
 			}
 		})
 	}
