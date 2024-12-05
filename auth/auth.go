@@ -42,7 +42,7 @@ func PubKeyContext(next http.Handler) http.Handler {
 
 		if token == "" {
 			fmt.Println("[auth] no token")
-			http.Error(w, http.StatusText(401), 401)
+			http.Error(w, http.StatusText(http.StatusUnauthorized), http.StatusUnauthorized)
 			return
 		}
 
@@ -53,13 +53,13 @@ func PubKeyContext(next http.Handler) http.Handler {
 
 			if err != nil {
 				fmt.Println("Failed to parse JWT")
-				http.Error(w, http.StatusText(401), 401)
+				http.Error(w, http.StatusText(http.StatusUnauthorized), http.StatusUnauthorized)
 				return
 			}
 
 			if claims.VerifyExpiresAt(time.Now().UnixNano(), true) {
 				fmt.Println("Token has expired")
-				http.Error(w, http.StatusText(401), 401)
+				http.Error(w, http.StatusText(http.StatusUnauthorized), http.StatusUnauthorized)
 				return
 			}
 
@@ -73,7 +73,7 @@ func PubKeyContext(next http.Handler) http.Handler {
 				if err != nil {
 					fmt.Println(err)
 				}
-				http.Error(w, http.StatusText(401), 401)
+				http.Error(w, http.StatusText(http.StatusUnauthorized), http.StatusUnauthorized)
 				return
 			}
 
@@ -93,7 +93,7 @@ func PubKeyContextSuperAdmin(next http.Handler) http.Handler {
 
 		if token == "" {
 			fmt.Println("[auth] no token")
-			http.Error(w, http.StatusText(401), 401)
+			http.Error(w, http.StatusText(http.StatusUnauthorized), http.StatusUnauthorized)
 			return
 		}
 
@@ -103,20 +103,20 @@ func PubKeyContextSuperAdmin(next http.Handler) http.Handler {
 
 			if err != nil {
 				fmt.Println("Failed to parse JWT")
-				http.Error(w, http.StatusText(401), 401)
+				http.Error(w, http.StatusText(http.StatusUnauthorized), http.StatusUnauthorized)
 				return
 			}
 
 			if claims.VerifyExpiresAt(time.Now().UnixNano(), true) {
 				fmt.Println("Token has expired")
-				http.Error(w, http.StatusText(401), 401)
+				http.Error(w, http.StatusText(http.StatusUnauthorized), http.StatusUnauthorized)
 				return
 			}
 
 			pubkey := fmt.Sprintf("%v", claims["pubkey"])
 			if !IsFreePass() && !AdminCheck(pubkey) {
 				fmt.Println("Not a super admin")
-				http.Error(w, http.StatusText(401), 401)
+				http.Error(w, http.StatusText(http.StatusUnauthorized), http.StatusUnauthorized)
 				return
 			}
 
@@ -130,13 +130,13 @@ func PubKeyContextSuperAdmin(next http.Handler) http.Handler {
 				if err != nil {
 					fmt.Println(err)
 				}
-				http.Error(w, http.StatusText(401), 401)
+				http.Error(w, http.StatusText(http.StatusUnauthorized), http.StatusUnauthorized)
 				return
 			}
 
 			if !IsFreePass() && !AdminCheck(pubkey) {
 				fmt.Println("Not a super admin : auth")
-				http.Error(w, http.StatusText(401), 401)
+				http.Error(w, http.StatusText(http.StatusUnauthorized), http.StatusUnauthorized)
 				return
 			}
 
@@ -149,17 +149,23 @@ func PubKeyContextSuperAdmin(next http.Handler) http.Handler {
 // ConnectionContext parses token for connection code
 func ConnectionCodeContext(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+
+		if r == nil {
+			http.Error(w, http.StatusText(500), http.StatusInternalServerError)
+			return
+		}
+
 		token := r.Header.Get("token")
 
 		if token == "" {
 			fmt.Println("[auth] no token")
-			http.Error(w, http.StatusText(401), 401)
+			http.Error(w, http.StatusText(http.StatusUnauthorized), http.StatusUnauthorized)
 			return
 		}
 
 		if token != config.Connection_Auth {
 			fmt.Println("Not a super admin : auth")
-			http.Error(w, http.StatusText(401), 401)
+			http.Error(w, http.StatusText(http.StatusUnauthorized), http.StatusUnauthorized)
 			return
 		}
 		ctx := context.WithValue(r.Context(), ContextKey, token)
@@ -175,7 +181,7 @@ func CypressContext(next http.Handler) http.Handler {
 			next.ServeHTTP(w, r.WithContext(ctx))
 		} else {
 			fmt.Println("Endpoint is for testing only : test endpoint")
-			http.Error(w, http.StatusText(401), 401)
+			http.Error(w, http.StatusText(http.StatusUnauthorized), http.StatusUnauthorized)
 			return
 		}
 	})
