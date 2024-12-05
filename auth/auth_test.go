@@ -6,6 +6,8 @@ import (
 	"encoding/hex"
 	"errors"
 	"fmt"
+	"net/http"
+	"net/http/httptest"
 	"strings"
 	"testing"
 
@@ -836,4 +838,136 @@ func TestSign(t *testing.T) {
 			}
 		})
 	}
+}
+
+func TestConnectionCodeContext(t *testing.T) {
+	config.Connection_Auth = "valid_token"
+
+	tests := []struct {
+		name           string
+		token          string
+		expectedStatus int
+		expectNextCall bool
+	}{
+		{
+			name:           "Valid Token in Header",
+			token:          "valid_token",
+			expectedStatus: http.StatusOK,
+			expectNextCall: true,
+		},
+		{
+			name:           "Invalid Token in Header",
+			token:          "invalid_token",
+			expectedStatus: http.StatusUnauthorized,
+			expectNextCall: false,
+		},
+		{
+			name:           "Empty Token in Header",
+			token:          "",
+			expectedStatus: http.StatusUnauthorized,
+			expectNextCall: false,
+		},
+		{
+			name:           "No Token Header Present",
+			token:          "",
+			expectedStatus: http.StatusUnauthorized,
+			expectNextCall: false,
+		},
+		{
+			name:           "Malformed Header",
+			token:          "malformed_header",
+			expectedStatus: http.StatusUnauthorized,
+			expectNextCall: false,
+		},
+		{
+			name:           "Token with Special Characters",
+			token:          "special!@#token",
+			expectedStatus: http.StatusUnauthorized,
+			expectNextCall: false,
+		},
+		{
+			name:           "Token with Whitespace",
+			token:          " " + config.Connection_Auth + " ",
+			expectedStatus: http.StatusUnauthorized,
+			expectNextCall: false,
+		},
+		{
+			name:           "Case Sensitivity in Token",
+			token:          strings.ToUpper(config.Connection_Auth),
+			expectedStatus: http.StatusUnauthorized,
+			expectNextCall: false,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+
+			nextCalled := false
+			next := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+				nextCalled = true
+				w.WriteHeader(http.StatusOK)
+			})
+
+			req := httptest.NewRequest(http.MethodGet, "/", nil)
+			if tt.token != "" {
+				req.Header.Set("token", tt.token)
+			}
+
+			rr := httptest.NewRecorder()
+
+			handler := ConnectionCodeContext(next)
+			handler.ServeHTTP(rr, req)
+
+			assert.Equal(t, tt.expectedStatus, rr.Code)
+
+			assert.Equal(t, tt.expectNextCall, nextCalled)
+		})
+	}
+
+	t.Run("Null Request Object", func(t *testing.T) {
+
+		nextCalled := false
+		next := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			nextCalled = true
+			w.WriteHeader(http.StatusOK)
+		})
+
+		handler := ConnectionCodeContext(next)
+		rr := httptest.NewRecorder()
+		handler.ServeHTTP(rr, nil)
+
+		assert.Equal(t, http.StatusInternalServerError, rr.Code)
+
+		assert.False(t, nextCalled)
+	})
+
+	t.Run("Large Number of Requests", func(t *testing.T) {
+
+		nextCalled := 0
+		next := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			nextCalled++
+			w.WriteHeader(http.StatusOK)
+		})
+
+		for i := 0; i < 1000; i++ {
+			req := httptest.NewRequest(http.MethodGet, "/", nil)
+			if i%2 == 0 {
+				req.Header.Set("token", "valid_token")
+			} else {
+				req.Header.Set("token", "invalid_token")
+			}
+
+			rr := httptest.NewRecorder()
+			handler := ConnectionCodeContext(next)
+			handler.ServeHTTP(rr, req)
+
+			if i%2 == 0 {
+				assert.Equal(t, http.StatusOK, rr.Code)
+			} else {
+				assert.Equal(t, http.StatusUnauthorized, rr.Code)
+			}
+		}
+
+		assert.Equal(t, 500, nextCalled)
+	})
 }
