@@ -410,7 +410,7 @@ func (th *ticketHandler) PostTicketDataToStakwork(w http.ResponseWriter, r *http
 		ticketMsg := websocket.TicketMessage{
 			BroadcastType:   "direct",
 			SourceSessionID: ticketRequest.Metadata.ID,
-			Message:         fmt.Sprintf("Hive has successfully updated your ticket %s", ticketRequest.Ticket.Name),
+			Message:         fmt.Sprintf("I have your updates and I'm rewriting ticket %s now", ticketRequest.Ticket.Name),
 			Action:          "message",
 			TicketDetails: websocket.TicketData{
 				FeatureUUID:       ticketRequest.Ticket.FeatureUUID,
