@@ -406,6 +406,31 @@ func (th *ticketHandler) PostTicketDataToStakwork(w http.ResponseWriter, r *http
 		return
 	}
 
+	if ticketRequest.Metadata.Source == "websocket" && ticketRequest.Metadata.ID != "" {
+		ticketMsg := websocket.TicketMessage{
+			BroadcastType:   "direct",
+			SourceSessionID: ticketRequest.Metadata.ID,
+			Message:         fmt.Sprintf("Hive has successfully updated your ticket %s", ticketRequest.Ticket.Name),
+			Action:          "message",
+			TicketDetails: websocket.TicketData{
+				FeatureUUID:       ticketRequest.Ticket.FeatureUUID,
+				PhaseUUID:         ticketRequest.Ticket.PhaseUUID,
+				TicketUUID:        ticketRequest.Ticket.UUID.String(),
+				TicketDescription: ticketRequest.Ticket.Description,
+			},
+		}
+
+		if err := websocket.WebsocketPool.SendTicketMessage(ticketMsg); err != nil {
+			log.Printf("Failed to send websocket message: %v", err)
+			w.WriteHeader(http.StatusOK)
+			json.NewEncoder(w).Encode(map[string]interface{}{
+				"ticket":          ticketRequest,
+				"websocket_error": err.Error(),
+			})
+			return
+		}
+	}
+
 	w.WriteHeader(http.StatusOK)
 	json.NewEncoder(w).Encode(TicketResponse{
 		Success:  true,
