@@ -30,6 +30,13 @@ type TicketResponse struct {
 	Errors   []string `json:"errors,omitempty"`
 }
 
+type StakworkResponse struct {
+	Success bool `json:"success"`
+	Data    struct {
+		ProjectID int64 `json:"project_id"`
+	} `json:"data"`
+}
+
 func NewTicketHandler(httpClient HttpClient, database db.Database) *ticketHandler {
 	return &ticketHandler{
 		httpClient: httpClient,
@@ -396,7 +403,18 @@ func (th *ticketHandler) PostTicketDataToStakwork(w http.ResponseWriter, r *http
 		return
 	}
 
-	if resp.StatusCode != http.StatusOK {
+	var stakworkResp StakworkResponse
+	if err := json.Unmarshal(respBody, &stakworkResp); err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		json.NewEncoder(w).Encode(TicketResponse{
+			Success: false,
+			Message: "Error parsing Stakwork response",
+			Errors:  []string{err.Error()},
+		})
+		return
+	}
+
+	if resp.StatusCode != http.StatusOK || !stakworkResp.Success {
 		w.WriteHeader(resp.StatusCode)
 		json.NewEncoder(w).Encode(TicketResponse{
 			Success: false,
@@ -422,6 +440,24 @@ func (th *ticketHandler) PostTicketDataToStakwork(w http.ResponseWriter, r *http
 
 		if err := websocket.WebsocketPool.SendTicketMessage(ticketMsg); err != nil {
 			log.Printf("Failed to send websocket message: %v", err)
+			w.WriteHeader(http.StatusOK)
+			json.NewEncoder(w).Encode(map[string]interface{}{
+				"ticket":          ticketRequest,
+				"websocket_error": err.Error(),
+			})
+			return
+		}
+
+		projectMsg := websocket.TicketMessage{
+			BroadcastType:   "direct",
+			SourceSessionID: ticketRequest.Metadata.ID,
+			Message:         fmt.Sprintf("https://jobs.stakwork.com/admin/projects/%d", stakworkResp.Data.ProjectID),
+			Action:          "swrun",
+			TicketDetails:   websocket.TicketData{},
+		}
+
+		if err := websocket.WebsocketPool.SendTicketMessage(projectMsg); err != nil {
+			log.Printf("Failed to send project ID websocket message: %v", err)
 			w.WriteHeader(http.StatusOK)
 			json.NewEncoder(w).Encode(map[string]interface{}{
 				"ticket":          ticketRequest,
