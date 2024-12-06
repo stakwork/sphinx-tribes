@@ -86,6 +86,12 @@ func PubKeyContext(next http.Handler) http.Handler {
 // PubKeyContext parses pukey from signed timestamp
 func PubKeyContextSuperAdmin(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+
+		if r == nil {
+			http.Error(w, http.StatusText(http.StatusUnauthorized), http.StatusUnauthorized)
+			return
+		}
+
 		token := r.URL.Query().Get("token")
 		if token == "" {
 			token = r.Header.Get("x-jwt")
