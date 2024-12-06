@@ -987,6 +987,8 @@ const (
 	ProcessAction ActionType = "process"
 
 	MessageAction ActionType = "message"
+
+	RunLinkAction ActionType = "run-link"
 )
 
 type TicketMessage struct {
