@@ -39,7 +39,21 @@ jobs:
         run: go get golang.org/x/tools/cmd/cover
 
       - name: Tests
-        run: sudo V2_BOT_URL=http://localhost:3005 V2_BOT_TOKEN=xyzxyzxyz go test ./... -race -v -coverprofile=coverage.out && ./cover-check.sh coverage.out 8.4
+        run: |
+          sudo V2_BOT_URL=http://localhost:3005 V2_BOT_TOKEN=xyzxyzxyz go test ./... -race -v -coverprofile=coverage.out > test_output.log 2>&1
+          ./cover-check.sh coverage.out 8.4
+          if [ -f "test_output.log" ]; then
+            sudo cat test_output.log
+          else
+            echo "Log file not found!"
+          fi
+
+      - name: Upload test log
+        uses: actions/upload-artifact@v3
+        if: failure()
+        with:
+          name: test-logs
+          path: test_output.log
 
       - name: Droping DB with docker compose
         run: docker compose -f ./docker/testdb-docker-compose.yml -p test_db down
