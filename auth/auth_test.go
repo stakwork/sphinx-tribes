@@ -3,6 +3,7 @@ package auth
 import (
 	"bytes"
 	"encoding/base64"
+	"encoding/binary"
 	"encoding/hex"
 	"errors"
 	"fmt"
@@ -972,6 +973,561 @@ func TestConnectionCodeContext(t *testing.T) {
 
 		assert.Equal(t, 500, nextCalled)
 	})
+}
+
+func TestPubKeyContextSuperAdmin(t *testing.T) {
+
+	config.InitConfig()
+	InitJwt()
+
+	privKey, err := btcec.NewPrivateKey()
+	assert.NoError(t, err)
+	expectedPubKeyHex := hex.EncodeToString(privKey.PubKey().SerializeCompressed())
+
+	config.SuperAdmins = []string{expectedPubKeyHex}
+	config.AdminDevFreePass = "freepass"
+	originalSuperAdmins := config.SuperAdmins
+	originalAdminDevFreePass := config.AdminDevFreePass
+
+	createValidJWT := func(pubkey string, expireHours int) string {
+		claims := map[string]interface{}{
+			"pubkey": pubkey,
+			"exp":    time.Now().Add(time.Hour * time.Duration(expireHours)).Unix(),
+		}
+		_, tokenString, _ := TokenAuth.Encode(claims)
+		return tokenString
+	}
+
+	createValidTribeToken := func(_ string) string {
+		timeBuf := make([]byte, 4)
+		binary.BigEndian.PutUint32(timeBuf, uint32(time.Now().Unix()))
+		msg := append(signedMsgPrefix, timeBuf...)
+		digest := chainhash.DoubleHashB(msg)
+		sig, err := btcecdsa.SignCompact(privKey, digest, true)
+		assert.NoError(t, err)
+		token := append(timeBuf, sig...)
+		return base64.URLEncoding.EncodeToString(token)
+	}
+
+	tests := []struct {
+		name           string
+		setupToken     func(r *http.Request)
+		setupConfig    func()
+		expectedStatus int
+		expectNextCall bool
+	}{
+		{
+			name: "Valid JWT Token with Super Admin Privileges",
+			setupToken: func(r *http.Request) {
+				r.Header.Set("x-jwt", createValidJWT(expectedPubKeyHex, 24))
+			},
+			setupConfig: func() {
+				config.SuperAdmins = []string{expectedPubKeyHex}
+			},
+			expectedStatus: http.StatusOK,
+			expectNextCall: true,
+		},
+		{
+			name: "Valid Tribe UUID Token with Super Admin Privileges",
+			setupToken: func(r *http.Request) {
+				r.Header.Set("x-jwt", createValidTribeToken(expectedPubKeyHex))
+			},
+			setupConfig: func() {
+				config.SuperAdmins = []string{expectedPubKeyHex}
+			},
+			expectedStatus: http.StatusOK,
+			expectNextCall: true,
+		},
+		{
+			name:           "Empty Token in Request",
+			setupToken:     func(r *http.Request) {},
+			setupConfig:    func() {},
+			expectedStatus: http.StatusUnauthorized,
+			expectNextCall: false,
+		},
+		{
+			name: "Expired JWT Token",
+			setupToken: func(r *http.Request) {
+				r.Header.Set("x-jwt", createValidJWT(expectedPubKeyHex, -1))
+			},
+			setupConfig:    func() {},
+			expectedStatus: http.StatusUnauthorized,
+			expectNextCall: false,
+		},
+		{
+			name: "Invalid JWT Token Format",
+			setupToken: func(r *http.Request) {
+				r.Header.Set("x-jwt", "invalid.jwt.token")
+			},
+			setupConfig:    func() {},
+			expectedStatus: http.StatusUnauthorized,
+			expectNextCall: false,
+		},
+		{
+			name: "Invalid Tribe UUID Token",
+			setupToken: func(r *http.Request) {
+				r.Header.Set("x-jwt", "invalid-tribe-token")
+			},
+			setupConfig:    func() {},
+			expectedStatus: http.StatusUnauthorized,
+			expectNextCall: false,
+		},
+		{
+			name: "JWT Token with Non-Super Admin Pubkey",
+			setupToken: func(r *http.Request) {
+				r.Header.Set("x-jwt", createValidJWT("non-admin-pubkey", 24))
+			},
+			setupConfig: func() {
+				config.SuperAdmins = []string{expectedPubKeyHex}
+				config.AdminDevFreePass = ""
+				config.AdminStrings = "non-empty"
+			},
+			expectedStatus: http.StatusUnauthorized,
+			expectNextCall: false,
+		},
+		{
+			name: "Tribe UUID Token with Non-Super Admin Pubkey",
+			setupToken: func(r *http.Request) {
+				r.Header.Set("x-jwt", "non.admin.tribe.uuid")
+			},
+			setupConfig: func() {
+				config.SuperAdmins = []string{expectedPubKeyHex}
+				config.AdminDevFreePass = ""
+				config.AdminStrings = "non-empty"
+			},
+			expectedStatus: http.StatusUnauthorized,
+			expectNextCall: false,
+		},
+		{
+			name: "Token in Both Query and Header",
+			setupToken: func(r *http.Request) {
+				r.URL.RawQuery = "token=" + createValidJWT(expectedPubKeyHex, 24)
+			},
+			setupConfig: func() {
+				config.SuperAdmins = []string{expectedPubKeyHex}
+			},
+			expectedStatus: http.StatusOK,
+			expectNextCall: true,
+		},
+		{
+			name: "Free Pass Configuration",
+			setupToken: func(r *http.Request) {
+				r.Header.Set("x-jwt", createValidJWT("any-pubkey", 24))
+			},
+			setupConfig: func() {
+				config.SuperAdmins = []string{config.AdminDevFreePass}
+			},
+			expectedStatus: http.StatusOK,
+			expectNextCall: true,
+		},
+		{
+			name: "Malformed Token in Header",
+			setupToken: func(r *http.Request) {
+				r.Header.Set("x-jwt", "malformed token")
+			},
+			setupConfig:    func() {},
+			expectedStatus: http.StatusUnauthorized,
+			expectNextCall: false,
+		},
+		{
+			name: "Token with Special Characters",
+			setupToken: func(r *http.Request) {
+				r.Header.Set("x-jwt", "special!@#token")
+			},
+			setupConfig:    func() {},
+			expectedStatus: http.StatusUnauthorized,
+			expectNextCall: false,
+		},
+		{
+			name: "Token with Whitespace",
+			setupToken: func(r *http.Request) {
+				r.Header.Set("x-jwt", " "+createValidJWT(expectedPubKeyHex, 24)+" ")
+			},
+			setupConfig:    func() {},
+			expectedStatus: http.StatusUnauthorized,
+			expectNextCall: false,
+		},
+		{
+			name: "Case Sensitivity in Token",
+			setupToken: func(r *http.Request) {
+				r.Header.Set("x-jwt", strings.ToUpper(createValidJWT(expectedPubKeyHex, 24)))
+			},
+			setupConfig:    func() {},
+			expectedStatus: http.StatusUnauthorized,
+			expectNextCall: false,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+
+			config.SuperAdmins = originalSuperAdmins
+			config.AdminDevFreePass = originalAdminDevFreePass
+
+			if tt.setupConfig != nil {
+				tt.setupConfig()
+			}
+
+			nextCalled := false
+			next := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+				nextCalled = true
+				w.WriteHeader(http.StatusOK)
+			})
+
+			req := httptest.NewRequest(http.MethodGet, "/", nil)
+			tt.setupToken(req)
+
+			rr := httptest.NewRecorder()
+
+			handler := PubKeyContextSuperAdmin(next)
+			handler.ServeHTTP(rr, req)
+
+			assert.Equal(t, tt.expectedStatus, rr.Code)
+			assert.Equal(t, tt.expectNextCall, nextCalled)
+		})
+	}
+
+	t.Run("Null Request Object", func(t *testing.T) {
+		nextCalled := false
+		next := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			nextCalled = true
+			w.WriteHeader(http.StatusOK)
+		})
+
+		handler := PubKeyContextSuperAdmin(next)
+		rr := httptest.NewRecorder()
+		handler.ServeHTTP(rr, nil)
+
+		assert.Equal(t, http.StatusUnauthorized, rr.Code)
+		assert.False(t, nextCalled)
+	})
+
+	t.Run("Large Number of Requests", func(t *testing.T) {
+		nextCalled := 0
+		next := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			nextCalled++
+			w.WriteHeader(http.StatusOK)
+		})
+
+		for i := 0; i < 1000; i++ {
+			req := httptest.NewRequest(http.MethodGet, "/", nil)
+			if i%2 == 0 {
+				req.Header.Set("x-jwt", createValidJWT(expectedPubKeyHex, 24))
+			} else {
+				req.Header.Set("x-jwt", createValidJWT("non-admin-pubkey", 24))
+			}
+
+			rr := httptest.NewRecorder()
+			handler := PubKeyContextSuperAdmin(next)
+			handler.ServeHTTP(rr, req)
+
+			if i%2 == 0 {
+				assert.Equal(t, http.StatusOK, rr.Code)
+			} else {
+				assert.Equal(t, http.StatusUnauthorized, rr.Code)
+			}
+		}
+
+		assert.Equal(t, 500, nextCalled)
+	})
+
+}
+
+func TestCypressContexts(t *testing.T) {
+	tests := []struct {
+		name             string
+		isFreePass       bool
+		contextKey       interface{}
+		expectedStatus   int
+		expectNextCalled bool
+	}{
+		{
+			name:             "Free Pass Allowed",
+			isFreePass:       true,
+			contextKey:       "",
+			expectedStatus:   http.StatusOK,
+			expectNextCalled: true,
+		},
+		{
+			name:             "Free Pass Disabled",
+			isFreePass:       false,
+			contextKey:       "",
+			expectedStatus:   http.StatusUnauthorized,
+			expectNextCalled: false,
+		},
+		{
+			name:             "Empty Context Key",
+			isFreePass:       true,
+			contextKey:       "",
+			expectedStatus:   http.StatusOK,
+			expectNextCalled: true,
+		},
+		{
+			name:             "Multiple Requests with Free Pass",
+			isFreePass:       true,
+			contextKey:       "",
+			expectedStatus:   http.StatusOK,
+			expectNextCalled: true,
+		},
+		{
+			name:             "Multiple Requests without Free Pass",
+			isFreePass:       false,
+			contextKey:       "",
+			expectedStatus:   http.StatusUnauthorized,
+			expectNextCalled: false,
+		},
+		{
+			name:             "Invalid Context Key Type",
+			isFreePass:       true,
+			contextKey:       12345,
+			expectedStatus:   http.StatusOK,
+			expectNextCalled: true,
+		},
+		{
+			name:             "Empty Request with Free Pass",
+			isFreePass:       true,
+			contextKey:       "",
+			expectedStatus:   http.StatusOK,
+			expectNextCalled: true,
+		},
+		{
+			name:             "Empty Request without Free Pass",
+			isFreePass:       false,
+			contextKey:       "",
+			expectedStatus:   http.StatusUnauthorized,
+			expectNextCalled: false,
+		},
+		{
+			name:             "Null Context with Free Pass",
+			isFreePass:       true,
+			contextKey:       "",
+			expectedStatus:   http.StatusOK,
+			expectNextCalled: true,
+		},
+		{
+			name:             "Nil Request Context",
+			isFreePass:       true,
+			contextKey:       "testKey",
+			expectedStatus:   http.StatusOK,
+			expectNextCalled: true,
+		},
+		{
+			name:             "Null Context without Free Pass",
+			isFreePass:       false,
+			contextKey:       "",
+			expectedStatus:   http.StatusUnauthorized,
+			expectNextCalled: false,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+
+			config.AdminStrings = ""
+			if !tt.isFreePass {
+				config.AdminStrings = "non-empty"
+			}
+
+			nextCalled := false
+			next := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+				nextCalled = true
+				w.WriteHeader(http.StatusOK)
+			})
+
+			req := httptest.NewRequest(http.MethodGet, "/", nil)
+			rr := httptest.NewRecorder()
+
+			handler := CypressContext(next)
+			handler.ServeHTTP(rr, req)
+
+			assert.Equal(t, tt.expectedStatus, rr.Code)
+			assert.Equal(t, tt.expectNextCalled, nextCalled)
+
+			if !tt.expectNextCalled {
+				assert.Equal(t, http.StatusText(http.StatusUnauthorized)+"\n", rr.Body.String())
+			}
+		})
+	}
+
+	t.Run("Null Request Object", func(t *testing.T) {
+		config.AdminStrings = "non-empty"
+
+		nextCalled := false
+		next := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			nextCalled = true
+			w.WriteHeader(http.StatusOK)
+		})
+
+		handler := CypressContext(next)
+		rr := httptest.NewRecorder()
+		handler.ServeHTTP(rr, nil)
+
+		assert.Equal(t, http.StatusUnauthorized, rr.Code)
+		assert.False(t, nextCalled)
+		assert.Equal(t, http.StatusText(http.StatusUnauthorized)+"\n", rr.Body.String())
+	})
+
+	t.Run("Large Number of Requests", func(t *testing.T) {
+		config.AdminStrings = ""
+
+		nextCalled := 0
+		next := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			nextCalled++
+			w.WriteHeader(http.StatusOK)
+		})
+
+		for i := 0; i < 1000; i++ {
+			req := httptest.NewRequest(http.MethodGet, "/", nil)
+			rr := httptest.NewRecorder()
+
+			handler := CypressContext(next)
+			handler.ServeHTTP(rr, req)
+
+			assert.Equal(t, http.StatusOK, rr.Code)
+		}
+
+		assert.Equal(t, 1000, nextCalled)
+	})
+}
+
+func TestParseTokenString(t *testing.T) {
+	tests := []struct {
+		name          string
+		input         string
+		expectedTs    uint32
+		expectedTime  []byte
+		expectedSig   []byte
+		expectedError error
+	}{
+		{
+			name:          "Valid Token Without Prefix",
+			input:         base64.URLEncoding.EncodeToString(append([]byte{0, 0, 0, 1}, []byte("sig")...)),
+			expectedTs:    1,
+			expectedTime:  []byte{0, 0, 0, 1},
+			expectedSig:   []byte("sig"),
+			expectedError: nil,
+		},
+		{
+			name:          "Valid Token With Prefix",
+			input:         "." + base64.URLEncoding.EncodeToString(append([]byte{0, 0, 0, 1}, []byte("sig")...)),
+			expectedTs:    1,
+			expectedTime:  []byte(base64.URLEncoding.EncodeToString([]byte{0, 0, 0, 1})),
+			expectedSig:   []byte("sig"),
+			expectedError: nil,
+		},
+		{
+			name:          "Minimum Length Token",
+			input:         base64.URLEncoding.EncodeToString(append([]byte{0, 0, 0, 1}, []byte("s")...)),
+			expectedTs:    1,
+			expectedTime:  []byte{0, 0, 0, 1},
+			expectedSig:   []byte("s"),
+			expectedError: nil,
+		},
+		{
+			name:          "Token Just Below Minimum Length",
+			input:         base64.URLEncoding.EncodeToString([]byte{0, 0, 0, 1}),
+			expectedTs:    0,
+			expectedTime:  nil,
+			expectedSig:   nil,
+			expectedError: errors.New("invalid signature (too short)"),
+		},
+		{
+			name:          "Invalid Base64 String",
+			input:         "invalid_base64",
+			expectedTs:    0,
+			expectedTime:  nil,
+			expectedSig:   nil,
+			expectedError: base64.CorruptInputError(12),
+		},
+		{
+			name:          "Empty String",
+			input:         "",
+			expectedTs:    0,
+			expectedTime:  nil,
+			expectedSig:   nil,
+			expectedError: errors.New("invalid signature (too short)"),
+		},
+		{
+			name:          "Token with Invalid Characters",
+			input:         "!!invalid!!",
+			expectedTs:    0,
+			expectedTime:  nil,
+			expectedSig:   nil,
+			expectedError: base64.CorruptInputError(0),
+		},
+		{
+			name:          "Large Token",
+			input:         base64.URLEncoding.EncodeToString(append([]byte{0, 0, 0, 1}, make([]byte, 1000)...)),
+			expectedTs:    1,
+			expectedTime:  []byte{0, 0, 0, 1},
+			expectedSig:   make([]byte, 1000),
+			expectedError: nil,
+		},
+		{
+			name:          "Token with Special Characters",
+			input:         base64.URLEncoding.EncodeToString(append([]byte{0, 0, 0, 1}, []byte("!@#$%^&*()")...)),
+			expectedTs:    1,
+			expectedTime:  []byte{0, 0, 0, 1},
+			expectedSig:   []byte("!@#$%^&*()"),
+			expectedError: nil,
+		},
+		{
+			name:          "Token with Non-UTF8 Characters",
+			input:         "." + base64.URLEncoding.EncodeToString(append([]byte{0, 0, 0, 1}, []byte{0xff, 0xfe, 0xfd}...)),
+			expectedTs:    1,
+			expectedTime:  []byte(base64.URLEncoding.EncodeToString([]byte{0, 0, 0, 1})),
+			expectedSig:   []byte{0xff, 0xfe, 0xfd},
+			expectedError: nil,
+		},
+		{
+			name:          "Token with Leading and Trailing Whitespace",
+			input:         " " + base64.URLEncoding.EncodeToString(append([]byte{0, 0, 0, 1}, []byte("sig")...)) + " ",
+			expectedTs:    1,
+			expectedTime:  []byte{0, 0, 0, 1},
+			expectedSig:   []byte("sig"),
+			expectedError: nil,
+		},
+		{
+			name:          "Token with Mixed Case Sensitivity",
+			input:         base64.URLEncoding.EncodeToString(append([]byte{0, 0, 0, 1}, []byte("SiG")...)),
+			expectedTs:    1,
+			expectedTime:  []byte{0, 0, 0, 1},
+			expectedSig:   []byte("SiG"),
+			expectedError: nil,
+		},
+		{
+			name:          "Token with Padding Characters",
+			input:         base64.URLEncoding.EncodeToString(append([]byte{0, 0, 0, 1}, []byte("sig")...)),
+			expectedTs:    1,
+			expectedTime:  []byte{0, 0, 0, 1},
+			expectedSig:   []byte("sig"),
+			expectedError: nil,
+		},
+		{
+			name:          "Token with Embedded Null Bytes",
+			input:         base64.URLEncoding.EncodeToString(append([]byte{0, 0, 0, 1}, []byte{0, 0, 0}...)),
+			expectedTs:    1,
+			expectedTime:  []byte{0, 0, 0, 1},
+			expectedSig:   []byte{0, 0, 0},
+			expectedError: nil,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			ts, timeBuf, sig, err := ParseTokenString(strings.TrimSpace(tt.input))
+
+			assert.Equal(t, tt.expectedTs, ts)
+			assert.Equal(t, tt.expectedTime, timeBuf)
+			assert.Equal(t, tt.expectedSig, sig)
+			if tt.expectedError != nil {
+				assert.Error(t, err)
+				assert.Equal(t, tt.expectedError.Error(), err.Error())
+			} else {
+				assert.NoError(t, err)
+			}
+		})
+	}
 }
 
 func TestDecodeJwt(t *testing.T) {
