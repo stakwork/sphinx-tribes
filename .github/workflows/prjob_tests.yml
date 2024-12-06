@@ -39,21 +39,39 @@ jobs:
         run: go get golang.org/x/tools/cmd/cover
 
       - name: Tests
+        continue-on-error: true
         run: |
-          sudo V2_BOT_URL=http://localhost:3005 V2_BOT_TOKEN=xyzxyzxyz go test ./... -race -v -coverprofile=coverage.out > test_output.log 2>&1
-          ./cover-check.sh coverage.out 8.4
-          if [ -f "test_output.log" ]; then
-            sudo cat test_output.log
-          else
-            echo "Log file not found!"
+          if ! sudo V2_BOT_URL=http://localhost:3005 V2_BOT_TOKEN=xyzxyzxyz go test ./... -failfast -race -v -coverprofile=coverage.out > test_output.log 2>&1; then
+            echo "::set-output name=test_status::failed"
           fi
+          ./cover-check.sh coverage.out 8.4
 
       - name: Upload test log
+        if: ${{steps.tests.outputs.test_status}} == 'failed'
         uses: actions/upload-artifact@v3
-        if: failure()
         with:
           name: test-logs
           path: test_output.log
+
+      - name: Parse test log
+        if: ${{steps.tests.outputs.test_status}} == 'failed'
+        run: |
+          cat test_output.log
+          if grep -q "\-\-\- FAIL" test_output.log; then
+            echo "Errors found in the logs."
+            # Write a loop here to get all the errors
+            # Send a curl request to jarvis use the env vars to set the url and token
+            
+            #curl -X POST \
+            #-H "Content-Type: application/json" \
+            #-H "Authorization: Bearer ${{ secrets.JARVIS_API_TOKEN }}" \
+            #-d '{"log": "<log variable here>"}' \
+            #${{ secrets.JARVIS_URL }}/endpoint
+            exit 1
+          else
+            echo "No errors found in the logs."
+          fi
+
 
       - name: Droping DB with docker compose
         run: docker compose -f ./docker/testdb-docker-compose.yml -p test_db down
