@@ -997,7 +997,7 @@ func TestPubKeyContextSuperAdmin(t *testing.T) {
 		return tokenString
 	}
 
-	createValidTribeToken := func(pubkey string) string {
+	createValidTribeToken := func(_ string) string {
 		timeBuf := make([]byte, 4)
 		binary.BigEndian.PutUint32(timeBuf, uint32(time.Now().Unix()))
 		msg := append(signedMsgPrefix, timeBuf...)
@@ -1387,4 +1387,144 @@ func TestCypressContexts(t *testing.T) {
 
 		assert.Equal(t, 1000, nextCalled)
 	})
+}
+
+func TestParseTokenString(t *testing.T) {
+	tests := []struct {
+		name          string
+		input         string
+		expectedTs    uint32
+		expectedTime  []byte
+		expectedSig   []byte
+		expectedError error
+	}{
+		{
+			name:          "Valid Token Without Prefix",
+			input:         base64.URLEncoding.EncodeToString(append([]byte{0, 0, 0, 1}, []byte("sig")...)),
+			expectedTs:    1,
+			expectedTime:  []byte{0, 0, 0, 1},
+			expectedSig:   []byte("sig"),
+			expectedError: nil,
+		},
+		{
+			name:          "Valid Token With Prefix",
+			input:         "." + base64.URLEncoding.EncodeToString(append([]byte{0, 0, 0, 1}, []byte("sig")...)),
+			expectedTs:    1,
+			expectedTime:  []byte(base64.URLEncoding.EncodeToString([]byte{0, 0, 0, 1})),
+			expectedSig:   []byte("sig"),
+			expectedError: nil,
+		},
+		{
+			name:          "Minimum Length Token",
+			input:         base64.URLEncoding.EncodeToString(append([]byte{0, 0, 0, 1}, []byte("s")...)),
+			expectedTs:    1,
+			expectedTime:  []byte{0, 0, 0, 1},
+			expectedSig:   []byte("s"),
+			expectedError: nil,
+		},
+		{
+			name:          "Token Just Below Minimum Length",
+			input:         base64.URLEncoding.EncodeToString([]byte{0, 0, 0, 1}),
+			expectedTs:    0,
+			expectedTime:  nil,
+			expectedSig:   nil,
+			expectedError: errors.New("invalid signature (too short)"),
+		},
+		{
+			name:          "Invalid Base64 String",
+			input:         "invalid_base64",
+			expectedTs:    0,
+			expectedTime:  nil,
+			expectedSig:   nil,
+			expectedError: base64.CorruptInputError(12),
+		},
+		{
+			name:          "Empty String",
+			input:         "",
+			expectedTs:    0,
+			expectedTime:  nil,
+			expectedSig:   nil,
+			expectedError: errors.New("invalid signature (too short)"),
+		},
+		{
+			name:          "Token with Invalid Characters",
+			input:         "!!invalid!!",
+			expectedTs:    0,
+			expectedTime:  nil,
+			expectedSig:   nil,
+			expectedError: base64.CorruptInputError(0),
+		},
+		{
+			name:          "Large Token",
+			input:         base64.URLEncoding.EncodeToString(append([]byte{0, 0, 0, 1}, make([]byte, 1000)...)),
+			expectedTs:    1,
+			expectedTime:  []byte{0, 0, 0, 1},
+			expectedSig:   make([]byte, 1000),
+			expectedError: nil,
+		},
+		{
+			name:          "Token with Special Characters",
+			input:         base64.URLEncoding.EncodeToString(append([]byte{0, 0, 0, 1}, []byte("!@#$%^&*()")...)),
+			expectedTs:    1,
+			expectedTime:  []byte{0, 0, 0, 1},
+			expectedSig:   []byte("!@#$%^&*()"),
+			expectedError: nil,
+		},
+		{
+			name:          "Token with Non-UTF8 Characters",
+			input:         "." + base64.URLEncoding.EncodeToString(append([]byte{0, 0, 0, 1}, []byte{0xff, 0xfe, 0xfd}...)),
+			expectedTs:    1,
+			expectedTime:  []byte(base64.URLEncoding.EncodeToString([]byte{0, 0, 0, 1})),
+			expectedSig:   []byte{0xff, 0xfe, 0xfd},
+			expectedError: nil,
+		},
+		{
+			name:          "Token with Leading and Trailing Whitespace",
+			input:         " " + base64.URLEncoding.EncodeToString(append([]byte{0, 0, 0, 1}, []byte("sig")...)) + " ",
+			expectedTs:    1,
+			expectedTime:  []byte{0, 0, 0, 1},
+			expectedSig:   []byte("sig"),
+			expectedError: nil,
+		},
+		{
+			name:          "Token with Mixed Case Sensitivity",
+			input:         base64.URLEncoding.EncodeToString(append([]byte{0, 0, 0, 1}, []byte("SiG")...)),
+			expectedTs:    1,
+			expectedTime:  []byte{0, 0, 0, 1},
+			expectedSig:   []byte("SiG"),
+			expectedError: nil,
+		},
+		{
+			name:          "Token with Padding Characters",
+			input:         base64.URLEncoding.EncodeToString(append([]byte{0, 0, 0, 1}, []byte("sig")...)),
+			expectedTs:    1,
+			expectedTime:  []byte{0, 0, 0, 1},
+			expectedSig:   []byte("sig"),
+			expectedError: nil,
+		},
+		{
+			name:          "Token with Embedded Null Bytes",
+			input:         base64.URLEncoding.EncodeToString(append([]byte{0, 0, 0, 1}, []byte{0, 0, 0}...)),
+			expectedTs:    1,
+			expectedTime:  []byte{0, 0, 0, 1},
+			expectedSig:   []byte{0, 0, 0},
+			expectedError: nil,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			ts, timeBuf, sig, err := ParseTokenString(strings.TrimSpace(tt.input))
+
+			assert.Equal(t, tt.expectedTs, ts)
+			assert.Equal(t, tt.expectedTime, timeBuf)
+			assert.Equal(t, tt.expectedSig, sig)
+			if tt.expectedError != nil {
+				assert.Error(t, err)
+				assert.Equal(t, tt.expectedError.Error(), err.Error())
+			} else {
+				assert.NoError(t, err)
+			}
+		})
+	}
 }
