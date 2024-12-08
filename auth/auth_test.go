@@ -1711,3 +1711,148 @@ func TestDecodeJwt(t *testing.T) {
 		}
 	})
 }
+
+func TestVerifyTribeUUID(t *testing.T) {
+	privKey, err := btcec.NewPrivateKey()
+	assert.NoError(t, err)
+
+	createToken := func(timestamp uint32, msg string) string {
+		timeBuf := make([]byte, 4)
+		binary.BigEndian.PutUint32(timeBuf, timestamp)
+
+		signedMsg := append(signedMsgPrefix, timeBuf...)
+		digest := chainhash.DoubleHashB(signedMsg)
+		sig, err := btcecdsa.SignCompact(privKey, digest, true)
+		assert.NoError(t, err)
+
+		token := append(timeBuf, sig...)
+		return base64.URLEncoding.EncodeToString(token)
+	}
+
+	currentTimestamp := uint32(time.Now().Unix())
+	validUUID := createToken(currentTimestamp, "validUUID")
+	expiredUUID := createToken(currentTimestamp-301, "expiredUUID")
+	exact5MinUUID := createToken(currentTimestamp-300, "exact5MinUUID")
+	currentTimeUUID := createToken(currentTimestamp, "currentUUID")
+	missingTimestampUUID := base64.URLEncoding.EncodeToString([]byte("missingTimestamp"))
+	nonUTF8UUID := createToken(currentTimestamp, string([]byte{0xff, 0xfe, 0xfd}))
+	forcedUTF8UUID := createToken(currentTimestamp, ".forcedUTF8UUID")
+	futureUUID := createToken(currentTimestamp+300, "futureUUID")
+	invalidFormatUUID := "!!notBase64!!"
+
+	expectedPubKey := hex.EncodeToString(privKey.PubKey().SerializeCompressed())
+
+	tests := []struct {
+		name           string
+		uuid           string
+		checkTimestamp bool
+		expectedPubkey string
+		expectedError  error
+	}{
+		{
+			name:           "Valid UUID with Timestamp Check",
+			uuid:           validUUID,
+			checkTimestamp: true,
+			expectedPubkey: expectedPubKey,
+			expectedError:  nil,
+		},
+		{
+			name:           "Valid UUID without Timestamp Check",
+			uuid:           validUUID,
+			checkTimestamp: false,
+			expectedPubkey: expectedPubKey,
+			expectedError:  nil,
+		},
+		{
+			name:           "UUID with Timestamp Exactly 5 Minutes Ago",
+			uuid:           exact5MinUUID,
+			checkTimestamp: true,
+			expectedPubkey: expectedPubKey,
+			expectedError:  nil,
+		},
+		{
+			name:           "UUID with Timestamp Just Over 5 Minutes Ago",
+			uuid:           expiredUUID,
+			checkTimestamp: true,
+			expectedPubkey: "",
+			expectedError:  errors.New("too late"),
+		},
+		{
+			name:           "UUID with Timestamp Exactly at Current Time",
+			uuid:           currentTimeUUID,
+			checkTimestamp: true,
+			expectedPubkey: expectedPubKey,
+			expectedError:  nil,
+		},
+		{
+			name:           "Invalid UUID Format",
+			uuid:           invalidFormatUUID,
+			checkTimestamp: true,
+			expectedPubkey: "",
+			expectedError:  errors.New("illegal base64 data at input byte 0"),
+		},
+		{
+			name:           "Invalid Signature in UUID",
+			uuid:           base64.URLEncoding.EncodeToString([]byte("invalid signature")),
+			checkTimestamp: true,
+			expectedPubkey: "",
+			expectedError:  errors.New("invalid compact signature size"),
+		},
+		{
+			name:           "Empty UUID String",
+			uuid:           "",
+			checkTimestamp: true,
+			expectedPubkey: "",
+			expectedError:  errors.New("invalid signature (too short)"),
+		},
+		{
+			name:           "UUID with Missing Timestamp",
+			uuid:           missingTimestampUUID,
+			checkTimestamp: true,
+			expectedPubkey: "",
+			expectedError:  errors.New("invalid compact signature size"),
+		},
+		{
+			name:           "UUID with Non-UTF8 Characters",
+			uuid:           nonUTF8UUID,
+			checkTimestamp: true,
+			expectedPubkey: expectedPubKey,
+			expectedError:  nil,
+		},
+		{
+			name:           "UUID with Forced UTF8 Signature",
+			uuid:           forcedUTF8UUID,
+			checkTimestamp: true,
+			expectedPubkey: expectedPubKey,
+			expectedError:  nil,
+		},
+		{
+			name:           "UUID with Future Timestamp",
+			uuid:           futureUUID,
+			checkTimestamp: true,
+			expectedPubkey: "",
+			expectedError:  errors.New("too early"),
+		},
+		{
+			name:           "Large UUID String",
+			uuid:           createToken(currentTimestamp, string(make([]byte, 10000))),
+			checkTimestamp: true,
+			expectedPubkey: expectedPubKey,
+			expectedError:  nil,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			pubkey, err := VerifyTribeUUID(tt.uuid, tt.checkTimestamp)
+
+			assert.Equal(t, tt.expectedPubkey, pubkey)
+			if tt.expectedError != nil {
+				assert.Error(t, err)
+				assert.Equal(t, tt.expectedError.Error(), err.Error())
+			} else {
+				assert.NoError(t, err)
+			}
+		})
+	}
+}
