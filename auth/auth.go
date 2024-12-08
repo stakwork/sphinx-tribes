@@ -229,6 +229,11 @@ func VerifyTribeUUID(uuid string, checkTimestamp bool) (string, error) {
 			fmt.Println("TOO LATE!")
 			return "", errors.New("too late")
 		}
+
+		if int64(ts) > now {
+			fmt.Println("TOO EARLY!")
+			return "", errors.New("too early")
+		}
 	}
 
 	return pubkey, nil
