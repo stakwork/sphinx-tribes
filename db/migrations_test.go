@@ -19,10 +19,39 @@ func TestTicketsMigrationPostgres(t *testing.T) {
 	}
 
 	// Check if columns exist
-	columns := []string{"uuid", "feature_uuid", "phase_uuid", "name", "sequence", "dependency", "description", "status", "created_at", "updated_at"}
+	columns := []string{
+		"uuid",
+		"ticket_group",
+		"feature_uuid",
+		"phase_uuid",
+		"name",
+		"sequence",
+		"dependency",
+		"description",
+		"status",
+		"version",
+		"author",
+		"author_id",
+		"created_at",
+		"updated_at",
+	}
+
 	for _, column := range columns {
 		if !TestDB.db.Migrator().HasColumn(&Tickets{}, column) {
 			t.Errorf("Column %s is missing in the 'tickets' table", column)
+		}
+	}
+
+	indexes := []string{
+		"group_index",
+		"composite_index",
+		"phase_index",
+	}
+
+	for _, index := range indexes {
+		hasIndex := TestDB.db.Migrator().HasIndex(&Tickets{}, index)
+		if !hasIndex {
+			t.Errorf("Index %s is missing in the 'tickets' table", index)
 		}
 	}
 
@@ -31,6 +60,7 @@ func TestTicketsMigrationPostgres(t *testing.T) {
 
 type TestTickets struct {
 	UUID        uuid.UUID    `gorm:"primaryKey;type:uuid;default:gen_random_uuid()"`
+	TicketGroup *uuid.UUID   `gorm:"type:uuid;index:group_index" json:"ticket_group,omitempty"`
 	FeatureUUID string       `gorm:"type:uuid;not null" json:"feature_uuid" validate:"required"`
 	PhaseUUID   string       `gorm:"type:uuid;not null" json:"phase_uuid" validate:"required"`
 	Name        string       `gorm:"type:varchar(255);not null"`
@@ -38,6 +68,9 @@ type TestTickets struct {
 	Dependency  []int        `gorm:"type:integer[]"`
 	Description string       `gorm:"type:text"`
 	Status      TicketStatus `gorm:"type:varchar(50);not null;default:'draft'"`
+	Version     *int         `gorm:"type:integer" json:"version,omitempty"`
+	Author      *Author      `gorm:"type:varchar(50)" json:"author,omitempty"`
+	AuthorID    *string      `gorm:"type:varchar(255)" json:"author_id,omitempty"`
 	CreatedAt   time.Time    `gorm:"type:timestamp;not null;default:current_timestamp" json:"created_at"`
 	UpdatedAt   time.Time    `gorm:"type:timestamp;not null;default:current_timestamp" json:"updated_at"`
 }
