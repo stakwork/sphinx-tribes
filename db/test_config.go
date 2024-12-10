@@ -61,6 +61,8 @@ func InitTestDB() {
 	db.AutoMigrate(&WfRequest{})
 	db.AutoMigrate(&WfProcessingMap{})
 	db.AutoMigrate(&Tickets{})
+	db.AutoMigrate(&ChatMessage{})
+	db.AutoMigrate(&Chat{})
 
 	people := TestDB.GetAllPeople()
 	for _, p := range people {
