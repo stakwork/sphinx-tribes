@@ -947,6 +947,8 @@ type WfRequest struct {
 
 type TicketStatus string
 
+type Author string
+
 const (
 	DraftTicket      TicketStatus = "DRAFT"
 	ReadyTicket      TicketStatus = "READY"
@@ -957,8 +959,14 @@ const (
 	CompletedTicket  TicketStatus = "COMPLETED"
 )
 
+const (
+	HumanAuthor Author = "HUMAN"
+	AgentAuthor Author = "AGENT"
+)
+
 type Tickets struct {
 	UUID         uuid.UUID         `gorm:"primaryKey;type:uuid"`
+	TicketGroup  *uuid.UUID        `gorm:"type:uuid;index:group_index" json:"ticket_group,omitempty"`
 	FeatureUUID  string            `gorm:"type:varchar(255);index:composite_index" json:"feature_uuid"`
 	Features     WorkspaceFeatures `gorm:"foreignKey:FeatureUUID;references:Uuid"`
 	PhaseUUID    string            `gorm:"type:varchar(255);index:phase_index" json:"phase_uuid"`
@@ -969,10 +977,11 @@ type Tickets struct {
 	Description  string            `gorm:"type:text" json:"description"`
 	Status       TicketStatus      `gorm:"type:varchar(50);default:'DRAFT'" json:"status"`
 	Version      int               `gorm:"type:integer;default:0" json:"version"`
+	Author       *Author           `gorm:"type:varchar(50)" json:"author,omitempty"`
+	AuthorID     *string           `gorm:"type:varchar(255)" json:"author_id,omitempty"`
 	CreatedAt    time.Time         `gorm:"type:timestamp;default:current_timestamp" json:"created_at"`
 	UpdatedAt    time.Time         `gorm:"type:timestamp;default:current_timestamp" json:"updated_at"`
 }
-
 type BroadcastType string
 
 const (
