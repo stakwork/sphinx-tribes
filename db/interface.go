@@ -201,4 +201,8 @@ type Database interface {
 	GetProductBrief(workspaceUuid string) (string, error)
 	GetFeatureBrief(featureUuid string) (string, error)
 	GetTicketsByPhaseUUID(featureUUID string, phaseUUID string) ([]Tickets, error)
+	AddChat(chat *Chat) (Chat, error)
+	GetChatByChatID(chatID string) (Chat, error)
+	AddChatMessage(message *ChatMessage) (ChatMessage, error)
+	GetChatMessagesForChatID(chatID string) ([]ChatMessage, error)
 }

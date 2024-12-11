@@ -39,6 +39,7 @@ func NewRouter() *http.Server {
 	r.Mount("/features", FeatureRoutes())
 	r.Mount("/workflows", WorkflowRoutes())
 	r.Mount("/bounties/ticket", TicketRoutes())
+	r.Mount("/hivechat", ChatRoutes())
 
 	r.Group(func(r chi.Router) {
 		r.Get("/tribe_by_feed", tribeHandlers.GetFirstTribeByFeed)

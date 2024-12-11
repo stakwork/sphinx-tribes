@@ -84,6 +84,8 @@ func InitDB() {
 	db.AutoMigrate(&WfRequest{})
 	db.AutoMigrate(&WfProcessingMap{})
 	db.AutoMigrate(&Tickets{})
+	db.AutoMigrate(&ChatMessage{})
+	db.AutoMigrate(&Chat{})
 
 	DB.MigrateTablesWithOrgUuid()
 	DB.MigrateOrganizationToWorkspace()
