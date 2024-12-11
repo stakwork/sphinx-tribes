@@ -25,33 +25,10 @@ func (_m *Database) EXPECT() *Database_Expecter {
 	return &Database_Expecter{mock: &_m.Mock}
 }
 
-// AddChat provides a mock function with given fields: chat
-func (_m *Database) AddChat(chat *db.Chat) (db.Chat, error) {
-	ret := _m.Called(chat)
-
-	var r0 db.Chat
-	if rf, ok := ret.Get(0).(func(*db.Chat) db.Chat); ok {
-		r0 = rf(chat)
-	} else {
-		r0 = ret.Get(0).(db.Chat)
-	}
-
-	var r1 error
-	if rf, ok := ret.Get(1).(func(*db.Chat) error); ok {
-		r1 = rf(chat)
-	} else {
-		r1 = ret.Error(1)
-	}
-
-	return r0, r1
-}
-
-// Database_AddChat_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'AddChat'
 type Database_AddChat_Call struct {
 	*mock.Call
 }
 
-// AddChat is a helper method to define mock.On call
 func (_e *Database_Expecter) AddChat(chat interface{}) *Database_AddChat_Call {
 	return &Database_AddChat_Call{Call: _e.mock.On("AddChat", chat)}
 }
@@ -73,20 +50,26 @@ func (_c *Database_AddChat_Call) RunAndReturn(run func(*db.Chat) (db.Chat, error
 	return _c
 }
 
-// GetChatByChatID provides a mock function with given fields: chatID
-func (_m *Database) GetChatByChatID(chatID string) (db.Chat, error) {
-	ret := _m.Called(chatID)
+func (_m *Database) AddChat(chat *db.Chat) (db.Chat, error) {
+	ret := _m.Called(chat)
+
+	if len(ret) == 0 {
+		panic("no return value specified for AddChat")
+	}
 
 	var r0 db.Chat
-	if rf, ok := ret.Get(0).(func(string) db.Chat); ok {
-		r0 = rf(chatID)
+	var r1 error
+	if rf, ok := ret.Get(0).(func(*db.Chat) (db.Chat, error)); ok {
+		return rf(chat)
+	}
+	if rf, ok := ret.Get(0).(func(*db.Chat) db.Chat); ok {
+		r0 = rf(chat)
 	} else {
 		r0 = ret.Get(0).(db.Chat)
 	}
 
-	var r1 error
-	if rf, ok := ret.Get(1).(func(string) error); ok {
-		r1 = rf(chatID)
+	if rf, ok := ret.Get(1).(func(*db.Chat) error); ok {
+		r1 = rf(chat)
 	} else {
 		r1 = ret.Error(1)
 	}
@@ -94,12 +77,10 @@ func (_m *Database) GetChatByChatID(chatID string) (db.Chat, error) {
 	return r0, r1
 }
 
-// Database_GetChatByChatID_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'GetChatByChatID'
 type Database_GetChatByChatID_Call struct {
 	*mock.Call
 }
 
-// GetChatByChatID is a helper method to define mock.On call
 func (_e *Database_Expecter) GetChatByChatID(chatID interface{}) *Database_GetChatByChatID_Call {
 	return &Database_GetChatByChatID_Call{Call: _e.mock.On("GetChatByChatID", chatID)}
 }
@@ -121,20 +102,26 @@ func (_c *Database_GetChatByChatID_Call) RunAndReturn(run func(string) (db.Chat,
 	return _c
 }
 
-// AddChatMessage provides a mock function with given fields: chatMessage
-func (_m *Database) AddChatMessage(chatMessage *db.ChatMessage) (db.ChatMessage, error) {
-	ret := _m.Called(chatMessage)
+func (_m *Database) GetChatByChatID(chatID string) (db.Chat, error) {
+	ret := _m.Called(chatID)
 
-	var r0 db.ChatMessage
-	if rf, ok := ret.Get(0).(func(*db.ChatMessage) db.ChatMessage); ok {
-		r0 = rf(chatMessage)
-	} else {
-		r0 = ret.Get(0).(db.ChatMessage)
+	if len(ret) == 0 {
+		panic("no return value specified for GetChatByChatID")
 	}
 
+	var r0 db.Chat
 	var r1 error
-	if rf, ok := ret.Get(1).(func(*db.ChatMessage) error); ok {
-		r1 = rf(chatMessage)
+	if rf, ok := ret.Get(0).(func(string) (db.Chat, error)); ok {
+		return rf(chatID)
+	}
+	if rf, ok := ret.Get(0).(func(string) db.Chat); ok {
+		r0 = rf(chatID)
+	} else {
+		r0 = ret.Get(0).(db.Chat)
+	}
+
+	if rf, ok := ret.Get(1).(func(string) error); ok {
+		r1 = rf(chatID)
 	} else {
 		r1 = ret.Error(1)
 	}
@@ -142,12 +129,10 @@ func (_m *Database) AddChatMessage(chatMessage *db.ChatMessage) (db.ChatMessage,
 	return r0, r1
 }
 
-// Database_AddChatMessage_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'AddChatMessage'
 type Database_AddChatMessage_Call struct {
 	*mock.Call
 }
 
-// AddChatMessage is a helper method to define mock.On call
 func (_e *Database_Expecter) AddChatMessage(chatMessage interface{}) *Database_AddChatMessage_Call {
 	return &Database_AddChatMessage_Call{Call: _e.mock.On("AddChatMessage", chatMessage)}
 }
@@ -169,20 +154,26 @@ func (_c *Database_AddChatMessage_Call) RunAndReturn(run func(*db.ChatMessage) (
 	return _c
 }
 
-// GetChatMessagesForChatID provides a mock function with given fields: chatID
-func (_m *Database) GetChatMessagesForChatID(chatID string) ([]db.ChatMessage, error) {
-	ret := _m.Called(chatID)
+func (_m *Database) AddChatMessage(chatMessage *db.ChatMessage) (db.ChatMessage, error) {
+	ret := _m.Called(chatMessage)
 
-	var r0 []db.ChatMessage
-	if rf, ok := ret.Get(0).(func(string) []db.ChatMessage); ok {
-		r0 = rf(chatID)
-	} else {
-		r0 = ret.Get(0).([]db.ChatMessage)
+	if len(ret) == 0 {
+		panic("no return value specified for AddChatMessage")
 	}
 
+	var r0 db.ChatMessage
 	var r1 error
-	if rf, ok := ret.Get(1).(func(string) error); ok {
-		r1 = rf(chatID)
+	if rf, ok := ret.Get(0).(func(*db.ChatMessage) (db.ChatMessage, error)); ok {
+		return rf(chatMessage)
+	}
+	if rf, ok := ret.Get(0).(func(*db.ChatMessage) db.ChatMessage); ok {
+		r0 = rf(chatMessage)
+	} else {
+		r0 = ret.Get(0).(db.ChatMessage)
+	}
+
+	if rf, ok := ret.Get(1).(func(*db.ChatMessage) error); ok {
+		r1 = rf(chatMessage)
 	} else {
 		r1 = ret.Error(1)
 	}
@@ -190,12 +181,10 @@ func (_m *Database) GetChatMessagesForChatID(chatID string) ([]db.ChatMessage, e
 	return r0, r1
 }
 
-// Database_GetChatMessagesForChatID_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'GetChatMessagesForChatID'
 type Database_GetChatMessagesForChatID_Call struct {
 	*mock.Call
 }
 
-// GetChatMessagesForChatID is a helper method to define mock.On call
 func (_e *Database_Expecter) GetChatMessagesForChatID(chatID interface{}) *Database_GetChatMessagesForChatID_Call {
 	return &Database_GetChatMessagesForChatID_Call{Call: _e.mock.On("GetChatMessagesForChatID", chatID)}
 }
@@ -215,6 +204,35 @@ func (_c *Database_GetChatMessagesForChatID_Call) Return(_a0 []db.ChatMessage, _
 func (_c *Database_GetChatMessagesForChatID_Call) RunAndReturn(run func(string) ([]db.ChatMessage, error)) *Database_GetChatMessagesForChatID_Call {
 	_c.Call.Return(run)
 	return _c
+}
+
+func (_m *Database) GetChatMessagesForChatID(chatID string) ([]db.ChatMessage, error) {
+	ret := _m.Called(chatID)
+
+	if len(ret) == 0 {
+		panic("no return value specified for GetChatMessagesForChatID")
+	}
+
+	var r0 []db.ChatMessage
+	var r1 error
+	if rf, ok := ret.Get(0).(func(string) ([]db.ChatMessage, error)); ok {
+		return rf(chatID)
+	}
+	if rf, ok := ret.Get(0).(func(string) []db.ChatMessage); ok {
+		r0 = rf(chatID)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).([]db.ChatMessage)
+		}
+	}
+
+	if rf, ok := ret.Get(1).(func(string) error); ok {
+		r1 = rf(chatID)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
 }
 
 // AddAndUpdateBudget provides a mock function with given fields: invoice
