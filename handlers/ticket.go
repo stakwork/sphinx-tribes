@@ -273,9 +273,13 @@ func (th *ticketHandler) PostTicketDataToStakwork(w http.ResponseWriter, r *http
 		return
 	}
 
-	var productBrief, featureBrief string
+	var (
+		productBrief, featureBrief string
+		feature                    db.WorkspaceFeatures
+	)
+
 	if ticket.FeatureUUID != "" {
-		feature := th.db.GetFeatureByUuid(ticket.FeatureUUID)
+		feature = th.db.GetFeatureByUuid(ticket.FeatureUUID)
 		if feature.Uuid == "" {
 			w.WriteHeader(http.StatusInternalServerError)
 			json.NewEncoder(w).Encode(TicketResponse{
@@ -322,6 +326,31 @@ func (th *ticketHandler) PostTicketDataToStakwork(w http.ResponseWriter, r *http
 
 	webhookURL := fmt.Sprintf("%s/bounties/ticket/review", host)
 
+	var schematicURL string
+	if feature.WorkspaceUuid != "" {
+
+		workspace := th.db.GetWorkspaceByUuid(feature.WorkspaceUuid)
+
+		if workspace.Uuid == "" {
+			w.WriteHeader(http.StatusNotFound)
+			json.NewEncoder(w).Encode(TicketResponse{
+				Success: false,
+				Message: "Workspace not found",
+			})
+			return
+		}
+
+		schematicURL = workspace.SchematicUrl
+		if schematicURL == "" {
+			w.WriteHeader(http.StatusNotFound)
+			json.NewEncoder(w).Encode(TicketResponse{
+				Success: false,
+				Message: "Schematic URL not found in the workspace",
+			})
+			return
+		}
+	}
+
 	stakworkPayload := map[string]interface{}{
 		"name":        "Hive Ticket Builder",
 		"workflow_id": 37324,
@@ -339,6 +368,7 @@ func (th *ticketHandler) PostTicketDataToStakwork(w http.ResponseWriter, r *http
 						"examples":          "",
 						"sourceWebsocket":   ticketRequest.Metadata.ID,
 						"webhook_url":       webhookURL,
+						"phaseSchematic":    schematicURL,
 					},
 				},
 			},
