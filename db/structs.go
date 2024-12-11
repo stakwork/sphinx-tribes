@@ -1008,6 +1008,60 @@ type TicketMessage struct {
 	TicketDetails   Tickets       `json:"ticketDetails"`
 }
 
+type ContextTagType string
+
+const (
+	ProductBriefContext ContextTagType = "productBrief"
+	FeatureBriefContext ContextTagType = "featureBrief"
+	SchematicContext    ContextTagType = "schematic"
+)
+
+type ContextTag struct {
+	Type ContextTagType `json:"type"`
+	ID   string         `json:"id"`
+}
+
+type ChatRole string
+
+const (
+	UserRole      ChatRole = "user"
+	AssistantRole ChatRole = "assistant"
+)
+
+type ChatMessageStatus string
+
+const (
+	SendingStatus ChatMessageStatus = "sending"
+	SentStatus    ChatMessageStatus = "sent"
+	ErrorStatus   ChatMessageStatus = "error"
+)
+
+type ChatSource string
+
+const (
+	UserSource  ChatSource = "user"
+	AgentSource ChatSource = "agent"
+)
+
+type ChatMessage struct {
+	ID          string            `json:"id" gorm:"primaryKey"`
+	ChatID      string            `json:"chatId" gorm:"index"`
+	Message     string            `json:"message"`
+	Role        ChatRole          `json:"role"`
+	Timestamp   time.Time         `json:"timestamp"`
+	ContextTags []ContextTag      `json:"contextTags" gorm:"type:jsonb"`
+	Status      ChatMessageStatus `json:"status"`
+	Source      ChatSource        `json:"source"`
+}
+
+type Chat struct {
+	ID          string    `json:"id" gorm:"primaryKey"`
+	WorkspaceID string    `json:"workspaceId" gorm:"index"`
+	Title       string    `json:"title"`
+	CreatedAt   time.Time `json:"createdAt"`
+	UpdatedAt   time.Time `json:"updatedAt"`
+}
+
 func (Person) TableName() string {
 	return "people"
 }
