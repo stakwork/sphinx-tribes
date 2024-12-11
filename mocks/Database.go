@@ -9791,3 +9791,208 @@ func (_c *Database_GetTicketsByPhaseUUID_Call) RunAndReturn(run func(string, str
 	_c.Call.Return(run)
 	return _c
 }
+
+
+type Database_CreateOrEditCodeGraph_Call struct {
+    *mock.Call
+}
+
+func (_e *Database_Expecter) CreateOrEditCodeGraph(m interface{}) *Database_CreateOrEditCodeGraph_Call {
+    return &Database_CreateOrEditCodeGraph_Call{Call: _e.mock.On("CreateOrEditCodeGraph", m)}
+}
+
+func (_c *Database_CreateOrEditCodeGraph_Call) Run(run func(m db.WorkspaceCodeGraph)) *Database_CreateOrEditCodeGraph_Call {
+    _c.Call.Run(func(args mock.Arguments) {
+        run(args[0].(db.WorkspaceCodeGraph))
+    })
+    return _c
+}
+
+func (_c *Database_CreateOrEditCodeGraph_Call) Return(_a0 db.WorkspaceCodeGraph, _a1 error) *Database_CreateOrEditCodeGraph_Call {
+    _c.Call.Return(_a0, _a1)
+    return _c
+}
+
+func (_c *Database_CreateOrEditCodeGraph_Call) RunAndReturn(run func(db.WorkspaceCodeGraph) (db.WorkspaceCodeGraph, error)) *Database_CreateOrEditCodeGraph_Call {
+    _c.Call.Return(run)
+    return _c
+}
+
+// CreateOrEditCodeGraph provides a mock function with given fields: m
+func (_m *Database) CreateOrEditCodeGraph(m db.WorkspaceCodeGraph) (db.WorkspaceCodeGraph, error) {
+    ret := _m.Called(m)
+
+    if len(ret) == 0 {
+        panic("no return value specified for CreateOrEditCodeGraph")
+    }
+
+    var r0 db.WorkspaceCodeGraph
+    var r1 error
+    if rf, ok := ret.Get(0).(func(db.WorkspaceCodeGraph) (db.WorkspaceCodeGraph, error)); ok {
+        return rf(m)
+    }
+    if rf, ok := ret.Get(0).(func(db.WorkspaceCodeGraph) db.WorkspaceCodeGraph); ok {
+        r0 = rf(m)
+    } else {
+        r0 = ret.Get(0).(db.WorkspaceCodeGraph)
+    }
+
+    if rf, ok := ret.Get(1).(func(db.WorkspaceCodeGraph) error); ok {
+        r1 = rf(m)
+    } else {
+        r1 = ret.Error(1)
+    }
+
+    return r0, r1
+}
+
+type Database_GetCodeGraphByUUID_Call struct {
+    *mock.Call
+}
+
+func (_e *Database_Expecter) GetCodeGraphByUUID(uuid interface{}) *Database_GetCodeGraphByUUID_Call {
+    return &Database_GetCodeGraphByUUID_Call{Call: _e.mock.On("GetCodeGraphByUUID", uuid)}
+}
+
+func (_c *Database_GetCodeGraphByUUID_Call) Run(run func(uuid string)) *Database_GetCodeGraphByUUID_Call {
+    _c.Call.Run(func(args mock.Arguments) {
+        run(args[0].(string))
+    })
+    return _c
+}
+
+func (_c *Database_GetCodeGraphByUUID_Call) Return(_a0 db.WorkspaceCodeGraph, _a1 error) *Database_GetCodeGraphByUUID_Call {
+    _c.Call.Return(_a0, _a1)
+    return _c
+}
+
+func (_c *Database_GetCodeGraphByUUID_Call) RunAndReturn(run func(string) (db.WorkspaceCodeGraph, error)) *Database_GetCodeGraphByUUID_Call {
+    _c.Call.Return(run)
+    return _c
+}
+
+// GetCodeGraphByUUID provides a mock function with given fields: uuid
+func (_m *Database) GetCodeGraphByUUID(uuid string) (db.WorkspaceCodeGraph, error) {
+    ret := _m.Called(uuid)
+
+    if len(ret) == 0 {
+        panic("no return value specified for GetCodeGraphByUUID")
+    }
+
+    var r0 db.WorkspaceCodeGraph
+    var r1 error
+    if rf, ok := ret.Get(0).(func(string) (db.WorkspaceCodeGraph, error)); ok {
+        return rf(uuid)
+    }
+    if rf, ok := ret.Get(0).(func(string) db.WorkspaceCodeGraph); ok {
+        r0 = rf(uuid)
+    } else {
+        r0 = ret.Get(0).(db.WorkspaceCodeGraph)
+    }
+
+    if rf, ok := ret.Get(1).(func(string) error); ok {
+        r1 = rf(uuid)
+    } else {
+        r1 = ret.Error(1)
+    }
+
+    return r0, r1
+}
+
+type Database_GetCodeGraphsByWorkspaceUuid_Call struct {
+    *mock.Call
+}
+
+func (_e *Database_Expecter) GetCodeGraphsByWorkspaceUuid(workspace_uuid interface{}) *Database_GetCodeGraphsByWorkspaceUuid_Call {
+    return &Database_GetCodeGraphsByWorkspaceUuid_Call{Call: _e.mock.On("GetCodeGraphsByWorkspaceUuid", workspace_uuid)}
+}
+
+func (_c *Database_GetCodeGraphsByWorkspaceUuid_Call) Run(run func(workspace_uuid string)) *Database_GetCodeGraphsByWorkspaceUuid_Call {
+    _c.Call.Run(func(args mock.Arguments) {
+        run(args[0].(string))
+    })
+    return _c
+}
+
+func (_c *Database_GetCodeGraphsByWorkspaceUuid_Call) Return(_a0 []db.WorkspaceCodeGraph, _a1 error) *Database_GetCodeGraphsByWorkspaceUuid_Call {
+    _c.Call.Return(_a0, _a1)
+    return _c
+}
+
+func (_c *Database_GetCodeGraphsByWorkspaceUuid_Call) RunAndReturn(run func(string) ([]db.WorkspaceCodeGraph, error)) *Database_GetCodeGraphsByWorkspaceUuid_Call {
+    _c.Call.Return(run)
+    return _c
+}
+
+// GetCodeGraphsByWorkspaceUuid provides a mock function with given fields: workspace_uuid
+func (_m *Database) GetCodeGraphsByWorkspaceUuid(workspace_uuid string) ([]db.WorkspaceCodeGraph, error) {
+    ret := _m.Called(workspace_uuid)
+
+    if len(ret) == 0 {
+        panic("no return value specified for GetCodeGraphsByWorkspaceUuid")
+    }
+
+    var r0 []db.WorkspaceCodeGraph
+    var r1 error
+    if rf, ok := ret.Get(0).(func(string) ([]db.WorkspaceCodeGraph, error)); ok {
+        return rf(workspace_uuid)
+    }
+    if rf, ok := ret.Get(0).(func(string) []db.WorkspaceCodeGraph); ok {
+        r0 = rf(workspace_uuid)
+    } else {
+        if ret.Get(0) != nil {
+            r0 = ret.Get(0).([]db.WorkspaceCodeGraph)
+        }
+    }
+
+    if rf, ok := ret.Get(1).(func(string) error); ok {
+        r1 = rf(workspace_uuid)
+    } else {
+        r1 = ret.Error(1)
+    }
+
+    return r0, r1
+}
+
+type Database_DeleteCodeGraph_Call struct {
+    *mock.Call
+}
+
+func (_e *Database_Expecter) DeleteCodeGraph(workspace_uuid interface{}, uuid interface{}) *Database_DeleteCodeGraph_Call {
+    return &Database_DeleteCodeGraph_Call{Call: _e.mock.On("DeleteCodeGraph", workspace_uuid, uuid)}
+}
+
+func (_c *Database_DeleteCodeGraph_Call) Run(run func(workspace_uuid string, uuid string)) *Database_DeleteCodeGraph_Call {
+    _c.Call.Run(func(args mock.Arguments) {
+        run(args[0].(string), args[1].(string))
+    })
+    return _c
+}
+
+func (_c *Database_DeleteCodeGraph_Call) Return(_a0 error) *Database_DeleteCodeGraph_Call {
+    _c.Call.Return(_a0)
+    return _c
+}
+
+func (_c *Database_DeleteCodeGraph_Call) RunAndReturn(run func(string, string) error) *Database_DeleteCodeGraph_Call {
+    _c.Call.Return(run)
+    return _c
+}
+
+// DeleteCodeGraph provides a mock function with given fields: workspace_uuid, uuid
+func (_m *Database) DeleteCodeGraph(workspace_uuid string, uuid string) error {
+    ret := _m.Called(workspace_uuid, uuid)
+
+    if len(ret) == 0 {
+        panic("no return value specified for DeleteCodeGraph")
+    }
+
+    var r0 error
+    if rf, ok := ret.Get(0).(func(string, string) error); ok {
+        r0 = rf(workspace_uuid, uuid)
+    } else {
+        r0 = ret.Error(0)
+    }
+
+    return r0
+}
