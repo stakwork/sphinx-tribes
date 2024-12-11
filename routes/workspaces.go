@@ -55,6 +55,11 @@ func WorkspaceRoutes() chi.Router {
 		r.Delete("/{workspace_uuid}/repository/{uuid}", workspaceHandlers.DeleteWorkspaceRepository)
 
 		r.Get("/{workspace_uuid}/lastwithdrawal", workspaceHandlers.GetLastWithdrawal)
+
+		r.Post("/codegraph", workspaceHandlers.CreateOrEditWorkspaceCodeGraph)
+		r.Get("/codegraph/{uuid}", workspaceHandlers.GetWorkspaceCodeGraphByUUID)
+		r.Get("/{workspace_uuid}/codegraph", workspaceHandlers.GetCodeGraphsByWorkspaceUuid)
+		r.Delete("/{workspace_uuid}/codegraph/{uuid}", workspaceHandlers.DeleteWorkspaceCodeGraph)
 	})
 	return r
 }

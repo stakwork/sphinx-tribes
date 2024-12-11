@@ -79,6 +79,7 @@ func InitDB() {
 	db.AutoMigrate(&BountyRoles{})
 	db.AutoMigrate(&UserInvoiceData{})
 	db.AutoMigrate(&WorkspaceRepositories{})
+	db.AutoMigrate(&WorkspaceCodeGraph{})
 	db.AutoMigrate(&WorkspaceFeatures{})
 	db.AutoMigrate(&FeaturePhase{})
 	db.AutoMigrate(&FeatureStory{})
