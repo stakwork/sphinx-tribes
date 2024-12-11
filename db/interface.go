@@ -205,4 +205,7 @@ type Database interface {
 	GetCodeGraphsByWorkspaceUuid(workspace_uuid string) ([]WorkspaceCodeGraph, error)
 	CreateOrEditCodeGraph(m WorkspaceCodeGraph) (WorkspaceCodeGraph, error)
 	DeleteCodeGraph(workspace_uuid string, uuid string) error
+	GetTicketsWithoutGroup() ([]Tickets, error)
+	UpdateTicketsWithoutGroup(ticket Tickets) error
+	ProcessUpdateTicketsWithoutGroup()
 }
