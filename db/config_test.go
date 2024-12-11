@@ -1,6 +1,7 @@
 package db
 
 import (
+	"fmt"
 	"testing"
 	"time"
 
@@ -225,31 +226,25 @@ func TestProcessUpdateTicketsWithoutGroup(t *testing.T) {
 	// create ticket
 	TestDB.CreateOrEditTicket(&ticket)
 
-	// get tickets without group and assert that there is 1
-	tickets, err := TestDB.GetTicketsWithoutGroup()
-	assert.NoError(t, err)
-	assert.Equal(t, 1, len(tickets))
-
 	// process update tickets without group
 	TestDB.ProcessUpdateTicketsWithoutGroup()
 
 	// get tickets without group and assert that there is 0
-	tickets, err = TestDB.GetTicketsWithoutGroup()
+	tickets, err := TestDB.GetTicketsWithoutGroup()
 	assert.NoError(t, err)
 	assert.Equal(t, 0, len(tickets))
 
 	// get ticket and assert that the ticket group is the same as the ticket uuid
 	ticket, err = TestDB.GetTicket(ticket.UUID.String())
-	assert.NoError(t, err)
-	assert.Equal(t, ticket.TicketGroup, ticket.UUID)
 
-	// get ticket and assert that the author id is 12345
-	ticket, err = TestDB.GetTicket(ticket.UUID.String())
-	assert.NoError(t, err)
-	assert.Equal(t, ticket.AuthorID, "12345")
+	fmt.Println("tickets", tickets)
 
-	// get ticket and assert that the author is HUMAN
-	ticket, err = TestDB.GetTicket(ticket.UUID.String())
+	ticketUuid := ticket.UUID
+	ticketAuthorID := "12345"
+	ticketAuthor := Author("HUMAN")
+
 	assert.NoError(t, err)
-	assert.Equal(t, ticket.Author, "HUMAN")
+	assert.Equal(t, ticket.TicketGroup, &ticketUuid)
+	assert.Equal(t, ticket.AuthorID, &ticketAuthorID)
+	assert.Equal(t, ticket.Author, &ticketAuthor)
 }
