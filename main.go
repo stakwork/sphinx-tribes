@@ -20,10 +20,7 @@ import (
 )
 
 func main() {
-	var err error
-
-	err = godotenv.Load()
-	if err != nil {
+	if err := godotenv.Load(); err != nil {
 		fmt.Println("no .env file")
 	}
 
@@ -31,6 +28,8 @@ func main() {
 	db.InitRedis()
 	db.InitCache()
 	db.InitRoles()
+	db.DB.ProcessUpdateTicketsWithoutGroup()
+
 	// Config has to be inited before JWT, if not it will lead to NO JWT error
 	config.InitConfig()
 	auth.InitJwt()
