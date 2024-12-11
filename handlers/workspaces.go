@@ -1130,3 +1130,127 @@ func GetAllUserWorkspaces(pubkey string) []db.Workspace {
 
 	return workspaces
 }
+
+func (oh *workspaceHandler) CreateOrEditWorkspaceCodeGraph(w http.ResponseWriter, r *http.Request) {
+	ctx := r.Context()
+	pubKeyFromAuth, _ := ctx.Value(auth.ContextKey).(string)
+	if pubKeyFromAuth == "" {
+		fmt.Println("[workspaces] no pubkey from auth")
+		w.WriteHeader(http.StatusUnauthorized)
+		return
+	}
+
+	codeGraph := db.WorkspaceCodeGraph{}
+	body, _ := io.ReadAll(r.Body)
+	r.Body.Close()
+	err := json.Unmarshal(body, &codeGraph)
+
+	if err != nil {
+		fmt.Println("[workspaces]", err)
+		w.WriteHeader(http.StatusNotAcceptable)
+		return
+	}
+
+	if len(codeGraph.Uuid) == 0 {
+		codeGraph.Uuid = xid.New().String()
+		codeGraph.CreatedBy = pubKeyFromAuth
+	}
+	codeGraph.UpdatedBy = pubKeyFromAuth
+
+	err = db.Validate.Struct(codeGraph)
+	if err != nil {
+		w.WriteHeader(http.StatusBadRequest)
+		msg := fmt.Sprintf("Error: did not pass validation test : %s", err)
+		json.NewEncoder(w).Encode(msg)
+		return
+	}
+
+	workspace := oh.db.GetWorkspaceByUuid(codeGraph.WorkspaceUuid)
+	if workspace.Uuid != codeGraph.WorkspaceUuid {
+		w.WriteHeader(http.StatusUnauthorized)
+		json.NewEncoder(w).Encode("Workspace does not exist")
+		return
+	}
+
+	p, err := oh.db.CreateOrEditCodeGraph(codeGraph)
+	if err != nil {
+		w.WriteHeader(http.StatusBadRequest)
+		return
+	}
+
+	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode(p)
+}
+
+func (oh *workspaceHandler) GetWorkspaceCodeGraphByUUID(w http.ResponseWriter, r *http.Request) {
+	ctx := r.Context()
+	pubKeyFromAuth, _ := ctx.Value(auth.ContextKey).(string)
+	if pubKeyFromAuth == "" {
+		fmt.Println("[workspaces] no pubkey from auth")
+		w.WriteHeader(http.StatusUnauthorized)
+		return
+	}
+
+	uuid := chi.URLParam(r, "uuid")
+	codeGraph, err := oh.db.GetCodeGraphByUUID(uuid)
+	if err != nil {
+		fmt.Println("[workspaces] code graph not found:", err)
+		w.WriteHeader(http.StatusNotFound)
+		json.NewEncoder(w).Encode(map[string]string{"error": "Code graph not found"})
+		return
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode(codeGraph)
+}
+
+func (oh *workspaceHandler) GetCodeGraphsByWorkspaceUuid(w http.ResponseWriter, r *http.Request) {
+	ctx := r.Context()
+	pubKeyFromAuth, _ := ctx.Value(auth.ContextKey).(string)
+	if pubKeyFromAuth == "" {
+		fmt.Println("[workspaces] no pubkey from auth")
+		w.WriteHeader(http.StatusUnauthorized)
+		return
+	}
+
+	workspace_uuid := chi.URLParam(r, "workspace_uuid")
+	codeGraphs, err := oh.db.GetCodeGraphsByWorkspaceUuid(workspace_uuid)
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		json.NewEncoder(w).Encode(map[string]string{"error": "Failed to get code graphs"})
+		return
+	}
+
+	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode(codeGraphs)
+}
+
+func (oh *workspaceHandler) DeleteWorkspaceCodeGraph(w http.ResponseWriter, r *http.Request) {
+	ctx := r.Context()
+	pubKeyFromAuth, _ := ctx.Value(auth.ContextKey).(string)
+
+	if pubKeyFromAuth == "" {
+		fmt.Println("[workspaces] no pubkey from auth")
+		w.WriteHeader(http.StatusUnauthorized)
+		return
+	}
+
+	workspace_uuid := chi.URLParam(r, "workspace_uuid")
+	uuid := chi.URLParam(r, "uuid")
+
+	err := oh.db.DeleteCodeGraph(workspace_uuid, uuid)
+	if err != nil {
+		if err.Error() == "code graph not found" {
+			w.WriteHeader(http.StatusNotFound)
+			json.NewEncoder(w).Encode(map[string]string{"error": "Code graph not found"})
+			return
+		}
+		w.WriteHeader(http.StatusInternalServerError)
+		json.NewEncoder(w).Encode(map[string]string{"error": "Failed to delete code graph"})
+		return
+	}
+
+	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode(map[string]string{"message": "Code graph deleted successfully"})
+}

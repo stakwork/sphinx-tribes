@@ -18,6 +18,7 @@ import (
 	"github.com/stakwork/sphinx-tribes/auth"
 	"github.com/stakwork/sphinx-tribes/db"
 	"github.com/stretchr/testify/assert"
+	"gorm.io/gorm"
 )
 
 func TestUnitCreateOrEditWorkspace(t *testing.T) {
@@ -1640,6 +1641,340 @@ func TestDeleteWorkspaceRepository(t *testing.T) {
 		_, err = db.TestDB.GetWorkspaceRepoByWorkspaceUuidAndRepoUuid(workspace.Uuid, repository.Uuid)
 		assert.Error(t, err)
 		assert.Equal(t, "workspace repository not found", err.Error())
+		assert.Equal(t, http.StatusOK, rr.Code)
+	})
+}
+
+func TestCreateOrEditWorkspaceCodeGraph(t *testing.T) {
+	teardownSuite := SetupSuite(t)
+	defer teardownSuite(t)
+	oHandler := NewWorkspaceHandler(db.TestDB)
+
+	t.Run("should return error if a user is not authorized", func(t *testing.T) {
+		rr := httptest.NewRecorder()
+		handler := http.HandlerFunc(oHandler.CreateOrEditWorkspaceCodeGraph)
+
+		bodyJson := []byte(`{"key": "value"}`)
+		ctx := context.WithValue(context.Background(), auth.ContextKey, "")
+		req, err := http.NewRequestWithContext(ctx, http.MethodPost, "/codegraph", bytes.NewReader(bodyJson))
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		handler.ServeHTTP(rr, req)
+		assert.Equal(t, http.StatusUnauthorized, rr.Code)
+	})
+
+	t.Run("should return error if body is not a valid json", func(t *testing.T) {
+		rr := httptest.NewRecorder()
+		handler := http.HandlerFunc(oHandler.CreateOrEditWorkspaceCodeGraph)
+
+		invalidJson := []byte(`{"key": "value"`)
+		ctx := context.WithValue(context.Background(), auth.ContextKey, "pub-key")
+		req, err := http.NewRequestWithContext(ctx, http.MethodPost, "/codegraph", bytes.NewReader(invalidJson))
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		handler.ServeHTTP(rr, req)
+		assert.Equal(t, http.StatusNotAcceptable, rr.Code)
+	})
+
+	t.Run("should return error if a Workspace UUID that does not exist is passed to the API body", func(t *testing.T) {
+		rr := httptest.NewRecorder()
+		handler := http.HandlerFunc(oHandler.CreateOrEditWorkspaceCodeGraph)
+
+		workspace := db.Workspace{
+			Uuid:        uuid.New().String(),
+			Name:        uuid.New().String(),
+			OwnerPubKey: "workspace_owner_pubkey",
+			Github:      "https://github.com/test",
+			Website:     "https://www.test.com",
+			Description: "Test Description",
+		}
+		db.TestDB.CreateOrEditWorkspace(workspace)
+
+		codeGraph := db.WorkspaceCodeGraph{
+			Uuid:          uuid.New().String(),
+			WorkspaceUuid: "wrongid",
+			Name:          "testgraph",
+			Url:           "https://github.com/test/graph",
+		}
+
+		requestBody, _ := json.Marshal(codeGraph)
+		ctx := context.WithValue(context.Background(), auth.ContextKey, "pub-key")
+		req, err := http.NewRequestWithContext(ctx, http.MethodPost, "/codegraph", bytes.NewReader(requestBody))
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		handler.ServeHTTP(rr, req)
+		assert.Equal(t, http.StatusUnauthorized, rr.Code)
+	})
+
+	t.Run("user should be able to add a workspace code graph when the right conditions are met", func(t *testing.T) {
+		rr := httptest.NewRecorder()
+		handler := http.HandlerFunc(oHandler.CreateOrEditWorkspaceCodeGraph)
+
+		workspace := db.Workspace{
+			Uuid:        uuid.New().String(),
+			Name:        uuid.New().String(),
+			OwnerPubKey: "workspace_owner_pubkey",
+			Github:      "https://github.com/test",
+			Website:     "https://www.test.com",
+			Description: "Test Description",
+		}
+		db.TestDB.CreateOrEditWorkspace(workspace)
+
+		codeGraph := db.WorkspaceCodeGraph{
+			Uuid:          uuid.New().String(),
+			WorkspaceUuid: workspace.Uuid,
+			Name:          "testgraph",
+			Url:           "https://github.com/test/graph",
+		}
+
+		requestBody, _ := json.Marshal(codeGraph)
+		ctx := context.WithValue(context.Background(), auth.ContextKey, "pub-key")
+		req, err := http.NewRequestWithContext(ctx, http.MethodPost, "/codegraph", bytes.NewReader(requestBody))
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		handler.ServeHTTP(rr, req)
+
+		var returnedCodeGraph db.WorkspaceCodeGraph
+		err = json.Unmarshal(rr.Body.Bytes(), &returnedCodeGraph)
+		assert.NoError(t, err)
+
+		assert.Equal(t, http.StatusOK, rr.Code)
+		assert.Equal(t, codeGraph.Name, returnedCodeGraph.Name)
+		assert.Equal(t, codeGraph.Url, returnedCodeGraph.Url)
+	})
+}
+
+func TestGetWorkspaceCodeGraphByUUID(t *testing.T) {
+	teardownSuite := SetupSuite(t)
+	defer teardownSuite(t)
+
+	oHandler := NewWorkspaceHandler(db.TestDB)
+
+	person := db.Person{
+		Uuid:        uuid.New().String(),
+		OwnerAlias:  "test-alias",
+		UniqueName:  "test-unique-name",
+		OwnerPubKey: "test-pubkey",
+		PriceToMeet: 0,
+		Description: "test-description",
+	}
+	db.TestDB.CreateOrEditPerson(person)
+
+	workspace := db.Workspace{
+		Uuid:        uuid.New().String(),
+		Name:        "test-workspace" + uuid.New().String(),
+		OwnerPubKey: person.OwnerPubKey,
+		Github:      "https://github.com/test",
+		Website:     "https://www.test.com",
+		Description: "test-description",
+	}
+	db.TestDB.CreateOrEditWorkspace(workspace)
+
+	codeGraph := db.WorkspaceCodeGraph{
+		Uuid:          uuid.New().String(),
+		WorkspaceUuid: workspace.Uuid,
+		Name:          "test-graph",
+		Url:           "https://github.com/test/graph",
+	}
+	db.TestDB.CreateOrEditCodeGraph(codeGraph)
+
+	t.Run("should return error if user is not authorized", func(t *testing.T) {
+		rr := httptest.NewRecorder()
+		handler := http.HandlerFunc(oHandler.GetWorkspaceCodeGraphByUUID)
+
+		rctx := chi.NewRouteContext()
+		rctx.URLParams.Add("uuid", codeGraph.Uuid)
+		req, err := http.NewRequestWithContext(context.WithValue(context.Background(), chi.RouteCtxKey, rctx),
+			http.MethodGet, "/codegraph/"+codeGraph.Uuid, nil)
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		handler.ServeHTTP(rr, req)
+		assert.Equal(t, http.StatusUnauthorized, rr.Code)
+	})
+
+	t.Run("should return code graph if user is authorized", func(t *testing.T) {
+		rr := httptest.NewRecorder()
+		handler := http.HandlerFunc(oHandler.GetWorkspaceCodeGraphByUUID)
+
+		rctx := chi.NewRouteContext()
+		rctx.URLParams.Add("uuid", codeGraph.Uuid)
+		ctx := context.WithValue(context.Background(), auth.ContextKey, person.OwnerPubKey)
+		req, err := http.NewRequestWithContext(context.WithValue(ctx, chi.RouteCtxKey, rctx),
+			http.MethodGet, "/codegraph/"+codeGraph.Uuid, nil)
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		handler.ServeHTTP(rr, req)
+		assert.Equal(t, http.StatusOK, rr.Code)
+
+		var returnedCodeGraph db.WorkspaceCodeGraph
+		err = json.Unmarshal(rr.Body.Bytes(), &returnedCodeGraph)
+		assert.NoError(t, err)
+		assert.Equal(t, codeGraph.Name, returnedCodeGraph.Name)
+		assert.Equal(t, codeGraph.Url, returnedCodeGraph.Url)
+	})
+}
+
+func TestGetCodeGraphsByWorkspaceUuid(t *testing.T) {
+	teardownSuite := SetupSuite(t)
+	defer teardownSuite(t)
+
+	oHandler := NewWorkspaceHandler(db.TestDB)
+
+	person := db.Person{
+		Uuid:        uuid.New().String(),
+		OwnerAlias:  "test-alias",
+		UniqueName:  "test-unique-name",
+		OwnerPubKey: "test-pubkey",
+		PriceToMeet: 0,
+		Description: "test-description",
+	}
+	db.TestDB.CreateOrEditPerson(person)
+
+	workspace := db.Workspace{
+		Uuid:        uuid.New().String(),
+		Name:        "test-workspace" + uuid.New().String(),
+		OwnerPubKey: person.OwnerPubKey,
+		Github:      "https://github.com/test",
+		Website:     "https://www.test.com",
+		Description: "test-description",
+	}
+	db.TestDB.CreateOrEditWorkspace(workspace)
+
+	codeGraph := db.WorkspaceCodeGraph{
+		Uuid:          uuid.New().String(),
+		WorkspaceUuid: workspace.Uuid,
+		Name:          "test-graph",
+		Url:           "https://github.com/test/graph",
+	}
+	db.TestDB.CreateOrEditCodeGraph(codeGraph)
+
+	t.Run("should return error if user is not authorized", func(t *testing.T) {
+		rr := httptest.NewRecorder()
+		handler := http.HandlerFunc(oHandler.GetCodeGraphsByWorkspaceUuid)
+
+		rctx := chi.NewRouteContext()
+		rctx.URLParams.Add("workspace_uuid", workspace.Uuid)
+		req, err := http.NewRequestWithContext(context.WithValue(context.Background(), chi.RouteCtxKey, rctx),
+			http.MethodGet, "/"+workspace.Uuid+"/codegraph", nil)
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		handler.ServeHTTP(rr, req)
+		assert.Equal(t, http.StatusUnauthorized, rr.Code)
+	})
+
+	t.Run("should return workspace code graphs if user is authorized", func(t *testing.T) {
+		rr := httptest.NewRecorder()
+		handler := http.HandlerFunc(oHandler.GetCodeGraphsByWorkspaceUuid)
+
+		rctx := chi.NewRouteContext()
+		rctx.URLParams.Add("workspace_uuid", workspace.Uuid)
+		ctx := context.WithValue(context.Background(), auth.ContextKey, person.OwnerPubKey)
+		req, err := http.NewRequestWithContext(context.WithValue(ctx, chi.RouteCtxKey, rctx),
+			http.MethodGet, "/"+workspace.Uuid+"/codegraph", nil)
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		handler.ServeHTTP(rr, req)
+		assert.Equal(t, http.StatusOK, rr.Code)
+
+		var returnedCodeGraphs []db.WorkspaceCodeGraph
+		err = json.Unmarshal(rr.Body.Bytes(), &returnedCodeGraphs)
+		assert.NoError(t, err)
+		assert.Equal(t, 1, len(returnedCodeGraphs))
+		assert.Equal(t, codeGraph.Name, returnedCodeGraphs[0].Name)
+		assert.Equal(t, codeGraph.Url, returnedCodeGraphs[0].Url)
+	})
+}
+
+func TestDeleteWorkspaceCodeGraph(t *testing.T) {
+	teardownSuite := SetupSuite(t)
+	defer teardownSuite(t)
+
+	oHandler := NewWorkspaceHandler(db.TestDB)
+
+	person := db.Person{
+		Uuid:        "uuid",
+		OwnerAlias:  "alias",
+		UniqueName:  "unique_name",
+		OwnerPubKey: "pubkey",
+		PriceToMeet: 0,
+		Description: "description",
+	}
+	db.TestDB.CreateOrEditPerson(person)
+
+	workspace := db.Workspace{
+		Uuid:        "workspace_uuid",
+		Name:        "workspace_name",
+		OwnerPubKey: "person.OwnerPubkey",
+		Github:      "github",
+		Website:     "website",
+		Description: "description",
+	}
+	db.TestDB.CreateOrEditWorkspace(workspace)
+
+	codeGraph := db.WorkspaceCodeGraph{
+		Uuid:          "graph_uuid",
+		WorkspaceUuid: workspace.Uuid,
+		Name:          "graph_name",
+		Url:           "graph_url",
+	}
+	db.TestDB.CreateOrEditCodeGraph(codeGraph)
+
+	ctx := context.WithValue(context.Background(), auth.ContextKey, workspace.OwnerPubKey)
+
+	t.Run("Should test that it throws a 401 error if a user is not authorized", func(t *testing.T) {
+		rctx := chi.NewRouteContext()
+		rctx.URLParams.Add("uuid", codeGraph.Uuid)
+		rctx.URLParams.Add("workspace_uuid", workspace.Uuid)
+		req, err := http.NewRequestWithContext(context.WithValue(context.Background(), chi.RouteCtxKey, rctx),
+			http.MethodDelete, "/"+workspace.Uuid+"/codegraph/"+codeGraph.Uuid, nil)
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		rr := httptest.NewRecorder()
+		http.HandlerFunc(oHandler.DeleteWorkspaceCodeGraph).ServeHTTP(rr, req)
+
+		assert.Equal(t, http.StatusUnauthorized, rr.Code)
+	})
+
+	t.Run("Should test that the code graph is deleted after the Delete API request is successful", func(t *testing.T) {
+		existingGraph, err := db.TestDB.GetCodeGraphByUUID(codeGraph.Uuid)
+		if err != nil {
+			t.Fatal(err)
+		}
+		assert.NotEmpty(t, existingGraph)
+
+		rctx := chi.NewRouteContext()
+		rctx.URLParams.Add("uuid", codeGraph.Uuid)
+		rctx.URLParams.Add("workspace_uuid", workspace.Uuid)
+		req, err := http.NewRequestWithContext(context.WithValue(ctx, chi.RouteCtxKey, rctx),
+			http.MethodDelete, "/"+workspace.Uuid+"/codegraph/"+codeGraph.Uuid, nil)
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		rr := httptest.NewRecorder()
+		http.HandlerFunc(oHandler.DeleteWorkspaceCodeGraph).ServeHTTP(rr, req)
+
+		_, err = db.TestDB.GetCodeGraphByUUID(codeGraph.Uuid)
+		assert.Error(t, err)
+		assert.Equal(t, gorm.ErrRecordNotFound.Error(), err.Error())
 		assert.Equal(t, http.StatusOK, rr.Code)
 	})
 }
