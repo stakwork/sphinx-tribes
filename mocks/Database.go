@@ -25,6 +25,198 @@ func (_m *Database) EXPECT() *Database_Expecter {
 	return &Database_Expecter{mock: &_m.Mock}
 }
 
+// AddChat provides a mock function with given fields: chat
+func (_m *Database) AddChat(chat *db.Chat) (db.Chat, error) {
+	ret := _m.Called(chat)
+
+	var r0 db.Chat
+	if rf, ok := ret.Get(0).(func(*db.Chat) db.Chat); ok {
+		r0 = rf(chat)
+	} else {
+		r0 = ret.Get(0).(db.Chat)
+	}
+
+	var r1 error
+	if rf, ok := ret.Get(1).(func(*db.Chat) error); ok {
+		r1 = rf(chat)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
+// Database_AddChat_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'AddChat'
+type Database_AddChat_Call struct {
+	*mock.Call
+}
+
+// AddChat is a helper method to define mock.On call
+func (_e *Database_Expecter) AddChat(chat interface{}) *Database_AddChat_Call {
+	return &Database_AddChat_Call{Call: _e.mock.On("AddChat", chat)}
+}
+
+func (_c *Database_AddChat_Call) Run(run func(chat *db.Chat)) *Database_AddChat_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(*db.Chat))
+	})
+	return _c
+}
+
+func (_c *Database_AddChat_Call) Return(_a0 db.Chat, _a1 error) *Database_AddChat_Call {
+	_c.Call.Return(_a0, _a1)
+	return _c
+}
+
+func (_c *Database_AddChat_Call) RunAndReturn(run func(*db.Chat) (db.Chat, error)) *Database_AddChat_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
+// GetChatByChatID provides a mock function with given fields: chatID
+func (_m *Database) GetChatByChatID(chatID string) (db.Chat, error) {
+	ret := _m.Called(chatID)
+
+	var r0 db.Chat
+	if rf, ok := ret.Get(0).(func(string) db.Chat); ok {
+		r0 = rf(chatID)
+	} else {
+		r0 = ret.Get(0).(db.Chat)
+	}
+
+	var r1 error
+	if rf, ok := ret.Get(1).(func(string) error); ok {
+		r1 = rf(chatID)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
+// Database_GetChatByChatID_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'GetChatByChatID'
+type Database_GetChatByChatID_Call struct {
+	*mock.Call
+}
+
+// GetChatByChatID is a helper method to define mock.On call
+func (_e *Database_Expecter) GetChatByChatID(chatID interface{}) *Database_GetChatByChatID_Call {
+	return &Database_GetChatByChatID_Call{Call: _e.mock.On("GetChatByChatID", chatID)}
+}
+
+func (_c *Database_GetChatByChatID_Call) Run(run func(chatID string)) *Database_GetChatByChatID_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(string))
+	})
+	return _c
+}
+
+func (_c *Database_GetChatByChatID_Call) Return(_a0 db.Chat, _a1 error) *Database_GetChatByChatID_Call {
+	_c.Call.Return(_a0, _a1)
+	return _c
+}
+
+func (_c *Database_GetChatByChatID_Call) RunAndReturn(run func(string) (db.Chat, error)) *Database_GetChatByChatID_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
+// AddChatMessage provides a mock function with given fields: chatMessage
+func (_m *Database) AddChatMessage(chatMessage *db.ChatMessage) (db.ChatMessage, error) {
+	ret := _m.Called(chatMessage)
+
+	var r0 db.ChatMessage
+	if rf, ok := ret.Get(0).(func(*db.ChatMessage) db.ChatMessage); ok {
+		r0 = rf(chatMessage)
+	} else {
+		r0 = ret.Get(0).(db.ChatMessage)
+	}
+
+	var r1 error
+	if rf, ok := ret.Get(1).(func(*db.ChatMessage) error); ok {
+		r1 = rf(chatMessage)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
+// Database_AddChatMessage_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'AddChatMessage'
+type Database_AddChatMessage_Call struct {
+	*mock.Call
+}
+
+// AddChatMessage is a helper method to define mock.On call
+func (_e *Database_Expecter) AddChatMessage(chatMessage interface{}) *Database_AddChatMessage_Call {
+	return &Database_AddChatMessage_Call{Call: _e.mock.On("AddChatMessage", chatMessage)}
+}
+
+func (_c *Database_AddChatMessage_Call) Run(run func(chatMessage *db.ChatMessage)) *Database_AddChatMessage_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(*db.ChatMessage))
+	})
+	return _c
+}
+
+func (_c *Database_AddChatMessage_Call) Return(_a0 db.ChatMessage, _a1 error) *Database_AddChatMessage_Call {
+	_c.Call.Return(_a0, _a1)
+	return _c
+}
+
+func (_c *Database_AddChatMessage_Call) RunAndReturn(run func(*db.ChatMessage) (db.ChatMessage, error)) *Database_AddChatMessage_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
+// GetChatMessagesForChatID provides a mock function with given fields: chatID
+func (_m *Database) GetChatMessagesForChatID(chatID string) ([]db.ChatMessage, error) {
+	ret := _m.Called(chatID)
+
+	var r0 []db.ChatMessage
+	if rf, ok := ret.Get(0).(func(string) []db.ChatMessage); ok {
+		r0 = rf(chatID)
+	} else {
+		r0 = ret.Get(0).([]db.ChatMessage)
+	}
+
+	var r1 error
+	if rf, ok := ret.Get(1).(func(string) error); ok {
+		r1 = rf(chatID)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
+// Database_GetChatMessagesForChatID_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'GetChatMessagesForChatID'
+type Database_GetChatMessagesForChatID_Call struct {
+	*mock.Call
+}
+
+// GetChatMessagesForChatID is a helper method to define mock.On call
+func (_e *Database_Expecter) GetChatMessagesForChatID(chatID interface{}) *Database_GetChatMessagesForChatID_Call {
+	return &Database_GetChatMessagesForChatID_Call{Call: _e.mock.On("GetChatMessagesForChatID", chatID)}
+}
+
+func (_c *Database_GetChatMessagesForChatID_Call) Run(run func(chatID string)) *Database_GetChatMessagesForChatID_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(string))
+	})
+	return _c
+}
+
+func (_c *Database_GetChatMessagesForChatID_Call) Return(_a0 []db.ChatMessage, _a1 error) *Database_GetChatMessagesForChatID_Call {
+	_c.Call.Return(_a0, _a1)
+	return _c
+}
+
+func (_c *Database_GetChatMessagesForChatID_Call) RunAndReturn(run func(string) ([]db.ChatMessage, error)) *Database_GetChatMessagesForChatID_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
 // AddAndUpdateBudget provides a mock function with given fields: invoice
 func (_m *Database) AddAndUpdateBudget(invoice db.NewInvoiceList) db.NewPaymentHistory {
 	ret := _m.Called(invoice)
