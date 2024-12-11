@@ -169,23 +169,19 @@ func (db database) GetTicketsWithoutGroup() ([]Tickets, error) {
 }
 
 func (db database) UpdateTicketsWithoutGroup(ticket Tickets) error {
-	data := []map[string]interface{}{}
+	data := map[string]interface{}{}
 
-	data = append(data, map[string]interface{}{
-		"ticket_group": ticket.UUID,
-	})
+	data["ticket_group"] = ticket.UUID
 
 	if ticket.AuthorID == nil {
-		data = append(data, map[string]interface{}{
-			"author_id": "12345",
-		})
+		data["author_id"] = "12345"
 	}
 
 	if ticket.Author == nil {
-		data = append(data, map[string]interface{}{
-			"author": "HUMAN",
-		})
+		data["author"] = "HUMAN"
 	}
+
+	fmt.Println("data ===", data)
 
 	result := db.db.Model(&Tickets{}).Where("uuid = ?", ticket.UUID).Updates(data)
 

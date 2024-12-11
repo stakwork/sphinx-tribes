@@ -460,7 +460,8 @@ func (db database) UserHasManageBountyRoles(pubKeyFromAuth string, uuid string) 
 
 func (db database) ProcessUpdateTicketsWithoutGroup() {
 	// get all tickets without group
-	tickets, err := DB.GetTicketsWithoutGroup()
+	tickets, err := db.GetTicketsWithoutGroup()
+
 	if err != nil {
 		log.Printf("Error getting tickets without group: %v", err)
 		return
@@ -468,7 +469,8 @@ func (db database) ProcessUpdateTicketsWithoutGroup() {
 
 	// update each ticket with group uuid
 	for _, ticket := range tickets {
-		err := DB.UpdateTicketsWithoutGroup(ticket)
+		fmt.Println("ticket from process", ticket)
+		err := db.UpdateTicketsWithoutGroup(ticket)
 		if err != nil {
 			log.Printf("Error updating ticket: %v", err)
 		}
