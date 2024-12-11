@@ -2,6 +2,7 @@ package db
 
 import (
 	"fmt"
+	"log"
 	"os"
 
 	"github.com/rs/xid"
@@ -455,4 +456,21 @@ func (db database) UserHasManageBountyRoles(pubKeyFromAuth string, uuid string) 
 		}
 	}
 	return true
+}
+
+func (db database) ProcessUpdateTicketsWithoutGroup() {
+	// get all tickets without group
+	tickets, err := DB.GetTicketsWithoutGroup()
+	if err != nil {
+		log.Printf("Error getting tickets without group: %v", err)
+		return
+	}
+
+	// update each ticket with group uuid
+	for _, ticket := range tickets {
+		err := DB.UpdateTicketsWithoutGroup(ticket)
+		if err != nil {
+			log.Printf("Error updating ticket: %v", err)
+		}
+	}
 }

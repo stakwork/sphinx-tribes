@@ -150,3 +150,48 @@ func (db database) GetTicketsByPhaseUUID(featureUUID string, phaseUUID string) (
 
 	return tickets, nil
 }
+
+func (db database) GetTicketsWithoutGroup() ([]Tickets, error) {
+	var tickets []Tickets
+
+	result := db.db.
+		Where("ticket_group IS NULL OR ticket_group = ?", uuid.Nil).Find(&tickets)
+
+	if result.Error != nil {
+		return nil, fmt.Errorf("failed to fetch tickets: %w", result.Error)
+	}
+
+	if result.RowsAffected == 0 {
+		return []Tickets{}, nil
+	}
+
+	return tickets, nil
+}
+
+func (db database) UpdateTicketsWithoutGroup(ticket Tickets) error {
+	data := []map[string]interface{}{}
+
+	data = append(data, map[string]interface{}{
+		"ticket_group": ticket.UUID,
+	})
+
+	if ticket.AuthorID == nil {
+		data = append(data, map[string]interface{}{
+			"author_id": "12345",
+		})
+	}
+
+	if ticket.Author == nil {
+		data = append(data, map[string]interface{}{
+			"author": "HUMAN",
+		})
+	}
+
+	result := db.db.Model(&Tickets{}).Where("uuid = ?", ticket.UUID).Updates(data)
+
+	if result.Error != nil {
+		return fmt.Errorf("failed to update ticket: %w", result.Error)
+	}
+
+	return nil
+}

@@ -4,6 +4,7 @@ import (
 	"testing"
 	"time"
 
+	"github.com/google/uuid"
 	"github.com/stretchr/testify/assert"
 	"gorm.io/gorm"
 )
@@ -151,4 +152,104 @@ func TestUserHasManageBountyRoles(t *testing.T) {
 		// Assert that it returns false since the user does not have all bounty roles
 		assert.False(t, result, "Expected UserHasManageBountyRoles to return false for user without all bounty roles")
 	})
+}
+
+func TestProcessUpdateTicketsWithoutGroup(t *testing.T) {
+	InitTestDB()
+
+	// create person
+	now := time.Now()
+
+	person := Person{
+		Uuid:        uuid.New().String(),
+		OwnerPubKey: "testfeaturepubkeyProcess",
+		OwnerAlias:  "testfeaturealiasProcess",
+		Description: "testfeaturedescriptionProcess",
+		Created:     &now,
+		Updated:     &now,
+		Deleted:     false,
+	}
+
+	// create person
+	TestDB.CreateOrEditPerson(person)
+
+	workspace := Workspace{
+		Uuid:    uuid.New().String(),
+		Name:    "Test tickets process space",
+		Created: &now,
+		Updated: &now,
+	}
+
+	// create workspace
+	TestDB.CreateOrEditWorkspace(workspace)
+
+	workspaceFeatures := WorkspaceFeatures{
+		Uuid:          uuid.New().String(),
+		WorkspaceUuid: workspace.Uuid,
+		Name:          "test process feature",
+		Brief:         "test get process brief",
+		Requirements:  "Test get process requirements",
+		Architecture:  "Test get process architecture",
+		Url:           "Test get process url",
+		Priority:      1,
+		Created:       &now,
+		Updated:       &now,
+		CreatedBy:     "test",
+		UpdatedBy:     "test",
+	}
+
+	// create WorkspaceFeatures
+	TestDB.CreateOrEditFeature(workspaceFeatures)
+
+	featurePhase := FeaturePhase{
+		Uuid:        uuid.New().String(),
+		FeatureUuid: workspaceFeatures.Uuid,
+		Name:        "test get process feature phase",
+		Priority:    1,
+		Created:     &now,
+		Updated:     &now,
+	}
+
+	// create FeaturePhase
+	TestDB.CreateOrEditFeaturePhase(featurePhase)
+
+	ticket := Tickets{
+		UUID:        uuid.New(),
+		FeatureUUID: workspaceFeatures.Uuid,
+		PhaseUUID:   featurePhase.Uuid,
+		Name:        "test get process ticket",
+		CreatedAt:   now,
+		UpdatedAt:   now,
+	}
+
+	// create ticket
+	TestDB.CreateOrEditTicket(&ticket)
+
+	// get tickets without group and assert that there is 1
+	tickets, err := TestDB.GetTicketsWithoutGroup()
+	assert.NoError(t, err)
+	assert.Equal(t, 1, len(tickets))
+
+	// process update tickets without group
+	TestDB.ProcessUpdateTicketsWithoutGroup()
+
+	// get tickets without group and assert that there is 0
+	tickets, err = TestDB.GetTicketsWithoutGroup()
+	assert.NoError(t, err)
+	assert.Equal(t, 0, len(tickets))
+
+	// get ticket and assert that the ticket group is the same as the ticket uuid
+	ticket, err = TestDB.GetTicket(ticket.UUID.String())
+	assert.NoError(t, err)
+	assert.Equal(t, ticket.TicketGroup, ticket.UUID)
+
+	// get ticket and assert that the author id is 12345
+	ticket, err = TestDB.GetTicket(ticket.UUID.String())
+	assert.NoError(t, err)
+	assert.Equal(t, ticket.AuthorID, "12345")
+
+	// get ticket and assert that the author is HUMAN
+	ticket, err = TestDB.GetTicket(ticket.UUID.String())
+	assert.NoError(t, err)
+	assert.Equal(t, ticket.Author, "HUMAN")
 }
