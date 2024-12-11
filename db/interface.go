@@ -201,4 +201,8 @@ type Database interface {
 	GetProductBrief(workspaceUuid string) (string, error)
 	GetFeatureBrief(featureUuid string) (string, error)
 	GetTicketsByPhaseUUID(featureUUID string, phaseUUID string) ([]Tickets, error)
+	GetCodeGraphByUUID(uuid string) (WorkspaceCodeGraph, error)
+	GetCodeGraphsByWorkspaceUuid(workspace_uuid string) ([]WorkspaceCodeGraph, error)
+	CreateOrEditCodeGraph(m WorkspaceCodeGraph) (WorkspaceCodeGraph, error)
+	DeleteCodeGraph(workspace_uuid string, uuid string) error
 }
