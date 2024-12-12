@@ -137,9 +137,12 @@ VALUES
 
 ALTER TABLE IF EXISTS tribes ADD COLUMN IF NOT EXISTS preview VARCHAR NULL;
 
-CREATE TABLE connectioncodes {
+CREATE TABLE connectioncodes (
   id SERIAL PRIMARY KEY,
   connection_string TEXT,
   is_used boolean,
-  date_created timestamptz
-}
+  date_created timestamptz,
+  pubkey TEXT,
+  route_hint TEXT,
+  sats_amount bigint
+)

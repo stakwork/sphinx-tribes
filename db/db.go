@@ -1659,9 +1659,11 @@ func (db database) GetConnectionCode() ConnectionCodesShort {
 
 	db.db.Raw(`SELECT connection_string, date_created FROM connectioncodes WHERE is_used =? ORDER BY id DESC LIMIT 1`, false).Find(&c)
 
-	db.db.Model(&ConnectionCodes{}).Where("connection_string = ?", c.ConnectionString).Updates(map[string]interface{}{
-		"is_used": true,
-	})
+	if c.ConnectionString != "" {
+		db.db.Model(&ConnectionCodes{}).Where("connection_string = ?", c.ConnectionString).Updates(map[string]interface{}{
+			"is_used": true,
+		})
+	}
 
 	return c
 }

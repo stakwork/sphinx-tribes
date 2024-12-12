@@ -17,7 +17,7 @@ import (
 
 type authHandler struct {
 	db                        db.Database
-	makeConnectionCodeRequest func() string
+	makeConnectionCodeRequest func(amt_msat uint64, alias string, pubkey string, route_hint string) string
 	decodeJwt                 func(token string) (jwt.MapClaims, error)
 	encodeJwt                 func(pubkey string) (string, error)
 }
@@ -64,46 +64,70 @@ func (ah *authHandler) CreateConnectionCode(w http.ResponseWriter, r *http.Reque
 	body, err := io.ReadAll(r.Body)
 	if err != nil {
 		fmt.Println("ReadAll Error", err)
+		w.WriteHeader(http.StatusBadRequest)
+		return
 	}
 	r.Body.Close()
 
 	err = json.Unmarshal(body, &codeBody)
-
 	if err != nil {
-		fmt.Println("Could not umarshal connection code body")
+		fmt.Println("Could not unmarshal connection code body")
 		w.WriteHeader(http.StatusNotAcceptable)
 		return
 	}
 
+	if codeBody.RouteHint != "" && codeBody.Pubkey == "" {
+		w.WriteHeader(http.StatusNotAcceptable)
+		json.NewEncoder(w).Encode("pubkey is required when Route hint is provided")
+		return
+	}
+
+	if codeBody.Pubkey != "" && codeBody.RouteHint == "" {
+		w.WriteHeader(http.StatusBadRequest)
+		json.NewEncoder(w).Encode("Route hint is required when pubkey is provided")
+		return
+	}
+
+	if codeBody.SatsAmount == 0 {
+		w.WriteHeader(http.StatusBadRequest)
+		json.NewEncoder(w).Encode("Sats amount must be greater than 0")
+		return
+	}
+
 	for i := 0; i < int(codeBody.Number); i++ {
-		code := ah.makeConnectionCodeRequest()
+
+		amtMsat := codeBody.SatsAmount * 1000
+		code := ah.makeConnectionCodeRequest(amtMsat, "new_user", codeBody.Pubkey, codeBody.RouteHint)
 
 		if code != "" {
 			newCode := db.ConnectionCodes{
 				ConnectionString: code,
 				IsUsed:           false,
+				Pubkey:           codeBody.Pubkey,
+				RouteHint:        codeBody.RouteHint,
+				SatsAmount:       int64(codeBody.SatsAmount),
 			}
 			codeArr = append(codeArr, newCode)
 		}
 	}
 
 	_, err = ah.db.CreateConnectionCode(codeArr)
-
 	if err != nil {
 		fmt.Println("[auth] => ERR create connection code", err)
 		w.WriteHeader(http.StatusBadRequest)
 		return
 	}
+
 	w.WriteHeader(http.StatusOK)
 	json.NewEncoder(w).Encode("Codes created successfully")
 }
 
-func MakeConnectionCodeRequest() string {
+func MakeConnectionCodeRequest(amt_msat uint64, alias string, pubkey string, route_hint string) string {
 	url := fmt.Sprintf("%s/invite", config.V2BotUrl)
 	client := http.Client{}
 
 	// Build v2 keysend payment data
-	bodyData := utils.BuildV2ConnectionCodes(100, "new_user")
+	bodyData := utils.BuildV2ConnectionCodes(amt_msat, alias, pubkey, route_hint)
 	jsonBody := []byte(bodyData)
 
 	req, _ := http.NewRequest(http.MethodPost, url, bytes.NewBuffer(jsonBody))
@@ -111,7 +135,6 @@ func MakeConnectionCodeRequest() string {
 	req.Header.Set("Content-Type", "application/json")
 
 	res, err := client.Do(req)
-
 	if err != nil {
 		log.Printf("[Invite] Request Failed: %s", err)
 		return ""
@@ -120,20 +143,19 @@ func MakeConnectionCodeRequest() string {
 	defer res.Body.Close()
 
 	body, err := io.ReadAll(res.Body)
-
 	if err != nil {
 		log.Printf("Could not read invite body: %s", err)
+		return ""
 	}
 
-	inviteReponse := db.InviteReponse{}
-	err = json.Unmarshal(body, &inviteReponse)
-
+	inviteResponse := db.InviteReponse{}
+	err = json.Unmarshal(body, &inviteResponse)
 	if err != nil {
 		fmt.Println("Could not get connection code")
 		return ""
 	}
 
-	return inviteReponse.Invite
+	return inviteResponse.Invite
 }
 
 func (ah *authHandler) GetConnectionCode(w http.ResponseWriter, _ *http.Request) {

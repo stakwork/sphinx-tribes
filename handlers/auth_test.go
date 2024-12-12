@@ -62,10 +62,17 @@ func TestCreateConnectionCode(t *testing.T) {
 		rr := httptest.NewRecorder()
 		handler := http.HandlerFunc(aHandler.CreateConnectionCode)
 		data := db.InviteBody{
-			Number: 2,
+			Number:     2,
+			SatsAmount: 100,
+			Pubkey:     "test_pubkey",
+			RouteHint:  "test_route_hint",
 		}
 
-		aHandler.makeConnectionCodeRequest = func() string {
+		aHandler.makeConnectionCodeRequest = func(amt_msat uint64, alias string, pubkey string, route_hint string) string {
+			assert.Equal(t, uint64(100000), amt_msat)
+			assert.Equal(t, "new_user", alias)
+			assert.Equal(t, "test_pubkey", pubkey)
+			assert.Equal(t, "test_route_hint", route_hint)
 			return "22222222222222222"
 		}
 
@@ -83,9 +90,38 @@ func TestCreateConnectionCode(t *testing.T) {
 		assert.NotEmpty(t, codes)
 	})
 
-	t.Run("should return error if failed to add connection code", func(t *testing.T) {
+	t.Run("should return error if sats amount is zero", func(t *testing.T) {
 		data := db.InviteBody{
-			Number: 0,
+			Number:     2,
+			SatsAmount: 0,
+			Pubkey:     "test_pubkey",
+			RouteHint:  "test_route_hint",
+		}
+
+		body, _ := json.Marshal(data)
+
+		req, err := http.NewRequest(http.MethodPost, "/connectioncodes", bytes.NewBuffer(body))
+		if err != nil {
+			t.Fatal(err)
+		}
+		rr := httptest.NewRecorder()
+		handler := http.HandlerFunc(aHandler.CreateConnectionCode)
+
+		handler.ServeHTTP(rr, req)
+		assert.Equal(t, http.StatusBadRequest, rr.Code)
+
+		var response string
+		err = json.NewDecoder(rr.Body).Decode(&response)
+		assert.NoError(t, err)
+		assert.Equal(t, "Sats amount must be greater than 0", response)
+	})
+
+	t.Run("should return error if pubkey provided without route hint", func(t *testing.T) {
+		data := db.InviteBody{
+			Number:     2,
+			SatsAmount: 100,
+			Pubkey:     "test_pubkey",
+			RouteHint:  "",
 		}
 
 		body, _ := json.Marshal(data)
@@ -99,6 +135,11 @@ func TestCreateConnectionCode(t *testing.T) {
 
 		handler.ServeHTTP(rr, req)
 		assert.Equal(t, http.StatusBadRequest, rr.Code)
+
+		var response string
+		err = json.NewDecoder(rr.Body).Decode(&response)
+		assert.NoError(t, err)
+		assert.Equal(t, "Route hint is required when pubkey is provided", response)
 	})
 
 	t.Run("should return error for malformed request body", func(t *testing.T) {
@@ -136,12 +177,10 @@ func TestGetConnectionCode(t *testing.T) {
 	aHandler := NewAuthHandler(db.TestDB)
 
 	t.Run("should return connection code from db", func(t *testing.T) {
-
 		rr := httptest.NewRecorder()
 		handler := http.HandlerFunc(aHandler.GetConnectionCode)
 
 		codeStrArr := []string{"sampleCode1"}
-
 		codeArr := []db.ConnectionCodes{}
 		now := time.Now()
 
@@ -151,8 +190,10 @@ func TestGetConnectionCode(t *testing.T) {
 				ConnectionString: code,
 				IsUsed:           false,
 				DateCreated:      &now,
+				Pubkey:           "test_pubkey",
+				RouteHint:        "test_route_hint",
+				SatsAmount:       100,
 			}
-
 			codeArr = append(codeArr, code)
 		}
 
@@ -181,9 +222,7 @@ func TestGetConnectionCode(t *testing.T) {
 			timeDifference = -timeDifference
 		}
 		assert.True(t, timeDifference <= tolerance, "Expected DateCreated to be within tolerance")
-
 	})
-
 }
 
 func TestGetIsAdmin(t *testing.T) {
