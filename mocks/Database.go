@@ -25,6 +25,216 @@ func (_m *Database) EXPECT() *Database_Expecter {
 	return &Database_Expecter{mock: &_m.Mock}
 }
 
+type Database_AddChat_Call struct {
+	*mock.Call
+}
+
+func (_e *Database_Expecter) AddChat(chat interface{}) *Database_AddChat_Call {
+	return &Database_AddChat_Call{Call: _e.mock.On("AddChat", chat)}
+}
+
+func (_c *Database_AddChat_Call) Run(run func(chat *db.Chat)) *Database_AddChat_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(*db.Chat))
+	})
+	return _c
+}
+
+func (_c *Database_AddChat_Call) Return(_a0 db.Chat, _a1 error) *Database_AddChat_Call {
+	_c.Call.Return(_a0, _a1)
+	return _c
+}
+
+func (_c *Database_AddChat_Call) RunAndReturn(run func(*db.Chat) (db.Chat, error)) *Database_AddChat_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
+func (_m *Database) AddChat(chat *db.Chat) (db.Chat, error) {
+	ret := _m.Called(chat)
+
+	if len(ret) == 0 {
+		panic("no return value specified for AddChat")
+	}
+
+	var r0 db.Chat
+	var r1 error
+	if rf, ok := ret.Get(0).(func(*db.Chat) (db.Chat, error)); ok {
+		return rf(chat)
+	}
+	if rf, ok := ret.Get(0).(func(*db.Chat) db.Chat); ok {
+		r0 = rf(chat)
+	} else {
+		r0 = ret.Get(0).(db.Chat)
+	}
+
+	if rf, ok := ret.Get(1).(func(*db.Chat) error); ok {
+		r1 = rf(chat)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
+type Database_GetChatByChatID_Call struct {
+	*mock.Call
+}
+
+func (_e *Database_Expecter) GetChatByChatID(chatID interface{}) *Database_GetChatByChatID_Call {
+	return &Database_GetChatByChatID_Call{Call: _e.mock.On("GetChatByChatID", chatID)}
+}
+
+func (_c *Database_GetChatByChatID_Call) Run(run func(chatID string)) *Database_GetChatByChatID_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(string))
+	})
+	return _c
+}
+
+func (_c *Database_GetChatByChatID_Call) Return(_a0 db.Chat, _a1 error) *Database_GetChatByChatID_Call {
+	_c.Call.Return(_a0, _a1)
+	return _c
+}
+
+func (_c *Database_GetChatByChatID_Call) RunAndReturn(run func(string) (db.Chat, error)) *Database_GetChatByChatID_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
+func (_m *Database) GetChatByChatID(chatID string) (db.Chat, error) {
+	ret := _m.Called(chatID)
+
+	if len(ret) == 0 {
+		panic("no return value specified for GetChatByChatID")
+	}
+
+	var r0 db.Chat
+	var r1 error
+	if rf, ok := ret.Get(0).(func(string) (db.Chat, error)); ok {
+		return rf(chatID)
+	}
+	if rf, ok := ret.Get(0).(func(string) db.Chat); ok {
+		r0 = rf(chatID)
+	} else {
+		r0 = ret.Get(0).(db.Chat)
+	}
+
+	if rf, ok := ret.Get(1).(func(string) error); ok {
+		r1 = rf(chatID)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
+type Database_AddChatMessage_Call struct {
+	*mock.Call
+}
+
+func (_e *Database_Expecter) AddChatMessage(chatMessage interface{}) *Database_AddChatMessage_Call {
+	return &Database_AddChatMessage_Call{Call: _e.mock.On("AddChatMessage", chatMessage)}
+}
+
+func (_c *Database_AddChatMessage_Call) Run(run func(chatMessage *db.ChatMessage)) *Database_AddChatMessage_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(*db.ChatMessage))
+	})
+	return _c
+}
+
+func (_c *Database_AddChatMessage_Call) Return(_a0 db.ChatMessage, _a1 error) *Database_AddChatMessage_Call {
+	_c.Call.Return(_a0, _a1)
+	return _c
+}
+
+func (_c *Database_AddChatMessage_Call) RunAndReturn(run func(*db.ChatMessage) (db.ChatMessage, error)) *Database_AddChatMessage_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
+func (_m *Database) AddChatMessage(chatMessage *db.ChatMessage) (db.ChatMessage, error) {
+	ret := _m.Called(chatMessage)
+
+	if len(ret) == 0 {
+		panic("no return value specified for AddChatMessage")
+	}
+
+	var r0 db.ChatMessage
+	var r1 error
+	if rf, ok := ret.Get(0).(func(*db.ChatMessage) (db.ChatMessage, error)); ok {
+		return rf(chatMessage)
+	}
+	if rf, ok := ret.Get(0).(func(*db.ChatMessage) db.ChatMessage); ok {
+		r0 = rf(chatMessage)
+	} else {
+		r0 = ret.Get(0).(db.ChatMessage)
+	}
+
+	if rf, ok := ret.Get(1).(func(*db.ChatMessage) error); ok {
+		r1 = rf(chatMessage)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
+type Database_GetChatMessagesForChatID_Call struct {
+	*mock.Call
+}
+
+func (_e *Database_Expecter) GetChatMessagesForChatID(chatID interface{}) *Database_GetChatMessagesForChatID_Call {
+	return &Database_GetChatMessagesForChatID_Call{Call: _e.mock.On("GetChatMessagesForChatID", chatID)}
+}
+
+func (_c *Database_GetChatMessagesForChatID_Call) Run(run func(chatID string)) *Database_GetChatMessagesForChatID_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(string))
+	})
+	return _c
+}
+
+func (_c *Database_GetChatMessagesForChatID_Call) Return(_a0 []db.ChatMessage, _a1 error) *Database_GetChatMessagesForChatID_Call {
+	_c.Call.Return(_a0, _a1)
+	return _c
+}
+
+func (_c *Database_GetChatMessagesForChatID_Call) RunAndReturn(run func(string) ([]db.ChatMessage, error)) *Database_GetChatMessagesForChatID_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
+func (_m *Database) GetChatMessagesForChatID(chatID string) ([]db.ChatMessage, error) {
+	ret := _m.Called(chatID)
+
+	if len(ret) == 0 {
+		panic("no return value specified for GetChatMessagesForChatID")
+	}
+
+	var r0 []db.ChatMessage
+	var r1 error
+	if rf, ok := ret.Get(0).(func(string) ([]db.ChatMessage, error)); ok {
+		return rf(chatID)
+	}
+	if rf, ok := ret.Get(0).(func(string) []db.ChatMessage); ok {
+		r0 = rf(chatID)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).([]db.ChatMessage)
+		}
+	}
+
+	if rf, ok := ret.Get(1).(func(string) error); ok {
+		r1 = rf(chatID)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
 // AddAndUpdateBudget provides a mock function with given fields: invoice
 func (_m *Database) AddAndUpdateBudget(invoice db.NewInvoiceList) db.NewPaymentHistory {
 	ret := _m.Called(invoice)
