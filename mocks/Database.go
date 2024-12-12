@@ -181,6 +181,62 @@ func (_m *Database) AddChatMessage(chatMessage *db.ChatMessage) (db.ChatMessage,
 	return r0, r1
 }
 
+type Database_UpdateChatMessage_Call struct {
+	*mock.Call
+}
+
+func (_e *Database_Expecter) UpdateChatMessage(chatMessage interface{}) *Database_UpdateChatMessage_Call {
+	return &Database_UpdateChatMessage_Call{Call: _e.mock.On("UpdateChatMessage", chatMessage)}
+}
+
+func (_c *Database_UpdateChatMessage_Call) Run(run func(chatMessage *db.ChatMessage)) *Database_UpdateChatMessage_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(*db.ChatMessage))
+	})
+	return _c
+}
+
+func (_c *Database_UpdateChatMessage_Call) Return(_a0 db.ChatMessage, _a1 error) *Database_UpdateChatMessage_Call {
+	_c.Call.Return(_a0, _a1)
+	return _c
+}
+
+func (_c *Database_UpdateChatMessage_Call) RunAndReturn(run func(*db.ChatMessage) (db.ChatMessage, error)) *Database_UpdateChatMessage_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
+func (_m *Database) UpdateChatMessage(chatMessage *db.ChatMessage) (db.ChatMessage, error) {
+
+	ret := _m.Called(chatMessage)
+
+
+	if len(ret) == 0 {
+		panic("no return value specified for UpdateChatMessage")
+	}
+
+	var r0 db.ChatMessage
+	var r1 error
+
+	if rf, ok := ret.Get(0).(func(*db.ChatMessage) (db.ChatMessage, error)); ok {
+		return rf(chatMessage)
+	}
+
+	if rf, ok := ret.Get(0).(func(*db.ChatMessage) db.ChatMessage); ok {
+		r0 = rf(chatMessage)
+	} else {
+		r0 = ret.Get(0).(db.ChatMessage)
+	}
+
+	if rf, ok := ret.Get(1).(func(*db.ChatMessage) error); ok {
+		r1 = rf(chatMessage)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
 type Database_GetChatMessagesForChatID_Call struct {
 	*mock.Call
 }
@@ -228,58 +284,6 @@ func (_m *Database) GetChatMessagesForChatID(chatID string) ([]db.ChatMessage, e
 
 	if rf, ok := ret.Get(1).(func(string) error); ok {
 		r1 = rf(chatID)
-	} else {
-		r1 = ret.Error(1)
-	}
-
-	return r0, r1
-}
-
-type Database_UpdateChatMessage_Call struct {
-	*mock.Call
-}
-
-func (_e *Database_Expecter) UpdateChatMessage(chatMessage interface{}) *Database_UpdateChatMessage_Call {
-	return &Database_UpdateChatMessage_Call{Call: _e.mock.On("UpdateChatMessage", chatMessage)}
-}
-
-func (_c *Database_UpdateChatMessage_Call) Run(run func(chatMessage *db.ChatMessage)) *Database_UpdateChatMessage_Call {
-	_c.Call.Run(func(args mock.Arguments) {
-		run(args[0].(*db.ChatMessage))
-	})
-	return _c
-}
-
-func (_c *Database_UpdateChatMessage_Call) Return(_a0 db.ChatMessage, _a1 error) *Database_UpdateChatMessage_Call {
-	_c.Call.Return(_a0, _a1)
-	return _c
-}
-
-func (_c *Database_UpdateChatMessage_Call) RunAndReturn(run func(*db.ChatMessage) (db.ChatMessage, error)) *Database_UpdateChatMessage_Call {
-	_c.Call.Return(run)
-	return _c
-}
-
-func (_m *Database) UpdateChatMessage(chatMessage *db.ChatMessage) (db.ChatMessage, error) {
-	ret := _m.Called(chatMessage)
-
-	if len(ret) == 0 {
-		panic("no return value specified for UpdateChatMessage")
-	}
-
-	var r0 db.ChatMessage
-	var r1 error
-	if rf, ok := ret.Get(0).(func(*db.ChatMessage) (db.ChatMessage, error)); ok {
-		return rf(chatMessage)
-	}
-	if rf, ok := ret.Get(0).(func(*db.ChatMessage) db.ChatMessage); ok {
-		r0 = rf(chatMessage)
-	} else {
-		r0 = ret.Get(0).(db.ChatMessage)
-	}
-
-	if rf, ok := ret.Get(1).(func(*db.ChatMessage) error); ok {
-		r1 = rf(chatMessage)
 	} else {
 		r1 = ret.Error(1)
 	}
