@@ -204,6 +204,7 @@ type Database interface {
 	AddChat(chat *Chat) (Chat, error)
 	GetChatByChatID(chatID string) (Chat, error)
 	AddChatMessage(message *ChatMessage) (ChatMessage, error)
+	UpdateChatMessage(message *ChatMessage) (ChatMessage, error)
 	GetChatMessagesForChatID(chatID string) ([]ChatMessage, error)
 	GetCodeGraphByUUID(uuid string) (WorkspaceCodeGraph, error)
 	GetCodeGraphsByWorkspaceUuid(workspace_uuid string) ([]WorkspaceCodeGraph, error)

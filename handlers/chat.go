@@ -1,10 +1,15 @@
 package handlers
 
 import (
+	"bytes"
 	"encoding/json"
 	"fmt"
 	"github.com/rs/xid"
+	"github.com/stakwork/sphinx-tribes/websocket"
+	"io"
+	"log"
 	"net/http"
+	"os"
 	"time"
 
 	"github.com/go-chi/chi"
@@ -25,6 +30,23 @@ type ChatResponse struct {
 type HistoryChatResponse struct {
 	Success bool        `json:"success"`
 	Data    interface{} `json:"data,omitempty"`
+}
+
+type ChatHistoryResponse struct {
+	Messages []db.ChatMessage `json:"messages"`
+}
+
+type StakworkChatPayload struct {
+	Name           string                 `json:"name"`
+	WorkflowID     int                    `json:"workflow_id"`
+	WorkflowParams map[string]interface{} `json:"workflow_params"`
+}
+
+type ChatWebhookResponse struct {
+	Success bool             `json:"success"`
+	Message string           `json:"message"`
+	ChatID  string           `json:"chat_id"`
+	History []db.ChatMessage `json:"history"`
 }
 
 func NewChatHandler(httpClient *http.Client, database db.Database) *ChatHandler {
@@ -74,6 +96,7 @@ func (ch *ChatHandler) CreateChat(w http.ResponseWriter, r *http.Request) {
 }
 
 func (ch *ChatHandler) SendMessage(w http.ResponseWriter, r *http.Request) {
+
 	var request struct {
 		ChatID      string `json:"chatId"`
 		Message     string `json:"message"`
@@ -81,6 +104,7 @@ func (ch *ChatHandler) SendMessage(w http.ResponseWriter, r *http.Request) {
 			Type string `json:"type"`
 			ID   string `json:"id"`
 		} `json:"contextTags"`
+		SourceWebsocketID string `json:"sourceWebsocketId"`
 	}
 
 	if err := json.NewDecoder(r.Body).Decode(&request); err != nil {
@@ -92,6 +116,29 @@ func (ch *ChatHandler) SendMessage(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	history, err := ch.db.GetChatMessagesForChatID(request.ChatID)
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		json.NewEncoder(w).Encode(ChatResponse{
+			Success: false,
+			Message: fmt.Sprintf("Failed to fetch chat history: %v", err),
+		})
+		return
+	}
+
+	start := 0
+	if len(history) > 20 {
+		start = len(history) - 20
+	}
+	recentHistory := history[start:]
+
+	messageHistory := make([]map[string]string, len(recentHistory))
+	for i, msg := range recentHistory {
+		messageHistory[i] = map[string]string{
+			string(msg.Role): msg.Message,
+		}
+	}
+
 	message := &db.ChatMessage{
 		ID:        xid.New().String(),
 		ChatID:    request.ChatID,
@@ -99,6 +146,7 @@ func (ch *ChatHandler) SendMessage(w http.ResponseWriter, r *http.Request) {
 		Role:      "user",
 		Timestamp: time.Now(),
 		Status:    "sending",
+		Source:    "user",
 	}
 
 	createdMessage, err := ch.db.AddChatMessage(message)
@@ -106,9 +154,54 @@ func (ch *ChatHandler) SendMessage(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusInternalServerError)
 		json.NewEncoder(w).Encode(ChatResponse{
 			Success: false,
-			Message: fmt.Sprintf("Failed to send message: %v", err),
+			Message: fmt.Sprintf("Failed to save message: %v", err),
 		})
 		return
+	}
+
+	stakworkPayload := StakworkChatPayload{
+		Name:       "Hive Chat Processor",
+		WorkflowID: 38842,
+		WorkflowParams: map[string]interface{}{
+			"set_var": map[string]interface{}{
+				"attributes": map[string]interface{}{
+					"vars": map[string]interface{}{
+						"chatId":            request.ChatID,
+						"messageId":         createdMessage.ID,
+						"message":           request.Message,
+						"history":           messageHistory,
+						"contextTags":       "This is a project with Typescript frontend and Go Backend",
+						"sourceWebsocketId": request.SourceWebsocketID,
+						"webhook_url":       fmt.Sprintf("%s/hivechat/process", os.Getenv("HOST")),
+					},
+				},
+			},
+		},
+	}
+
+	if err := ch.sendToStakwork(stakworkPayload); err != nil {
+
+		createdMessage.Status = "error"
+		ch.db.UpdateChatMessage(&createdMessage)
+
+		w.WriteHeader(http.StatusInternalServerError)
+		json.NewEncoder(w).Encode(ChatResponse{
+			Success: false,
+			Message: fmt.Sprintf("Failed to process message: %v", err),
+		})
+		return
+	}
+
+	wsMessage := websocket.TicketMessage{
+		BroadcastType:   "direct",
+		SourceSessionID: request.SourceWebsocketID,
+		Message:         "Message sent",
+		Action:          "process",
+		ChatMessage:     createdMessage,
+	}
+
+	if err := websocket.WebsocketPool.SendTicketMessage(wsMessage); err != nil {
+		log.Printf("Failed to send websocket message: %v", err)
 	}
 
 	w.WriteHeader(http.StatusOK)
@@ -117,6 +210,43 @@ func (ch *ChatHandler) SendMessage(w http.ResponseWriter, r *http.Request) {
 		Message: "Message sent successfully",
 		Data:    createdMessage,
 	})
+}
+
+func (ch *ChatHandler) sendToStakwork(payload StakworkChatPayload) error {
+	payloadJSON, err := json.Marshal(payload)
+	if err != nil {
+		return fmt.Errorf("error marshaling payload: %v", err)
+	}
+
+	req, err := http.NewRequest(
+		http.MethodPost,
+		"https://api.stakwork.com/api/v1/projects",
+		bytes.NewBuffer(payloadJSON),
+	)
+	if err != nil {
+		return fmt.Errorf("error creating request: %v", err)
+	}
+
+	apiKey := os.Getenv("SWWFKEY")
+	if apiKey == "" {
+		return fmt.Errorf("SWWFKEY environment variable not set")
+	}
+
+	req.Header.Set("Authorization", "Token token="+apiKey)
+	req.Header.Set("Content-Type", "application/json")
+
+	resp, err := ch.httpClient.Do(req)
+	if err != nil {
+		return fmt.Errorf("error sending request: %v", err)
+	}
+	defer resp.Body.Close()
+
+	if resp.StatusCode != http.StatusOK {
+		body, _ := io.ReadAll(resp.Body)
+		return fmt.Errorf("stakwork API error: %s", string(body))
+	}
+
+	return nil
 }
 
 func (ch *ChatHandler) GetChatHistory(w http.ResponseWriter, r *http.Request) {

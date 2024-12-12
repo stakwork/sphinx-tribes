@@ -53,6 +53,35 @@ func (db database) AddChatMessage(chatMessage *ChatMessage) (ChatMessage, error)
 	return *chatMessage, nil
 }
 
+func (db database) UpdateChatMessage(chatMessage *ChatMessage) (ChatMessage, error) {
+	if chatMessage.ID == "" {
+		return ChatMessage{}, errors.New("message ID is required")
+	}
+
+	var existingMessage ChatMessage
+	if err := db.db.First(&existingMessage, "id = ?", chatMessage.ID).Error; err != nil {
+		return ChatMessage{}, fmt.Errorf("message not found: %w", err)
+	}
+
+	if chatMessage.Message != "" {
+		existingMessage.Message = chatMessage.Message
+	}
+	if chatMessage.Status != "" {
+		existingMessage.Status = chatMessage.Status
+	}
+	if chatMessage.Role != "" {
+		existingMessage.Role = chatMessage.Role
+	}
+
+	existingMessage.Timestamp = time.Now()
+
+	if err := db.db.Save(&existingMessage).Error; err != nil {
+		return ChatMessage{}, fmt.Errorf("failed to update chat message: %w", err)
+	}
+
+	return existingMessage, nil
+}
+
 func (db database) GetChatMessagesForChatID(chatID string) ([]ChatMessage, error) {
 	var chatMessages []ChatMessage
 
