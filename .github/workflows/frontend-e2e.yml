@@ -23,9 +23,11 @@ jobs:
       - name: Build Tribes Image
         run: pwd && ls && docker build -t sphinxlightning/sphinx-tribes:latest .
 
+
+# change_v2_ports
       - name: Clone Stack
         run: |
-          git clone --single-branch --branch change_v2_ports https://github.com/stakwork/sphinx-stack.git stack
+          git clone --single-branch --branch change_sphinx_bot_version https://github.com/stakwork/sphinx-stack.git stack
 
       - name: Clone Sphinx Tribes Frontend
         run: |
