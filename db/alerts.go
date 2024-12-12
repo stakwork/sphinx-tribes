@@ -21,7 +21,7 @@ type Action struct {
 }
 
 func (db database) ProcessAlerts(p Person) {
-	// get the existing person's github_issues
+	// get the existing person's github_issuess
 	// compare to see if there are new ones
 	// check the new ones for coding languages like "#Javascript"
 
