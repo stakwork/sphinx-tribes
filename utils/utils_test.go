@@ -410,3 +410,93 @@ func TestBuildSearchQuery(t *testing.T) {
 		})
 	}
 }
+
+func TestBuildV2ConnectionCodes(t *testing.T) {
+	tests := []struct {
+		name      string
+		amtMsat   uint64
+		alias     string
+		pubkey    string
+		routeHint string
+		expected  string
+	}{
+		{
+			name:      "Standard Input with Route Hint",
+			amtMsat:   100000,
+			alias:     "new_user",
+			pubkey:    "abcdef123456",
+			routeHint: "hint123",
+			expected:  `{"amt_msat": 100000, "alias": "new_user", "inviter_pubkey":"abcdef123456", "inviter_route_hint":"hint123"}`,
+		},
+		{
+			name:      "Standard Input without Route Hint",
+			amtMsat:   100000,
+			alias:     "new_user",
+			pubkey:    "abcdef123456",
+			routeHint: "",
+			expected:  `{"amt_msat": 100000, "alias": "new_user"}`,
+		},
+		{
+			name:      "Empty Pubkey and Route Hint",
+			amtMsat:   100000,
+			alias:     "new_user",
+			pubkey:    "",
+			routeHint: "",
+			expected:  `{"amt_msat": 100000, "alias": "new_user"}`,
+		},
+		{
+			name:      "Long Strings",
+			amtMsat:   100000,
+			alias:     strings.Repeat("a", 1000),
+			pubkey:    strings.Repeat("b", 1000),
+			routeHint: strings.Repeat("c", 1000),
+			expected:  fmt.Sprintf(`{"amt_msat": 100000, "alias": "%s", "inviter_pubkey":"%s", "inviter_route_hint":"%s"}`, strings.Repeat("a", 1000), strings.Repeat("b", 1000), strings.Repeat("c", 1000)),
+		},
+		{
+			name:      "Special Characters in Strings",
+			amtMsat:   100000,
+			alias:     "user!@#",
+			pubkey:    "abc!@#123",
+			routeHint: "hint$%^",
+			expected:  `{"amt_msat": 100000, "alias": "user!@#", "inviter_pubkey":"abc!@#123", "inviter_route_hint":"hint$%^"}`,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			result := BuildV2ConnectionCodes(tt.amtMsat, tt.alias, tt.pubkey, tt.routeHint)
+			assert.JSONEq(t, tt.expected, result)
+		})
+	}
+}
+
+func TestConvertSatsToMsats(t *testing.T) {
+	tests := []struct {
+		name     string
+		sats     uint64
+		expected uint64
+	}{
+		{
+			name:     "Zero Satoshis",
+			sats:     0,
+			expected: 0,
+		},
+		{
+			name:     "One Satoshi",
+			sats:     1,
+			expected: 1000,
+		},
+		{
+			name:     "Small Amount",
+			sats:     123,
+			expected: 123000,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			result := ConvertSatsToMsats(tt.sats)
+			assert.Equal(t, tt.expected, result)
+		})
+	}
+}
