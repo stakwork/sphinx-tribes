@@ -191,7 +191,7 @@ func (_e *Database_Expecter) UpdateChatMessage(chatMessage interface{}) *Databas
 
 func (_c *Database_UpdateChatMessage_Call) Run(run func(chatMessage *db.ChatMessage)) *Database_UpdateChatMessage_Call {
 	_c.Call.Run(func(args mock.Arguments) {
-		run(args[0].(*db.ChatMessage))
+		run(args.Get(0).(*db.ChatMessage))
 	})
 	return _c
 }
@@ -207,30 +207,20 @@ func (_c *Database_UpdateChatMessage_Call) RunAndReturn(run func(*db.ChatMessage
 }
 
 func (_m *Database) UpdateChatMessage(chatMessage *db.ChatMessage) (db.ChatMessage, error) {
-
 	ret := _m.Called(chatMessage)
-
-
-	if len(ret) == 0 {
-		panic("no return value specified for UpdateChatMessage")
-	}
 
 	var r0 db.ChatMessage
 	var r1 error
-
 	if rf, ok := ret.Get(0).(func(*db.ChatMessage) (db.ChatMessage, error)); ok {
 		return rf(chatMessage)
 	}
-
-	if rf, ok := ret.Get(0).(func(*db.ChatMessage) db.ChatMessage); ok {
-		r0 = rf(chatMessage)
-	} else {
+	if ret.Get(0) != nil {
 		r0 = ret.Get(0).(db.ChatMessage)
 	}
 
 	if rf, ok := ret.Get(1).(func(*db.ChatMessage) error); ok {
 		r1 = rf(chatMessage)
-	} else {
+	} else if ret.Get(1) != nil {
 		r1 = ret.Error(1)
 	}
 
