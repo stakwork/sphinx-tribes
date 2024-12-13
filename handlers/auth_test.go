@@ -62,10 +62,13 @@ func TestCreateConnectionCode(t *testing.T) {
 		rr := httptest.NewRecorder()
 		handler := http.HandlerFunc(aHandler.CreateConnectionCode)
 		data := db.InviteBody{
-			Number: 2,
+			Number:     2,
+			Pubkey:     "Test_pubkey",
+			RouteHint:  "Test_Route_hint",
+			SatsAmount: 21,
 		}
 
-		aHandler.makeConnectionCodeRequest = func() string {
+		aHandler.makeConnectionCodeRequest = func(inviter_pubkey string, inviter_route_hint string, msats_amount uint64) string {
 			return "22222222222222222"
 		}
 

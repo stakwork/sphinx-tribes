@@ -15,6 +15,8 @@ jobs:
 
       - uses: actions/checkout@v2
 
+      # change_sphinx_bot_version
+
       - name: Clone Stack
         run: |
           git clone --single-branch --branch change_v2_ports https://github.com/stakwork/sphinx-stack.git stackv2;
@@ -31,6 +33,7 @@ jobs:
             docker logs alice.sphinx
             docker logs bob.sphinx
             docker wait stackv2-v2setup-1
+            docker logs mixer.sphinx
 
       - name: Starting DB
         run: docker compose -f ./docker/testdb-docker-compose.yml -p test_db  up -d

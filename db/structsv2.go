@@ -80,5 +80,8 @@ type InviteReponse struct {
 }
 
 type InviteBody struct {
-	Number uint `json:"number"`
+	Number     uint   `json:"number"`
+	Pubkey     string `json:"pubkey"`
+	RouteHint  string `json:"route_hint"`
+	SatsAmount uint64 `json:"sats_amount"`
 }

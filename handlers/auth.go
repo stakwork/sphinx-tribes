@@ -17,7 +17,7 @@ import (
 
 type authHandler struct {
 	db                        db.Database
-	makeConnectionCodeRequest func() string
+	makeConnectionCodeRequest func(inviter_pubkey string, inviter_route_hint string, msats_amount uint64) string
 	decodeJwt                 func(token string) (jwt.MapClaims, error)
 	encodeJwt                 func(pubkey string) (string, error)
 }
@@ -75,8 +75,26 @@ func (ah *authHandler) CreateConnectionCode(w http.ResponseWriter, r *http.Reque
 		return
 	}
 
+	if codeBody.Pubkey != "" && codeBody.RouteHint == "" {
+		fmt.Println("route hint missing")
+		w.WriteHeader(http.StatusNotAcceptable)
+		return
+	}
+
+	if codeBody.RouteHint != "" && codeBody.Pubkey == "" {
+		fmt.Println("pubkey missing missing")
+		w.WriteHeader(http.StatusNotAcceptable)
+		return
+	}
+
+	if codeBody.SatsAmount == 0 {
+		codeBody.SatsAmount = 100
+	} else {
+		codeBody.SatsAmount = utils.ConvertSatsToMsats(codeBody.SatsAmount)
+	}
+
 	for i := 0; i < int(codeBody.Number); i++ {
-		code := ah.makeConnectionCodeRequest()
+		code := ah.makeConnectionCodeRequest(codeBody.Pubkey, codeBody.RouteHint, codeBody.SatsAmount)
 
 		if code != "" {
 			newCode := db.ConnectionCodes{
@@ -98,12 +116,12 @@ func (ah *authHandler) CreateConnectionCode(w http.ResponseWriter, r *http.Reque
 	json.NewEncoder(w).Encode("Codes created successfully")
 }
 
-func MakeConnectionCodeRequest() string {
+func MakeConnectionCodeRequest(inviter_pubkey string, inviter_route_hint string, msats_amount uint64) string {
 	url := fmt.Sprintf("%s/invite", config.V2BotUrl)
 	client := http.Client{}
 
 	// Build v2 keysend payment data
-	bodyData := utils.BuildV2ConnectionCodes(100, "new_user")
+	bodyData := utils.BuildV2ConnectionCodes(msats_amount, "new_user", inviter_pubkey, inviter_route_hint)
 	jsonBody := []byte(bodyData)
 
 	req, _ := http.NewRequest(http.MethodPost, url, bytes.NewBuffer(jsonBody))
