@@ -90,12 +90,6 @@ func (ah *authHandler) CreateConnectionCode(w http.ResponseWriter, r *http.Reque
 	}
 
 	if codeBody.SatsAmount == 0 {
-		w.WriteHeader(http.StatusBadRequest)
-		json.NewEncoder(w).Encode("Sats amount must be greater than 0")
-		return
-	}
-
-	if codeBody.SatsAmount == 0 {
 		codeBody.SatsAmount = 100
 	} else {
 		codeBody.SatsAmount = utils.ConvertSatsToMsats(codeBody.SatsAmount)
@@ -108,9 +102,6 @@ func (ah *authHandler) CreateConnectionCode(w http.ResponseWriter, r *http.Reque
 			newCode := db.ConnectionCodes{
 				ConnectionString: code,
 				IsUsed:           false,
-				Pubkey:           codeBody.Pubkey,
-				RouteHint:        codeBody.RouteHint,
-				SatsAmount:       int64(codeBody.SatsAmount),
 			}
 			codeArr = append(codeArr, newCode)
 		}
