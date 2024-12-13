@@ -64,26 +64,34 @@ func (ah *authHandler) CreateConnectionCode(w http.ResponseWriter, r *http.Reque
 	body, err := io.ReadAll(r.Body)
 	if err != nil {
 		fmt.Println("ReadAll Error", err)
+		w.WriteHeader(http.StatusBadRequest)
+		return
 	}
 	r.Body.Close()
 
 	err = json.Unmarshal(body, &codeBody)
 
 	if err != nil {
-		fmt.Println("Could not umarshal connection code body")
+		fmt.Println("Could not unmarshal connection code body")
 		w.WriteHeader(http.StatusNotAcceptable)
 		return
 	}
 
 	if codeBody.Pubkey != "" && codeBody.RouteHint == "" {
-		fmt.Println("route hint missing")
-		w.WriteHeader(http.StatusNotAcceptable)
+		w.WriteHeader(http.StatusBadRequest)
+		json.NewEncoder(w).Encode("Route hint is required when pubkey is provided")
 		return
 	}
 
 	if codeBody.RouteHint != "" && codeBody.Pubkey == "" {
-		fmt.Println("pubkey missing missing")
 		w.WriteHeader(http.StatusNotAcceptable)
+		json.NewEncoder(w).Encode("pubkey is required when Route hint is provided")
+		return
+	}
+
+	if codeBody.SatsAmount == 0 {
+		w.WriteHeader(http.StatusBadRequest)
+		json.NewEncoder(w).Encode("Sats amount must be greater than 0")
 		return
 	}
 
@@ -100,6 +108,9 @@ func (ah *authHandler) CreateConnectionCode(w http.ResponseWriter, r *http.Reque
 			newCode := db.ConnectionCodes{
 				ConnectionString: code,
 				IsUsed:           false,
+				Pubkey:           codeBody.Pubkey,
+				RouteHint:        codeBody.RouteHint,
+				SatsAmount:       int64(codeBody.SatsAmount),
 			}
 			codeArr = append(codeArr, newCode)
 		}
