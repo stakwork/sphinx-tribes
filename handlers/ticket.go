@@ -111,15 +111,9 @@ func (th *ticketHandler) UpdateTicket(w http.ResponseWriter, r *http.Request) {
 
 	var updateRequest UpdateTicketRequest
 	if err := json.Unmarshal(body, &updateRequest); err != nil {
-
-		var ticket db.Tickets
-		if err := json.Unmarshal(body, &ticket); err != nil {
-			w.WriteHeader(http.StatusBadRequest)
-			json.NewEncoder(w).Encode(map[string]string{"error": "Error parsing request body"})
-			return
-		}
-
-		updateRequest.Ticket = &ticket
+		w.WriteHeader(http.StatusBadRequest)
+		json.NewEncoder(w).Encode(map[string]string{"error": "Error parsing request body"})
+		return
 	}
 
 	if updateRequest.Ticket == nil {
@@ -128,15 +122,45 @@ func (th *ticketHandler) UpdateTicket(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	updateRequest.Ticket.UUID = ticketUUID
+	existingTicket, err := th.db.GetTicket(ticketUUID.String())
+	var newTicket db.Tickets
 
-	if updateRequest.Ticket.Status != "" && !db.IsValidTicketStatus(updateRequest.Ticket.Status) {
-		w.WriteHeader(http.StatusBadRequest)
-		json.NewEncoder(w).Encode(map[string]string{"error": "Invalid ticket status"})
-		return
+	if err != nil {
+		newTicket = db.Tickets{
+			UUID:        updateRequest.Ticket.UUID,
+			TicketGroup: func() *uuid.UUID { id := uuid.New(); return &id }(),
+			FeatureUUID: updateRequest.Ticket.FeatureUUID,
+			PhaseUUID:   updateRequest.Ticket.PhaseUUID,
+			Name:        updateRequest.Ticket.Name,
+			Sequence:    updateRequest.Ticket.Sequence,
+			Dependency:  updateRequest.Ticket.Dependency,
+			Description: updateRequest.Ticket.Description,
+			Status:      updateRequest.Ticket.Status,
+			Version:     1,
+			CreatedAt:   time.Now(),
+			UpdatedAt:   time.Now(),
+		}
+	} else {
+
+		newTicket = db.Tickets{
+			UUID:        uuid.New(),
+			TicketGroup: existingTicket.TicketGroup,
+			FeatureUUID: updateRequest.Ticket.FeatureUUID,
+			PhaseUUID:   updateRequest.Ticket.PhaseUUID,
+			Name:        updateRequest.Ticket.Name,
+			Sequence:    updateRequest.Ticket.Sequence,
+			Dependency:  updateRequest.Ticket.Dependency,
+			Description: updateRequest.Ticket.Description,
+			Status:      updateRequest.Ticket.Status,
+			Version:     existingTicket.Version + 1,
+			Author:      updateRequest.Ticket.Author,
+			AuthorID:    updateRequest.Ticket.AuthorID,
+			CreatedAt:   time.Now(),
+			UpdatedAt:   time.Now(),
+		}
 	}
 
-	updatedTicket, err := th.db.CreateOrEditTicket(updateRequest.Ticket)
+	createdTicket, err := th.db.CreateOrEditTicket(&newTicket)
 	if err != nil {
 		if err.Error() == "feature_uuid, phase_uuid, and name are required" {
 			w.WriteHeader(http.StatusBadRequest)
@@ -166,7 +190,7 @@ func (th *ticketHandler) UpdateTicket(w http.ResponseWriter, r *http.Request) {
 			log.Printf("Failed to send websocket message: %v", err)
 			w.WriteHeader(http.StatusOK)
 			json.NewEncoder(w).Encode(map[string]interface{}{
-				"ticket":          updatedTicket,
+				"ticket":          createdTicket,
 				"websocket_error": err.Error(),
 			})
 			return
@@ -174,7 +198,7 @@ func (th *ticketHandler) UpdateTicket(w http.ResponseWriter, r *http.Request) {
 	}
 
 	w.WriteHeader(http.StatusOK)
-	json.NewEncoder(w).Encode(updatedTicket)
+	json.NewEncoder(w).Encode(createdTicket)
 }
 
 func (th *ticketHandler) DeleteTicket(w http.ResponseWriter, r *http.Request) {
