@@ -341,14 +341,6 @@ func (th *ticketHandler) PostTicketDataToStakwork(w http.ResponseWriter, r *http
 		}
 
 		schematicURL = workspace.SchematicUrl
-		if schematicURL == "" {
-			w.WriteHeader(http.StatusNotFound)
-			json.NewEncoder(w).Encode(TicketResponse{
-				Success: false,
-				Message: "Schematic URL not found in the workspace",
-			})
-			return
-		}
 
 		codeGraph, err := th.db.GetCodeGraphByUUID(feature.WorkspaceUuid)
 		if err == nil {
