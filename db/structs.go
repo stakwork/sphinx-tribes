@@ -226,6 +226,9 @@ type ConnectionCodes struct {
 	ConnectionString string     `json:"connection_string"`
 	IsUsed           bool       `json:"is_used"`
 	DateCreated      *time.Time `json:"date_created"`
+	Pubkey           string     `json:"pubkey"`
+	RouteHint        string     `json:"route_hint"`
+	SatsAmount       int64      `json:"sats_amount"`
 }
 
 type ConnectionCodesShort struct {
