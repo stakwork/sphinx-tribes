@@ -105,6 +105,7 @@ func (ch *ChatHandler) SendMessage(w http.ResponseWriter, r *http.Request) {
 			ID   string `json:"id"`
 		} `json:"contextTags"`
 		SourceWebsocketID string `json:"sourceWebsocketId"`
+		WorkspaceUUID     string `json:"workspaceUUID"`
 	}
 
 	if err := json.NewDecoder(r.Body).Decode(&request); err != nil {
@@ -112,6 +113,25 @@ func (ch *ChatHandler) SendMessage(w http.ResponseWriter, r *http.Request) {
 		json.NewEncoder(w).Encode(ChatResponse{
 			Success: false,
 			Message: "Invalid request body",
+		})
+		return
+	}
+
+	if request.WorkspaceUUID == "" {
+		w.WriteHeader(http.StatusBadRequest)
+		json.NewEncoder(w).Encode(ChatResponse{
+			Success: false,
+			Message: "workspaceUUID is required",
+		})
+		return
+	}
+
+	context, err := ch.db.GetProductBrief(request.WorkspaceUUID)
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		json.NewEncoder(w).Encode(ChatResponse{
+			Success: false,
+			Message: "Error retrieving product brief",
 		})
 		return
 	}
@@ -170,7 +190,7 @@ func (ch *ChatHandler) SendMessage(w http.ResponseWriter, r *http.Request) {
 						"messageId":         createdMessage.ID,
 						"message":           request.Message,
 						"history":           messageHistory,
-						"contextTags":       "This is a project with Typescript frontend and Go Backend",
+						"contextTags":       context,
 						"sourceWebsocketId": request.SourceWebsocketID,
 						"webhook_url":       fmt.Sprintf("%s/hivechat/process", os.Getenv("HOST")),
 					},
