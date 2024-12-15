@@ -4,12 +4,13 @@ import (
 	"bytes"
 	"context"
 	"encoding/json"
-	"github.com/google/uuid"
-	"github.com/lib/pq"
 	"net/http"
 	"net/http/httptest"
 	"strconv"
 	"testing"
+
+	"github.com/google/uuid"
+	"github.com/lib/pq"
 
 	"fmt"
 	"time"
@@ -154,6 +155,8 @@ func TestBountyMetrics(t *testing.T) {
 		avgCompletedDays := uint(0)
 		uniqueHuntersPaid := int64(2)
 		newHuntersPaid := int64(2)
+		newHunters := db.TestDB.GetNewHunters(dateRange)
+		peopleByPeriod := db.TestDB.TotalPeopleByPeriod(dateRange)
 
 		expectedMetricRes := db.BountyMetrics{
 			BountiesPosted:         totalBountiesPosted,
@@ -167,6 +170,8 @@ func TestBountyMetrics(t *testing.T) {
 			AverageCompleted:       avgCompletedDays,
 			UniqueHuntersPaid:      uniqueHuntersPaid,
 			NewHuntersPaid:         newHuntersPaid,
+			NewHunters:             newHunters,
+			NewHuntersByPeriod:     peopleByPeriod,
 		}
 
 		var res db.BountyMetrics
