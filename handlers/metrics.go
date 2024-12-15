@@ -98,6 +98,13 @@ func PeopleMetrics(w http.ResponseWriter, r *http.Request) {
 
 	request := db.PaymentDateRange{}
 	body, err := io.ReadAll(r.Body)
+
+	if err != nil {
+		w.WriteHeader(http.StatusNotAcceptable)
+		json.NewEncoder(w).Encode("Request body not accepted")
+		return
+	}
+
 	r.Body.Close()
 
 	err = json.Unmarshal(body, &request)
@@ -127,6 +134,13 @@ func (mh *metricHandler) BountyMetrics(w http.ResponseWriter, r *http.Request) {
 
 	request := db.PaymentDateRange{}
 	body, err := io.ReadAll(r.Body)
+
+	if err != nil {
+		w.WriteHeader(http.StatusNotAcceptable)
+		json.NewEncoder(w).Encode("Request body not accepted")
+		return
+	}
+
 	r.Body.Close()
 
 	err = json.Unmarshal(body, &request)
@@ -163,6 +177,8 @@ func (mh *metricHandler) BountyMetrics(w http.ResponseWriter, r *http.Request) {
 	avgCompletedDays := mh.db.AverageCompletedTime(request, workspace)
 	uniqueHuntersPaid := mh.db.TotalHuntersPaid(request, workspace)
 	newHuntersPaid := mh.db.NewHuntersPaid(request, workspace)
+	newHunters := mh.db.GetNewHunters(request)
+	peopleByPeriod := mh.db.TotalPeopleByPeriod(request)
 
 	bountyMetrics := db.BountyMetrics{
 		BountiesPosted:         totalBountiesPosted,
@@ -176,6 +192,8 @@ func (mh *metricHandler) BountyMetrics(w http.ResponseWriter, r *http.Request) {
 		AverageCompleted:       avgCompletedDays,
 		UniqueHuntersPaid:      uniqueHuntersPaid,
 		NewHuntersPaid:         newHuntersPaid,
+		NewHunters:             newHunters,
+		NewHuntersByPeriod:     peopleByPeriod,
 	}
 
 	if db.RedisError == nil && db.RedisClient != nil {

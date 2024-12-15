@@ -899,6 +899,8 @@ type BountyMetrics struct {
 	AverageCompleted       uint  `json:"average_completed"`
 	UniqueHuntersPaid      int64 `json:"unique_hunters_paid"`
 	NewHuntersPaid         int64 `json:"new_hunters_paid"`
+	NewHunters             int64 `json:"new_hunters"`
+	NewHuntersByPeriod     int64 `json:"new_hunters_by_period"`
 }
 
 type MetricsBountyCsv struct {

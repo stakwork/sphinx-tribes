@@ -17,6 +17,23 @@ func (db database) TotalPeopleByDateRange(r PaymentDateRange) int64 {
 	return count
 }
 
+func (db database) TotalPeopleByPeriod(r PaymentDateRange) int64 {
+	var count int64
+	db.db.Model(&Person{}).Where("created < ?", r.StartDate).Count(&count)
+	return count
+}
+
+func (db database) GetNewHunters(r PaymentDateRange) int64 {
+	var totalCount int64
+	var newHunters int64
+	var huntersByPeriod int64 = db.TotalPeopleByPeriod(r)
+
+	db.db.Model(&Person{}).Count(&totalCount)
+
+	newHunters = totalCount - huntersByPeriod
+	return newHunters
+}
+
 func (db database) TotalWorkspacesByDateRange(r PaymentDateRange) int64 {
 	var count int64
 	db.db.Model(&Organization{}).Where("created >= ?", r.StartDate).Where("created <= ?", r.EndDate).Count(&count)
