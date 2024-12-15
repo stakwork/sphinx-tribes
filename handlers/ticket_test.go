@@ -251,11 +251,9 @@ func TestUpdateTicket(t *testing.T) {
 		rr := httptest.NewRecorder()
 		handler := http.HandlerFunc(tHandler.UpdateTicket)
 
-		updateTicket := db.Tickets{
-			UUID:        createdTicket.UUID,
-			Description: "Updated description", // Optional field
-			Status:      db.ReadyTicket,        // Optional field
-		}
+		updateTicket := createdTicket
+		updateTicket.Description = "Updated Description"
+		updateTicket.Status = db.ReadyTicket
 
 		updateRequest := UpdateTicketRequest{
 			Metadata: struct {
