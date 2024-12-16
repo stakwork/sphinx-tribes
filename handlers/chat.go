@@ -4,13 +4,14 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
-	"github.com/rs/xid"
-	"github.com/stakwork/sphinx-tribes/websocket"
 	"io"
 	"log"
 	"net/http"
 	"os"
 	"time"
+
+	"github.com/rs/xid"
+	"github.com/stakwork/sphinx-tribes/websocket"
 
 	"github.com/go-chi/chi"
 	"github.com/stakwork/sphinx-tribes/db"
@@ -192,7 +193,7 @@ func (ch *ChatHandler) SendMessage(w http.ResponseWriter, r *http.Request) {
 						"history":           messageHistory,
 						"contextTags":       context,
 						"sourceWebsocketId": request.SourceWebsocketID,
-						"webhook_url":       fmt.Sprintf("%s/hivechat/process", os.Getenv("HOST")),
+						"webhook_url":       fmt.Sprintf("%s/hivechat/response", os.Getenv("HOST")),
 					},
 				},
 			},
@@ -298,9 +299,58 @@ func (ch *ChatHandler) GetChatHistory(w http.ResponseWriter, r *http.Request) {
 }
 
 func (ch *ChatHandler) ProcessChatResponse(w http.ResponseWriter, r *http.Request) {
+	var request struct {
+		ChatID            string `json:"chatId"`
+		MessageID         string `json:"messageId"`
+		Response          string `json:"response"`
+		SourceWebsocketID string `json:"sourceWebsocketId"`
+	}
+
+	if err := json.NewDecoder(r.Body).Decode(&request); err != nil {
+		w.WriteHeader(http.StatusBadRequest)
+		json.NewEncoder(w).Encode(ChatResponse{
+			Success: false,
+			Message: "Invalid request body",
+		})
+		return
+	}
+
+	message := &db.ChatMessage{
+		ID:        request.MessageID,
+		ChatID:    request.ChatID,
+		Message:   request.Response,
+		Role:      "assistant",
+		Timestamp: time.Now(),
+		Status:    "sent",
+		Source:    "agent",
+	}
+
+	createdMessage, err := ch.db.AddChatMessage(message)
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		json.NewEncoder(w).Encode(ChatResponse{
+			Success: false,
+			Message: fmt.Sprintf("Failed to save response message: %v", err),
+		})
+		return
+	}
+
+	wsMessage := websocket.TicketMessage{
+		BroadcastType:   "direct",
+		SourceSessionID: request.SourceWebsocketID,
+		Message:         "Response received",
+		Action:          "message",
+		ChatMessage:     createdMessage,
+	}
+
+	if err := websocket.WebsocketPool.SendTicketMessage(wsMessage); err != nil {
+		log.Printf("Failed to send websocket message: %v", err)
+	}
+
 	w.WriteHeader(http.StatusOK)
 	json.NewEncoder(w).Encode(ChatResponse{
 		Success: true,
-		Message: "Stubbed out - process chat response",
+		Message: "Response processed successfully",
+		Data:    createdMessage,
 	})
 }
