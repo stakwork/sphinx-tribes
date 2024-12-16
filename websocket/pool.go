@@ -41,12 +41,10 @@ func (pool *Pool) Start() {
 			} else {
 				fmt.Println("Websocket pool client save error")
 			}
-			break
 		case client := <-pool.Unregister:
 			pool.Clients[client.Host].Client.Conn.WriteJSON(Message{Type: 1, Body: "User Disconnected..."})
 			delete(pool.Clients, client.Host)
 			fmt.Println("Size of Connection Pool: ", len(pool.Clients))
-			break
 		case message := <-pool.Broadcast:
 			fmt.Println("Sending message to all clients in Pool")
 			for client, _ := range pool.Clients {

@@ -65,9 +65,9 @@ func NewRouter() *http.Server {
 		r.Get("/poll/{challenge}", db.Poll)
 		r.Post("/save", db.PostSave)
 		r.Get("/save/{key}", db.PollSave)
-		r.Get("/websocket", handlers.HandleWebSocket)
 		r.Get("/migrate_bounties", handlers.MigrateBounties)
 		r.Get("/test/internal-server-error", testInternalServerError)
+		r.Get("/websocket", handlers.HandleWebSocket)
 	})
 
 	r.Group(func(r chi.Router) {
