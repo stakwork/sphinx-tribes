@@ -142,35 +142,35 @@ func getFromAuth(path string) (*extractResponse, error) {
 }
 
 // Middleware to handle InternalServerError
-func internalServerErrorHandler(next http.Handler) http.Handler {
-	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		rr := &responseRecorder{ResponseWriter: w, statusCode: http.StatusOK}
-		next.ServeHTTP(rr, r)
+// func internalServerErrorHandler(next http.Handler) http.Handler {
+// 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+// 		rr := &responseRecorder{ResponseWriter: w, statusCode: http.StatusOK}
+// 		next.ServeHTTP(rr, r)
 
-		if rr.statusCode == http.StatusInternalServerError {
-			fmt.Printf("Internal Server Error: %s %s\n", r.Method, r.URL.Path)
-			http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
-		}
-	})
-}
+// 		if rr.statusCode == http.StatusInternalServerError {
+// 			fmt.Printf("Internal Server Error: %s %s\n", r.Method, r.URL.Path)
+// 			http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
+// 		}
+// 	})
+// }
 
 // Custom ResponseWriter to capture status codes
-type responseRecorder struct {
-	http.ResponseWriter
-	statusCode int
-}
+// type responseRecorder struct {
+// 	http.ResponseWriter
+// 	statusCode int
+// }
 
-func (rr *responseRecorder) WriteHeader(code int) {
-	rr.statusCode = code
-	rr.ResponseWriter.WriteHeader(code)
-}
+// func (rr *responseRecorder) WriteHeader(code int) {
+// 	rr.statusCode = code
+// 	rr.ResponseWriter.WriteHeader(code)
+// }
 
 func initChi() *chi.Mux {
 	r := chi.NewRouter()
 	r.Use(middleware.RequestID)
 	r.Use(middleware.Logger)
 	r.Use(middleware.Recoverer)
-	r.Use(internalServerErrorHandler)
+	// r.Use(internalServerErrorHandler)
 	cors := cors.New(cors.Options{
 		AllowedOrigins:   []string{"*"},
 		AllowedMethods:   []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"},
