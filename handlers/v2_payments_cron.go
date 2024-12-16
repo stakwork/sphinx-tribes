@@ -14,14 +14,14 @@ import (
 )
 
 func InitV2PaymentsCron() {
+	log.Println("Pending Invoice Cron Job Started")
 	paymentHistories := db.DB.GetPendingPaymentHistory()
 	for _, payment := range paymentHistories {
-		tag := payment.Tag
-		tagResult := GetInvoiceStatusByTag(tag)
-
 		bounty := db.DB.GetBounty(payment.BountyId)
 
 		if bounty.ID > 0 {
+			tag := payment.Tag
+			tagResult := GetInvoiceStatusByTag(tag)
 
 			if tagResult.Status == db.PaymentComplete {
 				db.DB.SetPaymentAsComplete(tag)
@@ -37,23 +37,20 @@ func InitV2PaymentsCron() {
 				bounty.CompletionDate = &now
 
 				db.DB.UpdateBountyPaymentStatuses(bounty)
-
-			} else if tagResult.Status == db.PaymentFailed {
-				// Handle failed payments
-
-				err := db.DB.ProcessReversePayments(payment.ID)
-				if err != nil {
-					log.Printf("Could not reverse bounty payment : Bounty ID - %d, Payment ID - %d, Error - %s", bounty.ID, payment.ID, err)
-				}
-
 			} else if tagResult.Status == db.PaymentPending {
+				log.Println("Payment Status From V2 BOT IS Pending", payment)
 				if payment.PaymentStatus == db.PaymentPending {
+					log.Println("Payment Status From DB IS Pending", payment)
 					created := utils.ConvertTimeToTimestamp(payment.Created.String())
 
 					now := time.Now()
 					daysDiff := utils.GetDateDaysDifference(int64(created), &now)
 
+					log.Println("Payment Date Difference Is", daysDiff)
+
 					if daysDiff >= 7 {
+
+						log.Println("Payment Date Difference Is Greater Or Equals 7 Days", payment)
 
 						err := db.DB.ProcessReversePayments(payment.ID)
 						if err != nil {
@@ -61,8 +58,16 @@ func InitV2PaymentsCron() {
 						}
 					}
 				}
-			}
+			} else if tagResult.Status == db.PaymentFailed {
+				// Handle failed payments
+				err := db.DB.ProcessReversePayments(payment.ID)
+				if err != nil {
+					log.Printf("Could not reverse bounty payment : Bounty ID - %d, Payment ID - %d, Error - %s", bounty.ID, payment.ID, err)
+				}
 
+			} else {
+				log.Println("Payment Status From V2 BOT IS Unknown", payment, tagResult)
+			}
 		}
 	}
 }
@@ -99,7 +104,7 @@ func GetInvoiceStatusByTag(tag string) db.V2TagRes {
 	err = json.Unmarshal(body, &tagRes)
 
 	if err != nil {
-		log.Printf("Could not unmarshall get tag result: %s", err)
+		log.Printf("Could not unmarshal get tag result: %s", err)
 	}
 
 	resultLength := len(tagRes)

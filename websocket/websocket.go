@@ -40,6 +40,7 @@ func ServeWs(pool *Pool, w http.ResponseWriter, r *http.Request) {
 
 	conn, err := Upgrade(w, r)
 	if err != nil {
+		fmt.Println("Error in ServeWs", err)
 		fmt.Fprintf(w, "%+v\n", err)
 	}
 
