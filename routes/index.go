@@ -147,7 +147,6 @@ func getFromAuth(path string) (*extractResponse, error) {
 // Middleware to handle InternalServerError
 func internalServerErrorHandler(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		fmt.Println("Inside Internal Server Middleware")
 
 		rr := negroni.NewResponseWriter(w)
 		next.ServeHTTP(rr, r)
