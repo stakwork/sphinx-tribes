@@ -6,6 +6,7 @@ import (
 	"io"
 	"net/http"
 	"os"
+	"runtime"
 	"time"
 
 	"github.com/go-chi/chi"
@@ -41,6 +42,7 @@ func NewRouter() *http.Server {
 	r.Mount("/workflows", WorkflowRoutes())
 	r.Mount("/bounties/ticket", TicketRoutes())
 	r.Mount("/hivechat", ChatRoutes())
+	r.Mount("/test", TestRoutes())
 
 	r.Group(func(r chi.Router) {
 		r.Get("/tribe_by_feed", tribeHandlers.GetFirstTribeByFeed)
@@ -145,16 +147,26 @@ func getFromAuth(path string) (*extractResponse, error) {
 // Middleware to handle InternalServerError
 func internalServerErrorHandler(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		fmt.Println("Inside Internal Server Middleware")
+
 		rr := negroni.NewResponseWriter(w)
 		next.ServeHTTP(rr, r)
 
 		if rr.Status() == http.StatusInternalServerError {
-			fmt.Printf("Internal Server Error: %s %s\n", r.Method, r.URL.Path)
+			// Get stack trace
+			buf := make([]byte, 1024)
+			n := runtime.Stack(buf, false)
+			stackTrace := string(buf[:n])
+
+			fmt.Printf("Internal Server Error: %s %s\nStack Trace:\n%s\n",
+				r.Method,
+				r.URL.Path,
+				stackTrace,
+			)
 			http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
 		}
 	})
 }
-
 
 func initChi() *chi.Mux {
 	r := chi.NewRouter()
