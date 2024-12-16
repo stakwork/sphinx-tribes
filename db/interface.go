@@ -213,4 +213,6 @@ type Database interface {
 	GetTicketsWithoutGroup() ([]Tickets, error)
 	UpdateTicketsWithoutGroup(ticket Tickets) error
 	ProcessUpdateTicketsWithoutGroup()
+	GetNewHunters(r PaymentDateRange) int64
+	TotalPeopleByPeriod(r PaymentDateRange) int64
 }

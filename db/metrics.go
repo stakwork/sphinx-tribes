@@ -5,6 +5,7 @@ import (
 	"math"
 	"net/http"
 	"strings"
+	"time"
 
 	"github.com/stakwork/sphinx-tribes/utils"
 )
@@ -15,6 +16,38 @@ func (db database) TotalPeopleByDateRange(r PaymentDateRange) int64 {
 	var count int64
 	db.db.Model(&Person{}).Where("created >= ?", r.StartDate).Where("created <= ?", r.EndDate).Count(&count)
 	return count
+}
+
+func (db database) TotalPeopleByPeriod(r PaymentDateRange) int64 {
+	var count int64
+
+	// convert timestamp string to int64
+	timestamp, err := utils.ConvertStringToInt(r.StartDate)
+	if err != nil {
+		fmt.Println("Error parsing date:", err)
+	}
+
+	// Convert the timestamp to a time.Time object
+	t := time.Unix(int64(timestamp), 0)
+
+	// Format the time as a human-readable string
+	formattedTime := t.Format("2006-01-02 15:04:05")
+
+	db.db.Model(&Person{}).Where("created < ?", formattedTime).Count(&count)
+	return count
+}
+
+func (db database) GetNewHunters(r PaymentDateRange) int64 {
+	var totalCount int64
+	var newHunters int64 = 0
+	var huntersByPeriod int64 = db.TotalPeopleByPeriod(r)
+
+	db.db.Model(&Person{}).Count(&totalCount)
+
+	if huntersByPeriod > 0 && totalCount > huntersByPeriod {
+		newHunters = totalCount - huntersByPeriod
+	}
+	return newHunters
 }
 
 func (db database) TotalWorkspacesByDateRange(r PaymentDateRange) int64 {
