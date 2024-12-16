@@ -98,7 +98,7 @@ func (ch *ChatHandler) CreateChat(w http.ResponseWriter, r *http.Request) {
 func (ch *ChatHandler) SendMessage(w http.ResponseWriter, r *http.Request) {
 
 	var request struct {
-		ChatID      string `json:"chatId"`
+		ChatID      string `json:"chat_id"`
 		Message     string `json:"message"`
 		ContextTags []struct {
 			Type string `json:"type"`
