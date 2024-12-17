@@ -3,6 +3,7 @@ package db
 import (
 	"errors"
 	"fmt"
+	"log"
 	"net/http"
 	"strings"
 	"time"
@@ -724,14 +725,25 @@ func (db database) ProcessReversePayments(paymentId uint) error {
 		paymentHistory.PaymentStatus = PaymentFailed
 
 		workspace_uuid := paymentHistory.WorkspaceUuid
+		log.Println("WorkspaceUuid =====", workspace_uuid)
+
+		// get workspace
+		workspace := Workspace{}
+		tx.Model(&Workspace{}).Where("uuid = ?", workspace_uuid).Find(&workspace)
+
+		log.Println("Workspace =====", workspace)
 
 		// check that the sum of budget withdrawals and payments is not greater than deposits
 
 		var depositAmount uint
 		tx.Model(&NewPaymentHistory{}).Where("workspace_uuid = ?", workspace_uuid).Where("status = ?", true).Where("payment_type = ?", "deposit").Select("SUM(amount)").Row().Scan(&depositAmount)
 
+		log.Println("DepositAmount =====", depositAmount)
+
 		var withdrawalAmount uint
 		tx.Model(&NewPaymentHistory{}).Where("workspace_uuid = ?", workspace_uuid).Where("status = ?", true).Where("payment_type != ?", "deposit").Select("SUM(amount)").Row().Scan(&withdrawalAmount)
+
+		log.Println("WithdrawalAmount =====", withdrawalAmount)
 
 		if withdrawalAmount > depositAmount {
 			tx.Rollback()
