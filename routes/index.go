@@ -147,24 +147,27 @@ func getFromAuth(path string) (*extractResponse, error) {
 // Middleware to handle InternalServerError
 func internalServerErrorHandler(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		fmt.Println("Inside Internal Server Middleware")
-
 		rr := negroni.NewResponseWriter(w)
+
+		defer func() {
+			if err := recover(); err != nil {
+				// Get stack trace
+				buf := make([]byte, 4096)
+				n := runtime.Stack(buf, true)
+				stackTrace := string(buf[:n])
+
+				fmt.Printf("Internal Server Error: %s %s\nError: %v\nStack Trace:\n%s\n",
+					r.Method,
+					r.URL.Path,
+					err,
+					stackTrace,
+				)
+
+				http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
+			}
+		}()
+
 		next.ServeHTTP(rr, r)
-
-		if rr.Status() == http.StatusInternalServerError {
-			// Get stack trace
-			buf := make([]byte, 1024)
-			n := runtime.Stack(buf, false)
-			stackTrace := string(buf[:n])
-
-			fmt.Printf("Internal Server Error: %s %s\nStack Trace:\n%s\n",
-				r.Method,
-				r.URL.Path,
-				stackTrace,
-			)
-			http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
-		}
 	})
 }
 
