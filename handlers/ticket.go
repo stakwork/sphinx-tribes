@@ -556,7 +556,7 @@ func (th *ticketHandler) ProcessTicketReview(w http.ResponseWriter, r *http.Requ
 		return
 	}
 
-	ticket, err := th.db.GetTicket(reviewReq.Value.TicketUUID)
+	existingTicket, err := th.db.GetTicket(reviewReq.Value.TicketUUID)
 	if err != nil {
 		log.Printf("Error fetching ticket: %v", err)
 		w.WriteHeader(http.StatusNotFound)
@@ -564,26 +564,38 @@ func (th *ticketHandler) ProcessTicketReview(w http.ResponseWriter, r *http.Requ
 		return
 	}
 
-	ticket.Description = reviewReq.Value.TicketDescription
-	ticket.UpdatedAt = time.Now()
+	newTicket := db.Tickets{
+		UUID:        uuid.New(),
+		TicketGroup: existingTicket.TicketGroup,
+		FeatureUUID: existingTicket.FeatureUUID,
+		PhaseUUID:   existingTicket.PhaseUUID,
+		Name:        existingTicket.Name,
+		Sequence:    existingTicket.Sequence,
+		Dependency:  existingTicket.Dependency,
+		Description: reviewReq.Value.TicketDescription,
+		Status:      existingTicket.Status,
+		Version:     existingTicket.Version + 1,
+		CreatedAt:   time.Now(),
+		UpdatedAt:   time.Now(),
+	}
 
-	updatedTicket, err := th.db.UpdateTicket(ticket)
+	createdTicket, err := th.db.CreateOrEditTicket(&newTicket)
 	if err != nil {
-		log.Printf("Error updating ticket: %v", err)
+		log.Printf("Error creating new ticket: %v", err)
 		w.WriteHeader(http.StatusInternalServerError)
-		json.NewEncoder(w).Encode(map[string]string{"error": "Failed to update ticket"})
+		json.NewEncoder(w).Encode(map[string]string{"error": "Failed to create new ticket"})
 		return
 	}
 
 	ticketMsg := websocket.TicketMessage{
 		BroadcastType:   "direct",
 		SourceSessionID: reviewReq.SourceWebsocket,
-		Message:         fmt.Sprintf("Successful update of %s", reviewReq.Value.TicketUUID),
+		Message:         fmt.Sprintf("Successfully created new version for ticket %s", createdTicket.UUID.String()),
 		Action:          "process",
 		TicketDetails: websocket.TicketData{
 			FeatureUUID:       reviewReq.Value.FeatureUUID,
 			PhaseUUID:         reviewReq.Value.PhaseUUID,
-			TicketUUID:        reviewReq.Value.TicketUUID,
+			TicketUUID:        createdTicket.UUID.String(),
 			TicketDescription: reviewReq.Value.TicketDescription,
 		},
 	}
@@ -592,15 +604,15 @@ func (th *ticketHandler) ProcessTicketReview(w http.ResponseWriter, r *http.Requ
 		log.Printf("Failed to send websocket message: %v", err)
 		w.WriteHeader(http.StatusOK)
 		json.NewEncoder(w).Encode(map[string]interface{}{
-			"ticket":          updatedTicket,
+			"ticket":          createdTicket,
 			"websocket_error": err.Error(),
 		})
 		return
 	}
 
-	log.Printf("Successfully updated ticket %s", reviewReq.Value.TicketUUID)
+	log.Printf("Successfully created new ticket version %s", createdTicket.UUID.String())
 	w.WriteHeader(http.StatusOK)
-	json.NewEncoder(w).Encode(updatedTicket)
+	json.NewEncoder(w).Encode(createdTicket)
 }
 
 func (th *ticketHandler) GetTicketsByPhaseUUID(w http.ResponseWriter, r *http.Request) {
