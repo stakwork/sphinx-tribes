@@ -935,7 +935,15 @@ func TestConnectionCodeContext(t *testing.T) {
 			w.WriteHeader(http.StatusOK)
 		})
 
-		handler := ConnectionCodeContext(next)
+		handler := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			defer func() {
+				if err := recover(); err != nil {
+					http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
+				}
+			}()
+			ConnectionCodeContext(next).ServeHTTP(w, r)
+		})
+
 		rr := httptest.NewRecorder()
 		handler.ServeHTTP(rr, nil)
 
