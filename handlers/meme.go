@@ -43,7 +43,7 @@ func MemeImageUpload(w http.ResponseWriter, r *http.Request) {
 	dst, err := os.Create(dirName + "/" + header.Filename)
 
 	if err != nil {
-		http.Error(w, "Unable to create file", http.StatusInternalServerError)
+		panic("Unable to create file")
 		return
 	}
 
@@ -51,7 +51,7 @@ func MemeImageUpload(w http.ResponseWriter, r *http.Request) {
 
 	_, err = io.Copy(dst, file)
 	if err != nil {
-		http.Error(w, "Unable to copy saved file", http.StatusInternalServerError)
+		panic("Unable to copy saved file")
 		return
 	}
 

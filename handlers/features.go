@@ -562,7 +562,7 @@ func (oh *featureHandler) StoriesSend(w http.ResponseWriter, r *http.Request) {
 
 	apiKey := os.Getenv("SWWFKEY")
 	if apiKey == "" {
-		http.Error(w, "API key not set in environment", http.StatusInternalServerError)
+		panic("API key not set in environment")
 		return
 	}
 
@@ -580,13 +580,13 @@ func (oh *featureHandler) StoriesSend(w http.ResponseWriter, r *http.Request) {
 
 	stakworkPayloadJSON, err := json.Marshal(stakworkPayload)
 	if err != nil {
-		http.Error(w, "Failed to encode payload", http.StatusInternalServerError)
+		panic("Failed to encode payload")
 		return
 	}
 
 	req, err := http.NewRequest("POST", "https://api.stakwork.com/api/v1/projects", bytes.NewBuffer(stakworkPayloadJSON))
 	if err != nil {
-		http.Error(w, "Failed to create request to Stakwork API", http.StatusInternalServerError)
+		panic("Failed to create request to Stakwork API")
 		return
 	}
 	req.Header.Set("Authorization", "Token token="+apiKey)
@@ -595,14 +595,14 @@ func (oh *featureHandler) StoriesSend(w http.ResponseWriter, r *http.Request) {
 	client := &http.Client{}
 	resp, err := client.Do(req)
 	if err != nil {
-		http.Error(w, "Failed to send request to Stakwork API", http.StatusInternalServerError)
+		panic("Failed to send request to Stakwork API")
 		return
 	}
 	defer resp.Body.Close()
 
 	respBody, err := io.ReadAll(resp.Body)
 	if err != nil {
-		http.Error(w, "Failed to read response from Stakwork API", http.StatusInternalServerError)
+		panic("Failed to read response from Stakwork API")
 		return
 	}
 
@@ -636,7 +636,7 @@ func (oh *featureHandler) BriefSend(w http.ResponseWriter, r *http.Request) {
 
 	host := os.Getenv("HOST")
 	if host == "" {
-		http.Error(w, "HOST environment variable not set", http.StatusInternalServerError)
+		panic("HOST environment variable not set")
 		return
 	}
 
@@ -650,7 +650,7 @@ func (oh *featureHandler) BriefSend(w http.ResponseWriter, r *http.Request) {
 
 	apiKey := os.Getenv("SWWFKEY")
 	if apiKey == "" {
-		http.Error(w, "API key not set in environment", http.StatusInternalServerError)
+		panic("API key not set in environment")
 		return
 	}
 
@@ -668,13 +668,13 @@ func (oh *featureHandler) BriefSend(w http.ResponseWriter, r *http.Request) {
 
 	stakworkPayloadJSON, err := json.Marshal(stakworkPayload)
 	if err != nil {
-		http.Error(w, "Failed to encode payload", http.StatusInternalServerError)
+		panic("Failed to encode payload")
 		return
 	}
 
 	req, err := http.NewRequest(http.MethodPost, "https://api.stakwork.com/api/v1/projects", bytes.NewBuffer(stakworkPayloadJSON))
 	if err != nil {
-		http.Error(w, "Failed to create request to Stakwork API", http.StatusInternalServerError)
+		panic("Failed to create request to Stakwork API")
 		return
 	}
 	req.Header.Set("Authorization", "Token token="+apiKey)
@@ -683,14 +683,14 @@ func (oh *featureHandler) BriefSend(w http.ResponseWriter, r *http.Request) {
 	client := &http.Client{}
 	resp, err := client.Do(req)
 	if err != nil {
-		http.Error(w, "Failed to send request to Stakwork API", http.StatusInternalServerError)
+		panic("Failed to send request to Stakwork API")
 		return
 	}
 	defer resp.Body.Close()
 
 	respBody, err := io.ReadAll(resp.Body)
 	if err != nil {
-		http.Error(w, "Failed to read response from Stakwork API", http.StatusInternalServerError)
+		panic("Failed to read response from Stakwork API")
 		return
 	}
 
