@@ -270,6 +270,34 @@ func (ch *ChatHandler) sendToStakwork(payload StakworkChatPayload) error {
 	return nil
 }
 
+func (ch *ChatHandler) GetChat(w http.ResponseWriter, r *http.Request) {
+	workspaceID := r.URL.Query().Get("workspace_id")
+	if workspaceID == "" {
+		w.WriteHeader(http.StatusBadRequest)
+		json.NewEncoder(w).Encode(ChatResponse{
+			Success: false,
+			Message: "workspace_id query parameter is required",
+		})
+		return
+	}
+
+	chats, err := ch.db.GetChatsForWorkspace(workspaceID)
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		json.NewEncoder(w).Encode(ChatResponse{
+			Success: false,
+			Message: fmt.Sprintf("Failed to fetch chats: %v", err),
+		})
+		return
+	}
+
+	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode(ChatResponse{
+		Success: true,
+		Data:    chats,
+	})
+}
+
 func (ch *ChatHandler) GetChatHistory(w http.ResponseWriter, r *http.Request) {
 	chatID := chi.URLParam(r, "uuid")
 	if chatID == "" {

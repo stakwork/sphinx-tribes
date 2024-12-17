@@ -1,11 +1,12 @@
 package routes
 
 import (
+	"net/http"
+
 	"github.com/go-chi/chi"
 	"github.com/stakwork/sphinx-tribes/auth"
 	"github.com/stakwork/sphinx-tribes/db"
 	"github.com/stakwork/sphinx-tribes/handlers"
-	"net/http"
 )
 
 func ChatRoutes() chi.Router {
@@ -16,6 +17,7 @@ func ChatRoutes() chi.Router {
 
 	r.Group(func(r chi.Router) {
 		r.Use(auth.PubKeyContext)
+		r.Get("/", chatHandler.GetChat)
 		r.Post("/", chatHandler.CreateChat)
 		r.Post("/send", chatHandler.SendMessage)
 		r.Get("/history/{uuid}", chatHandler.GetChatHistory)
