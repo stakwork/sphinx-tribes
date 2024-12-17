@@ -344,7 +344,7 @@ func (ch *ChatHandler) ProcessChatResponse(w http.ResponseWriter, r *http.Reques
 	}
 
 	message := &db.ChatMessage{
-		ID:        request.MessageID,
+		ID:        xid.New().String(),
 		ChatID:    request.ChatID,
 		Message:   request.Response,
 		Role:      "assistant",
