@@ -97,3 +97,17 @@ func (db database) GetChatMessagesForChatID(chatID string) ([]ChatMessage, error
 
 	return chatMessages, nil
 }
+
+func (db database) GetChatsForWorkspace(workspaceID string) ([]Chat, error) {
+	var chats []Chat
+
+	result := db.db.Where("workspace_id = ?", workspaceID).
+		Order("updated_at DESC").
+		Find(&chats)
+
+	if result.Error != nil {
+		return nil, fmt.Errorf("failed to fetch chats: %w", result.Error)
+	}
+
+	return chats, nil
+}
