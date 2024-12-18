@@ -1,6 +1,7 @@
 package routes
 
 import (
+	"bytes"
 	"encoding/json"
 	"fmt"
 	"io"
@@ -15,6 +16,7 @@ import (
 	"github.com/urfave/negroni"
 
 	"github.com/stakwork/sphinx-tribes/auth"
+	"github.com/stakwork/sphinx-tribes/config"
 	"github.com/stakwork/sphinx-tribes/db"
 	"github.com/stakwork/sphinx-tribes/handlers"
 	"github.com/stakwork/sphinx-tribes/utils"
@@ -145,6 +147,49 @@ func getFromAuth(path string) (*extractResponse, error) {
 	}, nil
 }
 
+func sendEdgeListToJarvis(edgeList utils.EdgeList) error {
+	if config.JarvisUrl == "" || config.JarvisToken == "" {
+		fmt.Println("Jarvis configuration not found, skipping error reporting")
+		return nil
+	}
+
+	jarvisURL := fmt.Sprintf("%s/node/edge/bulk", config.JarvisUrl)
+
+	jsonData, err := json.Marshal(edgeList)
+	if err != nil {
+		fmt.Printf("Failed to marshal edge list: %v\n", err)
+		return nil
+	}
+
+	req, err := http.NewRequest("POST", jarvisURL, bytes.NewBuffer(jsonData))
+	if err != nil {
+		fmt.Printf("Failed to create Jarvis request: %v\n", err)
+		return nil
+	}
+
+	req.Header.Set("Content-Type", "application/json")
+	req.Header.Set("x-api-token", config.JarvisToken)
+
+	client := &http.Client{
+		Timeout: 10 * time.Second,
+	}
+
+	resp, err := client.Do(req)
+	if err != nil {
+		fmt.Printf("Failed to send error to Jarvis: %v\n", err)
+		return err
+	}
+	defer resp.Body.Close()
+
+	if resp.StatusCode >= 200 && resp.StatusCode < 300 {
+		fmt.Println("Successfully sent error to Jarvis")
+		return nil
+	}
+
+	body, _ := io.ReadAll(resp.Body)
+	return fmt.Errorf("jarvis returned non-success status: %d, body: %s", resp.StatusCode, string(body))
+}
+
 // Middleware to handle InternalServerError
 func internalServerErrorHandler(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
@@ -168,7 +213,13 @@ func internalServerErrorHandler(next http.Handler) http.Handler {
 					utils.PrettyPrintEdgeList(edgeList),
 				)
 
-				panic(http.StatusText(http.StatusInternalServerError))
+				go func() {
+					if err := sendEdgeListToJarvis(edgeList); err != nil {
+						fmt.Printf("Error sending to Jarvis: %v\n", err)
+					}
+				}()
+
+				http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
 			}
 		}()
 
