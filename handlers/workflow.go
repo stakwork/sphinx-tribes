@@ -41,7 +41,7 @@ func (wh *workflowHandler) HandleWorkflowRequest(w http.ResponseWriter, r *http.
 
 	processedRequestID, err := utils.ProcessWorkflowRequest(request.RequestID, request.Source)
 	if err != nil {
-		http.Error(w, "Failed to process workflow request", http.StatusInternalServerError)
+		panic("Failed to process workflow request")
 		return
 	}
 
@@ -49,7 +49,7 @@ func (wh *workflowHandler) HandleWorkflowRequest(w http.ResponseWriter, r *http.
 	request.Status = db.StatusNew
 
 	if err := wh.db.CreateWorkflowRequest(&request); err != nil {
-		http.Error(w, "Failed to create workflow request", http.StatusInternalServerError)
+		panic("Failed to create workflow request")
 		return
 	}
 
@@ -84,7 +84,7 @@ func (wh *workflowHandler) HandleWorkflowResponse(w http.ResponseWriter, r *http
 
 	request, err := wh.db.GetWorkflowRequest(response.RequestID)
 	if err != nil {
-		http.Error(w, "Failed to retrieve original request", http.StatusInternalServerError)
+		panic("Failed to retrieve original request")
 		return
 	}
 	if request == nil {
@@ -94,7 +94,7 @@ func (wh *workflowHandler) HandleWorkflowResponse(w http.ResponseWriter, r *http
 
 	processingMap, err := wh.db.GetProcessingMapByKey(request.Source, request.Action)
 	if err != nil {
-		http.Error(w, "Failed to check processing requirements", http.StatusInternalServerError)
+		panic("Failed to check processing requirements")
 		return
 	}
 
@@ -109,7 +109,7 @@ func (wh *workflowHandler) HandleWorkflowResponse(w http.ResponseWriter, r *http
 		response.ResponseData,
 	)
 	if err != nil {
-		http.Error(w, "Failed to update workflow request", http.StatusInternalServerError)
+		panic("Failed to update workflow request")
 		return
 	}
 
