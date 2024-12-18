@@ -508,7 +508,12 @@ func (th *ticketHandler) PostTicketDataToStakwork(w http.ResponseWriter, r *http
 			SourceSessionID: ticketRequest.Metadata.ID,
 			Message:         fmt.Sprintf("https://jobs.stakwork.com/admin/projects/%d", stakworkResp.Data.ProjectID),
 			Action:          "swrun",
-			TicketDetails:   websocket.TicketData{},
+			TicketDetails: websocket.TicketData{
+				FeatureUUID:       ticketRequest.Ticket.FeatureUUID,
+				PhaseUUID:         ticketRequest.Ticket.PhaseUUID,
+				TicketUUID:        ticketRequest.Ticket.UUID.String(),
+				TicketDescription: ticketRequest.Ticket.Description,
+			},
 		}
 
 		if err := websocket.WebsocketPool.SendTicketMessage(projectMsg); err != nil {
