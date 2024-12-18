@@ -328,10 +328,12 @@ func (ch *ChatHandler) GetChatHistory(w http.ResponseWriter, r *http.Request) {
 
 func (ch *ChatHandler) ProcessChatResponse(w http.ResponseWriter, r *http.Request) {
 	var request struct {
-		ChatID            string `json:"chatId"`
-		MessageID         string `json:"messageId"`
-		Response          string `json:"response"`
-		SourceWebsocketID string `json:"sourceWebsocketId"`
+		Value struct {
+			ChatID            string `json:"chatId"`
+			MessageID         string `json:"messageId"`
+			Response          string `json:"response"`
+			SourceWebsocketID string `json:"sourceWebsocketId"`
+		} `json:"value"`
 	}
 
 	if err := json.NewDecoder(r.Body).Decode(&request); err != nil {
@@ -343,7 +345,11 @@ func (ch *ChatHandler) ProcessChatResponse(w http.ResponseWriter, r *http.Reques
 		return
 	}
 
-	if request.ChatID == "" {
+	chatID := request.Value.ChatID
+	response := request.Value.Response
+	sourceWebsocketID := request.Value.SourceWebsocketID
+
+	if chatID == "" {
 		w.WriteHeader(http.StatusBadRequest)
 		json.NewEncoder(w).Encode(ChatResponse{
 			Success: false,
@@ -354,8 +360,8 @@ func (ch *ChatHandler) ProcessChatResponse(w http.ResponseWriter, r *http.Reques
 
 	message := &db.ChatMessage{
 		ID:        xid.New().String(),
-		ChatID:    request.ChatID,
-		Message:   request.Response,
+		ChatID:    chatID,
+		Message:   response,
 		Role:      "assistant",
 		Timestamp: time.Now(),
 		Status:    "sent",
@@ -372,18 +378,9 @@ func (ch *ChatHandler) ProcessChatResponse(w http.ResponseWriter, r *http.Reques
 		return
 	}
 
-	if createdMessage.ChatID == "" {
-		w.WriteHeader(http.StatusBadRequest)
-		json.NewEncoder(w).Encode(ChatResponse{
-			Success: false,
-			Message: "ChatID is required for response",
-		})
-		return
-	}
-
 	wsMessage := websocket.TicketMessage{
 		BroadcastType:   "direct",
-		SourceSessionID: request.SourceWebsocketID,
+		SourceSessionID: sourceWebsocketID,
 		Message:         "Response received",
 		Action:          "message",
 		ChatMessage:     createdMessage,
