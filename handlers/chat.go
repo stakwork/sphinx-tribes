@@ -343,6 +343,15 @@ func (ch *ChatHandler) ProcessChatResponse(w http.ResponseWriter, r *http.Reques
 		return
 	}
 
+	if request.ChatID == "" {
+		w.WriteHeader(http.StatusBadRequest)
+		json.NewEncoder(w).Encode(ChatResponse{
+			Success: false,
+			Message: "ChatID is required for message creation",
+		})
+		return
+	}
+
 	message := &db.ChatMessage{
 		ID:        xid.New().String(),
 		ChatID:    request.ChatID,
@@ -359,6 +368,15 @@ func (ch *ChatHandler) ProcessChatResponse(w http.ResponseWriter, r *http.Reques
 		json.NewEncoder(w).Encode(ChatResponse{
 			Success: false,
 			Message: fmt.Sprintf("Failed to save response message: %v", err),
+		})
+		return
+	}
+
+	if createdMessage.ChatID == "" {
+		w.WriteHeader(http.StatusBadRequest)
+		json.NewEncoder(w).Encode(ChatResponse{
+			Success: false,
+			Message: "ChatID is required for response",
 		})
 		return
 	}
