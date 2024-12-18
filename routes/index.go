@@ -17,6 +17,7 @@ import (
 	"github.com/stakwork/sphinx-tribes/auth"
 	"github.com/stakwork/sphinx-tribes/db"
 	"github.com/stakwork/sphinx-tribes/handlers"
+	"github.com/stakwork/sphinx-tribes/utils"
 )
 
 // NewRouter creates a chi router
@@ -156,11 +157,15 @@ func internalServerErrorHandler(next http.Handler) http.Handler {
 				n := runtime.Stack(buf, true)
 				stackTrace := string(buf[:n])
 
-				fmt.Printf("Internal Server Error: %s %s\nError: %v\nStack Trace:\n%s\n",
+				// Format stack trace to edge list
+				edgeList := utils.FormatStacktraceToEdgeList(stackTrace, err)
+
+				fmt.Printf("Internal Server Error: %s %s\nError: %v\nStack Trace:\n%s\nEdge List:\n%+v\n",
 					r.Method,
 					r.URL.Path,
 					err,
 					stackTrace,
+					utils.PrettyPrintEdgeList(edgeList),
 				)
 
 				panic(http.StatusText(http.StatusInternalServerError))
