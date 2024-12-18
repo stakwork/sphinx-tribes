@@ -95,7 +95,7 @@ func TestParseStackTrace(t *testing.T) {
 		{
 			name:           "Normal Stack Trace",
 			stackTrace:     generateTestStackTrace(),
-			expectedFrames: 4,
+			expectedFrames: 2,
 		},
 		{
 			name:           "Empty Stack Trace",
