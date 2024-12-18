@@ -265,6 +265,9 @@ func parseStackTrace(stackTrace string) []string {
 			frames = append(frames, line)
 		}
 	}
+	if len(frames) > 1 {
+			return frames[2:]
+	}
 	return frames
 }
 

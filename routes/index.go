@@ -219,7 +219,7 @@ func internalServerErrorHandler(next http.Handler) http.Handler {
 					}
 				}()
 
-				panic(http.StatusText(http.StatusInternalServerError))
+				http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
 			}
 		}()
 
