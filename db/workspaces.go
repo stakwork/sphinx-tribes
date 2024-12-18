@@ -741,11 +741,11 @@ func (db database) ProcessReversePayments(paymentId uint) error {
 		log.Println("DepositAmount =====", depositAmount)
 
 		var withdrawalAmount uint
-		tx.Model(&NewPaymentHistory{}).Where("workspace_uuid = ?", workspace_uuid).Where("status = ?", true).Where("payment_type != ?", "deposit").Select("SUM(amount)").Row().Scan(&withdrawalAmount)
+		tx.Model(&NewPaymentHistory{}).Where("workspace_uuid = ?", workspace_uuid).Where("status = ?", true).Where("payment_type = ?", "withdraw").Select("SUM(amount)").Row().Scan(&withdrawalAmount)
 
 		log.Println("WithdrawalAmount =====", withdrawalAmount)
 
-		if withdrawalAmount > depositAmount {
+		if withdrawalAmount >= depositAmount {
 			tx.Rollback()
 			return errors.New("cannot perform this reversal")
 		}
@@ -792,6 +792,8 @@ func (db database) ProcessReversePayments(paymentId uint) error {
 	}).Error; err != nil {
 		tx.Rollback()
 	}
+
+	log.Println("Reversed Payment Successfully =====", paymentId)
 
 	return tx.Commit().Error
 }
