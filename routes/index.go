@@ -163,7 +163,7 @@ func internalServerErrorHandler(next http.Handler) http.Handler {
 					stackTrace,
 				)
 
-				http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
+				panic(http.StatusText(http.StatusInternalServerError))
 			}
 		}()
 
