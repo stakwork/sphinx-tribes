@@ -61,6 +61,7 @@ require (
 	github.com/onsi/gomega v1.26.0 // indirect
 	github.com/robfig/cron v1.2.0
 	github.com/urfave/negroni v1.0.0 // indirect
+	github.com/xhd2015/xgo/runtime v1.0.52 // indirect
 	golang.org/x/exp v0.0.0-20230315142452-642cacee5cc0 // indirect
 	gopkg.in/go-playground/assert.v1 v1.2.1 // indirect
 )
