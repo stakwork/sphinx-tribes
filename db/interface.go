@@ -202,6 +202,7 @@ type Database interface {
 	GetFeatureBrief(featureUuid string) (string, error)
 	GetTicketsByPhaseUUID(featureUUID string, phaseUUID string) ([]Tickets, error)
 	AddChat(chat *Chat) (Chat, error)
+	UpdateChat(chat *Chat) (Chat, error)
 	GetChatByChatID(chatID string) (Chat, error)
 	AddChatMessage(message *ChatMessage) (ChatMessage, error)
 	UpdateChatMessage(message *ChatMessage) (ChatMessage, error)

@@ -24,6 +24,31 @@ func (db database) AddChat(chat *Chat) (Chat, error) {
 	return *chat, nil
 }
 
+func (db database) UpdateChat(chat *Chat) (Chat, error) {
+	if chat.ID == "" {
+		return Chat{}, errors.New("chat ID is required")
+	}
+
+	var existingChat Chat
+	if err := db.db.First(&existingChat, "id = ?", chat.ID).Error; err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return Chat{}, fmt.Errorf("chat not found")
+		}
+		return Chat{}, fmt.Errorf("failed to fetch chat: %w", err)
+	}
+
+	if chat.Title != "" {
+		existingChat.Title = chat.Title
+	}
+	existingChat.UpdatedAt = time.Now()
+
+	if err := db.db.Save(&existingChat).Error; err != nil {
+		return Chat{}, fmt.Errorf("failed to update chat: %w", err)
+	}
+
+	return existingChat, nil
+}
+
 func (db database) GetChatByChatID(chatID string) (Chat, error) {
 	var chat Chat
 	result := db.db.Where("id = ?", chatID).First(&chat)
