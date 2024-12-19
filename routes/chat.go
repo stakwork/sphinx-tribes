@@ -19,6 +19,7 @@ func ChatRoutes() chi.Router {
 		r.Use(auth.PubKeyContext)
 		r.Get("/", chatHandler.GetChat)
 		r.Post("/", chatHandler.CreateChat)
+		r.Put("/{chat_id}", chatHandler.UpdateChat)
 		r.Post("/send", chatHandler.SendMessage)
 		r.Get("/history/{uuid}", chatHandler.GetChatHistory)
 	})
