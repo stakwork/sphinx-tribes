@@ -27,6 +27,7 @@ var MemeUrl string
 var RelayAuthKey string
 var RelayNodeKey string
 var SuperAdmins []string = []string{""}
+var LogLevel string
 
 // these are constants for the store
 var InvoiceList = "INVOICELIST"
@@ -67,6 +68,7 @@ func InitConfig() {
 	V2BotUrl = os.Getenv("V2_BOT_URL")
 	V2BotToken = os.Getenv("V2_BOT_TOKEN")
 	FfWebsocket = os.Getenv("FF_WEBSOCKET") == "true"
+	LogLevel = os.Getenv("LOG_LEVEL")
 
 	// Add to super admins
 	SuperAdmins = StripSuperAdmins(AdminStrings)
@@ -134,6 +136,10 @@ func InitConfig() {
 
 	if JarvisToken == "" {
 		JarvisToken = ""
+	}
+
+	if LogLevel == "" {
+		LogLevel = "DEBUG"
 	}
 }
 
