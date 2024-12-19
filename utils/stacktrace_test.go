@@ -25,12 +25,14 @@ func TestFormatStacktraceToEdgeList(t *testing.T) {
 		name           string
 		stackTrace     string
 		err            interface{}
+		state          string
 		expectedChecks func(t *testing.T, edgeList EdgeList)
 	}{
 		{
 			name:       "Basic Error Scenario",
 			stackTrace: generateTestStackTrace(),
 			err:        fmt.Errorf("test error"),
+			state:      "Error Variables:\ntest error",
 			expectedChecks: func(t *testing.T, edgeList EdgeList) {
 				assert.NotNil(t, edgeList)
 				assert.Greater(t, len(edgeList.EdgeList), 0)
@@ -40,6 +42,12 @@ func TestFormatStacktraceToEdgeList(t *testing.T) {
 				assert.NotNil(t, generatedByEdge)
 				assert.Equal(t, "Report", generatedByEdge.Source.NodeType)
 				assert.Equal(t, "Application", generatedByEdge.Targets[0].NodeType)
+
+				// Verify error message contains state information
+				reportNode := generatedByEdge.Source
+				reportData, ok := reportNode.NodeData.(ReportNodeData)
+				assert.True(t, ok)
+				assert.Contains(t, reportData.Errors, "Variable State:")
 
 				// Check HAS edges
 				hasEdges := findEdgesByType(edgeList, "HAS")
@@ -62,6 +70,7 @@ func TestFormatStacktraceToEdgeList(t *testing.T) {
 			name:       "Nil Error Scenario",
 			stackTrace: generateTestStackTrace(),
 			err:        nil,
+			state:      "Error Variables:\n<nil>",
 			expectedChecks: func(t *testing.T, edgeList EdgeList) {
 				assert.NotNil(t, edgeList)
 				assert.Greater(t, len(edgeList.EdgeList), 0)
@@ -71,6 +80,7 @@ func TestFormatStacktraceToEdgeList(t *testing.T) {
 			name:       "Complex Error Scenario",
 			stackTrace: generateTestStackTrace(),
 			err:        struct{ message string }{"complex error"},
+			state:      "Error Variables:\n{message:complex error}",
 			expectedChecks: func(t *testing.T, edgeList EdgeList) {
 				assert.NotNil(t, edgeList)
 				assert.Greater(t, len(edgeList.EdgeList), 0)
@@ -80,7 +90,7 @@ func TestFormatStacktraceToEdgeList(t *testing.T) {
 
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {
-			edgeList := FormatStacktraceToEdgeList(tc.stackTrace, tc.err)
+			edgeList := FormatStacktraceToEdgeList(tc.stackTrace, tc.err, tc.state)
 			tc.expectedChecks(t, edgeList)
 		})
 	}
@@ -119,6 +129,42 @@ another random line`,
 	}
 }
 
+func TestCaptureVariableState(t *testing.T) {
+	testCases := []struct {
+		name          string
+		err           interface{}
+		expectedState string
+	}{
+		{
+			name:          "Simple Error",
+			err:           fmt.Errorf("test error"),
+			expectedState: "Error Variables:\ntest error",
+		},
+		{
+			name:          "Map Error",
+			err:           map[string]interface{}{"key": "value"},
+			expectedState: "Error Variables:\n{\n  \"key\": \"value\"\n}",
+		},
+		{
+			name:          "Nil Error",
+			err:           nil,
+			expectedState: "Error Variables:\n<nil>",
+		},
+		{
+			name:          "Struct Error",
+			err:           struct{ msg string }{"test"},
+			expectedState: "Error Variables:\n{msg:test}",
+		},
+	}
+
+	for _, tc := range testCases {
+		t.Run(tc.name, func(t *testing.T) {
+			state := CaptureVariableState(tc.err)
+			assert.Equal(t, tc.expectedState, state)
+		})
+	}
+}
+
 func TestGenerateReportID(t *testing.T) {
 
 	reportID1 := generateReportID()
@@ -151,23 +197,24 @@ func findEdgesByType(edgeList EdgeList, edgeType string) []Edge {
 func BenchmarkFormatStacktraceToEdgeList(b *testing.B) {
 	stackTrace := generateTestStackTrace()
 	err := fmt.Errorf("benchmark error")
+	state := CaptureVariableState(err)
 
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
-		FormatStacktraceToEdgeList(stackTrace, err)
+		FormatStacktraceToEdgeList(stackTrace, err, state)
 	}
 }
 
 func TestLongStackTraceHandling(t *testing.T) {
-
 	var longStackTraceBuilder strings.Builder
 	for i := 0; i < 1000; i++ {
 		longStackTraceBuilder.WriteString(fmt.Sprintf("goroutine %d [running]:\n", i))
 		longStackTraceBuilder.WriteString(fmt.Sprintf("/path/to/long/stack/trace%d.go:%d +0x26\n", i, i))
 	}
 	longStackTrace := longStackTraceBuilder.String()
+	state := "Error Variables:\nStress Test Error"
 
-	edgeList := FormatStacktraceToEdgeList(longStackTrace, "Stress Test Error")
+	edgeList := FormatStacktraceToEdgeList(longStackTrace, "Stress Test Error", state)
 	assert.NotNil(t, edgeList)
 	assert.Greater(t, len(edgeList.EdgeList), 0)
 }
@@ -175,14 +222,14 @@ func TestLongStackTraceHandling(t *testing.T) {
 func TestConcurrentStackTraceFormatting(t *testing.T) {
 	stackTrace := generateTestStackTrace()
 	err := fmt.Errorf("concurrent error")
+	state := CaptureVariableState(err)
 
 	concurrentRuns := 100
-
 	results := make(chan EdgeList, concurrentRuns)
 
 	for i := 0; i < concurrentRuns; i++ {
 		go func() {
-			results <- FormatStacktraceToEdgeList(stackTrace, err)
+			results <- FormatStacktraceToEdgeList(stackTrace, err, state)
 		}()
 	}
 
