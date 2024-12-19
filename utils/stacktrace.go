@@ -72,7 +72,24 @@ type TraceNodeData struct {
 	TraceUUID  string `json:"trace_uuid"`
 }
 
-func FormatStacktraceToEdgeList(stackTrace string, err interface{}) EdgeList {
+func CaptureVariableState(err interface{}) string {
+
+	errStr := fmt.Sprintf("%+v", err)
+
+	var state strings.Builder
+	state.WriteString("Error Variables:\n")
+
+	if m, ok := err.(map[string]interface{}); ok {
+		b, _ := json.MarshalIndent(m, "", "  ")
+		state.Write(b)
+	} else {
+		state.WriteString(errStr)
+	}
+
+	return state.String()
+}
+
+func FormatStacktraceToEdgeList(stackTrace string, err interface{}, state string) EdgeList {
 
 	now := time.Now().Unix()
 
@@ -81,7 +98,7 @@ func FormatStacktraceToEdgeList(stackTrace string, err interface{}) EdgeList {
 
 	reportNodeData := ReportNodeData{
 		AppType:        nil,
-		Errors:         fmt.Sprintf("%v", err),
+		Errors:         fmt.Sprintf("%v\nVariable State:\n%s", err, state),
 		ReleaseStage:   "development",
 		ReportID:       reportID,
 		SeverityReason: "unhandledException",
@@ -266,7 +283,7 @@ func parseStackTrace(stackTrace string) []string {
 		}
 	}
 	if len(frames) > 1 {
-			return frames[2:]
+		return frames[2:]
 	}
 	return frames
 }
