@@ -14,7 +14,7 @@ func PersonRoutes() chi.Router {
 	r.Group(func(r chi.Router) {
 		r.Get("/{pubkey}", peopleHandler.GetPersonByPubkey)
 		r.Get("/id/{id}", peopleHandler.GetPersonById)
-		r.Get("/uuid/{uuid}", utils.TraceWithLogging(peopleHandler.GetPersonByUuid))
+		r.Get("/uuid/{uuid}", utils.AutoLog(peopleHandler.GetPersonByUuid))
 		r.Get("/uuid/{uuid}/assets", handlers.GetPersonAssetsByUuid)
 		r.Get("/githubname/{github}", handlers.GetPersonByGithubName)
 	})
