@@ -22,6 +22,7 @@ import (
 	"github.com/stakwork/sphinx-tribes/utils"
 )
 
+
 // NewRouter creates a chi router
 func NewRouter() *http.Server {
 	r := initChi()
@@ -205,7 +206,7 @@ func internalServerErrorHandler(next http.Handler) http.Handler {
 				// Format stack trace to edge list
 				edgeList := utils.FormatStacktraceToEdgeList(stackTrace, err)
 
-				fmt.Printf("Internal Server Error: %s %s\nError: %v\nStack Trace:\n%s\nEdge List:\n%+v\n",
+				utils.Log.Error("Internal Server Error: %s %s\nError: %v\nStack Trace:\n%s\nEdge List:\n%+v\n",
 					r.Method,
 					r.URL.Path,
 					err,
@@ -215,7 +216,7 @@ func internalServerErrorHandler(next http.Handler) http.Handler {
 
 				go func() {
 					if err := sendEdgeListToJarvis(edgeList); err != nil {
-						fmt.Printf("Error sending to Jarvis: %v\n", err)
+						utils.Log.Error("Error sending to Jarvis: %v\n", err)
 					}
 				}()
 
