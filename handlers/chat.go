@@ -96,6 +96,62 @@ func (ch *ChatHandler) CreateChat(w http.ResponseWriter, r *http.Request) {
 	})
 }
 
+func (ch *ChatHandler) UpdateChat(w http.ResponseWriter, r *http.Request) {
+	chatID := chi.URLParam(r, "chat_id")
+	if chatID == "" {
+		w.WriteHeader(http.StatusBadRequest)
+		json.NewEncoder(w).Encode(ChatResponse{
+			Success: false,
+			Message: "Chat ID is required",
+		})
+		return
+	}
+
+	var request struct {
+		WorkspaceID string `json:"workspaceId"`
+		Title       string `json:"title"`
+	}
+
+	if err := json.NewDecoder(r.Body).Decode(&request); err != nil {
+		w.WriteHeader(http.StatusBadRequest)
+		json.NewEncoder(w).Encode(ChatResponse{
+			Success: false,
+			Message: "Invalid request body",
+		})
+		return
+	}
+
+	existingChat, err := ch.db.GetChatByChatID(chatID)
+	if err != nil {
+		w.WriteHeader(http.StatusNotFound)
+		json.NewEncoder(w).Encode(ChatResponse{
+			Success: false,
+			Message: "Chat not found",
+		})
+		return
+	}
+
+	updatedChat := existingChat
+	updatedChat.Title = request.Title
+
+	updatedChat, err = ch.db.UpdateChat(&updatedChat)
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		json.NewEncoder(w).Encode(ChatResponse{
+			Success: false,
+			Message: fmt.Sprintf("Failed to update chat: %v", err),
+		})
+		return
+	}
+
+	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode(ChatResponse{
+		Success: true,
+		Message: "Chat updated successfully",
+		Data:    updatedChat,
+	})
+}
+
 func (ch *ChatHandler) SendMessage(w http.ResponseWriter, r *http.Request) {
 
 	var request struct {
