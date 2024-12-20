@@ -20,7 +20,7 @@ func ConfirmIdentityTweet(username string) (string, error) {
 	if err != nil {
 		return "", err
 	}
-	// fmt.Println("tok", token)
+	Log.Info("Twitter verification token: %s", token)
 	pubkey, err := auth.VerifyArbitrary(token, "Sphinx Verification")
 	return pubkey, err
 }
