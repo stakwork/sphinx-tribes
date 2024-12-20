@@ -201,14 +201,17 @@ func internalServerErrorHandler(next http.Handler) http.Handler {
 				n := runtime.Stack(buf, true)
 				stackTrace := string(buf[:n])
 
-				// Format stack trace to edge list
-				edgeList := utils.FormatStacktraceToEdgeList(stackTrace, err)
+				state := utils.CaptureVariableState(err)
 
-				utils.Log.Error("Internal Server Error: %s %s\nError: %v\nStack Trace:\n%s\nEdge List:\n%+v\n",
+				// Format stack trace to edge list
+				edgeList := utils.FormatStacktraceToEdgeList(stackTrace, err, state)
+
+				utils.Log.Error("Internal Server Error: %s %s\nError: %v\nStack Trace:\n%s\nVariable State:\n%s\nEdge List:\n%+v\n",
 					r.Method,
 					r.URL.Path,
 					err,
 					stackTrace,
+					state,
 					utils.PrettyPrintEdgeList(edgeList),
 				)
 
