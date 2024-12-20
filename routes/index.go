@@ -22,7 +22,6 @@ import (
 	"github.com/stakwork/sphinx-tribes/utils"
 )
 
-
 // NewRouter creates a chi router
 func NewRouter() *http.Server {
 	r := initChi()
@@ -108,12 +107,11 @@ func NewRouter() *http.Server {
 	server := &http.Server{Addr: ":" + PORT, Handler: r}
 
 	go func() {
-		fmt.Println("Listening on port " + PORT)
+		utils.Log.Info("Listening on port %s", PORT)
 		if err := server.ListenAndServe(); err != nil {
-			fmt.Println("server err:", err.Error())
+			utils.Log.Error("server err: %s", err.Error())
 		}
 	}()
-
 	return server
 }
 
@@ -150,7 +148,7 @@ func getFromAuth(path string) (*extractResponse, error) {
 
 func sendEdgeListToJarvis(edgeList utils.EdgeList) error {
 	if config.JarvisUrl == "" || config.JarvisToken == "" {
-		fmt.Println("Jarvis configuration not found, skipping error reporting")
+		utils.Log.Info("Jarvis configuration not found, skipping error reporting")
 		return nil
 	}
 
@@ -158,13 +156,13 @@ func sendEdgeListToJarvis(edgeList utils.EdgeList) error {
 
 	jsonData, err := json.Marshal(edgeList)
 	if err != nil {
-		fmt.Printf("Failed to marshal edge list: %v\n", err)
+		utils.Log.Error("Failed to marshal edge list: %v", err)
 		return nil
 	}
 
 	req, err := http.NewRequest("POST", jarvisURL, bytes.NewBuffer(jsonData))
 	if err != nil {
-		fmt.Printf("Failed to create Jarvis request: %v\n", err)
+		utils.Log.Error("Failed to create Jarvis request: %v", err)
 		return nil
 	}
 
@@ -177,13 +175,13 @@ func sendEdgeListToJarvis(edgeList utils.EdgeList) error {
 
 	resp, err := client.Do(req)
 	if err != nil {
-		fmt.Printf("Failed to send error to Jarvis: %v\n", err)
+		utils.Log.Error("Failed to send error to Jarvis: %v", err)
 		return err
 	}
 	defer resp.Body.Close()
 
 	if resp.StatusCode >= 200 && resp.StatusCode < 300 {
-		fmt.Println("Successfully sent error to Jarvis")
+		utils.Log.Info("Successfully sent error to Jarvis")
 		return nil
 	}
 
