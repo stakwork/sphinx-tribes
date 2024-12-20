@@ -1,9 +1,11 @@
 package utils
 
 import (
+	"github.com/google/uuid"
 	"log"
 	"os"
 	"strings"
+	"sync"
 )
 
 type Logger struct {
@@ -13,6 +15,8 @@ type Logger struct {
 	debugLogger   *log.Logger
 	machineLogger *log.Logger
 	logLevel      string
+	mu            sync.Mutex
+	requestUUID   string
 }
 
 var Log = Logger{
@@ -24,32 +28,54 @@ var Log = Logger{
 	logLevel:      strings.ToUpper(os.Getenv("LOG_LEVEL")),
 }
 
-func (l *Logger) Machine(format string, v ...interface{}) {
-	if l.logLevel == "MACHINE" {
-		l.machineLogger.Printf(format, v...)
+func (l *Logger) SetRequestUUID() {
+	l.mu.Lock()
+	defer l.mu.Unlock()
+	l.requestUUID = uuid.NewString()
+}
+
+func (l *Logger) ClearRequestUUID() {
+	l.mu.Lock()
+	defer l.mu.Unlock()
+	l.requestUUID = ""
+}
+
+func (l *Logger) logWithPrefix(logger *log.Logger, format string, v ...interface{}) {
+	l.mu.Lock()
+
+	requestUUID := l.requestUUID
+	l.mu.Unlock()
+	logger.Printf("["+requestUUID+"] "+format, v...)
+}
+
+func (l *Logger) Info(format string, v ...interface{}) {
+	l.SetRequestUUID()
+	defer l.ClearRequestUUID()
+	if l.logLevel == "MACHINE" || l.logLevel == "DEBUG" || l.logLevel == "INFO" {
+		l.logWithPrefix(l.infoLogger, format, v...)
 	}
 }
 
 func (l *Logger) Debug(format string, v ...interface{}) {
+	l.SetRequestUUID()
+	defer l.ClearRequestUUID()
 	if l.logLevel == "MACHINE" || l.logLevel == "DEBUG" {
-		l.debugLogger.Printf(format, v...)
-	}
-}
-
-func (l *Logger) Info(format string, v ...interface{}) {
-	if l.logLevel == "MACHINE" || l.logLevel == "DEBUG" || l.logLevel == "INFO" {
-		l.infoLogger.Printf(format, v...)
+		l.logWithPrefix(l.debugLogger, format, v...)
 	}
 }
 
 func (l *Logger) Warning(format string, v ...interface{}) {
+	l.SetRequestUUID()
+	defer l.ClearRequestUUID()
 	if l.logLevel == "MACHINE" || l.logLevel == "DEBUG" || l.logLevel == "INFO" || l.logLevel == "WARNING" {
-		l.warningLogger.Printf(format, v...)
+		l.logWithPrefix(l.warningLogger, format, v...)
 	}
 }
 
 func (l *Logger) Error(format string, v ...interface{}) {
+	l.SetRequestUUID()
+	defer l.ClearRequestUUID()
 	if l.logLevel == "MACHINE" || l.logLevel == "DEBUG" || l.logLevel == "INFO" || l.logLevel == "WARNING" || l.logLevel == "ERROR" {
-		l.errorLogger.Printf(format, v...)
+		l.logWithPrefix(l.errorLogger, format, v...)
 	}
 }
