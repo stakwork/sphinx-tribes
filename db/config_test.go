@@ -248,3 +248,140 @@ func TestProcessUpdateTicketsWithoutGroup(t *testing.T) {
 	assert.Equal(t, ticket.AuthorID, &ticketAuthorID)
 	assert.Equal(t, ticket.Author, &ticketAuthor)
 }
+
+func TestGetRolesMap(t *testing.T) {
+
+	originalRoles := ConfigBountyRoles
+	defer func() {
+
+		ConfigBountyRoles = originalRoles
+	}()
+	tests := []struct {
+		name     string
+		roles    []BountyRoles
+		expected map[string]string
+	}{
+		{
+			name: "Basic Functionality: Standard Input",
+			roles: []BountyRoles{
+				{Name: "ADD BOUNTY"},
+				{Name: "UPDATE BOUNTY"},
+				{Name: "DELETE BOUNTY"},
+			},
+			expected: map[string]string{
+				"ADD BOUNTY":    "ADD BOUNTY",
+				"UPDATE BOUNTY": "UPDATE BOUNTY",
+				"DELETE BOUNTY": "DELETE BOUNTY",
+			},
+		},
+		{
+			name:     "Edge Case: Empty Input",
+			roles:    []BountyRoles{},
+			expected: map[string]string{},
+		},
+		{
+			name: "Edge Case: Single Role",
+			roles: []BountyRoles{
+				{Name: "ADD BOUNTY"},
+			},
+			expected: map[string]string{
+				"ADD BOUNTY": "ADD BOUNTY",
+			},
+		},
+		{
+			name: "Edge Case: Duplicate Role Names",
+			roles: []BountyRoles{
+				{Name: "ADD BOUNTY"},
+				{Name: "ADD BOUNTY"},
+			},
+			expected: map[string]string{
+				"ADD BOUNTY": "ADD BOUNTY",
+			},
+		},
+		{
+			name: "Special Case: Role Names with Special Characters",
+			roles: []BountyRoles{
+				{Name: "ROLE@SPECIAL"},
+				{Name: "ROLE#TEST"},
+				{Name: "ROLE!ADMIN"},
+			},
+			expected: map[string]string{
+				"ROLE@SPECIAL": "ROLE@SPECIAL",
+				"ROLE#TEST":    "ROLE#TEST",
+				"ROLE!ADMIN":   "ROLE!ADMIN",
+			},
+		},
+		{
+			name: "Special Case: Role Names with Spaces",
+			roles: []BountyRoles{
+				{Name: "ADD USER ROLE"},
+				{Name: "MANAGE USER ROLE"},
+			},
+			expected: map[string]string{
+				"ADD USER ROLE":    "ADD USER ROLE",
+				"MANAGE USER ROLE": "MANAGE USER ROLE",
+			},
+		},
+		{
+			name:     "Error Condition: Nil Input",
+			roles:    nil,
+			expected: map[string]string{},
+		},
+		{
+			name: "Performance and Scale: Large Number of Roles",
+			roles: func() []BountyRoles {
+				roles := make([]BountyRoles, 1000)
+				for i := 0; i < 1000; i++ {
+					roles[i] = BountyRoles{Name: fmt.Sprintf("ROLE_%d", i)}
+				}
+				return roles
+			}(),
+			expected: func() map[string]string {
+				expected := make(map[string]string)
+				for i := 0; i < 1000; i++ {
+					roleName := fmt.Sprintf("ROLE_%d", i)
+					expected[roleName] = roleName
+				}
+				return expected
+			}(),
+		},
+		{
+			name: "Special Case: Role Names with Unicode Characters",
+			roles: []BountyRoles{
+				{Name: "管理员角色"},
+				{Name: "用户角色"},
+			},
+			expected: map[string]string{
+				"管理员角色": "管理员角色",
+				"用户角色":  "用户角色",
+			},
+		},
+		{
+			name: "Special Case: Role Names with Numeric Characters",
+			roles: []BountyRoles{
+				{Name: "ROLE_123"},
+				{Name: "ROLE_456"},
+			},
+			expected: map[string]string{
+				"ROLE_123": "ROLE_123",
+				"ROLE_456": "ROLE_456",
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+
+			ConfigBountyRoles = tt.roles
+			result := GetRolesMap()
+			assert.Equal(t, tt.expected, result, "Maps should be equal")
+			assert.Equal(t, len(tt.expected), len(result), "Map lengths should match")
+			if tt.roles != nil {
+				for _, role := range tt.roles {
+					mappedRole, exists := result[role.Name]
+					assert.True(t, exists, "Role should exist in map")
+					assert.Equal(t, role.Name, mappedRole, "Role should be mapped to itself")
+				}
+			}
+		})
+	}
+}
