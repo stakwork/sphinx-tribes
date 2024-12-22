@@ -68,7 +68,7 @@ func InitConfig() {
 	V2BotUrl = os.Getenv("V2_BOT_URL")
 	V2BotToken = os.Getenv("V2_BOT_TOKEN")
 	FfWebsocket = os.Getenv("FF_WEBSOCKET") == "true"
-	LogLevel = os.Getenv("LOG_LEVEL")
+	LogLevel = strings.ToUpper(os.Getenv("LOG_LEVEL"))
 
 	// Add to super admins
 	SuperAdmins = StripSuperAdmins(AdminStrings)
