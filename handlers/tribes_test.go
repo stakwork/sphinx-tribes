@@ -964,4 +964,87 @@ func TestGenerateBudgetInvoice(t *testing.T) {
 			assert.Equal(t, "example_invoice", response.Response.Invoice, "The invoice in the response should match the mock")
 		}
 	})
+
+	t.Run("Should test V1 payment path with valid request", func(t *testing.T) {
+
+		ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			w.WriteHeader(http.StatusOK)
+			json.NewEncoder(w).Encode(invoiceResponse)
+		}))
+		defer ts.Close()
+
+		config.RelayUrl = ts.URL
+		config.IsV2Payment = false
+		config.RelayAuthKey = "test_auth_key"
+		reqBody := db.BudgetInvoiceRequest{
+			Amount:        userAmount,
+			SenderPubKey:  person.OwnerPubKey,
+			PaymentType:   "deposit",
+			WorkspaceUuid: "workspace_uuid_1",
+		}
+		bodyBytes, err := json.Marshal(reqBody)
+		assert.NoError(t, err)
+		req, err := http.NewRequestWithContext(authorizedCtx, http.MethodPost, "/budgetinvoices", bytes.NewBuffer(bodyBytes))
+		assert.NoError(t, err)
+		req.Header.Set("Content-Type", "application/json")
+		rr := httptest.NewRecorder()
+		handler := http.HandlerFunc(tHandler.GenerateBudgetInvoice)
+		handler.ServeHTTP(rr, req)
+		assert.Equal(t, http.StatusOK, rr.Code)
+		var response db.InvoiceResponse
+		err = json.Unmarshal(rr.Body.Bytes(), &response)
+		assert.NoError(t, err)
+		assert.True(t, response.Succcess)
+		assert.Equal(t, "example_invoice", response.Response.Invoice)
+	})
+
+	t.Run("Should test V2 payment path with valid request", func(t *testing.T) {
+
+		ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			w.WriteHeader(http.StatusOK)
+			json.NewEncoder(w).Encode(map[string]interface{}{
+				"bolt11": "test_invoice_v2",
+			})
+		}))
+		defer ts.Close()
+
+		config.V2BotUrl = ts.URL
+		config.V2BotToken = "test_bot_token"
+		config.IsV2Payment = true
+		reqBody := db.BudgetInvoiceRequest{
+			Amount:        userAmount,
+			SenderPubKey:  person.OwnerPubKey,
+			PaymentType:   "deposit",
+			WorkspaceUuid: "workspace_uuid_2",
+		}
+		bodyBytes, err := json.Marshal(reqBody)
+		assert.NoError(t, err)
+		req, err := http.NewRequestWithContext(authorizedCtx, http.MethodPost, "/budgetinvoices", bytes.NewBuffer(bodyBytes))
+		assert.NoError(t, err)
+		req.Header.Set("Content-Type", "application/json")
+		rr := httptest.NewRecorder()
+		handler := http.HandlerFunc(tHandler.GenerateBudgetInvoice)
+		handler.ServeHTTP(rr, req)
+		assert.Equal(t, http.StatusOK, rr.Code)
+	})
+
+	t.Run("Should test empty request body", func(t *testing.T) {
+		req, err := http.NewRequestWithContext(authorizedCtx, http.MethodPost, "/budgetinvoices", bytes.NewBuffer([]byte{}))
+		assert.NoError(t, err)
+		req.Header.Set("Content-Type", "application/json")
+		rr := httptest.NewRecorder()
+		handler := http.HandlerFunc(tHandler.GenerateBudgetInvoice)
+		handler.ServeHTTP(rr, req)
+		assert.Equal(t, http.StatusNotAcceptable, rr.Code)
+	})
+
+	t.Run("Should test invalid JSON in request body", func(t *testing.T) {
+		req, err := http.NewRequestWithContext(authorizedCtx, http.MethodPost, "/budgetinvoices", bytes.NewBuffer([]byte("{invalid json}")))
+		assert.NoError(t, err)
+		req.Header.Set("Content-Type", "application/json")
+		rr := httptest.NewRecorder()
+		handler := http.HandlerFunc(tHandler.GenerateBudgetInvoice)
+		handler.ServeHTTP(rr, req)
+		assert.Equal(t, http.StatusNotAcceptable, rr.Code)
+	})
 }
