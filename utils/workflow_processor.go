@@ -3,6 +3,7 @@ package utils
 import (
 	"encoding/json"
 	"fmt"
+
 	"github.com/google/uuid"
 )
 
@@ -32,6 +33,6 @@ func lookupProcessingConfig(source string) error {
 }
 
 func processWithHandler(requestID string) (string, error) {
-	fmt.Println("Processing with default handler")
+	Log.Info("Processing with default handler")
 	return fmt.Sprintf("Processed with default handler, RequestID: %s", requestID), nil
 }
