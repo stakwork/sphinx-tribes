@@ -9,11 +9,15 @@ import (
 	"os"
 	"runtime"
 	"time"
+	"strings"
+	"context"
 
 	"github.com/go-chi/chi"
 	"github.com/go-chi/chi/middleware"
 	"github.com/rs/cors"
 	"github.com/urfave/negroni"
+	"github.com/xhd2015/xgo/runtime/core"
+	"github.com/xhd2015/xgo/runtime/trap"
 
 	"github.com/stakwork/sphinx-tribes/auth"
 	"github.com/stakwork/sphinx-tribes/config"
@@ -195,6 +199,18 @@ func internalServerErrorHandler(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		rr := negroni.NewResponseWriter(w)
 
+		trap.AddInterceptor(&trap.Interceptor{
+			Pre: func(ctx context.Context, f *core.FuncInfo, args core.Object, results core.Object) (interface{}, error) {
+				index := strings.Index(f.File, "sphinx-tribes")
+				trimmed := f.File
+				if index != -1 {
+					trimmed = f.File[index:]
+				}
+				logger.Log.Machine("%s:%d %s\n", trimmed, f.Line, f.Name)
+
+				return nil, nil
+			},
+		})
 		defer func() {
 			if err := recover(); err != nil {
 				// Get stack trace

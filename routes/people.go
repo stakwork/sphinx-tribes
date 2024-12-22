@@ -6,7 +6,6 @@ import (
 	"github.com/go-chi/chi"
 	"github.com/stakwork/sphinx-tribes/db"
 	"github.com/stakwork/sphinx-tribes/handlers"
-	"github.com/stakwork/sphinx-tribes/utils"
 )
 
 func PeopleRoutes() chi.Router {
@@ -15,10 +14,10 @@ func PeopleRoutes() chi.Router {
 
 	peopleHandler := handlers.NewPeopleHandler(db.DB)
 	r.Group(func(r chi.Router) {
-		r.Get("/", utils.AutoLog(peopleHandler.GetListedPeople))
-		r.Get("/search", utils.AutoLog(peopleHandler.GetPeopleBySearch))
-		r.Get("/posts", utils.AutoLog(handlers.GetListedPosts))
-		r.Get("/wanteds/assigned/{uuid}", utils.AutoLog(bountyHandler.GetPersonAssignedBounties))
+		r.Get("/", peopleHandler.GetListedPeople)
+		r.Get("/search", peopleHandler.GetPeopleBySearch)
+		r.Get("/posts", handlers.GetListedPosts)
+		r.Get("/wanteds/assigned/{uuid}", bountyHandler.GetPersonAssignedBounties)
 		r.Get("/wanteds/created/{uuid}", bountyHandler.GetPersonCreatedBounties)
 		r.Get("/wanteds/header", handlers.GetWantedsHeader)
 		r.Get("/short", handlers.GetPeopleShortList)
