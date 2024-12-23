@@ -6,6 +6,9 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"path/filepath"
+	"runtime"
+	"strconv"
 	"sync"
 )
 
@@ -20,11 +23,11 @@ type Logger struct {
 }
 
 var Log = Logger{
-	infoLogger:    log.New(os.Stdout, "INFO: ", log.Ldate|log.Ltime|log.Lshortfile),
-	warningLogger: log.New(os.Stdout, "WARNING: ", log.Ldate|log.Ltime|log.Lshortfile),
-	errorLogger:   log.New(os.Stderr, "ERROR: ", log.Ldate|log.Ltime|log.Lshortfile),
-	debugLogger:   log.New(os.Stdout, "DEBUG: ", log.Ldate|log.Ltime|log.Lshortfile),
-	machineLogger: log.New(os.Stdout, "MACHINE: ", log.Ldate|log.Ltime|log.Lshortfile),
+	infoLogger:    log.New(os.Stdout, "INFO: ", log.Ldate|log.Ltime),
+	warningLogger: log.New(os.Stdout, "WARNING: ", log.Ldate|log.Ltime),
+	errorLogger:   log.New(os.Stderr, "ERROR: ", log.Ldate|log.Ltime),
+	debugLogger:   log.New(os.Stdout, "DEBUG: ", log.Ldate|log.Ltime),
+	machineLogger: log.New(os.Stdout, "MACHINE: ", log.Ldate|log.Ltime),
 }
 
 func (l *Logger) SetRequestUUID(uuidString string) {
@@ -56,10 +59,24 @@ func (l *Logger) logWithPrefix(logger *log.Logger, format string, v ...interface
 	requestUUID := l.requestUUID
 	l.mu.Unlock()
 
+	var file string
+	var line int
+	var ok bool
+
+	// Use runtime.Caller with skip 3 to go to the caller of the method that called logWithPrefix
+	_, file, line, ok = runtime.Caller(2)
+	if !ok {
+		file = "???"
+		line = 0
+	}
+
+	shortFile := filepath.Base(file)
+	line_str := strconv.Itoa(line)
+
 	if requestUUID == "" {
-		logger.Printf(format, v...)
+		logger.Printf("["+shortFile+":"+line_str+"] "+format, v...)
 	} else {
-		logger.Printf("["+requestUUID+"] "+format, v...)
+		logger.Printf("["+shortFile+":"+line_str+"] ["+requestUUID+"] "+format, v...)
 	}
 }
 
