@@ -1,8 +1,7 @@
 package utils
 
 import (
-	"crypto/sha1"
-	"encoding/hex"
+	"github.com/google/uuid"
 	"github.com/stakwork/sphinx-tribes/config"
 	"log"
 	"net/http"
@@ -42,13 +41,7 @@ func (l *Logger) ClearRequestUUID() {
 
 func RouteBasedUUIDMiddleware(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-
-		routeIdentifier := r.Method + ":" + r.URL.Path
-
-		hash := sha1.New()
-		hash.Write([]byte(routeIdentifier))
-		uuid := hex.EncodeToString(hash.Sum(nil))
-
+		uuid := uuid.NewString()
 		Log.SetRequestUUID(uuid)
 
 		defer Log.ClearRequestUUID()
