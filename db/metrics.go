@@ -7,6 +7,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/stakwork/sphinx-tribes/logger"
 	"github.com/stakwork/sphinx-tribes/utils"
 )
 
@@ -24,7 +25,7 @@ func (db database) TotalPeopleByPeriod(r PaymentDateRange) int64 {
 	// convert timestamp string to int64
 	timestamp, err := utils.ConvertStringToInt(r.StartDate)
 	if err != nil {
-		utils.Log.Error("Error parsing date: %v", err)
+		logger.Log.Error("Error parsing date: %v", err)
 	}
 
 	// Convert the timestamp to a time.Time object

@@ -3,9 +3,10 @@ package db
 import (
 	"testing"
 	"time"
+	"fmt"
 
 	"github.com/google/uuid"
-	"github.com/stakwork/sphinx-tribes/utils"
+	"github.com/stakwork/sphinx-tribes/logger"
 	"github.com/stretchr/testify/assert"
 	"gorm.io/gorm"
 )
@@ -237,7 +238,7 @@ func TestProcessUpdateTicketsWithoutGroup(t *testing.T) {
 	// get ticket and assert that the ticket group is the same as the ticket uuid
 	ticket, err = TestDB.GetTicket(ticket.UUID.String())
 
-	utils.Log.Info("tickets: %v", tickets)
+	logger.Log.Info("tickets: %v", tickets)
 
 	ticketUuid := ticket.UUID
 	ticketAuthorID := "12345"
