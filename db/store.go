@@ -14,7 +14,7 @@ import (
 	"github.com/rs/xid"
 	"github.com/stakwork/sphinx-tribes/auth"
 	"github.com/stakwork/sphinx-tribes/config"
-	"github.com/stakwork/sphinx-tribes/utils"
+	"github.com/stakwork/sphinx-tribes/logger"
 )
 
 type StoreData struct {
@@ -172,7 +172,7 @@ func Verify(w http.ResponseWriter, r *http.Request) {
 	challenge := chi.URLParam(r, "challenge")
 	_, err := Store.GetChallengeCache(challenge)
 	if err != nil {
-		utils.Log.Error("challenge not found: %v", err)
+		logger.Log.Error("challenge not found: %v", err)
 		w.WriteHeader(http.StatusUnauthorized)
 		return
 	}
@@ -182,7 +182,7 @@ func Verify(w http.ResponseWriter, r *http.Request) {
 	r.Body.Close()
 	err = json.Unmarshal(body, &payload)
 	if err != nil {
-		utils.Log.Error("%v", err)
+		logger.Log.Error("%v", err)
 		w.WriteHeader(http.StatusNotAcceptable)
 		return
 	}
@@ -190,7 +190,7 @@ func Verify(w http.ResponseWriter, r *http.Request) {
 	payload.Pubkey = pubKeyFromAuth
 	marshalled, err := json.Marshal(payload)
 	if err != nil {
-		utils.Log.Error("payload unparseable: %v", err)
+		logger.Log.Error("payload unparseable: %v", err)
 		w.WriteHeader(http.StatusUnauthorized)
 		return
 	}
@@ -270,14 +270,14 @@ func PostSave(w http.ResponseWriter, r *http.Request) {
 	r.Body.Close()
 	err = json.Unmarshal(body, &save)
 	if err != nil {
-		utils.Log.Error("%v", err)
+		logger.Log.Error("%v", err)
 		w.WriteHeader(http.StatusNotAcceptable)
 		return
 	}
 
 	s, err := json.Marshal(save)
 	if err != nil {
-		utils.Log.Error("save payload unparseable: %v", err)
+		logger.Log.Error("save payload unparseable: %v", err)
 		w.WriteHeader(http.StatusUnauthorized)
 		return
 	}

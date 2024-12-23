@@ -13,7 +13,7 @@ import (
 	"github.com/google/go-github/v39/github"
 	"github.com/stakwork/sphinx-tribes/auth"
 	"github.com/stakwork/sphinx-tribes/db"
-	"github.com/stakwork/sphinx-tribes/utils"
+	"github.com/stakwork/sphinx-tribes/logger"
 	"golang.org/x/oauth2"
 )
 
@@ -28,7 +28,7 @@ func GetGithubIssue(w http.ResponseWriter, r *http.Request) {
 	}
 	issue, err := GetIssue(owner, repo, issueNum)
 	if err != nil {
-		utils.Log.Error("Github error: %v", err)
+		logger.Log.Error("Github error: %v", err)
 		w.WriteHeader(http.StatusNotFound)
 		return
 	}

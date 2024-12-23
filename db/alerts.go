@@ -10,7 +10,7 @@ import (
 	"os"
 	"strconv"
 
-	"github.com/stakwork/sphinx-tribes/utils"
+	"github.com/stakwork/sphinx-tribes/logger"
 )
 
 type Action struct {
@@ -37,7 +37,7 @@ func (db database) ProcessAlerts(p Person) {
 	alertTribeUuid := os.Getenv("ALERT_TRIBE_UUID")
 	botId := os.Getenv("ALERT_BOT_ID")
 	if relayUrl == "" || alertSecret == "" || alertTribeUuid == "" || botId == "" {
-		utils.Log.Info("Ticket alerts: ENV information not found")
+		logger.Log.Info("Ticket alerts: ENV information not found")
 		return
 	}
 
@@ -51,14 +51,14 @@ func (db database) ProcessAlerts(p Person) {
 
 	// Check that new ticket time exists
 	if p.NewTicketTime == 0 {
-		utils.Log.Info("Ticket alerts: New ticket time not found")
+		logger.Log.Info("Ticket alerts: New ticket time not found")
 		return
 	}
 
 	var issue PropertyMap = nil
 	wanteds, ok := p.Extras["wanted"].([]interface{})
 	if !ok {
-		utils.Log.Info("Ticket alerts: No tickets found for person")
+		logger.Log.Info("Ticket alerts: No tickets found for person")
 	}
 	for _, wanted := range wanteds {
 		w, ok2 := wanted.(map[string]interface{})
@@ -77,19 +77,19 @@ func (db database) ProcessAlerts(p Person) {
 	}
 
 	if issue == nil {
-		utils.Log.Info("Ticket alerts: No ticket identified with the correct timestamp")
+		logger.Log.Info("Ticket alerts: No ticket identified with the correct timestamp")
 	}
 
 	languages, ok4 := issue["codingLanguage"].([]interface{})
 	if !ok4 {
-		utils.Log.Info("Ticket alerts: No languages found in ticket")
+		logger.Log.Info("Ticket alerts: No languages found in ticket")
 		return
 	}
 
 	var err error
 	people, err := db.GetPeopleForNewTicket(languages)
 	if err != nil {
-		utils.Log.Error("Ticket alerts: DB query to get interested people failed: %v", err)
+		logger.Log.Error("Ticket alerts: DB query to get interested people failed: %v", err)
 		return
 	}
 
@@ -99,12 +99,12 @@ func (db database) ProcessAlerts(p Person) {
 		action.Pubkey = per.OwnerPubKey
 		buf, err := json.Marshal(action)
 		if err != nil {
-			utils.Log.Error("Ticket alerts: Unable to parse message into byte buffer: %v", err)
+			logger.Log.Error("Ticket alerts: Unable to parse message into byte buffer: %v", err)
 			return
 		}
 		request, err := http.NewRequest("POST", relayUrl, bytes.NewReader(buf))
 		if err != nil {
-			utils.Log.Error("Ticket alerts: Unable to create a request to send to relay: %v", err)
+			logger.Log.Error("Ticket alerts: Unable to create a request to send to relay: %v", err)
 			return
 		}
 
@@ -116,7 +116,7 @@ func (db database) ProcessAlerts(p Person) {
 		request.Header.Set("Content-Type", "application/json")
 		_, err = client.Do(request)
 		if err != nil {
-			utils.Log.Error("Ticket alerts: Unable to communicate request to relay: %v", err)
+			logger.Log.Error("Ticket alerts: Unable to communicate request to relay: %v", err)
 		}
 	}
 

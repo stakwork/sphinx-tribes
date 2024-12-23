@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"github.com/redis/go-redis/v9"
+	"github.com/stakwork/sphinx-tribes/logger"
 	"github.com/stakwork/sphinx-tribes/utils"
 )
 
@@ -29,27 +30,27 @@ func InitRedis() {
 		opt, err := redis.ParseURL(redisURL)
 		if err != nil {
 			RedisError = err
-			utils.Log.Error("REDIS URL CONNECTION ERROR === %v", err)
+			logger.Log.Error("REDIS URL CONNECTION ERROR === %v", err)
 		}
 		RedisClient = redis.NewClient(opt)
 	}
 	if err := RedisClient.Ping(ctx).Err(); err != nil {
 		RedisError = err
-		utils.Log.Error("Could Not Connect To Redis: %v", err)
+		logger.Log.Error("Could Not Connect To Redis: %v", err)
 	}
 }
 
 func SetValue(key string, value interface{}) {
 	err := RedisClient.Set(ctx, key, value, expireTime).Err()
 	if err != nil {
-		utils.Log.Error("REDIS SET ERROR: %v", err)
+		logger.Log.Error("REDIS SET ERROR: %v", err)
 	}
 }
 
 func GetValue(key string) string {
 	val, err := RedisClient.Get(ctx, key).Result()
 	if err != nil {
-		utils.Log.Error("REDIS GET ERROR: %v", err)
+		logger.Log.Error("REDIS GET ERROR: %v", err)
 	}
 
 	return val
@@ -59,7 +60,7 @@ func SetMap(key string, values map[string]interface{}) {
 	for k, v := range values {
 		err := RedisClient.HSet(ctx, key, k, v).Err()
 		if err != nil {
-			utils.Log.Error("REDIS SET MAP ERROR: %v", err)
+			logger.Log.Error("REDIS SET MAP ERROR: %v", err)
 		}
 	}
 	RedisClient.Expire(ctx, key, expireTime)

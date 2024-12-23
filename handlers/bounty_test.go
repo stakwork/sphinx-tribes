@@ -19,6 +19,7 @@ import (
 	"time"
 
 	"github.com/gorilla/websocket"
+	"github.com/stakwork/sphinx-tribes/logger"
 	"github.com/stakwork/sphinx-tribes/utils"
 
 	"github.com/go-chi/chi"
@@ -235,7 +236,7 @@ func TestCreateOrEditBounty(t *testing.T) {
 
 		json, err := json.Marshal(updatedBounty)
 		if err != nil {
-			utils.Log.Error("Could not marshal json data")
+			logger.Log.Error("Could not marshal json data")
 		}
 
 		req, err := http.NewRequestWithContext(ctx, http.MethodPost, "/", bytes.NewReader(json))
@@ -1242,7 +1243,7 @@ func MockNewWSServer(t *testing.T) (*httptest.Server, *websocket.Conn) {
 		upgrader.CheckOrigin = func(r *http.Request) bool { return true }
 		ws, err := upgrader.Upgrade(w, r, nil)
 		if err != nil {
-			utils.Log.Error("upgrade error: %v", err)
+			logger.Log.Error("upgrade error: %v", err)
 			return
 		}
 		defer ws.Close()
