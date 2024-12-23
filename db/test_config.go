@@ -77,3 +77,7 @@ func InitTestDB() {
 func CleanDB() {
 	TestDB.db.Exec("DELETE FROM people")
 }
+
+func DeleteAllChats() {
+	TestDB.db.Exec("DELETE FROM chats")
+}
