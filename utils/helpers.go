@@ -8,13 +8,14 @@ import (
 	"time"
 
 	decodepay "github.com/nbd-wtf/ln-decodepay"
+	"github.com/stakwork/sphinx-tribes/logger"
 )
 
 func GetRandomToken(length int) string {
 	randomBytes := make([]byte, 32)
 	_, err := rand.Read(randomBytes)
 	if err != nil {
-		Log.Error("Random token error: %v", err)
+		logger.Log.Error("Random token error: %v", err)
 	}
 	return base32.StdEncoding.EncodeToString(randomBytes)[:length]
 }
@@ -23,7 +24,7 @@ func ConvertStringToUint(number string) (uint, error) {
 	numberParse, err := strconv.ParseUint(number, 10, 32)
 
 	if err != nil {
-		Log.Error("could not parse string to uint: %v", err)
+		logger.Log.Error("could not parse string to uint: %v", err)
 		return 0, err
 	}
 
@@ -34,7 +35,7 @@ func ConvertStringToInt(number string) (int, error) {
 	numberParse, err := strconv.ParseInt(number, 10, 32)
 
 	if err != nil {
-		Log.Error("could not parse string to int: %v", err)
+		logger.Log.Error("could not parse string to int: %v", err)
 		return 0, err
 	}
 
@@ -45,7 +46,7 @@ func GetInvoiceAmount(paymentRequest string) uint {
 	decodedInvoice, err := decodepay.Decodepay(paymentRequest)
 
 	if err != nil {
-		Log.Error("Could not Decode Invoice: %v", err)
+		logger.Log.Error("Could not Decode Invoice: %v", err)
 		return 0
 	}
 	amountInt := decodedInvoice.MSatoshi / 1000
@@ -57,7 +58,7 @@ func GetInvoiceAmount(paymentRequest string) uint {
 func GetInvoiceExpired(paymentRequest string) bool {
 	decodedInvoice, err := decodepay.Decodepay(paymentRequest)
 	if err != nil {
-		Log.Error("Could not Decode Invoice: %v", err)
+		logger.Log.Error("Could not Decode Invoice: %v", err)
 		return false
 	}
 
@@ -82,7 +83,7 @@ func ConvertTimeToTimestamp(date string) int {
 
 	t, err := time.Parse(format, dateTouse)
 	if err != nil {
-		Log.Error("Parse string to timestamp: %v", err)
+		logger.Log.Error("Parse string to timestamp: %v", err)
 	} else {
 		return int(t.Unix())
 	}

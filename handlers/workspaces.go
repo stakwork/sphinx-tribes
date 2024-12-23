@@ -13,6 +13,7 @@ import (
 	"github.com/rs/xid"
 	"github.com/stakwork/sphinx-tribes/auth"
 	"github.com/stakwork/sphinx-tribes/db"
+	"github.com/stakwork/sphinx-tribes/logger"
 	"github.com/stakwork/sphinx-tribes/utils"
 	"gorm.io/gorm"
 )
@@ -46,7 +47,7 @@ func (oh *workspaceHandler) CreateOrEditWorkspace(w http.ResponseWriter, r *http
 	ctx := r.Context()
 	pubKeyFromAuth, _ := ctx.Value(auth.ContextKey).(string)
 	if pubKeyFromAuth == "" {
-		fmt.Println("[workspaces] no pubkey from auth")
+		logger.Log.Info("[workspaces] no pubkey from auth")
 		w.WriteHeader(http.StatusUnauthorized)
 		return
 	}
@@ -58,7 +59,7 @@ func (oh *workspaceHandler) CreateOrEditWorkspace(w http.ResponseWriter, r *http
 	err := json.Unmarshal(body, &workspace)
 
 	if err != nil {
-		fmt.Println("[workspaces] ", err)
+		logger.Log.Error("[workspaces] %v", err)
 		w.WriteHeader(http.StatusNotAcceptable)
 		return
 	}
@@ -66,14 +67,14 @@ func (oh *workspaceHandler) CreateOrEditWorkspace(w http.ResponseWriter, r *http
 	workspace.Name = strings.TrimSpace(workspace.Name)
 
 	if len(workspace.Name) == 0 || len(workspace.Name) > 20 {
-		fmt.Printf("[workspaces] invalid workspace name %s\n", workspace.Name)
+		logger.Log.Info("[workspaces] invalid workspace name %s", workspace.Name)
 		w.WriteHeader(http.StatusBadRequest)
 		json.NewEncoder(w).Encode("Error: workspace name must be present and should not exceed 20 character")
 		return
 	}
 
 	if len(workspace.Description) > 120 {
-		fmt.Printf("[workspaces] invalid workspace name %s\n", workspace.Description)
+		logger.Log.Info("[workspaces] invalid workspace name %s", workspace.Description)
 		w.WriteHeader(http.StatusBadRequest)
 		json.NewEncoder(w).Encode("Error: workspace description should not exceed 120 character")
 		return
@@ -82,9 +83,9 @@ func (oh *workspaceHandler) CreateOrEditWorkspace(w http.ResponseWriter, r *http
 	if pubKeyFromAuth != workspace.OwnerPubKey {
 		hasRole := db.UserHasAccess(pubKeyFromAuth, workspace.Uuid, db.EditOrg)
 		if !hasRole {
-			fmt.Println("[workspaces] mismatched pubkey")
-			fmt.Println("[workspaces] Auth pubkey:", pubKeyFromAuth)
-			fmt.Println("[workspaces] OwnerPubKey:", workspace.OwnerPubKey)
+			logger.Log.Info("[workspaces] mismatched pubkey")
+			logger.Log.Info("[workspaces] Auth pubkey: %s", pubKeyFromAuth)
+			logger.Log.Info("[workspaces] OwnerPubKey: %s", workspace.OwnerPubKey)
 			w.WriteHeader(http.StatusUnauthorized)
 			json.NewEncoder(w).Encode("Don't have access to Edit workspace")
 			return
@@ -96,7 +97,7 @@ func (oh *workspaceHandler) CreateOrEditWorkspace(w http.ResponseWriter, r *http
 	if err != nil {
 		w.WriteHeader(http.StatusBadRequest)
 		msg := fmt.Sprintf("Error: did not pass validation test : %s", err)
-		json.NewEncoder(w).Encode(msg)
+			json.NewEncoder(w).Encode(msg)
 		return
 	}
 
@@ -110,7 +111,7 @@ func (oh *workspaceHandler) CreateOrEditWorkspace(w http.ResponseWriter, r *http
 	existing := oh.db.GetWorkspaceByUuid(workspace.Uuid)
 	if existing.ID == 0 { // new!
 		if workspace.ID != 0 { // can't try to "edit" if it does not exist already
-			fmt.Println("[workspaces] cant edit non existing")
+			logger.Log.Info("[workspaces] cant edit non existing")
 			w.WriteHeader(http.StatusUnauthorized)
 			return
 		}
@@ -177,7 +178,7 @@ func (oh *workspaceHandler) CreateWorkspaceUser(w http.ResponseWriter, r *http.R
 	r.Body.Close()
 
 	if err != nil {
-		fmt.Println("[body] ", err)
+		logger.Log.Error("[body] %v", err)
 		w.WriteHeader(http.StatusNotAcceptable)
 		return
 	}
@@ -192,13 +193,13 @@ func (oh *workspaceHandler) CreateWorkspaceUser(w http.ResponseWriter, r *http.R
 	workspace := oh.db.GetWorkspaceByUuid(workspaceUser.WorkspaceUuid)
 
 	if err != nil {
-		fmt.Println("[workspaces] ", err)
+		logger.Log.Error("[workspaces] %v", err)
 		w.WriteHeader(http.StatusNotAcceptable)
 		return
 	}
 
 	if pubKeyFromAuth == "" {
-		fmt.Println("[workspaces] no pubkey from auth")
+		logger.Log.Info("[workspaces] no pubkey from auth")
 		w.WriteHeader(http.StatusUnauthorized)
 		return
 	}
@@ -264,7 +265,7 @@ func GetWorkspaceUser(w http.ResponseWriter, r *http.Request) {
 	pubKeyFromAuth, _ := ctx.Value(auth.ContextKey).(string)
 
 	if pubKeyFromAuth == "" {
-		fmt.Println("[workspaces] no pubkey from auth")
+		logger.Log.Info("[workspaces] no pubkey from auth")
 		w.WriteHeader(http.StatusUnauthorized)
 		return
 	}
@@ -293,7 +294,7 @@ func DeleteWorkspaceUser(w http.ResponseWriter, r *http.Request) {
 	r.Body.Close()
 
 	if err != nil {
-		fmt.Println("[body] ", err)
+		logger.Log.Error("[body] %v", err)
 		w.WriteHeader(http.StatusNotAcceptable)
 		return
 	}
@@ -305,13 +306,13 @@ func DeleteWorkspaceUser(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if err != nil {
-		fmt.Println("[workspaces]", err)
+		logger.Log.Error("[workspaces] %v", err)
 		w.WriteHeader(http.StatusNotAcceptable)
 		return
 	}
 
 	if pubKeyFromAuth == "" {
-		fmt.Println("[workspaces] no pubkey from auth")
+		logger.Log.Info("[workspaces] no pubkey from auth")
 		w.WriteHeader(http.StatusUnauthorized)
 		return
 	}
@@ -362,7 +363,7 @@ func (oh *workspaceHandler) AddUserRoles(w http.ResponseWriter, r *http.Request)
 	r.Body.Close()
 
 	if err != nil {
-		fmt.Println("[body] ", err)
+		logger.Log.Error("[body] %v", err)
 		w.WriteHeader(http.StatusNotAcceptable)
 		return
 	}
@@ -370,14 +371,14 @@ func (oh *workspaceHandler) AddUserRoles(w http.ResponseWriter, r *http.Request)
 	err = json.Unmarshal(body, &roles)
 
 	if err != nil {
-		fmt.Println("[workspaces]:", err)
+		logger.Log.Error("[workspaces]: %v", err)
 		w.WriteHeader(http.StatusNotAcceptable)
 		return
 	}
 
 	if pubKeyFromAuth == "" {
 		w.WriteHeader(http.StatusUnauthorized)
-		json.NewEncoder(w).Encode("no pubkey from auth")
+			json.NewEncoder(w).Encode("no pubkey from auth")
 		return
 	}
 
@@ -465,7 +466,7 @@ func GetUserWorkspaces(w http.ResponseWriter, r *http.Request) {
 	userId, _ := utils.ConvertStringToUint(userIdParam)
 
 	if userId == 0 {
-		fmt.Println("[workspaces] provide user id")
+		logger.Log.Info("[workspaces] provide user id")
 		w.WriteHeader(http.StatusNotAcceptable)
 		return
 	}
@@ -483,7 +484,7 @@ func (oh *workspaceHandler) GetUserDropdownWorkspaces(w http.ResponseWriter, r *
 	userId, _ := utils.ConvertStringToUint(userIdParam)
 
 	if userId == 0 {
-		fmt.Println("[workspaces] provide user id")
+		logger.Log.Info("[workspaces] provide user id")
 		w.WriteHeader(http.StatusNotAcceptable)
 		return
 	}
@@ -582,7 +583,7 @@ func (oh *workspaceHandler) GetWorkspaceBudget(w http.ResponseWriter, r *http.Re
 	uuid := chi.URLParam(r, "uuid")
 
 	if pubKeyFromAuth == "" {
-		fmt.Println("[workspaces] no pubkey from auth")
+		logger.Log.Info("[workspaces] no pubkey from auth")
 		w.WriteHeader(http.StatusUnauthorized)
 		return
 	}
@@ -628,7 +629,7 @@ func GetPaymentHistory(w http.ResponseWriter, r *http.Request) {
 	uuid := chi.URLParam(r, "uuid")
 
 	if pubKeyFromAuth == "" {
-		fmt.Println("[workspaces] no pubkey from auth")
+		logger.Log.Info("[workspaces] no pubkey from auth")
 		w.WriteHeader(http.StatusUnauthorized)
 		return
 	}
@@ -668,7 +669,7 @@ func UpdateWorkspacePendingPayments(w http.ResponseWriter, r *http.Request) {
 	workspace_uuid := chi.URLParam(r, "workspace_uuid")
 
 	if pubKeyFromAuth == "" {
-		fmt.Println("no pubkey from auth")
+		logger.Log.Info("no pubkey from auth")
 		w.WriteHeader(http.StatusUnauthorized)
 		return
 	}
@@ -722,7 +723,7 @@ func (oh *workspaceHandler) PollBudgetInvoices(w http.ResponseWriter, r *http.Re
 	uuid := chi.URLParam(r, "uuid")
 
 	if pubKeyFromAuth == "" {
-		fmt.Println("[workspaces] no pubkey from auth")
+		logger.Log.Info("[workspaces] no pubkey from auth")
 		w.WriteHeader(http.StatusUnauthorized)
 		return
 	}
@@ -760,7 +761,7 @@ func (oh *workspaceHandler) PollUserWorkspacesBudget(w http.ResponseWriter, r *h
 	pubKeyFromAuth, _ := ctx.Value(auth.ContextKey).(string)
 
 	if pubKeyFromAuth == "" {
-		fmt.Println("[workspaces] no pubkey from auth")
+		logger.Log.Info("[workspaces] no pubkey from auth")
 		w.WriteHeader(http.StatusUnauthorized)
 		return
 	}
@@ -807,7 +808,7 @@ func GetInvoicesCount(w http.ResponseWriter, r *http.Request) {
 	uuid := chi.URLParam(r, "uuid")
 
 	if pubKeyFromAuth == "" {
-		fmt.Println("[workspaces] no pubkey from auth")
+		logger.Log.Info("[workspaces] no pubkey from auth")
 		w.WriteHeader(http.StatusUnauthorized)
 		return
 	}
@@ -822,7 +823,7 @@ func GetAllUserInvoicesCount(w http.ResponseWriter, r *http.Request) {
 	pubKeyFromAuth, _ := ctx.Value(auth.ContextKey).(string)
 
 	if pubKeyFromAuth == "" {
-		fmt.Println("[workspaces] no pubkey from auth")
+		logger.Log.Info("[workspaces] no pubkey from auth")
 		w.WriteHeader(http.StatusUnauthorized)
 		return
 	}
@@ -843,7 +844,7 @@ func (oh *workspaceHandler) DeleteWorkspace(w http.ResponseWriter, r *http.Reque
 	uuid := chi.URLParam(r, "uuid")
 
 	if pubKeyFromAuth == "" {
-		fmt.Println("[workspaces] no pubkey from auth")
+		logger.Log.Info("[workspaces] no pubkey from auth")
 		w.WriteHeader(http.StatusUnauthorized)
 		return
 	}
@@ -851,7 +852,7 @@ func (oh *workspaceHandler) DeleteWorkspace(w http.ResponseWriter, r *http.Reque
 	workspace := oh.db.GetWorkspaceByUuid(uuid)
 	if pubKeyFromAuth != workspace.OwnerPubKey {
 		msg := "only workspace admin can delete an workspace"
-		fmt.Println("[workspaces]", msg)
+		logger.Log.Info("[workspaces] %s", msg)
 		w.WriteHeader(http.StatusUnauthorized)
 		json.NewEncoder(w).Encode(msg)
 		return
@@ -860,7 +861,7 @@ func (oh *workspaceHandler) DeleteWorkspace(w http.ResponseWriter, r *http.Reque
 	// Soft delete Workspace and delete user data
 	if err := oh.db.ProcessDeleteWorkspace(uuid); err != nil {
 		msg := "Error removing users from workspace"
-		fmt.Println(msg, err)
+		logger.Log.Error("%s: %v", msg, err)
 		w.WriteHeader(http.StatusInternalServerError)
 		json.NewEncoder(w).Encode(msg)
 		return
@@ -874,7 +875,7 @@ func (oh *workspaceHandler) UpdateWorkspace(w http.ResponseWriter, r *http.Reque
 	ctx := r.Context()
 	pubKeyFromAuth, _ := ctx.Value(auth.ContextKey).(string)
 	if pubKeyFromAuth == "" {
-		fmt.Println("[workspaces] no pubkey from auth")
+		logger.Log.Info("[workspaces] no pubkey from auth")
 		w.WriteHeader(http.StatusUnauthorized)
 		return
 	}
@@ -885,7 +886,7 @@ func (oh *workspaceHandler) UpdateWorkspace(w http.ResponseWriter, r *http.Reque
 	err := json.Unmarshal(body, &workspace)
 
 	if err != nil {
-		fmt.Println("[workspaces]", err)
+		logger.Log.Error("[workspaces] %v", err)
 		w.WriteHeader(http.StatusNotAcceptable)
 		return
 	}
@@ -893,9 +894,9 @@ func (oh *workspaceHandler) UpdateWorkspace(w http.ResponseWriter, r *http.Reque
 	if pubKeyFromAuth != workspace.OwnerPubKey {
 		hasRole := db.UserHasAccess(pubKeyFromAuth, workspace.Uuid, db.EditOrg)
 		if !hasRole {
-			fmt.Println("[workspaces] mismatched pubkey")
-			fmt.Println("Auth Pubkey:", pubKeyFromAuth)
-			fmt.Println("OwnerPubKey:", workspace.OwnerPubKey)
+			logger.Log.Info("[workspaces] mismatched pubkey")
+			logger.Log.Info("Auth Pubkey: %s", pubKeyFromAuth)
+			logger.Log.Info("OwnerPubKey: %s", workspace.OwnerPubKey)
 			w.WriteHeader(http.StatusUnauthorized)
 			json.NewEncoder(w).Encode("Don't have access to Edit workspace")
 			return
@@ -925,7 +926,7 @@ func (oh *workspaceHandler) CreateOrEditWorkspaceRepository(w http.ResponseWrite
 	ctx := r.Context()
 	pubKeyFromAuth, _ := ctx.Value(auth.ContextKey).(string)
 	if pubKeyFromAuth == "" {
-		fmt.Println("[workspaces] no pubkey from auth")
+		logger.Log.Info("[workspaces] no pubkey from auth")
 		w.WriteHeader(http.StatusUnauthorized)
 		return
 	}
@@ -936,7 +937,7 @@ func (oh *workspaceHandler) CreateOrEditWorkspaceRepository(w http.ResponseWrite
 	err := json.Unmarshal(body, &workspaceRepo)
 
 	if err != nil {
-		fmt.Println("[workspaces]", err)
+		logger.Log.Error("[workspaces] %v", err)
 		w.WriteHeader(http.StatusNotAcceptable)
 		return
 	}
@@ -985,7 +986,7 @@ func (oh *workspaceHandler) GetWorkspaceRepositorByWorkspaceUuid(w http.Response
 	ctx := r.Context()
 	pubKeyFromAuth, _ := ctx.Value(auth.ContextKey).(string)
 	if pubKeyFromAuth == "" {
-		fmt.Println("[workspaces] no pubkey from auth")
+		logger.Log.Info("[workspaces] no pubkey from auth")
 		w.WriteHeader(http.StatusUnauthorized)
 		return
 	}
@@ -1001,7 +1002,7 @@ func (oh *workspaceHandler) GetWorkspaceRepoByWorkspaceUuidAndRepoUuid(w http.Re
 	ctx := r.Context()
 	pubKeyFromAuth, _ := ctx.Value(auth.ContextKey).(string)
 	if pubKeyFromAuth == "" {
-		fmt.Println("[workspaces] no pubkey from auth")
+		logger.Log.Info("[workspaces] no pubkey from auth")
 		w.WriteHeader(http.StatusUnauthorized)
 		return
 	}
@@ -1010,7 +1011,7 @@ func (oh *workspaceHandler) GetWorkspaceRepoByWorkspaceUuidAndRepoUuid(w http.Re
 	uuid := chi.URLParam(r, "uuid")
 	WorkspaceRepository, err := oh.db.GetWorkspaceRepoByWorkspaceUuidAndRepoUuid(workspace_uuid, uuid)
 	if err != nil {
-		fmt.Println("[workspaces] workspace repository not found:", err)
+		logger.Log.Error("[workspaces] workspace repository not found: %v", err)
 		w.WriteHeader(http.StatusNotFound)
 		json.NewEncoder(w).Encode(map[string]string{"error": "Repository not found"})
 		return
@@ -1026,7 +1027,7 @@ func (oh *workspaceHandler) DeleteWorkspaceRepository(w http.ResponseWriter, r *
 	pubKeyFromAuth, _ := ctx.Value(auth.ContextKey).(string)
 
 	if pubKeyFromAuth == "" {
-		fmt.Println("[workspaces] no pubkey from auth")
+		logger.Log.Info("[workspaces] no pubkey from auth")
 		w.WriteHeader(http.StatusUnauthorized)
 		return
 	}
@@ -1044,7 +1045,7 @@ func (oh *workspaceHandler) GetFeaturesByWorkspaceUuid(w http.ResponseWriter, r 
 	ctx := r.Context()
 	pubKeyFromAuth, _ := ctx.Value(auth.ContextKey).(string)
 	if pubKeyFromAuth == "" {
-		fmt.Println("[workspaces] no pubkey from auth")
+		logger.Log.Info("[workspaces] no pubkey from auth")
 		w.WriteHeader(http.StatusUnauthorized)
 		return
 	}
@@ -1079,7 +1080,7 @@ func (oh *workspaceHandler) GetLastWithdrawal(w http.ResponseWriter, r *http.Req
 	ctx := r.Context()
 	pubKeyFromAuth, _ := ctx.Value(auth.ContextKey).(string)
 	if pubKeyFromAuth == "" {
-		fmt.Println("[workspaces] no pubkey from auth")
+		logger.Log.Info("[workspaces] no pubkey from auth")
 		w.WriteHeader(http.StatusUnauthorized)
 		return
 	}
@@ -1135,7 +1136,7 @@ func (oh *workspaceHandler) CreateOrEditWorkspaceCodeGraph(w http.ResponseWriter
 	ctx := r.Context()
 	pubKeyFromAuth, _ := ctx.Value(auth.ContextKey).(string)
 	if pubKeyFromAuth == "" {
-		fmt.Println("[workspaces] no pubkey from auth")
+		logger.Log.Info("[workspaces] no pubkey from auth")
 		w.WriteHeader(http.StatusUnauthorized)
 		return
 	}
@@ -1146,7 +1147,7 @@ func (oh *workspaceHandler) CreateOrEditWorkspaceCodeGraph(w http.ResponseWriter
 	err := json.Unmarshal(body, &codeGraph)
 
 	if err != nil {
-		fmt.Println("[workspaces]", err)
+		logger.Log.Error("[workspaces] %v", err)
 		w.WriteHeader(http.StatusNotAcceptable)
 		return
 	}
@@ -1186,7 +1187,7 @@ func (oh *workspaceHandler) GetWorkspaceCodeGraphByUUID(w http.ResponseWriter, r
 	ctx := r.Context()
 	pubKeyFromAuth, _ := ctx.Value(auth.ContextKey).(string)
 	if pubKeyFromAuth == "" {
-		fmt.Println("[workspaces] no pubkey from auth")
+		logger.Log.Info("[workspaces] no pubkey from auth")
 		w.WriteHeader(http.StatusUnauthorized)
 		return
 	}
@@ -1194,7 +1195,7 @@ func (oh *workspaceHandler) GetWorkspaceCodeGraphByUUID(w http.ResponseWriter, r
 	uuid := chi.URLParam(r, "uuid")
 	codeGraph, err := oh.db.GetCodeGraphByUUID(uuid)
 	if err != nil {
-		fmt.Println("[workspaces] code graph not found:", err)
+		logger.Log.Error("[workspaces] code graph not found: %v", err)
 		w.WriteHeader(http.StatusNotFound)
 		json.NewEncoder(w).Encode(map[string]string{"error": "Code graph not found"})
 		return
@@ -1209,7 +1210,7 @@ func (oh *workspaceHandler) GetCodeGraphsByWorkspaceUuid(w http.ResponseWriter, 
 	ctx := r.Context()
 	pubKeyFromAuth, _ := ctx.Value(auth.ContextKey).(string)
 	if pubKeyFromAuth == "" {
-		fmt.Println("[workspaces] no pubkey from auth")
+		logger.Log.Info("[workspaces] no pubkey from auth")
 		w.WriteHeader(http.StatusUnauthorized)
 		return
 	}
@@ -1231,7 +1232,7 @@ func (oh *workspaceHandler) DeleteWorkspaceCodeGraph(w http.ResponseWriter, r *h
 	pubKeyFromAuth, _ := ctx.Value(auth.ContextKey).(string)
 
 	if pubKeyFromAuth == "" {
-		fmt.Println("[workspaces] no pubkey from auth")
+		logger.Log.Info("[workspaces] no pubkey from auth")
 		w.WriteHeader(http.StatusUnauthorized)
 		return
 	}
