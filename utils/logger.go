@@ -1,8 +1,11 @@
 package utils
 
 import (
+	"crypto/sha1"
+	"encoding/hex"
 	"github.com/stakwork/sphinx-tribes/config"
 	"log"
+	"net/http"
 	"os"
 	"sync"
 )
@@ -35,6 +38,23 @@ func (l *Logger) ClearRequestUUID() {
 	l.mu.Lock()
 	defer l.mu.Unlock()
 	l.requestUUID = ""
+}
+
+func RouteBasedUUIDMiddleware(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+
+		routeIdentifier := r.Method + ":" + r.URL.Path
+
+		hash := sha1.New()
+		hash.Write([]byte(routeIdentifier))
+		uuid := hex.EncodeToString(hash.Sum(nil))
+
+		Log.SetRequestUUID(uuid)
+
+		defer Log.ClearRequestUUID()
+
+		next.ServeHTTP(w, r)
+	})
 }
 
 func (l *Logger) logWithPrefix(logger *log.Logger, format string, v ...interface{}) {
