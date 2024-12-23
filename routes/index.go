@@ -232,7 +232,7 @@ func initChi() *chi.Mux {
 	r.Use(middleware.RequestID)
 	r.Use(middleware.Logger)
 	r.Use(middleware.Recoverer)
-	r.Use(utils.RouteBasedUUIDMiddleware)
+	r.Use(logger.RouteBasedUUIDMiddleware)
 	r.Use(internalServerErrorHandler)
 	cors := cors.New(cors.Options{
 		AllowedOrigins:   []string{"*"},
