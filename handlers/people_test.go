@@ -359,11 +359,11 @@ func TestDeletePerson(t *testing.T) {
 
 	pHandler := NewPeopleHandler(db.TestDB)
 
-	t.Run("successful deletion", func(t *testing.T) {
+	t.Run("should successfully delete person", func(t *testing.T) {
 		rr := httptest.NewRecorder()
 		handler := http.HandlerFunc(pHandler.DeletePerson)
 		person := db.Person{
-			ID:           112,
+			ID:           uint(rand.Intn(1000)),
 			Uuid:         "person_112_uuid",
 			OwnerPubKey:  "person_112_pubkey",
 			OwnerAlias:   "owner",
@@ -393,6 +393,94 @@ func TestDeletePerson(t *testing.T) {
 
 		deletedPerson := db.TestDB.GetPerson(person.ID)
 		assert.Empty(t, deletedPerson)
+	})
+
+	t.Run("should return error if id is invalid", func(t *testing.T) {
+		rr := httptest.NewRecorder()
+		handler := http.HandlerFunc(pHandler.DeletePerson)
+
+		rctx := chi.NewRouteContext()
+		rctx.URLParams.Add("id", "invalid")
+
+		ctx := context.WithValue(context.Background(), chi.RouteCtxKey, rctx)
+		ctx = context.WithValue(ctx, auth.ContextKey, "test-pubkey")
+
+		req, err := http.NewRequestWithContext(ctx, http.MethodDelete, "/person", nil)
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		handler.ServeHTTP(rr, req)
+		assert.Equal(t, http.StatusUnauthorized, rr.Code)
+	})
+
+	t.Run("should return error if id is zero", func(t *testing.T) {
+		rr := httptest.NewRecorder()
+		handler := http.HandlerFunc(pHandler.DeletePerson)
+
+		rctx := chi.NewRouteContext()
+		rctx.URLParams.Add("id", "0")
+
+		ctx := context.WithValue(context.Background(), chi.RouteCtxKey, rctx)
+		ctx = context.WithValue(ctx, auth.ContextKey, "test-pubkey")
+
+		req, err := http.NewRequestWithContext(ctx, http.MethodDelete, "/person", nil)
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		handler.ServeHTTP(rr, req)
+		assert.Equal(t, http.StatusUnauthorized, rr.Code)
+	})
+
+	t.Run("should return error if person does not exist", func(t *testing.T) {
+		rr := httptest.NewRecorder()
+		handler := http.HandlerFunc(pHandler.DeletePerson)
+
+		rctx := chi.NewRouteContext()
+		rctx.URLParams.Add("id", "999")
+
+		ctx := context.WithValue(context.Background(), chi.RouteCtxKey, rctx)
+		ctx = context.WithValue(ctx, auth.ContextKey, "test-pubkey")
+
+		req, err := http.NewRequestWithContext(ctx, http.MethodDelete, "/person", nil)
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		handler.ServeHTTP(rr, req)
+		assert.Equal(t, http.StatusUnauthorized, rr.Code)
+	})
+
+	t.Run("should return error if pubkey does not match", func(t *testing.T) {
+		rr := httptest.NewRecorder()
+		handler := http.HandlerFunc(pHandler.DeletePerson)
+
+		person := db.Person{
+			ID:           uint(rand.Intn(1000)),
+			OwnerPubKey:  "different-pubkey",
+			OwnerAlias:   "test-user",
+			UniqueName:   "test-user",
+			Description:  "test description",
+			Tags:         pq.StringArray{},
+			Extras:       db.PropertyMap{},
+			GithubIssues: db.PropertyMap{},
+		}
+		db.TestDB.CreateOrEditPerson(person)
+
+		rctx := chi.NewRouteContext()
+		rctx.URLParams.Add("id", strconv.Itoa(int(person.ID)))
+
+		ctx := context.WithValue(context.Background(), chi.RouteCtxKey, rctx)
+		ctx = context.WithValue(ctx, auth.ContextKey, "test-pubkey")
+
+		req, err := http.NewRequestWithContext(ctx, http.MethodDelete, "/person", nil)
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		handler.ServeHTTP(rr, req)
+		assert.Equal(t, http.StatusUnauthorized, rr.Code)
 	})
 }
 
