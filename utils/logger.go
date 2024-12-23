@@ -3,7 +3,8 @@ package utils
 import (
 	"log"
 	"os"
-	"strings"
+
+	"github.com/stakwork/sphinx-tribes/config"
 )
 
 type Logger struct {
@@ -12,7 +13,6 @@ type Logger struct {
 	errorLogger   *log.Logger
 	debugLogger   *log.Logger
 	machineLogger *log.Logger
-	logLevel      string
 }
 
 var Log = Logger{
@@ -21,35 +21,34 @@ var Log = Logger{
 	errorLogger:   log.New(os.Stderr, "ERROR: ", log.Ldate|log.Ltime|log.Lshortfile),
 	debugLogger:   log.New(os.Stdout, "DEBUG: ", log.Ldate|log.Ltime|log.Lshortfile),
 	machineLogger: log.New(os.Stdout, "MACHINE: ", log.Ldate|log.Ltime|log.Lshortfile),
-	logLevel:      strings.ToUpper(os.Getenv("LOG_LEVEL")),
 }
 
 func (l *Logger) Machine(format string, v ...interface{}) {
-	if l.logLevel == "MACHINE" {
+	if config.LogLevel == "MACHINE" {
 		l.machineLogger.Printf(format, v...)
 	}
 }
 
 func (l *Logger) Debug(format string, v ...interface{}) {
-	if l.logLevel == "MACHINE" || l.logLevel == "DEBUG" {
+	if config.LogLevel == "MACHINE" || config.LogLevel == "DEBUG" {
 		l.debugLogger.Printf(format, v...)
 	}
 }
 
 func (l *Logger) Info(format string, v ...interface{}) {
-	if l.logLevel == "MACHINE" || l.logLevel == "DEBUG" || l.logLevel == "INFO" {
+	if config.LogLevel == "MACHINE" || config.LogLevel == "DEBUG" || config.LogLevel == "INFO" {
 		l.infoLogger.Printf(format, v...)
 	}
 }
 
 func (l *Logger) Warning(format string, v ...interface{}) {
-	if l.logLevel == "MACHINE" || l.logLevel == "DEBUG" || l.logLevel == "INFO" || l.logLevel == "WARNING" {
+	if config.LogLevel == "MACHINE" || config.LogLevel == "DEBUG" || config.LogLevel == "INFO" || config.LogLevel == "WARNING" {
 		l.warningLogger.Printf(format, v...)
 	}
 }
 
 func (l *Logger) Error(format string, v ...interface{}) {
-	if l.logLevel == "MACHINE" || l.logLevel == "DEBUG" || l.logLevel == "INFO" || l.logLevel == "WARNING" || l.logLevel == "ERROR" {
+	if config.LogLevel == "MACHINE" || config.LogLevel == "DEBUG" || config.LogLevel == "INFO" || config.LogLevel == "WARNING" || config.LogLevel == "ERROR" {
 		l.errorLogger.Printf(format, v...)
 	}
 }
