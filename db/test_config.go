@@ -4,6 +4,7 @@ import (
 	"fmt"
 
 	"github.com/rs/xid"
+	"github.com/stakwork/sphinx-tribes/logger"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 )
@@ -35,7 +36,7 @@ func InitTestDB() {
 
 	TestDB.db = db
 
-	fmt.Println("DB CONNECTED")
+	logger.Log.Info("DB CONNECTED")
 
 	// migrate table changes
 	db.AutoMigrate(&Tribe{})
@@ -75,4 +76,8 @@ func InitTestDB() {
 
 func CleanDB() {
 	TestDB.db.Exec("DELETE FROM people")
+}
+
+func DeleteAllChats() {
+	TestDB.db.Exec("DELETE FROM chats")
 }

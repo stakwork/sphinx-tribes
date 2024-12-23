@@ -16,6 +16,7 @@ import (
 	"github.com/stakwork/sphinx-tribes/auth"
 	"github.com/stakwork/sphinx-tribes/config"
 	"github.com/stakwork/sphinx-tribes/db"
+	"github.com/stakwork/sphinx-tribes/logger"
 )
 
 func MemeImageUpload(w http.ResponseWriter, r *http.Request) {
@@ -23,7 +24,7 @@ func MemeImageUpload(w http.ResponseWriter, r *http.Request) {
 	pubKeyFromAuth, _ := ctx.Value(auth.ContextKey).(string)
 
 	if pubKeyFromAuth == "" {
-		fmt.Println("no pubkey from auth")
+		logger.Log.Info("no pubkey from auth")
 		w.WriteHeader(http.StatusUnauthorized)
 		return
 	}
@@ -61,7 +62,7 @@ func MemeImageUpload(w http.ResponseWriter, r *http.Request) {
 
 	if mErr != "" {
 		msg := "Could not get meme token"
-		fmt.Println(msg, mErr)
+		logger.Log.Error("%s: %s", msg, mErr)
 		w.WriteHeader(http.StatusNoContent)
 		json.NewEncoder(w).Encode(msg)
 	} else {
@@ -73,7 +74,7 @@ func MemeImageUpload(w http.ResponseWriter, r *http.Request) {
 		}
 
 		msg := "Could not get meme image"
-		fmt.Println(msg)
+		logger.Log.Error("%s", msg)
 		w.WriteHeader(http.StatusNoContent)
 		json.NewEncoder(w).Encode(msg)
 	}
@@ -204,7 +205,7 @@ func UploadMemeImage(file multipart.File, token string, fileName string) (error,
 	DeleteFileFromUploadsFolder(filePath)
 
 	if err != nil {
-		fmt.Println("meme request Error ===", err)
+		logger.Log.Error("meme request Error: %v", err)
 		return err, ""
 	}
 
@@ -234,7 +235,7 @@ func DeleteFileFromUploadsFolder(filePath string) {
 
 func CreateUploadsDirectory(dirName string) {
 	if _, err := os.Open(dirName); os.IsNotExist(err) {
-		fmt.Println("The directory named", dirName, "does not exist")
+		logger.Log.Info("The directory named %s does not exist", dirName)
 		os.Mkdir(dirName, 0755)
 	}
 }

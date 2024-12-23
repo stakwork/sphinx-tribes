@@ -14,6 +14,7 @@ import (
 	"github.com/stakwork/sphinx-tribes/auth"
 	"github.com/stakwork/sphinx-tribes/config"
 	"github.com/stakwork/sphinx-tribes/db"
+	"github.com/stakwork/sphinx-tribes/logger"
 	"github.com/stakwork/sphinx-tribes/utils"
 )
 
@@ -91,7 +92,7 @@ func PutTribeStats(w http.ResponseWriter, r *http.Request) {
 	r.Body.Close()
 	err = json.Unmarshal(body, &tribe)
 	if err != nil {
-		fmt.Println(err)
+		logger.Log.Error("%v", err)
 		w.WriteHeader(http.StatusNotAcceptable)
 		return
 	}
@@ -103,7 +104,7 @@ func PutTribeStats(w http.ResponseWriter, r *http.Request) {
 
 	extractedPubkey, err := auth.VerifyTribeUUID(tribe.UUID, false)
 	if err != nil {
-		fmt.Println(err)
+		logger.Log.Error("%v", err)
 		w.WriteHeader(http.StatusUnauthorized)
 		return
 	}
@@ -139,7 +140,7 @@ func (th *tribeHandler) DeleteTribe(w http.ResponseWriter, r *http.Request) {
 
 	extractedPubkey, err := th.verifyTribeUUID(uuid, false)
 	if err != nil {
-		fmt.Println(err)
+		logger.Log.Error("%v", err)
 		w.WriteHeader(http.StatusUnauthorized)
 		return
 	}
@@ -214,13 +215,13 @@ func (th *tribeHandler) CreateOrEditTribe(w http.ResponseWriter, r *http.Request
 	r.Body.Close()
 	err = json.Unmarshal(body, &tribe)
 	if err != nil {
-		fmt.Println(err)
+		logger.Log.Error("%v", err)
 		w.WriteHeader(http.StatusNotAcceptable)
 		return
 	}
 
 	if tribe.UUID == "" {
-		fmt.Println("createOrEditTribe no uuid")
+		logger.Log.Info("createOrEditTribe no uuid")
 		w.WriteHeader(http.StatusUnauthorized)
 		return
 	}
@@ -229,7 +230,7 @@ func (th *tribeHandler) CreateOrEditTribe(w http.ResponseWriter, r *http.Request
 
 	extractedPubkey, err := th.verifyTribeUUID(tribe.UUID, false)
 	if err != nil {
-		fmt.Println("extract UUID error", err)
+		logger.Log.Error("extract UUID error: %v", err)
 		w.WriteHeader(http.StatusUnauthorized)
 		return
 	}
@@ -238,7 +239,7 @@ func (th *tribeHandler) CreateOrEditTribe(w http.ResponseWriter, r *http.Request
 		tribe.Created = &now
 	} else { // IF PUBKEY IN CONTEXT, MUST AUTH!
 		if pubKeyFromAuth != extractedPubkey {
-			fmt.Println("createOrEditTribe pubkeys dont match")
+			logger.Log.Info("createOrEditTribe pubkeys dont match")
 			w.WriteHeader(http.StatusUnauthorized)
 			return
 		}
@@ -249,9 +250,9 @@ func (th *tribeHandler) CreateOrEditTribe(w http.ResponseWriter, r *http.Request
 		tribe.UniqueName, _ = th.tribeUniqueNameFromName(tribe.Name)
 	} else { // already exists! make sure it's owned
 		if existing.OwnerPubKey != extractedPubkey {
-			fmt.Println("createOrEditTribe tribe.ownerPubKey not match")
-			fmt.Println(existing.OwnerPubKey)
-			fmt.Println(extractedPubkey)
+			logger.Log.Info("createOrEditTribe tribe.ownerPubKey not match")
+			logger.Log.Info("existing owner: %s", existing.OwnerPubKey)
+			logger.Log.Info("extracted pubkey: %s", extractedPubkey)
 			w.WriteHeader(http.StatusUnauthorized)
 			return
 		}
@@ -263,7 +264,7 @@ func (th *tribeHandler) CreateOrEditTribe(w http.ResponseWriter, r *http.Request
 
 	_, err = th.db.CreateOrEditTribe(tribe)
 	if err != nil {
-		fmt.Println("=> ERR createOrEditTribe", err)
+		logger.Log.Error("=> ERR createOrEditTribe: %v", err)
 		w.WriteHeader(http.StatusBadRequest)
 		return
 	}
@@ -284,7 +285,7 @@ func PutTribeActivity(w http.ResponseWriter, r *http.Request) {
 
 	extractedPubkey, err := auth.VerifyTribeUUID(uuid, false)
 	if err != nil {
-		fmt.Println(err)
+		logger.Log.Error("%v", err)
 		w.WriteHeader(http.StatusUnauthorized)
 		return
 	}
@@ -316,7 +317,7 @@ func (th *tribeHandler) SetTribePreview(w http.ResponseWriter, r *http.Request) 
 
 	extractedPubkey, err := th.verifyTribeUUID(uuid, false)
 	if err != nil {
-		fmt.Println(err)
+		logger.Log.Error("%v", err)
 		w.WriteHeader(http.StatusUnauthorized)
 		return
 	}
@@ -350,7 +351,7 @@ func CreateLeaderBoard(w http.ResponseWriter, r *http.Request) {
 
 	extractedPubkey, err := auth.VerifyTribeUUID(uuid, false)
 	if err != nil {
-		fmt.Println(err)
+		logger.Log.Error("%v", err)
 		w.WriteHeader(http.StatusUnauthorized)
 		return
 	}
@@ -365,7 +366,7 @@ func CreateLeaderBoard(w http.ResponseWriter, r *http.Request) {
 	r.Body.Close()
 	err = json.Unmarshal(body, &leaderBoard)
 	if err != nil {
-		fmt.Println(err)
+		logger.Log.Error("%v", err)
 		w.WriteHeader(http.StatusNotAcceptable)
 		return
 	}
@@ -373,7 +374,7 @@ func CreateLeaderBoard(w http.ResponseWriter, r *http.Request) {
 	_, err = db.DB.CreateLeaderBoard(uuid, leaderBoard)
 
 	if err != nil {
-		fmt.Println(err)
+		logger.Log.Error("%v", err)
 		w.WriteHeader(http.StatusNotAcceptable)
 		return
 	}
@@ -421,7 +422,7 @@ func UpdateLeaderBoard(w http.ResponseWriter, r *http.Request) {
 
 	extractedPubkey, err := auth.VerifyTribeUUID(uuid, false)
 	if err != nil {
-		fmt.Println(err)
+		logger.Log.Error("%v", err)
 		w.WriteHeader(http.StatusUnauthorized)
 		return
 	}
@@ -438,7 +439,7 @@ func UpdateLeaderBoard(w http.ResponseWriter, r *http.Request) {
 	r.Body.Close()
 	err = json.Unmarshal(body, &leaderBoard)
 	if err != nil {
-		fmt.Println(err)
+		logger.Log.Error("%v", err)
 		w.WriteHeader(http.StatusNotAcceptable)
 		return
 	}
@@ -469,7 +470,7 @@ func GenerateInvoice(w http.ResponseWriter, r *http.Request) {
 	r.Body.Close()
 
 	if err != nil {
-		fmt.Println(err)
+		logger.Log.Error("%v", err)
 		w.WriteHeader(http.StatusNotAcceptable)
 		return
 	}
@@ -477,7 +478,7 @@ func GenerateInvoice(w http.ResponseWriter, r *http.Request) {
 	err = json.Unmarshal(body, &invoice)
 
 	if err != nil {
-		fmt.Println(err)
+		logger.Log.Error("%v", err)
 		w.WriteHeader(http.StatusNotAcceptable)
 		return
 	}
@@ -570,7 +571,7 @@ func (th *tribeHandler) GenerateV1BudgetInvoice(w http.ResponseWriter, r *http.R
 	r.Body.Close()
 
 	if err != nil {
-		fmt.Println(err)
+		logger.Log.Error("%v", err)
 		w.WriteHeader(http.StatusNotAcceptable)
 		return
 	}
@@ -578,7 +579,7 @@ func (th *tribeHandler) GenerateV1BudgetInvoice(w http.ResponseWriter, r *http.R
 	err = json.Unmarshal(body, &invoice)
 
 	if err != nil {
-		fmt.Println(err)
+		logger.Log.Error("%v", err)
 		w.WriteHeader(http.StatusNotAcceptable)
 		return
 	}
@@ -662,7 +663,7 @@ func (th *tribeHandler) GenerateV2BudgetInvoice(w http.ResponseWriter, r *http.R
 	r.Body.Close()
 
 	if err != nil {
-		fmt.Println(err)
+		logger.Log.Error("%v", err)
 		w.WriteHeader(http.StatusNotAcceptable)
 		return
 	}
@@ -670,7 +671,7 @@ func (th *tribeHandler) GenerateV2BudgetInvoice(w http.ResponseWriter, r *http.R
 	err = json.Unmarshal(body, &invoice)
 
 	if err != nil {
-		fmt.Println(err)
+		logger.Log.Error("%v", err)
 		w.WriteHeader(http.StatusNotAcceptable)
 		return
 	}
