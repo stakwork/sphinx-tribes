@@ -16,6 +16,7 @@ import (
 	"github.com/btcsuite/btcd/chaincfg/chainhash"
 	"github.com/form3tech-oss/jwt-go"
 	"github.com/stakwork/sphinx-tribes/config"
+	"github.com/stakwork/sphinx-tribes/logger"
 )
 
 var (
@@ -41,7 +42,7 @@ func PubKeyContext(next http.Handler) http.Handler {
 		}
 
 		if token == "" {
-			fmt.Println("[auth] no token")
+			logger.Log.Info("[auth] no token")
 			http.Error(w, http.StatusText(http.StatusUnauthorized), http.StatusUnauthorized)
 			return
 		}
@@ -52,13 +53,13 @@ func PubKeyContext(next http.Handler) http.Handler {
 			claims, err := DecodeJwt(token)
 
 			if err != nil {
-				fmt.Println("Failed to parse JWT")
+				logger.Log.Info("Failed to parse JWT")
 				http.Error(w, http.StatusText(http.StatusUnauthorized), http.StatusUnauthorized)
 				return
 			}
 
 			if claims.VerifyExpiresAt(time.Now().UnixNano(), true) {
-				fmt.Println("Token has expired")
+				logger.Log.Info("Token has expired")
 				http.Error(w, http.StatusText(http.StatusUnauthorized), http.StatusUnauthorized)
 				return
 			}
@@ -69,9 +70,9 @@ func PubKeyContext(next http.Handler) http.Handler {
 			pubkey, err := VerifyTribeUUID(token, true)
 
 			if pubkey == "" || err != nil {
-				fmt.Println("[auth] no pubkey || err != nil")
+				logger.Log.Info("[auth] no pubkey || err != nil")
 				if err != nil {
-					fmt.Println(err)
+					logger.Log.Error("%v", err)
 				}
 				http.Error(w, http.StatusText(http.StatusUnauthorized), http.StatusUnauthorized)
 				return
@@ -98,7 +99,7 @@ func PubKeyContextSuperAdmin(next http.Handler) http.Handler {
 		}
 
 		if token == "" {
-			fmt.Println("[auth] no token")
+			logger.Log.Info("[auth] no token")
 			http.Error(w, http.StatusText(http.StatusUnauthorized), http.StatusUnauthorized)
 			return
 		}
@@ -108,20 +109,20 @@ func PubKeyContextSuperAdmin(next http.Handler) http.Handler {
 			claims, err := DecodeJwt(token)
 
 			if err != nil {
-				fmt.Println("Failed to parse JWT")
+				logger.Log.Info("Failed to parse JWT")
 				http.Error(w, http.StatusText(http.StatusUnauthorized), http.StatusUnauthorized)
 				return
 			}
 
 			if claims.VerifyExpiresAt(time.Now().UnixNano(), true) {
-				fmt.Println("Token has expired")
+				logger.Log.Info("Token has expired")
 				http.Error(w, http.StatusText(http.StatusUnauthorized), http.StatusUnauthorized)
 				return
 			}
 
 			pubkey := fmt.Sprintf("%v", claims["pubkey"])
 			if !IsFreePass() && !AdminCheck(pubkey) {
-				fmt.Println("Not a super admin")
+				logger.Log.Info("Not a super admin")
 				http.Error(w, http.StatusText(http.StatusUnauthorized), http.StatusUnauthorized)
 				return
 			}
@@ -132,16 +133,16 @@ func PubKeyContextSuperAdmin(next http.Handler) http.Handler {
 			pubkey, err := VerifyTribeUUID(token, true)
 
 			if pubkey == "" || err != nil {
-				fmt.Println("[auth] no pubkey || err != nil")
+				logger.Log.Info("[auth] no pubkey || err != nil")
 				if err != nil {
-					fmt.Println(err)
+					logger.Log.Error("%v", err)
 				}
 				http.Error(w, http.StatusText(http.StatusUnauthorized), http.StatusUnauthorized)
 				return
 			}
 
 			if !IsFreePass() && !AdminCheck(pubkey) {
-				fmt.Println("Not a super admin : auth")
+				logger.Log.Info("Not a super admin : auth")
 				http.Error(w, http.StatusText(http.StatusUnauthorized), http.StatusUnauthorized)
 				return
 			}
@@ -164,13 +165,13 @@ func ConnectionCodeContext(next http.Handler) http.Handler {
 		token := r.Header.Get("token")
 
 		if token == "" {
-			fmt.Println("[auth] no token")
+			logger.Log.Info("[auth] no token")
 			http.Error(w, http.StatusText(http.StatusUnauthorized), http.StatusUnauthorized)
 			return
 		}
 
 		if token != config.Connection_Auth {
-			fmt.Println("Not a super admin : auth")
+			logger.Log.Info("Not a super admin : auth")
 			http.Error(w, http.StatusText(http.StatusUnauthorized), http.StatusUnauthorized)
 			return
 		}
@@ -186,7 +187,7 @@ func CypressContext(next http.Handler) http.Handler {
 			ctx := context.WithValue(r.Context(), ContextKey, "")
 			next.ServeHTTP(w, r.WithContext(ctx))
 		} else {
-			fmt.Println("Endpoint is for testing only : test endpoint")
+			logger.Log.Info("Endpoint is for testing only : test endpoint")
 			http.Error(w, http.StatusText(http.StatusUnauthorized), http.StatusUnauthorized)
 			return
 		}
@@ -226,12 +227,12 @@ func VerifyTribeUUID(uuid string, checkTimestamp bool) (string, error) {
 		// 5 MINUTE MAX
 		now := time.Now().Unix()
 		if int64(ts) < now-300 {
-			fmt.Println("TOO LATE!")
+			logger.Log.Info("TOO LATE!")
 			return "", errors.New("too late")
 		}
 
 		if int64(ts) > now {
-			fmt.Println("TOO EARLY!")
+			logger.Log.Info("TOO EARLY!")
 			return "", errors.New("too early")
 		}
 	}
@@ -263,7 +264,7 @@ func VerifyAndExtract(msg, sig []byte) (string, bool, error) {
 	// RecoverCompact both recovers the pubkey and validates the signature.
 	pubKey, valid, err := btcecdsa.RecoverCompact(sig, digest)
 	if err != nil {
-		fmt.Printf("ERR: %+v\n", err)
+		logger.Log.Error("ERR: %+v", err)
 		return "", false, err
 	}
 	pubKeyHex := hex.EncodeToString(pubKey.SerializeCompressed())
