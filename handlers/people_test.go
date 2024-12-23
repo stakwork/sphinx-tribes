@@ -7,7 +7,9 @@ import (
 	"math/rand"
 	"net/http"
 	"net/http/httptest"
+	"os"
 	"strconv"
+	"strings"
 	"testing"
 	"time"
 
@@ -699,4 +701,146 @@ func TestGetPersonByUuid(t *testing.T) {
 		assert.NoError(t, err)
 		assert.Empty(t, returnedPerson)
 	})
+}
+
+func TestPersonIsAdmin(t *testing.T) {
+
+	originalAdminPubkeys := os.Getenv("ADMIN_PUBKEYS")
+	defer os.Setenv("ADMIN_PUBKEYS", originalAdminPubkeys)
+
+	tests := []struct {
+		name         string
+		adminPubkeys string
+		pk           string
+		expected     bool
+	}{
+		{
+			name:         "Single Admin Key Match",
+			adminPubkeys: "admin1",
+			pk:           "admin1",
+			expected:     true,
+		},
+		{
+			name:         "Multiple Admin Keys Match",
+			adminPubkeys: "admin1,admin2,admin3",
+			pk:           "admin2",
+			expected:     true,
+		},
+		{
+			name:         "No Match with Single Admin Key",
+			adminPubkeys: "admin1",
+			pk:           "admin2",
+			expected:     false,
+		},
+		{
+			name:         "No Match with Multiple Admin Keys",
+			adminPubkeys: "admin1,admin2,admin3",
+			pk:           "admin4",
+			expected:     false,
+		},
+		{
+			name:         "Empty Admin Keys",
+			adminPubkeys: "",
+			pk:           "admin1",
+			expected:     false,
+		},
+		{
+			name:         "Empty Input Key",
+			adminPubkeys: "admin1,admin2",
+			pk:           "",
+			expected:     false,
+		},
+		{
+			name:         "Whitespace in Admin Keys",
+			adminPubkeys: " admin1 , admin2 ",
+			pk:           "admin1",
+			expected:     false,
+		},
+		{
+			name:         "Whitespace in Input Key",
+			adminPubkeys: "admin1,admin2",
+			pk:           " admin1 ",
+			expected:     false,
+		},
+		{
+			name:         "Null Input Key",
+			adminPubkeys: "admin1,admin2",
+			pk:           "",
+			expected:     false,
+		},
+		{
+			name:         "Non-String Input Key",
+			adminPubkeys: "admin1,admin2",
+			pk:           "123",
+			expected:     false,
+		},
+		{
+			name:         "Large Number of Admin Keys",
+			adminPubkeys: strings.Repeat("admin,", 999) + "admin999",
+			pk:           "admin999",
+			expected:     true,
+		},
+		{
+			name:         "Long Admin Key",
+			adminPubkeys: strings.Repeat("a", 1000),
+			pk:           strings.Repeat("a", 1000),
+			expected:     true,
+		},
+		{
+			name:         "Case Sensitivity",
+			adminPubkeys: "Admin1",
+			pk:           "admin1",
+			expected:     false,
+		},
+		{
+			name:         "Special Characters in Admin Keys",
+			adminPubkeys: "admin@1,admin#2",
+			pk:           "admin@1",
+			expected:     true,
+		},
+		{
+			name:         "Comma at the End of Admin Keys",
+			adminPubkeys: "admin1,admin2,",
+			pk:           "admin2",
+			expected:     true,
+		},
+		{
+			name:         "Duplicate Admin Keys",
+			adminPubkeys: "admin1,admin1,admin2",
+			pk:           "admin1",
+			expected:     true,
+		},
+		{
+			name:         "Empty String in Admin Keys",
+			adminPubkeys: "admin1,admin2",
+			pk:           "",
+			expected:     false,
+		},
+		{
+			name:         "Unicode Characters",
+			adminPubkeys: "admin🔑,adminKey",
+			pk:           "admin🔑",
+			expected:     true,
+		},
+		{
+			name:         "Very Long Input Key",
+			adminPubkeys: "admin1,admin2",
+			pk:           strings.Repeat("x", 10000),
+			expected:     false,
+		},
+		{
+			name:         "Malformed Admin Keys",
+			adminPubkeys: "admin1,\n,admin2",
+			pk:           "admin2",
+			expected:     true,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			os.Setenv("ADMIN_PUBKEYS", tt.adminPubkeys)
+			result := PersonIsAdmin(tt.pk)
+			assert.Equal(t, tt.expected, result, "Test case: %s", tt.name)
+		})
+	}
 }
