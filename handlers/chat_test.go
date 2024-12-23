@@ -4,11 +4,13 @@ import (
 	"bytes"
 	"context"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"net/http"
 	"net/http/httptest"
 	"net/url"
 	"testing"
+	"time"
 
 	"github.com/go-chi/chi"
 	"github.com/google/uuid"
@@ -20,6 +22,12 @@ type Chat struct {
 	ID          string `json:"id"`
 	WorkspaceID string `json:"workspaceId"`
 	Title       string `json:"title"`
+}
+
+type ChatRes struct {
+	Success bool        `json:"success"`
+	Message string      `json:"message"`
+	Data    interface{} `json:"data,omitempty"`
 }
 
 func TestUpdateChat(t *testing.T) {
@@ -314,4 +322,315 @@ func TestGetChat(t *testing.T) {
 		assert.True(t, ok)
 		assert.Equal(t, 100, len(responseChats))
 	})
+}
+
+func TestProcessChatResponse(t *testing.T) {
+	teardownSuite := SetupSuite(t)
+	defer teardownSuite(t)
+
+	handler := NewChatHandler(&http.Client{}, db.TestDB)
+
+	tests := []struct {
+		name           string
+		input          string
+		mockDBResponse *db.ChatMessage
+		mockDBError    error
+		mockWSResponse error
+		expectedStatus int
+		expectedBody   ChatResponse
+	}{
+		{
+			name: "Valid Input",
+			input: `{
+  			"value": {
+  				"chatId": "validChatId",
+  				"messageId": "validMessageId",
+  				"response": "This is a response",
+  				"sourceWebsocketId": "validWebsocketId"
+  			}
+  		}`,
+			mockDBResponse: &db.ChatMessage{
+				ID:        "generatedID",
+				ChatID:    "validChatId",
+				Message:   "This is a response",
+				Role:      "assistant",
+				Timestamp: time.Now(),
+				Status:    "sent",
+				Source:    "agent",
+			},
+			mockDBError:    nil,
+			mockWSResponse: nil,
+			expectedStatus: http.StatusOK,
+			expectedBody: ChatResponse{
+				Success: true,
+				Message: "Response processed successfully",
+				Data: &db.ChatMessage{
+					ID:        "generatedID",
+					ChatID:    "validChatId",
+					Message:   "This is a response",
+					Role:      "assistant",
+					Timestamp: time.Now(),
+					Status:    "sent",
+					Source:    "agent",
+				},
+			},
+		},
+		{
+			name: "Empty ChatID",
+			input: `{
+  			"value": {
+  				"chatId": "",
+  				"messageId": "validMessageId",
+  				"response": "This is a response",
+  				"sourceWebsocketId": "validWebsocketId"
+  			}
+  		}`,
+			expectedStatus: http.StatusBadRequest,
+			expectedBody: ChatResponse{
+				Success: false,
+				Message: "ChatID is required for message creation",
+			},
+		},
+		{
+			name: "Empty Response",
+			input: `{
+  			"value": {
+  				"chatId": "validChatId",
+  				"messageId": "validMessageId",
+  				"response": "",
+  				"sourceWebsocketId": "validWebsocketId"
+  			}
+  		}`,
+			mockDBResponse: &db.ChatMessage{
+				ID:        "generatedID",
+				ChatID:    "validChatId",
+				Message:   "",
+				Role:      "assistant",
+				Timestamp: time.Now(),
+				Status:    "sent",
+				Source:    "agent",
+			},
+			mockDBError:    nil,
+			mockWSResponse: nil,
+			expectedStatus: http.StatusOK,
+			expectedBody: ChatResponse{
+				Success: true,
+				Message: "Response processed successfully",
+				Data: &db.ChatMessage{
+					ID:        "generatedID",
+					ChatID:    "validChatId",
+					Message:   "",
+					Role:      "assistant",
+					Timestamp: time.Now(),
+					Status:    "sent",
+					Source:    "agent",
+				},
+			},
+		},
+		{
+			name: "Invalid JSON Format",
+			input: `{
+  			"value": "invalidJson"
+  		}`,
+			expectedStatus: http.StatusBadRequest,
+			expectedBody: ChatResponse{
+				Success: false,
+				Message: "Invalid request body",
+			},
+		},
+		{
+			name: "Database Error",
+			input: `{
+  			"value": {
+  				"messageId": "validMessageId",
+  				"response": "This is a response",
+  				"sourceWebsocketId": "validWebsocketId"
+  			}
+  		}`,
+			mockDBResponse: nil,
+			mockDBError:    errors.New("database error"),
+			expectedStatus: http.StatusBadRequest,
+			expectedBody: ChatResponse{
+				Success: false,
+				Message: "ChatID is required for message creation",
+			},
+		},
+		{
+			name: "WebSocket Error",
+			input: `{
+  			"value": {
+  				"chatId": "validChatId",
+  				"messageId": "validMessageId",
+  				"response": "This is a response",
+  				"sourceWebsocketId": "validWebsocketId"
+  			}
+  		}`,
+			mockDBResponse: &db.ChatMessage{
+				ID:        "generatedID",
+				ChatID:    "validChatId",
+				Message:   "This is a response",
+				Role:      "assistant",
+				Timestamp: time.Now(),
+				Status:    "sent",
+				Source:    "agent",
+			},
+			mockDBError:    nil,
+			mockWSResponse: errors.New("websocket error"),
+			expectedStatus: http.StatusOK,
+			expectedBody: ChatResponse{
+				Success: true,
+				Message: "Response processed successfully",
+				Data: &db.ChatMessage{
+					ID:        "generatedID",
+					ChatID:    "validChatId",
+					Message:   "This is a response",
+					Role:      "assistant",
+					Timestamp: time.Now(),
+					Status:    "sent",
+					Source:    "agent",
+				},
+			},
+		},
+		{
+			name: "Missing SourceWebsocketID",
+			input: `{
+  			"value": {
+  				"chatId": "validChatId",
+  				"messageId": "validMessageId",
+  				"response": "This is a response"
+  			}
+  		}`,
+			mockDBResponse: &db.ChatMessage{
+				ID:        "generatedID",
+				ChatID:    "validChatId",
+				Message:   "This is a response",
+				Role:      "assistant",
+				Timestamp: time.Now(),
+				Status:    "sent",
+				Source:    "agent",
+			},
+			mockDBError:    nil,
+			mockWSResponse: nil,
+			expectedStatus: http.StatusOK,
+			expectedBody: ChatResponse{
+				Success: true,
+				Message: "Response processed successfully",
+				Data: &db.ChatMessage{
+					ID:        "generatedID",
+					ChatID:    "validChatId",
+					Message:   "This is a response",
+					Role:      "assistant",
+					Timestamp: time.Now(),
+					Status:    "sent",
+					Source:    "agent",
+				},
+			},
+		},
+		{
+			name: "All Fields Empty",
+			input: `{
+  			"value": {
+  				"chatId": "",
+  				"messageId": "",
+  				"response": "",
+  				"sourceWebsocketId": ""
+  			}
+  		}`,
+			expectedStatus: http.StatusBadRequest,
+			expectedBody: ChatResponse{
+				Success: false,
+				Message: "ChatID is required for message creation",
+			},
+		},
+		{
+			name: "Missing MessageID",
+			input: `{
+  			"value": {
+  				"chatId": "validChatId",
+  				"response": "This is a response",
+  				"sourceWebsocketId": "validWebsocketId"
+  			}
+  		}`,
+			mockDBResponse: &db.ChatMessage{
+				ID:        "generatedID",
+				ChatID:    "validChatId",
+				Message:   "This is a response",
+				Role:      "assistant",
+				Timestamp: time.Now(),
+				Status:    "sent",
+				Source:    "agent",
+			},
+			mockDBError:    nil,
+			mockWSResponse: nil,
+			expectedStatus: http.StatusOK,
+			expectedBody: ChatResponse{
+				Success: true,
+				Message: "Response processed successfully",
+				Data: &db.ChatMessage{
+					ID:        "generatedID",
+					ChatID:    "validChatId",
+					Message:   "This is a response",
+					Role:      "assistant",
+					Timestamp: time.Now(),
+					Status:    "sent",
+					Source:    "agent",
+				},
+			},
+		},
+		{
+			name: "Invalid request body",
+			input: `{
+  			"value": {
+  				"chatId": 1,
+  				"messageId": "validMessageId",
+  				"response": "This is a response",
+  				"sourceWebsocketId": "validWebsocketId"
+  			}
+  		}`,
+			expectedStatus: http.StatusBadRequest,
+			expectedBody: ChatResponse{
+				Success: false,
+				Message: "Invalid request body",
+			},
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			req := httptest.NewRequest(http.MethodPost, "/response", bytes.NewBufferString(tt.input))
+			w := httptest.NewRecorder()
+
+			handler.ProcessChatResponse(w, req)
+
+			resp := w.Result()
+			defer resp.Body.Close()
+
+			assert.Equal(t, tt.expectedStatus, resp.StatusCode)
+
+			var responseBody ChatRes
+			err := json.NewDecoder(resp.Body).Decode(&responseBody)
+			assert.NoError(t, err)
+			assert.Equal(t, tt.expectedBody.Success, responseBody.Success)
+			assert.Equal(t, tt.expectedBody.Message, responseBody.Message)
+
+			if tt.expectedBody.Data != nil {
+				assert.NotNil(t, responseBody.Data)
+				actualDataMap, ok := responseBody.Data.(map[string]interface{})
+				assert.True(t, ok, "Response Data should be a map[string]interface{}")
+
+				actualChatID, ok := actualDataMap["chatId"].(string)
+				assert.True(t, ok, "ChatID in response should be a string")
+				actualMessage, ok := actualDataMap["message"].(string)
+				assert.True(t, ok, "Message in response should be a string")
+
+				expectedData := tt.expectedBody.Data.(*db.ChatMessage)
+
+				// Compare ChatID and Message
+				assert.Equal(t, expectedData.ChatID, actualChatID)
+				assert.Equal(t, expectedData.Message, actualMessage)
+			} else {
+				assert.Nil(t, responseBody.Data)
+			}
+		})
+	}
 }
