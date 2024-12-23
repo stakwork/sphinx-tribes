@@ -158,7 +158,7 @@ func (ph *peopleHandler) UpdatePerson(w http.ResponseWriter, r *http.Request) {
 	} else {
 		if person.OwnerPubKey != existing.OwnerPubKey && person.OwnerAlias != existing.OwnerAlias {
 			// can't edit someone else's
-			fmt.Println("cant edit someone else")
+			utils.Log.Info("cant edit someone else")
 			w.WriteHeader(http.StatusUnauthorized)
 			return
 		}
@@ -200,7 +200,7 @@ func (ph *peopleHandler) UpsertLogin(w http.ResponseWriter, r *http.Request) {
 	r.Body.Close()
 	err = json.Unmarshal(body, &person)
 	if err != nil {
-		fmt.Println(err)
+		utils.Log.Error("%v", err)
 		w.WriteHeader(http.StatusNotAcceptable)
 		return
 	}
@@ -213,7 +213,7 @@ func (ph *peopleHandler) UpsertLogin(w http.ResponseWriter, r *http.Request) {
 	if existing.ID == 0 {
 		if person.ID != 0 {
 			// cant try to "edit" if not exists already
-			fmt.Println("cant edit non existing")
+			utils.Log.Info("cant edit non existing")
 			w.WriteHeader(http.StatusUnauthorized)
 			return
 		}
@@ -223,7 +223,7 @@ func (ph *peopleHandler) UpsertLogin(w http.ResponseWriter, r *http.Request) {
 
 	} else { // editing! needs ID
 		if person.ID != 0 && person.ID != existing.ID { // can't edit someone else's
-			fmt.Println("cant edit someone else")
+			utils.Log.Info("cant edit someone else")
 			w.WriteHeader(http.StatusUnauthorized)
 			return
 		}
@@ -255,7 +255,7 @@ func (ph *peopleHandler) UpsertLogin(w http.ResponseWriter, r *http.Request) {
 	tokenString, err := auth.EncodeJwt(person.OwnerPubKey)
 
 	if err != nil {
-		fmt.Println("Cannot generate jwt token")
+		utils.Log.Info("Cannot generate jwt token")
 	}
 
 	responseData["jwt"] = tokenString
@@ -285,41 +285,41 @@ func DeleteTicketByAdmin(w http.ResponseWriter, r *http.Request) {
 	createdStr := chi.URLParam(r, "created")
 	created, err := strconv.ParseInt(createdStr, 10, 64)
 	if err != nil {
-		fmt.Println("Unable to convert created to int64")
+		utils.Log.Info("Unable to convert created to int64")
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
 	if created == 0 || pubKey == "" {
-		fmt.Println("Insufficient details to delete ticket")
+		utils.Log.Info("Insufficient details to delete ticket")
 		w.WriteHeader(http.StatusBadRequest)
 		return
 	}
 	if pubKeyFromAuth == "" {
-		fmt.Println("no pubkey from auth")
+		utils.Log.Info("no pubkey from auth")
 		w.WriteHeader(http.StatusUnauthorized)
 		return
 	}
 	existing := db.DB.GetPersonByPubkey(pubKeyFromAuth)
 	if existing.ID == 0 {
-		fmt.Println("Could not fetch admin details from db")
+		utils.Log.Info("Could not fetch admin details from db")
 		w.WriteHeader(http.StatusUnauthorized)
 		return
 	} else if PersonIsAdmin(existing.OwnerPubKey) == false {
-		fmt.Println("Only admin is allowed to delete tickets")
+		utils.Log.Info("Only admin is allowed to delete tickets")
 		w.WriteHeader(http.StatusUnauthorized)
 		return
 	}
 
 	person := db.DB.GetPersonByPubkey(pubKey)
 	if person.ID == 0 {
-		fmt.Println("Could not fetch person from db")
+		utils.Log.Info("Could not fetch person from db")
 		w.WriteHeader(http.StatusUnauthorized)
 		return
 	}
 
 	wanteds, ok := person.Extras["wanted"].([]interface{})
 	if !ok {
-		fmt.Println("No tickets found for person")
+		utils.Log.Info("No tickets found for person")
 		w.WriteHeader(http.StatusBadRequest)
 		return
 	}
@@ -341,7 +341,7 @@ func DeleteTicketByAdmin(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if index == -1 {
-		fmt.Println("Ticket to delete not found")
+		utils.Log.Info("Ticket to delete not found")
 		w.WriteHeader(http.StatusBadRequest)
 		return
 	} else {
@@ -525,7 +525,7 @@ func (ph *peopleHandler) GetPersonByUuid(w http.ResponseWriter, r *http.Request)
 	personResponse["twitter_confirmed"] = person.TwitterConfirmed
 	personResponse["github_issues"] = person.GithubIssues
 	if err != nil {
-		fmt.Println("==> error: ", err)
+		utils.Log.Error("==> error: %v", err)
 	} else {
 		var badgeSlice []uint
 		for i := 0; i < len(assetBalanceData); i++ {
@@ -533,7 +533,7 @@ func (ph *peopleHandler) GetPersonByUuid(w http.ResponseWriter, r *http.Request)
 		}
 		personResponse["badges"] = badgeSlice
 	}
-	fmt.Println()
+	utils.Log.Info("") 
 	// FIXME use http to hit sphinx-element server for badges
 	// Todo: response should include no pubKey
 	// FIXME also filter by the tribe "profile_filters"
@@ -546,11 +546,11 @@ func GetPersonAssetsByUuid(w http.ResponseWriter, r *http.Request) {
 	person := db.DB.GetPersonByUuid(uuid)
 	assetList, err := GetAssetList(person.OwnerPubKey)
 	if err != nil {
-		fmt.Println(err)
+		utils.Log.Error("%v", err)
 		w.WriteHeader(http.StatusServiceUnavailable)
 		return
 	}
-	fmt.Println()
+	utils.Log.Info("") 
 	w.WriteHeader(http.StatusOK)
 	json.NewEncoder(w).Encode(assetList)
 }
@@ -569,25 +569,25 @@ func (ph *peopleHandler) DeletePerson(w http.ResponseWriter, r *http.Request) {
 	idString := chi.URLParam(r, "id")
 	id, err := strconv.Atoi(idString)
 	if err != nil {
-		fmt.Println(err)
+		utils.Log.Error("%v", err)
 		w.WriteHeader(http.StatusUnauthorized)
 		return
 	}
 
 	if id == 0 {
-		fmt.Println("id is 0")
+		utils.Log.Info("id is 0")
 		w.WriteHeader(http.StatusUnauthorized)
 		return
 	}
 
 	existing := ph.db.GetPerson(uint(id))
 	if existing.ID == 0 {
-		fmt.Println("existing id is 0")
+		utils.Log.Info("existing id is 0")
 		w.WriteHeader(http.StatusUnauthorized)
 		return
 	}
 	if existing.OwnerPubKey != pubKeyFromAuth {
-		fmt.Println("keys dont match")
+		utils.Log.Info("keys dont match")
 		w.WriteHeader(http.StatusUnauthorized)
 		return
 	}
@@ -619,7 +619,7 @@ func GetAssetByPubkey(pubkey string) ([]db.AssetBalanceData, error) {
 	resp, err := client.Do(req)
 
 	if err != nil {
-		fmt.Println("GET error:", err)
+		utils.Log.Error("GET error: %v", err)
 		return nil, err
 	}
 	defer resp.Body.Close()
@@ -628,7 +628,7 @@ func GetAssetByPubkey(pubkey string) ([]db.AssetBalanceData, error) {
 	body, err := io.ReadAll(resp.Body)
 	err = json.Unmarshal(body, &r)
 	if err != nil {
-		fmt.Println("json unmarshall error", err)
+		utils.Log.Error("json unmarshall error: %v", err)
 		return nil, err
 	}
 
@@ -652,7 +652,7 @@ func GetAssetList(pubkey string) ([]db.AssetListData, error) {
 	resp, err := client.Do(req)
 
 	if err != nil {
-		fmt.Println("GET error:", err)
+		utils.Log.Error("GET error: %v", err)
 		return nil, err
 	}
 	defer resp.Body.Close()
@@ -662,7 +662,7 @@ func GetAssetList(pubkey string) ([]db.AssetListData, error) {
 
 	err = json.Unmarshal(body, &r)
 	if err != nil {
-		fmt.Println("json unmarshall error", err)
+		utils.Log.Error("json unmarshall error: %v", err)
 		return nil, err
 	}
 
@@ -678,44 +678,44 @@ func AddOrRemoveBadge(w http.ResponseWriter, r *http.Request) {
 	r.Body.Close()
 	err = json.Unmarshal(body, &badgeCreationData)
 	if err != nil {
-		fmt.Println(err)
+		utils.Log.Error("%v", err)
 		w.WriteHeader(http.StatusNotAcceptable)
 		return
 	}
 
 	if badgeCreationData.Badge == "" {
-		fmt.Println("Badge cannot be Empty")
+		utils.Log.Info("Badge cannot be Empty")
 		w.WriteHeader(http.StatusBadRequest)
 		return
 	}
 
 	if badgeCreationData.Action == "" {
-		fmt.Println("Action cannot be Empty")
+		utils.Log.Info("Action cannot be Empty")
 		w.WriteHeader(http.StatusBadRequest)
 		return
 	}
 
 	if !(badgeCreationData.Action == "add" || badgeCreationData.Action == "remove") {
-		fmt.Println("Invalid action in Request")
+		utils.Log.Info("Invalid action in Request")
 		w.WriteHeader(http.StatusBadRequest)
 		return
 	}
 
 	if badgeCreationData.TribeUUID == "" {
-		fmt.Println("tribeId cannot be Empty")
-		w.WriteHeader(http.StatusBadRequest)
-		return
+			utils.Log.Info("tribeId cannot be Empty")
+			w.WriteHeader(http.StatusBadRequest)
+			return
 	}
 
 	extractedPubkey, err := auth.VerifyTribeUUID(badgeCreationData.TribeUUID, false)
 	if err != nil {
-		fmt.Println(err)
+		utils.Log.Error("%v", err)
 		w.WriteHeader(http.StatusUnauthorized)
 		return
 	}
 
 	if pubKeyFromAuth == "" {
-		fmt.Println("no pubkey from auth")
+		utils.Log.Info("no pubkey from auth")
 		w.WriteHeader(http.StatusBadRequest)
 		return
 	}
@@ -723,8 +723,8 @@ func AddOrRemoveBadge(w http.ResponseWriter, r *http.Request) {
 	tribe := db.DB.GetTribeByIdAndPubkey(badgeCreationData.TribeUUID, extractedPubkey)
 
 	if pubKeyFromAuth != tribe.OwnerPubKey {
-		fmt.Println(pubKeyFromAuth)
-		fmt.Println("mismatched pubkey")
+		utils.Log.Info("%s", pubKeyFromAuth)
+		utils.Log.Info("mismatched pubkey")
 		w.WriteHeader(http.StatusUnauthorized)
 		return
 	}

@@ -19,6 +19,7 @@ import (
 	"github.com/stakwork/sphinx-tribes/auth"
 	"github.com/stakwork/sphinx-tribes/config"
 	"github.com/stakwork/sphinx-tribes/db"
+	"github.com/stakwork/sphinx-tribes/utils"
 	"github.com/tuan78/jsonconv"
 )
 
@@ -37,7 +38,7 @@ func PaymentMetrics(w http.ResponseWriter, r *http.Request) {
 	workspace := keys.Get("workspace")
 
 	if pubKeyFromAuth == "" {
-		fmt.Println("no pubkey from auth")
+		utils.Log.Info("no pubkey from auth")
 		w.WriteHeader(http.StatusUnauthorized)
 		return
 	}
@@ -64,7 +65,7 @@ func WorkspacetMetrics(w http.ResponseWriter, r *http.Request) {
 	pubKeyFromAuth, _ := ctx.Value(auth.ContextKey).(string)
 
 	if pubKeyFromAuth == "" {
-		fmt.Println("no pubkey from auth")
+		utils.Log.Info("no pubkey from auth")
 		w.WriteHeader(http.StatusUnauthorized)
 		return
 	}
@@ -91,7 +92,7 @@ func PeopleMetrics(w http.ResponseWriter, r *http.Request) {
 	pubKeyFromAuth, _ := ctx.Value(auth.ContextKey).(string)
 
 	if pubKeyFromAuth == "" {
-		fmt.Println("no pubkey from auth")
+		utils.Log.Info("no pubkey from auth")
 		w.WriteHeader(http.StatusUnauthorized)
 		return
 	}
@@ -127,7 +128,7 @@ func (mh *metricHandler) BountyMetrics(w http.ResponseWriter, r *http.Request) {
 	workspace := keys.Get("workspace")
 
 	if pubKeyFromAuth == "" {
-		fmt.Println("no pubkey from auth")
+		utils.Log.Info("no pubkey from auth")
 		w.WriteHeader(http.StatusUnauthorized)
 		return
 	}
@@ -163,7 +164,7 @@ func (mh *metricHandler) BountyMetrics(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 	} else {
-		fmt.Println("Redis client is not initialized or there is an error with Redis")
+		utils.Log.Info("Redis client is not initialized or there is an error with Redis")
 	}
 
 	totalBountiesPosted := mh.db.TotalBountiesPosted(request, workspace)
@@ -200,7 +201,7 @@ func (mh *metricHandler) BountyMetrics(w http.ResponseWriter, r *http.Request) {
 		metricsMap := structs.Map(bountyMetrics)
 		db.SetMap(metricsKey, metricsMap)
 	} else {
-		fmt.Println("Redis client is not initialized or there is an error with Redis")
+		utils.Log.Info("Redis client is not initialized or there is an error with Redis")
 	}
 
 	w.WriteHeader(http.StatusOK)
@@ -212,7 +213,7 @@ func (mh *metricHandler) MetricsBounties(w http.ResponseWriter, r *http.Request)
 	pubKeyFromAuth, _ := ctx.Value(auth.ContextKey).(string)
 
 	if pubKeyFromAuth == "" {
-		fmt.Println("no pubkey from auth")
+		utils.Log.Info("no pubkey from auth")
 		w.WriteHeader(http.StatusUnauthorized)
 		return
 	}
@@ -240,7 +241,7 @@ func (mh *metricHandler) MetricsBountiesCount(w http.ResponseWriter, r *http.Req
 	pubKeyFromAuth, _ := ctx.Value(auth.ContextKey).(string)
 
 	if pubKeyFromAuth == "" {
-		fmt.Println("no pubkey from auth")
+		utils.Log.Info("no pubkey from auth")
 		w.WriteHeader(http.StatusUnauthorized)
 		return
 	}
@@ -266,7 +267,7 @@ func (mh *metricHandler) MetricsBountiesProviders(w http.ResponseWriter, r *http
 	pubKeyFromAuth, _ := ctx.Value(auth.ContextKey).(string)
 
 	if pubKeyFromAuth == "" {
-		fmt.Println("no pubkey from auth")
+		utils.Log.Info("no pubkey from auth")
 		w.WriteHeader(http.StatusUnauthorized)
 		return
 	}
@@ -292,7 +293,7 @@ func MetricsCsv(w http.ResponseWriter, r *http.Request) {
 	pubKeyFromAuth, _ := ctx.Value(auth.ContextKey).(string)
 
 	if pubKeyFromAuth == "" {
-		fmt.Println("no pubkey from auth")
+		utils.Log.Info("no pubkey from auth")
 		w.WriteHeader(http.StatusUnauthorized)
 		return
 	}
@@ -318,7 +319,7 @@ func MetricsCsv(w http.ResponseWriter, r *http.Request) {
 		err, url := UploadMetricsCsv(result, request)
 
 		if err != nil {
-			fmt.Println("Error uploading csv ===", err)
+			utils.Log.Error("Error uploading csv: %v", err)
 		}
 
 		w.WriteHeader(http.StatusOK)
@@ -333,7 +334,7 @@ func GetAdminWorkspaces(w http.ResponseWriter, r *http.Request) {
 	pubKeyFromAuth, _ := ctx.Value(auth.ContextKey).(string)
 
 	if pubKeyFromAuth == "" {
-		fmt.Println("no pubkey from auth")
+		utils.Log.Info("no pubkey from auth")
 		w.WriteHeader(http.StatusUnauthorized)
 		return
 	}
@@ -457,19 +458,19 @@ func UploadMetricsCsv(data [][]string, request db.PaymentDateRange) (error, stri
 	err, postPresignedUrl := createPresignedUrl(path)
 
 	if err != nil {
-		fmt.Println("Presigned Error", err)
+		utils.Log.Error("Presigned Error: %v", err)
 	}
 
 	r, err := http.NewRequest(http.MethodPut, postPresignedUrl, bytes.NewReader(fileBuffer))
 	if err != nil {
-		fmt.Println("Posting presign s3 error:", err)
+		utils.Log.Error("Posting presign s3 error: %v", err)
 	}
 	r.Header.Set("Content-Type", "multipart/form-data")
 	client := &http.Client{}
 	_, err = client.Do(r)
 
 	if err != nil {
-		fmt.Println("Error occured while posting presigned URL", err)
+		utils.Log.Error("Error occurred while posting presigned URL: %v", err)
 	}
 
 	// Delete image from uploads folder

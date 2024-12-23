@@ -235,7 +235,7 @@ func TestCreateOrEditBounty(t *testing.T) {
 
 		json, err := json.Marshal(updatedBounty)
 		if err != nil {
-			fmt.Println("Could not marshal json data")
+			utils.Log.Error("Could not marshal json data")
 		}
 
 		req, err := http.NewRequestWithContext(ctx, http.MethodPost, "/", bytes.NewReader(json))
@@ -1242,7 +1242,7 @@ func MockNewWSServer(t *testing.T) (*httptest.Server, *websocket.Conn) {
 		upgrader.CheckOrigin = func(r *http.Request) bool { return true }
 		ws, err := upgrader.Upgrade(w, r, nil)
 		if err != nil {
-			fmt.Println("upgrade:", err)
+			utils.Log.Error("upgrade error: %v", err)
 			return
 		}
 		defer ws.Close()
