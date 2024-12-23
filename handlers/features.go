@@ -15,6 +15,7 @@ import (
 	"github.com/rs/xid"
 	"github.com/stakwork/sphinx-tribes/auth"
 	"github.com/stakwork/sphinx-tribes/db"
+	"github.com/stakwork/sphinx-tribes/utils"
 )
 
 type PostData struct {
@@ -57,7 +58,7 @@ func (oh *featureHandler) CreateOrEditFeatures(w http.ResponseWriter, r *http.Re
 	ctx := r.Context()
 	pubKeyFromAuth, _ := ctx.Value(auth.ContextKey).(string)
 	if pubKeyFromAuth == "" {
-		fmt.Println("no pubkey from auth")
+		utils.Log.Info("no pubkey from auth")
 		w.WriteHeader(http.StatusUnauthorized)
 		return
 	}
@@ -68,7 +69,7 @@ func (oh *featureHandler) CreateOrEditFeatures(w http.ResponseWriter, r *http.Re
 	err := json.Unmarshal(body, &features)
 
 	if err != nil {
-		fmt.Println(err)
+		utils.Log.Error("%v", err)
 		w.WriteHeader(http.StatusNotAcceptable)
 		return
 	}
@@ -112,7 +113,7 @@ func (oh *featureHandler) DeleteFeature(w http.ResponseWriter, r *http.Request) 
 	ctx := r.Context()
 	pubKeyFromAuth, _ := ctx.Value(auth.ContextKey).(string)
 	if pubKeyFromAuth == "" {
-		fmt.Println("no pubkey from auth")
+		utils.Log.Info("no pubkey from auth")
 		w.WriteHeader(http.StatusUnauthorized)
 		return
 	}
@@ -134,7 +135,7 @@ func (oh *featureHandler) GetFeaturesByWorkspaceUuid(w http.ResponseWriter, r *h
 	ctx := r.Context()
 	pubKeyFromAuth, _ := ctx.Value(auth.ContextKey).(string)
 	if pubKeyFromAuth == "" {
-		fmt.Println("no pubkey from auth")
+		utils.Log.Info("no pubkey from auth")
 		w.WriteHeader(http.StatusUnauthorized)
 		return
 	}
@@ -150,7 +151,7 @@ func (oh *featureHandler) GetWorkspaceFeaturesCount(w http.ResponseWriter, r *ht
 	ctx := r.Context()
 	pubKeyFromAuth, _ := ctx.Value(auth.ContextKey).(string)
 	if pubKeyFromAuth == "" {
-		fmt.Println("no pubkey from auth")
+		utils.Log.Info("no pubkey from auth")
 		w.WriteHeader(http.StatusUnauthorized)
 		return
 	}
@@ -166,7 +167,7 @@ func (oh *featureHandler) GetFeatureByUuid(w http.ResponseWriter, r *http.Reques
 	ctx := r.Context()
 	pubKeyFromAuth, _ := ctx.Value(auth.ContextKey).(string)
 	if pubKeyFromAuth == "" {
-		fmt.Println("no pubkey from auth")
+		utils.Log.Info("no pubkey from auth")
 		w.WriteHeader(http.StatusUnauthorized)
 		return
 	}
@@ -240,7 +241,7 @@ func (oh *featureHandler) CreateOrEditFeaturePhase(w http.ResponseWriter, r *htt
 	ctx := r.Context()
 	pubKeyFromAuth, _ := ctx.Value(auth.ContextKey).(string)
 	if pubKeyFromAuth == "" {
-		fmt.Println("no pubkey from auth")
+		utils.Log.Info("no pubkey from auth")
 		w.WriteHeader(http.StatusUnauthorized)
 		return
 	}
@@ -289,7 +290,7 @@ func (oh *featureHandler) GetFeaturePhases(w http.ResponseWriter, r *http.Reques
 	ctx := r.Context()
 	pubKeyFromAuth, _ := ctx.Value(auth.ContextKey).(string)
 	if pubKeyFromAuth == "" {
-		fmt.Println("no pubkey from auth")
+		utils.Log.Info("no pubkey from auth")
 		w.WriteHeader(http.StatusUnauthorized)
 		return
 	}
@@ -305,7 +306,7 @@ func (oh *featureHandler) GetFeaturePhaseByUUID(w http.ResponseWriter, r *http.R
 	ctx := r.Context()
 	pubKeyFromAuth, _ := ctx.Value(auth.ContextKey).(string)
 	if pubKeyFromAuth == "" {
-		fmt.Println("no pubkey from auth")
+		utils.Log.Info("no pubkey from auth")
 		w.WriteHeader(http.StatusUnauthorized)
 		return
 	}
@@ -327,7 +328,7 @@ func (oh *featureHandler) DeleteFeaturePhase(w http.ResponseWriter, r *http.Requ
 	ctx := r.Context()
 	pubKeyFromAuth, _ := ctx.Value(auth.ContextKey).(string)
 	if pubKeyFromAuth == "" {
-		fmt.Println("no pubkey from auth")
+		utils.Log.Info("no pubkey from auth")
 		w.WriteHeader(http.StatusUnauthorized)
 		return
 	}
@@ -350,7 +351,7 @@ func (oh *featureHandler) CreateOrEditStory(w http.ResponseWriter, r *http.Reque
 	ctx := r.Context()
 	pubKeyFromAuth, _ := ctx.Value(auth.ContextKey).(string)
 	if pubKeyFromAuth == "" {
-		fmt.Println("no pubkey from auth")
+		utils.Log.Info("no pubkey from auth")
 		w.WriteHeader(http.StatusUnauthorized)
 		return
 	}
@@ -391,7 +392,7 @@ func (oh *featureHandler) GetStoriesByFeatureUuid(w http.ResponseWriter, r *http
 	ctx := r.Context()
 	pubKeyFromAuth, _ := ctx.Value(auth.ContextKey).(string)
 	if pubKeyFromAuth == "" {
-		fmt.Println("no pubkey from auth")
+		utils.Log.Info("no pubkey from auth")
 		w.WriteHeader(http.StatusUnauthorized)
 		return
 	}
@@ -414,7 +415,7 @@ func (oh *featureHandler) GetStoryByUuid(w http.ResponseWriter, r *http.Request)
 	ctx := r.Context()
 	pubKeyFromAuth, _ := ctx.Value(auth.ContextKey).(string)
 	if pubKeyFromAuth == "" {
-		fmt.Println("no pubkey from auth")
+		utils.Log.Info("no pubkey from auth")
 		w.WriteHeader(http.StatusUnauthorized)
 		return
 	}
@@ -432,7 +433,7 @@ func (oh *featureHandler) DeleteStory(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 	pubKeyFromAuth, _ := ctx.Value(auth.ContextKey).(string)
 	if pubKeyFromAuth == "" {
-		fmt.Println("no pubkey from auth")
+		utils.Log.Info("no pubkey from auth")
 		w.WriteHeader(http.StatusUnauthorized)
 		return
 	}
@@ -458,7 +459,7 @@ func (oh *featureHandler) GetBountiesByFeatureAndPhaseUuid(w http.ResponseWriter
 	ctx := r.Context()
 	pubKeyFromAuth, _ := ctx.Value(auth.ContextKey).(string)
 	if pubKeyFromAuth == "" {
-		fmt.Println("no pubkey from auth")
+		utils.Log.Info("no pubkey from auth")
 		w.WriteHeader(http.StatusUnauthorized)
 		return
 	}
@@ -482,7 +483,7 @@ func (oh *featureHandler) GetBountiesCountByFeatureAndPhaseUuid(w http.ResponseW
 	ctx := r.Context()
 	pubKeyFromAuth, _ := ctx.Value(auth.ContextKey).(string)
 	if pubKeyFromAuth == "" {
-		fmt.Println("no pubkey from auth")
+		utils.Log.Info("no pubkey from auth")
 		w.WriteHeader(http.StatusUnauthorized)
 		return
 	}
@@ -555,7 +556,7 @@ func (oh *featureHandler) StoriesSend(w http.ResponseWriter, r *http.Request) {
 	var postData PostData
 	err = json.Unmarshal(body, &postData)
 	if err != nil {
-		fmt.Println("[StoriesSend] JSON Unmarshal error:", err)
+		utils.Log.Error("[StoriesSend] JSON Unmarshal error: %v", err)
 		http.Error(w, "Invalid JSON format", http.StatusNotAcceptable)
 		return
 	}
@@ -614,7 +615,7 @@ func (oh *featureHandler) BriefSend(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 	pubKeyFromAuth, _ := ctx.Value(auth.ContextKey).(string)
 	if pubKeyFromAuth == "" {
-		fmt.Println("no pubkey from auth")
+		utils.Log.Info("no pubkey from auth")
 		w.WriteHeader(http.StatusUnauthorized)
 		return
 	}
@@ -629,7 +630,7 @@ func (oh *featureHandler) BriefSend(w http.ResponseWriter, r *http.Request) {
 	var postData AudioBriefPostData
 	err = json.Unmarshal(body, &postData)
 	if err != nil {
-		fmt.Println("[BriefSend] JSON Unmarshal error:", err)
+		utils.Log.Error("[BriefSend] JSON Unmarshal error: %v", err)
 		http.Error(w, "Invalid JSON format", http.StatusNotAcceptable)
 		return
 	}
