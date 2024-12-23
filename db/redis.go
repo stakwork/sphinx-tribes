@@ -2,7 +2,6 @@ package db
 
 import (
 	"context"
-	"fmt"
 	"os"
 	"time"
 
@@ -30,27 +29,27 @@ func InitRedis() {
 		opt, err := redis.ParseURL(redisURL)
 		if err != nil {
 			RedisError = err
-			fmt.Println("REDIS URL CONNECTION ERROR ===", err)
+			utils.Log.Error("REDIS URL CONNECTION ERROR === %v", err)
 		}
 		RedisClient = redis.NewClient(opt)
 	}
 	if err := RedisClient.Ping(ctx).Err(); err != nil {
 		RedisError = err
-		fmt.Println("Could Not Connect To Redis", err)
+		utils.Log.Error("Could Not Connect To Redis: %v", err)
 	}
 }
 
 func SetValue(key string, value interface{}) {
 	err := RedisClient.Set(ctx, key, value, expireTime).Err()
 	if err != nil {
-		fmt.Println("REDIS SET ERROR :", err)
+		utils.Log.Error("REDIS SET ERROR: %v", err)
 	}
 }
 
 func GetValue(key string) string {
 	val, err := RedisClient.Get(ctx, key).Result()
 	if err != nil {
-		fmt.Println("REDIS GET ERROR :", err)
+		utils.Log.Error("REDIS GET ERROR: %v", err)
 	}
 
 	return val
@@ -60,7 +59,7 @@ func SetMap(key string, values map[string]interface{}) {
 	for k, v := range values {
 		err := RedisClient.HSet(ctx, key, k, v).Err()
 		if err != nil {
-			fmt.Println("REDIS SET MAP ERROR :", err)
+			utils.Log.Error("REDIS SET MAP ERROR: %v", err)
 		}
 	}
 	RedisClient.Expire(ctx, key, expireTime)
