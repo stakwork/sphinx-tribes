@@ -19,6 +19,7 @@ import (
 	"github.com/stakwork/sphinx-tribes/config"
 	"github.com/stakwork/sphinx-tribes/db"
 	"github.com/stakwork/sphinx-tribes/handlers"
+	"github.com/stakwork/sphinx-tribes/logger"
 	"github.com/stakwork/sphinx-tribes/utils"
 )
 
@@ -107,9 +108,9 @@ func NewRouter() *http.Server {
 	server := &http.Server{Addr: ":" + PORT, Handler: r}
 
 	go func() {
-		utils.Log.Info("Listening on port %s", PORT)
+		logger.Log.Info("Listening on port %s", PORT)
 		if err := server.ListenAndServe(); err != nil {
-			utils.Log.Error("server err: %s", err.Error())
+			logger.Log.Error("server err: %s", err.Error())
 		}
 	}()
 	return server
@@ -148,7 +149,7 @@ func getFromAuth(path string) (*extractResponse, error) {
 
 func sendEdgeListToJarvis(edgeList utils.EdgeList) error {
 	if config.JarvisUrl == "" || config.JarvisToken == "" {
-		utils.Log.Info("Jarvis configuration not found, skipping error reporting")
+		logger.Log.Info("Jarvis configuration not found, skipping error reporting")
 		return nil
 	}
 
@@ -156,13 +157,13 @@ func sendEdgeListToJarvis(edgeList utils.EdgeList) error {
 
 	jsonData, err := json.Marshal(edgeList)
 	if err != nil {
-		utils.Log.Error("Failed to marshal edge list: %v", err)
+		logger.Log.Error("Failed to marshal edge list: %v", err)
 		return nil
 	}
 
 	req, err := http.NewRequest("POST", jarvisURL, bytes.NewBuffer(jsonData))
 	if err != nil {
-		utils.Log.Error("Failed to create Jarvis request: %v", err)
+		logger.Log.Error("Failed to create Jarvis request: %v", err)
 		return nil
 	}
 
@@ -175,13 +176,13 @@ func sendEdgeListToJarvis(edgeList utils.EdgeList) error {
 
 	resp, err := client.Do(req)
 	if err != nil {
-		utils.Log.Error("Failed to send error to Jarvis: %v", err)
+		logger.Log.Error("Failed to send error to Jarvis: %v", err)
 		return err
 	}
 	defer resp.Body.Close()
 
 	if resp.StatusCode >= 200 && resp.StatusCode < 300 {
-		utils.Log.Info("Successfully sent error to Jarvis")
+		logger.Log.Info("Successfully sent error to Jarvis")
 		return nil
 	}
 
@@ -204,7 +205,7 @@ func internalServerErrorHandler(next http.Handler) http.Handler {
 				// Format stack trace to edge list
 				edgeList := utils.FormatStacktraceToEdgeList(stackTrace, err)
 
-				utils.Log.Error("Internal Server Error: %s %s\nError: %v\nStack Trace:\n%s\nEdge List:\n%+v\n",
+				logger.Log.Error("Internal Server Error: %s %s\nError: %v\nStack Trace:\n%s\nEdge List:\n%+v\n",
 					r.Method,
 					r.URL.Path,
 					err,
@@ -214,7 +215,7 @@ func internalServerErrorHandler(next http.Handler) http.Handler {
 
 				go func() {
 					if err := sendEdgeListToJarvis(edgeList); err != nil {
-						utils.Log.Error("Error sending to Jarvis: %v\n", err)
+						logger.Log.Error("Error sending to Jarvis: %v\n", err)
 					}
 				}()
 
@@ -231,6 +232,7 @@ func initChi() *chi.Mux {
 	r.Use(middleware.RequestID)
 	r.Use(middleware.Logger)
 	r.Use(middleware.Recoverer)
+	r.Use(logger.RouteBasedUUIDMiddleware)
 	r.Use(internalServerErrorHandler)
 	cors := cors.New(cors.Options{
 		AllowedOrigins:   []string{"*"},

@@ -2,7 +2,6 @@ package handlers
 
 import (
 	"encoding/json"
-	"fmt"
 	"io"
 	"net/http"
 	"strconv"
@@ -10,6 +9,7 @@ import (
 	"github.com/go-chi/chi"
 	"github.com/stakwork/sphinx-tribes/auth"
 	"github.com/stakwork/sphinx-tribes/db"
+	"github.com/stakwork/sphinx-tribes/logger"
 )
 
 type channelHandler struct {
@@ -29,13 +29,13 @@ func (ch *channelHandler) DeleteChannel(w http.ResponseWriter, r *http.Request) 
 	idString := chi.URLParam(r, "id")
 	id, err := strconv.Atoi(idString)
 	if err != nil {
-		fmt.Println(err)
+		logger.Log.Error("%v", err)
 		w.WriteHeader(http.StatusUnauthorized)
 		return
 	}
 
 	if id == 0 {
-		fmt.Println("id is 0")
+		logger.Log.Info("id is 0")
 		w.WriteHeader(http.StatusUnauthorized)
 		return
 	}
@@ -43,12 +43,12 @@ func (ch *channelHandler) DeleteChannel(w http.ResponseWriter, r *http.Request) 
 	existing := ch.db.GetChannel(uint(id))
 	existingTribe := ch.db.GetTribe(existing.TribeUUID)
 	if existing.ID == 0 {
-		fmt.Println("existing id is 0")
+		logger.Log.Info("existing id is 0")
 		w.WriteHeader(http.StatusUnauthorized)
 		return
 	}
 	if existingTribe.OwnerPubKey != pubKeyFromAuth {
-		fmt.Println("keys dont match")
+		 logger.Log.Info("keys dont match")
 		w.WriteHeader(http.StatusUnauthorized)
 		return
 	}
@@ -70,7 +70,7 @@ func (ch *channelHandler) CreateChannel(w http.ResponseWriter, r *http.Request) 
 	r.Body.Close()
 	err = json.Unmarshal(body, &channel)
 	if err != nil {
-		fmt.Println(err)
+		logger.Log.Error("%v", err)
 		w.WriteHeader(http.StatusNotAcceptable)
 		return
 	}
@@ -78,7 +78,7 @@ func (ch *channelHandler) CreateChannel(w http.ResponseWriter, r *http.Request) 
 	//check that the tribe has the same pubKeyFromAuth
 	tribe := ch.db.GetTribe(channel.TribeUUID)
 	if tribe.OwnerPubKey != pubKeyFromAuth {
-		fmt.Println(err)
+		logger.Log.Error("%v", err)
 		w.WriteHeader(http.StatusUnauthorized)
 		return
 	}
@@ -86,7 +86,7 @@ func (ch *channelHandler) CreateChannel(w http.ResponseWriter, r *http.Request) 
 	tribeChannels := ch.db.GetChannelsByTribe(channel.TribeUUID)
 	for _, tribeChannel := range tribeChannels {
 		if tribeChannel.Name == channel.Name {
-			fmt.Println("Channel name already in use")
+			logger.Log.Info("Channel name already in use")
 			w.WriteHeader(http.StatusNotAcceptable)
 			return
 
@@ -95,7 +95,7 @@ func (ch *channelHandler) CreateChannel(w http.ResponseWriter, r *http.Request) 
 
 	channel, err = ch.db.CreateChannel(channel)
 	if err != nil {
-		fmt.Println(err)
+		logger.Log.Error("%v", err)
 		w.WriteHeader(http.StatusNotAcceptable)
 		return
 	}

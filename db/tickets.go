@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"github.com/google/uuid"
+	"github.com/stakwork/sphinx-tribes/logger"
 	"gorm.io/gorm"
 )
 
@@ -181,7 +182,7 @@ func (db database) UpdateTicketsWithoutGroup(ticket Tickets) error {
 		data["author"] = "HUMAN"
 	}
 
-	fmt.Println("data ===", data)
+	logger.Log.Info("data === %v", data)
 
 	result := db.db.Model(&Tickets{}).Where("uuid = ?", ticket.UUID).Updates(data)
 

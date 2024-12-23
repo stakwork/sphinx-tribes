@@ -9,6 +9,7 @@ import (
 
 	"github.com/imroc/req"
 	"github.com/stakwork/sphinx-tribes/auth"
+	"github.com/stakwork/sphinx-tribes/logger"
 )
 
 func ConfirmIdentityTweet(username string) (string, error) {
@@ -20,7 +21,7 @@ func ConfirmIdentityTweet(username string) (string, error) {
 	if err != nil {
 		return "", err
 	}
-	Log.Info("Twitter verification token: %s", token)
+	logger.Log.Info("Twitter verification token: %s", token)
 	pubkey, err := auth.VerifyArbitrary(token, "Sphinx Verification")
 	return pubkey, err
 }
