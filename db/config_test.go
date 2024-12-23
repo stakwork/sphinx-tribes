@@ -3,6 +3,7 @@ package db
 import (
 	"testing"
 	"time"
+	"fmt"
 
 	"github.com/google/uuid"
 	"github.com/stakwork/sphinx-tribes/logger"
