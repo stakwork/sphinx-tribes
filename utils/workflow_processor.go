@@ -5,6 +5,7 @@ import (
 	"fmt"
 
 	"github.com/google/uuid"
+	"github.com/stakwork/sphinx-tribes/logger"
 )
 
 type ProcessorConfig struct {
@@ -33,6 +34,6 @@ func lookupProcessingConfig(source string) error {
 }
 
 func processWithHandler(requestID string) (string, error) {
-	Log.Info("Processing with default handler")
+	logger.Log.Info("Processing with default handler")
 	return fmt.Sprintf("Processed with default handler, RequestID: %s", requestID), nil
 }

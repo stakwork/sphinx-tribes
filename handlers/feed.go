@@ -13,7 +13,7 @@ import (
 
 	"github.com/stakwork/sphinx-tribes/db"
 	"github.com/stakwork/sphinx-tribes/feeds"
-	"github.com/stakwork/sphinx-tribes/utils"
+	"github.com/stakwork/sphinx-tribes/logger"
 	"google.golang.org/api/option"
 	"google.golang.org/api/youtube/v3"
 )
@@ -59,7 +59,7 @@ func DownloadYoutubeFeed(w http.ResponseWriter, r *http.Request) {
 	r.Body.Close()
 	err = json.Unmarshal(body, &youtube_download)
 	if err != nil {
-		utils.Log.Error("[feed] %v", err)
+		logger.Log.Error("[feed] %v", err)
 		w.WriteHeader(http.StatusNotAcceptable)
 		return
 	}
@@ -95,7 +95,7 @@ func DownloadYoutubeFeed(w http.ResponseWriter, r *http.Request) {
 func processYoutubeDownload(data []string) {
 	stakworkKey := fmt.Sprintf("Token token=%s", os.Getenv("STAKWORK_KEY"))
 	if stakworkKey == "" {
-		utils.Log.Error("[feed] Youtube Download Error: Stakwork key not found")
+		logger.Log.Error("[feed] Youtube Download Error: Stakwork key not found")
 	} else {
 		type Vars struct {
 			YoutubeContent []string `json:"youtube_content"`
@@ -129,7 +129,7 @@ func processYoutubeDownload(data []string) {
 
 		buf, err := json.Marshal(body)
 		if err != nil {
-			utils.Log.Error("[feed] Youtube error: Unable to parse message into byte buffer: %v", err)
+			logger.Log.Error("[feed] Youtube error: Unable to parse message into byte buffer: %v", err)
 			return
 		}
 
@@ -141,14 +141,14 @@ func processYoutubeDownload(data []string) {
 		client := &http.Client{}
 		response, err := client.Do(request)
 		if err != nil {
-			utils.Log.Error("[feed] Youtube Download Request Error: %v", err)
+			logger.Log.Error("[feed] Youtube Download Request Error: %v", err)
 		}
 		defer response.Body.Close()
 		res, err := io.ReadAll(response.Body)
 		if err != nil {
-			utils.Log.Error("[feed] Youtube Download Request Error: %v", err)
+			logger.Log.Error("[feed] Youtube Download Request Error: %v", err)
 		}
-		utils.Log.Info("[feed] Youtube Download Success: %s", string(res))
+		logger.Log.Info("[feed] Youtube Download Success: %s", string(res))
 	}
 }
 
@@ -159,7 +159,7 @@ func GetPodcast(w http.ResponseWriter, r *http.Request) {
 	episodes, err := getEpisodes(url, feedid)
 
 	if err != nil {
-		utils.Log.Error("[feed] %v", err)
+		logger.Log.Error("[feed] %v", err)
 		w.WriteHeader(http.StatusNotFound)
 		return
 	}
@@ -168,7 +168,7 @@ func GetPodcast(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusOK)
 	err = json.NewEncoder(w).Encode(podcast)
 	if err != nil {
-		utils.Log.Error("[feed] %v", err)
+		logger.Log.Error("[feed] %v", err)
 	}
 }
 
@@ -268,7 +268,7 @@ func getFeed(feedURL string, feedID string) (*feeds.Podcast, error) {
 	resp, err := client.Do(req)
 
 	if err != nil {
-		utils.Log.Error("[feed] GET error: %v", err)
+		logger.Log.Error("[feed] GET error: %v", err)
 		return nil, err
 	}
 	defer resp.Body.Close()
@@ -277,7 +277,7 @@ func getFeed(feedURL string, feedID string) (*feeds.Podcast, error) {
 	body, err := io.ReadAll(resp.Body)
 	err = json.Unmarshal(body, &r)
 	if err != nil {
-		utils.Log.Error("[feed] json unmarshall error: %v", err)
+		logger.Log.Error("[feed] json unmarshall error: %v", err)
 		return nil, err
 	}
 
@@ -310,7 +310,7 @@ func getEpisodes(feedURL string, feedID string) ([]feeds.Episode, error) {
 	resp, err := client.Do(req)
 
 	if err != nil {
-		utils.Log.Error("[feed] GET error: %v", err)
+		logger.Log.Error("[feed] GET error: %v", err)
 		return nil, err
 	}
 	defer resp.Body.Close()
@@ -319,7 +319,7 @@ func getEpisodes(feedURL string, feedID string) ([]feeds.Episode, error) {
 	body, err := io.ReadAll(resp.Body)
 	err = json.Unmarshal(body, &r)
 	if err != nil {
-		utils.Log.Error("[feed] json unmarshall error: %v", err)
+		logger.Log.Error("[feed] json unmarshall error: %v", err)
 		return nil, err
 	}
 
@@ -344,7 +344,7 @@ func searchPodcastIndex(term string) ([]feeds.Podcast, error) {
 	resp, err := client.Do(req)
 
 	if err != nil {
-		utils.Log.Error("[feed] GET error: %v", err)
+		logger.Log.Error("[feed] GET error: %v", err)
 		return nil, err
 	}
 	defer resp.Body.Close()
@@ -353,7 +353,7 @@ func searchPodcastIndex(term string) ([]feeds.Podcast, error) {
 	body, err := io.ReadAll(resp.Body)
 	err = json.Unmarshal(body, &r)
 	if err != nil {
-		utils.Log.Error("[feed] json unmarshall error: %v", err)
+		logger.Log.Error("[feed] json unmarshall error: %v", err)
 		return nil, err
 	}
 

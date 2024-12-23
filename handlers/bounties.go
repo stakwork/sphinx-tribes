@@ -10,7 +10,7 @@ import (
 
 	"github.com/lib/pq"
 	"github.com/stakwork/sphinx-tribes/db"
-	"github.com/stakwork/sphinx-tribes/utils"
+	"github.com/stakwork/sphinx-tribes/logger"
 )
 
 func GetWantedsHeader(w http.ResponseWriter, r *http.Request) {
@@ -54,7 +54,7 @@ func DeleteBountyAssignee(w http.ResponseWriter, r *http.Request) {
 	err = json.Unmarshal(body, &invoice)
 
 	if err != nil {
-		utils.Log.Error("%v", err)
+		logger.Log.Error("%v", err)
 		w.WriteHeader(http.StatusNotAcceptable)
 		return
 	}
@@ -91,17 +91,17 @@ func MigrateBounties(w http.ResponseWriter, r *http.Request) {
 	peeps := db.DB.GetAllPeople()
 
 	for indexPeep, peep := range peeps {
-		utils.Log.Info("peep: %d", indexPeep)
+		logger.Log.Info("peep: %d", indexPeep)
 		bounties, ok := peep.Extras["wanted"].([]interface{})
 
 		if !ok {
-			utils.Log.Info("Wanted not there")
+			logger.Log.Info("Wanted not there")
 			continue
 		}
 
 		for index, bounty := range bounties {
 
-			utils.Log.Info("looping bounties: %d", index)
+			logger.Log.Info("looping bounties: %d", index)
 			migrateBounty := bounty.(map[string]interface{})
 
 			migrateBountyFinal := db.Bounty{}
@@ -156,8 +156,8 @@ func MigrateBounties(w http.ResponseWriter, r *http.Request) {
 			if !ok7 {
 				migrateBountyFinal.Created = 0
 			} else {
-				utils.Log.Info("Type: %v", reflect.TypeOf(CreatedInt64))
-				utils.Log.Info("Timestamp: %d", CreatedInt64)
+				logger.Log.Info("Type: %v", reflect.TypeOf(CreatedInt64))
+				logger.Log.Info("Timestamp: %d", CreatedInt64)
 				migrateBountyFinal.Created = CreatedInt64
 			}
 
@@ -237,7 +237,7 @@ func MigrateBounties(w http.ResponseWriter, r *http.Request) {
 			} else {
 				migrateBountyFinal.EstimatedCompletionDate = EstimatedCompletionDate
 			}
-			utils.Log.Info("Bounty about to be added ")
+			logger.Log.Info("Bounty about to be added ")
 			db.DB.AddBounty(migrateBountyFinal)
 			//Migrate the bounties here
 		}

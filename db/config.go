@@ -6,7 +6,7 @@ import (
 	"os"
 
 	"github.com/rs/xid"
-	"github.com/stakwork/sphinx-tribes/utils"
+	"github.com/stakwork/sphinx-tribes/logger"
 	"gopkg.in/go-playground/validator.v9"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
@@ -41,7 +41,7 @@ var DB database
 
 func InitDB() {
 	dbURL := os.Getenv("DATABASE_URL")
-	utils.Log.Info("db url : %v", dbURL)
+	logger.Log.Info("db url : %v", dbURL)
 
 	if dbURL == "" {
 		rdsHost := os.Getenv("RDS_HOSTNAME")
@@ -68,7 +68,7 @@ func InitDB() {
 	}
 
 	DB.db = db
-	utils.Log.Info("db connected")
+	logger.Log.Info("db connected")
 
 	// migrate table changes
 	db.AutoMigrate(&Tribe{})
@@ -472,7 +472,7 @@ func (db database) ProcessUpdateTicketsWithoutGroup() {
 
 	// update each ticket with group uuid
 	for _, ticket := range tickets {
-		utils.Log.Info("ticket from process: %v", ticket)
+		logger.Log.Info("ticket from process: %v", ticket)
 		err := db.UpdateTicketsWithoutGroup(ticket)
 		if err != nil {
 			log.Printf("Error updating ticket: %v", err)

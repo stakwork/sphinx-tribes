@@ -14,6 +14,7 @@ import (
 	"github.com/google/uuid"
 	"github.com/stakwork/sphinx-tribes/auth"
 	"github.com/stakwork/sphinx-tribes/db"
+	"github.com/stakwork/sphinx-tribes/logger"
 	"github.com/stakwork/sphinx-tribes/utils"
 	"github.com/stakwork/sphinx-tribes/websocket"
 )
@@ -81,7 +82,7 @@ func (th *ticketHandler) UpdateTicket(w http.ResponseWriter, r *http.Request) {
 	pubKeyFromAuth, _ := ctx.Value(auth.ContextKey).(string)
 
 	if pubKeyFromAuth == "" {
-		utils.Log.Info("[ticket] no pubkey from auth")
+		logger.Log.Info("[ticket] no pubkey from auth")
 		w.WriteHeader(http.StatusUnauthorized)
 		json.NewEncoder(w).Encode(map[string]string{"error": "Unauthorized"})
 		return
@@ -206,7 +207,7 @@ func (th *ticketHandler) DeleteTicket(w http.ResponseWriter, r *http.Request) {
 	pubKeyFromAuth, _ := ctx.Value(auth.ContextKey).(string)
 
 	if pubKeyFromAuth == "" {
-		utils.Log.Info("[ticket] no pubkey from auth")
+		logger.Log.Info("[ticket] no pubkey from auth")
 		w.WriteHeader(http.StatusUnauthorized)
 		json.NewEncoder(w).Encode(map[string]string{"error": "Unauthorized"})
 		return
@@ -240,7 +241,7 @@ func (th *ticketHandler) PostTicketDataToStakwork(w http.ResponseWriter, r *http
 	pubKeyFromAuth, _ := ctx.Value(auth.ContextKey).(string)
 
 	if pubKeyFromAuth == "" {
-		utils.Log.Info("[ticket] no pubkey from auth")
+		logger.Log.Info("[ticket] no pubkey from auth")
 		w.WriteHeader(http.StatusUnauthorized)
 		json.NewEncoder(w).Encode(map[string]string{"error": "Unauthorized"})
 		return
@@ -624,7 +625,7 @@ func (th *ticketHandler) GetTicketsByPhaseUUID(w http.ResponseWriter, r *http.Re
 	ctx := r.Context()
 	pubKeyFromAuth, _ := ctx.Value(auth.ContextKey).(string)
 	if pubKeyFromAuth == "" {
-		utils.Log.Info("no pubkey from auth")
+		logger.Log.Info("no pubkey from auth")
 		w.WriteHeader(http.StatusUnauthorized)
 		return
 	}

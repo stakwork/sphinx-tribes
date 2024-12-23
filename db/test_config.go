@@ -4,7 +4,7 @@ import (
 	"fmt"
 
 	"github.com/rs/xid"
-	"github.com/stakwork/sphinx-tribes/utils"
+	"github.com/stakwork/sphinx-tribes/logger"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 )
@@ -36,7 +36,7 @@ func InitTestDB() {
 
 	TestDB.db = db
 
-	utils.Log.Info("DB CONNECTED")
+	logger.Log.Info("DB CONNECTED")
 
 	// migrate table changes
 	db.AutoMigrate(&Tribe{})

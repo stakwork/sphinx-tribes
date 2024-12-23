@@ -12,7 +12,7 @@ import (
 	"github.com/go-chi/chi"
 	"github.com/stakwork/sphinx-tribes/auth"
 	"github.com/stakwork/sphinx-tribes/db"
-	"github.com/stakwork/sphinx-tribes/utils"
+	"github.com/stakwork/sphinx-tribes/logger"
 )
 
 type botHandler struct {
@@ -36,7 +36,7 @@ func (bt *botHandler) CreateOrEditBot(w http.ResponseWriter, r *http.Request) {
 	r.Body.Close()
 	err = json.Unmarshal(body, &bot)
 	if err != nil {
-		utils.Log.Error("%v", err)
+		logger.Log.Error("%v", err)
 		w.WriteHeader(http.StatusNotAcceptable)
 		return
 	}
@@ -50,7 +50,7 @@ func (bt *botHandler) CreateOrEditBot(w http.ResponseWriter, r *http.Request) {
 
 	extractedPubkey, err := bt.verifyTribeUUID(bot.UUID, false)
 	if err != nil {
-		utils.Log.Error("%v", err)
+		logger.Log.Error("%v", err)
 		w.WriteHeader(http.StatusUnauthorized)
 		return
 	}
@@ -70,7 +70,7 @@ func (bt *botHandler) CreateOrEditBot(w http.ResponseWriter, r *http.Request) {
 
 	_, err = bt.db.CreateOrEditBot(bot)
 	if err != nil {
-		utils.Log.Error("=> ERR createOrEditBot: %v", err)
+		logger.Log.Error("=> ERR createOrEditBot: %v", err)
 		w.WriteHeader(http.StatusBadRequest)
 		return
 	}
@@ -127,7 +127,7 @@ func (bt *botHandler) DeleteBot(w http.ResponseWriter, r *http.Request) {
 
 	uuid := chi.URLParam(r, "uuid")
 
-	utils.Log.Info("uuid: %s", uuid)
+	logger.Log.Info("uuid: %s", uuid)
 
 	if uuid == "" {
 		w.WriteHeader(http.StatusUnauthorized)
@@ -136,7 +136,7 @@ func (bt *botHandler) DeleteBot(w http.ResponseWriter, r *http.Request) {
 
 	extractedPubkey, err := bt.verifyTribeUUID(uuid, false)
 	if err != nil {
-		utils.Log.Error("%v", err)
+		logger.Log.Error("%v", err)
 		w.WriteHeader(http.StatusUnauthorized)
 		return
 	}
