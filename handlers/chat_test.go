@@ -160,7 +160,7 @@ func TestUpdateChat(t *testing.T) {
 	})
 }
 
-func TestGetChat(t *testing.T) {
+func TestCreateChat(t *testing.T) {
 	teardownSuite := SetupSuite(t)
 	defer teardownSuite(t)
 
@@ -321,6 +321,199 @@ func TestGetChat(t *testing.T) {
 		responseChats, ok := response.Data.([]interface{})
 		assert.True(t, ok)
 		assert.Equal(t, 100, len(responseChats))
+	})
+
+	t.Run("should successfully create chat when valid data is provided", func(t *testing.T) {
+		rr := httptest.NewRecorder()
+		handler := http.HandlerFunc(chatHandler.CreateChat)
+
+		requestBody := map[string]string{
+			"workspaceId": "workspace123",
+			"title":       "Test Chat",
+		}
+		bodyBytes, _ := json.Marshal(requestBody)
+
+		req, err := http.NewRequest(
+			http.MethodPost,
+			"/hivechat",
+			bytes.NewReader(bodyBytes),
+		)
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		handler.ServeHTTP(rr, req)
+
+		var response ChatResponse
+		_ = json.Unmarshal(rr.Body.Bytes(), &response)
+		assert.Equal(t, http.StatusOK, rr.Code)
+		assert.True(t, response.Success)
+		assert.Equal(t, "Chat created successfully", response.Message)
+
+		responseData, ok := response.Data.(map[string]interface{})
+		assert.True(t, ok, "Response data should be a map")
+		assert.NotEmpty(t, responseData["id"])
+		assert.Equal(t, "workspace123", responseData["workspaceId"])
+		assert.Equal(t, "Test Chat", responseData["title"])
+	})
+
+	t.Run("should return bad request when request body is invalid", func(t *testing.T) {
+		rr := httptest.NewRecorder()
+		handler := http.HandlerFunc(chatHandler.CreateChat)
+
+		invalidJson := []byte(`{"title": "Test Chat"`)
+		req, err := http.NewRequest(
+			http.MethodPost,
+			"/hivechat",
+			bytes.NewReader(invalidJson),
+		)
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		handler.ServeHTTP(rr, req)
+
+		var response ChatResponse
+		_ = json.Unmarshal(rr.Body.Bytes(), &response)
+		assert.Equal(t, http.StatusBadRequest, rr.Code)
+		assert.False(t, response.Success)
+		assert.Equal(t, "Invalid request body", response.Message)
+	})
+
+	t.Run("should return bad request when required field workspaceId is missing", func(t *testing.T) {
+		rr := httptest.NewRecorder()
+		handler := http.HandlerFunc(chatHandler.CreateChat)
+
+		requestBody := map[string]string{
+			"title": "Test Chat",
+		}
+		bodyBytes, _ := json.Marshal(requestBody)
+
+		req, err := http.NewRequest(
+			http.MethodPost,
+			"/hivechat",
+			bytes.NewReader(bodyBytes),
+		)
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		handler.ServeHTTP(rr, req)
+
+		var response ChatResponse
+		_ = json.Unmarshal(rr.Body.Bytes(), &response)
+		assert.Equal(t, http.StatusBadRequest, rr.Code)
+		assert.False(t, response.Success)
+		assert.Equal(t, "Invalid request body", response.Message)
+	})
+
+	t.Run("should return bad request when required field title is missing", func(t *testing.T) {
+		rr := httptest.NewRecorder()
+		handler := http.HandlerFunc(chatHandler.CreateChat)
+
+		requestBody := map[string]string{
+			"workspaceId": "workspace123",
+		}
+		bodyBytes, _ := json.Marshal(requestBody)
+
+		req, err := http.NewRequest(
+			http.MethodPost,
+			"/hivechat",
+			bytes.NewReader(bodyBytes),
+		)
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		handler.ServeHTTP(rr, req)
+
+		var response ChatResponse
+		_ = json.Unmarshal(rr.Body.Bytes(), &response)
+		assert.Equal(t, http.StatusBadRequest, rr.Code)
+		assert.False(t, response.Success)
+		assert.Equal(t, "Invalid request body", response.Message)
+	})
+
+	t.Run("should handle empty strings in required fields", func(t *testing.T) {
+		rr := httptest.NewRecorder()
+		handler := http.HandlerFunc(chatHandler.CreateChat)
+
+		requestBody := map[string]string{
+			"workspaceId": "",
+			"title":       "",
+		}
+		bodyBytes, _ := json.Marshal(requestBody)
+
+		req, err := http.NewRequest(
+			http.MethodPost,
+			"/hivechat",
+			bytes.NewReader(bodyBytes),
+		)
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		handler.ServeHTTP(rr, req)
+
+		var response ChatResponse
+		_ = json.Unmarshal(rr.Body.Bytes(), &response)
+		assert.Equal(t, http.StatusBadRequest, rr.Code)
+		assert.False(t, response.Success)
+		assert.Equal(t, "Invalid request body", response.Message)
+	})
+
+	t.Run("should return bad request when non-string title is provided", func(t *testing.T) {
+		rr := httptest.NewRecorder()
+		handler := http.HandlerFunc(chatHandler.CreateChat)
+
+		rawJSON := []byte(`{
+			"workspaceId": "workspace123",
+			"title": 12345
+		}`)
+
+		req, err := http.NewRequest(
+			http.MethodPost,
+			"/hivechat",
+			bytes.NewReader(rawJSON),
+		)
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		handler.ServeHTTP(rr, req)
+
+		var response ChatResponse
+		_ = json.Unmarshal(rr.Body.Bytes(), &response)
+		assert.Equal(t, http.StatusBadRequest, rr.Code)
+		assert.False(t, response.Success)
+		assert.Equal(t, "Invalid request body", response.Message)
+	})
+
+	t.Run("should return bad request when non-string workspaceId is provided", func(t *testing.T) {
+		rr := httptest.NewRecorder()
+		handler := http.HandlerFunc(chatHandler.CreateChat)
+
+		rawJSON := []byte(`{
+			"workspaceId": 12345,
+			"title": "Test Chat"
+		}`)
+
+		req, err := http.NewRequest(
+			http.MethodPost,
+			"/hivechat",
+			bytes.NewReader(rawJSON),
+		)
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		handler.ServeHTTP(rr, req)
+
+		var response ChatResponse
+		_ = json.Unmarshal(rr.Body.Bytes(), &response)
+		assert.Equal(t, http.StatusBadRequest, rr.Code)
+		assert.False(t, response.Success)
+		assert.Equal(t, "Invalid request body", response.Message)
 	})
 }
 
