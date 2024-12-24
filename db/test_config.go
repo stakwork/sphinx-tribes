@@ -94,3 +94,7 @@ func CleanTestData() {
 
 	TestDB.db.Exec("DELETE FROM people")
 }
+
+func DeleteAllChatMessages() {
+	TestDB.db.Exec("DELETE FROM chat_messages")
+}
