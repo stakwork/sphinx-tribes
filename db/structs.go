@@ -925,6 +925,15 @@ type FilterStattuCount struct {
 	Failed    int64 `json:"failed"`
 }
 
+type BountyCard struct {
+	BountyID    uint              `json:"id"`
+	Title       string            `json:"title"`
+	AssigneePic string            `json:"assignee_img,omitempty"`
+	Features    WorkspaceFeatures `json:"features"`
+	Phase       FeaturePhase      `json:"phase"`
+	Workspace   Workspace         `json:"workspace"`
+}
+
 type WfRequestStatus string
 
 const (
