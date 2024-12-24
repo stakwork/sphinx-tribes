@@ -2,6 +2,7 @@ package utils
 
 import (
 	"errors"
+	"strings"
 )
 
 type TicketReviewRequest struct {
@@ -16,10 +17,13 @@ type TicketReviewRequest struct {
 }
 
 func ValidateTicketReviewRequest(req *TicketReviewRequest) error {
-	if req.Value.TicketUUID == "" {
+	if req == nil {
+		return errors.New("nil request")
+	}
+	if strings.TrimSpace(req.Value.TicketUUID) == "" {
 		return errors.New("ticketUUID is required")
 	}
-	if req.Value.TicketDescription == "" {
+	if strings.TrimSpace(req.Value.TicketDescription) == "" {
 		return errors.New("ticketDescription is required")
 	}
 	return nil
