@@ -72,6 +72,15 @@ func (ch *ChatHandler) CreateChat(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	if request.WorkspaceID == "" || request.Title == "" {
+		w.WriteHeader(http.StatusBadRequest)
+		json.NewEncoder(w).Encode(ChatResponse{
+			Success: false,
+			Message: "Invalid request body",
+		})
+		return
+	}
+	
 	chat := &db.Chat{
 		ID:          xid.New().String(),
 		WorkspaceID: request.WorkspaceID,
