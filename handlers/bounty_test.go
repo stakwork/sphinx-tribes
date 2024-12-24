@@ -2202,3 +2202,193 @@ func TestPollInvoice(t *testing.T) {
 		mockHttpClient.AssertExpectations(t)
 	})
 }
+
+func TestGetBountyCards(t *testing.T) {
+	teardownSuite := SetupSuite(t)
+	defer teardownSuite(t)
+
+	mockHttpClient := mocks.NewHttpClient(t)
+	bHandler := NewBountyHandler(mockHttpClient, db.TestDB)
+
+	db.CleanTestData()
+
+	workspace := db.Workspace{
+		ID:          1,
+		Uuid:        "test-workspace-uuid",
+		Name:        "Test Workspace",
+		Description: "Test Workspace Description",
+		OwnerPubKey: "test-owner",
+	}
+	db.TestDB.CreateOrEditWorkspace(workspace)
+
+	phase := db.FeaturePhase{
+		Uuid:        "test-phase-uuid",
+		Name:        "Test Phase",
+		FeatureUuid: "test-feature-uuid",
+	}
+	db.TestDB.CreateOrEditFeaturePhase(phase)
+
+	feature := db.WorkspaceFeatures{
+		Uuid:          "test-feature-uuid",
+		Name:          "Test Feature",
+		WorkspaceUuid: workspace.Uuid,
+	}
+	db.TestDB.CreateOrEditFeature(feature)
+
+	assignee := db.Person{
+		OwnerPubKey: "test-assignee",
+		Img:         "test-image-url",
+	}
+	db.TestDB.CreateOrEditPerson(assignee)
+
+	now := time.Now()
+	bounty := db.NewBounty{
+		ID:            1,
+		Type:          "coding",
+		Title:         "Test Bounty",
+		Description:   "Test Description",
+		WorkspaceUuid: workspace.Uuid,
+		PhaseUuid:     phase.Uuid,
+		Assignee:      assignee.OwnerPubKey,
+		Show:          true,
+		Created:       now.Unix(),
+		OwnerID:       "test-owner",
+		Price:         1000,
+		Paid:          false,
+	}
+	db.TestDB.CreateOrEditBounty(bounty)
+
+	t.Run("should successfully return bounty cards", func(t *testing.T) {
+		rr := httptest.NewRecorder()
+		handler := http.HandlerFunc(bHandler.GetBountyCards)
+
+		req, err := http.NewRequest(http.MethodGet, "/gobounties/bounty-cards?workspace_uuid="+workspace.Uuid, nil)
+		assert.NoError(t, err)
+
+		handler.ServeHTTP(rr, req)
+
+		var response []db.BountyCard
+		err = json.Unmarshal(rr.Body.Bytes(), &response)
+		assert.NoError(t, err)
+		assert.Equal(t, http.StatusOK, rr.Code)
+		assert.NotEmpty(t, response, "Response should not be empty")
+
+		firstCard := response[0]
+		assert.Equal(t, bounty.ID, firstCard.BountyID)
+		assert.Equal(t, bounty.Title, firstCard.Title)
+		assert.Equal(t, assignee.Img, firstCard.AssigneePic)
+
+		assert.Equal(t, feature.Uuid, firstCard.Features.Uuid)
+		assert.Equal(t, feature.Name, firstCard.Features.Name)
+		assert.Equal(t, feature.WorkspaceUuid, firstCard.Features.WorkspaceUuid)
+
+		assert.Equal(t, phase.Uuid, firstCard.Phase.Uuid)
+		assert.Equal(t, phase.Name, firstCard.Phase.Name)
+		assert.Equal(t, phase.FeatureUuid, firstCard.Phase.FeatureUuid)
+
+		assert.Equal(t, workspace, firstCard.Workspace)
+	})
+
+	t.Run("should return empty array when no bounties exist", func(t *testing.T) {
+
+		db.TestDB.DeleteAllBounties()
+
+		rr := httptest.NewRecorder()
+		handler := http.HandlerFunc(bHandler.GetBountyCards)
+
+		req, err := http.NewRequest(http.MethodGet, "/gobounties/bounty-cards", nil)
+		assert.NoError(t, err)
+
+		handler.ServeHTTP(rr, req)
+
+		var response []db.BountyCard
+		err = json.Unmarshal(rr.Body.Bytes(), &response)
+		assert.NoError(t, err)
+		assert.Equal(t, http.StatusOK, rr.Code)
+		assert.Empty(t, response)
+	})
+
+	t.Run("should handle bounties without phase and feature", func(t *testing.T) {
+		bountyWithoutPhase := db.NewBounty{
+			ID:            2,
+			Type:          "coding",
+			Title:         "Test Bounty Without Phase",
+			Description:   "Test Description",
+			WorkspaceUuid: workspace.Uuid,
+			Assignee:      assignee.OwnerPubKey,
+			Show:          true,
+			Created:       now.Unix(),
+			OwnerID:       "test-owner",
+			Price:         1000,
+			Paid:          false,
+		}
+		db.TestDB.CreateOrEditBounty(bountyWithoutPhase)
+
+		rr := httptest.NewRecorder()
+		handler := http.HandlerFunc(bHandler.GetBountyCards)
+
+		req, err := http.NewRequest(http.MethodGet, "/gobounties/bounty-cards?workspace_uuid="+workspace.Uuid, nil)
+		assert.NoError(t, err)
+
+		handler.ServeHTTP(rr, req)
+
+		var response []db.BountyCard
+		err = json.Unmarshal(rr.Body.Bytes(), &response)
+		assert.NoError(t, err)
+		assert.Equal(t, http.StatusOK, rr.Code)
+		assert.NotEmpty(t, response)
+
+		var cardWithoutPhase db.BountyCard
+		for _, card := range response {
+			if card.BountyID == bountyWithoutPhase.ID {
+				cardWithoutPhase = card
+				break
+			}
+		}
+
+		assert.Equal(t, bountyWithoutPhase.ID, cardWithoutPhase.BountyID)
+		assert.Equal(t, bountyWithoutPhase.Title, cardWithoutPhase.Title)
+		assert.Equal(t, assignee.Img, cardWithoutPhase.AssigneePic)
+		assert.Empty(t, cardWithoutPhase.Phase.Uuid)
+		assert.Empty(t, cardWithoutPhase.Features.Uuid)
+	})
+
+	t.Run("should handle bounties without assignee", func(t *testing.T) {
+
+		db.TestDB.DeleteAllBounties()
+
+		bountyWithoutAssignee := db.NewBounty{
+			ID:            1,
+			Type:          "coding",
+			Title:         "Test Bounty Without Assignee",
+			Description:   "Test Description",
+			WorkspaceUuid: workspace.Uuid,
+			PhaseUuid:     phase.Uuid,
+			Show:          true,
+			Created:       now.Unix(),
+			OwnerID:       "test-owner",
+			Price:         1000,
+			Paid:          false,
+		}
+		db.TestDB.CreateOrEditBounty(bountyWithoutAssignee)
+
+		rr := httptest.NewRecorder()
+		handler := http.HandlerFunc(bHandler.GetBountyCards)
+
+		req, err := http.NewRequest(http.MethodGet, "/gobounties/bounty-cards?workspace_uuid="+workspace.Uuid, nil)
+		assert.NoError(t, err)
+
+		handler.ServeHTTP(rr, req)
+
+		var response []db.BountyCard
+		err = json.Unmarshal(rr.Body.Bytes(), &response)
+		assert.NoError(t, err)
+		assert.Equal(t, http.StatusOK, rr.Code)
+		assert.NotEmpty(t, response, "Response should not be empty")
+
+		cardWithoutAssignee := response[0]
+		assert.Equal(t, bountyWithoutAssignee.ID, cardWithoutAssignee.BountyID)
+		assert.Equal(t, bountyWithoutAssignee.Title, cardWithoutAssignee.Title)
+		assert.Empty(t, cardWithoutAssignee.AssigneePic)
+	})
+}

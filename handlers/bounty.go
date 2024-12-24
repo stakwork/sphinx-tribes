@@ -1492,3 +1492,45 @@ func GetFilterCount(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusOK)
 	json.NewEncoder(w).Encode(filterCount)
 }
+
+func (h *bountyHandler) GetBountyCards(w http.ResponseWriter, r *http.Request) {
+	bounties := h.db.GetAllBounties(r)
+	var bountyCardResponse []db.BountyCard = h.GenerateBountyCardResponse(bounties)
+
+	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode(bountyCardResponse)
+}
+
+func (h *bountyHandler) GenerateBountyCardResponse(bounties []db.NewBounty) []db.BountyCard {
+	var bountyCardResponse []db.BountyCard
+
+	for i := 0; i < len(bounties); i++ {
+		bounty := bounties[i]
+
+		assignee := h.db.GetPersonByPubkey(bounty.Assignee)
+		workspace := h.db.GetWorkspaceByUuid(bounty.WorkspaceUuid)
+
+		var phase db.FeaturePhase
+		var feature db.WorkspaceFeatures
+
+		if bounty.PhaseUuid != "" {
+			phase, _ = h.db.GetPhaseByUuid(bounty.PhaseUuid)
+		}
+
+		if phase.FeatureUuid != "" {
+			feature = h.db.GetFeatureByUuid(phase.FeatureUuid)
+		}
+		b := db.BountyCard{
+			BountyID:    bounty.ID,
+			Title:       bounty.Title,
+			AssigneePic: assignee.Img,
+			Features:    feature,
+			Phase:       phase,
+			Workspace:   workspace,
+		}
+
+		bountyCardResponse = append(bountyCardResponse, b)
+	}
+
+	return bountyCardResponse
+}
