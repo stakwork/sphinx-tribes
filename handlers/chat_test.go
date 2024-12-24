@@ -9,6 +9,7 @@ import (
 	"net/http/httptest"
 	"net/url"
 	"testing"
+	"time"
 
 	"github.com/go-chi/chi"
 	"github.com/google/uuid"
@@ -314,4 +315,284 @@ func TestGetChat(t *testing.T) {
 		assert.True(t, ok)
 		assert.Equal(t, 100, len(responseChats))
 	})
+}
+
+
+func TestGetChatHistory(t *testing.T) {
+	teardownSuite := SetupSuite(t)
+	defer teardownSuite(t)
+
+	chatHandler := NewChatHandler(&http.Client{}, db.TestDB)
+
+	t.Run("should successfully get chat history when valid chat_id is provided", func(t *testing.T) {
+
+		chat := &db.Chat{
+			ID:          uuid.New().String(),
+			WorkspaceID: "workspace1",
+			Title:       "Test Chat",
+		}
+		db.TestDB.AddChat(chat)
+
+		messages := []db.ChatMessage{
+			{
+				ID:        uuid.New().String(),
+				ChatID:    chat.ID,
+				Message:   "Message 1",
+				Role:      "user",
+				Timestamp: time.Now(),
+			},
+			{
+				ID:        uuid.New().String(),
+				ChatID:    chat.ID,
+				Message:   "Message 2",
+				Role:      "assistant",
+				Timestamp: time.Now(),
+			},
+		}
+		for _, msg := range messages {
+			db.TestDB.AddChatMessage(&msg)
+		}
+
+		rr := httptest.NewRecorder()
+		rctx := chi.NewRouteContext()
+		rctx.URLParams.Add("uuid", chat.ID)
+		req, err := http.NewRequestWithContext(
+			context.WithValue(context.Background(), chi.RouteCtxKey, rctx),
+			http.MethodGet,
+			"/hivechat/history/"+chat.ID,
+			nil,
+		)
+		assert.NoError(t, err)
+
+		handler := http.HandlerFunc(chatHandler.GetChatHistory)
+		handler.ServeHTTP(rr, req)
+
+		var response HistoryChatResponse
+		err = json.NewDecoder(rr.Body).Decode(&response)
+		assert.NoError(t, err)
+
+		assert.Equal(t, http.StatusOK, rr.Code)
+		assert.True(t, response.Success)
+		responseMessages, ok := response.Data.([]interface{})
+		assert.True(t, ok)
+		assert.Equal(t, 2, len(responseMessages))
+	})
+
+	t.Run("should return bad request when chat_id is missing", func(t *testing.T) {
+		rr := httptest.NewRecorder()
+		rctx := chi.NewRouteContext()
+		req, err := http.NewRequestWithContext(
+			context.WithValue(context.Background(), chi.RouteCtxKey, rctx),
+			http.MethodGet,
+			"/hivechat/history/",
+			nil,
+		)
+		assert.NoError(t, err)
+
+		handler := http.HandlerFunc(chatHandler.GetChatHistory)
+		handler.ServeHTTP(rr, req)
+
+		var response ChatResponse
+		err = json.NewDecoder(rr.Body).Decode(&response)
+		assert.NoError(t, err)
+
+		assert.Equal(t, http.StatusBadRequest, rr.Code)
+		assert.False(t, response.Success)
+		assert.Equal(t, "Chat ID is required", response.Message)
+	})
+
+	t.Run("should return empty array when chat has no messages", func(t *testing.T) {
+		chat := &db.Chat{
+			ID:          uuid.New().String(),
+			WorkspaceID: "workspace1",
+			Title:       "Empty Chat",
+		}
+		db.TestDB.AddChat(chat)
+
+		rr := httptest.NewRecorder()
+		rctx := chi.NewRouteContext()
+		rctx.URLParams.Add("uuid", chat.ID)
+		req, err := http.NewRequestWithContext(
+			context.WithValue(context.Background(), chi.RouteCtxKey, rctx),
+			http.MethodGet,
+			"/hivechat/history/"+chat.ID,
+			nil,
+		)
+		assert.NoError(t, err)
+
+		handler := http.HandlerFunc(chatHandler.GetChatHistory)
+		handler.ServeHTTP(rr, req)
+
+		var response HistoryChatResponse
+		err = json.NewDecoder(rr.Body).Decode(&response)
+		assert.NoError(t, err)
+
+		assert.Equal(t, http.StatusOK, rr.Code)
+		assert.True(t, response.Success)
+		responseMessages, ok := response.Data.([]interface{})
+		assert.True(t, ok)
+		assert.Empty(t, responseMessages)
+	})
+
+	t.Run("should handle chat with large number of messages", func(t *testing.T) {
+		chat := &db.Chat{
+			ID:          uuid.New().String(),
+			WorkspaceID: "workspace1",
+			Title:       "Large Chat",
+		}
+		db.TestDB.AddChat(chat)
+
+		for i := 0; i < 100; i++ {
+			message := &db.ChatMessage{
+				ID:        uuid.New().String(),
+				ChatID:    chat.ID,
+				Message:   fmt.Sprintf("Message %d", i),
+				Role:      "user",
+				Timestamp: time.Now(),
+			}
+			db.TestDB.AddChatMessage(message)
+		}
+
+		rr := httptest.NewRecorder()
+		rctx := chi.NewRouteContext()
+		rctx.URLParams.Add("uuid", chat.ID)
+		req, err := http.NewRequestWithContext(
+			context.WithValue(context.Background(), chi.RouteCtxKey, rctx),
+			http.MethodGet,
+			"/hivechat/history/"+chat.ID,
+			nil,
+		)
+		assert.NoError(t, err)
+
+		handler := http.HandlerFunc(chatHandler.GetChatHistory)
+		handler.ServeHTTP(rr, req)
+
+		var response HistoryChatResponse
+		err = json.NewDecoder(rr.Body).Decode(&response)
+		assert.NoError(t, err)
+
+		assert.Equal(t, http.StatusOK, rr.Code)
+		assert.True(t, response.Success)
+		responseMessages, ok := response.Data.([]interface{})
+		assert.True(t, ok)
+		assert.Equal(t, 100, len(responseMessages))
+	})
+
+	t.Run("Valid Chat ID with No Messages", func(t *testing.T) {
+		chat := &db.Chat{
+			ID:          uuid.New().String(),
+			WorkspaceID: "workspace1",
+			Title:       "Empty Chat",
+		}
+		db.TestDB.AddChat(chat)
+
+		rr := httptest.NewRecorder()
+		rctx := chi.NewRouteContext()
+		rctx.URLParams.Add("uuid", chat.ID)
+		req := httptest.NewRequest(http.MethodGet, "/hivechat/history/"+chat.ID, nil)
+		req = req.WithContext(context.WithValue(req.Context(), chi.RouteCtxKey, rctx))
+
+		chatHandler.GetChatHistory(rr, req)
+
+		var response HistoryChatResponse
+		json.NewDecoder(rr.Body).Decode(&response)
+
+		assert.Equal(t, http.StatusOK, rr.Code)
+		assert.True(t, response.Success)
+		messages, ok := response.Data.([]interface{})
+		assert.True(t, ok)
+		assert.Empty(t, messages)
+	})
+
+	t.Run("Chat ID with Special Characters", func(t *testing.T) {
+
+		db.DeleteAllChats()
+		db.DeleteAllChatMessages()
+
+		specialChatID := "special!@#$%^&*()_+-=[]{}|;:,.<>?"
+		chat := &db.Chat{
+			ID:          specialChatID,
+			WorkspaceID: "workspace1",
+			Title:       "Special Chat",
+		}
+		db.TestDB.AddChat(chat)
+
+		message := &db.ChatMessage{
+			ID:        uuid.New().String(),
+			ChatID:    specialChatID,
+			Message:   "Special message",
+			Role:      "user",
+			Timestamp: time.Now(),
+		}
+		db.TestDB.AddChatMessage(message)
+
+		rr := httptest.NewRecorder()
+		rctx := chi.NewRouteContext()
+		rctx.URLParams.Add("uuid", specialChatID)
+		req := httptest.NewRequest(
+			http.MethodGet,
+			"/hivechat/history/"+url.PathEscape(specialChatID),
+			nil,
+		)
+		req = req.WithContext(context.WithValue(req.Context(), chi.RouteCtxKey, rctx))
+
+		chatHandler.GetChatHistory(rr, req)
+
+		var response HistoryChatResponse
+		err := json.NewDecoder(rr.Body).Decode(&response)
+		assert.NoError(t, err)
+
+		assert.Equal(t, http.StatusOK, rr.Code)
+		assert.True(t, response.Success)
+
+		messages, ok := response.Data.([]interface{})
+		assert.True(t, ok)
+		assert.Equal(t, 1, len(messages))
+
+		firstMessage := messages[0].(map[string]interface{})
+		assert.Equal(t, specialChatID, firstMessage["chatId"])
+		assert.Equal(t, "Special message", firstMessage["message"])
+		assert.Equal(t, "user", firstMessage["role"])
+	})
+
+	t.Run("Non-Existent Chat ID", func(t *testing.T) {
+		nonExistentID := uuid.New().String()
+		rr := httptest.NewRecorder()
+		rctx := chi.NewRouteContext()
+		rctx.URLParams.Add("uuid", nonExistentID)
+		req := httptest.NewRequest(http.MethodGet, "/hivechat/history/"+nonExistentID, nil)
+		req = req.WithContext(context.WithValue(req.Context(), chi.RouteCtxKey, rctx))
+
+		chatHandler.GetChatHistory(rr, req)
+
+		var response HistoryChatResponse
+		json.NewDecoder(rr.Body).Decode(&response)
+
+		assert.Equal(t, http.StatusOK, rr.Code)
+		assert.True(t, response.Success)
+		messages, ok := response.Data.([]interface{})
+		assert.True(t, ok)
+		assert.Empty(t, messages)
+	})
+
+	t.Run("Malformed Chat ID", func(t *testing.T) {
+		malformedID := "malformed-chat-id-###"
+		rr := httptest.NewRecorder()
+		rctx := chi.NewRouteContext()
+		rctx.URLParams.Add("uuid", malformedID)
+		req := httptest.NewRequest(http.MethodGet, "/hivechat/history/"+malformedID, nil)
+		req = req.WithContext(context.WithValue(req.Context(), chi.RouteCtxKey, rctx))
+
+		chatHandler.GetChatHistory(rr, req)
+
+		var response HistoryChatResponse
+		json.NewDecoder(rr.Body).Decode(&response)
+
+		assert.Equal(t, http.StatusOK, rr.Code)
+		assert.True(t, response.Success)
+		messages, ok := response.Data.([]interface{})
+		assert.True(t, ok)
+		assert.Empty(t, messages)
+	})
+
 }
