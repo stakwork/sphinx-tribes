@@ -17,6 +17,7 @@ import (
 	"github.com/google/uuid"
 	"github.com/lib/pq"
 	"github.com/stakwork/sphinx-tribes/auth"
+	"github.com/stakwork/sphinx-tribes/config"
 	"github.com/stakwork/sphinx-tribes/db"
 	"github.com/stretchr/testify/assert"
 )
@@ -929,6 +930,203 @@ func TestPersonIsAdmin(t *testing.T) {
 			os.Setenv("ADMIN_PUBKEYS", tt.adminPubkeys)
 			result := PersonIsAdmin(tt.pk)
 			assert.Equal(t, tt.expected, result, "Test case: %s", tt.name)
+		})
+	}
+}
+
+func TestUpsertLogin(t *testing.T) {
+
+	config.InitConfig()
+	auth.InitJwt()
+
+	teardownSuite := SetupSuite(t)
+	defer teardownSuite(t)
+
+	pHandler := NewPeopleHandler(db.TestDB)
+
+	tests := []struct {
+		name             string
+		inputPerson      db.Person
+		setupRequest     func() (*httptest.ResponseRecorder, *http.Request)
+		expectedStatus   int
+		validateResponse func(t *testing.T, resp *httptest.ResponseRecorder, person db.Person)
+	}{
+		{
+			name: "Valid New Person Creation",
+			inputPerson: db.Person{
+				OwnerPubKey:  uuid.New().String(),
+				OwnerAlias:   "newAlias",
+				Description:  "test description",
+				Tags:         pq.StringArray{},
+				Extras:       db.PropertyMap{},
+				GithubIssues: db.PropertyMap{},
+			},
+			expectedStatus: http.StatusOK,
+			validateResponse: func(t *testing.T, resp *httptest.ResponseRecorder, person db.Person) {
+				assert.NotEmpty(t, resp.Body.String())
+
+				createdPerson := db.TestDB.GetPersonByPubkey(person.OwnerPubKey)
+				assert.NotEmpty(t, createdPerson)
+				assert.Equal(t, person.OwnerAlias, createdPerson.OwnerAlias)
+				assert.NotEmpty(t, createdPerson.UniqueName)
+				assert.NotEmpty(t, createdPerson.Created)
+				assert.NotEmpty(t, createdPerson.Uuid)
+			},
+		},
+		{
+			name: "Valid Existing Person Update",
+			inputPerson: db.Person{
+				OwnerPubKey:  uuid.New().String(),
+				OwnerAlias:   "existingAlias",
+				Description:  "initial description",
+				Tags:         pq.StringArray{},
+				Extras:       db.PropertyMap{},
+				GithubIssues: db.PropertyMap{},
+			},
+			expectedStatus: http.StatusOK,
+			validateResponse: func(t *testing.T, resp *httptest.ResponseRecorder, person db.Person) {
+
+				createdPerson, err := db.TestDB.CreateOrEditPerson(person)
+				assert.NoError(t, err)
+
+				updatedPerson := createdPerson
+				updatedPerson.Description = "updated description"
+
+				jsonBody, _ := json.Marshal(updatedPerson)
+				req := httptest.NewRequest(http.MethodPost, "/upsertlogin", bytes.NewReader(jsonBody))
+				w := httptest.NewRecorder()
+
+				pHandler.UpsertLogin(w, req)
+
+				assert.Equal(t, http.StatusOK, w.Code)
+				assert.NotEmpty(t, w.Body.String())
+
+				fetchedPerson := db.TestDB.GetPersonByPubkey(person.OwnerPubKey)
+				assert.Equal(t, "updated description", fetchedPerson.Description)
+			},
+		},
+		{
+			name:        "Empty Request Body",
+			inputPerson: db.Person{},
+			setupRequest: func() (*httptest.ResponseRecorder, *http.Request) {
+				req := httptest.NewRequest(http.MethodPost, "/upsertlogin", nil)
+				return httptest.NewRecorder(), req
+			},
+			expectedStatus: http.StatusNotAcceptable,
+			validateResponse: func(t *testing.T, resp *httptest.ResponseRecorder, person db.Person) {
+				assert.Contains(t, resp.Body.String(), "")
+			},
+		},
+		{
+			name:        "Invalid JSON Format",
+			inputPerson: db.Person{},
+			setupRequest: func() (*httptest.ResponseRecorder, *http.Request) {
+				req := httptest.NewRequest(http.MethodPost, "/upsertlogin", bytes.NewReader([]byte(`{"invalid json`)))
+				return httptest.NewRecorder(), req
+			},
+			expectedStatus:   http.StatusNotAcceptable,
+			validateResponse: func(t *testing.T, resp *httptest.ResponseRecorder, person db.Person) {},
+		},
+
+		{
+			name: "New Person with Non-zero ID",
+			inputPerson: db.Person{
+				ID:          1,
+				OwnerPubKey: uuid.New().String(),
+				OwnerAlias:  "newAlias",
+			},
+			expectedStatus: http.StatusUnauthorized,
+			validateResponse: func(t *testing.T, resp *httptest.ResponseRecorder, person db.Person) {
+				fetchedPerson := db.TestDB.GetPersonByPubkey(person.OwnerPubKey)
+				assert.Empty(t, fetchedPerson)
+			},
+		},
+		{
+			name: "Edit with Mismatched ID",
+			inputPerson: db.Person{
+				OwnerPubKey: uuid.New().String(),
+				OwnerAlias:  "existingAlias",
+			},
+			setupRequest: func() (*httptest.ResponseRecorder, *http.Request) {
+
+				person := db.Person{
+					OwnerPubKey: uuid.New().String(),
+					OwnerAlias:  "existingAlias",
+				}
+				createdPerson, _ := db.TestDB.CreateOrEditPerson(person)
+
+				updatedPerson := createdPerson
+				updatedPerson.ID = createdPerson.ID + 1
+
+				jsonBody, _ := json.Marshal(updatedPerson)
+				req := httptest.NewRequest(http.MethodPost, "/upsertlogin", bytes.NewReader(jsonBody))
+				return httptest.NewRecorder(), req
+			},
+			expectedStatus:   http.StatusUnauthorized,
+			validateResponse: func(t *testing.T, resp *httptest.ResponseRecorder, person db.Person) {},
+		},
+		{
+			name: "NewTicketTime Trigger",
+			inputPerson: db.Person{
+				OwnerPubKey:   uuid.New().String(),
+				OwnerAlias:    "ticketAlias",
+				NewTicketTime: time.Now().Unix(),
+				Tags:          pq.StringArray{},
+				Extras:        db.PropertyMap{},
+				GithubIssues:  db.PropertyMap{},
+			},
+			expectedStatus: http.StatusOK,
+			validateResponse: func(t *testing.T, resp *httptest.ResponseRecorder, person db.Person) {
+				assert.NotEmpty(t, resp.Body.String())
+
+				createdPerson := db.TestDB.GetPersonByPubkey(person.OwnerPubKey)
+				assert.NotEmpty(t, createdPerson)
+				assert.Equal(t, person.NewTicketTime, createdPerson.NewTicketTime)
+			},
+		},
+		{
+			name: "Large Extras Data",
+			inputPerson: db.Person{
+				OwnerPubKey:  uuid.New().String(),
+				OwnerAlias:   "extrasAlias",
+				Extras:       db.PropertyMap{"large_field": strings.Repeat("a", 1000)},
+				Tags:         pq.StringArray{},
+				GithubIssues: db.PropertyMap{},
+			},
+			expectedStatus: http.StatusOK,
+			validateResponse: func(t *testing.T, resp *httptest.ResponseRecorder, person db.Person) {
+				assert.NotEmpty(t, resp.Body.String())
+
+				createdPerson := db.TestDB.GetPersonByPubkey(person.OwnerPubKey)
+				assert.NotEmpty(t, createdPerson)
+				assert.Equal(t, person.Extras, createdPerson.Extras)
+			},
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+
+			db.CleanDB()
+
+			var w *httptest.ResponseRecorder
+			var req *http.Request
+
+			if tt.setupRequest != nil {
+				w, req = tt.setupRequest()
+			} else {
+				jsonBody, err := json.Marshal(tt.inputPerson)
+				assert.NoError(t, err)
+				req = httptest.NewRequest(http.MethodPost, "/upsertlogin", bytes.NewReader(jsonBody))
+				w = httptest.NewRecorder()
+			}
+
+			pHandler.UpsertLogin(w, req)
+
+			assert.Equal(t, tt.expectedStatus, w.Code)
+			if tt.validateResponse != nil {
+				tt.validateResponse(t, w, tt.inputPerson)
+			}
 		})
 	}
 }
