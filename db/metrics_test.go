@@ -1,6 +1,7 @@
 package db
 
 import (
+	"github.com/stretchr/testify/mock"
 	"math"
 	"testing"
 
@@ -220,6 +221,113 @@ func TestCompletedDifferenceCount(t *testing.T) {
 			result := mockDB.CompletedDifferenceCount(tt.dateRange, tt.workspace)
 
 			assert.Equal(t, tt.expected, result)
+		})
+	}
+}
+
+type MockDatabase struct {
+	mock.Mock
+}
+
+func (m *MockDatabase) TotalPeopleByPeriod(r PaymentDateRange) int64 {
+	args := m.Called(r)
+	return args.Get(0).(int64)
+}
+
+func TestTotalPeopleByPeriod(t *testing.T) {
+	mockDB := new(MockDatabase)
+
+	tests := []struct {
+		name          string
+		input         PaymentDateRange
+		mockReturn    int64
+		expectPanic   bool
+		expectedValue int64
+	}{
+		{
+			name:          "Standard Input with Valid Return Value",
+			input:         PaymentDateRange{StartDate: "2023-01-01", EndDate: "2023-12-31"},
+			mockReturn:    100,
+			expectPanic:   false,
+			expectedValue: 100,
+		},
+		{
+			name:          "Empty Date Range",
+			input:         PaymentDateRange{StartDate: "", EndDate: ""},
+			mockReturn:    0,
+			expectPanic:   false,
+			expectedValue: 0,
+		},
+		{
+			name:          "Single Day Date Range",
+			input:         PaymentDateRange{StartDate: "2023-01-01", EndDate: "2023-01-01"},
+			mockReturn:    1,
+			expectPanic:   false,
+			expectedValue: 1,
+		},
+		{
+			name:          "Maximum Date Range",
+			input:         PaymentDateRange{StartDate: "1900-01-01", EndDate: "2100-12-31"},
+			mockReturn:    10000,
+			expectPanic:   false,
+			expectedValue: 10000,
+		},
+		{
+			name:          "Invalid Date Range (End Date Before Start Date)",
+			input:         PaymentDateRange{StartDate: "2023-12-31", EndDate: "2023-01-01"},
+			mockReturn:    0,
+			expectPanic:   false,
+			expectedValue: 0,
+		},
+		{
+			name:          "Invalid Date Format",
+			input:         PaymentDateRange{StartDate: "2023-31-12", EndDate: "2023-01-01"},
+			mockReturn:    0,
+			expectPanic:   false,
+			expectedValue: 0,
+		},
+		{
+			name:          "Large Volume of Data",
+			input:         PaymentDateRange{StartDate: "2000-01-01", EndDate: "2023-12-31"},
+			mockReturn:    5000,
+			expectPanic:   false,
+			expectedValue: 5000,
+		},
+		{
+			name:          "Leap Year Date Range",
+			input:         PaymentDateRange{StartDate: "2020-02-28", EndDate: "2020-03-01"},
+			mockReturn:    2,
+			expectPanic:   false,
+			expectedValue: 2,
+		},
+		{
+			name:          "Boundary Date Range",
+			input:         PaymentDateRange{StartDate: "2023-12-31", EndDate: "2024-01-01"},
+			mockReturn:    1,
+			expectPanic:   false,
+			expectedValue: 1,
+		},
+		{
+			name:          "Non-Existent Date Range",
+			input:         PaymentDateRange{StartDate: "2023-02-30", EndDate: "2023-03-01"},
+			mockReturn:    0,
+			expectPanic:   false,
+			expectedValue: 0,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if tt.expectPanic {
+				assert.Panics(t, func() {
+					mockDB.TotalPeopleByPeriod(tt.input)
+				})
+			} else {
+				mockDB.On("TotalPeopleByPeriod", tt.input).Return(tt.mockReturn)
+				result := mockDB.TotalPeopleByPeriod(tt.input)
+				assert.Equal(t, tt.expectedValue, result)
+				mockDB.AssertExpectations(t)
+			}
 		})
 	}
 }
