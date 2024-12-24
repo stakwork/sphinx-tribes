@@ -98,6 +98,16 @@ func (m *mockDatabase) CompletedDifferenceCount(r PaymentDateRange, workspace st
 	return int64(len(list))
 }
 
+func (m *mockDatabase) AverageCompletedTime(r PaymentDateRange, workspace string) uint {
+    paidList := m.CompletedDifference(r, workspace)
+    paidCount := int64(len(paidList))
+    var paidSum uint
+    for _, diff := range paidList {
+        paidSum += uint(math.Round(diff.Diff))
+    }
+    return CalculateAverageDays(paidCount, paidSum)
+}
+
 func TestCompletedDifferenceCount(t *testing.T) {
 
 	tests := []struct {
@@ -222,4 +232,165 @@ func TestCompletedDifferenceCount(t *testing.T) {
 			assert.Equal(t, tt.expected, result)
 		})
 	}
+}
+
+
+func TestAverageCompletedTime(t *testing.T) {
+
+	tests := []struct {
+        name            string
+        dateRange      PaymentDateRange
+        workspace      string
+        mockData       []DateDifference
+        expected       uint
+    }{
+        {
+            name: "Standard Case - Multiple Entries",
+            dateRange: PaymentDateRange{
+                StartDate: "2023-01-01",
+                EndDate:   "2023-12-31",
+            },
+            workspace: "workspace1",
+            mockData:  []DateDifference{{Diff: 86400}, {Diff: 172800}},
+            expected:  2,
+        },
+        {
+            name: "Empty Result",
+            dateRange: PaymentDateRange{
+                StartDate: "2023-01-01",
+                EndDate:   "2023-12-31",
+            },
+            workspace: "workspace2",
+            mockData:  []DateDifference{},
+            expected:  0,
+        },
+        {
+            name: "Single Entry",
+            dateRange: PaymentDateRange{
+                StartDate: "2023-01-01",
+                EndDate:   "2023-12-31",
+            },
+            workspace: "workspace3",
+            mockData:  []DateDifference{{Diff: 86400}},
+            expected:  1,
+        },
+        {
+            name: "Very Small Time Difference",
+            dateRange: PaymentDateRange{
+                StartDate: "2023-01-01",
+                EndDate:   "2023-12-31",
+            },
+            workspace: "workspace4",
+            mockData:  []DateDifference{{Diff: 3600}}, 
+            expected:  0, 
+        },
+        {
+            name: "Large Time Difference",
+            dateRange: PaymentDateRange{
+                StartDate: "2023-01-01",
+                EndDate:   "2023-12-31",
+            },
+            workspace: "workspace5",
+            mockData:  []DateDifference{{Diff: 864000}}, 
+            expected:  10,
+        },
+        {
+            name: "Mixed Time Differences",
+            dateRange: PaymentDateRange{
+                StartDate: "2023-01-01",
+                EndDate:   "2023-12-31",
+            },
+            workspace: "workspace6",
+            mockData: []DateDifference{
+                {Diff: 86400},   
+                {Diff: 172800},  
+                {Diff: 259200}, 
+            },
+            expected: 2,
+        },
+        {
+            name: "No Workspace Specified",
+            dateRange: PaymentDateRange{
+                StartDate: "2023-01-01",
+                EndDate:   "2023-12-31",
+            },
+            workspace: "",
+            mockData:  []DateDifference{{Diff: 86400}},
+            expected:  1,
+        },
+        {
+            name: "Boundary Values - Zero",
+            dateRange: PaymentDateRange{
+                StartDate: "2023-01-01",
+                EndDate:   "2023-12-31",
+            },
+            workspace: "workspace7",
+            mockData:  []DateDifference{{Diff: 0}},
+            expected:  0,
+        },
+        {
+            name: "Boundary Values - Very Large",
+            dateRange: PaymentDateRange{
+                StartDate: "2023-01-01",
+                EndDate:   "2023-12-31",
+            },
+            workspace: "workspace8",
+            mockData:  []DateDifference{{Diff: 8640000}}, 
+            expected:  100,
+        },
+        {
+            name: "Invalid Date Range",
+            dateRange: PaymentDateRange{
+                StartDate: "2023-12-31",
+                EndDate:   "2023-01-01",
+            },
+            workspace: "workspace9",
+            mockData:  []DateDifference{},
+            expected:  0,
+        },
+        {
+            name: "Large Dataset",
+            dateRange: PaymentDateRange{
+                StartDate: "2023-01-01",
+                EndDate:   "2023-12-31",
+            },
+            workspace: "workspace10",
+            mockData: func() []DateDifference {
+                diffs := make([]DateDifference, 1000)
+                for i := range diffs {
+                    diffs[i] = DateDifference{Diff: 86400}
+                }
+                return diffs
+            }(),
+            expected: 1,
+        },
+        {
+            name: "Fractional Days",
+            dateRange: PaymentDateRange{
+                StartDate: "2023-01-01",
+                EndDate:   "2023-12-31",
+            },
+            workspace: "workspace11",
+            mockData: []DateDifference{
+                {Diff: 129600},  
+                {Diff: 172800},  
+            },
+            expected: 2,
+        },
+    }
+
+    for _, tt := range tests {
+        t.Run(tt.name, func(t *testing.T) {
+            mockDB := &mockDatabase{
+                completedDifferenceFn: func(r PaymentDateRange, workspace string) []DateDifference {
+                    assert.Equal(t, tt.dateRange, r)
+                    assert.Equal(t, tt.workspace, workspace)
+                    return tt.mockData
+                },
+            }
+
+            result := mockDB.AverageCompletedTime(tt.dateRange, tt.workspace)
+            assert.Equal(t, tt.expected, result)
+        })
+    }
 }
