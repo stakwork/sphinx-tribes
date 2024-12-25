@@ -2,15 +2,11 @@ package handlers
 
 import (
 	"encoding/json"
-	"io"
-	"log"
-	"net/http"
-	"reflect"
-	"strconv"
-
 	"github.com/lib/pq"
 	"github.com/stakwork/sphinx-tribes/db"
 	"github.com/stakwork/sphinx-tribes/logger"
+	"net/http"
+	"reflect"
 )
 
 func GetWantedsHeader(w http.ResponseWriter, r *http.Request) {
@@ -42,49 +38,6 @@ func GetBountiesLeaderboard(w http.ResponseWriter, _ *http.Request) {
 
 	w.WriteHeader(http.StatusOK)
 	json.NewEncoder(w).Encode(leaderBoard)
-}
-
-func DeleteBountyAssignee(w http.ResponseWriter, r *http.Request) {
-	invoice := db.DeleteBountyAssignee{}
-	body, err := io.ReadAll(r.Body)
-	var deletedAssignee bool
-
-	r.Body.Close()
-
-	err = json.Unmarshal(body, &invoice)
-
-	if err != nil {
-		logger.Log.Error("%v", err)
-		w.WriteHeader(http.StatusNotAcceptable)
-		return
-	}
-
-	owner_key := invoice.Owner_pubkey
-	date := invoice.Created
-
-	createdUint, _ := strconv.ParseUint(date, 10, 32)
-	b, err := db.DB.GetBountyByCreated(uint(createdUint))
-
-	if err == nil && b.OwnerID == owner_key {
-		b.Assignee = ""
-		b.AssignedHours = 0
-		b.CommitmentFee = 0
-		b.BountyExpires = ""
-
-		db.DB.UpdateBounty(b)
-
-		deletedAssignee = true
-	} else {
-		log.Printf("Could not delete bounty assignee")
-
-		deletedAssignee = false
-
-		w.WriteHeader(http.StatusBadRequest)
-		json.NewEncoder(w).Encode(deletedAssignee)
-	}
-
-	w.WriteHeader(http.StatusOK)
-	json.NewEncoder(w).Encode(deletedAssignee)
 }
 
 func MigrateBounties(w http.ResponseWriter, r *http.Request) {
