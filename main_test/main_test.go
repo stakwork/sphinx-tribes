@@ -10,16 +10,33 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-var executionCount = 0
-var mutex sync.Mutex
+type counter struct {
+	count int
+	mu    sync.Mutex
+}
 
-func mockHandler() {
-	mutex.Lock()
-	executionCount++
-	mutex.Unlock()
+func (c *counter) increment() {
+	c.mu.Lock()
+	defer c.mu.Unlock()
+	c.count++
+}
+
+func (c *counter) get() int {
+	c.mu.Lock()
+	defer c.mu.Unlock()
+	return c.count
+}
+
+func (c *counter) reset() {
+	c.mu.Lock()
+	defer c.mu.Unlock()
+	c.count = 0
 }
 
 func TestRunCron(t *testing.T) {
+
+	cnt := &counter{}
+
 	tests := []struct {
 		name     string
 		schedule string
@@ -48,16 +65,14 @@ func TestRunCron(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			resetExecutionCount()
+			cnt.reset()
 			c := cron.New()
 
 			started := make(chan bool, 1)
 			firstExecution := true
 
 			err := c.AddFunc(tt.schedule, func() {
-				mutex.Lock()
-				defer mutex.Unlock()
-				executionCount++
+				cnt.increment()
 				if firstExecution {
 					firstExecution = false
 					started <- true
@@ -81,47 +96,33 @@ func TestRunCron(t *testing.T) {
 			time.Sleep(tt.wait)
 			c.Stop()
 
-			mutex.Lock()
-			count := executionCount
-			mutex.Unlock()
+			t.Logf("Schedule: %s, Wait: %v, Executions: %d", tt.schedule, tt.wait, cnt.get())
 
-			t.Logf("Schedule: %s, Wait: %v, Executions: %d", tt.schedule, tt.wait, count)
-
-			if count < tt.want {
+			if cnt.get() < tt.want {
 
 				time.Sleep(500 * time.Millisecond)
-				mutex.Lock()
-				count = executionCount
-				mutex.Unlock()
+				cnt.increment()
 			}
 
-			assert.GreaterOrEqual(t, count, tt.want,
-				"Expected at least %d executions, got %d", tt.want, count)
+			assert.GreaterOrEqual(t, cnt.get(), tt.want,
+				"Expected at least %d executions, got %d", tt.want, cnt.get())
 		})
 	}
 }
 
-func resetExecutionCount() {
-	mutex.Lock()
-	defer mutex.Unlock()
-	executionCount = 0
-}
-
 func TestCronStopAndRestart(t *testing.T) {
-	resetExecutionCount()
+	cnt := &counter{}
 	c := cron.New()
 
 	started := make(chan bool, 1)
 	firstExecution := true
 
 	err := c.AddFunc("@every 100ms", func() {
-		mutex.Lock()
-		executionCount++
+		cnt.increment()
 		if firstExecution {
 			firstExecution = false
 			started <- true
 		}
-		mutex.Unlock()
 	})
 
 	if err != nil {
@@ -140,20 +141,14 @@ func TestCronStopAndRestart(t *testing.T) {
 	time.Sleep(300 * time.Millisecond)
 
 	c.Stop()
-	mutex.Lock()
-	initialCount := executionCount
-	mutex.Unlock()
+	initialCount := cnt.get()
 
 	t.Logf("Initial count after first run: %d", initialCount)
 	assert.Greater(t, initialCount, 0, "Should have at least one execution before stopping")
 
 	time.Sleep(300 * time.Millisecond)
 
-	mutex.Lock()
-	countAfterStop := executionCount
-	mutex.Unlock()
-
-	assert.Equal(t, initialCount, countAfterStop, "Cron should not execute after stopping")
+	assert.Equal(t, initialCount, cnt.get(), "Cron should not execute after stopping")
 
 	firstExecution = true
 
@@ -161,9 +156,7 @@ func TestCronStopAndRestart(t *testing.T) {
 
 	time.Sleep(500 * time.Millisecond)
 
-	mutex.Lock()
-	finalCount := executionCount
-	mutex.Unlock()
+	finalCount := cnt.get()
 
 	t.Logf("Final count after restart: %d (initial: %d)", finalCount, initialCount)
 	assert.Greater(t, finalCount, initialCount,
@@ -172,27 +165,17 @@ func TestCronStopAndRestart(t *testing.T) {
 }
 
 func TestMultipleCronJobs(t *testing.T) {
-	resetExecutionCount()
+	job1 := &counter{}
+	job2 := &counter{}
 	c := cron.New()
-
-	var job1Count, job2Count int
-	var mu sync.Mutex
 	done := make(chan bool)
 
-	err := c.AddFunc("*/1 * * * * *", func() {
-		mu.Lock()
-		job1Count++
-		mu.Unlock()
-	})
+	err := c.AddFunc("*/1 * * * * *", job1.increment)
 	if err != nil {
 		t.Fatalf("Failed to add first job: %v", err)
 	}
 
-	err = c.AddFunc("*/5 * * * * *", func() {
-		mu.Lock()
-		job2Count++
-		mu.Unlock()
-	})
+	err = c.AddFunc("*/5 * * * * *", job2.increment)
 	if err != nil {
 		t.Fatalf("Failed to add second job: %v", err)
 	}
@@ -207,39 +190,35 @@ func TestMultipleCronJobs(t *testing.T) {
 
 	<-done
 
-	mu.Lock()
-	j1Count := job1Count
-	j2Count := job2Count
-	mu.Unlock()
+	t.Logf("Job1 executions: %d, Job2 executions: %d", job1.get(), job2.get())
 
-	t.Logf("Job1 executions: %d, Job2 executions: %d", j1Count, j2Count)
-
-	if j1Count == 0 {
+	if job1.get() == 0 {
 		t.Error("First job did not execute")
 	}
-	if j2Count == 0 {
+	if job2.get() == 0 {
 		t.Error("Second job did not execute")
 	}
 
-	if j1Count <= j2Count {
+	if job1.get() <= job2.get() {
 		t.Errorf("Expected job1 (%d) to execute more times than job2 (%d)",
-			j1Count, j2Count)
+			job1.get(), job2.get())
 	}
 }
 
 func TestInvalidCronExpression(t *testing.T) {
+	cnt := &counter{}
 	c := cron.New()
-	err := c.AddFunc("invalid cron expression", mockHandler)
+	err := c.AddFunc("invalid cron expression", cnt.increment)
 	assert.Error(t, err, "Should return error for invalid cron expression")
 }
 
 func TestCronWithContext(t *testing.T) {
-	resetExecutionCount()
+	cnt := &counter{}
 	ctx, cancel := context.WithTimeout(context.Background(), 200*time.Millisecond)
 	defer cancel()
 
 	c := cron.New()
-	c.AddFunc("@every 50ms", mockHandler)
+	c.AddFunc("@every 50ms", cnt.increment)
 
 	go func() {
 		c.Start()
@@ -248,8 +227,8 @@ func TestCronWithContext(t *testing.T) {
 	}()
 
 	time.Sleep(300 * time.Millisecond)
-	initialCount := executionCount
+	initialCount := cnt.get()
 	time.Sleep(100 * time.Millisecond)
 
-	assert.Equal(t, initialCount, executionCount, "Cron should stop after context cancellation")
+	assert.Equal(t, initialCount, cnt.get(), "Cron should stop after context cancellation")
 }
