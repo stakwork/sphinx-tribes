@@ -2561,3 +2561,305 @@ func TestDeleteBountyAssignee(t *testing.T) {
 	}
 
 }
+
+func TestBountyGetFilterCount(t *testing.T) {
+	teardownSuite := SetupSuite(t)
+	defer teardownSuite(t)
+
+	mockHttpClient := mocks.NewHttpClient(t)
+	bHandler := NewBountyHandler(mockHttpClient, db.TestDB)
+
+	tests := []struct {
+		name          string
+		setupBounties []db.NewBounty
+		expected      db.FilterStattuCount
+	}{
+		{
+			name:          "Empty Database",
+			setupBounties: []db.NewBounty{},
+			expected: db.FilterStattuCount{
+				Open: 0, Assigned: 0, Completed: 0,
+				Paid: 0, Pending: 0, Failed: 0,
+			},
+		},
+		{
+			name: "Only Open Bounties",
+			setupBounties: []db.NewBounty{
+				{
+					Show:     true,
+					Assignee: "",
+					Paid:     false,
+					OwnerID:  "test-owner-1",
+					Type:     "coding",
+					Title:    "Test Bounty 1",
+				},
+				{
+					Show:     true,
+					Assignee: "",
+					Paid:     false,
+					OwnerID:  "test-owner-2",
+					Type:     "coding",
+					Title:    "Test Bounty 2",
+				},
+			},
+			expected: db.FilterStattuCount{
+				Open:      2,
+				Assigned:  0,
+				Completed: 0,
+				Paid:      0,
+				Pending:   0,
+				Failed:    0,
+			},
+		},
+		{
+			name: "Only Assigned Bounties",
+			setupBounties: []db.NewBounty{
+				{
+					Show:      true,
+					Assignee:  "user1",
+					Paid:      false,
+					Completed: false,
+					OwnerID:   "test-owner-1",
+					Type:      "coding",
+					Title:     "Test Bounty 1",
+					Created:   time.Now().Unix(),
+				},
+				{
+					Show:      true,
+					Assignee:  "user2",
+					Paid:      false,
+					Completed: false,
+					OwnerID:   "test-owner-2",
+					Type:      "coding",
+					Title:     "Test Bounty 2",
+					Created:   time.Now().Unix(),
+				},
+			},
+			expected: db.FilterStattuCount{
+				Open:      0,
+				Assigned:  2,
+				Completed: 0,
+				Paid:      0,
+				Pending:   0,
+				Failed:    0,
+			},
+		},
+		{
+			name: "Only Completed Bounties",
+			setupBounties: []db.NewBounty{
+				{
+					Show:      true,
+					Assignee:  "user1",
+					Completed: true,
+					Paid:      false,
+					OwnerID:   "test-owner-1",
+					Type:      "coding",
+					Title:     "Test Bounty 1",
+					Created:   time.Now().Unix(),
+				},
+				{
+					Show:      true,
+					Assignee:  "user2",
+					Completed: true,
+					Paid:      false,
+					OwnerID:   "test-owner-2",
+					Type:      "coding",
+					Title:     "Test Bounty 2",
+					Created:   time.Now().Unix(),
+				},
+			},
+			expected: db.FilterStattuCount{
+				Open:      0,
+				Assigned:  2,
+				Completed: 2,
+				Paid:      0,
+				Pending:   0,
+				Failed:    0,
+			},
+		},
+		{
+			name: "Only Paid Bounties",
+			setupBounties: []db.NewBounty{
+				{
+					Show:     true,
+					Assignee: "user1",
+					Paid:     true,
+					OwnerID:  "test-owner-1",
+					Type:     "coding",
+					Title:    "Test Bounty 1",
+					Created:  time.Now().Unix(),
+				},
+				{
+					Show:     true,
+					Assignee: "user2",
+					Paid:     true,
+					OwnerID:  "test-owner-2",
+					Type:     "coding",
+					Title:    "Test Bounty 2",
+					Created:  time.Now().Unix(),
+				},
+			},
+			expected: db.FilterStattuCount{
+				Open: 0, Assigned: 0, Completed: 0,
+				Paid: 2, Pending: 0, Failed: 0,
+			},
+		},
+		{
+			name: "Only Pending Payment Bounties",
+			setupBounties: []db.NewBounty{
+				{
+					Show:           true,
+					Assignee:       "user1",
+					PaymentPending: true,
+					OwnerID:        "test-owner-1",
+					Type:           "coding",
+					Title:          "Test Bounty 1",
+					Created:        time.Now().Unix(),
+				},
+				{
+					Show:           true,
+					Assignee:       "user2",
+					PaymentPending: true,
+					OwnerID:        "test-owner-2",
+					Type:           "coding",
+					Title:          "Test Bounty 2",
+					Created:        time.Now().Unix(),
+				},
+			},
+			expected: db.FilterStattuCount{
+				Open: 0, Assigned: 2, Completed: 0,
+				Paid: 0, Pending: 2, Failed: 0,
+			},
+		},
+		{
+			name: "Only Failed Payment Bounties",
+			setupBounties: []db.NewBounty{
+				{
+					Show:          true,
+					Assignee:      "user1",
+					PaymentFailed: true,
+					OwnerID:       "test-owner-1",
+					Type:          "coding",
+					Title:         "Test Bounty 1",
+					Created:       time.Now().Unix(),
+				},
+				{
+					Show:          true,
+					Assignee:      "user2",
+					PaymentFailed: true,
+					OwnerID:       "test-owner-2",
+					Type:          "coding",
+					Title:         "Test Bounty 2",
+					Created:       time.Now().Unix(),
+				},
+			},
+			expected: db.FilterStattuCount{
+				Open: 0, Assigned: 2, Completed: 0,
+				Paid: 0, Pending: 0, Failed: 2,
+			},
+		},
+		{
+			name: "Hidden Bounties Should Not Count",
+			setupBounties: []db.NewBounty{
+				{
+					Show:     false,
+					Assignee: "",
+					Paid:     false,
+					OwnerID:  "test-owner-1",
+					Type:     "coding",
+					Title:    "Test Bounty 1",
+					Created:  time.Now().Unix(),
+				},
+				{
+					Show:      false,
+					Assignee:  "user1",
+					Completed: true,
+					OwnerID:   "test-owner-2",
+					Type:      "coding",
+					Title:     "Test Bounty 2",
+					Created:   time.Now().Unix(),
+				},
+			},
+			expected: db.FilterStattuCount{
+				Open: 0, Assigned: 0, Completed: 0,
+				Paid: 0, Pending: 0, Failed: 0,
+			},
+		},
+		{
+			name: "Mixed Status Bounties",
+			setupBounties: []db.NewBounty{
+				{
+					Show: true, Assignee: "", Paid: false,
+					OwnerID: "test-owner-1", Type: "coding", Title: "Open Bounty",
+					Created: time.Now().Unix(),
+				},
+				{
+					Show: true, Assignee: "user1", Paid: false,
+					OwnerID: "test-owner-2", Type: "coding", Title: "Assigned Bounty",
+					Created: time.Now().Unix(),
+				},
+				{
+					Show: true, Assignee: "user2", Completed: true, Paid: false,
+					OwnerID: "test-owner-3", Type: "coding", Title: "Completed Bounty",
+					Created: time.Now().Unix(),
+				},
+				{
+					Show: true, Assignee: "user3", Paid: true,
+					OwnerID: "test-owner-4", Type: "coding", Title: "Paid Bounty",
+					Created: time.Now().Unix(),
+				},
+				{
+					Show: true, Assignee: "user4", PaymentPending: true,
+					OwnerID: "test-owner-5", Type: "coding", Title: "Pending Bounty",
+					Created: time.Now().Unix(),
+				},
+				{
+					Show: true, Assignee: "user5", PaymentFailed: true,
+					OwnerID: "test-owner-6", Type: "coding", Title: "Failed Bounty",
+					Created: time.Now().Unix(),
+				},
+				{
+					Show: false, Assignee: "user6", Paid: true,
+					OwnerID: "test-owner-7", Type: "coding", Title: "Hidden Bounty",
+					Created: time.Now().Unix(),
+				},
+			},
+			expected: db.FilterStattuCount{
+				Open: 1, Assigned: 4, Completed: 1,
+				Paid: 1, Pending: 1, Failed: 1,
+			},
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+
+			db.TestDB.DeleteAllBounties()
+
+			for _, bounty := range tt.setupBounties {
+				_, err := db.TestDB.CreateOrEditBounty(bounty)
+				if err != nil {
+					t.Fatalf("Failed to create test bounty: %v", err)
+				}
+			}
+
+			rr := httptest.NewRecorder()
+			req, err := http.NewRequest(http.MethodGet, "/filter/count", nil)
+			if err != nil {
+				t.Fatal(err)
+			}
+
+			bHandler.GetFilterCount(rr, req)
+
+			assert.Equal(t, http.StatusOK, rr.Code)
+
+			var result db.FilterStattuCount
+			err = json.NewDecoder(rr.Body).Decode(&result)
+			if err != nil {
+				t.Fatalf("Failed to decode response: %v", err)
+			}
+
+			assert.Equal(t, tt.expected, result)
+		})
+	}
+}

@@ -1487,8 +1487,8 @@ func (h *bountyHandler) PollInvoice(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(invoiceRes)
 }
 
-func GetFilterCount(w http.ResponseWriter, r *http.Request) {
-	filterCount := db.DB.GetFilterStatusCount()
+func (h *bountyHandler) GetFilterCount(w http.ResponseWriter, r *http.Request) {
+	filterCount := h.db.GetFilterStatusCount()
 	w.WriteHeader(http.StatusOK)
 	json.NewEncoder(w).Encode(filterCount)
 }
