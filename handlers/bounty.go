@@ -1643,6 +1643,7 @@ func isValidProofStatus(status db.ProofOfWorkStatus) bool {
 	}
 	return false
 }
+
 func (h *bountyHandler) DeleteBountyAssignee(w http.ResponseWriter, r *http.Request) {
 	invoice := db.DeleteBountyAssignee{}
 	body, err := io.ReadAll(r.Body)

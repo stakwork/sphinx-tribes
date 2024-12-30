@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"context"
 	"encoding/json"
+	"fmt"
 	"net/http"
 	"net/http/httptest"
 	"os"
@@ -46,12 +47,160 @@ func TestGetAdminPubkeys(t *testing.T) {
 
 		expected := `{"pubkeys":["test"]}`
 		if strings.TrimRight(rr.Body.String(), "\n") != expected {
-
 			t.Errorf("handler returned unexpected body: expected %s pubkeys %s is there a space after?", expected, rr.Body.String())
 		}
 	})
-}
 
+	t.Run("Should handle multiple admin pubkeys", func(t *testing.T) {
+		os.Setenv("ADMINS", "test1,test2,test3")
+		os.Setenv("RELAY_URL", "RelayUrl")
+		os.Setenv("RELAY_AUTH_KEY", "RelayAuthKey")
+		config.InitConfig()
+
+		req, err := http.NewRequest("GET", "/admin_pubkeys", nil)
+		assert.NoError(t, err)
+
+		rr := httptest.NewRecorder()
+		handler := http.HandlerFunc(GetAdminPubkeys)
+		handler.ServeHTTP(rr, req)
+
+		assert.Equal(t, http.StatusOK, rr.Code)
+		expected := `{"pubkeys":["test1","test2","test3"]}`
+		assert.JSONEq(t, expected, strings.TrimRight(rr.Body.String(), "\n"))
+	})
+
+	t.Run("Should handle empty admin pubkeys", func(t *testing.T) {
+		os.Setenv("ADMINS", "")
+		os.Setenv("RELAY_URL", "RelayUrl")
+		os.Setenv("RELAY_AUTH_KEY", "RelayAuthKey")
+		config.InitConfig()
+
+		req, err := http.NewRequest("GET", "/admin_pubkeys", nil)
+		assert.NoError(t, err)
+
+		rr := httptest.NewRecorder()
+		handler := http.HandlerFunc(GetAdminPubkeys)
+		handler.ServeHTTP(rr, req)
+
+		assert.Equal(t, http.StatusOK, rr.Code)
+		expected := `{"pubkeys":[]}`
+		assert.JSONEq(t, expected, strings.TrimRight(rr.Body.String(), "\n"))
+	})
+
+	t.Run("Should handle admin pubkeys with special characters", func(t *testing.T) {
+		os.Setenv("ADMINS", "test@123,test#456,test$789")
+		os.Setenv("RELAY_URL", "RelayUrl")
+		os.Setenv("RELAY_AUTH_KEY", "RelayAuthKey")
+		config.InitConfig()
+
+		req, err := http.NewRequest("GET", "/admin_pubkeys", nil)
+		assert.NoError(t, err)
+
+		rr := httptest.NewRecorder()
+		handler := http.HandlerFunc(GetAdminPubkeys)
+		handler.ServeHTTP(rr, req)
+
+		assert.Equal(t, http.StatusOK, rr.Code)
+		expected := `{"pubkeys":["test@123","test#456","test$789"]}`
+		assert.JSONEq(t, expected, strings.TrimRight(rr.Body.String(), "\n"))
+	})
+
+	t.Run("Should handle admin pubkeys with spaces", func(t *testing.T) {
+		os.Setenv("ADMINS", "test 123, test 456 , test 789")
+		os.Setenv("RELAY_URL", "RelayUrl")
+		os.Setenv("RELAY_AUTH_KEY", "RelayAuthKey")
+		config.InitConfig()
+
+		req, err := http.NewRequest("GET", "/admin_pubkeys", nil)
+		assert.NoError(t, err)
+
+		rr := httptest.NewRecorder()
+		handler := http.HandlerFunc(GetAdminPubkeys)
+		handler.ServeHTTP(rr, req)
+
+		assert.Equal(t, http.StatusOK, rr.Code)
+		expected := `{"pubkeys":["test 123","test 456","test 789"]}`
+		assert.JSONEq(t, expected, strings.TrimRight(rr.Body.String(), "\n"))
+	})
+
+	t.Run("Should handle invalid HTTP method", func(t *testing.T) {
+		os.Setenv("ADMINS", "test")
+		os.Setenv("RELAY_URL", "RelayUrl")
+		os.Setenv("RELAY_AUTH_KEY", "RelayAuthKey")
+		config.InitConfig()
+
+		req, err := http.NewRequest(http.MethodPost, "/admin_pubkeys", nil)
+		assert.NoError(t, err)
+
+		rr := httptest.NewRecorder()
+		handler := http.HandlerFunc(GetAdminPubkeys)
+		handler.ServeHTTP(rr, req)
+
+		assert.Equal(t, http.StatusOK, rr.Code)
+		expected := `{"pubkeys":["test"]}`
+		assert.JSONEq(t, expected, strings.TrimRight(rr.Body.String(), "\n"))
+	})
+	t.Run("Maximum Number of Admin Keys", func(t *testing.T) {
+
+		var keys []string
+		for i := 0; i < 1000; i++ {
+			keys = append(keys, fmt.Sprintf("key%d", i))
+		}
+		os.Setenv("ADMINS", strings.Join(keys, ","))
+		os.Setenv("RELAY_URL", "RelayUrl")
+		os.Setenv("RELAY_AUTH_KEY", "RelayAuthKey")
+		config.InitConfig()
+
+		req, err := http.NewRequest("GET", "/admin_pubkeys", nil)
+		assert.NoError(t, err)
+
+		rr := httptest.NewRecorder()
+		handler := http.HandlerFunc(GetAdminPubkeys)
+		handler.ServeHTTP(rr, req)
+
+		assert.Equal(t, http.StatusOK, rr.Code)
+		var response map[string][]string
+		err = json.Unmarshal(rr.Body.Bytes(), &response)
+		assert.NoError(t, err)
+		assert.Equal(t, 1000, len(response["pubkeys"]))
+	})
+
+	t.Run("Null Admin Keys List", func(t *testing.T) {
+		os.Unsetenv("ADMINS")
+		os.Setenv("RELAY_URL", "RelayUrl")
+		os.Setenv("RELAY_AUTH_KEY", "RelayAuthKey")
+		config.InitConfig()
+
+		req, err := http.NewRequest("GET", "/admin_pubkeys", nil)
+		assert.NoError(t, err)
+
+		rr := httptest.NewRecorder()
+		handler := http.HandlerFunc(GetAdminPubkeys)
+		handler.ServeHTTP(rr, req)
+
+		assert.Equal(t, http.StatusOK, rr.Code)
+		expected := `{"pubkeys":[]}`
+		assert.JSONEq(t, expected, strings.TrimRight(rr.Body.String(), "\n"))
+	})
+
+	t.Run("Unicode Characters in Admin Keys", func(t *testing.T) {
+		os.Setenv("ADMINS", "ключ1,キー2,钥匙3")
+		os.Setenv("RELAY_URL", "RelayUrl")
+		os.Setenv("RELAY_AUTH_KEY", "RelayAuthKey")
+		config.InitConfig()
+
+		req, err := http.NewRequest("GET", "/admin_pubkeys", nil)
+		assert.NoError(t, err)
+
+		rr := httptest.NewRecorder()
+		handler := http.HandlerFunc(GetAdminPubkeys)
+		handler.ServeHTTP(rr, req)
+
+		assert.Equal(t, http.StatusOK, rr.Code)
+		expected := `{"pubkeys":["ключ1","キー2","钥匙3"]}`
+		assert.JSONEq(t, expected, strings.TrimRight(rr.Body.String(), "\n"))
+	})
+}
 func TestCreateConnectionCode(t *testing.T) {
 	teardownSuite := SetupSuite(t)
 	defer teardownSuite(t)
@@ -286,6 +435,115 @@ func TestGetIsAdmin(t *testing.T) {
 		handler.ServeHTTP(rr, req)
 
 		assert.Equal(t, http.StatusOK, rr.Code)
+	})
+
+	t.Run("Should test that empty public key returns unauthorized", func(t *testing.T) {
+		req, err := http.NewRequest("GET", "/admin/auth", nil)
+		if err != nil {
+			t.Fatal(err)
+		}
+		rr := httptest.NewRecorder()
+		handler := http.HandlerFunc(aHandler.GetIsAdmin)
+
+		ctx := context.WithValue(req.Context(), auth.ContextKey, "")
+		req = req.WithContext(ctx)
+
+		handler.ServeHTTP(rr, req)
+
+		assert.Equal(t, http.StatusUnauthorized, rr.Code)
+		var responseBody string
+		json.NewDecoder(rr.Body).Decode(&responseBody)
+		assert.Equal(t, "Not a super admin: handler", responseBody)
+	})
+
+	t.Run("Should test that nil context value returns unauthorized", func(t *testing.T) {
+		req, err := http.NewRequest("GET", "/admin/auth", nil)
+		if err != nil {
+			t.Fatal(err)
+		}
+		rr := httptest.NewRecorder()
+		handler := http.HandlerFunc(aHandler.GetIsAdmin)
+
+		ctx := context.WithValue(req.Context(), auth.ContextKey, nil)
+		req = req.WithContext(ctx)
+
+		handler.ServeHTTP(rr, req)
+
+		assert.Equal(t, http.StatusUnauthorized, rr.Code)
+		var responseBody string
+		json.NewDecoder(rr.Body).Decode(&responseBody)
+		assert.Equal(t, "Not a super admin: handler", responseBody)
+	})
+
+	t.Run("Should test that free pass enabled allows any user", func(t *testing.T) {
+
+		originalAdmins := config.SuperAdmins
+		config.SuperAdmins = []string{config.AdminDevFreePass}
+		defer func() {
+			config.SuperAdmins = originalAdmins
+		}()
+
+		req, err := http.NewRequest("GET", "/admin/auth", nil)
+		if err != nil {
+			t.Fatal(err)
+		}
+		rr := httptest.NewRecorder()
+		handler := http.HandlerFunc(aHandler.GetIsAdmin)
+
+		ctx := context.WithValue(req.Context(), auth.ContextKey, "any_pubkey")
+		req = req.WithContext(ctx)
+
+		handler.ServeHTTP(rr, req)
+
+		assert.Equal(t, http.StatusOK, rr.Code)
+		var responseBody string
+		json.NewDecoder(rr.Body).Decode(&responseBody)
+		assert.Equal(t, "Log in successful", responseBody)
+	})
+
+	t.Run("Should test that invalid context value type returns unauthorized", func(t *testing.T) {
+		req, err := http.NewRequest("GET", "/admin/auth", nil)
+		if err != nil {
+			t.Fatal(err)
+		}
+		rr := httptest.NewRecorder()
+		handler := http.HandlerFunc(aHandler.GetIsAdmin)
+
+		ctx := context.WithValue(req.Context(), auth.ContextKey, 12345)
+		req = req.WithContext(ctx)
+
+		handler.ServeHTTP(rr, req)
+
+		assert.Equal(t, http.StatusUnauthorized, rr.Code)
+		var responseBody string
+		json.NewDecoder(rr.Body).Decode(&responseBody)
+		assert.Equal(t, "Not a super admin: handler", responseBody)
+	})
+
+	t.Run("Should test multiple admins configuration", func(t *testing.T) {
+
+		originalAdmins := config.SuperAdmins
+		config.SuperAdmins = []string{"admin1", "admin2", "admin3"}
+		defer func() {
+			config.SuperAdmins = originalAdmins
+		}()
+
+		req, err := http.NewRequest("GET", "/admin/auth", nil)
+		if err != nil {
+			t.Fatal(err)
+		}
+		rr := httptest.NewRecorder()
+		handler := http.HandlerFunc(aHandler.GetIsAdmin)
+
+		ctx := context.WithValue(req.Context(), auth.ContextKey, "admin2")
+		req = req.WithContext(ctx)
+
+		handler.ServeHTTP(rr, req)
+
+		assert.Equal(t, http.StatusOK, rr.Code)
+		var responseBody string
+		json.NewDecoder(rr.Body).Decode(&responseBody)
+		assert.Equal(t, "Log in successful", responseBody)
 	})
 }
 

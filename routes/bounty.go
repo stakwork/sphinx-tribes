@@ -47,7 +47,7 @@ func BountyRoutes() chi.Router {
 		r.Patch("/{id}/proofs/{proofId}/status", bountyHandler.UpdateProofStatus)
 
 		r.Post("/", bountyHandler.CreateOrEditBounty)
-		r.Delete("/assignee", handlers.DeleteBountyAssignee)
+		r.Delete("/assignee", bountyHandler.DeleteBountyAssignee)
 		r.Delete("/{pubkey}/{created}", bountyHandler.DeleteBounty)
 		r.Post("/paymentstatus/{created}", handlers.UpdatePaymentStatus)
 		r.Post("/completedstatus/{created}", handlers.UpdateCompletedStatus)
