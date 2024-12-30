@@ -1643,3 +1643,51 @@ func isValidProofStatus(status db.ProofOfWorkStatus) bool {
 	}
 	return false
 }
+func (h *bountyHandler) DeleteBountyAssignee(w http.ResponseWriter, r *http.Request) {
+	invoice := db.DeleteBountyAssignee{}
+	body, err := io.ReadAll(r.Body)
+	var deletedAssignee bool
+
+	r.Body.Close()
+
+	err = json.Unmarshal(body, &invoice)
+
+	if err != nil {
+		w.WriteHeader(http.StatusNotAcceptable)
+		return
+	}
+
+	owner_key := invoice.Owner_pubkey
+	date := invoice.Created
+
+	if owner_key == "" || date == "" {
+		w.WriteHeader(http.StatusBadRequest)
+		json.NewEncoder(w).Encode(false)
+		return
+	}
+
+	createdUint, _ := strconv.ParseUint(date, 10, 32)
+	b, err := h.db.GetBountyByCreated(uint(createdUint))
+
+	if err == nil && b.OwnerID == owner_key {
+		b.Assignee = ""
+		b.AssignedHours = 0
+		b.CommitmentFee = 0
+		b.BountyExpires = ""
+
+		h.db.UpdateBounty(b)
+
+		deletedAssignee = true
+	} else {
+		log.Printf("Could not delete bounty assignee")
+
+		deletedAssignee = false
+
+		w.WriteHeader(http.StatusBadRequest)
+		json.NewEncoder(w).Encode(deletedAssignee)
+	}
+
+	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode(deletedAssignee)
+
+}
