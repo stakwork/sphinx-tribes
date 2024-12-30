@@ -217,4 +217,8 @@ type Database interface {
 	ProcessUpdateTicketsWithoutGroup()
 	GetNewHunters(r PaymentDateRange) int64
 	TotalPeopleByPeriod(r PaymentDateRange) int64
+	GetProofsByBountyID(bountyID uint) []ProofOfWork
+	CreateProof(proof ProofOfWork) error
+	DeleteProof(proofID string) error
+	UpdateProofStatus(proofID string, status ProofOfWorkStatus) error
 }

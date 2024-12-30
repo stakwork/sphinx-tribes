@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
+	"github.com/google/uuid"
 	"io"
 	"log"
 	"net/http"
@@ -440,6 +441,8 @@ func (h *bountyHandler) GenerateBountyResponse(bounties []db.NewBounty) []db.Bou
 		assignee := h.db.GetPersonByPubkey(bounty.Assignee)
 		workspace := h.db.GetWorkspaceByUuid(bounty.WorkspaceUuid)
 
+		proofs := h.db.GetProofsByBountyID(bounty.ID)
+
 		b := db.BountyResponse{
 			Bounty: db.NewBounty{
 				ID:                      bounty.ID,
@@ -519,6 +522,11 @@ func (h *bountyHandler) GenerateBountyResponse(bounties []db.NewBounty) []db.Bou
 				Img:  workspace.Img,
 			},
 		}
+
+		if len(proofs) > 0 {
+			b.Proofs = proofs
+		}
+
 		bountyResponse = append(bountyResponse, b)
 	}
 
@@ -1535,6 +1543,107 @@ func (h *bountyHandler) GenerateBountyCardResponse(bounties []db.NewBounty) []db
 	return bountyCardResponse
 }
 
+func (h *bountyHandler) AddProofOfWork(w http.ResponseWriter, r *http.Request) {
+	bountyID := chi.URLParam(r, "id")
+	var proof db.ProofOfWork
+
+	body, err := io.ReadAll(r.Body)
+	defer r.Body.Close()
+	if err != nil {
+		http.Error(w, "Invalid request body", http.StatusBadRequest)
+		return
+	}
+
+	err = json.Unmarshal(body, &proof)
+	if err != nil || proof.Description == "" {
+		http.Error(w, "Description is required", http.StatusBadRequest)
+		return
+	}
+
+	proof.ID = uuid.New()
+	proof.BountyID, _ = utils.ConvertStringToUint(bountyID)
+	proof.CreatedAt = time.Now()
+	proof.SubmittedAt = time.Now()
+
+	if err := h.db.CreateProof(proof); err != nil {
+		http.Error(w, "Failed to add proof", http.StatusInternalServerError)
+		return
+	}
+
+	w.WriteHeader(http.StatusCreated)
+	json.NewEncoder(w).Encode(proof)
+}
+
+func (h *bountyHandler) GetProofsByBounty(w http.ResponseWriter, r *http.Request) {
+	bountyID := chi.URLParam(r, "id")
+
+	bountyUUID, err := utils.ConvertStringToUint(bountyID)
+	if err != nil {
+		http.Error(w, "Invalid bounty ID", http.StatusBadRequest)
+		return
+	}
+
+	proofs := h.db.GetProofsByBountyID(bountyUUID)
+
+	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode(proofs)
+}
+
+func (h *bountyHandler) DeleteProof(w http.ResponseWriter, r *http.Request) {
+	proofID := chi.URLParam(r, "proofId")
+
+	if _, err := uuid.Parse(proofID); err != nil {
+		http.Error(w, "Invalid proof ID", http.StatusBadRequest)
+		return
+	}
+
+	if err := h.db.DeleteProof(proofID); err != nil {
+		http.Error(w, "Failed to delete proof", http.StatusInternalServerError)
+		return
+	}
+
+	w.WriteHeader(http.StatusNoContent)
+}
+
+func (h *bountyHandler) UpdateProofStatus(w http.ResponseWriter, r *http.Request) {
+	proofID := chi.URLParam(r, "proofId")
+	var statusUpdate struct {
+		Status db.ProofOfWorkStatus `json:"status"`
+	}
+
+	if _, err := uuid.Parse(proofID); err != nil {
+		http.Error(w, "Invalid proof ID", http.StatusBadRequest)
+		return
+	}
+
+	body, err := io.ReadAll(r.Body)
+	defer r.Body.Close()
+	if err != nil {
+		http.Error(w, "Invalid request body", http.StatusBadRequest)
+		return
+	}
+
+	if err := json.Unmarshal(body, &statusUpdate); err != nil || !isValidProofStatus(statusUpdate.Status) {
+		http.Error(w, "Invalid status", http.StatusBadRequest)
+		return
+	}
+
+	if err := h.db.UpdateProofStatus(proofID, statusUpdate.Status); err != nil {
+		http.Error(w, "Failed to update status", http.StatusInternalServerError)
+		return
+	}
+
+	w.WriteHeader(http.StatusOK)
+}
+
+func isValidProofStatus(status db.ProofOfWorkStatus) bool {
+	switch status {
+	case db.NewStatus, db.AcceptedStatus, db.RejectedStatus, db.ChangeRequestedStatus:
+		return true
+	}
+	return false
+}
+
 func (h *bountyHandler) DeleteBountyAssignee(w http.ResponseWriter, r *http.Request) {
 	invoice := db.DeleteBountyAssignee{}
 	body, err := io.ReadAll(r.Body)
@@ -1581,4 +1690,5 @@ func (h *bountyHandler) DeleteBountyAssignee(w http.ResponseWriter, r *http.Requ
 
 	w.WriteHeader(http.StatusOK)
 	json.NewEncoder(w).Encode(deletedAssignee)
+
 }
