@@ -2392,3 +2392,172 @@ func TestGetBountyCards(t *testing.T) {
 		assert.Empty(t, cardWithoutAssignee.AssigneePic)
 	})
 }
+
+func TestDeleteBountyAssignee(t *testing.T) {
+
+	teardownSuite := SetupSuite(t)
+	defer teardownSuite(t)
+
+	mockHttpClient := mocks.NewHttpClient(t)
+
+	bHandler := NewBountyHandler(mockHttpClient, db.TestDB)
+
+	db.CleanTestData()
+
+	db.TestDB.CreateOrEditBounty(db.NewBounty{
+		Type:          "coding",
+		Title:         "Bounty 1",
+		Description:   "Description for Bounty 1",
+		WorkspaceUuid: "work-1",
+		OwnerID:       "validOwner",
+		Price:         1500,
+		Created:       1234567890,
+	})
+
+	db.TestDB.CreateOrEditBounty(db.NewBounty{
+		Type:          "design",
+		Title:         "Bounty 2",
+		Description:   "Description for Bounty 2",
+		WorkspaceUuid: "work-2",
+		OwnerID:       "nonExistentOwner",
+		Price:         2000,
+		Created:       1234567891,
+	})
+
+	db.TestDB.CreateOrEditBounty(db.NewBounty{
+		Type:          "design",
+		Title:         "Bounty 2",
+		Description:   "Description for Bounty 2",
+		WorkspaceUuid: "work-2",
+		OwnerID:       "validOwner",
+		Price:         2000,
+		Created:       0,
+	})
+
+	tests := []struct {
+		name           string
+		input          interface{}
+		mockSetup      func()
+		expectedStatus int
+		expectedBody   bool
+	}{
+		{
+			name: "Valid Input - Successful Deletion",
+			input: db.DeleteBountyAssignee{
+				Owner_pubkey: "validOwner",
+				Created:      "1234567890",
+			},
+			expectedStatus: http.StatusOK,
+			expectedBody:   true,
+		},
+		{
+			name:           "Empty JSON Body",
+			input:          nil,
+			expectedStatus: http.StatusNotAcceptable,
+			expectedBody:   false,
+		},
+		{
+			name:           "Invalid JSON Format",
+			input:          `{"Owner_pubkey": "abc", "Created": }`,
+			expectedStatus: http.StatusNotAcceptable,
+			expectedBody:   false,
+		},
+		{
+			name: "Non-Existent Bounty",
+			input: db.DeleteBountyAssignee{
+				Owner_pubkey: "nonExistentOwner",
+				Created:      "1234567890",
+			},
+			expectedStatus: http.StatusBadRequest,
+			expectedBody:   false,
+		},
+		{
+			name: "Mismatched Owner Key",
+			input: db.DeleteBountyAssignee{
+				Owner_pubkey: "wrongOwner",
+				Created:      "1234567890",
+			},
+			expectedStatus: http.StatusBadRequest,
+			expectedBody:   false,
+		},
+		{
+			name: "Invalid Data Types",
+			input: db.DeleteBountyAssignee{
+				Owner_pubkey: "validOwners",
+				Created:      "invalidDate",
+			},
+			expectedStatus: http.StatusBadRequest,
+			expectedBody:   false,
+		},
+		{
+			name: "Null Values",
+			input: db.DeleteBountyAssignee{
+				Owner_pubkey: "",
+				Created:      "",
+			},
+			expectedStatus: http.StatusBadRequest,
+			expectedBody:   false,
+		},
+		{
+			name: "Large JSON Body",
+			input: map[string]interface{}{
+				"Owner_pubkey": "validOwner",
+				"Created":      "1234567890",
+				"Extra":        make([]byte, 10000),
+			},
+			expectedStatus: http.StatusOK,
+			expectedBody:   true,
+		},
+		{
+			name: "Boundary Date Value",
+			input: db.DeleteBountyAssignee{
+				Owner_pubkey: "validOwner",
+				Created:      "0",
+			},
+			expectedStatus: http.StatusOK,
+			expectedBody:   true,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+
+			var body []byte
+			if tt.input != nil {
+				switch v := tt.input.(type) {
+				case string:
+					body = []byte(v)
+				default:
+					var err error
+					body, err = json.Marshal(tt.input)
+					if err != nil {
+						t.Fatalf("Failed to marshal input: %v", err)
+					}
+				}
+			}
+
+			req := httptest.NewRequest(http.MethodDelete, "/gobounties/assignee", bytes.NewReader(body))
+
+			w := httptest.NewRecorder()
+
+			bHandler.DeleteBountyAssignee(w, req)
+
+			resp := w.Result()
+			defer resp.Body.Close()
+
+			assert.Equal(t, tt.expectedStatus, resp.StatusCode)
+
+			if resp.StatusCode == http.StatusOK || resp.StatusCode == http.StatusBadRequest {
+
+				var result bool
+				err := json.NewDecoder(resp.Body).Decode(&result)
+				if err != nil {
+					t.Fatalf("Failed to decode response body: %v", err)
+				}
+
+				assert.Equal(t, tt.expectedBody, result)
+			}
+		})
+	}
+
+}
