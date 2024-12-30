@@ -1885,3 +1885,21 @@ func (db database) DeleteAllBounties() error {
 	}
 	return nil
 }
+
+func (db database) GetProofsByBountyID(bountyID uint) []ProofOfWork {
+	var proofs []ProofOfWork
+	db.db.Where("bounty_id = ?", bountyID).Find(&proofs)
+	return proofs
+}
+
+func (db database) CreateProof(proof ProofOfWork) error {
+	return db.db.Create(&proof).Error
+}
+
+func (db database) DeleteProof(proofID string) error {
+	return db.db.Delete(&ProofOfWork{}, "id = ?", proofID).Error
+}
+
+func (db database) UpdateProofStatus(proofID string, status ProofOfWorkStatus) error {
+	return db.db.Model(&ProofOfWork{}).Where("id = ?", proofID).Update("status", status).Error
+}

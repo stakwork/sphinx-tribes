@@ -483,6 +483,7 @@ type BountyResponse struct {
 	Owner        Person         `json:"owner"`
 	Organization WorkspaceShort `json:"organization"`
 	Workspace    WorkspaceShort `json:"workspace"`
+	Proofs       []ProofOfWork  `json:"proofs,omitempty"`
 }
 
 type BountyCountResponse struct {
@@ -1083,6 +1084,24 @@ type Chat struct {
 	Title       string    `json:"title"`
 	CreatedAt   time.Time `json:"createdAt"`
 	UpdatedAt   time.Time `json:"updatedAt"`
+}
+
+type ProofOfWorkStatus string
+
+const (
+	NewStatus             ProofOfWorkStatus = "New"
+	AcceptedStatus        ProofOfWorkStatus = "Accepted"
+	RejectedStatus        ProofOfWorkStatus = "Rejected"
+	ChangeRequestedStatus ProofOfWorkStatus = "Change Requested"
+)
+
+type ProofOfWork struct {
+	ID          uuid.UUID         `json:"id" gorm:"type:uuid;primaryKey"`
+	BountyID    uint              `json:"bounty_id"`
+	Description string            `json:"description" gorm:"type:text;not null"`
+	Status      ProofOfWorkStatus `json:"status" gorm:"type:varchar(20);default:'New'"`
+	CreatedAt   time.Time         `json:"created_at" gorm:"type:timestamp;default:current_timestamp"`
+	SubmittedAt time.Time         `json:"submitted_at" gorm:"type:timestamp;default:current_timestamp"`
 }
 
 func (Person) TableName() string {
