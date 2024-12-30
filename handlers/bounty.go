@@ -4,7 +4,6 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
-	"github.com/google/uuid"
 	"io"
 	"log"
 	"net/http"
@@ -12,6 +11,8 @@ import (
 	"strconv"
 	"sync"
 	"time"
+
+	"github.com/google/uuid"
 
 	"github.com/go-chi/chi"
 	"github.com/stakwork/sphinx-tribes/auth"
@@ -21,6 +22,15 @@ import (
 	"github.com/stakwork/sphinx-tribes/utils"
 	"gorm.io/gorm"
 )
+
+type BountyTimingResponse struct {
+	TotalWorkTimeSeconds int        `json:"total_work_time_seconds"`
+	TotalDurationSeconds int        `json:"total_duration_seconds"`
+	TotalAttempts        int        `json:"total_attempts"`
+	FirstAssignedAt      *time.Time `json:"first_assigned_at"`
+	LastPoWAt            *time.Time `json:"last_pow_at"`
+	ClosedAt             *time.Time `json:"closed_at"`
+}
 
 type bountyHandler struct {
 	httpClient               HttpClient
@@ -1607,6 +1617,8 @@ func (h *bountyHandler) DeleteProof(w http.ResponseWriter, r *http.Request) {
 
 func (h *bountyHandler) UpdateProofStatus(w http.ResponseWriter, r *http.Request) {
 	proofID := chi.URLParam(r, "proofId")
+	bountyID := chi.URLParam(r, "id")
+
 	var statusUpdate struct {
 		Status db.ProofOfWorkStatus `json:"status"`
 	}
@@ -1626,6 +1638,19 @@ func (h *bountyHandler) UpdateProofStatus(w http.ResponseWriter, r *http.Request
 	if err := json.Unmarshal(body, &statusUpdate); err != nil || !isValidProofStatus(statusUpdate.Status) {
 		http.Error(w, "Invalid status", http.StatusBadRequest)
 		return
+	}
+
+	if statusUpdate.Status == db.AcceptedStatus {
+		id, err := utils.ConvertStringToUint(bountyID)
+		if err != nil {
+			http.Error(w, "Invalid bounty ID", http.StatusBadRequest)
+			return
+		}
+
+		if err := h.db.UpdateBountyTimingOnProof(id); err != nil {
+			http.Error(w, "Failed to update timing", http.StatusInternalServerError)
+			return
+		}
 	}
 
 	if err := h.db.UpdateProofStatus(proofID, statusUpdate.Status); err != nil {
@@ -1691,4 +1716,64 @@ func (h *bountyHandler) DeleteBountyAssignee(w http.ResponseWriter, r *http.Requ
 	w.WriteHeader(http.StatusOK)
 	json.NewEncoder(w).Encode(deletedAssignee)
 
+}
+
+func (h *bountyHandler) GetBountyTimingStats(w http.ResponseWriter, r *http.Request) {
+	bountyID := chi.URLParam(r, "id")
+	id, err := utils.ConvertStringToUint(bountyID)
+	if err != nil {
+		http.Error(w, "Invalid bounty ID", http.StatusBadRequest)
+		return
+	}
+
+	timing, err := h.db.GetBountyTiming(id)
+	if err != nil {
+		http.Error(w, "Failed to get timing stats", http.StatusInternalServerError)
+		return
+	}
+
+	response := BountyTimingResponse{
+		TotalWorkTimeSeconds: timing.TotalWorkTimeSeconds,
+		TotalDurationSeconds: timing.TotalDurationSeconds,
+		TotalAttempts:        timing.TotalAttempts,
+		FirstAssignedAt:      timing.FirstAssignedAt,
+		LastPoWAt:            timing.LastPoWAt,
+		ClosedAt:             timing.ClosedAt,
+	}
+
+	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode(response)
+}
+
+func (h *bountyHandler) StartBountyTiming(w http.ResponseWriter, r *http.Request) {
+	bountyID := chi.URLParam(r, "id")
+
+	id, err := utils.ConvertStringToUint(bountyID)
+	if err != nil {
+		http.Error(w, "Invalid bounty ID", http.StatusBadRequest)
+		return
+	}
+
+	if err := h.db.StartBountyTiming(id); err != nil {
+		http.Error(w, "Failed to start timing", http.StatusInternalServerError)
+		return
+	}
+
+	w.WriteHeader(http.StatusOK)
+}
+
+func (h *bountyHandler) CloseBountyTiming(w http.ResponseWriter, r *http.Request) {
+	bountyID := chi.URLParam(r, "id")
+	id, err := utils.ConvertStringToUint(bountyID)
+	if err != nil {
+		http.Error(w, "Invalid bounty ID", http.StatusBadRequest)
+		return
+	}
+
+	if err := h.db.CloseBountyTiming(id); err != nil {
+		http.Error(w, "Failed to close timing", http.StatusInternalServerError)
+		return
+	}
+
+	w.WriteHeader(http.StatusOK)
 }

@@ -1903,3 +1903,77 @@ func (db database) DeleteProof(proofID string) error {
 func (db database) UpdateProofStatus(proofID string, status ProofOfWorkStatus) error {
 	return db.db.Model(&ProofOfWork{}).Where("id = ?", proofID).Update("status", status).Error
 }
+
+func (db database) CreateBountyTiming(bountyID uint) (*BountyTiming, error) {
+	timing := &BountyTiming{
+		BountyID: bountyID,
+	}
+	err := db.db.Create(timing).Error
+	return timing, err
+}
+
+func (db database) GetBountyTiming(bountyID uint) (*BountyTiming, error) {
+	var timing BountyTiming
+	err := db.db.Where("bounty_id = ?", bountyID).First(&timing).Error
+	if err != nil {
+		return nil, err
+	}
+	return &timing, nil
+}
+
+func (db database) UpdateBountyTiming(timing *BountyTiming) error {
+	return db.db.Save(timing).Error
+}
+
+func (db database) StartBountyTiming(bountyID uint) error {
+	now := time.Now()
+	timing, err := db.GetBountyTiming(bountyID)
+	if err != nil {
+
+		timing, err = db.CreateBountyTiming(bountyID)
+		if err != nil {
+			return err
+		}
+	}
+
+	if timing.FirstAssignedAt == nil {
+		timing.FirstAssignedAt = &now
+		return db.UpdateBountyTiming(timing)
+	}
+	return nil
+}
+
+func (db database) CloseBountyTiming(bountyID uint) error {
+	timing, err := db.GetBountyTiming(bountyID)
+	if err != nil {
+		return err
+	}
+
+	now := time.Now()
+	timing.ClosedAt = &now
+
+	if timing.FirstAssignedAt != nil {
+		timing.TotalDurationSeconds = int(now.Sub(*timing.FirstAssignedAt).Seconds())
+	}
+
+	return db.UpdateBountyTiming(timing)
+}
+
+func (db database) UpdateBountyTimingOnProof(bountyID uint) error {
+	timing, err := db.GetBountyTiming(bountyID)
+	if err != nil {
+		return err
+	}
+
+	now := time.Now()
+
+	if timing.LastPoWAt != nil {
+		workTime := int(now.Sub(*timing.LastPoWAt).Seconds())
+		timing.TotalWorkTimeSeconds += workTime
+	}
+
+	timing.LastPoWAt = &now
+	timing.TotalAttempts++
+
+	return db.UpdateBountyTiming(timing)
+}
