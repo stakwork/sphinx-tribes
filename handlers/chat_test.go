@@ -828,7 +828,6 @@ func TestProcessChatResponse(t *testing.T) {
 	}
 }
 
-
 func TestGetChatHistory(t *testing.T) {
 	teardownSuite := SetupSuite(t)
 	defer teardownSuite(t)
