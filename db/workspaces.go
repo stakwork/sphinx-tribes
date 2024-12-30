@@ -328,6 +328,27 @@ func (db database) ProcessUpdateBudget(non_tx_invoice NewInvoiceList) error {
 			totalBudget := workspaceBudget.TotalBudget
 			workspaceBudget.TotalBudget = totalBudget + paymentHistory.Amount
 
+			// check if the amount is greater than the total budget
+			log.Println("Budget Total Amount =====", totalBudget, workspace_uuid)
+
+			// get total deposits
+			var depositAmount uint
+			tx.Model(&NewPaymentHistory{}).Where("workspace_uuid = ?", workspace_uuid).Where("status = ?", true).Where("payment_type = ?", "deposit").Select("SUM(amount)").Row().Scan(&depositAmount)
+
+			log.Println("Budget DepositAmount =====", depositAmount, workspace_uuid)
+
+			var withdrawalAmount uint
+			tx.Model(&NewPaymentHistory{}).Where("workspace_uuid = ?", workspace_uuid).Where("status = ?", true).Where("payment_type = ?", "withdraw").Select("SUM(amount)").Row().Scan(&withdrawalAmount)
+
+			log.Println("Budget WithdrawalAmount =====", withdrawalAmount, workspace_uuid)
+
+			validAmount := depositAmount - withdrawalAmount
+
+			if validAmount <= totalBudget {
+				tx.Rollback()
+				return errors.New("cannot process payment")
+			}
+
 			if err = tx.Model(&NewBountyBudget{}).Where("workspace_uuid = ?", workspaceBudget.WorkspaceUuid).Updates(map[string]interface{}{
 				"total_budget": workspaceBudget.TotalBudget,
 			}).Error; err != nil {
@@ -497,28 +518,6 @@ func (db database) ProcessBountyPayment(payment NewPaymentHistory, bounty NewBou
 		// get Workspace budget and subtract payment from total budget
 		WorkspaceBudget := db.GetWorkspaceBudget(workspace_uuid)
 		totalBudget := WorkspaceBudget.TotalBudget
-
-		// check if the amount is greater than the total budget
-		log.Println("Budget Total Amount =====", totalBudget, workspace_uuid)
-
-		// get total deposits
-		var depositAmount uint
-		tx.Model(&NewPaymentHistory{}).Where("workspace_uuid = ?", workspace_uuid).Where("status = ?", true).Where("payment_type = ?", "deposit").Select("SUM(amount)").Row().Scan(&depositAmount)
-
-		log.Println("Budget DepositAmount =====", depositAmount, workspace_uuid)
-
-		var withdrawalAmount uint
-		tx.Model(&NewPaymentHistory{}).Where("workspace_uuid = ?", workspace_uuid).Where("status = ?", true).Where("payment_type = ?", "withdraw").Select("SUM(amount)").Row().Scan(&withdrawalAmount)
-
-		log.Println("Budget WithdrawalAmount =====", withdrawalAmount, workspace_uuid)
-
-		validAmount := depositAmount - withdrawalAmount
-
-		if validAmount <= totalBudget {
-			tx.Rollback()
-			return errors.New("cannot process payment")
-		}
-
 		// update budget
 		WorkspaceBudget.TotalBudget = totalBudget - payment.Amount
 		if err = tx.Model(&NewBountyBudget{}).Where("workspace_uuid = ?", payment.WorkspaceUuid).Updates(map[string]interface{}{
