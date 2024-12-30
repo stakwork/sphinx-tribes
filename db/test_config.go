@@ -65,6 +65,7 @@ func InitTestDB() {
 	db.AutoMigrate(&ChatMessage{})
 	db.AutoMigrate(&Chat{})
 	db.AutoMigrate(&WorkspaceCodeGraph{})
+	db.AutoMigrate(&ProofOfWork{})
 
 	people := TestDB.GetAllPeople()
 	for _, p := range people {
