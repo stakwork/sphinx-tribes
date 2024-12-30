@@ -89,6 +89,8 @@ func InitDB() {
 	db.AutoMigrate(&ChatMessage{})
 	db.AutoMigrate(&Chat{})
 	db.AutoMigrate(&ProofOfWork{})
+	db.AutoMigrate(&FeatureFlag{})
+	db.AutoMigrate(&Endpoint{})
 
 	DB.MigrateTablesWithOrgUuid()
 	DB.MigrateOrganizationToWorkspace()

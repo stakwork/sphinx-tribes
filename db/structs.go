@@ -1104,6 +1104,23 @@ type ProofOfWork struct {
 	SubmittedAt time.Time         `json:"submitted_at" gorm:"type:timestamp;default:current_timestamp"`
 }
 
+type FeatureFlag struct {
+	UUID        uuid.UUID `gorm:"type:uuid;primaryKey" json:"uuid"`
+	Name        string    `gorm:"type:varchar(255);unique;not null" json:"name"`
+	Description string    `gorm:"type:text" json:"description"`
+	Enabled     bool      `gorm:"type:boolean;default:false" json:"enabled"`
+	CreatedAt   time.Time `gorm:"type:timestamp;default:current_timestamp" json:"created_at"`
+	UpdatedAt   time.Time `gorm:"type:timestamp;default:current_timestamp" json:"updated_at"`
+}
+
+type Endpoint struct {
+	UUID            uuid.UUID `gorm:"type:uuid;primaryKey" json:"uuid"`
+	Path            string    `gorm:"type:varchar(255);not null" json:"path"`
+	FeatureFlagUUID uuid.UUID `gorm:"type:uuid;not null" json:"feature_flag_uuid"`
+	CreatedAt       time.Time `gorm:"type:timestamp;default:current_timestamp" json:"created_at"`
+	UpdatedAt       time.Time `gorm:"type:timestamp;default:current_timestamp" json:"updated_at"`
+}
+
 func (Person) TableName() string {
 	return "people"
 }
