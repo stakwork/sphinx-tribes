@@ -669,7 +669,6 @@ func TestGetBountyByCreated(t *testing.T) {
 					Owner:        owner,
 					Organization: workspace,
 					Workspace:    workspace,
-					Proofs:       []db.ProofOfWork{},
 				}
 				bountyResponses = append(bountyResponses, bountyResponse)
 			}
@@ -696,15 +695,11 @@ func TestGetBountyByCreated(t *testing.T) {
 		rctx := chi.NewRouteContext()
 		rctx.URLParams.Add("created", "1707991475")
 		req, _ := http.NewRequestWithContext(context.WithValue(context.Background(), chi.RouteCtxKey, rctx), http.MethodGet, "/created/1707991475", nil)
-
-		mockDb.On("GetProofsByBountyID", uint(1)).Return([]db.ProofOfWork{}).Once()
-
 		mockDb.On("GetBountyDataByCreated", createdStr).Return([]db.NewBounty{bounty}, nil).Once()
 		mockDb.On("GetPersonByPubkey", "owner-1").Return(db.Person{}).Once()
 		mockDb.On("GetPersonByPubkey", "user1").Return(db.Person{}).Once()
 		mockDb.On("GetWorkspaceByUuid", "work-1").Return(db.Workspace{}).Once()
 		mockDb.On("GetProofsByBountyID", bounty.ID).Return([]db.ProofOfWork{}).Once()
-
 		handler.ServeHTTP(rr, req)
 
 		var returnedBounty []db.BountyResponse
@@ -712,6 +707,7 @@ func TestGetBountyByCreated(t *testing.T) {
 		assert.NoError(t, err)
 		assert.Equal(t, http.StatusOK, rr.Code)
 		assert.NotEmpty(t, returnedBounty)
+
 	})
 	t.Run("Should return 404 if bounty is not present in db", func(t *testing.T) {
 		rr := httptest.NewRecorder()
