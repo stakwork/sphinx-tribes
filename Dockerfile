@@ -8,11 +8,15 @@ WORKDIR /app
 COPY go.mod .
 COPY go.sum .
 
+# Installing xgo
+RUN go install github.com/xhd2015/xgo/cmd/xgo@latest
+ENV PATH="/usr/local/xgo/bin:${PATH}"
+
 RUN go mod download
 
 COPY . .
 
-RUN CGO_ENABLED=0 go build
+RUN CGO_ENABLED=0 xgo build
 
 # final stage
 FROM alpine:latest

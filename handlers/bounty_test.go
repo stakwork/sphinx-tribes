@@ -703,6 +703,7 @@ func TestGetBountyByCreated(t *testing.T) {
 		mockDb.On("GetPersonByPubkey", "owner-1").Return(db.Person{}).Once()
 		mockDb.On("GetPersonByPubkey", "user1").Return(db.Person{}).Once()
 		mockDb.On("GetWorkspaceByUuid", "work-1").Return(db.Workspace{}).Once()
+		mockDb.On("GetProofsByBountyID", bounty.ID).Return([]db.ProofOfWork{}).Once()
 
 		handler.ServeHTTP(rr, req)
 
