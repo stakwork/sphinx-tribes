@@ -1,8 +1,9 @@
 package routes
 
 import (
-	"github.com/stakwork/sphinx-tribes/auth"
 	"net/http"
+
+	"github.com/stakwork/sphinx-tribes/auth"
 
 	"github.com/go-chi/chi"
 	"github.com/stakwork/sphinx-tribes/db"
@@ -51,6 +52,10 @@ func BountyRoutes() chi.Router {
 		r.Delete("/{pubkey}/{created}", bountyHandler.DeleteBounty)
 		r.Post("/paymentstatus/{created}", handlers.UpdatePaymentStatus)
 		r.Post("/completedstatus/{created}", handlers.UpdateCompletedStatus)
+
+		r.Get("/{id}/timing", bountyHandler.GetBountyTimingStats)
+		r.Put("/{id}/timing/start", bountyHandler.StartBountyTiming)
+		r.Put("/{id}/timing/close", bountyHandler.CloseBountyTiming)
 	})
 	return r
 }
