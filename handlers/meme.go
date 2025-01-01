@@ -208,10 +208,18 @@ func SignChallenge(challenge string) db.RelaySignerResponse {
 func GetMemeToken(id string, sig string) (string, db.MemeTokenSuccess) {
 	memeUrl := fmt.Sprintf("%s/verify", config.MemeUrl)
 
+	var pubkey string
+
+	if config.V2BotUrl != "" {
+		pubkey = config.GetV2ContactKey()
+	} else {
+		pubkey = config.RelayNodeKey
+	}
+
 	formData := url.Values{
 		"id":     {id},
 		"sig":    {sig},
-		"pubkey": {config.RelayNodeKey},
+		"pubkey": {pubkey},
 	}
 
 	res, err := http.PostForm(memeUrl, formData)
