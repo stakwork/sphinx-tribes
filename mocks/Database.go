@@ -1592,52 +1592,6 @@ func (_c *Database_CreateProcessingMap_Call) RunAndReturn(run func(*db.WfProcess
 	return _c
 }
 
-// CreateProof provides a mock function with given fields: proof
-func (_m *Database) CreateProof(proof db.ProofOfWork) error {
-	ret := _m.Called(proof)
-
-	if len(ret) == 0 {
-		panic("no return value specified for CreateProof")
-	}
-
-	var r0 error
-	if rf, ok := ret.Get(0).(func(db.ProofOfWork) error); ok {
-		r0 = rf(proof)
-	} else {
-		r0 = ret.Error(0)
-	}
-
-	return r0
-}
-
-// Database_CreateProof_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'CreateProof'
-type Database_CreateProof_Call struct {
-	*mock.Call
-}
-
-// CreateProof is a helper method to define mock.On call
-//   - proof db.ProofOfWork
-func (_e *Database_Expecter) CreateProof(proof interface{}) *Database_CreateProof_Call {
-	return &Database_CreateProof_Call{Call: _e.mock.On("CreateProof", proof)}
-}
-
-func (_c *Database_CreateProof_Call) Run(run func(proof db.ProofOfWork)) *Database_CreateProof_Call {
-	_c.Call.Run(func(args mock.Arguments) {
-		run(args[0].(db.ProofOfWork))
-	})
-	return _c
-}
-
-func (_c *Database_CreateProof_Call) Return(_a0 error) *Database_CreateProof_Call {
-	_c.Call.Return(_a0)
-	return _c
-}
-
-func (_c *Database_CreateProof_Call) RunAndReturn(run func(db.ProofOfWork) error) *Database_CreateProof_Call {
-	_c.Call.Return(run)
-	return _c
-}
-
 // CreateUserRoles provides a mock function with given fields: roles, uuid, pubkey
 func (_m *Database) CreateUserRoles(roles []db.WorkspaceUserRoles, uuid string, pubkey string) []db.WorkspaceUserRoles {
 	ret := _m.Called(roles, uuid, pubkey)
@@ -2251,52 +2205,6 @@ func (_c *Database_DeleteProcessingMapByKey_Call) Return(_a0 error) *Database_De
 }
 
 func (_c *Database_DeleteProcessingMapByKey_Call) RunAndReturn(run func(string, string) error) *Database_DeleteProcessingMapByKey_Call {
-	_c.Call.Return(run)
-	return _c
-}
-
-// DeleteProof provides a mock function with given fields: proofID
-func (_m *Database) DeleteProof(proofID string) error {
-	ret := _m.Called(proofID)
-
-	if len(ret) == 0 {
-		panic("no return value specified for DeleteProof")
-	}
-
-	var r0 error
-	if rf, ok := ret.Get(0).(func(string) error); ok {
-		r0 = rf(proofID)
-	} else {
-		r0 = ret.Error(0)
-	}
-
-	return r0
-}
-
-// Database_DeleteProof_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'DeleteProof'
-type Database_DeleteProof_Call struct {
-	*mock.Call
-}
-
-// DeleteProof is a helper method to define mock.On call
-//   - proofID string
-func (_e *Database_Expecter) DeleteProof(proofID interface{}) *Database_DeleteProof_Call {
-	return &Database_DeleteProof_Call{Call: _e.mock.On("DeleteProof", proofID)}
-}
-
-func (_c *Database_DeleteProof_Call) Run(run func(proofID string)) *Database_DeleteProof_Call {
-	_c.Call.Run(func(args mock.Arguments) {
-		run(args[0].(string))
-	})
-	return _c
-}
-
-func (_c *Database_DeleteProof_Call) Return(_a0 error) *Database_DeleteProof_Call {
-	_c.Call.Return(_a0)
-	return _c
-}
-
-func (_c *Database_DeleteProof_Call) RunAndReturn(run func(string) error) *Database_DeleteProof_Call {
 	_c.Call.Return(run)
 	return _c
 }
@@ -6192,54 +6100,6 @@ func (_c *Database_GetProductBrief_Call) RunAndReturn(run func(string) (string, 
 	return _c
 }
 
-// GetProofsByBountyID provides a mock function with given fields: bountyID
-func (_m *Database) GetProofsByBountyID(bountyID uint) []db.ProofOfWork {
-	ret := _m.Called(bountyID)
-
-	if len(ret) == 0 {
-		panic("no return value specified for GetProofsByBountyID")
-	}
-
-	var r0 []db.ProofOfWork
-	if rf, ok := ret.Get(0).(func(uint) []db.ProofOfWork); ok {
-		r0 = rf(bountyID)
-	} else {
-		if ret.Get(0) != nil {
-			r0 = ret.Get(0).([]db.ProofOfWork)
-		}
-	}
-
-	return r0
-}
-
-// Database_GetProofsByBountyID_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'GetProofsByBountyID'
-type Database_GetProofsByBountyID_Call struct {
-	*mock.Call
-}
-
-// GetProofsByBountyID is a helper method to define mock.On call
-//   - bountyID uint
-func (_e *Database_Expecter) GetProofsByBountyID(bountyID interface{}) *Database_GetProofsByBountyID_Call {
-	return &Database_GetProofsByBountyID_Call{Call: _e.mock.On("GetProofsByBountyID", bountyID)}
-}
-
-func (_c *Database_GetProofsByBountyID_Call) Run(run func(bountyID uint)) *Database_GetProofsByBountyID_Call {
-	_c.Call.Run(func(args mock.Arguments) {
-		run(args[0].(uint))
-	})
-	return _c
-}
-
-func (_c *Database_GetProofsByBountyID_Call) Return(_a0 []db.ProofOfWork) *Database_GetProofsByBountyID_Call {
-	_c.Call.Return(_a0)
-	return _c
-}
-
-func (_c *Database_GetProofsByBountyID_Call) RunAndReturn(run func(uint) []db.ProofOfWork) *Database_GetProofsByBountyID_Call {
-	_c.Call.Return(run)
-	return _c
-}
-
 // GetSumOfDeposits provides a mock function with given fields: workspace_uuid
 func (_m *Database) GetSumOfDeposits(workspace_uuid string) uint {
 	ret := _m.Called(workspace_uuid)
@@ -10045,53 +9905,6 @@ func (_c *Database_UpdateProcessingMap_Call) RunAndReturn(run func(*db.WfProcess
 	return _c
 }
 
-// UpdateProofStatus provides a mock function with given fields: proofID, status
-func (_m *Database) UpdateProofStatus(proofID string, status db.ProofOfWorkStatus) error {
-	ret := _m.Called(proofID, status)
-
-	if len(ret) == 0 {
-		panic("no return value specified for UpdateProofStatus")
-	}
-
-	var r0 error
-	if rf, ok := ret.Get(0).(func(string, db.ProofOfWorkStatus) error); ok {
-		r0 = rf(proofID, status)
-	} else {
-		r0 = ret.Error(0)
-	}
-
-	return r0
-}
-
-// Database_UpdateProofStatus_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'UpdateProofStatus'
-type Database_UpdateProofStatus_Call struct {
-	*mock.Call
-}
-
-// UpdateProofStatus is a helper method to define mock.On call
-//   - proofID string
-//   - status db.ProofOfWorkStatus
-func (_e *Database_Expecter) UpdateProofStatus(proofID interface{}, status interface{}) *Database_UpdateProofStatus_Call {
-	return &Database_UpdateProofStatus_Call{Call: _e.mock.On("UpdateProofStatus", proofID, status)}
-}
-
-func (_c *Database_UpdateProofStatus_Call) Run(run func(proofID string, status db.ProofOfWorkStatus)) *Database_UpdateProofStatus_Call {
-	_c.Call.Run(func(args mock.Arguments) {
-		run(args[0].(string), args[1].(db.ProofOfWorkStatus))
-	})
-	return _c
-}
-
-func (_c *Database_UpdateProofStatus_Call) Return(_a0 error) *Database_UpdateProofStatus_Call {
-	_c.Call.Return(_a0)
-	return _c
-}
-
-func (_c *Database_UpdateProofStatus_Call) RunAndReturn(run func(string, db.ProofOfWorkStatus) error) *Database_UpdateProofStatus_Call {
-	_c.Call.Return(run)
-	return _c
-}
-
 // UpdateTicket provides a mock function with given fields: ticket
 func (_m *Database) UpdateTicket(ticket db.Tickets) (db.Tickets, error) {
 	ret := _m.Called(ticket)
@@ -10637,4 +10450,282 @@ func NewDatabase(t interface {
 	t.Cleanup(func() { mock.AssertExpectations(t) })
 
 	return mock
+}
+
+
+func (_m *Database) CreateBountyTiming(bountyID uint) (*db.BountyTiming, error) {
+    ret := _m.Called(bountyID)
+
+    var r0 *db.BountyTiming
+    var r1 error
+    if rf, ok := ret.Get(0).(func(uint) (*db.BountyTiming, error)); ok {
+        return rf(bountyID)
+    }
+    if rf, ok := ret.Get(0).(func(uint) *db.BountyTiming); ok {
+        r0 = rf(bountyID)
+    } else {
+        if ret.Get(0) != nil {
+            r0 = ret.Get(0).(*db.BountyTiming)
+        }
+    }
+
+    if rf, ok := ret.Get(1).(func(uint) error); ok {
+        r1 = rf(bountyID)
+    } else {
+        r1 = ret.Error(1)
+    }
+
+    return r0, r1
+}
+
+func (_m *Database) GetBountyTiming(bountyID uint) (*db.BountyTiming, error) {
+    ret := _m.Called(bountyID)
+
+    var r0 *db.BountyTiming
+    var r1 error
+    if rf, ok := ret.Get(0).(func(uint) (*db.BountyTiming, error)); ok {
+        return rf(bountyID)
+    }
+    if rf, ok := ret.Get(0).(func(uint) *db.BountyTiming); ok {
+        r0 = rf(bountyID)
+    } else {
+        if ret.Get(0) != nil {
+            r0 = ret.Get(0).(*db.BountyTiming)
+        }
+    }
+
+    if rf, ok := ret.Get(1).(func(uint) error); ok {
+        r1 = rf(bountyID)
+    } else {
+        r1 = ret.Error(1)
+    }
+
+    return r0, r1
+}
+
+func (_m *Database) UpdateBountyTiming(timing *db.BountyTiming) error {
+    ret := _m.Called(timing)
+
+    var r0 error
+    if rf, ok := ret.Get(0).(func(*db.BountyTiming) error); ok {
+        r0 = rf(timing)
+    } else {
+        r0 = ret.Error(0)
+    }
+
+    return r0
+}
+
+func (_m *Database) StartBountyTiming(bountyID uint) error {
+    ret := _m.Called(bountyID)
+
+    var r0 error
+    if rf, ok := ret.Get(0).(func(uint) error); ok {
+        r0 = rf(bountyID)
+    } else {
+        r0 = ret.Error(0)
+    }
+
+    return r0
+}
+
+func (_m *Database) CloseBountyTiming(bountyID uint) error {
+    ret := _m.Called(bountyID)
+
+    var r0 error
+    if rf, ok := ret.Get(0).(func(uint) error); ok {
+        r0 = rf(bountyID)
+    } else {
+        r0 = ret.Error(0)
+    }
+
+    return r0
+}
+
+func (_m *Database) UpdateBountyTimingOnProof(bountyID uint) error {
+    ret := _m.Called(bountyID)
+
+    var r0 error
+    if rf, ok := ret.Get(0).(func(uint) error); ok {
+        r0 = rf(bountyID)
+    } else {
+        r0 = ret.Error(0)
+    }
+
+    return r0
+}
+
+type Database_CreateBountyTiming_Call struct {
+    *mock.Call
+}
+
+func (_e *Database_Expecter) CreateBountyTiming(bountyID interface{}) *Database_CreateBountyTiming_Call {
+    return &Database_CreateBountyTiming_Call{Call: _e.mock.On("CreateBountyTiming", bountyID)}
+}
+
+type Database_GetBountyTiming_Call struct {
+    *mock.Call
+}
+
+func (_e *Database_Expecter) GetBountyTiming(bountyID interface{}) *Database_GetBountyTiming_Call {
+    return &Database_GetBountyTiming_Call{Call: _e.mock.On("GetBountyTiming", bountyID)}
+}
+
+type Database_UpdateBountyTiming_Call struct {
+    *mock.Call
+}
+
+func (_e *Database_Expecter) UpdateBountyTiming(timing interface{}) *Database_UpdateBountyTiming_Call {
+    return &Database_UpdateBountyTiming_Call{Call: _e.mock.On("UpdateBountyTiming", timing)}
+}
+
+type Database_StartBountyTiming_Call struct {
+    *mock.Call
+}
+
+func (_e *Database_Expecter) StartBountyTiming(bountyID interface{}) *Database_StartBountyTiming_Call {
+    return &Database_StartBountyTiming_Call{Call: _e.mock.On("StartBountyTiming", bountyID)}
+}
+
+type Database_CloseBountyTiming_Call struct {
+    *mock.Call
+}
+
+func (_e *Database_Expecter) CloseBountyTiming(bountyID interface{}) *Database_CloseBountyTiming_Call {
+    return &Database_CloseBountyTiming_Call{Call: _e.mock.On("CloseBountyTiming", bountyID)}
+}
+
+type Database_UpdateBountyTimingOnProof_Call struct {
+    *mock.Call
+}
+
+func (_e *Database_Expecter) UpdateBountyTimingOnProof(bountyID interface{}) *Database_UpdateBountyTimingOnProof_Call {
+    return &Database_UpdateBountyTimingOnProof_Call{Call: _e.mock.On("UpdateBountyTimingOnProof", bountyID)}
+}
+
+
+func (_m *Database) GetProofsByBountyID(bountyID uint) []db.ProofOfWork {
+    ret := _m.Called(bountyID)
+
+    var r0 []db.ProofOfWork
+    if rf, ok := ret.Get(0).(func(uint) []db.ProofOfWork); ok {
+        r0 = rf(bountyID)
+    } else {
+        if ret.Get(0) != nil {
+            r0 = ret.Get(0).([]db.ProofOfWork)
+        }
+    }
+
+    return r0
+}
+
+func (_m *Database) CreateProof(proof db.ProofOfWork) error {
+    ret := _m.Called(proof)
+
+    var r0 error
+    if rf, ok := ret.Get(0).(func(db.ProofOfWork) error); ok {
+        r0 = rf(proof)
+    } else {
+        r0 = ret.Error(0)
+    }
+
+    return r0
+}
+
+func (_m *Database) DeleteProof(proofID string) error {
+    ret := _m.Called(proofID)
+
+    var r0 error
+    if rf, ok := ret.Get(0).(func(string) error); ok {
+        r0 = rf(proofID)
+    } else {
+        r0 = ret.Error(0)
+    }
+
+    return r0
+}
+
+func (_m *Database) UpdateProofStatus(proofID string, status db.ProofOfWorkStatus) error {
+    ret := _m.Called(proofID, status)
+
+    var r0 error
+    if rf, ok := ret.Get(0).(func(string, db.ProofOfWorkStatus) error); ok {
+        r0 = rf(proofID, status)
+    } else {
+        r0 = ret.Error(0)
+    }
+
+    return r0
+}
+
+type Database_GetProofsByBountyID_Call struct {
+    *mock.Call
+}
+
+func (_e *Database_Expecter) GetProofsByBountyID(bountyID interface{}) *Database_GetProofsByBountyID_Call {
+    return &Database_GetProofsByBountyID_Call{Call: _e.mock.On("GetProofsByBountyID", bountyID)}
+}
+
+type Database_CreateProof_Call struct {
+    *mock.Call
+}
+
+func (_e *Database_Expecter) CreateProof(proof interface{}) *Database_CreateProof_Call {
+    return &Database_CreateProof_Call{Call: _e.mock.On("CreateProof", proof)}
+}
+
+type Database_DeleteProof_Call struct {
+    *mock.Call
+}
+
+func (_e *Database_Expecter) DeleteProof(proofID interface{}) *Database_DeleteProof_Call {
+    return &Database_DeleteProof_Call{Call: _e.mock.On("DeleteProof", proofID)}
+}
+
+type Database_UpdateProofStatus_Call struct {
+    *mock.Call
+}
+
+func (_e *Database_Expecter) UpdateProofStatus(proofID interface{}, status interface{}) *Database_UpdateProofStatus_Call {
+    return &Database_UpdateProofStatus_Call{Call: _e.mock.On("UpdateProofStatus", proofID, status)}
+}
+
+func (_c *Database_GetProofsByBountyID_Call) Return(_a0 []db.ProofOfWork) *Database_GetProofsByBountyID_Call {
+    _c.Call.Return(_a0)
+    return _c
+}
+
+func (_c *Database_CreateProof_Call) Return(_a0 error) *Database_CreateProof_Call {
+    _c.Call.Return(_a0)
+    return _c
+}
+
+func (_c *Database_DeleteProof_Call) Return(_a0 error) *Database_DeleteProof_Call {
+    _c.Call.Return(_a0)
+    return _c
+}
+
+func (_c *Database_UpdateProofStatus_Call) Return(_a0 error) *Database_UpdateProofStatus_Call {
+    _c.Call.Return(_a0)
+    return _c
+}
+
+func (_c *Database_GetProofsByBountyID_Call) RunAndReturn(run func(uint) []db.ProofOfWork) *Database_GetProofsByBountyID_Call {
+    _c.Call.Return(run)
+    return _c
+}
+
+func (_c *Database_CreateProof_Call) RunAndReturn(run func(db.ProofOfWork) error) *Database_CreateProof_Call {
+    _c.Call.Return(run)
+    return _c
+}
+
+func (_c *Database_DeleteProof_Call) RunAndReturn(run func(string) error) *Database_DeleteProof_Call {
+    _c.Call.Return(run)
+    return _c
+}
+
+func (_c *Database_UpdateProofStatus_Call) RunAndReturn(run func(string, db.ProofOfWorkStatus) error) *Database_UpdateProofStatus_Call {
+    _c.Call.Return(run)
+    return _c
 }

@@ -1104,6 +1104,19 @@ type ProofOfWork struct {
 	SubmittedAt time.Time         `json:"submitted_at" gorm:"type:timestamp;default:current_timestamp"`
 }
 
+type BountyTiming struct {
+	ID                   uuid.UUID  `json:"id" gorm:"type:uuid;primaryKey"`
+	BountyID             uint       `json:"bounty_id" gorm:"not null"`
+	TotalWorkTimeSeconds int        `json:"total_work_time_seconds" gorm:"default:0"`
+	TotalDurationSeconds int        `json:"total_duration_seconds" gorm:"default:0"`
+	TotalAttempts        int        `json:"total_attempts" gorm:"default:0"`
+	FirstAssignedAt      *time.Time `json:"first_assigned_at"`
+	LastPoWAt            *time.Time `json:"last_pow_at"`
+	ClosedAt             *time.Time `json:"closed_at"`
+	CreatedAt            time.Time  `json:"created_at" gorm:"default:current_timestamp"`
+	UpdatedAt            time.Time  `json:"updated_at" gorm:"default:current_timestamp"`
+}
+
 type FeatureFlag struct {
 	UUID        uuid.UUID `gorm:"type:uuid;primaryKey" json:"uuid"`
 	Name        string    `gorm:"type:varchar(255);unique;not null" json:"name"`
