@@ -2,7 +2,6 @@ package handlers
 
 import (
 	"encoding/json"
-	"fmt"
 	"net/http"
 
 	"github.com/go-chi/chi"
@@ -155,6 +154,15 @@ func (fh *FeatureFlagHandler) UpdateFeatureFlag(w http.ResponseWriter, r *http.R
 
 	updatedFlag, err := fh.db.UpdateFeatureFlag(flag)
 	if err != nil {
+		if err.Error() == "feature flag not found" {
+			w.WriteHeader(http.StatusNotFound)
+			json.NewEncoder(w).Encode(FeatureFlagResponse{
+				Success: false,
+				Message: "Feature flag not found",
+			})
+			return
+		}
+
 		w.WriteHeader(http.StatusInternalServerError)
 		json.NewEncoder(w).Encode(FeatureFlagResponse{
 			Success: false,
@@ -193,7 +201,15 @@ func (fh *FeatureFlagHandler) DeleteFeatureFlag(w http.ResponseWriter, r *http.R
 	}
 
 	if err := fh.db.DeleteFeatureFlag(flagUUID); err != nil {
-		fmt.Print(err)
+		if err.Error() == "feature flag not found" {
+			w.WriteHeader(http.StatusNotFound)
+			json.NewEncoder(w).Encode(FeatureFlagResponse{
+				Success: false,
+				Message: "Feature flag not found",
+			})
+			return
+		}
+
 		w.WriteHeader(http.StatusInternalServerError)
 		json.NewEncoder(w).Encode(FeatureFlagResponse{
 			Success: false,
