@@ -109,6 +109,7 @@ func SetupSuite(_ *testing.T) func(tb testing.TB) {
 	db.InitTestDB()
 
 	return func(_ testing.TB) {
+		defer db.CloseTestDB()
 		log.Println("Teardown test")
 	}
 }
