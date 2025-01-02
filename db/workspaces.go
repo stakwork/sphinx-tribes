@@ -217,26 +217,26 @@ func (db database) GetWorkspaceStatusBudget(workspace_uuid string) StatusBudget 
 	workspaceBudget := db.GetWorkspaceBudget(workspace_uuid)
 
 	var openBudget uint
-	db.db.Model(&NewBounty{}).Where("workspace_uuid = ?", workspace_uuid).Where("assignee = '' ").Where("paid != true").Select("SUM(price)").Row().Scan(&openBudget)
+	db.db.Model(&NewBounty{}).Where("workspace_uuid = ?", workspace_uuid).Where("assignee = '' ").Where("paid != ?", true).Select("SUM(price)").Row().Scan(&openBudget)
 
 	var openCount int64
-	db.db.Model(&NewBounty{}).Where("workspace_uuid = ?", workspace_uuid).Where("assignee = '' ").Where("paid != true").Count(&openCount)
+	db.db.Model(&NewBounty{}).Where("workspace_uuid = ?", workspace_uuid).Where("assignee = '' ").Where("paid != ?", true).Count(&openCount)
 
 	var openDifference int = int(workspaceBudget.TotalBudget - openBudget)
 
 	var assignedBudget uint
-	db.db.Model(&NewBounty{}).Where("workspace_uuid = ?", workspace_uuid).Where("assignee != '' ").Where("paid != true").Select("SUM(price)").Row().Scan(&assignedBudget)
+	db.db.Model(&NewBounty{}).Where("workspace_uuid = ?", workspace_uuid).Where("assignee != '' ").Where("paid != ?", true).Where("completed != ?", true).Select("SUM(price)").Row().Scan(&assignedBudget)
 
 	var assignedCount int64
-	db.db.Model(&NewBounty{}).Where("workspace_uuid = ?", workspace_uuid).Where("assignee != '' ").Where("paid != true").Count(&assignedCount)
+	db.db.Model(&NewBounty{}).Where("workspace_uuid = ?", workspace_uuid).Where("assignee != '' ").Where("paid != ?", true).Where("completed != ?", true).Count(&assignedCount)
 
 	var assignedDifference int = int(workspaceBudget.TotalBudget - assignedBudget)
 
 	var completedBudget uint
-	db.db.Model(&NewBounty{}).Where("workspace_uuid = ?", workspace_uuid).Where("completed = true ").Where("paid != true").Select("SUM(price)").Row().Scan(&completedBudget)
+	db.db.Model(&NewBounty{}).Where("workspace_uuid = ?", workspace_uuid).Where("completed = ?", true).Where("paid != ?", true).Select("SUM(price)").Row().Scan(&completedBudget)
 
 	var completedCount int64
-	db.db.Model(&NewBounty{}).Where("workspace_uuid = ?", workspace_uuid).Where("completed = true ").Where("paid != true").Count(&completedCount)
+	db.db.Model(&NewBounty{}).Where("workspace_uuid = ?", workspace_uuid).Where("completed = ?", true).Where("paid != ?", true).Count(&completedCount)
 
 	var completedDifference int = int(workspaceBudget.TotalBudget - completedBudget)
 
