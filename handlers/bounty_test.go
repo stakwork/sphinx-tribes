@@ -2864,3 +2864,209 @@ func TestBountyGetFilterCount(t *testing.T) {
 		})
 	}
 }
+
+func TestGenerateBountyCardResponse(t *testing.T) {
+
+	teardownSuite := SetupSuite(t)
+	defer teardownSuite(t)
+
+	mockHttpClient := mocks.NewHttpClient(t)
+	bHandler := NewBountyHandler(mockHttpClient, db.TestDB)
+
+	db.CleanTestData()
+
+	workspace := db.Workspace{
+		ID:          1,
+		Uuid:        "test-workspace-uuid",
+		Name:        "Test Workspace",
+		Description: "Test Workspace Description",
+		OwnerPubKey: "test-owner",
+	}
+	_, err := db.TestDB.CreateOrEditWorkspace(workspace)
+	assert.NoError(t, err)
+
+	phase := db.FeaturePhase{
+		Uuid:        "test-phase-uuid",
+		Name:        "Test Phase",
+		FeatureUuid: "test-feature-uuid",
+	}
+	db.TestDB.CreateOrEditFeaturePhase(phase)
+
+	feature := db.WorkspaceFeatures{
+		Uuid:          "test-feature-uuid",
+		Name:          "Test Feature",
+		WorkspaceUuid: workspace.Uuid,
+	}
+	db.TestDB.CreateOrEditFeature(feature)
+
+	assignee := db.Person{
+		OwnerPubKey: "test-assignee",
+		Img:         "test-image-url",
+	}
+	db.TestDB.CreateOrEditPerson(assignee)
+
+	now := time.Now()
+
+	publicBounty := db.NewBounty{
+		ID:            1,
+		Type:          "coding",
+		Title:         "Public Bounty",
+		Description:   "Test Description",
+		WorkspaceUuid: workspace.Uuid,
+		PhaseUuid:     phase.Uuid,
+		Assignee:      assignee.OwnerPubKey,
+		Show:          true,
+		Created:       now.Unix(),
+		OwnerID:       "test-owner",
+		Price:         1000,
+	}
+	_, err = db.TestDB.CreateOrEditBounty(publicBounty)
+	assert.NoError(t, err)
+
+	privateBounty := db.NewBounty{
+		ID:            2,
+		Type:          "coding",
+		Title:         "Private Bounty",
+		Description:   "Test Description",
+		WorkspaceUuid: workspace.Uuid,
+		PhaseUuid:     phase.Uuid,
+		Assignee:      assignee.OwnerPubKey,
+		Show:          false,
+		Created:       now.Unix(),
+		OwnerID:       "test-owner",
+		Price:         2000,
+	}
+	_, err = db.TestDB.CreateOrEditBounty(privateBounty)
+	assert.NoError(t, err)
+
+	inputBounties := []db.NewBounty{publicBounty, privateBounty}
+
+	response := bHandler.GenerateBountyCardResponse(inputBounties)
+
+	assert.Equal(t, 2, len(response), "Should return cards for both bounties")
+
+	titles := make(map[string]bool)
+	for _, card := range response {
+		titles[card.Title] = true
+
+		assert.Equal(t, workspace.Uuid, card.Workspace.Uuid)
+		assert.Equal(t, assignee.Img, card.AssigneePic)
+		assert.Equal(t, phase.Uuid, card.Phase.Uuid)
+		assert.Equal(t, feature.Uuid, card.Features.Uuid)
+	}
+
+	assert.True(t, titles["Public Bounty"], "Public bounty should be present")
+	assert.True(t, titles["Private Bounty"], "Private bounty should be present")
+}
+
+func TestGetWorkspaceBountyCards(t *testing.T) {
+	teardownSuite := SetupSuite(t)
+	defer teardownSuite(t)
+
+	mockHttpClient := mocks.NewHttpClient(t)
+	bHandler := NewBountyHandler(mockHttpClient, db.TestDB)
+
+	db.CleanTestData()
+
+	workspace := db.Workspace{
+		ID:          1,
+		Uuid:        "test-workspace-uuid",
+		Name:        "Test Workspace",
+		Description: "Test Workspace Description",
+		OwnerPubKey: "test-owner",
+	}
+	_, err := db.TestDB.CreateOrEditWorkspace(workspace)
+	assert.NoError(t, err)
+
+	phase := db.FeaturePhase{
+		Uuid:        "test-phase-uuid",
+		Name:        "Test Phase",
+		FeatureUuid: "test-feature-uuid",
+	}
+	db.TestDB.CreateOrEditFeaturePhase(phase)
+
+	feature := db.WorkspaceFeatures{
+		Uuid:          "test-feature-uuid",
+		Name:          "Test Feature",
+		WorkspaceUuid: workspace.Uuid,
+	}
+	db.TestDB.CreateOrEditFeature(feature)
+
+	assignee := db.Person{
+		OwnerPubKey: "test-assignee",
+		Img:         "test-image-url",
+	}
+	db.TestDB.CreateOrEditPerson(assignee)
+
+	now := time.Now()
+
+	publicBounty := db.NewBounty{
+		ID:            1,
+		Type:          "coding",
+		Title:         "Public Bounty",
+		Description:   "Test Description",
+		WorkspaceUuid: workspace.Uuid,
+		PhaseUuid:     phase.Uuid,
+		Assignee:      assignee.OwnerPubKey,
+		Show:          true,
+		Created:       now.Unix(),
+		OwnerID:       "test-owner",
+		Price:         1000,
+	}
+
+	privateBounty := db.NewBounty{
+		ID:            2,
+		Type:          "coding",
+		Title:         "Private Bounty",
+		Description:   "Test Description",
+		WorkspaceUuid: workspace.Uuid,
+		PhaseUuid:     phase.Uuid,
+		Assignee:      assignee.OwnerPubKey,
+		Show:          false,
+		Created:       now.Add(time.Hour).Unix(),
+		OwnerID:       "test-owner",
+		Price:         2000,
+	}
+
+	t.Run("should only get public bounty", func(t *testing.T) {
+		db.TestDB.DeleteAllBounties()
+		_, err := db.TestDB.CreateOrEditBounty(publicBounty)
+		assert.NoError(t, err)
+
+		rr := httptest.NewRecorder()
+		handler := http.HandlerFunc(bHandler.GetBountyCards)
+
+		req, err := http.NewRequest(http.MethodGet, "/gobounties/bounty-cards", nil)
+		assert.NoError(t, err)
+
+		handler.ServeHTTP(rr, req)
+
+		var response []db.BountyCard
+		err = json.Unmarshal(rr.Body.Bytes(), &response)
+		assert.NoError(t, err)
+		assert.Equal(t, http.StatusOK, rr.Code)
+		assert.Equal(t, 1, len(response))
+		assert.Equal(t, "Public Bounty", response[0].Title)
+	})
+
+	t.Run("should get private bounty in workspace context", func(t *testing.T) {
+		db.TestDB.DeleteAllBounties()
+		_, err := db.TestDB.CreateOrEditBounty(privateBounty)
+		assert.NoError(t, err)
+
+		rr := httptest.NewRecorder()
+		handler := http.HandlerFunc(bHandler.GetBountyCards)
+
+		req, err := http.NewRequest(http.MethodGet, fmt.Sprintf("/gobounties/bounty-cards?workspace_uuid=%s", workspace.Uuid), nil)
+		assert.NoError(t, err)
+
+		handler.ServeHTTP(rr, req)
+
+		var response []db.BountyCard
+		err = json.Unmarshal(rr.Body.Bytes(), &response)
+		assert.NoError(t, err)
+		assert.Equal(t, http.StatusOK, rr.Code)
+		assert.Equal(t, 1, len(response))
+		assert.Equal(t, "Private Bounty", response[0].Title)
+	})
+}
