@@ -1512,7 +1512,15 @@ func (h *bountyHandler) GetFilterCount(w http.ResponseWriter, r *http.Request) {
 }
 
 func (h *bountyHandler) GetBountyCards(w http.ResponseWriter, r *http.Request) {
-	bounties := h.db.GetAllBounties(r)
+	workspaceUuid := r.URL.Query().Get("workspace_uuid")
+	var bounties []db.NewBounty
+
+	if workspaceUuid != "" {
+		bounties = h.db.GetWorkspaceBountyCardsData(r)
+	} else {
+		bounties = h.db.GetAllBounties(r)
+	}
+
 	var bountyCardResponse []db.BountyCard = h.GenerateBountyCardResponse(bounties)
 
 	w.WriteHeader(http.StatusOK)
