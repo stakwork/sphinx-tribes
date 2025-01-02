@@ -13,6 +13,8 @@ func TestTicketsMigrationPostgres(t *testing.T) {
 	// init test db
 	InitTestDB()
 
+	defer CloseTestDB()
+
 	// Check if table exists
 	if !TestDB.db.Migrator().HasTable(&Tickets{}) {
 		t.Fatalf("Table 'tickets' does not exist after migration")
@@ -77,6 +79,8 @@ type TestTickets struct {
 
 func TestTicketsIndexPerformance(t *testing.T) {
 	InitTestDB()
+
+	defer CloseTestDB()
 
 	// Ensure cleanup
 	defer func() {
