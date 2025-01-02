@@ -1132,16 +1132,16 @@ type FeatureFlag struct {
 	Description string     `gorm:"type:text" json:"description"`
 	Enabled     bool       `gorm:"type:boolean;default:false" json:"enabled"`
 	Endpoints   []Endpoint `gorm:"foreignKey:FeatureFlagUUID" json:"endpoints,omitempty"`
-	CreatedAt   time.Time  `gorm:"type:timestamp;default:current_timestamp" json:"created_at"`
-	UpdatedAt   time.Time  `gorm:"type:timestamp;default:current_timestamp" json:"updated_at"`
+	CreatedAt   time.Time  `gorm:"type:timestamp;default:current_timestamp" json:"-"`
+	UpdatedAt   time.Time  `gorm:"type:timestamp;default:current_timestamp" json:"-"`
 }
 
 type Endpoint struct {
 	UUID            uuid.UUID `gorm:"type:uuid;primaryKey" json:"uuid"`
 	Path            string    `gorm:"type:varchar(255);not null" json:"path"`
-	FeatureFlagUUID uuid.UUID `gorm:"type:uuid;not null" json:"feature_flag_uuid"`
-	CreatedAt       time.Time `gorm:"type:timestamp;default:current_timestamp" json:"created_at"`
-	UpdatedAt       time.Time `gorm:"type:timestamp;default:current_timestamp" json:"updated_at"`
+	FeatureFlagUUID uuid.UUID `gorm:"type:uuid;not null" json:"-"`
+	CreatedAt       time.Time `gorm:"type:timestamp;default:current_timestamp" json:"-"`
+	UpdatedAt       time.Time `gorm:"type:timestamp;default:current_timestamp" json:"-"`
 }
 
 func (Person) TableName() string {
