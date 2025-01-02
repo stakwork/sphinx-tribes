@@ -1,9 +1,9 @@
 package db
 
 import (
+	"fmt"
 	"testing"
 	"time"
-	"fmt"
 
 	"github.com/google/uuid"
 	"github.com/stakwork/sphinx-tribes/logger"
@@ -158,6 +158,8 @@ func TestUserHasManageBountyRoles(t *testing.T) {
 
 func TestProcessUpdateTicketsWithoutGroup(t *testing.T) {
 	InitTestDB()
+
+	defer CloseTestDB()
 
 	// create person
 	now := time.Now()

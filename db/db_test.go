@@ -9,6 +9,8 @@ func TestGetFilterStatusCount(t *testing.T) {
 
 	InitTestDB()
 
+	defer CloseTestDB()
+
 	tests := []struct {
 		name     string
 		setup    []NewBounty
