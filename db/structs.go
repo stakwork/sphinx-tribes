@@ -1127,12 +1127,13 @@ type BountyTiming struct {
 }
 
 type FeatureFlag struct {
-	UUID        uuid.UUID `gorm:"type:uuid;primaryKey" json:"uuid"`
-	Name        string    `gorm:"type:varchar(255);unique;not null" json:"name"`
-	Description string    `gorm:"type:text" json:"description"`
-	Enabled     bool      `gorm:"type:boolean;default:false" json:"enabled"`
-	CreatedAt   time.Time `gorm:"type:timestamp;default:current_timestamp" json:"created_at"`
-	UpdatedAt   time.Time `gorm:"type:timestamp;default:current_timestamp" json:"updated_at"`
+	UUID        uuid.UUID  `gorm:"type:uuid;primaryKey" json:"uuid"`
+	Name        string     `gorm:"type:varchar(255);unique;not null" json:"name"`
+	Description string     `gorm:"type:text" json:"description"`
+	Enabled     bool       `gorm:"type:boolean;default:false" json:"enabled"`
+	Endpoints   []Endpoint `gorm:"foreignKey:FeatureFlagUUID" json:"endpoints,omitempty"`
+	CreatedAt   time.Time  `gorm:"type:timestamp;default:current_timestamp" json:"created_at"`
+	UpdatedAt   time.Time  `gorm:"type:timestamp;default:current_timestamp" json:"updated_at"`
 }
 
 type Endpoint struct {
