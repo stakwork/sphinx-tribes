@@ -2949,6 +2949,63 @@ func (_c *Database_GetAllBounties_Call) RunAndReturn(run func(*http.Request) []d
 	return _c
 }
 
+// GetAllEndpoints provides a mock function with no fields
+func (_m *Database) GetAllEndpoints() ([]db.Endpoint, error) {
+	ret := _m.Called()
+
+	if len(ret) == 0 {
+		panic("no return value specified for GetAllEndpoints")
+	}
+
+	var r0 []db.Endpoint
+	var r1 error
+	if rf, ok := ret.Get(0).(func() ([]db.Endpoint, error)); ok {
+		return rf()
+	}
+	if rf, ok := ret.Get(0).(func() []db.Endpoint); ok {
+		r0 = rf()
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).([]db.Endpoint)
+		}
+	}
+
+	if rf, ok := ret.Get(1).(func() error); ok {
+		r1 = rf()
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
+// Database_GetAllEndpoints_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'GetAllEndpoints'
+type Database_GetAllEndpoints_Call struct {
+	*mock.Call
+}
+
+// GetAllEndpoints is a helper method to define mock.On call
+func (_e *Database_Expecter) GetAllEndpoints() *Database_GetAllEndpoints_Call {
+	return &Database_GetAllEndpoints_Call{Call: _e.mock.On("GetAllEndpoints")}
+}
+
+func (_c *Database_GetAllEndpoints_Call) Run(run func()) *Database_GetAllEndpoints_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run()
+	})
+	return _c
+}
+
+func (_c *Database_GetAllEndpoints_Call) Return(_a0 []db.Endpoint, _a1 error) *Database_GetAllEndpoints_Call {
+	_c.Call.Return(_a0, _a1)
+	return _c
+}
+
+func (_c *Database_GetAllEndpoints_Call) RunAndReturn(run func() ([]db.Endpoint, error)) *Database_GetAllEndpoints_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
 // GetAllTribes provides a mock function with no fields
 func (_m *Database) GetAllTribes() []db.Tribe {
 	ret := _m.Called()
