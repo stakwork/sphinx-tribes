@@ -10729,3 +10729,26 @@ func (_c *Database_UpdateProofStatus_Call) RunAndReturn(run func(string, db.Proo
     _c.Call.Return(run)
     return _c
 }
+
+func (_m *Database) GetWorkspaceBountyCardsData(r *http.Request) []db.NewBounty {
+    ret := _m.Called(r)
+
+    var r0 []db.NewBounty
+    if rf, ok := ret.Get(0).(func(*http.Request) []db.NewBounty); ok {
+        r0 = rf(r)
+    } else {
+        if ret.Get(0) != nil {
+            r0 = ret.Get(0).([]db.NewBounty)
+        }
+    }
+
+    return r0
+}
+
+type Database_GetWorkspaceBountyCardsData_Call struct {
+    *mock.Call
+}
+
+func (_e *Database_Expecter) GetWorkspaceBountyCardsData(r interface{}) *Database_GetWorkspaceBountyCardsData_Call {
+    return &Database_GetWorkspaceBountyCardsData_Call{Call: _e.mock.On("GetWorkspaceBountyCardsData", r)}
+}

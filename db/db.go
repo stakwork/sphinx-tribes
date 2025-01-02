@@ -1977,3 +1977,40 @@ func (db database) UpdateBountyTimingOnProof(bountyID uint) error {
 
 	return db.UpdateBountyTiming(timing)
 }
+
+func (db database) GetWorkspaceBountyCardsData(r *http.Request) []NewBounty {
+	keys := r.URL.Query()
+	offset, limit, sortBy, direction, search := utils.GetPaginationParams(r)
+	workspaceUuid := keys.Get("workspace_uuid")
+
+	orderQuery := ""
+	limitQuery := ""
+	searchQuery := ""
+	workspaceQuery := ""
+
+	if sortBy != "" && direction != "" {
+		orderQuery = "ORDER BY " + sortBy + " " + direction
+	} else {
+		orderQuery = "ORDER BY created DESC"
+	}
+
+	if limit != 0 {
+		limitQuery = fmt.Sprintf("LIMIT %d OFFSET %d", limit, offset)
+	}
+
+	if search != "" {
+		searchQuery = fmt.Sprintf("AND LOWER(title) LIKE %s", "'%"+strings.ToLower(search)+"%'")
+	}
+
+	if workspaceUuid != "" {
+		workspaceQuery = "WHERE workspace_uuid = '" + workspaceUuid + "'"
+	}
+
+	query := "SELECT * FROM public.bounty"
+	allQuery := query + " " + workspaceQuery + " " + searchQuery + " " + orderQuery + " " + limitQuery
+
+	ms := []NewBounty{}
+	db.db.Raw(allQuery).Scan(&ms)
+
+	return ms
+}

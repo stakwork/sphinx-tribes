@@ -227,4 +227,5 @@ type Database interface {
 	StartBountyTiming(bountyID uint) error
 	CloseBountyTiming(bountyID uint) error
 	UpdateBountyTimingOnProof(bountyID uint) error
+	GetWorkspaceBountyCardsData(r *http.Request) []NewBounty
 }
