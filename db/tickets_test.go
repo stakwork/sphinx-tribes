@@ -131,7 +131,10 @@ func TestCreateOrEditTicket(t *testing.T) {
 }
 
 func TestGetTicket(t *testing.T) {
-	SetupSuite(t)
+	InitTestDB()
+
+	defer CloseTestDB()
+
 	// create person
 	now := time.Now()
 

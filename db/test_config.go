@@ -100,11 +100,11 @@ func DeleteAllChatMessages() {
 }
 
 func CloseTestDB() {
-	dbInstance, err := TestDB.db.DB()
+	instance, err := TestDB.db.DB()
 
 	if err != nil {
 		panic(err)
 	}
 
-	dbInstance.Close()
+	instance.Close()
 }
