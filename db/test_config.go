@@ -98,3 +98,13 @@ func CleanTestData() {
 func DeleteAllChatMessages() {
 	TestDB.db.Exec("DELETE FROM chat_messages")
 }
+
+func CloseTestDB() {
+	dbInstance, err := TestDB.db.DB()
+
+	if err != nil {
+		panic(err)
+	}
+
+	dbInstance.Close()
+}

@@ -18,6 +18,8 @@ import (
 )
 
 func TestGetBotByUniqueName(t *testing.T) {
+	SetupSuite(t)
+
 	teardownSuite := SetupSuite(t)
 	defer teardownSuite(t)
 
