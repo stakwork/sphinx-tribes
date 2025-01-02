@@ -242,4 +242,5 @@ type Database interface {
 	DeleteEndpoint(endpointUUID uuid.UUID) error
 	GetEndpointsByFeatureFlag(flagUUID uuid.UUID) ([]Endpoint, error)
 	GetEndpointByPath(path string) (Endpoint, error)
+	GetAllEndpoints() ([]Endpoint, error)
 }

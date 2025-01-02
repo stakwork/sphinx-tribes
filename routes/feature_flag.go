@@ -2,6 +2,7 @@ package routes
 
 import (
 	"github.com/go-chi/chi"
+	"github.com/stakwork/sphinx-tribes/auth"
 	"github.com/stakwork/sphinx-tribes/db"
 	"github.com/stakwork/sphinx-tribes/handlers"
 )
@@ -11,7 +12,7 @@ func FeatureFlagRoutes() chi.Router {
 	featureFlagHandler := handlers.NewFeatureFlagHandler(db.DB)
 
 	r.Group(func(r chi.Router) {
-		// add feature flag middleware
+		r.Use(auth.PubKeyContext)
 
 		r.Get("/", featureFlagHandler.GetFeatureFlags)
 		r.Post("/", featureFlagHandler.CreateFeatureFlag)

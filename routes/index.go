@@ -24,6 +24,7 @@ import (
 	"github.com/stakwork/sphinx-tribes/db"
 	"github.com/stakwork/sphinx-tribes/handlers"
 	"github.com/stakwork/sphinx-tribes/logger"
+	customMiddleware "github.com/stakwork/sphinx-tribes/middlewares"
 	"github.com/stakwork/sphinx-tribes/utils"
 )
 
@@ -251,6 +252,7 @@ func initChi() *chi.Mux {
 	r.Use(middleware.Recoverer)
 	r.Use(logger.RouteBasedUUIDMiddleware)
 	r.Use(internalServerErrorHandler)
+	r.Use(customMiddleware.FeatureFlag(db.DB))
 	cors := cors.New(cors.Options{
 		AllowedOrigins:   []string{"*"},
 		AllowedMethods:   []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"},

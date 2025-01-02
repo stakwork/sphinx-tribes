@@ -1,4 +1,3 @@
-// db/feature_flags.go
 package db
 
 import (
@@ -183,4 +182,12 @@ func (db database) GetEndpointByUUID(uuid uuid.UUID) (Endpoint, error) {
 	}
 
 	return endpoint, nil
+}
+
+func (db database) GetAllEndpoints() ([]Endpoint, error) {
+	var endpoints []Endpoint
+	if err := db.db.Find(&endpoints).Error; err != nil {
+		return nil, fmt.Errorf("failed to fetch endpoints: %w", err)
+	}
+	return endpoints, nil
 }
