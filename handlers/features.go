@@ -58,11 +58,11 @@ func (oh *featureHandler) CreateOrEditFeatures(w http.ResponseWriter, r *http.Re
 	ctx := r.Context()
 	pubKeyFromAuth, _ := ctx.Value(auth.ContextKey).(string)
 	if pubKeyFromAuth == "" {
-		logger.Log.Info("no pubkey from auth")
+		logger.Log.Info("No pubkey from auth")
 		w.WriteHeader(http.StatusUnauthorized)
 		return
 	}
-
+	//test
 	features := db.WorkspaceFeatures{}
 	body, _ := io.ReadAll(r.Body)
 	r.Body.Close()
