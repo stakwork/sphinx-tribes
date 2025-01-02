@@ -2,15 +2,15 @@ package routes
 
 import (
 	"bytes"
+	"context"
 	"encoding/json"
 	"fmt"
 	"io"
 	"net/http"
 	"os"
 	"runtime"
-	"time"
 	"strings"
-	"context"
+	"time"
 
 	"github.com/go-chi/chi"
 	"github.com/go-chi/chi/middleware"
@@ -51,6 +51,7 @@ func NewRouter() *http.Server {
 	r.Mount("/bounties/ticket", TicketRoutes())
 	r.Mount("/hivechat", ChatRoutes())
 	r.Mount("/test", TestRoutes())
+	r.Mount("/feature-flags", FeatureFlagRoutes())
 
 	r.Group(func(r chi.Router) {
 		r.Get("/tribe_by_feed", tribeHandlers.GetFirstTribeByFeed)
