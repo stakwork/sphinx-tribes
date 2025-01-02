@@ -3028,6 +3028,9 @@ func TestGetWorkspaceBountyCards(t *testing.T) {
 		Price:         2000,
 	}
 
+	fiveWeeksAgo := now.Add(-5 * 7 * 24 * time.Hour)
+	threeWeeksAgo := now.Add(-3 * 7 * 24 * time.Hour)
+
 	t.Run("should only get public bounty", func(t *testing.T) {
 		db.TestDB.DeleteAllBounties()
 		_, err := db.TestDB.CreateOrEditBounty(publicBounty)
@@ -3068,5 +3071,147 @@ func TestGetWorkspaceBountyCards(t *testing.T) {
 		assert.Equal(t, http.StatusOK, rr.Code)
 		assert.Equal(t, 1, len(response))
 		assert.Equal(t, "Private Bounty", response[0].Title)
+	})
+
+	t.Run("should include recent unpaid bounty", func(t *testing.T) {
+		db.TestDB.DeleteAllBounties()
+
+		recentUnpaidBounty := db.NewBounty{
+			ID:            1,
+			Type:          "coding",
+			Title:         "Recent Unpaid",
+			Description:   "Test Description",
+			WorkspaceUuid: workspace.Uuid,
+			PhaseUuid:     phase.Uuid,
+			Assignee:      assignee.OwnerPubKey,
+			Show:          true,
+			Created:       now.Unix(),
+			OwnerID:       "test-owner",
+			Price:         1000,
+			Updated:       &now,
+			Paid:          false,
+		}
+		_, err := db.TestDB.CreateOrEditBounty(recentUnpaidBounty)
+		assert.NoError(t, err)
+
+		rr := httptest.NewRecorder()
+		handler := http.HandlerFunc(bHandler.GetBountyCards)
+		req, err := http.NewRequest(http.MethodGet, fmt.Sprintf("/gobounties/bounty-cards?workspace_uuid=%s", workspace.Uuid), nil)
+		assert.NoError(t, err)
+
+		handler.ServeHTTP(rr, req)
+
+		var response []db.BountyCard
+		err = json.Unmarshal(rr.Body.Bytes(), &response)
+		assert.NoError(t, err)
+		assert.Equal(t, http.StatusOK, rr.Code)
+		assert.Equal(t, 1, len(response))
+		assert.Equal(t, "Recent Unpaid", response[0].Title)
+	})
+
+	t.Run("should include recent paid bounty", func(t *testing.T) {
+		db.TestDB.DeleteAllBounties()
+
+		recentPaidBounty := db.NewBounty{
+			ID:            1,
+			Type:          "coding",
+			Title:         "Recent Paid",
+			Description:   "Test Description",
+			WorkspaceUuid: workspace.Uuid,
+			PhaseUuid:     phase.Uuid,
+			Assignee:      assignee.OwnerPubKey,
+			Show:          true,
+			Created:       now.Unix(),
+			OwnerID:       "test-owner",
+			Price:         1000,
+			Updated:       &now,
+			Paid:          true,
+		}
+		_, err := db.TestDB.CreateOrEditBounty(recentPaidBounty)
+		assert.NoError(t, err)
+
+		rr := httptest.NewRecorder()
+		handler := http.HandlerFunc(bHandler.GetBountyCards)
+		req, err := http.NewRequest(http.MethodGet, fmt.Sprintf("/gobounties/bounty-cards?workspace_uuid=%s", workspace.Uuid), nil)
+		assert.NoError(t, err)
+
+		handler.ServeHTTP(rr, req)
+
+		var response []db.BountyCard
+		err = json.Unmarshal(rr.Body.Bytes(), &response)
+		assert.NoError(t, err)
+		assert.Equal(t, http.StatusOK, rr.Code)
+		assert.Equal(t, 1, len(response))
+		assert.Equal(t, "Recent Paid", response[0].Title)
+	})
+
+	t.Run("should exclude old unpaid bounty", func(t *testing.T) {
+		db.TestDB.DeleteAllBounties()
+
+		oldUnpaidBounty := db.NewBounty{
+			ID:            1,
+			Type:          "coding",
+			Title:         "Old Unpaid",
+			Description:   "Test Description",
+			WorkspaceUuid: workspace.Uuid,
+			PhaseUuid:     phase.Uuid,
+			Assignee:      assignee.OwnerPubKey,
+			Show:          true,
+			Created:       fiveWeeksAgo.Unix(),
+			OwnerID:       "test-owner",
+			Price:         1000,
+			Updated:       &fiveWeeksAgo,
+			Paid:          false,
+		}
+		_, err := db.TestDB.CreateOrEditBounty(oldUnpaidBounty)
+		assert.NoError(t, err)
+
+		rr := httptest.NewRecorder()
+		handler := http.HandlerFunc(bHandler.GetBountyCards)
+		req, err := http.NewRequest(http.MethodGet, fmt.Sprintf("/gobounties/bounty-cards?workspace_uuid=%s", workspace.Uuid), nil)
+		assert.NoError(t, err)
+
+		handler.ServeHTTP(rr, req)
+
+		var response []db.BountyCard
+		err = json.Unmarshal(rr.Body.Bytes(), &response)
+		assert.NoError(t, err)
+		assert.Equal(t, http.StatusOK, rr.Code)
+		assert.Equal(t, 0, len(response))
+	})
+
+	t.Run("should exclude old paid bounty", func(t *testing.T) {
+		db.TestDB.DeleteAllBounties()
+
+		oldPaidBounty := db.NewBounty{
+			ID:            1,
+			Type:          "coding",
+			Title:         "Old Paid",
+			Description:   "Test Description",
+			WorkspaceUuid: workspace.Uuid,
+			PhaseUuid:     phase.Uuid,
+			Assignee:      assignee.OwnerPubKey,
+			Show:          true,
+			Created:       threeWeeksAgo.Unix(),
+			OwnerID:       "test-owner",
+			Price:         1000,
+			Updated:       &threeWeeksAgo,
+			Paid:          true,
+		}
+		_, err := db.TestDB.CreateOrEditBounty(oldPaidBounty)
+		assert.NoError(t, err)
+
+		rr := httptest.NewRecorder()
+		handler := http.HandlerFunc(bHandler.GetBountyCards)
+		req, err := http.NewRequest(http.MethodGet, fmt.Sprintf("/gobounties/bounty-cards?workspace_uuid=%s", workspace.Uuid), nil)
+		assert.NoError(t, err)
+
+		handler.ServeHTTP(rr, req)
+
+		var response []db.BountyCard
+		err = json.Unmarshal(rr.Body.Bytes(), &response)
+		assert.NoError(t, err)
+		assert.Equal(t, http.StatusOK, rr.Code)
+		assert.Equal(t, 0, len(response))
 	})
 }
