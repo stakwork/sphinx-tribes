@@ -80,7 +80,7 @@ func (ch *ChatHandler) CreateChat(w http.ResponseWriter, r *http.Request) {
 		})
 		return
 	}
-	
+
 	chat := &db.Chat{
 		ID:          xid.New().String(),
 		WorkspaceID: request.WorkspaceID,
@@ -221,7 +221,8 @@ func (ch *ChatHandler) SendMessage(w http.ResponseWriter, r *http.Request) {
 	messageHistory := make([]map[string]string, len(recentHistory))
 	for i, msg := range recentHistory {
 		messageHistory[i] = map[string]string{
-			string(msg.Role): msg.Message,
+			"role":    string(msg.Role),
+			"content": msg.Message,
 		}
 	}
 
