@@ -174,11 +174,13 @@ func GetBountyCount(w http.ResponseWriter, r *http.Request) {
 
 func (h *bountyHandler) GetPersonCreatedBounties(w http.ResponseWriter, r *http.Request) {
 	bounties, err := h.db.GetCreatedBounties(r)
+
 	if err != nil {
 		w.WriteHeader(http.StatusBadRequest)
 		logger.Log.Error("[bounty] Error: %v", err)
 	} else {
 		var bountyResponse []db.BountyResponse = h.GenerateBountyResponse(bounties)
+
 		w.WriteHeader(http.StatusOK)
 		json.NewEncoder(w).Encode(bountyResponse)
 	}

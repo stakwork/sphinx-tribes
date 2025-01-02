@@ -810,6 +810,8 @@ func (db database) GetCreatedBounties(r *http.Request) ([]NewBounty, error) {
 
 	offset, limit, sortBy, direction, _ := utils.GetPaginationParams(r)
 	person := db.GetPersonByUuid(uuid)
+
+	fmt.Println("person", person)
 	pubkey := person.OwnerPubKey
 	keys := r.URL.Query()
 
@@ -862,6 +864,7 @@ func (db database) GetCreatedBounties(r *http.Request) ([]NewBounty, error) {
 	allQuery := query + " " + statusQuery + " " + orderQuery + " " + limitQuery
 
 	err := db.db.Raw(allQuery).Find(&ms).Error
+
 	return ms, err
 }
 
