@@ -62,7 +62,7 @@ func (oh *featureHandler) CreateOrEditFeatures(w http.ResponseWriter, r *http.Re
 		w.WriteHeader(http.StatusUnauthorized)
 		return
 	}
-
+	//test
 	features := db.WorkspaceFeatures{}
 	body, _ := io.ReadAll(r.Body)
 	r.Body.Close()
