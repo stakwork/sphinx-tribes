@@ -1991,8 +1991,8 @@ func (db database) GetWorkspaceBountyCardsData(r *http.Request) []NewBounty {
 
 	timeFilterQuery = `
 		AND (
-			(NOT paid AND updated > NOW() - INTERVAL '4 weeks')
-			OR (paid AND updated > NOW() - INTERVAL '2 weeks')
+			(NOT paid AND EXTRACT(EPOCH FROM updated::timestamp) > EXTRACT(EPOCH FROM (NOW() - INTERVAL '4 weeks')))
+			OR (paid AND EXTRACT(EPOCH FROM updated::timestamp) > EXTRACT(EPOCH FROM (NOW() - INTERVAL '2 weeks')))
 			OR updated IS NULL  -- Preserve existing records without updated timestamp
 		)`
 
