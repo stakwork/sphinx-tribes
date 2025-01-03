@@ -1990,6 +1990,14 @@ func (db database) GetWorkspaceBountyCardsData(r *http.Request) []NewBounty {
 	limitQuery := ""
 	searchQuery := ""
 	workspaceQuery := ""
+	timeFilterQuery := ""
+
+	timeFilterQuery = `
+		AND (
+			(NOT paid AND EXTRACT(EPOCH FROM updated::timestamp) > EXTRACT(EPOCH FROM (NOW() - INTERVAL '4 weeks')))
+			OR (paid AND EXTRACT(EPOCH FROM updated::timestamp) > EXTRACT(EPOCH FROM (NOW() - INTERVAL '2 weeks')))
+			OR updated IS NULL  -- Preserve existing records without updated timestamp
+		)`
 
 	if sortBy != "" && direction != "" {
 		orderQuery = "ORDER BY " + sortBy + " " + direction
@@ -2010,7 +2018,7 @@ func (db database) GetWorkspaceBountyCardsData(r *http.Request) []NewBounty {
 	}
 
 	query := "SELECT * FROM public.bounty"
-	allQuery := query + " " + workspaceQuery + " " + searchQuery + " " + orderQuery + " " + limitQuery
+	allQuery := query + " " + workspaceQuery + timeFilterQuery + " " + searchQuery + " " + orderQuery + " " + limitQuery
 
 	ms := []NewBounty{}
 	db.db.Raw(allQuery).Scan(&ms)
