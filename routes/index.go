@@ -239,7 +239,7 @@ func internalServerErrorHandler(next http.Handler) http.Handler {
 				if index != -1 {
 					trimmed = f.File[index:]
 				}
-				//fmt.Printf("%s:%d %s\n", trimmed, f.Line, f.Name)
+
 				newContent := fmt.Sprintf("%s:%d %s,\n", trimmed, f.Line, f.Name)
 				if elements_chain.Len()+len(newContent) <= 512000 {
 					elements_chain.WriteString(newContent)
@@ -248,6 +248,7 @@ func internalServerErrorHandler(next http.Handler) http.Handler {
 					fmt.Printf("elements_chain length exceeded 500KB, skipping further additions.\n")
 					isExceedingLimit = true
 				}
+
 
 				if args != nil {
 					var variableLog []string
@@ -276,11 +277,11 @@ func internalServerErrorHandler(next http.Handler) http.Handler {
 							}
 
 							variableLog = append(variableLog,
-								fmt.Sprintf("%s: %v", field.Name, valueStr))
+								fmt.Sprintf("[Machine] %s: %v", field.Name, valueStr))
 						}
 
-						if len(variableLog) > 0 {
-							logger.Log.Machine("Variables: %s\n", strings.Join(variableLog, ", "))
+						if len(variableLog) > 0 && config.LogLevel == "MACHINE" {
+							fmt.Printf("Variables: %s\n", strings.Join(variableLog, ", "))
 						}
 					}
 				}
