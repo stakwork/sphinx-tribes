@@ -207,7 +207,10 @@ func internalServerErrorHandler(next http.Handler) http.Handler {
 				if index != -1 {
 					trimmed = f.File[index:]
 				}
-				logger.Log.Machine("%s:%d %s\n", trimmed, f.Line, f.Name)
+				//logger.Log.Machine("hi")
+				if config.LogLevel == "MACHINE" {
+					fmt.Printf("[Machine] %s:%d %s\n", trimmed, f.Line, f.Name)
+				}
 
 				if args != nil {
 					var variableLog []string
@@ -236,11 +239,11 @@ func internalServerErrorHandler(next http.Handler) http.Handler {
 							}
 
 							variableLog = append(variableLog,
-								fmt.Sprintf("%s: %v", field.Name, valueStr))
+								fmt.Sprintf("[Machine] %s: %v", field.Name, valueStr))
 						}
 
-						if len(variableLog) > 0 {
-							logger.Log.Machine("Variables: %s\n", strings.Join(variableLog, ", "))
+						if len(variableLog) > 0 && config.LogLevel == "MACHINE" {
+							fmt.Printf("Variables: %s\n", strings.Join(variableLog, ", "))
 						}
 					}
 				}
