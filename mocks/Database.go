@@ -9650,6 +9650,63 @@ func (_c *Database_UpdateChatMessage_Call) RunAndReturn(run func(*db.ChatMessage
 	return _c
 }
 
+// UpdateFeatureStatus provides a mock function with given fields: uuid, status
+func (_m *Database) UpdateFeatureStatus(uuid string, status db.FeatureStatus) (db.WorkspaceFeatures, error) {
+	ret := _m.Called(uuid, status)
+
+	if len(ret) == 0 {
+		panic("no return value specified for UpdateFeatureStatus")
+	}
+
+	var r0 db.WorkspaceFeatures
+	var r1 error
+	if rf, ok := ret.Get(0).(func(string, db.FeatureStatus) (db.WorkspaceFeatures, error)); ok {
+		return rf(uuid, status)
+	}
+	if rf, ok := ret.Get(0).(func(string, db.FeatureStatus) db.WorkspaceFeatures); ok {
+		r0 = rf(uuid, status)
+	} else {
+		r0 = ret.Get(0).(db.WorkspaceFeatures)
+	}
+
+	if rf, ok := ret.Get(1).(func(string, db.FeatureStatus) error); ok {
+		r1 = rf(uuid, status)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
+// Database_UpdateFeatureStatus_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'UpdateFeatureStatus'
+type Database_UpdateFeatureStatus_Call struct {
+	*mock.Call
+}
+
+// UpdateFeatureStatus is a helper method to define mock.On call
+//   - uuid string
+//   - status db.FeatureStatus
+func (_e *Database_Expecter) UpdateFeatureStatus(uuid interface{}, status interface{}) *Database_UpdateFeatureStatus_Call {
+	return &Database_UpdateFeatureStatus_Call{Call: _e.mock.On("UpdateFeatureStatus", uuid, status)}
+}
+
+func (_c *Database_UpdateFeatureStatus_Call) Run(run func(uuid string, status db.FeatureStatus)) *Database_UpdateFeatureStatus_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(string), args[1].(db.FeatureStatus))
+	})
+	return _c
+}
+
+func (_c *Database_UpdateFeatureStatus_Call) Return(_a0 db.WorkspaceFeatures, _a1 error) *Database_UpdateFeatureStatus_Call {
+	_c.Call.Return(_a0, _a1)
+	return _c
+}
+
+func (_c *Database_UpdateFeatureStatus_Call) RunAndReturn(run func(string, db.FeatureStatus) (db.WorkspaceFeatures, error)) *Database_UpdateFeatureStatus_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
 // UpdateGithubConfirmed provides a mock function with given fields: id, confirmed
 func (_m *Database) UpdateGithubConfirmed(id uint, confirmed bool) {
 	_m.Called(id, confirmed)
@@ -10452,303 +10509,301 @@ func NewDatabase(t interface {
 	return mock
 }
 
-
 func (_m *Database) CreateBountyTiming(bountyID uint) (*db.BountyTiming, error) {
-    ret := _m.Called(bountyID)
+	ret := _m.Called(bountyID)
 
-    var r0 *db.BountyTiming
-    var r1 error
-    if rf, ok := ret.Get(0).(func(uint) (*db.BountyTiming, error)); ok {
-        return rf(bountyID)
-    }
-    if rf, ok := ret.Get(0).(func(uint) *db.BountyTiming); ok {
-        r0 = rf(bountyID)
-    } else {
-        if ret.Get(0) != nil {
-            r0 = ret.Get(0).(*db.BountyTiming)
-        }
-    }
+	var r0 *db.BountyTiming
+	var r1 error
+	if rf, ok := ret.Get(0).(func(uint) (*db.BountyTiming, error)); ok {
+		return rf(bountyID)
+	}
+	if rf, ok := ret.Get(0).(func(uint) *db.BountyTiming); ok {
+		r0 = rf(bountyID)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(*db.BountyTiming)
+		}
+	}
 
-    if rf, ok := ret.Get(1).(func(uint) error); ok {
-        r1 = rf(bountyID)
-    } else {
-        r1 = ret.Error(1)
-    }
+	if rf, ok := ret.Get(1).(func(uint) error); ok {
+		r1 = rf(bountyID)
+	} else {
+		r1 = ret.Error(1)
+	}
 
-    return r0, r1
+	return r0, r1
 }
 
 func (_m *Database) GetBountyTiming(bountyID uint) (*db.BountyTiming, error) {
-    ret := _m.Called(bountyID)
+	ret := _m.Called(bountyID)
 
-    var r0 *db.BountyTiming
-    var r1 error
-    if rf, ok := ret.Get(0).(func(uint) (*db.BountyTiming, error)); ok {
-        return rf(bountyID)
-    }
-    if rf, ok := ret.Get(0).(func(uint) *db.BountyTiming); ok {
-        r0 = rf(bountyID)
-    } else {
-        if ret.Get(0) != nil {
-            r0 = ret.Get(0).(*db.BountyTiming)
-        }
-    }
+	var r0 *db.BountyTiming
+	var r1 error
+	if rf, ok := ret.Get(0).(func(uint) (*db.BountyTiming, error)); ok {
+		return rf(bountyID)
+	}
+	if rf, ok := ret.Get(0).(func(uint) *db.BountyTiming); ok {
+		r0 = rf(bountyID)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(*db.BountyTiming)
+		}
+	}
 
-    if rf, ok := ret.Get(1).(func(uint) error); ok {
-        r1 = rf(bountyID)
-    } else {
-        r1 = ret.Error(1)
-    }
+	if rf, ok := ret.Get(1).(func(uint) error); ok {
+		r1 = rf(bountyID)
+	} else {
+		r1 = ret.Error(1)
+	}
 
-    return r0, r1
+	return r0, r1
 }
 
 func (_m *Database) UpdateBountyTiming(timing *db.BountyTiming) error {
-    ret := _m.Called(timing)
+	ret := _m.Called(timing)
 
-    var r0 error
-    if rf, ok := ret.Get(0).(func(*db.BountyTiming) error); ok {
-        r0 = rf(timing)
-    } else {
-        r0 = ret.Error(0)
-    }
+	var r0 error
+	if rf, ok := ret.Get(0).(func(*db.BountyTiming) error); ok {
+		r0 = rf(timing)
+	} else {
+		r0 = ret.Error(0)
+	}
 
-    return r0
+	return r0
 }
 
 func (_m *Database) StartBountyTiming(bountyID uint) error {
-    ret := _m.Called(bountyID)
+	ret := _m.Called(bountyID)
 
-    var r0 error
-    if rf, ok := ret.Get(0).(func(uint) error); ok {
-        r0 = rf(bountyID)
-    } else {
-        r0 = ret.Error(0)
-    }
+	var r0 error
+	if rf, ok := ret.Get(0).(func(uint) error); ok {
+		r0 = rf(bountyID)
+	} else {
+		r0 = ret.Error(0)
+	}
 
-    return r0
+	return r0
 }
 
 func (_m *Database) CloseBountyTiming(bountyID uint) error {
-    ret := _m.Called(bountyID)
+	ret := _m.Called(bountyID)
 
-    var r0 error
-    if rf, ok := ret.Get(0).(func(uint) error); ok {
-        r0 = rf(bountyID)
-    } else {
-        r0 = ret.Error(0)
-    }
+	var r0 error
+	if rf, ok := ret.Get(0).(func(uint) error); ok {
+		r0 = rf(bountyID)
+	} else {
+		r0 = ret.Error(0)
+	}
 
-    return r0
+	return r0
 }
 
 func (_m *Database) UpdateBountyTimingOnProof(bountyID uint) error {
-    ret := _m.Called(bountyID)
+	ret := _m.Called(bountyID)
 
-    var r0 error
-    if rf, ok := ret.Get(0).(func(uint) error); ok {
-        r0 = rf(bountyID)
-    } else {
-        r0 = ret.Error(0)
-    }
+	var r0 error
+	if rf, ok := ret.Get(0).(func(uint) error); ok {
+		r0 = rf(bountyID)
+	} else {
+		r0 = ret.Error(0)
+	}
 
-    return r0
+	return r0
 }
 
 type Database_CreateBountyTiming_Call struct {
-    *mock.Call
+	*mock.Call
 }
 
 func (_e *Database_Expecter) CreateBountyTiming(bountyID interface{}) *Database_CreateBountyTiming_Call {
-    return &Database_CreateBountyTiming_Call{Call: _e.mock.On("CreateBountyTiming", bountyID)}
+	return &Database_CreateBountyTiming_Call{Call: _e.mock.On("CreateBountyTiming", bountyID)}
 }
 
 type Database_GetBountyTiming_Call struct {
-    *mock.Call
+	*mock.Call
 }
 
 func (_e *Database_Expecter) GetBountyTiming(bountyID interface{}) *Database_GetBountyTiming_Call {
-    return &Database_GetBountyTiming_Call{Call: _e.mock.On("GetBountyTiming", bountyID)}
+	return &Database_GetBountyTiming_Call{Call: _e.mock.On("GetBountyTiming", bountyID)}
 }
 
 type Database_UpdateBountyTiming_Call struct {
-    *mock.Call
+	*mock.Call
 }
 
 func (_e *Database_Expecter) UpdateBountyTiming(timing interface{}) *Database_UpdateBountyTiming_Call {
-    return &Database_UpdateBountyTiming_Call{Call: _e.mock.On("UpdateBountyTiming", timing)}
+	return &Database_UpdateBountyTiming_Call{Call: _e.mock.On("UpdateBountyTiming", timing)}
 }
 
 type Database_StartBountyTiming_Call struct {
-    *mock.Call
+	*mock.Call
 }
 
 func (_e *Database_Expecter) StartBountyTiming(bountyID interface{}) *Database_StartBountyTiming_Call {
-    return &Database_StartBountyTiming_Call{Call: _e.mock.On("StartBountyTiming", bountyID)}
+	return &Database_StartBountyTiming_Call{Call: _e.mock.On("StartBountyTiming", bountyID)}
 }
 
 type Database_CloseBountyTiming_Call struct {
-    *mock.Call
+	*mock.Call
 }
 
 func (_e *Database_Expecter) CloseBountyTiming(bountyID interface{}) *Database_CloseBountyTiming_Call {
-    return &Database_CloseBountyTiming_Call{Call: _e.mock.On("CloseBountyTiming", bountyID)}
+	return &Database_CloseBountyTiming_Call{Call: _e.mock.On("CloseBountyTiming", bountyID)}
 }
 
 type Database_UpdateBountyTimingOnProof_Call struct {
-    *mock.Call
+	*mock.Call
 }
 
 func (_e *Database_Expecter) UpdateBountyTimingOnProof(bountyID interface{}) *Database_UpdateBountyTimingOnProof_Call {
-    return &Database_UpdateBountyTimingOnProof_Call{Call: _e.mock.On("UpdateBountyTimingOnProof", bountyID)}
+	return &Database_UpdateBountyTimingOnProof_Call{Call: _e.mock.On("UpdateBountyTimingOnProof", bountyID)}
 }
 
-
 func (_m *Database) GetProofsByBountyID(bountyID uint) []db.ProofOfWork {
-    ret := _m.Called(bountyID)
+	ret := _m.Called(bountyID)
 
-    var r0 []db.ProofOfWork
-    if rf, ok := ret.Get(0).(func(uint) []db.ProofOfWork); ok {
-        r0 = rf(bountyID)
-    } else {
-        if ret.Get(0) != nil {
-            r0 = ret.Get(0).([]db.ProofOfWork)
-        }
-    }
+	var r0 []db.ProofOfWork
+	if rf, ok := ret.Get(0).(func(uint) []db.ProofOfWork); ok {
+		r0 = rf(bountyID)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).([]db.ProofOfWork)
+		}
+	}
 
-    return r0
+	return r0
 }
 
 func (_m *Database) CreateProof(proof db.ProofOfWork) error {
-    ret := _m.Called(proof)
+	ret := _m.Called(proof)
 
-    var r0 error
-    if rf, ok := ret.Get(0).(func(db.ProofOfWork) error); ok {
-        r0 = rf(proof)
-    } else {
-        r0 = ret.Error(0)
-    }
+	var r0 error
+	if rf, ok := ret.Get(0).(func(db.ProofOfWork) error); ok {
+		r0 = rf(proof)
+	} else {
+		r0 = ret.Error(0)
+	}
 
-    return r0
+	return r0
 }
 
 func (_m *Database) DeleteProof(proofID string) error {
-    ret := _m.Called(proofID)
+	ret := _m.Called(proofID)
 
-    var r0 error
-    if rf, ok := ret.Get(0).(func(string) error); ok {
-        r0 = rf(proofID)
-    } else {
-        r0 = ret.Error(0)
-    }
+	var r0 error
+	if rf, ok := ret.Get(0).(func(string) error); ok {
+		r0 = rf(proofID)
+	} else {
+		r0 = ret.Error(0)
+	}
 
-    return r0
+	return r0
 }
 
 func (_m *Database) UpdateProofStatus(proofID string, status db.ProofOfWorkStatus) error {
-    ret := _m.Called(proofID, status)
+	ret := _m.Called(proofID, status)
 
-    var r0 error
-    if rf, ok := ret.Get(0).(func(string, db.ProofOfWorkStatus) error); ok {
-        r0 = rf(proofID, status)
-    } else {
-        r0 = ret.Error(0)
-    }
+	var r0 error
+	if rf, ok := ret.Get(0).(func(string, db.ProofOfWorkStatus) error); ok {
+		r0 = rf(proofID, status)
+	} else {
+		r0 = ret.Error(0)
+	}
 
-    return r0
+	return r0
 }
 
 type Database_GetProofsByBountyID_Call struct {
-    *mock.Call
+	*mock.Call
 }
 
 func (_e *Database_Expecter) GetProofsByBountyID(bountyID interface{}) *Database_GetProofsByBountyID_Call {
-    return &Database_GetProofsByBountyID_Call{Call: _e.mock.On("GetProofsByBountyID", bountyID)}
+	return &Database_GetProofsByBountyID_Call{Call: _e.mock.On("GetProofsByBountyID", bountyID)}
 }
 
 type Database_CreateProof_Call struct {
-    *mock.Call
+	*mock.Call
 }
 
 func (_e *Database_Expecter) CreateProof(proof interface{}) *Database_CreateProof_Call {
-    return &Database_CreateProof_Call{Call: _e.mock.On("CreateProof", proof)}
+	return &Database_CreateProof_Call{Call: _e.mock.On("CreateProof", proof)}
 }
 
 type Database_DeleteProof_Call struct {
-    *mock.Call
+	*mock.Call
 }
 
 func (_e *Database_Expecter) DeleteProof(proofID interface{}) *Database_DeleteProof_Call {
-    return &Database_DeleteProof_Call{Call: _e.mock.On("DeleteProof", proofID)}
+	return &Database_DeleteProof_Call{Call: _e.mock.On("DeleteProof", proofID)}
 }
 
 type Database_UpdateProofStatus_Call struct {
-    *mock.Call
+	*mock.Call
 }
 
 func (_e *Database_Expecter) UpdateProofStatus(proofID interface{}, status interface{}) *Database_UpdateProofStatus_Call {
-    return &Database_UpdateProofStatus_Call{Call: _e.mock.On("UpdateProofStatus", proofID, status)}
+	return &Database_UpdateProofStatus_Call{Call: _e.mock.On("UpdateProofStatus", proofID, status)}
 }
 
 func (_c *Database_GetProofsByBountyID_Call) Return(_a0 []db.ProofOfWork) *Database_GetProofsByBountyID_Call {
-    _c.Call.Return(_a0)
-    return _c
+	_c.Call.Return(_a0)
+	return _c
 }
 
 func (_c *Database_CreateProof_Call) Return(_a0 error) *Database_CreateProof_Call {
-    _c.Call.Return(_a0)
-    return _c
+	_c.Call.Return(_a0)
+	return _c
 }
 
 func (_c *Database_DeleteProof_Call) Return(_a0 error) *Database_DeleteProof_Call {
-    _c.Call.Return(_a0)
-    return _c
+	_c.Call.Return(_a0)
+	return _c
 }
 
 func (_c *Database_UpdateProofStatus_Call) Return(_a0 error) *Database_UpdateProofStatus_Call {
-    _c.Call.Return(_a0)
-    return _c
+	_c.Call.Return(_a0)
+	return _c
 }
 
 func (_c *Database_GetProofsByBountyID_Call) RunAndReturn(run func(uint) []db.ProofOfWork) *Database_GetProofsByBountyID_Call {
-    _c.Call.Return(run)
-    return _c
+	_c.Call.Return(run)
+	return _c
 }
 
 func (_c *Database_CreateProof_Call) RunAndReturn(run func(db.ProofOfWork) error) *Database_CreateProof_Call {
-    _c.Call.Return(run)
-    return _c
+	_c.Call.Return(run)
+	return _c
 }
 
 func (_c *Database_DeleteProof_Call) RunAndReturn(run func(string) error) *Database_DeleteProof_Call {
-    _c.Call.Return(run)
-    return _c
+	_c.Call.Return(run)
+	return _c
 }
 
 func (_c *Database_UpdateProofStatus_Call) RunAndReturn(run func(string, db.ProofOfWorkStatus) error) *Database_UpdateProofStatus_Call {
-    _c.Call.Return(run)
-    return _c
+	_c.Call.Return(run)
+	return _c
 }
 
 func (_m *Database) GetWorkspaceBountyCardsData(r *http.Request) []db.NewBounty {
-    ret := _m.Called(r)
+	ret := _m.Called(r)
 
-    var r0 []db.NewBounty
-    if rf, ok := ret.Get(0).(func(*http.Request) []db.NewBounty); ok {
-        r0 = rf(r)
-    } else {
-        if ret.Get(0) != nil {
-            r0 = ret.Get(0).([]db.NewBounty)
-        }
-    }
+	var r0 []db.NewBounty
+	if rf, ok := ret.Get(0).(func(*http.Request) []db.NewBounty); ok {
+		r0 = rf(r)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).([]db.NewBounty)
+		}
+	}
 
-    return r0
+	return r0
 }
 
 type Database_GetWorkspaceBountyCardsData_Call struct {
-    *mock.Call
+	*mock.Call
 }
 
 func (_e *Database_Expecter) GetWorkspaceBountyCardsData(r interface{}) *Database_GetWorkspaceBountyCardsData_Call {
-    return &Database_GetWorkspaceBountyCardsData_Call{Call: _e.mock.On("GetWorkspaceBountyCardsData", r)}
+	return &Database_GetWorkspaceBountyCardsData_Call{Call: _e.mock.On("GetWorkspaceBountyCardsData", r)}
 }
