@@ -2,15 +2,16 @@ package routes
 
 import (
 	"bytes"
+	"context"
 	"encoding/json"
 	"fmt"
 	"io"
 	"net/http"
 	"os"
+	"reflect"
 	"runtime"
-	"time"
 	"strings"
-	"context"
+	"time"
 
 	"github.com/go-chi/chi"
 	"github.com/go-chi/chi/middleware"
@@ -206,7 +207,46 @@ func internalServerErrorHandler(next http.Handler) http.Handler {
 				if index != -1 {
 					trimmed = f.File[index:]
 				}
-				logger.Log.Machine("%s:%d %s\n", trimmed, f.Line, f.Name)
+				//logger.Log.Machine("hi")
+				if config.LogLevel == "MACHINE" {
+					fmt.Printf("[Machine] %s:%d %s\n", trimmed, f.Line, f.Name)
+				}
+
+				if args != nil {
+					var variableLog []string
+
+					v := reflect.ValueOf(args)
+					if v.Kind() == reflect.Ptr {
+						v = v.Elem()
+					}
+
+					if v.Kind() == reflect.Struct {
+						for i := 0; i < v.NumField(); i++ {
+							field := v.Type().Field(i)
+							value := v.Field(i)
+
+							// Convert value to string safely
+							var valueStr string
+							switch value.Kind() {
+							case reflect.String:
+								valueStr = value.String()
+							case reflect.Int, reflect.Int64:
+								valueStr = fmt.Sprintf("%d", value.Int())
+							case reflect.Bool:
+								valueStr = fmt.Sprintf("%v", value.Bool())
+							default:
+								valueStr = fmt.Sprintf("%v", value.Interface())
+							}
+
+							variableLog = append(variableLog,
+								fmt.Sprintf("[Machine] %s: %v", field.Name, valueStr))
+						}
+
+						if len(variableLog) > 0 && config.LogLevel == "MACHINE" {
+							fmt.Printf("Variables: %s\n", strings.Join(variableLog, ", "))
+						}
+					}
+				}
 
 				return nil, nil
 			},
