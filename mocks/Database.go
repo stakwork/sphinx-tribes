@@ -10807,3 +10807,95 @@ type Database_GetWorkspaceBountyCardsData_Call struct {
 func (_e *Database_Expecter) GetWorkspaceBountyCardsData(r interface{}) *Database_GetWorkspaceBountyCardsData_Call {
 	return &Database_GetWorkspaceBountyCardsData_Call{Call: _e.mock.On("GetWorkspaceBountyCardsData", r)}
 }
+
+// IncrementProofCount provides a mock function with given fields: bountyID
+func (_m *Database) IncrementProofCount(bountyID uint) error {
+	ret := _m.Called(bountyID)
+
+	if len(ret) == 0 {
+		panic("no return value specified for IncrementProofCount")
+	}
+
+	var r0 error
+	if rf, ok := ret.Get(0).(func(uint) error); ok {
+		r0 = rf(bountyID)
+	} else {
+		r0 = ret.Error(0)
+	}
+
+	return r0
+}
+
+// Database_IncrementProofCount_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'IncrementProofCount'
+type Database_IncrementProofCount_Call struct {
+	*mock.Call
+}
+
+// IncrementProofCount is a helper method to define mock.On call
+//   - bountyID uint
+func (_e *Database_Expecter) IncrementProofCount(bountyID interface{}) *Database_IncrementProofCount_Call {
+	return &Database_IncrementProofCount_Call{Call: _e.mock.On("IncrementProofCount", bountyID)}
+}
+
+func (_c *Database_IncrementProofCount_Call) Run(run func(bountyID uint)) *Database_IncrementProofCount_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(uint))
+	})
+	return _c
+}
+
+func (_c *Database_IncrementProofCount_Call) Return(_a0 error) *Database_IncrementProofCount_Call {
+	_c.Call.Return(_a0)
+	return _c
+}
+
+func (_c *Database_IncrementProofCount_Call) RunAndReturn(run func(uint) error) *Database_IncrementProofCount_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
+// DecrementProofCount provides a mock function with given fields: bountyID
+func (_m *Database) DecrementProofCount(bountyID uint) error {
+	ret := _m.Called(bountyID)
+
+	if len(ret) == 0 {
+		panic("no return value specified for DecrementProofCount")
+	}
+
+	var r0 error
+	if rf, ok := ret.Get(0).(func(uint) error); ok {
+		r0 = rf(bountyID)
+	} else {
+		r0 = ret.Error(0)
+	}
+
+	return r0
+}
+
+// Database_DecrementProofCount_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'DecrementProofCount'
+type Database_DecrementProofCount_Call struct {
+	*mock.Call
+}
+
+// DecrementProofCount is a helper method to define mock.On call
+//   - bountyID uint
+func (_e *Database_Expecter) DecrementProofCount(bountyID interface{}) *Database_DecrementProofCount_Call {
+	return &Database_DecrementProofCount_Call{Call: _e.mock.On("DecrementProofCount", bountyID)}
+}
+
+func (_c *Database_DecrementProofCount_Call) Run(run func(bountyID uint)) *Database_DecrementProofCount_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(uint))
+	})
+	return _c
+}
+
+func (_c *Database_DecrementProofCount_Call) Return(_a0 error) *Database_DecrementProofCount_Call {
+	_c.Call.Return(_a0)
+	return _c
+}
+
+func (_c *Database_DecrementProofCount_Call) RunAndReturn(run func(uint) error) *Database_DecrementProofCount_Call {
+	_c.Call.Return(run)
+	return _c
+}
