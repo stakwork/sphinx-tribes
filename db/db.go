@@ -6,6 +6,7 @@ package db
 import (
 	"errors"
 	"fmt"
+	"math"
 	"net/http"
 	"net/url"
 	"regexp"
@@ -1905,6 +1906,34 @@ func (db database) DeleteProof(proofID string) error {
 
 func (db database) UpdateProofStatus(proofID string, status ProofOfWorkStatus) error {
 	return db.db.Model(&ProofOfWork{}).Where("id = ?", proofID).Update("status", status).Error
+}
+
+func (db database) IncrementProofCount(bountyID uint) error { // Ensure bountyID is of type uint
+	var bounty NewBounty
+
+	if err := db.db.Where("id = ?", bountyID).First(&bounty).Error; err != nil {
+		return err
+	}
+
+	return db.db.Model(&bounty).
+		Updates(map[string]interface{}{
+			"proof_of_work_count": bounty.ProofOfWorkCount + 1,
+			"updated":             time.Now(),
+		}).Error
+}
+func (db database) DecrementProofCount(bountyID uint) error {
+	var bounty NewBounty
+	if err := db.db.Where("id = ?", bountyID).First(&bounty).Error; err != nil {
+		return err
+	}
+
+	newCount := int(math.Max(0, float64(bounty.ProofOfWorkCount-1)))
+
+	return db.db.Model(&bounty).
+		Updates(map[string]interface{}{
+			"proof_of_work_count": newCount,
+			"updated":             time.Now(),
+		}).Error
 }
 
 func (db database) CreateBountyTiming(bountyID uint) (*BountyTiming, error) {

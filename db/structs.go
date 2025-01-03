@@ -432,6 +432,7 @@ type NewBounty struct {
 	PhasePriority           int            `json:"phase_priority"`
 	PaymentPending          bool           `gorm:"default:false" json:"payment_pending"`
 	PaymentFailed           bool           `gorm:"default:false" json:"payment_failed"`
+	ProofOfWorkCount        int            `gorm:"type:integer;default:0;not null" json:"pow"`
 }
 
 type BountyOwners struct {
@@ -484,6 +485,7 @@ type BountyResponse struct {
 	Organization WorkspaceShort `json:"organization"`
 	Workspace    WorkspaceShort `json:"workspace"`
 	Proofs       []ProofOfWork  `json:"proofs,omitempty"`
+	Pow          int            `json:"pow"`
 }
 
 type BountyCountResponse struct {
