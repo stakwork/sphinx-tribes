@@ -5,6 +5,8 @@ import (
 	"fmt"
 	"time"
 
+	"github.com/lib/pq"
+
 	"github.com/google/uuid"
 	"github.com/stakwork/sphinx-tribes/logger"
 	"gorm.io/gorm"
@@ -191,4 +193,30 @@ func (db database) UpdateTicketsWithoutGroup(ticket Tickets) error {
 	}
 
 	return nil
+}
+
+func (db database) CreateBountyFromTicket(ticket Tickets) (*NewBounty, error) {
+	now := time.Now()
+
+	bounty := &NewBounty{
+
+		Title:       ticket.Name,
+		Description: ticket.Description,
+		PhaseUuid:   ticket.PhaseUUID,
+
+		Type:    "Other",
+		Price:   21,
+		Created: now.Unix(),
+		Updated: &now,
+		Show:    true,
+
+		CodingLanguages: pq.StringArray{},
+	}
+
+	result := db.db.Create(bounty)
+	if result.Error != nil {
+		return nil, fmt.Errorf("failed to create bounty: %w", result.Error)
+	}
+
+	return bounty, nil
 }

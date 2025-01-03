@@ -38,6 +38,12 @@ type StakworkResponse struct {
 	} `json:"data"`
 }
 
+type CreateBountyResponse struct {
+	BountyID uint   `json:"bounty_id"`
+	Success  bool   `json:"success"`
+	Message  string `json:"message,omitempty"`
+}
+
 func NewTicketHandler(httpClient HttpClient, database db.Database) *ticketHandler {
 	return &ticketHandler{
 		httpClient: httpClient,
@@ -668,4 +674,43 @@ func (th *ticketHandler) GetTicketsByPhaseUUID(w http.ResponseWriter, r *http.Re
 
 	w.WriteHeader(http.StatusOK)
 	json.NewEncoder(w).Encode(tickets)
+}
+
+func (th *ticketHandler) TicketToBounty(w http.ResponseWriter, r *http.Request) {
+
+	ctx := r.Context()
+	pubKeyFromAuth, _ := ctx.Value(auth.ContextKey).(string)
+	if pubKeyFromAuth == "" {
+		logger.Log.Info("no pubkey from auth")
+		w.WriteHeader(http.StatusUnauthorized)
+		return
+	}
+
+	ticketUUID := chi.URLParam(r, "ticket_uuid")
+	if ticketUUID == "" {
+		http.Error(w, "ticket UUID is required", http.StatusBadRequest)
+		return
+	}
+
+	ticket, err := th.db.GetTicket(ticketUUID)
+	if err != nil {
+		http.Error(w, "failed to fetch ticket", http.StatusNotFound)
+		return
+	}
+
+	bounty, err := th.db.CreateBountyFromTicket(ticket)
+	if err != nil {
+		http.Error(w, "failed to create bounty", http.StatusInternalServerError)
+		return
+	}
+
+	response := CreateBountyResponse{
+		BountyID: bounty.ID,
+		Success:  true,
+		Message:  "Bounty created successfully",
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusCreated)
+	json.NewEncoder(w).Encode(response)
 }
