@@ -488,6 +488,7 @@ func (h *bountyHandler) GenerateBountyResponse(bounties []db.NewBounty) []db.Bou
 				PaymentFailed:           bounty.PaymentFailed,
 				PhaseUuid:               bounty.PhaseUuid,
 				PhasePriority:           bounty.PhasePriority,
+				ProofOfWorkCount:        bounty.ProofOfWorkCount,
 			},
 			Assignee: db.Person{
 				ID:               assignee.ID,
@@ -533,6 +534,7 @@ func (h *bountyHandler) GenerateBountyResponse(bounties []db.NewBounty) []db.Bou
 				Uuid: workspace.Uuid,
 				Img:  workspace.Img,
 			},
+			Pow: bounty.ProofOfWorkCount,
 		}
 
 		if len(proofs) > 0 {
@@ -1586,7 +1588,12 @@ func (h *bountyHandler) AddProofOfWork(w http.ResponseWriter, r *http.Request) {
 	proof.SubmittedAt = time.Now()
 
 	if err := h.db.CreateProof(proof); err != nil {
-		http.Error(w, "Failed to add proof", http.StatusInternalServerError)
+		http.Error(w, "Failed to create proof", http.StatusInternalServerError)
+		return
+	}
+
+	if err := h.db.IncrementProofCount(proof.BountyID); err != nil { // Pass the correct type (uint) here
+		http.Error(w, "Failed to update bounty proof count", http.StatusInternalServerError)
 		return
 	}
 
@@ -1610,6 +1617,7 @@ func (h *bountyHandler) GetProofsByBounty(w http.ResponseWriter, r *http.Request
 }
 
 func (h *bountyHandler) DeleteProof(w http.ResponseWriter, r *http.Request) {
+	bountyID := chi.URLParam(r, "id")
 	proofID := chi.URLParam(r, "proofId")
 
 	if _, err := uuid.Parse(proofID); err != nil {
@@ -1617,8 +1625,19 @@ func (h *bountyHandler) DeleteProof(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	bountyIDUint, err := utils.ConvertStringToUint(bountyID)
+	if err != nil {
+		http.Error(w, "Invalid bounty ID", http.StatusBadRequest)
+		return
+	}
+
 	if err := h.db.DeleteProof(proofID); err != nil {
 		http.Error(w, "Failed to delete proof", http.StatusInternalServerError)
+		return
+	}
+
+	if err := h.db.DecrementProofCount(bountyIDUint); err != nil {
+		http.Error(w, "Failed to update bounty proof count", http.StatusInternalServerError)
 		return
 	}
 
