@@ -10807,3 +10807,67 @@ type Database_GetWorkspaceBountyCardsData_Call struct {
 func (_e *Database_Expecter) GetWorkspaceBountyCardsData(r interface{}) *Database_GetWorkspaceBountyCardsData_Call {
 	return &Database_GetWorkspaceBountyCardsData_Call{Call: _e.mock.On("GetWorkspaceBountyCardsData", r)}
 }
+
+
+func (_m *Database) CreateBountyFromTicket(ticket db.Tickets) (*db.NewBounty, error) {
+   ret := _m.Called(ticket)
+
+
+   if len(ret) == 0 {
+      panic("no return value specified for CreateBountyFromTicket")
+   }
+
+
+   var r0 *db.NewBounty
+   var r1 error
+   if rf, ok := ret.Get(0).(func(db.Tickets) (*db.NewBounty, error)); ok {
+      return rf(ticket)
+   }
+   if rf, ok := ret.Get(0).(func(db.Tickets) *db.NewBounty); ok {
+      r0 = rf(ticket)
+   } else {
+      if ret.Get(0) != nil {
+         r0 = ret.Get(0).(*db.NewBounty)
+      }
+   }
+
+
+   if rf, ok := ret.Get(1).(func(db.Tickets) error); ok {
+      r1 = rf(ticket)
+   } else {
+      r1 = ret.Error(1)
+   }
+
+
+   return r0, r1
+}
+
+
+type Database_CreateBountyFromTicket_Call struct {
+   *mock.Call
+}
+
+
+func (_e *Database_Expecter) CreateBountyFromTicket(ticket interface{}) *Database_CreateBountyFromTicket_Call {
+   return &Database_CreateBountyFromTicket_Call{Call: _e.mock.On("CreateBountyFromTicket", ticket)}
+}
+
+
+func (_c *Database_CreateBountyFromTicket_Call) Run(run func(ticket db.Tickets)) *Database_CreateBountyFromTicket_Call {
+   _c.Call.Run(func(args mock.Arguments) {
+      run(args[0].(db.Tickets))
+   })
+   return _c
+}
+
+
+func (_c *Database_CreateBountyFromTicket_Call) Return(_a0 *db.NewBounty, _a1 error) *Database_CreateBountyFromTicket_Call {
+   _c.Call.Return(_a0, _a1)
+   return _c
+}
+
+
+func (_c *Database_CreateBountyFromTicket_Call) RunAndReturn(run func(db.Tickets) (*db.NewBounty, error)) *Database_CreateBountyFromTicket_Call {
+   _c.Call.Return(run)
+   return _c
+}
