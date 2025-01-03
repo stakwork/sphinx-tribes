@@ -12,6 +12,10 @@ import (
 
 func (db database) GetFeaturesByWorkspaceUuid(uuid string, r *http.Request) []WorkspaceFeatures {
 	offset, limit, sortBy, direction, _ := utils.GetPaginationParams(r)
+	statusFilter := r.URL.Query().Get("status")
+	if statusFilter == "" {
+		statusFilter = string(ActiveFeature)
+	}
 
 	orderQuery := ""
 	limitQuery := ""
@@ -28,13 +32,10 @@ func (db database) GetFeaturesByWorkspaceUuid(uuid string, r *http.Request) []Wo
 		limitQuery = fmt.Sprintf("LIMIT %d  OFFSET %d", limit, offset)
 	}
 
-	query := `SELECT * FROM public.workspace_features WHERE workspace_uuid = '` + uuid + `'`
-
+	query := `SELECT * FROM public.workspace_features WHERE workspace_uuid = ? AND feat_status = ? `
 	allQuery := query + " " + orderQuery + " " + limitQuery
 
-	theQuery := db.db.Raw(allQuery)
-
-	theQuery.Scan(&ms)
+	db.db.Raw(allQuery, uuid, statusFilter).Scan(&ms)
 
 	return ms
 }
@@ -355,4 +356,16 @@ func (db database) GetFeatureBrief(featureUuid string) (string, error) {
 		feature.Brief)
 
 	return featureBrief, nil
+}
+
+func (db database) UpdateFeatureStatus(uuid string, status FeatureStatus) (WorkspaceFeatures, error) {
+	var feature WorkspaceFeatures
+
+	result := db.db.Model(&WorkspaceFeatures{}).Where("uuid = ?", uuid).Update("feat_status", status)
+	if result.RowsAffected == 0 {
+		return feature, errors.New("feature not found or status unchanged")
+	}
+
+	db.db.Where("uuid = ?", uuid).First(&feature)
+	return feature, nil
 }

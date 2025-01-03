@@ -588,23 +588,31 @@ type WorkspaceCodeGraph struct {
 	UpdatedBy     string     `json:"updated_by"`
 }
 
+type FeatureStatus string
+
+const (
+	ActiveFeature   FeatureStatus = "active"
+	ArchivedFeature FeatureStatus = "archived"
+)
+
 type WorkspaceFeatures struct {
-	ID                     uint       `json:"id"`
-	Uuid                   string     `gorm:"unique;not null" json:"uuid"`
-	WorkspaceUuid          string     `gorm:"not null" json:"workspace_uuid"`
-	Name                   string     `gorm:"not null" json:"name"`
-	Brief                  string     `json:"brief"`
-	Requirements           string     `json:"requirements"`
-	Architecture           string     `json:"architecture"`
-	Url                    string     `json:"url"`
-	Priority               int        `json:"priority"`
-	Created                *time.Time `json:"created"`
-	Updated                *time.Time `json:"updated"`
-	CreatedBy              string     `json:"created_by"`
-	UpdatedBy              string     `json:"updated_by"`
-	BountiesCountCompleted int        `gorm:"-" json:"bounties_count_completed"`
-	BountiesCountAssigned  int        `gorm:"-" json:"bounties_count_assigned"`
-	BountiesCountOpen      int        `gorm:"-" json:"bounties_count_open"`
+	ID                     uint          `json:"id"`
+	Uuid                   string        `gorm:"unique;not null" json:"uuid"`
+	WorkspaceUuid          string        `gorm:"not null" json:"workspace_uuid"`
+	Name                   string        `gorm:"not null" json:"name"`
+	Brief                  string        `json:"brief"`
+	Requirements           string        `json:"requirements"`
+	Architecture           string        `json:"architecture"`
+	Url                    string        `json:"url"`
+	Priority               int           `json:"priority"`
+	Created                *time.Time    `json:"created"`
+	Updated                *time.Time    `json:"updated"`
+	CreatedBy              string        `json:"created_by"`
+	UpdatedBy              string        `json:"updated_by"`
+	BountiesCountCompleted int           `gorm:"-" json:"bounties_count_completed"`
+	BountiesCountAssigned  int           `gorm:"-" json:"bounties_count_assigned"`
+	BountiesCountOpen      int           `gorm:"-" json:"bounties_count_open"`
+	FeatStatus             FeatureStatus `gorm:"type:varchar(20);default:'active';not null" json:"feat_status"`
 }
 
 type FeaturePhase struct {
