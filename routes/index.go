@@ -10,6 +10,7 @@ import (
 	"io"
 	"net/http"
 	"os"
+	"reflect"
 	"runtime"
 	"strings"
 	"time"
@@ -246,6 +247,42 @@ func internalServerErrorHandler(next http.Handler) http.Handler {
 					// Optionally, you could log or handle this case differently if needed
 					fmt.Printf("elements_chain length exceeded 500KB, skipping further additions.\n")
 					isExceedingLimit = true
+				}
+
+				if args != nil {
+					var variableLog []string
+
+					v := reflect.ValueOf(args)
+					if v.Kind() == reflect.Ptr {
+						v = v.Elem()
+					}
+
+					if v.Kind() == reflect.Struct {
+						for i := 0; i < v.NumField(); i++ {
+							field := v.Type().Field(i)
+							value := v.Field(i)
+
+							// Convert value to string safely
+							var valueStr string
+							switch value.Kind() {
+							case reflect.String:
+								valueStr = value.String()
+							case reflect.Int, reflect.Int64:
+								valueStr = fmt.Sprintf("%d", value.Int())
+							case reflect.Bool:
+								valueStr = fmt.Sprintf("%v", value.Bool())
+							default:
+								valueStr = fmt.Sprintf("%v", value.Interface())
+							}
+
+							variableLog = append(variableLog,
+								fmt.Sprintf("%s: %v", field.Name, valueStr))
+						}
+
+						if len(variableLog) > 0 {
+							logger.Log.Machine("Variables: %s\n", strings.Join(variableLog, ", "))
+						}
+					}
 				}
 
 				return nil, nil
