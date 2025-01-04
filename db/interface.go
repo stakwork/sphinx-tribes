@@ -231,4 +231,5 @@ type Database interface {
 	UpdateBountyTimingOnProof(bountyID uint) error
 	GetWorkspaceBountyCardsData(r *http.Request) []NewBounty
 	UpdateFeatureStatus(uuid string, status FeatureStatus) (WorkspaceFeatures, error)
+	CreateBountyFromTicket(ticket Tickets) (*NewBounty, error)
 }
