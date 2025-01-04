@@ -414,6 +414,7 @@ type NewBounty struct {
 	TicketUrl               string         `json:"ticket_url"`
 	OrgUuid                 string         `gorm:"-" json:"org_uuid"`
 	WorkspaceUuid           string         `json:"workspace_uuid"`
+	FeatureUuid             string         `json:"feature_uuid"`
 	Description             string         `json:"description"`
 	WantedType              string         `json:"wanted_type"`
 	Deliverables            string         `json:"deliverables"`

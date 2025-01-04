@@ -24,7 +24,7 @@ func TicketRoutes() chi.Router {
 		r.Get("/feature/{feature_uuid}/phase/{phase_uuid}", ticketHandler.GetTicketsByPhaseUUID)
 		r.Post("/review/send", ticketHandler.PostTicketDataToStakwork)
 		r.Post("/{uuid}", ticketHandler.UpdateTicket)
-
+		r.Post("/{ticket_uuid}/bounty", ticketHandler.TicketToBounty)
 		r.Delete("/{uuid}", ticketHandler.DeleteTicket)
 	})
 
