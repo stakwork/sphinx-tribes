@@ -221,6 +221,8 @@ type Database interface {
 	CreateProof(proof ProofOfWork) error
 	DeleteProof(proofID string) error
 	UpdateProofStatus(proofID string, status ProofOfWorkStatus) error
+	IncrementProofCount(bountyID uint) error
+	DecrementProofCount(bountyID uint) error
 	CreateBountyTiming(bountyID uint) (*BountyTiming, error)
 	GetBountyTiming(bountyID uint) (*BountyTiming, error)
 	UpdateBountyTiming(timing *BountyTiming) error
