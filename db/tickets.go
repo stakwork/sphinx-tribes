@@ -202,7 +202,7 @@ func (db database) CreateBountyFromTicket(ticket Tickets) (*NewBounty, error) {
 		Description:     ticket.Description,
 		PhaseUuid:       ticket.PhaseUUID,
 		FeatureUuid:     ticket.FeatureUUID,
-		Type:            "Other",
+		Type:            "freelance_job_request",
 		Price:           21,
 		Created:         now.Unix(),
 		Updated:         &now,

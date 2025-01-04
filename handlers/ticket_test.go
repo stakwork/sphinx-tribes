@@ -13,6 +13,7 @@ import (
 	"github.com/stakwork/sphinx-tribes/auth"
 	"github.com/stakwork/sphinx-tribes/db"
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
 func TestGetTicket(t *testing.T) {
@@ -468,4 +469,120 @@ func TestDeleteTicket(t *testing.T) {
 		assert.Error(t, err)
 		assert.Equal(t, "ticket not found", err.Error())
 	})
+}
+
+func TestTicketToBounty(t *testing.T) {
+	teardownSuite := SetupSuite(t)
+	defer teardownSuite(t)
+
+	tHandler := NewTicketHandler(&http.Client{}, db.TestDB)
+
+	workspace := db.Workspace{
+		Uuid:        uuid.New().String(),
+		Name:        "test-workspace",
+		OwnerPubKey: "test-pubkey",
+	}
+	_, err := db.TestDB.CreateOrEditWorkspace(workspace)
+	require.NoError(t, err)
+
+	feature := db.WorkspaceFeatures{
+		Uuid:          uuid.New().String(),
+		WorkspaceUuid: workspace.Uuid,
+		Name:          "test-feature",
+	}
+	_, err = db.TestDB.CreateOrEditFeature(feature)
+	require.NoError(t, err)
+
+	phase := db.FeaturePhase{
+		Uuid:        uuid.New().String(),
+		FeatureUuid: feature.Uuid,
+		Name:        "test-phase",
+	}
+	_, err = db.TestDB.CreateOrEditFeaturePhase(phase)
+	require.NoError(t, err)
+
+	ticket := db.Tickets{
+		UUID:        uuid.New(),
+		FeatureUUID: feature.Uuid,
+		PhaseUUID:   phase.Uuid,
+		Name:        "Test Ticket",
+		Description: "Test Description",
+		Status:      db.DraftTicket,
+	}
+	createdTicket, err := db.TestDB.UpdateTicket(ticket)
+	require.NoError(t, err)
+
+	tests := []struct {
+		name     string
+		ticket   string
+		auth     string
+		wantCode int
+		validate func(*testing.T, *httptest.ResponseRecorder)
+	}{
+		{
+			name:     "unauthorized - no auth token",
+			ticket:   createdTicket.UUID.String(),
+			auth:     "",
+			wantCode: http.StatusUnauthorized,
+		},
+		{
+			name:     "bad request - missing ticket UUID",
+			ticket:   "",
+			auth:     workspace.OwnerPubKey,
+			wantCode: http.StatusBadRequest,
+		},
+		{
+			name:     "not found - ticket doesn't exist",
+			ticket:   uuid.New().String(),
+			auth:     workspace.OwnerPubKey,
+			wantCode: http.StatusNotFound,
+		},
+		{
+			name:     "success - creates bounty from ticket",
+			ticket:   createdTicket.UUID.String(),
+			auth:     workspace.OwnerPubKey,
+			wantCode: http.StatusCreated,
+			validate: func(t *testing.T, rr *httptest.ResponseRecorder) {
+				var resp CreateBountyResponse
+				require.NoError(t, json.NewDecoder(rr.Body).Decode(&resp))
+
+				assert.True(t, resp.Success)
+				assert.NotZero(t, resp.BountyID)
+				assert.Equal(t, "Bounty created successfully", resp.Message)
+
+				bounty := db.TestDB.GetBounty(resp.BountyID)
+
+				assert.Equal(t, createdTicket.Name, bounty.Title)
+				assert.Equal(t, createdTicket.Description, bounty.Description)
+				assert.Equal(t, createdTicket.PhaseUUID, bounty.PhaseUuid)
+				assert.Equal(t, "freelance_job_request", bounty.Type)
+				assert.Equal(t, uint(21), bounty.Price)
+				assert.True(t, bounty.Show)
+			},
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			rr := httptest.NewRecorder()
+			req := httptest.NewRequest(http.MethodPost, "/tickets/bounty", nil)
+
+			if tt.ticket != "" {
+				rctx := chi.NewRouteContext()
+				rctx.URLParams.Add("ticket_uuid", tt.ticket)
+				req = req.WithContext(context.WithValue(req.Context(), chi.RouteCtxKey, rctx))
+			}
+
+			if tt.auth != "" {
+				req = req.WithContext(context.WithValue(req.Context(), auth.ContextKey, tt.auth))
+			}
+
+			tHandler.TicketToBounty(rr, req)
+
+			assert.Equal(t, tt.wantCode, rr.Code)
+			if tt.validate != nil {
+				tt.validate(t, rr)
+			}
+		})
+	}
 }
