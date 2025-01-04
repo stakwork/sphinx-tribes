@@ -2012,16 +2012,37 @@ func (db database) UpdateBountyTimingOnProof(bountyID uint) error {
 
 func (db database) GetWorkspaceBountyCardsData(r *http.Request) []NewBounty {
 	keys := r.URL.Query()
+	_, _, sortBy, direction, search := utils.GetPaginationParams(r)
 	workspaceUuid := keys.Get("workspace_uuid")
 
+	orderQuery := ""
+	searchQuery := ""
 	workspaceQuery := ""
+	timeFilterQuery := ""
+
+	timeFilterQuery = `
+		AND (
+			(NOT paid AND EXTRACT(EPOCH FROM updated::timestamp) > EXTRACT(EPOCH FROM (NOW() - INTERVAL '4 weeks')))
+			OR (paid AND EXTRACT(EPOCH FROM updated::timestamp) > EXTRACT(EPOCH FROM (NOW() - INTERVAL '2 weeks')))
+			OR updated IS NULL  -- Preserve existing records without updated timestamp
+		)`
+
+	if sortBy != "" && direction != "" {
+		orderQuery = "ORDER BY " + sortBy + " " + direction
+	} else {
+		orderQuery = "ORDER BY created DESC"
+	}
+
+	if search != "" {
+		searchQuery = fmt.Sprintf("AND LOWER(title) LIKE %s", "'%"+strings.ToLower(search)+"%'")
+	}
 
 	if workspaceUuid != "" {
 		workspaceQuery = "WHERE workspace_uuid = '" + workspaceUuid + "'"
 	}
 
 	query := "SELECT * FROM public.bounty"
-	allQuery := query + " " + workspaceQuery
+	allQuery := query + " " + workspaceQuery + timeFilterQuery + " " + searchQuery + " " + orderQuery
 
 	ms := []NewBounty{}
 	db.db.Raw(allQuery).Scan(&ms)
