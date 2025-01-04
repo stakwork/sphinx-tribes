@@ -53,6 +53,12 @@ type UpdateTicketRequest struct {
 	Ticket *db.Tickets `json:"ticket"`
 }
 
+type CreateBountyResponse struct {
+	BountyID uint   `json:"bounty_id"`
+	Success  bool   `json:"success"`
+	Message  string `json:"message"`
+}
+
 func (th *ticketHandler) GetTicket(w http.ResponseWriter, r *http.Request) {
 	uuid := chi.URLParam(r, "uuid")
 	if uuid == "" {
@@ -668,4 +674,45 @@ func (th *ticketHandler) GetTicketsByPhaseUUID(w http.ResponseWriter, r *http.Re
 
 	w.WriteHeader(http.StatusOK)
 	json.NewEncoder(w).Encode(tickets)
+}
+
+func (th *ticketHandler) TicketToBounty(w http.ResponseWriter, r *http.Request) {
+	ctx := r.Context()
+	if pubKey, _ := ctx.Value(auth.ContextKey).(string); pubKey == "" {
+		http.Error(w, "unauthorized", http.StatusUnauthorized)
+		return
+	}
+
+	ticketUUID := chi.URLParam(r, "ticket_uuid")
+	if ticketUUID == "" {
+		http.Error(w, "ticket UUID is required", http.StatusBadRequest)
+		return
+	}
+
+	if _, err := uuid.Parse(ticketUUID); err != nil {
+		http.Error(w, "invalid ticket UUID format", http.StatusBadRequest)
+		return
+	}
+
+	ticket, err := th.db.GetTicket(ticketUUID)
+	if err != nil {
+		logger.Log.Error("failed to fetch ticket", "error", err, "uuid", ticketUUID)
+		http.Error(w, "ticket not found", http.StatusNotFound)
+		return
+	}
+
+	bounty, err := th.db.CreateBountyFromTicket(ticket)
+	if err != nil {
+		logger.Log.Error("failed to create bounty", "error", err, "ticket_uuid", ticketUUID)
+		http.Error(w, "failed to create bounty", http.StatusInternalServerError)
+		return
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusCreated)
+	json.NewEncoder(w).Encode(CreateBountyResponse{
+		BountyID: bounty.ID,
+		Success:  true,
+		Message:  "Bounty created successfully",
+	})
 }
