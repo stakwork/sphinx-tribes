@@ -1,62 +1,85 @@
 package db
 
 import (
+	"fmt"
 	"testing"
+	"time"
 
 	"github.com/google/uuid"
+	"github.com/stretchr/testify/assert"
+	"golang.org/x/exp/rand"
 )
 
 func TestProcessUpdateBudget(t *testing.T) {
 	InitTestDB()
 	defer CloseTestDB()
 
-	// create a user
-	person := Person{
-		Uuid:        uuid.New().String(),
-		OwnerPubKey: "test_user_update_budget",
-		OwnerAlias:  "test_user_update_budget",
-		Description: "test_user_update_budget_description",
-	}
+	t.Run("Should test that the budget is updated", func(t *testing.T) {
 
-	TestDB.db.Create(&person)
+		// create a user
+		person := Person{
+			Uuid:        uuid.New().String(),
+			OwnerPubKey: "test_user_update_budget",
+			OwnerAlias:  "test_user_update_budget",
+			Description: "test_user_update_budget_description",
+		}
 
-	// Create a new workspace
-	uuid := uuid.New()
-	workspace := Workspace{
-		OwnerPubKey: person.OwnerPubKey,
-		Uuid:        uuid.String(),
-		Name:        "Test Workspace",
-	}
+		TestDB.db.Create(&person)
 
-	TestDB.db.Create(&workspace)
+		// Create a new workspace
+		uuid := uuid.New()
 
-	// create invoice
-	invoice := NewInvoiceList{
-		WorkspaceUuid:  workspace.Uuid,
-		PaymentRequest: "test_payment_request",
-		Status:         true,
-		OwnerPubkey:    person.OwnerPubKey,
-	}
+		randomWorkspaceName := fmt.Sprintf("Test Workspace Budget %d", rand.Intn(1000))
+		workspace := Workspace{
+			OwnerPubKey: person.OwnerPubKey,
+			Uuid:        uuid.String(),
+			Name:        randomWorkspaceName,
+		}
 
-	TestDB.db.Create(&invoice)
+		TestDB.db.Create(&workspace)
 
-	// create paymentHistory
+		now := time.Now()
 
-	amount := 50000
+		randomPaymentRequest := fmt.Sprintf("test_payment_request_%d", rand.Intn(1000))
+		// create invoice
+		invoice := NewInvoiceList{
+			WorkspaceUuid:  workspace.Uuid,
+			PaymentRequest: randomPaymentRequest,
+			Status:         false,
+			OwnerPubkey:    person.OwnerPubKey,
+			Created:        &now,
+		}
 
-	paymentHistory := NewPaymentHistory{
-		WorkspaceUuid: workspace.Uuid,
-		Amount:        uint(amount),
-		PaymentStatus: PaymentComplete,
-		PaymentType:   Deposit,
-		SenderPubKey:  person.OwnerPubKey,
-	}
+		TestDB.db.Create(&invoice)
 
-	TestDB.db.Create(&paymentHistory)
+		// create paymentHistory
+		amount := 50000
 
-	// Process the update budget
-	err := TestDB.ProcessUpdateBudget(invoice)
-	if err != nil {
-		t.Fatalf("Failed to process update budget: %v", err)
-	}
+		paymentHistory := NewPaymentHistory{
+			WorkspaceUuid: workspace.Uuid,
+			Amount:        uint(amount),
+			PaymentStatus: PaymentComplete,
+			PaymentType:   Deposit,
+			SenderPubKey:  person.OwnerPubKey,
+			Created:       &now,
+		}
+
+		TestDB.db.Create(&paymentHistory)
+
+		// Process the update budget
+		err := TestDB.ProcessUpdateBudget(invoice)
+		if err != nil {
+			t.Fatalf("Failed to process update budget: %v", err)
+		}
+
+		// get workspace budget
+		workspaceBudget := TestDB.GetWorkspaceBudget(workspace.Uuid)
+
+		if workspaceBudget.TotalBudget != uint(amount) {
+			t.Fatalf("Total budget is not correct: %v", workspaceBudget.TotalBudget)
+		}
+
+		// assert that balance is updated
+		assert.Equal(t, workspaceBudget.TotalBudget, uint(amount))
+	})
 }
