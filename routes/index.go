@@ -2,15 +2,15 @@ package routes
 
 import (
 	"bytes"
+	"context"
 	"encoding/json"
 	"fmt"
 	"io"
 	"net/http"
 	"os"
 	"runtime"
-	"time"
 	"strings"
-	"context"
+	"time"
 
 	"github.com/go-chi/chi"
 	"github.com/go-chi/chi/middleware"
@@ -24,6 +24,7 @@ import (
 	"github.com/stakwork/sphinx-tribes/db"
 	"github.com/stakwork/sphinx-tribes/handlers"
 	"github.com/stakwork/sphinx-tribes/logger"
+	customMiddleware "github.com/stakwork/sphinx-tribes/middlewares"
 	"github.com/stakwork/sphinx-tribes/utils"
 )
 
@@ -51,6 +52,7 @@ func NewRouter() *http.Server {
 	r.Mount("/bounties/ticket", TicketRoutes())
 	r.Mount("/hivechat", ChatRoutes())
 	r.Mount("/test", TestRoutes())
+	r.Mount("/feature-flags", FeatureFlagRoutes())
 
 	r.Group(func(r chi.Router) {
 		r.Get("/tribe_by_feed", tribeHandlers.GetFirstTribeByFeed)
@@ -250,6 +252,7 @@ func initChi() *chi.Mux {
 	r.Use(middleware.Recoverer)
 	r.Use(logger.RouteBasedUUIDMiddleware)
 	r.Use(internalServerErrorHandler)
+	r.Use(customMiddleware.FeatureFlag(db.DB))
 	cors := cors.New(cors.Options{
 		AllowedOrigins:   []string{"*"},
 		AllowedMethods:   []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"},

@@ -3,6 +3,8 @@ package db
 import (
 	"net/http"
 	"time"
+
+	"github.com/google/uuid"
 )
 
 type Database interface {
@@ -232,4 +234,16 @@ type Database interface {
 	GetWorkspaceBountyCardsData(r *http.Request) []NewBounty
 	UpdateFeatureStatus(uuid string, status FeatureStatus) (WorkspaceFeatures, error)
 	CreateBountyFromTicket(ticket Tickets) (*NewBounty, error)
+	AddFeatureFlag(flag *FeatureFlag) (FeatureFlag, error)
+	UpdateFeatureFlag(flag *FeatureFlag) (FeatureFlag, error)
+	DeleteFeatureFlag(flagUUID uuid.UUID) error
+	GetFeatureFlags() ([]FeatureFlag, error)
+	GetFeatureFlagByUUID(flagUUID uuid.UUID) (FeatureFlag, error)
+	GetEndpointByUUID(uuid uuid.UUID) (Endpoint, error)
+	AddEndpoint(endpoint *Endpoint) (Endpoint, error)
+	UpdateEndpoint(endpoint *Endpoint) (Endpoint, error)
+	DeleteEndpoint(endpointUUID uuid.UUID) error
+	GetEndpointsByFeatureFlag(flagUUID uuid.UUID) ([]Endpoint, error)
+	GetEndpointByPath(path string) (Endpoint, error)
+	GetAllEndpoints() ([]Endpoint, error)
 }
