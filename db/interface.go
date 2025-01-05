@@ -197,6 +197,7 @@ type Database interface {
 	DeleteProcessingMap(id uint) error
 	ProcessReversePayments(paymentId uint) error
 	CreateOrEditTicket(ticket *Tickets) (Tickets, error)
+	GetTicketsByGroup(ticketGroupUUID string) ([]Tickets, error)
 	GetTicket(uuid string) (Tickets, error)
 	UpdateTicket(ticket Tickets) (Tickets, error)
 	DeleteTicket(uuid string) error
