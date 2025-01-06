@@ -11851,3 +11851,61 @@ func (_c *Database_DecrementProofCount_Call) RunAndReturn(run func(uint) error) 
 	_c.Call.Return(run)
 	return _c
 }
+
+// GetTicketsByGroup provides a mock function with given fields: ticketGroupUUID
+func (_m *Database) GetTicketsByGroup(ticketGroupUUID string) ([]db.Tickets, error) {
+	ret := _m.Called(ticketGroupUUID)
+
+	if len(ret) == 0 {
+		panic("no return value specified for GetTicketsByGroup")
+	}
+
+	var r0 []db.Tickets
+	var r1 error
+	if rf, ok := ret.Get(0).(func(string) ([]db.Tickets, error)); ok {
+		return rf(ticketGroupUUID)
+	}
+	if rf, ok := ret.Get(0).(func(string) []db.Tickets); ok {
+		r0 = rf(ticketGroupUUID)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).([]db.Tickets)
+		}
+	}
+
+	if rf, ok := ret.Get(1).(func(string) error); ok {
+		r1 = rf(ticketGroupUUID)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
+// Database_GetTicketsByGroup_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'GetTicketsByGroup'
+type Database_GetTicketsByGroup_Call struct {
+	*mock.Call
+}
+
+// GetTicketsByGroup is a helper method to define mock.On call
+//   - ticketGroupUUID string
+func (_e *Database_Expecter) GetTicketsByGroup(ticketGroupUUID interface{}) *Database_GetTicketsByGroup_Call {
+	return &Database_GetTicketsByGroup_Call{Call: _e.mock.On("GetTicketsByGroup", ticketGroupUUID)}
+}
+
+func (_c *Database_GetTicketsByGroup_Call) Run(run func(ticketGroupUUID string)) *Database_GetTicketsByGroup_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(string))
+	})
+	return _c
+}
+
+func (_c *Database_GetTicketsByGroup_Call) Return(_a0 []db.Tickets, _a1 error) *Database_GetTicketsByGroup_Call {
+	_c.Call.Return(_a0, _a1)
+	return _c
+}
+
+func (_c *Database_GetTicketsByGroup_Call) RunAndReturn(run func(string) ([]db.Tickets, error)) *Database_GetTicketsByGroup_Call {
+	_c.Call.Return(run)
+	return _c
+}
