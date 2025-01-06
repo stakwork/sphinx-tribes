@@ -123,6 +123,17 @@ func (db database) UpdateTicket(ticket Tickets) (Tickets, error) {
 	return updatedTicket, nil
 }
 
+func (db database) GetTicketsByGroup(ticketGroupUUID string) ([]Tickets, error) {
+	var tickets []Tickets
+
+	result := db.db.Model(&Tickets{}).Where("ticket_group = ?", ticketGroupUUID).Find(&tickets)
+	if result.Error != nil {
+		return nil, fmt.Errorf("failed to fetch tickets by group: %w", result.Error)
+	}
+
+	return tickets, nil
+}
+
 func (db database) DeleteTicket(uuid string) error {
 	result := db.db.Where("uuid = ?", uuid).Delete(&Tickets{})
 	if result.Error != nil {
