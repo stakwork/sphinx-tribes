@@ -748,9 +748,8 @@ func (th *ticketHandler) GetTicketsByPhaseUUID(w http.ResponseWriter, r *http.Re
 func (th *ticketHandler) TicketToBounty(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 	pubKeyFromAuth, _ := ctx.Value(auth.ContextKey).(string)
-
 	if pubKeyFromAuth == "" {
-		logger.Log.Info("no pubkey from auth")
+		logger.Log.Error("no pubkey from auth")
 		w.WriteHeader(http.StatusUnauthorized)
 		return
 	}
@@ -773,14 +772,23 @@ func (th *ticketHandler) TicketToBounty(w http.ResponseWriter, r *http.Request) 
 		return
 	}
 
-	ticket.AuthorID = &pubKeyFromAuth
+	logger.Log.Info("creating bounty from ticket",
+		"ticket_uuid", ticketUUID,
+		"pubkey", pubKeyFromAuth)
 
-	bounty, err := th.db.CreateBountyFromTicket(ticket)
+	bounty, err := th.db.CreateBountyFromTicket(ticket, pubKeyFromAuth)
 	if err != nil {
-		logger.Log.Error("failed to create bounty", "error", err, "ticket_uuid", ticketUUID)
+		logger.Log.Error("failed to create bounty",
+			"error", err,
+			"ticket_uuid", ticketUUID,
+			"pubkey", pubKeyFromAuth)
 		http.Error(w, "failed to create bounty", http.StatusInternalServerError)
 		return
 	}
+
+	logger.Log.Info("bounty created successfully",
+		"bounty_id", bounty.ID,
+		"owner_id", bounty.OwnerID)
 
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusCreated)
