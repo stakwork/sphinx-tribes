@@ -556,7 +556,7 @@ func TestTicketToBounty(t *testing.T) {
 				assert.Equal(t, createdTicket.Name, bounty.Title)
 				assert.Equal(t, createdTicket.Description, bounty.Description)
 				assert.Equal(t, createdTicket.PhaseUUID, bounty.PhaseUuid)
-				assert.Equal(t, "Other", bounty.Type)
+				assert.Equal(t, "freelance_job_request", bounty.Type)
 				assert.Equal(t, uint(21), bounty.Price)
 				assert.True(t, bounty.Show)
 			},

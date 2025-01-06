@@ -861,9 +861,9 @@ func (_c *Database_CountDevelopers_Call) RunAndReturn(run func() int64) *Databas
 	return _c
 }
 
-// CreateBountyFromTicket provides a mock function with given fields: ticket
-func (_m *Database) CreateBountyFromTicket(ticket db.Tickets) (*db.NewBounty, error) {
-	ret := _m.Called(ticket)
+// CreateBountyFromTicket provides a mock function with given fields: ticket, pubkey
+func (_m *Database) CreateBountyFromTicket(ticket db.Tickets, pubkey string) (*db.NewBounty, error) {
+	ret := _m.Called(ticket, pubkey)
 
 	if len(ret) == 0 {
 		panic("no return value specified for CreateBountyFromTicket")
@@ -871,19 +871,19 @@ func (_m *Database) CreateBountyFromTicket(ticket db.Tickets) (*db.NewBounty, er
 
 	var r0 *db.NewBounty
 	var r1 error
-	if rf, ok := ret.Get(0).(func(db.Tickets) (*db.NewBounty, error)); ok {
-		return rf(ticket)
+	if rf, ok := ret.Get(0).(func(db.Tickets, string) (*db.NewBounty, error)); ok {
+		return rf(ticket, pubkey)
 	}
-	if rf, ok := ret.Get(0).(func(db.Tickets) *db.NewBounty); ok {
-		r0 = rf(ticket)
+	if rf, ok := ret.Get(0).(func(db.Tickets, string) *db.NewBounty); ok {
+		r0 = rf(ticket, pubkey)
 	} else {
 		if ret.Get(0) != nil {
 			r0 = ret.Get(0).(*db.NewBounty)
 		}
 	}
 
-	if rf, ok := ret.Get(1).(func(db.Tickets) error); ok {
-		r1 = rf(ticket)
+	if rf, ok := ret.Get(1).(func(db.Tickets, string) error); ok {
+		r1 = rf(ticket, pubkey)
 	} else {
 		r1 = ret.Error(1)
 	}
@@ -898,13 +898,14 @@ type Database_CreateBountyFromTicket_Call struct {
 
 // CreateBountyFromTicket is a helper method to define mock.On call
 //   - ticket db.Tickets
-func (_e *Database_Expecter) CreateBountyFromTicket(ticket interface{}) *Database_CreateBountyFromTicket_Call {
-	return &Database_CreateBountyFromTicket_Call{Call: _e.mock.On("CreateBountyFromTicket", ticket)}
+//   - pubkey string
+func (_e *Database_Expecter) CreateBountyFromTicket(ticket interface{}, pubkey interface{}) *Database_CreateBountyFromTicket_Call {
+	return &Database_CreateBountyFromTicket_Call{Call: _e.mock.On("CreateBountyFromTicket", ticket, pubkey)}
 }
 
-func (_c *Database_CreateBountyFromTicket_Call) Run(run func(ticket db.Tickets)) *Database_CreateBountyFromTicket_Call {
+func (_c *Database_CreateBountyFromTicket_Call) Run(run func(ticket db.Tickets, pubkey string)) *Database_CreateBountyFromTicket_Call {
 	_c.Call.Run(func(args mock.Arguments) {
-		run(args[0].(db.Tickets))
+		run(args[0].(db.Tickets), args[1].(string))
 	})
 	return _c
 }
@@ -914,10 +915,11 @@ func (_c *Database_CreateBountyFromTicket_Call) Return(_a0 *db.NewBounty, _a1 er
 	return _c
 }
 
-func (_c *Database_CreateBountyFromTicket_Call) RunAndReturn(run func(db.Tickets) (*db.NewBounty, error)) *Database_CreateBountyFromTicket_Call {
+func (_c *Database_CreateBountyFromTicket_Call) RunAndReturn(run func(db.Tickets, string) (*db.NewBounty, error)) *Database_CreateBountyFromTicket_Call {
 	_c.Call.Return(run)
 	return _c
 }
+
 
 // CreateBountyTiming provides a mock function with given fields: bountyID
 func (_m *Database) CreateBountyTiming(bountyID uint) (*db.BountyTiming, error) {
