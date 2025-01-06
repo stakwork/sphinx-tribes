@@ -197,17 +197,25 @@ func (db database) UpdateTicketsWithoutGroup(ticket Tickets) error {
 func (db database) CreateBountyFromTicket(ticket Tickets) (*NewBounty, error) {
 	now := time.Now()
 
+	workspace := db.GetWorkspaceByUuid(ticket.Features.WorkspaceUuid)
+
+	ownerPubKey := ticket.AuthorID
+	if ownerPubKey == nil || *ownerPubKey == "" {
+		ownerPubKey = &ticket.Features.CreatedBy
+	}
+
 	bounty := &NewBounty{
 		Title:           ticket.Name,
 		Description:     ticket.Description,
 		PhaseUuid:       ticket.PhaseUUID,
-		FeatureUuid:     ticket.FeatureUUID,
-		Type:            "freelance_job_request",
+		OwnerID:         *ownerPubKey,
+		Type:            "Other",
 		Price:           21,
 		Created:         now.Unix(),
 		Updated:         &now,
 		Show:            true,
 		CodingLanguages: pq.StringArray{},
+		Tribe:           workspace.Name,
 	}
 
 	if err := db.db.Create(bounty).Error; err != nil {

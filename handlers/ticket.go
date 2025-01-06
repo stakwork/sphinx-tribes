@@ -678,8 +678,11 @@ func (th *ticketHandler) GetTicketsByPhaseUUID(w http.ResponseWriter, r *http.Re
 
 func (th *ticketHandler) TicketToBounty(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
-	if pubKey, _ := ctx.Value(auth.ContextKey).(string); pubKey == "" {
-		http.Error(w, "unauthorized", http.StatusUnauthorized)
+	pubKeyFromAuth, _ := ctx.Value(auth.ContextKey).(string)
+
+	if pubKeyFromAuth == "" {
+		logger.Log.Info("no pubkey from auth")
+		w.WriteHeader(http.StatusUnauthorized)
 		return
 	}
 
@@ -696,10 +699,12 @@ func (th *ticketHandler) TicketToBounty(w http.ResponseWriter, r *http.Request) 
 
 	ticket, err := th.db.GetTicket(ticketUUID)
 	if err != nil {
-		logger.Log.Error("failed to fetch ticket", "error", err, "uuid", ticketUUID)
-		http.Error(w, "ticket not found", http.StatusNotFound)
+		logger.Log.Error("failed to fetch ticket", "error", err, "ticket_uuid", ticketUUID)
+		http.Error(w, "failed to fetch ticket", http.StatusNotFound)
 		return
 	}
+
+	ticket.AuthorID = &pubKeyFromAuth
 
 	bounty, err := th.db.CreateBountyFromTicket(ticket)
 	if err != nil {
