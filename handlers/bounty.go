@@ -1198,8 +1198,10 @@ func formatPayError(errorMsg string) db.InvoicePayError {
 
 func (h *bountyHandler) GetLightningInvoice(payment_request string) (db.InvoiceResult, db.InvoiceError) {
 	if config.IsV2Payment {
+		fmt.Println("V2 3333 ==========================", payment_request)
 		return h.GetV2LightningInvoice(payment_request)
 	} else {
+		fmt.Println("V1 2222 ==========================")
 		return h.GetV1LightningInvoice(payment_request)
 	}
 }
@@ -1259,26 +1261,38 @@ func (h *bountyHandler) GetV2LightningInvoice(payment_request string) (db.Invoic
 		Bolt11: payment_request,
 	}
 
+	fmt.Println("V2 Invoice URL ==========================", url)
+
 	jsonBody, _ := json.Marshal(invoiceBody)
+
+	fmt.Println("V2 Invoice Body ==========================", invoiceBody)
 
 	req, err := http.NewRequest(http.MethodPost, url, bytes.NewBuffer(jsonBody))
 	req.Header.Set("x-admin-token", config.V2BotToken)
 	req.Header.Set("Content-Type", "application/json")
 	res, _ := h.httpClient.Do(req)
 
+	fmt.Println("Invoice Response ==========================", res, err, res.Body)
+
 	if err != nil {
 		log.Printf("[bounty] Request Failed: %s", err)
 		return db.InvoiceResult{}, db.InvoiceError{Success: false, Error: err.Error()}
 	}
 
+	fmt.Println("Response befor status code 0  ==========================", res.StatusCode)
+
 	defer res.Body.Close()
 
 	body, err := io.ReadAll(res.Body)
+
+	fmt.Println("Response befor status code 1  ==========================", body)
 
 	if err != nil {
 		log.Printf("[bounty] Reading Invoice body failed: %s", err)
 		return db.InvoiceResult{}, db.InvoiceError{Success: false, Error: err.Error()}
 	}
+
+	fmt.Println("Response befor status code 2  ==========================", body)
 
 	if res.StatusCode != 200 {
 		// Unmarshal result
