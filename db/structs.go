@@ -1100,12 +1100,20 @@ type ChatMessage struct {
 	Source      ChatSource        `json:"source"`
 }
 
+type ChatStatus string
+
+const (
+	ActiveStatus  ChatStatus = "active"
+	ArchiveStatus ChatStatus = "archived"
+)
+
 type Chat struct {
-	ID          string    `json:"id" gorm:"primaryKey"`
-	WorkspaceID string    `json:"workspaceId" gorm:"index"`
-	Title       string    `json:"title"`
-	CreatedAt   time.Time `json:"createdAt"`
-	UpdatedAt   time.Time `json:"updatedAt"`
+	ID          string     `json:"id" gorm:"primaryKey"`
+	WorkspaceID string     `json:"workspaceId" gorm:"index"`
+	Title       string     `json:"title"`
+	Status      ChatStatus `json:"status" gorm:"default:active"`
+	CreatedAt   time.Time  `json:"createdAt"`
+	UpdatedAt   time.Time  `json:"updatedAt"`
 }
 
 type ProofOfWorkStatus string
