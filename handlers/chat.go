@@ -85,6 +85,7 @@ func (ch *ChatHandler) CreateChat(w http.ResponseWriter, r *http.Request) {
 		ID:          xid.New().String(),
 		WorkspaceID: request.WorkspaceID,
 		Title:       request.Title,
+		Status:      "active",
 	}
 
 	createdChat, err := ch.db.AddChat(chat)
@@ -157,6 +158,48 @@ func (ch *ChatHandler) UpdateChat(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(ChatResponse{
 		Success: true,
 		Message: "Chat updated successfully",
+		Data:    updatedChat,
+	})
+}
+
+func (ch *ChatHandler) ArchiveChat(w http.ResponseWriter, r *http.Request) {
+	chatID := chi.URLParam(r, "chat_id")
+	if chatID == "" {
+		w.WriteHeader(http.StatusBadRequest)
+		json.NewEncoder(w).Encode(ChatResponse{
+			Success: false,
+			Message: "Chat ID is required",
+		})
+		return
+	}
+
+	existingChat, err := ch.db.GetChatByChatID(chatID)
+	if err != nil {
+		w.WriteHeader(http.StatusNotFound)
+		json.NewEncoder(w).Encode(ChatResponse{
+			Success: false,
+			Message: "Chat not found",
+		})
+		return
+	}
+
+	updatedChat := existingChat
+	updatedChat.Status = db.ArchiveStatus
+
+	updatedChat, err = ch.db.UpdateChat(&updatedChat)
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		json.NewEncoder(w).Encode(ChatResponse{
+			Success: false,
+			Message: fmt.Sprintf("Failed to archive chat: %v", err),
+		})
+		return
+	}
+
+	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode(ChatResponse{
+		Success: true,
+		Message: "Chat archived successfully",
 		Data:    updatedChat,
 	})
 }
@@ -338,6 +381,8 @@ func (ch *ChatHandler) sendToStakwork(payload StakworkChatPayload) error {
 
 func (ch *ChatHandler) GetChat(w http.ResponseWriter, r *http.Request) {
 	workspaceID := r.URL.Query().Get("workspace_id")
+	chatStatus := r.URL.Query().Get("status")
+
 	if workspaceID == "" {
 		w.WriteHeader(http.StatusBadRequest)
 		json.NewEncoder(w).Encode(ChatResponse{
@@ -347,7 +392,7 @@ func (ch *ChatHandler) GetChat(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	chats, err := ch.db.GetChatsForWorkspace(workspaceID)
+	chats, err := ch.db.GetChatsForWorkspace(workspaceID, chatStatus)
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
 		json.NewEncoder(w).Encode(ChatResponse{

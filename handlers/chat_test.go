@@ -1106,3 +1106,93 @@ func TestGetChatHistory(t *testing.T) {
 	})
 
 }
+
+func TestArchiveChat(t *testing.T) {
+	teardownSuite := SetupSuite(t)
+	defer teardownSuite(t)
+
+	chatHandler := NewChatHandler(&http.Client{}, db.TestDB)
+
+	t.Run("should successfully archive chat when valid chat_id is provided", func(t *testing.T) {
+		chat := &db.Chat{
+			ID:          uuid.New().String(),
+			WorkspaceID: "workspace1",
+			Title:       "Test Chat",
+			Status:      "active",
+		}
+		db.TestDB.AddChat(chat)
+
+		rr := httptest.NewRecorder()
+		rctx := chi.NewRouteContext()
+		rctx.URLParams.Add("chat_id", chat.ID)
+		req, err := http.NewRequestWithContext(
+			context.WithValue(context.Background(), chi.RouteCtxKey, rctx),
+			http.MethodPut,
+			"/hivechat/"+chat.ID+"/archive",
+			nil,
+		)
+		assert.NoError(t, err)
+
+		handler := http.HandlerFunc(chatHandler.ArchiveChat)
+		handler.ServeHTTP(rr, req)
+
+		var response ChatResponse
+		err = json.NewDecoder(rr.Body).Decode(&response)
+		assert.NoError(t, err)
+
+		assert.Equal(t, http.StatusOK, rr.Code)
+		assert.True(t, response.Success)
+		assert.Equal(t, "Chat archived successfully", response.Message)
+
+		archivedChat, err := db.TestDB.GetChatByChatID(chat.ID)
+		assert.NoError(t, err)
+		assert.Equal(t, db.ArchiveStatus, archivedChat.Status)
+	})
+
+	t.Run("should return not found when chat doesn't exist", func(t *testing.T) {
+		rr := httptest.NewRecorder()
+		rctx := chi.NewRouteContext()
+		rctx.URLParams.Add("chat_id", uuid.New().String())
+		req, err := http.NewRequestWithContext(
+			context.WithValue(context.Background(), chi.RouteCtxKey, rctx),
+			http.MethodPut,
+			"/hivechat/"+uuid.New().String()+"/archive",
+			nil,
+		)
+		assert.NoError(t, err)
+
+		handler := http.HandlerFunc(chatHandler.ArchiveChat)
+		handler.ServeHTTP(rr, req)
+
+		var response ChatResponse
+		err = json.NewDecoder(rr.Body).Decode(&response)
+		assert.NoError(t, err)
+
+		assert.Equal(t, http.StatusNotFound, rr.Code)
+		assert.False(t, response.Success)
+		assert.Equal(t, "Chat not found", response.Message)
+	})
+
+	t.Run("should return bad request when chat_id is missing", func(t *testing.T) {
+		rr := httptest.NewRecorder()
+		rctx := chi.NewRouteContext()
+		req, err := http.NewRequestWithContext(
+			context.WithValue(context.Background(), chi.RouteCtxKey, rctx),
+			http.MethodPut,
+			"/hivechat//archive",
+			nil,
+		)
+		assert.NoError(t, err)
+
+		handler := http.HandlerFunc(chatHandler.ArchiveChat)
+		handler.ServeHTTP(rr, req)
+
+		var response ChatResponse
+		err = json.NewDecoder(rr.Body).Decode(&response)
+		assert.NoError(t, err)
+
+		assert.Equal(t, http.StatusBadRequest, rr.Code)
+		assert.False(t, response.Success)
+		assert.Equal(t, "Chat ID is required", response.Message)
+	})
+}
