@@ -26,6 +26,7 @@ type workspaceHandler struct {
 	configUserHasAccess            func(pubKeyFromAuth string, uuid string, role string) bool
 	configUserHasManageBountyRoles func(pubKeyFromAuth string, uuid string) bool
 	userHasManageBountyRoles       func(pubKeyFromAuth string, uuid string) bool
+	getAllUserWorkspaces           func(pubKeyFromAuth string) []db.Workspace
 }
 
 func NewWorkspaceHandler(database db.Database) *workspaceHandler {
@@ -40,6 +41,7 @@ func NewWorkspaceHandler(database db.Database) *workspaceHandler {
 		configUserHasAccess:            configHandler.UserHasAccess,
 		configUserHasManageBountyRoles: configHandler.UserHasManageBountyRoles,
 		userHasManageBountyRoles:       dbConf.UserHasManageBountyRoles,
+		getAllUserWorkspaces:           GetAllUserWorkspaces,
 	}
 }
 
@@ -722,8 +724,6 @@ func (oh *workspaceHandler) PollBudgetInvoices(w http.ResponseWriter, r *http.Re
 	pubKeyFromAuth, _ := ctx.Value(auth.ContextKey).(string)
 	uuid := chi.URLParam(r, "uuid")
 
-	log.Println("Uuid ==========================", uuid)
-
 	if pubKeyFromAuth == "" {
 		logger.Log.Info("[workspaces] no pubkey from auth")
 		w.WriteHeader(http.StatusUnauthorized)
@@ -732,7 +732,6 @@ func (oh *workspaceHandler) PollBudgetInvoices(w http.ResponseWriter, r *http.Re
 
 	workInvoices := oh.db.GetWorkspaceInvoices(uuid)
 
-	fmt.Println("workInvoices ==========================", workInvoices)
 	for _, inv := range workInvoices {
 		invoiceRes, invoiceErr := oh.getLightningInvoice(inv.PaymentRequest)
 
@@ -741,8 +740,6 @@ func (oh *workspaceHandler) PollBudgetInvoices(w http.ResponseWriter, r *http.Re
 			json.NewEncoder(w).Encode(invoiceErr)
 			return
 		}
-
-		fmt.Println("invoiceRes ==========================", invoiceRes)
 
 		if invoiceRes.Response.Settled {
 			if !inv.Status && inv.Type == "BUDGET" {
@@ -773,7 +770,7 @@ func (oh *workspaceHandler) PollUserWorkspacesBudget(w http.ResponseWriter, r *h
 	}
 
 	// get the user workspaces
-	workspaces := GetAllUserWorkspaces(pubKeyFromAuth)
+	workspaces := oh.getAllUserWorkspaces(pubKeyFromAuth)
 	// loop through the worksppaces and get each workspace invoice
 	for _, space := range workspaces {
 
