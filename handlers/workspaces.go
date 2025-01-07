@@ -26,6 +26,7 @@ type workspaceHandler struct {
 	configUserHasAccess            func(pubKeyFromAuth string, uuid string, role string) bool
 	configUserHasManageBountyRoles func(pubKeyFromAuth string, uuid string) bool
 	userHasManageBountyRoles       func(pubKeyFromAuth string, uuid string) bool
+	getAllUserWorkspaces           func(pubKeyFromAuth string) []db.Workspace
 }
 
 func NewWorkspaceHandler(database db.Database) *workspaceHandler {
@@ -40,6 +41,7 @@ func NewWorkspaceHandler(database db.Database) *workspaceHandler {
 		configUserHasAccess:            configHandler.UserHasAccess,
 		configUserHasManageBountyRoles: configHandler.UserHasManageBountyRoles,
 		userHasManageBountyRoles:       dbConf.UserHasManageBountyRoles,
+		getAllUserWorkspaces:           GetAllUserWorkspaces,
 	}
 }
 
@@ -97,7 +99,7 @@ func (oh *workspaceHandler) CreateOrEditWorkspace(w http.ResponseWriter, r *http
 	if err != nil {
 		w.WriteHeader(http.StatusBadRequest)
 		msg := fmt.Sprintf("Error: did not pass validation test : %s", err)
-			json.NewEncoder(w).Encode(msg)
+		json.NewEncoder(w).Encode(msg)
 		return
 	}
 
@@ -378,7 +380,7 @@ func (oh *workspaceHandler) AddUserRoles(w http.ResponseWriter, r *http.Request)
 
 	if pubKeyFromAuth == "" {
 		w.WriteHeader(http.StatusUnauthorized)
-			json.NewEncoder(w).Encode("no pubkey from auth")
+		json.NewEncoder(w).Encode("no pubkey from auth")
 		return
 	}
 
@@ -729,6 +731,7 @@ func (oh *workspaceHandler) PollBudgetInvoices(w http.ResponseWriter, r *http.Re
 	}
 
 	workInvoices := oh.db.GetWorkspaceInvoices(uuid)
+
 	for _, inv := range workInvoices {
 		invoiceRes, invoiceErr := oh.getLightningInvoice(inv.PaymentRequest)
 
@@ -767,7 +770,7 @@ func (oh *workspaceHandler) PollUserWorkspacesBudget(w http.ResponseWriter, r *h
 	}
 
 	// get the user workspaces
-	workspaces := GetAllUserWorkspaces(pubKeyFromAuth)
+	workspaces := oh.getAllUserWorkspaces(pubKeyFromAuth)
 	// loop through the worksppaces and get each workspace invoice
 	for _, space := range workspaces {
 

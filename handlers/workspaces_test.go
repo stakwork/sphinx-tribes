@@ -16,6 +16,7 @@ import (
 	"github.com/go-chi/chi"
 	"github.com/google/uuid"
 	"github.com/stakwork/sphinx-tribes/auth"
+	"github.com/stakwork/sphinx-tribes/config"
 	"github.com/stakwork/sphinx-tribes/db"
 	"github.com/stretchr/testify/assert"
 	"gorm.io/gorm"
@@ -1976,5 +1977,409 @@ func TestDeleteWorkspaceCodeGraph(t *testing.T) {
 		assert.Error(t, err)
 		assert.Equal(t, gorm.ErrRecordNotFound.Error(), err.Error())
 		assert.Equal(t, http.StatusOK, rr.Code)
+	})
+}
+
+func TestPollBudgetInvoices(t *testing.T) {
+	teardownSuite := SetupSuite(t)
+	defer teardownSuite(t)
+
+	config.IsV2Payment = true
+	config.V2BotUrl = "http://v2-bot-url.com"
+	config.V2BotToken = "v2-bot-token"
+
+	// create a user
+	person := db.Person{
+		Uuid:        uuid.New().String(),
+		OwnerPubKey: "test_user_poll_budget",
+		OwnerAlias:  "test_user_poll_update_budget",
+		Description: "test_user_poll_update_budget_description",
+	}
+
+	db.TestDB.CreateOrEditPerson(person)
+
+	t.Run("Should return 401 if the user is not authorized", func(t *testing.T) {
+		rr := httptest.NewRecorder()
+		oHandler := NewWorkspaceHandler(db.TestDB)
+		handler := http.HandlerFunc(oHandler.PollBudgetInvoices)
+
+		req, err := http.NewRequest(http.MethodGet, "/poll/invoices/"+workspace.Uuid, nil)
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		handler.ServeHTTP(rr, req)
+		assert.Equal(t, http.StatusUnauthorized, rr.Code)
+	})
+
+	t.Run("Should update the budget if the invoice if a single invoice is paid invoice is paid", func(t *testing.T) {
+		now := time.Now()
+
+		amount := 50000
+
+		// Create a new workspace
+		uuid := uuid.New()
+
+		randomWorkspaceName := fmt.Sprintf("Test Poll Workspace Budget %d", rand.Intn(1000))
+		workspace := db.Workspace{
+			OwnerPubKey: person.OwnerPubKey,
+			Uuid:        uuid.String(),
+			Name:        randomWorkspaceName,
+		}
+
+		db.TestDB.CreateOrEditWorkspace(workspace)
+
+		randomPaymentRequest := fmt.Sprintf("test_update_budget_payment_request_%d", rand.Intn(1000))
+		// create invoice
+		invoice := db.NewInvoiceList{
+			WorkspaceUuid:  workspace.Uuid,
+			PaymentRequest: randomPaymentRequest,
+			Status:         false,
+			OwnerPubkey:    person.OwnerPubKey,
+			Created:        &now,
+			Type:           "BUDGET",
+		}
+
+		db.TestDB.AddInvoice(invoice)
+
+		mockGetLightningInvoice := func(payment_request string) (db.InvoiceResult, db.InvoiceError) {
+			return db.InvoiceResult{
+				Success: true,
+				Response: db.InvoiceCheckResponse{
+					Settled:         true,
+					Amount:          strconv.Itoa(amount),
+					Payment_request: invoice.PaymentRequest,
+				},
+			}, db.InvoiceError{}
+		}
+
+		// create paymentHistory
+		paymentHistory := db.NewPaymentHistory{
+			WorkspaceUuid: workspace.Uuid,
+			Amount:        uint(amount),
+			PaymentStatus: db.PaymentComplete,
+			PaymentType:   db.Deposit,
+			SenderPubKey:  person.OwnerPubKey,
+			Created:       &now,
+		}
+
+		db.TestDB.AddPaymentHistory(paymentHistory)
+
+		ctx := context.Background()
+		oHandler := NewWorkspaceHandler(db.TestDB)
+
+		oHandler.getLightningInvoice = mockGetLightningInvoice
+		rr := httptest.NewRecorder()
+		handler := http.HandlerFunc(oHandler.PollBudgetInvoices)
+
+		rctx := chi.NewRouteContext()
+		rctx.URLParams.Add("uuid", workspace.Uuid)
+
+		authorizedCtx := context.WithValue(ctx, auth.ContextKey, invoice.OwnerPubkey)
+		req, err := http.NewRequestWithContext(context.WithValue(authorizedCtx, chi.RouteCtxKey, rctx), http.MethodGet, "/poll/invoices/"+workspace.Uuid, nil)
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		handler.ServeHTTP(rr, req)
+
+		assert.Equal(t, http.StatusOK, rr.Code)
+
+		workspaceBudget := db.TestDB.GetWorkspaceBudget(workspace.Uuid)
+		assert.Equal(t, workspaceBudget.TotalBudget, uint(amount))
+	})
+
+	t.Run("Should update the budget if the invoice if a multiple invoice is paid invoice is paid ", func(t *testing.T) {
+		now := time.Now()
+
+		amount := 10000
+
+		randomWorkspaceName := fmt.Sprintf("Test Poll Multiple Workspace Budget %d", rand.Intn(1000))
+		workspace := db.Workspace{
+			OwnerPubKey: person.OwnerPubKey,
+			Uuid:        uuid.New().String(),
+			Name:        randomWorkspaceName,
+		}
+
+		db.TestDB.CreateOrEditWorkspace(workspace)
+
+		for i := 0; i < 3; i++ {
+			randomPaymentRequest := fmt.Sprintf("test_update_budget_payment_request_%d%d", rand.Intn(amount), i)
+			// create invoice
+			invoice := db.NewInvoiceList{
+				WorkspaceUuid:  workspace.Uuid,
+				PaymentRequest: randomPaymentRequest,
+				Status:         false,
+				OwnerPubkey:    person.OwnerPubKey,
+				Created:        &now,
+				Type:           "BUDGET",
+			}
+			db.TestDB.AddInvoice(invoice)
+		}
+
+		for i := 0; i < 3; i++ {
+			// create paymentHistory
+			paymentHistory := db.NewPaymentHistory{
+				WorkspaceUuid: workspace.Uuid,
+				Amount:        uint(amount),
+				PaymentStatus: db.PaymentComplete,
+				PaymentType:   db.Deposit,
+				SenderPubKey:  person.OwnerPubKey,
+				Created:       &now,
+			}
+			db.TestDB.AddPaymentHistory(paymentHistory)
+		}
+
+		mockGetLightningInvoice := func(payment_request string) (db.InvoiceResult, db.InvoiceError) {
+			return db.InvoiceResult{
+				Success: true,
+				Response: db.InvoiceCheckResponse{
+					Settled:         true,
+					Amount:          strconv.Itoa(amount),
+					Payment_request: "",
+				},
+			}, db.InvoiceError{}
+		}
+
+		ctx := context.Background()
+		oHandler := NewWorkspaceHandler(db.TestDB)
+
+		oHandler.getLightningInvoice = mockGetLightningInvoice
+
+		rr := httptest.NewRecorder()
+		handler := http.HandlerFunc(oHandler.PollBudgetInvoices)
+
+		rctx := chi.NewRouteContext()
+		rctx.URLParams.Add("uuid", workspace.Uuid)
+
+		authorizedCtx := context.WithValue(ctx, auth.ContextKey, person.OwnerPubKey)
+		req, err := http.NewRequestWithContext(context.WithValue(authorizedCtx, chi.RouteCtxKey, rctx), http.MethodGet, "/poll/invoices/"+workspace.Uuid, nil)
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		handler.ServeHTTP(rr, req)
+		assert.Equal(t, http.StatusOK, rr.Code)
+
+		workspaceBudget := db.TestDB.GetWorkspaceBudget(workspace.Uuid)
+		assert.Equal(t, workspaceBudget.TotalBudget, uint(amount*3))
+	})
+}
+
+func TestPollUserWorkspacesBudget(t *testing.T) {
+	teardownSuite := SetupSuite(t)
+	defer teardownSuite(t)
+
+	config.IsV2Payment = true
+	config.V2BotUrl = "http://v2-bot-url.com"
+	config.V2BotToken = "v2-bot-token"
+
+	// create a user
+	person := db.Person{
+		Uuid:        uuid.New().String(),
+		OwnerPubKey: "test_user_poll_budget",
+		OwnerAlias:  "test_user_poll_update_budget",
+		Description: "test_user_poll_update_budget_description",
+	}
+
+	db.TestDB.CreateOrEditPerson(person)
+
+	// create second user
+	person2 := db.Person{
+		Uuid:        uuid.New().String(),
+		OwnerPubKey: "test_user_poll_budget_2",
+		OwnerAlias:  "test_user_poll_update_budget_2",
+		Description: "test_user_poll_update_budget_description_2",
+	}
+	db.TestDB.CreateOrEditPerson(person2)
+
+	t.Run("Should return 401 if the user is not authorized", func(t *testing.T) {
+		rr := httptest.NewRecorder()
+		oHandler := NewWorkspaceHandler(db.TestDB)
+		handler := http.HandlerFunc(oHandler.PollUserWorkspacesBudget)
+
+		req, err := http.NewRequest(http.MethodGet, "/poll/user/invoices", nil)
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		handler.ServeHTTP(rr, req)
+		assert.Equal(t, http.StatusUnauthorized, rr.Code)
+	})
+
+	t.Run("Should update the user workspaces budget if the invoice if a single invoice is paid invoice is paid", func(t *testing.T) {
+		now := time.Now()
+
+		amount := 50000
+
+		// Create a new workspace
+		uuid := uuid.New()
+
+		randomWorkspaceName := fmt.Sprintf("Test Poll User Workspace Budget %d", rand.Intn(1000))
+		workspace := db.Workspace{
+			OwnerPubKey: person.OwnerPubKey,
+			Uuid:        uuid.String(),
+			Name:        randomWorkspaceName,
+		}
+
+		db.TestDB.CreateOrEditWorkspace(workspace)
+
+		// add user 2 to workspace users
+		db.TestDB.CreateWorkspaceUser(db.WorkspaceUsers{
+			WorkspaceUuid: workspace.Uuid,
+			OwnerPubKey:   person2.OwnerPubKey,
+		})
+
+		randomPaymentRequest := fmt.Sprintf("test_update_budget_payment_request_%d", rand.Intn(1000))
+		// create invoice
+		invoice := db.NewInvoiceList{
+			WorkspaceUuid:  workspace.Uuid,
+			PaymentRequest: randomPaymentRequest,
+			Status:         false,
+			OwnerPubkey:    person2.OwnerPubKey,
+			Created:        &now,
+			Type:           "BUDGET",
+		}
+
+		db.TestDB.AddInvoice(invoice)
+
+		mockGetLightningInvoice := func(payment_request string) (db.InvoiceResult, db.InvoiceError) {
+			return db.InvoiceResult{
+				Success: true,
+				Response: db.InvoiceCheckResponse{
+					Settled:         true,
+					Amount:          strconv.Itoa(amount),
+					Payment_request: invoice.PaymentRequest,
+				},
+			}, db.InvoiceError{}
+		}
+
+		mockGetAllUserWorkspaces := func(pubKeyFromAuth string) []db.Workspace {
+			return []db.Workspace{workspace}
+		}
+
+		// create paymentHistory
+		paymentHistory := db.NewPaymentHistory{
+			WorkspaceUuid: workspace.Uuid,
+			Amount:        uint(amount),
+			PaymentStatus: db.PaymentComplete,
+			PaymentType:   db.Deposit,
+			SenderPubKey:  person.OwnerPubKey,
+			Created:       &now,
+		}
+
+		db.TestDB.AddPaymentHistory(paymentHistory)
+
+		ctx := context.Background()
+		oHandler := NewWorkspaceHandler(db.TestDB)
+
+		oHandler.getLightningInvoice = mockGetLightningInvoice
+		oHandler.getAllUserWorkspaces = mockGetAllUserWorkspaces
+
+		rr := httptest.NewRecorder()
+		handler := http.HandlerFunc(oHandler.PollUserWorkspacesBudget)
+
+		rctx := chi.NewRouteContext()
+		rctx.URLParams.Add("uuid", workspace.Uuid)
+
+		authorizedCtx := context.WithValue(ctx, auth.ContextKey, person2.OwnerPubKey)
+		req, err := http.NewRequestWithContext(context.WithValue(authorizedCtx, chi.RouteCtxKey, rctx), http.MethodGet, "/poll/user/invoices", nil)
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		handler.ServeHTTP(rr, req)
+
+		assert.Equal(t, http.StatusOK, rr.Code)
+
+		workspaceBudget := db.TestDB.GetWorkspaceBudget(workspace.Uuid)
+		assert.Equal(t, workspaceBudget.TotalBudget, uint(amount))
+	})
+
+	t.Run("Should update the user workspaces budget if the invoice if a multiple invoice is paid invoice is paid ", func(t *testing.T) {
+		now := time.Now()
+
+		amount := 10000
+
+		randomWorkspaceName := fmt.Sprintf("Test Poll Multiple Workspace Budget %d", rand.Intn(1000))
+		workspace := db.Workspace{
+			OwnerPubKey: person.OwnerPubKey,
+			Uuid:        uuid.New().String(),
+			Name:        randomWorkspaceName,
+		}
+
+		db.TestDB.CreateOrEditWorkspace(workspace)
+
+		// add user 2 to workspace users
+		db.TestDB.CreateWorkspaceUser(db.WorkspaceUsers{
+			WorkspaceUuid: workspace.Uuid,
+			OwnerPubKey:   person2.OwnerPubKey,
+		})
+
+		for i := 0; i < 3; i++ {
+			randomPaymentRequest := fmt.Sprintf("test_user_workspace_update_budget_payment_request_%d%d", rand.Intn(amount), i)
+			// create invoice
+			invoice := db.NewInvoiceList{
+				WorkspaceUuid:  workspace.Uuid,
+				PaymentRequest: randomPaymentRequest,
+				Status:         false,
+				OwnerPubkey:    person2.OwnerPubKey,
+				Created:        &now,
+				Type:           "BUDGET",
+			}
+			db.TestDB.AddInvoice(invoice)
+		}
+
+		for i := 0; i < 3; i++ {
+			// create paymentHistory
+			paymentHistory := db.NewPaymentHistory{
+				WorkspaceUuid: workspace.Uuid,
+				Amount:        uint(amount),
+				PaymentStatus: db.PaymentComplete,
+				PaymentType:   db.Deposit,
+				SenderPubKey:  person.OwnerPubKey,
+				Created:       &now,
+			}
+			db.TestDB.AddPaymentHistory(paymentHistory)
+		}
+
+		mockGetLightningInvoice := func(payment_request string) (db.InvoiceResult, db.InvoiceError) {
+			return db.InvoiceResult{
+				Success: true,
+				Response: db.InvoiceCheckResponse{
+					Settled:         true,
+					Amount:          strconv.Itoa(amount),
+					Payment_request: "",
+				},
+			}, db.InvoiceError{}
+		}
+
+		mockGetAllUserWorkspaces := func(pubKeyFromAuth string) []db.Workspace {
+			return []db.Workspace{workspace}
+		}
+
+		ctx := context.Background()
+		oHandler := NewWorkspaceHandler(db.TestDB)
+
+		oHandler.getLightningInvoice = mockGetLightningInvoice
+		oHandler.getAllUserWorkspaces = mockGetAllUserWorkspaces
+
+		rr := httptest.NewRecorder()
+		handler := http.HandlerFunc(oHandler.PollUserWorkspacesBudget)
+
+		rctx := chi.NewRouteContext()
+		rctx.URLParams.Add("uuid", workspace.Uuid)
+
+		authorizedCtx := context.WithValue(ctx, auth.ContextKey, person2.OwnerPubKey)
+		req, err := http.NewRequestWithContext(context.WithValue(authorizedCtx, chi.RouteCtxKey, rctx), http.MethodGet, "/poll/user/invoices", nil)
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		handler.ServeHTTP(rr, req)
+		assert.Equal(t, http.StatusOK, rr.Code)
+
+		workspaceBudget := db.TestDB.GetWorkspaceBudget(workspace.Uuid)
+		assert.Equal(t, workspaceBudget.TotalBudget, uint(amount*3))
 	})
 }
