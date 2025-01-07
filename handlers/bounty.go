@@ -1550,6 +1550,9 @@ func (h *bountyHandler) GenerateBountyCardResponse(bounties []db.NewBounty) []db
 		if phase.FeatureUuid != "" {
 			feature = h.db.GetFeatureByUuid(phase.FeatureUuid)
 		}
+
+		status := calculateBountyStatus(bounty)
+
 		b := db.BountyCard{
 			BountyID:    bounty.ID,
 			Title:       bounty.Title,
@@ -1557,12 +1560,33 @@ func (h *bountyHandler) GenerateBountyCardResponse(bounties []db.NewBounty) []db
 			Features:    feature,
 			Phase:       phase,
 			Workspace:   workspace,
+			Status:      status,
 		}
 
 		bountyCardResponse = append(bountyCardResponse, b)
 	}
 
 	return bountyCardResponse
+}
+
+func calculateBountyStatus(bounty db.NewBounty) db.BountyStatus {
+	if bounty.Paid {
+		return db.StatusPaid
+	}
+	if bounty.Completed || bounty.PaymentPending {
+		return db.StatusComplete
+	}
+	if bounty.Assignee == "" {
+		return db.StatusTodo
+	}
+	if bounty.Assignee != "" && bounty.ProofOfWorkCount == 0 {
+		return db.StatusInProgress
+	}
+	if bounty.Assignee != "" && bounty.ProofOfWorkCount > 0 {
+		return db.StatusInReview
+	}
+
+	return db.StatusTodo
 }
 
 func (h *bountyHandler) AddProofOfWork(w http.ResponseWriter, r *http.Request) {
