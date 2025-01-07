@@ -937,6 +937,16 @@ type FilterStattuCount struct {
 	Failed    int64 `json:"failed"`
 }
 
+type BountyStatus string
+
+const (
+	StatusTodo       BountyStatus = "TODO"
+	StatusInProgress BountyStatus = "IN_PROGRESS"
+	StatusInReview   BountyStatus = "IN_REVIEW"
+	StatusComplete   BountyStatus = "COMPLETED"
+	StatusPaid       BountyStatus = "PAID"
+)
+
 type BountyCard struct {
 	BountyID    uint              `json:"id"`
 	Title       string            `json:"title"`
@@ -944,6 +954,7 @@ type BountyCard struct {
 	Features    WorkspaceFeatures `json:"features"`
 	Phase       FeaturePhase      `json:"phase"`
 	Workspace   Workspace         `json:"workspace"`
+	Status      BountyStatus      `json:"status"`
 }
 
 type WfRequestStatus string
