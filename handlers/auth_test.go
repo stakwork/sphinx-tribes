@@ -600,7 +600,7 @@ func TestGetIsAdmin(t *testing.T) {
 		ctx := context.WithValue(req.Context(), auth.ContextKey, "non_admin_pubkey")
 		req = req.WithContext(ctx)
 
-		config.AdminDevFreePass = "freepass"
+		config.AdminDevFreePass = "FREE_PASS"
 		handler.ServeHTTP(rr, req)
 
 		assert.Equal(t, http.StatusOK, rr.Code)
