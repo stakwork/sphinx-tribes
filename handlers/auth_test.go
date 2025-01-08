@@ -600,10 +600,18 @@ func TestGetIsAdmin(t *testing.T) {
 		ctx := context.WithValue(req.Context(), auth.ContextKey, "non_admin_pubkey")
 		req = req.WithContext(ctx)
 
+		originalFreePass := config.AdminDevFreePass
 		config.AdminDevFreePass = "FREE_PASS"
+		defer func() {
+			config.AdminDevFreePass = originalFreePass
+		}()
+
 		handler.ServeHTTP(rr, req)
 
 		assert.Equal(t, http.StatusOK, rr.Code)
+		var responseBody string
+		json.NewDecoder(rr.Body).Decode(&responseBody)
+		assert.Equal(t, "Log in successful", responseBody)
 	})
 
 	t.Run("Empty Public Key in Context", func(t *testing.T) {
