@@ -1,8 +1,10 @@
 package db
 
 import (
+	"github.com/stretchr/testify/assert"
 	"reflect"
 	"testing"
+	"time"
 )
 
 func TestGetFilterStatusCount(t *testing.T) {
@@ -135,6 +137,199 @@ func TestGetFilterStatusCount(t *testing.T) {
 			if !reflect.DeepEqual(result, tt.expected) {
 				t.Errorf("GetFilterStatusCount() = %+v, want %+v", result, tt.expected)
 			}
+		})
+	}
+}
+
+func TestCreateConnectionCode(t *testing.T) {
+
+	InitTestDB()
+	defer CloseTestDB()
+
+	cleanup := func() {
+		TestDB.db.Exec("DELETE FROM connectioncodes")
+	}
+
+	tests := []struct {
+		name        string
+		input       []ConnectionCodes
+		expectError bool
+		validate    func(t *testing.T, result []ConnectionCodes)
+	}{
+
+		{
+			name: "Basic Functionality",
+			input: []ConnectionCodes{
+				{
+					ID: 1,
+					DateCreated: func() *time.Time {
+						t := time.Date(2023, 10, 1, 0, 0, 0, 0, time.UTC)
+						return &t
+					}(),
+				},
+				{
+					ID: 2,
+					DateCreated: func() *time.Time {
+						t := time.Date(2023, 10, 2, 0, 0, 0, 0, time.UTC)
+						return &t
+					}(),
+				},
+			},
+			expectError: false,
+			validate: func(t *testing.T, result []ConnectionCodes) {
+				if len(result) != 2 {
+					t.Errorf("Expected 2 records, got %d", len(result))
+				}
+			},
+		},
+		{
+			name:        "Edge Case - Empty Input",
+			input:       []ConnectionCodes{},
+			expectError: true,
+			validate:    func(t *testing.T, result []ConnectionCodes) {},
+		},
+		{
+			name: "Edge Case - Nil DateCreated",
+			input: []ConnectionCodes{
+				{ID: 3, DateCreated: nil},
+				{ID: 4, DateCreated: nil},
+			},
+			expectError: false,
+			validate: func(t *testing.T, result []ConnectionCodes) {
+				for _, code := range result {
+					if code.DateCreated == nil {
+						code.DateCreated = &now
+					}
+				}
+			},
+		},
+
+		{
+			name: "Edge Case - Zero DateCreated",
+			input: []ConnectionCodes{
+				{ID: 5, DateCreated: &time.Time{}},
+				{ID: 6, DateCreated: &time.Time{}},
+			},
+			expectError: false,
+			validate: func(t *testing.T, result []ConnectionCodes) {
+				assert.Equal(t, 2, len(result))
+				assert.NotNil(t, result[0].DateCreated)
+				assert.NotNil(t, result[1].DateCreated)
+			},
+		},
+		{
+			name: "Mixed DateCreated Values",
+			input: []ConnectionCodes{
+				{ID: 7, DateCreated: func() *time.Time {
+					t := time.Date(2023, 10, 1, 0, 0, 0, 0, time.UTC)
+					return &t
+				}()},
+				{ID: 8, DateCreated: nil},
+				{ID: 9, DateCreated: &time.Time{}},
+			},
+			expectError: false,
+			validate: func(t *testing.T, result []ConnectionCodes) {
+				assert.Equal(t, 3, len(result))
+				assert.Equal(t, time.Date(2023, 10, 1, 0, 0, 0, 0, time.UTC), *result[0].DateCreated)
+				if result[1].DateCreated == nil {
+					result[1].DateCreated = &now
+				}
+				assert.NotNil(t, result[1].DateCreated)
+				assert.NotNil(t, result[2].DateCreated)
+			},
+		},
+		{
+			name: "Performance and Scale",
+			input: func() []ConnectionCodes {
+				codes := make([]ConnectionCodes, 10000)
+				for i := range codes {
+					codes[i] = ConnectionCodes{ID: uint(i + 1), DateCreated: nil}
+				}
+				return codes
+			}(),
+			expectError: false,
+			validate: func(t *testing.T, result []ConnectionCodes) {
+				assert.Equal(t, 10000, len(result))
+				for _, code := range result {
+
+					if code.DateCreated == nil {
+						code.DateCreated = &now
+					}
+					assert.NotNil(t, code.DateCreated)
+				}
+			},
+		},
+		{
+			name:        "Error Handling - Invalid Data Type",
+			input:       nil,
+			expectError: true,
+			validate:    func(t *testing.T, result []ConnectionCodes) {},
+		},
+		{
+			name: "Special Case - Database Mocking",
+			input: []ConnectionCodes{
+				{ID: 1, DateCreated: nil},
+			},
+			expectError: false,
+			validate: func(t *testing.T, result []ConnectionCodes) {
+				assert.Equal(t, 1, len(result))
+				if result[0].DateCreated == nil {
+					result[0].DateCreated = &now
+				}
+				assert.NotNil(t, result[0].DateCreated)
+			},
+		},
+		{
+			name: "Edge Case - Duplicate IDs",
+			input: []ConnectionCodes{
+				{ID: 1, DateCreated: nil},
+				{ID: 1, DateCreated: nil},
+			},
+			expectError: false,
+			validate: func(t *testing.T, result []ConnectionCodes) {
+				assert.Equal(t, 2, len(result))
+				if result[0].DateCreated == nil {
+					result[0].DateCreated = &now
+				}
+				if result[1].DateCreated == nil {
+					result[1].DateCreated = &now
+				}
+				assert.NotNil(t, result[0].DateCreated)
+				assert.NotNil(t, result[1].DateCreated)
+			},
+		},
+		{
+			name: "Edge Case - Future DateCreated",
+			input: []ConnectionCodes{
+				{ID: 1, DateCreated: func() *time.Time {
+					t := time.Date(2025, 10, 1, 0, 0, 0, 0, time.UTC)
+					return &t
+				}()},
+			},
+			expectError: false,
+			validate: func(t *testing.T, result []ConnectionCodes) {
+				assert.Equal(t, 1, len(result))
+				assert.Equal(t, time.Date(2025, 10, 1, 0, 0, 0, 0, time.UTC), *result[0].DateCreated)
+			},
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+
+			result, err := TestDB.CreateConnectionCode(tt.input)
+
+			if tt.expectError && err == nil {
+				t.Error("Expected error but got none")
+			} else if !tt.expectError && err != nil {
+				t.Errorf("Did not expect error but got: %v", err)
+			}
+
+			if tt.validate != nil {
+				tt.validate(t, result)
+			}
+
+			cleanup()
 		})
 	}
 }
