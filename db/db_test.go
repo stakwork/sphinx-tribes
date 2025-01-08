@@ -146,6 +146,10 @@ func TestCreateConnectionCode(t *testing.T) {
 	InitTestDB()
 	defer CloseTestDB()
 
+	cleanup := func() {
+		TestDB.db.Exec("DELETE FROM connectioncodes")
+	}
+
 	tests := []struct {
 		name        string
 		input       []ConnectionCodes
@@ -324,6 +328,8 @@ func TestCreateConnectionCode(t *testing.T) {
 			if tt.validate != nil {
 				tt.validate(t, result)
 			}
+
+			cleanup()
 		})
 	}
 }
