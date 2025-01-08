@@ -1,10 +1,12 @@
 package db
 
 import (
-	"github.com/stretchr/testify/assert"
 	"reflect"
 	"testing"
 	"time"
+
+	"github.com/stretchr/testify/assert"
+	"gorm.io/gorm"
 )
 
 func TestGetFilterStatusCount(t *testing.T) {
@@ -330,6 +332,128 @@ func TestCreateConnectionCode(t *testing.T) {
 			}
 
 			cleanup()
+		})
+	}
+}
+
+func TestIncrementProofCount(t *testing.T) {
+	InitTestDB()
+	defer CloseTestDB()
+
+	tests := []struct {
+		name          string
+		bountyID      uint
+		initialBounty *NewBounty
+		expectedCount int
+		expectedError error
+	}{
+		{
+			name:     "Valid Bounty ID with Existing Record",
+			bountyID: 1,
+			initialBounty: &NewBounty{
+				ID:               1,
+				ProofOfWorkCount: 5,
+			},
+			expectedCount: 6,
+			expectedError: nil,
+		},
+		{
+			name:          "Minimum Bounty ID",
+			bountyID:      0,
+			initialBounty: nil,
+			expectedCount: 0,
+			expectedError: gorm.ErrRecordNotFound,
+		},
+		{
+			name:          "Maximum Bounty ID",
+			bountyID:      uint(2147483647),
+			initialBounty: nil,
+			expectedCount: 0,
+			expectedError: gorm.ErrRecordNotFound,
+		},
+		{
+			name:          "Non-Existent Bounty ID",
+			bountyID:      9999,
+			initialBounty: nil,
+			expectedCount: 0,
+			expectedError: gorm.ErrRecordNotFound,
+		},
+		{
+			name:     "Bounty with Maximum Proof of Work Count",
+			bountyID: 2,
+			initialBounty: &NewBounty{
+				ID:               2,
+				ProofOfWorkCount: 21,
+			},
+			expectedCount: 22,
+			expectedError: nil,
+		},
+		{
+			name:     "Bounty with Null Updated Timestamp",
+			bountyID: 3,
+			initialBounty: &NewBounty{
+				ID:               3,
+				ProofOfWorkCount: 10,
+				Updated:          nil,
+			},
+			expectedCount: 11,
+			expectedError: nil,
+		},
+		{
+			name:     "Bounty with Negative Proof of Work Count",
+			bountyID: 4,
+			initialBounty: &NewBounty{
+				ID:               4,
+				ProofOfWorkCount: -5,
+			},
+			expectedCount: -4,
+			expectedError: nil,
+		},
+		{
+			name:     "Bounty with Maximum Updated Timestamp",
+			bountyID: 5,
+			initialBounty: &NewBounty{
+				ID:               5,
+				ProofOfWorkCount: 15,
+				Updated:          &time.Time{},
+			},
+			expectedCount: 16,
+			expectedError: nil,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+
+			TestDB.DeleteAllBounties()
+
+			if tt.initialBounty != nil {
+				if err := TestDB.db.Create(tt.initialBounty).Error; err != nil {
+					t.Fatalf("Failed to create test bounty: %v", err)
+				}
+			}
+
+			err := TestDB.IncrementProofCount(tt.bountyID)
+
+			if tt.expectedError != nil {
+				assert.ErrorIs(t, err, tt.expectedError)
+				return
+			}
+
+			assert.NoError(t, err)
+
+			var bounty NewBounty
+			if err := TestDB.db.Where("id = ?", tt.bountyID).First(&bounty).Error; err != nil {
+				t.Fatalf("Failed to retrieve bounty: %v", err)
+			}
+
+			assert.Equal(t, tt.expectedCount, bounty.ProofOfWorkCount)
+
+			if bounty.Updated != nil {
+				assert.WithinDuration(t, time.Now(), *bounty.Updated, time.Second)
+			} else {
+				t.Error("Updated timestamp is nil")
+			}
 		})
 	}
 }
