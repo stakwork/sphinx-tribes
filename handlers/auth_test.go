@@ -5,6 +5,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"math"
 	"net/http"
 	"net/http/httptest"
 	"os"
@@ -1218,4 +1219,99 @@ func TestGetLnurlAuth(t *testing.T) {
 		assert.Empty(t, response["k1"])
 		assert.Empty(t, response["encode"])
 	})
+}
+
+func TestMakeConnectionCodeRequest(t *testing.T) {
+
+	tests := []struct {
+		name               string
+		inviter_pubkey     string
+		inviter_route_hint string
+		msats_amount       uint64
+		mockResponse       *http.Response
+		mockError          error
+		expected           string
+	}{
+		{
+			name:               "Valid Input with All Parameters Provided",
+			inviter_pubkey:     "valid_pubkey",
+			inviter_route_hint: "valid_route_hint",
+			msats_amount:       1000,
+			mockError:          nil,
+			expected:           "invite_code",
+		},
+		{
+			name:               "Zero msats_amount",
+			inviter_pubkey:     "valid_pubkey",
+			inviter_route_hint: "valid_route_hint",
+			msats_amount:       0,
+			mockError:          nil,
+			expected:           "invite_code",
+		},
+		{
+			name:               "Maximum msats_amount",
+			inviter_pubkey:     "valid_pubkey",
+			inviter_route_hint: "valid_route_hint",
+			msats_amount:       math.MaxUint64,
+			mockError:          nil,
+			expected:           "invite_code",
+		},
+		{
+			name:               "Invalid inviter_pubkey Format",
+			inviter_pubkey:     "invalid_pubkey",
+			inviter_route_hint: "valid_route_hint",
+			msats_amount:       1000,
+			mockError:          nil,
+			expected:           "",
+		},
+		{
+			name:               "Invalid inviter_route_hint Format",
+			inviter_pubkey:     "valid_pubkey",
+			inviter_route_hint: "invalid_route_hint",
+			msats_amount:       1000,
+			mockError:          nil,
+			expected:           "",
+		},
+		{
+			name:               "HTTP Request Failure",
+			inviter_pubkey:     "valid_pubkey",
+			inviter_route_hint: "valid_route_hint",
+			msats_amount:       1000,
+			mockError:          fmt.Errorf("network error"),
+			expected:           "",
+		},
+		{
+			name:               "Invalid JSON Response",
+			inviter_pubkey:     "valid_pubkey",
+			inviter_route_hint: "valid_route_hint",
+			msats_amount:       1000,
+			mockError:          nil,
+			expected:           "",
+		},
+		{
+			name:               "Empty Response Body",
+			inviter_pubkey:     "valid_pubkey",
+			inviter_route_hint: "valid_route_hint",
+			msats_amount:       1000,
+			mockError:          nil,
+			expected:           "",
+		},
+		{
+			name:               "Null or Empty Inputs",
+			inviter_pubkey:     "",
+			inviter_route_hint: "",
+			msats_amount:       1000,
+			mockError:          nil,
+			expected:           "invite_code",
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+
+			result := MakeConnectionCodeRequest(tt.inviter_pubkey, tt.inviter_route_hint, tt.msats_amount)
+
+			assert.Equal(t, tt.expected, result)
+		})
+	}
 }
