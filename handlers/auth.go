@@ -21,6 +21,8 @@ type authHandler struct {
 	makeConnectionCodeRequest func(inviter_pubkey string, inviter_route_hint string, msats_amount uint64) string
 	decodeJwt                 func(token string) (jwt.MapClaims, error)
 	encodeJwt                 func(pubkey string) (string, error)
+	adminCheck                func(pubkey string) bool
+	isFreePass                func() bool
 }
 
 func NewAuthHandler(db db.Database) *authHandler {
@@ -29,6 +31,8 @@ func NewAuthHandler(db db.Database) *authHandler {
 		makeConnectionCodeRequest: MakeConnectionCodeRequest,
 		decodeJwt:                 auth.DecodeJwt,
 		encodeJwt:                 auth.EncodeJwt,
+		adminCheck:                auth.AdminCheck,
+		isFreePass:                auth.IsFreePass,
 	}
 }
 
@@ -46,9 +50,9 @@ func GetAdminPubkeys(w http.ResponseWriter, r *http.Request) {
 func (ah *authHandler) GetIsAdmin(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 	pubKeyFromAuth, _ := ctx.Value(auth.ContextKey).(string)
-	isAdmin := auth.AdminCheck(pubKeyFromAuth)
+	isAdmin := ah.adminCheck(pubKeyFromAuth)
 
-	if !auth.IsFreePass() && !isAdmin {
+	if !ah.isFreePass() && !isAdmin {
 		w.WriteHeader(http.StatusUnauthorized)
 		json.NewEncoder(w).Encode("Not a super admin: handler")
 		return
