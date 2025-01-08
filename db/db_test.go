@@ -203,8 +203,8 @@ func TestCreateConnectionCode(t *testing.T) {
 		{
 			name: "Edge Case - Zero DateCreated",
 			input: []ConnectionCodes{
-				{ID: 1, DateCreated: &time.Time{}},
-				{ID: 2, DateCreated: &time.Time{}},
+				{ID: 5, DateCreated: &time.Time{}},
+				{ID: 6, DateCreated: &time.Time{}},
 			},
 			expectError: false,
 			validate: func(t *testing.T, result []ConnectionCodes) {
@@ -216,12 +216,12 @@ func TestCreateConnectionCode(t *testing.T) {
 		{
 			name: "Mixed DateCreated Values",
 			input: []ConnectionCodes{
-				{ID: 1, DateCreated: func() *time.Time {
+				{ID: 7, DateCreated: func() *time.Time {
 					t := time.Date(2023, 10, 1, 0, 0, 0, 0, time.UTC)
 					return &t
 				}()},
-				{ID: 2, DateCreated: nil},
-				{ID: 3, DateCreated: &time.Time{}},
+				{ID: 8, DateCreated: nil},
+				{ID: 9, DateCreated: &time.Time{}},
 			},
 			expectError: false,
 			validate: func(t *testing.T, result []ConnectionCodes) {
