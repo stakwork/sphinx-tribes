@@ -151,7 +151,6 @@ func TestCreateOrEditBounty(t *testing.T) {
 	}
 
 	failedBounty := db.NewBounty{
-		Type:          "coding",
 		Title:         "new bounty",
 		Description:   "failed bounty description",
 		WorkspaceUuid: "work-1",
