@@ -17,7 +17,7 @@ func TestGetFilterStatusCount(t *testing.T) {
 		expected FilterStattuCount
 	}{
 		{
-			name:  "Empty Database",
+			name:  "Empty Database ",
 			setup: []NewBounty{},
 			expected: FilterStattuCount{
 				Open: 0, Assigned: 0, Completed: 0,
