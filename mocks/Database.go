@@ -920,7 +920,6 @@ func (_c *Database_CreateBountyFromTicket_Call) RunAndReturn(run func(db.Tickets
 	return _c
 }
 
-
 // CreateBountyTiming provides a mock function with given fields: bountyID
 func (_m *Database) CreateBountyTiming(bountyID uint) (*db.BountyTiming, error) {
 	ret := _m.Called(bountyID)
@@ -4272,9 +4271,9 @@ func (_c *Database_GetChatMessagesForChatID_Call) RunAndReturn(run func(string) 
 	return _c
 }
 
-// GetChatsForWorkspace provides a mock function with given fields: workspaceID
-func (_m *Database) GetChatsForWorkspace(workspaceID string) ([]db.Chat, error) {
-	ret := _m.Called(workspaceID)
+// GetChatsForWorkspace provides a mock function with given fields: workspaceID, chatStatus
+func (_m *Database) GetChatsForWorkspace(workspaceID string, chatStatus string) ([]db.Chat, error) {
+	ret := _m.Called(workspaceID, chatStatus)
 
 	if len(ret) == 0 {
 		panic("no return value specified for GetChatsForWorkspace")
@@ -4282,19 +4281,19 @@ func (_m *Database) GetChatsForWorkspace(workspaceID string) ([]db.Chat, error) 
 
 	var r0 []db.Chat
 	var r1 error
-	if rf, ok := ret.Get(0).(func(string) ([]db.Chat, error)); ok {
-		return rf(workspaceID)
+	if rf, ok := ret.Get(0).(func(string, string) ([]db.Chat, error)); ok {
+		return rf(workspaceID, chatStatus)
 	}
-	if rf, ok := ret.Get(0).(func(string) []db.Chat); ok {
-		r0 = rf(workspaceID)
+	if rf, ok := ret.Get(0).(func(string, string) []db.Chat); ok {
+		r0 = rf(workspaceID, chatStatus)
 	} else {
 		if ret.Get(0) != nil {
 			r0 = ret.Get(0).([]db.Chat)
 		}
 	}
 
-	if rf, ok := ret.Get(1).(func(string) error); ok {
-		r1 = rf(workspaceID)
+	if rf, ok := ret.Get(1).(func(string, string) error); ok {
+		r1 = rf(workspaceID, chatStatus)
 	} else {
 		r1 = ret.Error(1)
 	}
@@ -4309,13 +4308,14 @@ type Database_GetChatsForWorkspace_Call struct {
 
 // GetChatsForWorkspace is a helper method to define mock.On call
 //   - workspaceID string
-func (_e *Database_Expecter) GetChatsForWorkspace(workspaceID interface{}) *Database_GetChatsForWorkspace_Call {
-	return &Database_GetChatsForWorkspace_Call{Call: _e.mock.On("GetChatsForWorkspace", workspaceID)}
+//   - chatStatus string
+func (_e *Database_Expecter) GetChatsForWorkspace(workspaceID interface{}, chatStatus interface{}) *Database_GetChatsForWorkspace_Call {
+	return &Database_GetChatsForWorkspace_Call{Call: _e.mock.On("GetChatsForWorkspace", workspaceID, chatStatus)}
 }
 
-func (_c *Database_GetChatsForWorkspace_Call) Run(run func(workspaceID string)) *Database_GetChatsForWorkspace_Call {
+func (_c *Database_GetChatsForWorkspace_Call) Run(run func(workspaceID string, chatStatus string)) *Database_GetChatsForWorkspace_Call {
 	_c.Call.Run(func(args mock.Arguments) {
-		run(args[0].(string))
+		run(args[0].(string), args[1].(string))
 	})
 	return _c
 }
@@ -4325,7 +4325,7 @@ func (_c *Database_GetChatsForWorkspace_Call) Return(_a0 []db.Chat, _a1 error) *
 	return _c
 }
 
-func (_c *Database_GetChatsForWorkspace_Call) RunAndReturn(run func(string) ([]db.Chat, error)) *Database_GetChatsForWorkspace_Call {
+func (_c *Database_GetChatsForWorkspace_Call) RunAndReturn(run func(string, string) ([]db.Chat, error)) *Database_GetChatsForWorkspace_Call {
 	_c.Call.Return(run)
 	return _c
 }
