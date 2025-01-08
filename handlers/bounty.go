@@ -202,6 +202,19 @@ func (h *bountyHandler) CreateOrEditBounty(w http.ResponseWriter, r *http.Reques
 	ctx := r.Context()
 	pubKeyFromAuth, _ := ctx.Value(auth.ContextKey).(string)
 
+	// return 401 if pubKeyFromAuth is empty
+	if pubKeyFromAuth == "" {
+		w.WriteHeader(http.StatusUnauthorized)
+		return
+	}
+
+	// check if  use exists
+	user := h.db.GetPersonByPubkey(pubKeyFromAuth)
+	if user.OwnerPubKey == "" {
+		w.WriteHeader(http.StatusUnauthorized)
+		return
+	}
+
 	bounty := db.NewBounty{}
 	body, err := io.ReadAll(r.Body)
 	r.Body.Close()
