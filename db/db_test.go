@@ -457,3 +457,82 @@ func TestIncrementProofCount(t *testing.T) {
 		})
 	}
 }
+
+func parseDate(dateStr string) *time.Time {
+	date, err := time.Parse("2006-01-02", dateStr)
+	if err != nil {
+		panic("Error parsing date: " + err.Error())
+	}
+	return &date
+}
+
+func TestGetConnectionCode(t *testing.T) {
+	InitTestDB()
+
+	defer CloseTestDB()
+
+	cleanup := func() {
+		TestDB.db.Exec("DELETE FROM connectioncodes")
+	}
+
+	tests := []struct {
+		name             string
+		connectionCodes  []ConnectionCodes
+		expected         ConnectionCodesShort
+		expectUpdateCall bool
+	}{
+		{
+			name: "Basic Functionality",
+			connectionCodes: []ConnectionCodes{
+				{ConnectionString: "code1", DateCreated: parseDate("2006-01-02"), IsUsed: false},
+				{ConnectionString: "code2", DateCreated: parseDate("2023-10-02"), IsUsed: false},
+			},
+			expected:         ConnectionCodesShort{ConnectionString: "code2", DateCreated: parseDate("2023-10-02")},
+			expectUpdateCall: true,
+		},
+		{
+			name: "No Unused Connection Codes",
+			connectionCodes: []ConnectionCodes{
+				{ConnectionString: "code1", DateCreated: parseDate("2023-10-01"), IsUsed: true},
+			},
+			expected:         ConnectionCodesShort{},
+			expectUpdateCall: false,
+		},
+		{
+			name: "Single Unused Connection Code",
+			connectionCodes: []ConnectionCodes{
+				{ConnectionString: "code1", DateCreated: parseDate("2023-10-01"), IsUsed: false},
+			},
+			expected:         ConnectionCodesShort{ConnectionString: "code1", DateCreated: parseDate("2023-10-01")},
+			expectUpdateCall: true,
+		},
+		{
+			name: "Multiple Unused Connection Codes",
+			connectionCodes: []ConnectionCodes{
+				{ConnectionString: "code1", DateCreated: parseDate("2023-10-01"), IsUsed: false},
+				{ConnectionString: "code2", DateCreated: parseDate("2023-10-02"), IsUsed: false},
+			},
+			expected:         ConnectionCodesShort{ConnectionString: "code2", DateCreated: parseDate("2023-10-02")},
+			expectUpdateCall: true,
+		},
+		{
+			name:             "Edge Case: Empty Database",
+			connectionCodes:  []ConnectionCodes{},
+			expected:         ConnectionCodesShort{},
+			expectUpdateCall: false,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+
+			TestDB.CreateConnectionCode(tt.connectionCodes)
+
+			result := TestDB.GetConnectionCode()
+
+			assert.Equal(t, tt.expected.ConnectionString, result.ConnectionString)
+
+			cleanup()
+		})
+	}
+}
