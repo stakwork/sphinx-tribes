@@ -126,12 +126,15 @@ func TestCreateOrEditBounty(t *testing.T) {
 	teardownSuite := SetupSuite(t)
 	defer teardownSuite(t)
 
+	// create user
+	db.TestDB.CreateOrEditPerson(bountyOwner)
+
 	existingBounty := db.NewBounty{
 		Type:          "coding",
 		Title:         "existing bounty",
 		Description:   "existing bounty description",
 		WorkspaceUuid: "work-1",
-		OwnerID:       "first-user",
+		OwnerID:       bountyOwner.OwnerPubKey,
 		Price:         2000,
 	}
 
@@ -143,19 +146,19 @@ func TestCreateOrEditBounty(t *testing.T) {
 		Title:         "new bounty",
 		Description:   "new bounty description",
 		WorkspaceUuid: "work-1",
-		OwnerID:       "test-key",
+		OwnerID:       bountyOwner.OwnerPubKey,
 		Price:         1500,
 	}
 
 	failedBounty := db.NewBounty{
-		Type:          "coding",
 		Title:         "new bounty",
 		Description:   "failed bounty description",
 		WorkspaceUuid: "work-1",
+		OwnerID:       bountyOwner.OwnerPubKey,
 		Price:         1500,
 	}
 
-	ctx := context.WithValue(context.Background(), auth.ContextKey, "test-key")
+	ctx := context.WithValue(context.Background(), auth.ContextKey, bountyOwner.OwnerPubKey)
 	mockClient := mocks.NewHttpClient(t)
 	mockUserHasManageBountyRolesTrue := func(pubKeyFromAuth string, uuid string) bool {
 		return true
