@@ -262,6 +262,13 @@ func ReceiveLnAuthData(w http.ResponseWriter, r *http.Request) {
 func (ah *authHandler) RefreshToken(w http.ResponseWriter, r *http.Request) {
 	token := r.Header.Get("x-jwt")
 
+	if token == "" {
+		logger.Log.Error("[auth] Missing JWT token")
+		w.WriteHeader(http.StatusUnauthorized)
+		json.NewEncoder(w).Encode("Missing JWT token")
+		return
+	}
+
 	responseData := make(map[string]interface{})
 	claims, err := ah.decodeJwt(token)
 
@@ -272,7 +279,13 @@ func (ah *authHandler) RefreshToken(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	pubkey := fmt.Sprint(claims["pubkey"])
+	pubkey, ok := claims["pubkey"].(string)
+	if !ok || pubkey == "" {
+		logger.Log.Error("[auth] Missing pubkey claim in JWT")
+		w.WriteHeader(http.StatusUnauthorized)
+		json.NewEncoder(w).Encode("Missing pubkey claim in JWT")
+		return
+	}
 
 	userCount := ah.db.GetLnUser(pubkey)
 
