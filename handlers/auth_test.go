@@ -779,4 +779,76 @@ func TestRefreshToken(t *testing.T) {
 		assert.Equal(t, mockEncodedToken, responseData["jwt"])
 		assert.EqualValues(t, person, fetchedPerson)
 	})
+
+	t.Run("Empty JWT Token", func(t *testing.T) {
+		req, err := http.NewRequest("GET", "/refresh_jwt", nil)
+		assert.NoError(t, err)
+
+		rr := httptest.NewRecorder()
+		handler := http.HandlerFunc(aHandler.RefreshToken)
+		handler.ServeHTTP(rr, req)
+
+		assert.Equal(t, http.StatusUnauthorized, rr.Code)
+	})
+
+	t.Run("JWT Token with Missing pubkey Claim", func(t *testing.T) {
+		mockToken := "mock_token"
+		aHandler.decodeJwt = func(token string) (jwt.MapClaims, error) {
+			return jwt.MapClaims{}, nil
+		}
+
+		req, err := http.NewRequest("GET", "/refresh_jwt", nil)
+		assert.NoError(t, err)
+		req.Header.Set("x-jwt", mockToken)
+
+		rr := httptest.NewRecorder()
+		handler := http.HandlerFunc(aHandler.RefreshToken)
+		handler.ServeHTTP(rr, req)
+
+		assert.Equal(t, http.StatusUnauthorized, rr.Code)
+	})
+
+	t.Run("Invalid JWT Token", func(t *testing.T) {
+		mockToken := "invalid_token"
+		aHandler.decodeJwt = func(token string) (jwt.MapClaims, error) {
+			return nil, fmt.Errorf("invalid token")
+		}
+
+		req, err := http.NewRequest("GET", "/refresh_jwt", nil)
+		assert.NoError(t, err)
+		req.Header.Set("x-jwt", mockToken)
+
+		rr := httptest.NewRecorder()
+		handler := http.HandlerFunc(aHandler.RefreshToken)
+		handler.ServeHTTP(rr, req)
+
+		assert.Equal(t, http.StatusUnauthorized, rr.Code)
+	})
+
+	t.Run("Error During JWT Encoding", func(t *testing.T) {
+		mockToken := "mock_token"
+		person := db.Person{
+			Uuid:        uuid.New().String(),
+			OwnerPubKey: "your_pubkey",
+		}
+		db.TestDB.CreateOrEditPerson(person)
+
+		aHandler.decodeJwt = func(token string) (jwt.MapClaims, error) {
+			return jwt.MapClaims{"pubkey": person.OwnerPubKey}, nil
+		}
+		aHandler.encodeJwt = func(pubkey string) (string, error) {
+			return "", fmt.Errorf("encoding error")
+		}
+
+		req, err := http.NewRequest("GET", "/refresh_jwt", nil)
+		assert.NoError(t, err)
+		req.Header.Set("x-jwt", mockToken)
+
+		rr := httptest.NewRecorder()
+		handler := http.HandlerFunc(aHandler.RefreshToken)
+		handler.ServeHTTP(rr, req)
+
+		assert.Equal(t, http.StatusNotAcceptable, rr.Code)
+	})
+
 }
