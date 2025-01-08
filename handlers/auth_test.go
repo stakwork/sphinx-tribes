@@ -545,6 +545,178 @@ func TestGetIsAdmin(t *testing.T) {
 		json.NewDecoder(rr.Body).Decode(&responseBody)
 		assert.Equal(t, "Log in successful", responseBody)
 	})
+
+	t.Run("Admin User with Free Pass Disabled", func(t *testing.T) {
+		req, err := http.NewRequest("GET", "/admin/auth", nil)
+		assert.NoError(t, err)
+		rr := httptest.NewRecorder()
+		handler := http.HandlerFunc(aHandler.GetIsAdmin)
+
+		ctx := context.WithValue(req.Context(), auth.ContextKey, config.SuperAdmins[0])
+		req = req.WithContext(ctx)
+
+		config.AdminDevFreePass = ""
+		handler.ServeHTTP(rr, req)
+
+		assert.Equal(t, http.StatusOK, rr.Code)
+	})
+
+	t.Run("Non-Admin User with Free Pass Disabled", func(t *testing.T) {
+		req, err := http.NewRequest("GET", "/admin/auth", nil)
+		assert.NoError(t, err)
+		rr := httptest.NewRecorder()
+		handler := http.HandlerFunc(aHandler.GetIsAdmin)
+
+		ctx := context.WithValue(req.Context(), auth.ContextKey, "non_admin_pubkey")
+		req = req.WithContext(ctx)
+
+		config.AdminDevFreePass = ""
+		handler.ServeHTTP(rr, req)
+
+		assert.Equal(t, http.StatusUnauthorized, rr.Code)
+	})
+
+	t.Run("Admin User with Free Pass Enabled", func(t *testing.T) {
+		req, err := http.NewRequest("GET", "/admin/auth", nil)
+		assert.NoError(t, err)
+		rr := httptest.NewRecorder()
+		handler := http.HandlerFunc(aHandler.GetIsAdmin)
+
+		ctx := context.WithValue(req.Context(), auth.ContextKey, config.SuperAdmins[0])
+		req = req.WithContext(ctx)
+
+		config.AdminDevFreePass = "freepass"
+		handler.ServeHTTP(rr, req)
+
+		assert.Equal(t, http.StatusOK, rr.Code)
+	})
+
+	t.Run("Non-Admin User with Free Pass Enabled", func(t *testing.T) {
+
+		originalAdmins := config.SuperAdmins
+		config.SuperAdmins = []string{config.AdminDevFreePass}
+		defer func() {
+			config.SuperAdmins = originalAdmins
+		}()
+
+		req, err := http.NewRequest("GET", "/admin/auth", nil)
+		if err != nil {
+			t.Fatal(err)
+		}
+		rr := httptest.NewRecorder()
+		handler := http.HandlerFunc(aHandler.GetIsAdmin)
+
+		ctx := context.WithValue(req.Context(), auth.ContextKey, "any_pubkey")
+		req = req.WithContext(ctx)
+
+		handler.ServeHTTP(rr, req)
+
+		assert.Equal(t, http.StatusOK, rr.Code)
+		var responseBody string
+		json.NewDecoder(rr.Body).Decode(&responseBody)
+		assert.Equal(t, "Log in successful", responseBody)
+	})
+
+	t.Run("Empty Public Key in Context", func(t *testing.T) {
+		req, err := http.NewRequest("GET", "/admin/auth", nil)
+		assert.NoError(t, err)
+		rr := httptest.NewRecorder()
+		handler := http.HandlerFunc(aHandler.GetIsAdmin)
+
+		ctx := context.WithValue(req.Context(), auth.ContextKey, "")
+		req = req.WithContext(ctx)
+
+		handler.ServeHTTP(rr, req)
+
+		assert.Equal(t, http.StatusUnauthorized, rr.Code)
+	})
+
+	t.Run("Nil Context", func(t *testing.T) {
+		req, err := http.NewRequest("GET", "/admin/auth", nil)
+		assert.NoError(t, err)
+		rr := httptest.NewRecorder()
+		handler := http.HandlerFunc(aHandler.GetIsAdmin)
+
+		handler.ServeHTTP(rr, req)
+
+		assert.Equal(t, http.StatusUnauthorized, rr.Code)
+	})
+
+	t.Run("Invalid Data Type for Public Key", func(t *testing.T) {
+		req, err := http.NewRequest("GET", "/admin/auth", nil)
+		assert.NoError(t, err)
+		rr := httptest.NewRecorder()
+		handler := http.HandlerFunc(aHandler.GetIsAdmin)
+
+		ctx := context.WithValue(req.Context(), auth.ContextKey, 12345)
+		req = req.WithContext(ctx)
+
+		handler.ServeHTTP(rr, req)
+
+		assert.Equal(t, http.StatusUnauthorized, rr.Code)
+	})
+
+	t.Run("Missing Context Key", func(t *testing.T) {
+		req, err := http.NewRequest("GET", "/admin/auth", nil)
+		assert.NoError(t, err)
+		rr := httptest.NewRecorder()
+		handler := http.HandlerFunc(aHandler.GetIsAdmin)
+
+		handler.ServeHTTP(rr, req)
+
+		assert.Equal(t, http.StatusUnauthorized, rr.Code)
+	})
+
+	t.Run("Large Number of Admins in Configuration", func(t *testing.T) {
+		originalAdmins := config.SuperAdmins
+		config.SuperAdmins = make([]string, 1000)
+		for i := 0; i < 1000; i++ {
+			config.SuperAdmins[i] = fmt.Sprintf("admin%d", i)
+		}
+		defer func() { config.SuperAdmins = originalAdmins }()
+
+		req, err := http.NewRequest("GET", "/admin/auth", nil)
+		assert.NoError(t, err)
+		rr := httptest.NewRecorder()
+		handler := http.HandlerFunc(aHandler.GetIsAdmin)
+
+		ctx := context.WithValue(req.Context(), auth.ContextKey, "admin500")
+		req = req.WithContext(ctx)
+
+		handler.ServeHTTP(rr, req)
+
+		assert.Equal(t, http.StatusOK, rr.Code)
+	})
+
+	t.Run("Admin User with Invalid Free Pass State", func(t *testing.T) {
+		req, err := http.NewRequest("GET", "/admin/auth", nil)
+		assert.NoError(t, err)
+		rr := httptest.NewRecorder()
+		handler := http.HandlerFunc(aHandler.GetIsAdmin)
+
+		ctx := context.WithValue(req.Context(), auth.ContextKey, config.SuperAdmins[0])
+		req = req.WithContext(ctx)
+
+		config.AdminDevFreePass = "invalid"
+		handler.ServeHTTP(rr, req)
+
+		assert.Equal(t, http.StatusOK, rr.Code)
+	})
+
+	t.Run("Non-Admin User with Invalid Free Pass State", func(t *testing.T) {
+		req, err := http.NewRequest("GET", "/admin/auth", nil)
+		assert.NoError(t, err)
+		rr := httptest.NewRecorder()
+		handler := http.HandlerFunc(aHandler.GetIsAdmin)
+
+		ctx := context.WithValue(req.Context(), auth.ContextKey, "non_admin_pubkey")
+		req = req.WithContext(ctx)
+
+		config.AdminDevFreePass = "invalid"
+		handler.ServeHTTP(rr, req)
+
+		assert.Equal(t, http.StatusUnauthorized, rr.Code)
+	})
 }
 
 func TestRefreshToken(t *testing.T) {
