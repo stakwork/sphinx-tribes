@@ -9,6 +9,8 @@ import (
 	"gorm.io/gorm"
 )
 
+const maxDescriptionLength = 1000
+
 func (db database) AddFeatureFlag(flag *FeatureFlag) (FeatureFlag, error) {
 	if flag.UUID == uuid.Nil {
 		return FeatureFlag{}, errors.New("feature flag UUID is required")
@@ -28,6 +30,14 @@ func (db database) AddFeatureFlag(flag *FeatureFlag) (FeatureFlag, error) {
 func (db database) UpdateFeatureFlag(flag *FeatureFlag) (FeatureFlag, error) {
 	if flag.UUID == uuid.Nil {
 		return FeatureFlag{}, errors.New("feature flag UUID is required")
+	}
+
+	if flag.Name == "" {
+		return FeatureFlag{}, errors.New("feature flag name cannot be empty")
+	}
+
+	if len(flag.Description) > maxDescriptionLength {
+		return FeatureFlag{}, errors.New("description too long")
 	}
 
 	var existingFlag FeatureFlag
