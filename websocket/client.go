@@ -41,6 +41,7 @@ type TicketData struct {
 	PhaseUUID         string `json:"phaseUUID"`
 	TicketUUID        string `json:"ticketUUID"`
 	TicketDescription string `json:"ticketDescription"`
+	TicketName        string `json:"ticketName,omitempty"`
 }
 
 func (c *Client) Read() {
