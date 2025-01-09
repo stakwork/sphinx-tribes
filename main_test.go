@@ -10,13 +10,45 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-var executionCount = 0
-var mutex sync.Mutex
+type safeCounter struct {
+	count          int
+	firstExecution bool
+	mu             sync.Mutex
+}
+
+func (c *safeCounter) increment(started chan<- bool) {
+	c.mu.Lock()
+	defer c.mu.Unlock()
+	c.count++
+	if c.firstExecution && started != nil {
+		c.firstExecution = false
+		started <- true
+	}
+}
+
+func (c *safeCounter) getCount() int {
+	c.mu.Lock()
+	defer c.mu.Unlock()
+	return c.count
+}
+
+func (c *safeCounter) reset() {
+	c.mu.Lock()
+	defer c.mu.Unlock()
+	c.count = 0
+	c.firstExecution = true
+}
+
+var counter = &safeCounter{
+	firstExecution: true,
+}
 
 func mockHandler() {
-	mutex.Lock()
-	executionCount++
-	mutex.Unlock()
+	counter.increment(nil)
+}
+
+func resetExecutionCount() {
+	counter.reset()
 }
 
 func TestRunCron(t *testing.T) {
@@ -48,20 +80,13 @@ func TestRunCron(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			resetExecutionCount()
+			counter.reset()
 			c := cron.New()
 
 			started := make(chan bool, 1)
-			firstExecution := true
 
 			err := c.AddFunc(tt.schedule, func() {
-				mutex.Lock()
-				defer mutex.Unlock()
-				executionCount++
-				if firstExecution {
-					firstExecution = false
-					started <- true
-				}
+				counter.increment(started)
 			})
 
 			if err != nil {
@@ -73,7 +98,6 @@ func TestRunCron(t *testing.T) {
 
 			select {
 			case <-started:
-
 			case <-time.After(2 * time.Second):
 				t.Fatal("Cron job failed to start within timeout")
 			}
@@ -81,18 +105,12 @@ func TestRunCron(t *testing.T) {
 			time.Sleep(tt.wait)
 			c.Stop()
 
-			mutex.Lock()
-			count := executionCount
-			mutex.Unlock()
-
+			count := counter.getCount()
 			t.Logf("Schedule: %s, Wait: %v, Executions: %d", tt.schedule, tt.wait, count)
 
 			if count < tt.want {
-
 				time.Sleep(500 * time.Millisecond)
-				mutex.Lock()
-				count = executionCount
-				mutex.Unlock()
+				count = counter.getCount()
 			}
 
 			assert.GreaterOrEqual(t, count, tt.want,
@@ -101,27 +119,14 @@ func TestRunCron(t *testing.T) {
 	}
 }
 
-func resetExecutionCount() {
-	mutex.Lock()
-	defer mutex.Unlock()
-	executionCount = 0
-}
-
 func TestCronStopAndRestart(t *testing.T) {
-	resetExecutionCount()
+	counter.reset()
 	c := cron.New()
 
 	started := make(chan bool, 1)
-	firstExecution := true
 
 	err := c.AddFunc("@every 100ms", func() {
-		mutex.Lock()
-		executionCount++
-		if firstExecution {
-			firstExecution = false
-			started <- true
-		}
-		mutex.Unlock()
+		counter.increment(started)
 	})
 
 	if err != nil {
@@ -132,7 +137,6 @@ func TestCronStopAndRestart(t *testing.T) {
 
 	select {
 	case <-started:
-
 	case <-time.After(1 * time.Second):
 		t.Fatal("Cron job failed to start within timeout")
 	}
@@ -140,33 +144,27 @@ func TestCronStopAndRestart(t *testing.T) {
 	time.Sleep(300 * time.Millisecond)
 
 	c.Stop()
-	mutex.Lock()
-	initialCount := executionCount
-	mutex.Unlock()
+	initialCount := counter.getCount()
 
 	t.Logf("Initial count after first run: %d", initialCount)
 	assert.Greater(t, initialCount, 0, "Should have at least one execution before stopping")
 
 	time.Sleep(300 * time.Millisecond)
 
-	mutex.Lock()
-	countAfterStop := executionCount
-	mutex.Unlock()
-
+	countAfterStop := counter.getCount()
 	assert.Equal(t, initialCount, countAfterStop, "Cron should not execute after stopping")
 
-	firstExecution = true
+	counter.reset()
+	started = make(chan bool, 1)
 
 	c.Start()
 
 	time.Sleep(500 * time.Millisecond)
 
-	mutex.Lock()
-	finalCount := executionCount
-	mutex.Unlock()
+	finalCount := counter.getCount()
 
 	t.Logf("Final count after restart: %d (initial: %d)", finalCount, initialCount)
-	assert.Greater(t, finalCount, initialCount,
+	assert.Greater(t, finalCount, 0,
 		"Cron should execute after restarting (initial: %d, final: %d)",
 		initialCount, finalCount)
 }
@@ -234,12 +232,16 @@ func TestInvalidCronExpression(t *testing.T) {
 }
 
 func TestCronWithContext(t *testing.T) {
-	resetExecutionCount()
+	counter.reset()
 	ctx, cancel := context.WithTimeout(context.Background(), 200*time.Millisecond)
 	defer cancel()
 
 	c := cron.New()
-	c.AddFunc("@every 50ms", mockHandler)
+	started := make(chan bool, 1)
+
+	c.AddFunc("@every 50ms", func() {
+		counter.increment(started)
+	})
 
 	go func() {
 		c.Start()
@@ -248,8 +250,8 @@ func TestCronWithContext(t *testing.T) {
 	}()
 
 	time.Sleep(300 * time.Millisecond)
-	initialCount := executionCount
+	initialCount := counter.getCount()
 	time.Sleep(100 * time.Millisecond)
 
-	assert.Equal(t, initialCount, executionCount, "Cron should stop after context cancellation")
+	assert.Equal(t, initialCount, counter.getCount(), "Cron should stop after context cancellation")
 }
