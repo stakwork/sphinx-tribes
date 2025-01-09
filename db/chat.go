@@ -127,6 +127,11 @@ func (db database) GetChatMessagesForChatID(chatID string) ([]ChatMessage, error
 }
 
 func (db database) GetChatsForWorkspace(workspaceID string, chatStatus string) ([]Chat, error) {
+
+	if workspaceID == "" {
+		return []Chat{}, errors.New("workspace ID is required")
+	}
+
 	var chats []Chat
 
 	if chatStatus == "" {
