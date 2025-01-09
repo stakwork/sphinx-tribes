@@ -852,3 +852,179 @@ func TestRefreshToken(t *testing.T) {
 	})
 
 }
+
+func TestGetLnurlAuth(t *testing.T) {
+
+	originalStore := db.Store
+	defer func() {
+		db.Store = originalStore
+	}()
+
+	db.InitCache()
+
+	t.Run("Valid Request with Existing Socket Key", func(t *testing.T) {
+
+		existingSocketKey := "existing123"
+		db.Store.SetSocketConnections(db.Client{
+			Host: existingSocketKey,
+			Conn: nil,
+		})
+
+		req, err := http.NewRequest("GET", "/lnauth?socketKey="+existingSocketKey, nil)
+		assert.NoError(t, err)
+		req.Host = "test.com"
+
+		rr := httptest.NewRecorder()
+		handler := http.HandlerFunc(GetLnurlAuth)
+		handler.ServeHTTP(rr, req)
+
+		assert.Equal(t, http.StatusOK, rr.Code)
+
+		var response map[string]string
+		err = json.NewDecoder(rr.Body).Decode(&response)
+		assert.NoError(t, err)
+		assert.NotEmpty(t, response["k1"])
+		assert.NotEmpty(t, response["encode"])
+
+		socket, err := db.Store.GetSocketConnections(response["k1"][0:20])
+		assert.NoError(t, err)
+		assert.Equal(t, response["k1"][0:20], socket.Host)
+	})
+
+	t.Run("Valid Request with Non-Existing Socket Key", func(t *testing.T) {
+		nonExistingKey := "nonexistent456"
+		req, err := http.NewRequest("GET", "/lnauth?socketKey="+nonExistingKey, nil)
+		assert.NoError(t, err)
+		req.Host = "test.com"
+
+		rr := httptest.NewRecorder()
+		handler := http.HandlerFunc(GetLnurlAuth)
+		handler.ServeHTTP(rr, req)
+
+		assert.Equal(t, http.StatusOK, rr.Code)
+
+		var response map[string]string
+		err = json.NewDecoder(rr.Body).Decode(&response)
+		assert.NoError(t, err)
+		assert.NotEmpty(t, response["k1"])
+		assert.NotEmpty(t, response["encode"])
+
+		socket, err := db.Store.GetSocketConnections(response["k1"][0:20])
+		assert.NoError(t, err)
+		assert.Equal(t, response["k1"][0:20], socket.Host)
+	})
+
+	t.Run("Handles missing socketKey parameter", func(t *testing.T) {
+		req, err := http.NewRequest("GET", "/lnauth", nil)
+		assert.NoError(t, err)
+		req.Host = "test.com"
+
+		rr := httptest.NewRecorder()
+		handler := http.HandlerFunc(GetLnurlAuth)
+		handler.ServeHTTP(rr, req)
+
+		assert.Equal(t, http.StatusOK, rr.Code)
+
+		var response map[string]string
+		err = json.NewDecoder(rr.Body).Decode(&response)
+		assert.NoError(t, err)
+
+		assert.NotEmpty(t, response["k1"])
+		assert.NotEmpty(t, response["encode"])
+	})
+
+	t.Run("Successfully generates LNURL AUTH", func(t *testing.T) {
+		req, err := http.NewRequest("GET", "/lnauth?socketKey=test123", nil)
+		assert.NoError(t, err)
+
+		req.Host = "test.com"
+
+		rr := httptest.NewRecorder()
+		handler := http.HandlerFunc(GetLnurlAuth)
+		handler.ServeHTTP(rr, req)
+
+		assert.Equal(t, http.StatusOK, rr.Code)
+
+		var response map[string]string
+		err = json.NewDecoder(rr.Body).Decode(&response)
+		assert.NoError(t, err)
+
+		assert.NotEmpty(t, response["k1"])
+		assert.NotEmpty(t, response["encode"])
+
+		lnStore, err := db.Store.GetLnCache(response["k1"])
+		assert.NoError(t, err)
+		assert.Equal(t, response["k1"], lnStore.K1)
+		assert.Empty(t, lnStore.Key)
+		assert.False(t, lnStore.Status)
+
+		socket, err := db.Store.GetSocketConnections(response["k1"][0:20])
+		assert.NoError(t, err)
+		assert.Equal(t, response["k1"][0:20], socket.Host)
+	})
+
+	t.Run("Handles empty server host", func(t *testing.T) {
+		req, err := http.NewRequest("GET", "/lnauth?socketKey=test123", nil)
+		assert.NoError(t, err)
+
+		rr := httptest.NewRecorder()
+		handler := http.HandlerFunc(GetLnurlAuth)
+		handler.ServeHTTP(rr, req)
+
+		assert.Equal(t, http.StatusOK, rr.Code)
+
+		var response map[string]string
+		err = json.NewDecoder(rr.Body).Decode(&response)
+		assert.NoError(t, err)
+
+		assert.NotEmpty(t, response["k1"])
+		assert.NotEmpty(t, response["encode"])
+	})
+
+	t.Run("Verifies cache storage", func(t *testing.T) {
+		req, err := http.NewRequest("GET", "/lnauth?socketKey=test123", nil)
+		assert.NoError(t, err)
+		req.Host = "test.com"
+
+		rr := httptest.NewRecorder()
+		handler := http.HandlerFunc(GetLnurlAuth)
+		handler.ServeHTTP(rr, req)
+
+		var response map[string]string
+		err = json.NewDecoder(rr.Body).Decode(&response)
+		assert.NoError(t, err)
+
+		lnStore, err := db.Store.GetLnCache(response["k1"])
+		assert.NoError(t, err)
+		assert.Equal(t, response["k1"], lnStore.K1)
+		assert.Empty(t, lnStore.Key)
+		assert.False(t, lnStore.Status)
+
+		socket, err := db.Store.GetSocketConnections(response["k1"][0:20])
+		assert.NoError(t, err)
+		assert.Equal(t, response["k1"][0:20], socket.Host)
+	})
+
+	t.Run("Empty Socket Key", func(t *testing.T) {
+		req, err := http.NewRequest("GET", "/lnauth?socketKey=", nil)
+		assert.NoError(t, err)
+		req.Host = "test.com"
+
+		rr := httptest.NewRecorder()
+		handler := http.HandlerFunc(GetLnurlAuth)
+		handler.ServeHTTP(rr, req)
+
+		assert.Equal(t, http.StatusOK, rr.Code)
+
+		var response map[string]string
+		err = json.NewDecoder(rr.Body).Decode(&response)
+		assert.NoError(t, err)
+		assert.NotEmpty(t, response["k1"])
+		assert.NotEmpty(t, response["encode"])
+
+		socket, err := db.Store.GetSocketConnections(response["k1"][0:20])
+		assert.NoError(t, err)
+		assert.Equal(t, response["k1"][0:20], socket.Host)
+	})
+
+}
