@@ -21,6 +21,7 @@ func TestValidateTicketReviewRequest(t *testing.T) {
 					PhaseUUID         string `json:"phaseUUID"`
 					TicketUUID        string `json:"ticketUUID" validate:"required"`
 					TicketDescription string `json:"ticketDescription" validate:"required"`
+					TicketName        string `json:"ticketName,omitempty"`
 				}{
 					TicketUUID:        "test-uuid",
 					TicketDescription: "test description",
@@ -36,6 +37,7 @@ func TestValidateTicketReviewRequest(t *testing.T) {
 					PhaseUUID         string `json:"phaseUUID"`
 					TicketUUID        string `json:"ticketUUID" validate:"required"`
 					TicketDescription string `json:"ticketDescription" validate:"required"`
+					TicketName        string `json:"ticketName,omitempty"`
 				}{
 					TicketDescription: "test description",
 				},
@@ -50,6 +52,7 @@ func TestValidateTicketReviewRequest(t *testing.T) {
 					PhaseUUID         string `json:"phaseUUID"`
 					TicketUUID        string `json:"ticketUUID" validate:"required"`
 					TicketDescription string `json:"ticketDescription" validate:"required"`
+					TicketName        string `json:"ticketName,omitempty"`
 				}{
 					TicketUUID: "test-uuid",
 				},
@@ -64,6 +67,7 @@ func TestValidateTicketReviewRequest(t *testing.T) {
 					PhaseUUID         string `json:"phaseUUID"`
 					TicketUUID        string `json:"ticketUUID" validate:"required"`
 					TicketDescription string `json:"ticketDescription" validate:"required"`
+					TicketName        string `json:"ticketName,omitempty"`
 				}{
 					TicketUUID:        "",
 					TicketDescription: "",
@@ -84,6 +88,7 @@ func TestValidateTicketReviewRequest(t *testing.T) {
 					PhaseUUID         string `json:"phaseUUID"`
 					TicketUUID        string `json:"ticketUUID" validate:"required"`
 					TicketDescription string `json:"ticketDescription" validate:"required"`
+					TicketName        string `json:"ticketName,omitempty"`
 				}{
 					TicketUUID:        "   ",
 					TicketDescription: "This is a valid ticket description",
@@ -99,6 +104,7 @@ func TestValidateTicketReviewRequest(t *testing.T) {
 					PhaseUUID         string `json:"phaseUUID"`
 					TicketUUID        string `json:"ticketUUID" validate:"required"`
 					TicketDescription string `json:"ticketDescription" validate:"required"`
+					TicketName        string `json:"ticketName,omitempty"`
 				}{
 					TicketUUID:        "123e4567-e89b-12d3-a456-426614174000",
 					TicketDescription: "   ",
@@ -114,6 +120,7 @@ func TestValidateTicketReviewRequest(t *testing.T) {
 					PhaseUUID         string `json:"phaseUUID"`
 					TicketUUID        string `json:"ticketUUID" validate:"required"`
 					TicketDescription string `json:"ticketDescription" validate:"required"`
+					TicketName        string `json:"ticketName,omitempty"`
 				}{
 					TicketUUID:        "123e4567-e89b-12d3-a456-426614174000",
 					TicketDescription: strings.Repeat("a", 10000),
@@ -129,6 +136,7 @@ func TestValidateTicketReviewRequest(t *testing.T) {
 					PhaseUUID         string `json:"phaseUUID"`
 					TicketUUID        string `json:"ticketUUID" validate:"required"`
 					TicketDescription string `json:"ticketDescription" validate:"required"`
+					TicketName        string `json:"ticketName,omitempty"`
 				}{
 					TicketUUID:        "not-a-uuid",
 					TicketDescription: "This is a valid ticket description",
@@ -144,11 +152,13 @@ func TestValidateTicketReviewRequest(t *testing.T) {
 					PhaseUUID         string `json:"phaseUUID"`
 					TicketUUID        string `json:"ticketUUID" validate:"required"`
 					TicketDescription string `json:"ticketDescription" validate:"required"`
+					TicketName        string `json:"ticketName,omitempty"`
 				}{
 					FeatureUUID:       "feature-123",
 					PhaseUUID:         "phase-456",
 					TicketUUID:        "ticket-789",
 					TicketDescription: "test description",
+					TicketName:        "test name",
 				},
 			},
 			wantErr: "",
@@ -161,6 +171,7 @@ func TestValidateTicketReviewRequest(t *testing.T) {
 					PhaseUUID         string `json:"phaseUUID"`
 					TicketUUID        string `json:"ticketUUID" validate:"required"`
 					TicketDescription string `json:"ticketDescription" validate:"required"`
+					TicketName        string `json:"ticketName,omitempty"`
 				}{
 					TicketUUID:        "ticket-789",
 					TicketDescription: "test description",
