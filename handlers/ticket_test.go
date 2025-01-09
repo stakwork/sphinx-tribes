@@ -13,6 +13,7 @@ import (
 	"github.com/google/uuid"
 	"github.com/stakwork/sphinx-tribes/auth"
 	"github.com/stakwork/sphinx-tribes/db"
+	"github.com/stakwork/sphinx-tribes/utils"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
@@ -733,5 +734,277 @@ func TestTicketToBountyConversionAndEditing(t *testing.T) {
 		err = json.NewDecoder(rr.Body).Decode(&updatedBounty)
 		require.NoError(t, err)
 		assert.Equal(t, assignee.OwnerPubKey, updatedBounty.Assignee)
+	})
+}
+
+func TestProcessTicketReview(t *testing.T) {
+	teardownSuite := SetupSuite(t)
+	defer teardownSuite(t)
+
+	tHandler := NewTicketHandler(&http.Client{}, db.TestDB)
+
+	person := db.Person{
+		Uuid:        uuid.New().String(),
+		OwnerAlias:  "test-alias",
+		UniqueName:  "test-unique-name",
+		OwnerPubKey: "test-pubkey",
+		PriceToMeet: 0,
+		Description: "test-description",
+	}
+	_, err := db.TestDB.CreateOrEditPerson(person)
+	require.NoError(t, err)
+
+	workspace := db.Workspace{
+		Uuid:        uuid.New().String(),
+		Name:        "test-workspace" + uuid.New().String(),
+		OwnerPubKey: person.OwnerPubKey,
+		Github:      "https://github.com/test",
+		Website:     "https://www.testwebsite.com",
+		Description: "test-description",
+	}
+	_, err = db.TestDB.CreateOrEditWorkspace(workspace)
+	require.NoError(t, err)
+
+	feature := db.WorkspaceFeatures{
+		Uuid:          uuid.New().String(),
+		WorkspaceUuid: workspace.Uuid,
+		Name:          "test-feature",
+		Url:           "https://github.com/test-feature",
+		Priority:      0,
+	}
+	createdFeature, err := db.TestDB.CreateOrEditFeature(feature)
+	require.NoError(t, err)
+
+	featurePhase := db.FeaturePhase{
+		Uuid:        uuid.New().String(),
+		FeatureUuid: feature.Uuid,
+		Name:        "test-phase",
+		Priority:    0,
+	}
+	createdPhase, err := db.TestDB.CreateOrEditFeaturePhase(featurePhase)
+	require.NoError(t, err)
+
+	ticket := db.Tickets{
+		UUID:        uuid.New(),
+		FeatureUUID: createdFeature.Uuid,
+		PhaseUUID:   createdPhase.Uuid,
+		Name:        "Test Ticket",
+		Sequence:    1,
+		Description: "Test Description",
+		Status:      db.DraftTicket,
+		Version:     0,
+		CreatedAt:   time.Now(),
+		UpdatedAt:   time.Now(),
+	}
+	createdTicket, _ := db.TestDB.CreateOrEditTicket(&ticket)
+
+	t.Run("should return 400 if request body is empty", func(t *testing.T) {
+		rr := httptest.NewRecorder()
+		req := httptest.NewRequest(http.MethodPost, "/bounties/ticket/review", nil)
+
+		handler := http.HandlerFunc(tHandler.ProcessTicketReview)
+		handler.ServeHTTP(rr, req)
+
+		assert.Equal(t, http.StatusBadRequest, rr.Code)
+	})
+
+	t.Run("should return 400 if request body is invalid JSON", func(t *testing.T) {
+		rr := httptest.NewRecorder()
+		handler := http.HandlerFunc(tHandler.ProcessTicketReview)
+
+		req, err := http.NewRequest(http.MethodPost, "/tickets/review", bytes.NewBufferString("invalid json"))
+		require.NoError(t, err)
+
+		handler.ServeHTTP(rr, req)
+		assert.Equal(t, http.StatusBadRequest, rr.Code)
+	})
+
+	t.Run("should return 400 if ticket UUID is missing", func(t *testing.T) {
+		rr := httptest.NewRecorder()
+		handler := http.HandlerFunc(tHandler.ProcessTicketReview)
+
+		reviewReq := utils.TicketReviewRequest{
+			Value: struct {
+				FeatureUUID       string `json:"featureUUID"`
+				PhaseUUID         string `json:"phaseUUID"`
+				TicketUUID        string `json:"ticketUUID" validate:"required"`
+				TicketDescription string `json:"ticketDescription" validate:"required"`
+				TicketName        string `json:"ticketName,omitempty"`
+			}{
+				FeatureUUID:       feature.Uuid,
+				PhaseUUID:         featurePhase.Uuid,
+				TicketDescription: "Updated Description",
+			},
+			SourceWebsocket: "test-websocket",
+		}
+
+		requestBody, _ := json.Marshal(reviewReq)
+		req, err := http.NewRequest(http.MethodPost, "/tickets/review", bytes.NewBuffer(requestBody))
+		require.NoError(t, err)
+
+		handler.ServeHTTP(rr, req)
+		assert.Equal(t, http.StatusBadRequest, rr.Code)
+	})
+
+	t.Run("should return 404 if ticket not found", func(t *testing.T) {
+		rr := httptest.NewRecorder()
+		handler := http.HandlerFunc(tHandler.ProcessTicketReview)
+
+		reviewReq := utils.TicketReviewRequest{
+			Value: struct {
+				FeatureUUID       string `json:"featureUUID"`
+				PhaseUUID         string `json:"phaseUUID"`
+				TicketUUID        string `json:"ticketUUID" validate:"required"`
+				TicketDescription string `json:"ticketDescription" validate:"required"`
+				TicketName        string `json:"ticketName,omitempty"`
+			}{
+				FeatureUUID:       feature.Uuid,
+				PhaseUUID:         featurePhase.Uuid,
+				TicketUUID:        uuid.New().String(),
+				TicketDescription: "Updated Description",
+			},
+			SourceWebsocket: "test-websocket",
+		}
+
+		requestBody, _ := json.Marshal(reviewReq)
+		req, err := http.NewRequest(http.MethodPost, "/tickets/review", bytes.NewBuffer(requestBody))
+		require.NoError(t, err)
+
+		handler.ServeHTTP(rr, req)
+		assert.Equal(t, http.StatusNotFound, rr.Code)
+	})
+
+	t.Run("should update ticket with new description only", func(t *testing.T) {
+		rr := httptest.NewRecorder()
+
+		r := chi.NewRouter()
+		r.Mount("/bounties/ticket", func() http.Handler {
+			r := chi.NewRouter()
+			r.Post("/review", tHandler.ProcessTicketReview)
+			return r
+		}())
+
+		newDescription := "Updated Description"
+		reviewReq := utils.TicketReviewRequest{
+			Value: struct {
+				FeatureUUID       string `json:"featureUUID"`
+				PhaseUUID         string `json:"phaseUUID"`
+				TicketUUID        string `json:"ticketUUID" validate:"required"`
+				TicketDescription string `json:"ticketDescription" validate:"required"`
+				TicketName        string `json:"ticketName,omitempty"`
+			}{
+				FeatureUUID:       createdFeature.Uuid,
+				PhaseUUID:         createdPhase.Uuid,
+				TicketUUID:        createdTicket.UUID.String(),
+				TicketDescription: newDescription,
+			},
+			SourceWebsocket: "test-websocket",
+		}
+
+		requestBody, err := json.Marshal(reviewReq)
+		require.NoError(t, err)
+
+		req, err := http.NewRequest(http.MethodPost, "/bounties/ticket/review", bytes.NewBuffer(requestBody))
+		require.NoError(t, err)
+		req.Header.Set("Content-Type", "application/json")
+
+		ctx := context.WithValue(req.Context(), auth.ContextKey, person.OwnerPubKey)
+		req = req.WithContext(ctx)
+
+		r.ServeHTTP(rr, req)
+
+		t.Logf("Response Body: %s", rr.Body.String())
+		t.Logf("Response Status: %d", rr.Code)
+
+		assert.Equal(t, http.StatusOK, rr.Code)
+
+		var response struct {
+			Ticket db.Tickets `json:"ticket"`
+		}
+		err = json.Unmarshal(rr.Body.Bytes(), &response)
+		require.NoError(t, err)
+
+		returnedTicket := response.Ticket
+
+		// Verify the returned ticket
+		assert.NotEmpty(t, returnedTicket.UUID)
+		assert.Equal(t, newDescription, returnedTicket.Description)
+		assert.Equal(t, createdTicket.Name, returnedTicket.Name)
+		assert.Equal(t, createdTicket.Version+1, returnedTicket.Version)
+
+		// Verify the ticket in the database
+		updatedTicket, err := db.TestDB.GetTicket(returnedTicket.UUID.String())
+		require.NoError(t, err)
+		assert.Equal(t, newDescription, updatedTicket.Description)
+		assert.Equal(t, createdTicket.Name, updatedTicket.Name)
+		assert.Equal(t, createdTicket.Version+1, updatedTicket.Version)
+	})
+
+	t.Run("should update ticket with new name and description", func(t *testing.T) {
+		rr := httptest.NewRecorder()
+
+		r := chi.NewRouter()
+		r.Mount("/bounties/ticket", func() http.Handler {
+			r := chi.NewRouter()
+			r.Post("/review", tHandler.ProcessTicketReview)
+			return r
+		}())
+
+		newDescription := "Updated Description"
+		newName := "Updated Ticket Name"
+		reviewReq := utils.TicketReviewRequest{
+			Value: struct {
+				FeatureUUID       string `json:"featureUUID"`
+				PhaseUUID         string `json:"phaseUUID"`
+				TicketUUID        string `json:"ticketUUID" validate:"required"`
+				TicketDescription string `json:"ticketDescription" validate:"required"`
+				TicketName        string `json:"ticketName,omitempty"`
+			}{
+				FeatureUUID:       createdFeature.Uuid,
+				PhaseUUID:         createdPhase.Uuid,
+				TicketUUID:        createdTicket.UUID.String(),
+				TicketDescription: newDescription,
+				TicketName:        newName,
+			},
+			SourceWebsocket: "test-websocket",
+		}
+
+		requestBody, err := json.Marshal(reviewReq)
+		require.NoError(t, err)
+
+		req, err := http.NewRequest(http.MethodPost, "/bounties/ticket/review", bytes.NewBuffer(requestBody))
+		require.NoError(t, err)
+		req.Header.Set("Content-Type", "application/json")
+
+		ctx := context.WithValue(req.Context(), auth.ContextKey, person.OwnerPubKey)
+		req = req.WithContext(ctx)
+
+		r.ServeHTTP(rr, req)
+
+		t.Logf("Response Body: %s", rr.Body.String())
+		t.Logf("Response Status: %d", rr.Code)
+
+		assert.Equal(t, http.StatusOK, rr.Code)
+
+		var response struct {
+			Ticket db.Tickets `json:"ticket"`
+		}
+		err = json.Unmarshal(rr.Body.Bytes(), &response)
+		require.NoError(t, err)
+
+		returnedTicket := response.Ticket
+
+		// Verify the returned ticket
+		assert.NotEmpty(t, returnedTicket.UUID)
+		assert.Equal(t, newDescription, returnedTicket.Description)
+		assert.Equal(t, newName, returnedTicket.Name)
+		assert.Equal(t, createdTicket.Version+1, returnedTicket.Version)
+
+		// Verify the ticket in the database
+		updatedTicket, err := db.TestDB.GetTicket(returnedTicket.UUID.String())
+		require.NoError(t, err)
+		assert.Equal(t, newDescription, updatedTicket.Description)
+		assert.Equal(t, newName, updatedTicket.Name)
+		assert.Equal(t, createdTicket.Version+1, updatedTicket.Version)
 	})
 }
