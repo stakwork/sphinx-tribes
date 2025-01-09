@@ -12,6 +12,8 @@ import (
 	"sync"
 	"time"
 
+	"github.com/google/uuid"
+
 	"github.com/go-chi/chi"
 	"github.com/stakwork/sphinx-tribes/auth"
 	"github.com/stakwork/sphinx-tribes/config"
@@ -20,6 +22,15 @@ import (
 	"github.com/stakwork/sphinx-tribes/utils"
 	"gorm.io/gorm"
 )
+
+type BountyTimingResponse struct {
+	TotalWorkTimeSeconds int        `json:"total_work_time_seconds"`
+	TotalDurationSeconds int        `json:"total_duration_seconds"`
+	TotalAttempts        int        `json:"total_attempts"`
+	FirstAssignedAt      *time.Time `json:"first_assigned_at"`
+	LastPoWAt            *time.Time `json:"last_pow_at"`
+	ClosedAt             *time.Time `json:"closed_at"`
+}
 
 type bountyHandler struct {
 	httpClient               HttpClient
@@ -163,11 +174,13 @@ func GetBountyCount(w http.ResponseWriter, r *http.Request) {
 
 func (h *bountyHandler) GetPersonCreatedBounties(w http.ResponseWriter, r *http.Request) {
 	bounties, err := h.db.GetCreatedBounties(r)
+
 	if err != nil {
 		w.WriteHeader(http.StatusBadRequest)
 		logger.Log.Error("[bounty] Error: %v", err)
 	} else {
 		var bountyResponse []db.BountyResponse = h.GenerateBountyResponse(bounties)
+
 		w.WriteHeader(http.StatusOK)
 		json.NewEncoder(w).Encode(bountyResponse)
 	}
@@ -188,6 +201,19 @@ func (h *bountyHandler) GetPersonAssignedBounties(w http.ResponseWriter, r *http
 func (h *bountyHandler) CreateOrEditBounty(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 	pubKeyFromAuth, _ := ctx.Value(auth.ContextKey).(string)
+
+	// return 401 if pubKeyFromAuth is empty
+	if pubKeyFromAuth == "" {
+		w.WriteHeader(http.StatusUnauthorized)
+		return
+	}
+
+	// check if  use exists
+	user := h.db.GetPersonByPubkey(pubKeyFromAuth)
+	if user.OwnerPubKey == "" {
+		w.WriteHeader(http.StatusUnauthorized)
+		return
+	}
 
 	bounty := db.NewBounty{}
 	body, err := io.ReadAll(r.Body)
@@ -440,6 +466,8 @@ func (h *bountyHandler) GenerateBountyResponse(bounties []db.NewBounty) []db.Bou
 		assignee := h.db.GetPersonByPubkey(bounty.Assignee)
 		workspace := h.db.GetWorkspaceByUuid(bounty.WorkspaceUuid)
 
+		proofs := h.db.GetProofsByBountyID(bounty.ID)
+
 		b := db.BountyResponse{
 			Bounty: db.NewBounty{
 				ID:                      bounty.ID,
@@ -473,6 +501,7 @@ func (h *bountyHandler) GenerateBountyResponse(bounties []db.NewBounty) []db.Bou
 				PaymentFailed:           bounty.PaymentFailed,
 				PhaseUuid:               bounty.PhaseUuid,
 				PhasePriority:           bounty.PhasePriority,
+				ProofOfWorkCount:        bounty.ProofOfWorkCount,
 			},
 			Assignee: db.Person{
 				ID:               assignee.ID,
@@ -518,7 +547,13 @@ func (h *bountyHandler) GenerateBountyResponse(bounties []db.NewBounty) []db.Bou
 				Uuid: workspace.Uuid,
 				Img:  workspace.Img,
 			},
+			Pow: bounty.ProofOfWorkCount,
 		}
+
+		if len(proofs) > 0 {
+			b.Proofs = proofs
+		}
+
 		bountyResponse = append(bountyResponse, b)
 	}
 
@@ -1487,14 +1522,22 @@ func (h *bountyHandler) PollInvoice(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(invoiceRes)
 }
 
-func GetFilterCount(w http.ResponseWriter, r *http.Request) {
-	filterCount := db.DB.GetFilterStatusCount()
+func (h *bountyHandler) GetFilterCount(w http.ResponseWriter, r *http.Request) {
+	filterCount := h.db.GetFilterStatusCount()
 	w.WriteHeader(http.StatusOK)
 	json.NewEncoder(w).Encode(filterCount)
 }
 
 func (h *bountyHandler) GetBountyCards(w http.ResponseWriter, r *http.Request) {
-	bounties := h.db.GetAllBounties(r)
+	workspaceUuid := r.URL.Query().Get("workspace_uuid")
+	var bounties []db.NewBounty
+
+	if workspaceUuid != "" {
+		bounties = h.db.GetWorkspaceBountyCardsData(r)
+	} else {
+		bounties = h.db.GetAllBounties(r)
+	}
+
 	var bountyCardResponse []db.BountyCard = h.GenerateBountyCardResponse(bounties)
 
 	w.WriteHeader(http.StatusOK)
@@ -1520,6 +1563,9 @@ func (h *bountyHandler) GenerateBountyCardResponse(bounties []db.NewBounty) []db
 		if phase.FeatureUuid != "" {
 			feature = h.db.GetFeatureByUuid(phase.FeatureUuid)
 		}
+
+		status := calculateBountyStatus(bounty)
+
 		b := db.BountyCard{
 			BountyID:    bounty.ID,
 			Title:       bounty.Title,
@@ -1527,10 +1573,273 @@ func (h *bountyHandler) GenerateBountyCardResponse(bounties []db.NewBounty) []db
 			Features:    feature,
 			Phase:       phase,
 			Workspace:   workspace,
+			Status:      status,
 		}
 
 		bountyCardResponse = append(bountyCardResponse, b)
 	}
 
 	return bountyCardResponse
+}
+
+func calculateBountyStatus(bounty db.NewBounty) db.BountyStatus {
+	if bounty.Paid {
+		return db.StatusPaid
+	}
+	if bounty.Completed || bounty.PaymentPending {
+		return db.StatusComplete
+	}
+	if bounty.Assignee == "" {
+		return db.StatusTodo
+	}
+	if bounty.Assignee != "" && bounty.ProofOfWorkCount == 0 {
+		return db.StatusInProgress
+	}
+	if bounty.Assignee != "" && bounty.ProofOfWorkCount > 0 {
+		return db.StatusInReview
+	}
+
+	return db.StatusTodo
+}
+
+func (h *bountyHandler) AddProofOfWork(w http.ResponseWriter, r *http.Request) {
+	bountyID := chi.URLParam(r, "id")
+	var proof db.ProofOfWork
+
+	body, err := io.ReadAll(r.Body)
+	defer r.Body.Close()
+	if err != nil {
+		http.Error(w, "Invalid request body", http.StatusBadRequest)
+		return
+	}
+
+	err = json.Unmarshal(body, &proof)
+	if err != nil || proof.Description == "" {
+		http.Error(w, "Description is required", http.StatusBadRequest)
+		return
+	}
+
+	proof.ID = uuid.New()
+	proof.BountyID, _ = utils.ConvertStringToUint(bountyID)
+	proof.CreatedAt = time.Now()
+	proof.SubmittedAt = time.Now()
+
+	if err := h.db.CreateProof(proof); err != nil {
+		http.Error(w, "Failed to create proof", http.StatusInternalServerError)
+		return
+	}
+
+	if err := h.db.IncrementProofCount(proof.BountyID); err != nil { // Pass the correct type (uint) here
+		http.Error(w, "Failed to update bounty proof count", http.StatusInternalServerError)
+		return
+	}
+
+	w.WriteHeader(http.StatusCreated)
+	json.NewEncoder(w).Encode(proof)
+}
+
+func (h *bountyHandler) GetProofsByBounty(w http.ResponseWriter, r *http.Request) {
+	bountyID := chi.URLParam(r, "id")
+
+	bountyUUID, err := utils.ConvertStringToUint(bountyID)
+	if err != nil {
+		http.Error(w, "Invalid bounty ID", http.StatusBadRequest)
+		return
+	}
+
+	proofs := h.db.GetProofsByBountyID(bountyUUID)
+
+	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode(proofs)
+}
+
+func (h *bountyHandler) DeleteProof(w http.ResponseWriter, r *http.Request) {
+	bountyID := chi.URLParam(r, "id")
+	proofID := chi.URLParam(r, "proofId")
+
+	if _, err := uuid.Parse(proofID); err != nil {
+		http.Error(w, "Invalid proof ID", http.StatusBadRequest)
+		return
+	}
+
+	bountyIDUint, err := utils.ConvertStringToUint(bountyID)
+	if err != nil {
+		http.Error(w, "Invalid bounty ID", http.StatusBadRequest)
+		return
+	}
+
+	if err := h.db.DeleteProof(proofID); err != nil {
+		http.Error(w, "Failed to delete proof", http.StatusInternalServerError)
+		return
+	}
+
+	if err := h.db.DecrementProofCount(bountyIDUint); err != nil {
+		http.Error(w, "Failed to update bounty proof count", http.StatusInternalServerError)
+		return
+	}
+
+	w.WriteHeader(http.StatusNoContent)
+}
+
+func (h *bountyHandler) UpdateProofStatus(w http.ResponseWriter, r *http.Request) {
+	proofID := chi.URLParam(r, "proofId")
+	bountyID := chi.URLParam(r, "id")
+
+	var statusUpdate struct {
+		Status db.ProofOfWorkStatus `json:"status"`
+	}
+
+	if _, err := uuid.Parse(proofID); err != nil {
+		http.Error(w, "Invalid proof ID", http.StatusBadRequest)
+		return
+	}
+
+	body, err := io.ReadAll(r.Body)
+	defer r.Body.Close()
+	if err != nil {
+		http.Error(w, "Invalid request body", http.StatusBadRequest)
+		return
+	}
+
+	if err := json.Unmarshal(body, &statusUpdate); err != nil || !isValidProofStatus(statusUpdate.Status) {
+		http.Error(w, "Invalid status", http.StatusBadRequest)
+		return
+	}
+
+	if statusUpdate.Status == db.AcceptedStatus {
+		id, err := utils.ConvertStringToUint(bountyID)
+		if err != nil {
+			http.Error(w, "Invalid bounty ID", http.StatusBadRequest)
+			return
+		}
+
+		if err := h.db.UpdateBountyTimingOnProof(id); err != nil {
+			http.Error(w, "Failed to update timing", http.StatusInternalServerError)
+			return
+		}
+	}
+
+	if err := h.db.UpdateProofStatus(proofID, statusUpdate.Status); err != nil {
+		http.Error(w, "Failed to update status", http.StatusInternalServerError)
+		return
+	}
+
+	w.WriteHeader(http.StatusOK)
+}
+
+func isValidProofStatus(status db.ProofOfWorkStatus) bool {
+	switch status {
+	case db.NewStatus, db.AcceptedStatus, db.RejectedStatus, db.ChangeRequestedStatus:
+		return true
+	}
+	return false
+}
+
+func (h *bountyHandler) DeleteBountyAssignee(w http.ResponseWriter, r *http.Request) {
+	invoice := db.DeleteBountyAssignee{}
+	body, err := io.ReadAll(r.Body)
+	var deletedAssignee bool
+
+	r.Body.Close()
+
+	err = json.Unmarshal(body, &invoice)
+
+	if err != nil {
+		w.WriteHeader(http.StatusNotAcceptable)
+		return
+	}
+
+	owner_key := invoice.Owner_pubkey
+	date := invoice.Created
+
+	if owner_key == "" || date == "" {
+		w.WriteHeader(http.StatusBadRequest)
+		json.NewEncoder(w).Encode(false)
+		return
+	}
+
+	createdUint, _ := strconv.ParseUint(date, 10, 32)
+	b, err := h.db.GetBountyByCreated(uint(createdUint))
+
+	if err == nil && b.OwnerID == owner_key {
+		b.Assignee = ""
+		b.AssignedHours = 0
+		b.CommitmentFee = 0
+		b.BountyExpires = ""
+
+		h.db.UpdateBounty(b)
+
+		deletedAssignee = true
+	} else {
+		log.Printf("Could not delete bounty assignee")
+
+		deletedAssignee = false
+
+		w.WriteHeader(http.StatusBadRequest)
+		json.NewEncoder(w).Encode(deletedAssignee)
+	}
+
+	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode(deletedAssignee)
+
+}
+
+func (h *bountyHandler) GetBountyTimingStats(w http.ResponseWriter, r *http.Request) {
+	bountyID := chi.URLParam(r, "id")
+	id, err := utils.ConvertStringToUint(bountyID)
+	if err != nil {
+		http.Error(w, "Invalid bounty ID", http.StatusBadRequest)
+		return
+	}
+
+	timing, err := h.db.GetBountyTiming(id)
+	if err != nil {
+		http.Error(w, "Failed to get timing stats", http.StatusInternalServerError)
+		return
+	}
+
+	response := BountyTimingResponse{
+		TotalWorkTimeSeconds: timing.TotalWorkTimeSeconds,
+		TotalDurationSeconds: timing.TotalDurationSeconds,
+		TotalAttempts:        timing.TotalAttempts,
+		FirstAssignedAt:      timing.FirstAssignedAt,
+		LastPoWAt:            timing.LastPoWAt,
+		ClosedAt:             timing.ClosedAt,
+	}
+
+	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode(response)
+}
+
+func (h *bountyHandler) StartBountyTiming(w http.ResponseWriter, r *http.Request) {
+	bountyID := chi.URLParam(r, "id")
+
+	id, err := utils.ConvertStringToUint(bountyID)
+	if err != nil {
+		http.Error(w, "Invalid bounty ID", http.StatusBadRequest)
+		return
+	}
+
+	if err := h.db.StartBountyTiming(id); err != nil {
+		http.Error(w, "Failed to start timing", http.StatusInternalServerError)
+		return
+	}
+
+	w.WriteHeader(http.StatusOK)
+}
+
+func (h *bountyHandler) CloseBountyTiming(w http.ResponseWriter, r *http.Request) {
+	bountyID := chi.URLParam(r, "id")
+	id, err := utils.ConvertStringToUint(bountyID)
+	if err != nil {
+		http.Error(w, "Invalid bounty ID", http.StatusBadRequest)
+		return
+	}
+
+	if err := h.db.CloseBountyTiming(id); err != nil {
+		http.Error(w, "Failed to close timing", http.StatusInternalServerError)
+		return
+	}
+
+	w.WriteHeader(http.StatusOK)
 }

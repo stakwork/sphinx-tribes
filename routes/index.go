@@ -2,24 +2,29 @@ package routes
 
 import (
 	"bytes"
+	"context"
 	"encoding/json"
 	"fmt"
 	"io"
 	"net/http"
 	"os"
 	"runtime"
+	"strings"
 	"time"
 
 	"github.com/go-chi/chi"
 	"github.com/go-chi/chi/middleware"
 	"github.com/rs/cors"
 	"github.com/urfave/negroni"
+	"github.com/xhd2015/xgo/runtime/core"
+	"github.com/xhd2015/xgo/runtime/trap"
 
 	"github.com/stakwork/sphinx-tribes/auth"
 	"github.com/stakwork/sphinx-tribes/config"
 	"github.com/stakwork/sphinx-tribes/db"
 	"github.com/stakwork/sphinx-tribes/handlers"
 	"github.com/stakwork/sphinx-tribes/logger"
+	customMiddleware "github.com/stakwork/sphinx-tribes/middlewares"
 	"github.com/stakwork/sphinx-tribes/utils"
 )
 
@@ -47,6 +52,7 @@ func NewRouter() *http.Server {
 	r.Mount("/bounties/ticket", TicketRoutes())
 	r.Mount("/hivechat", ChatRoutes())
 	r.Mount("/test", TestRoutes())
+	r.Mount("/feature-flags", FeatureFlagRoutes())
 
 	r.Group(func(r chi.Router) {
 		r.Get("/tribe_by_feed", tribeHandlers.GetFirstTribeByFeed)
@@ -195,6 +201,18 @@ func internalServerErrorHandler(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		rr := negroni.NewResponseWriter(w)
 
+		trap.AddInterceptor(&trap.Interceptor{
+			Pre: func(ctx context.Context, f *core.FuncInfo, args core.Object, results core.Object) (interface{}, error) {
+				index := strings.Index(f.File, "sphinx-tribes")
+				trimmed := f.File
+				if index != -1 {
+					trimmed = f.File[index:]
+				}
+				logger.Log.Machine("%s:%d %s\n", trimmed, f.Line, f.Name)
+
+				return nil, nil
+			},
+		})
 		defer func() {
 			if err := recover(); err != nil {
 				// Get stack trace
@@ -234,10 +252,11 @@ func initChi() *chi.Mux {
 	r.Use(middleware.Recoverer)
 	r.Use(logger.RouteBasedUUIDMiddleware)
 	r.Use(internalServerErrorHandler)
+	r.Use(customMiddleware.FeatureFlag(db.DB))
 	cors := cors.New(cors.Options{
 		AllowedOrigins:   []string{"*"},
 		AllowedMethods:   []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"},
-		AllowedHeaders:   []string{"Accept", "Authorization", "Content-Type", "X-CSRF-Token", "X-User", "authorization", "x-jwt", "Referer", "User-Agent"},
+		AllowedHeaders:   []string{"Accept", "Authorization", "Content-Type", "X-CSRF-Token", "X-User", "authorization", "x-jwt", "Referer", "User-Agent", "x-session-id"},
 		AllowCredentials: true,
 		MaxAge:           300,
 	})

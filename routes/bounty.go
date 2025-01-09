@@ -3,8 +3,9 @@ package routes
 import (
 	"net/http"
 
-	"github.com/go-chi/chi"
 	"github.com/stakwork/sphinx-tribes/auth"
+
+	"github.com/go-chi/chi"
 	"github.com/stakwork/sphinx-tribes/db"
 	"github.com/stakwork/sphinx-tribes/handlers"
 )
@@ -28,7 +29,7 @@ func BountyRoutes() chi.Router {
 		r.Get("/count/{personKey}/{tabType}", handlers.GetUserBountyCount)
 		r.Get("/count", handlers.GetBountyCount)
 		r.Get("/invoice/{paymentRequest}", bountyHandler.GetInvoiceData)
-		r.Get("/filter/count", handlers.GetFilterCount)
+		r.Get("/filter/count", bountyHandler.GetFilterCount)
 
 	})
 	r.Group(func(r chi.Router) {
@@ -41,11 +42,20 @@ func BountyRoutes() chi.Router {
 		r.Get("/payment/{bountyId}", handlers.GetPaymentByBountyId)
 		r.Put("/payment/status/{id}", bountyHandler.UpdateBountyPaymentStatus)
 
+		r.Post("/{id}/proof", bountyHandler.AddProofOfWork)
+		r.Get("/{id}/proofs", bountyHandler.GetProofsByBounty)
+		r.Delete("/{id}/proofs/{proofId}", bountyHandler.DeleteProof)
+		r.Patch("/{id}/proofs/{proofId}/status", bountyHandler.UpdateProofStatus)
+
 		r.Post("/", bountyHandler.CreateOrEditBounty)
-		r.Delete("/assignee", handlers.DeleteBountyAssignee)
+		r.Delete("/assignee", bountyHandler.DeleteBountyAssignee)
 		r.Delete("/{pubkey}/{created}", bountyHandler.DeleteBounty)
 		r.Post("/paymentstatus/{created}", handlers.UpdatePaymentStatus)
 		r.Post("/completedstatus/{created}", handlers.UpdateCompletedStatus)
+
+		r.Get("/{id}/timing", bountyHandler.GetBountyTimingStats)
+		r.Put("/{id}/timing/start", bountyHandler.StartBountyTiming)
+		r.Put("/{id}/timing/close", bountyHandler.CloseBountyTiming)
 	})
 	return r
 }

@@ -1,15 +1,25 @@
 package db
 
 import (
+	"log"
 	"testing"
 	"time"
 
 	"github.com/google/uuid"
 )
 
-func TestCreateOrEditTicket(t *testing.T) {
-	// test create or edit tickers
+func SetupSuite(_ *testing.T) func(tb testing.TB) {
 	InitTestDB()
+
+	return func(_ testing.TB) {
+		defer CloseTestDB()
+		log.Println("Teardown test")
+	}
+}
+
+func TestCreateOrEditTicket(t *testing.T) {
+	teardownSuite := SetupSuite(t)
+	defer teardownSuite(t)
 
 	// create person
 	now := time.Now()
@@ -122,6 +132,8 @@ func TestCreateOrEditTicket(t *testing.T) {
 
 func TestGetTicket(t *testing.T) {
 	InitTestDB()
+
+	defer CloseTestDB()
 
 	// create person
 	now := time.Now()

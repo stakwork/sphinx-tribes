@@ -414,6 +414,7 @@ type NewBounty struct {
 	TicketUrl               string         `json:"ticket_url"`
 	OrgUuid                 string         `gorm:"-" json:"org_uuid"`
 	WorkspaceUuid           string         `json:"workspace_uuid"`
+	FeatureUuid             string         `json:"feature_uuid"`
 	Description             string         `json:"description"`
 	WantedType              string         `json:"wanted_type"`
 	Deliverables            string         `json:"deliverables"`
@@ -432,6 +433,7 @@ type NewBounty struct {
 	PhasePriority           int            `json:"phase_priority"`
 	PaymentPending          bool           `gorm:"default:false" json:"payment_pending"`
 	PaymentFailed           bool           `gorm:"default:false" json:"payment_failed"`
+	ProofOfWorkCount        int            `gorm:"type:integer;default:0;not null" json:"pow"`
 }
 
 type BountyOwners struct {
@@ -483,6 +485,8 @@ type BountyResponse struct {
 	Owner        Person         `json:"owner"`
 	Organization WorkspaceShort `json:"organization"`
 	Workspace    WorkspaceShort `json:"workspace"`
+	Proofs       []ProofOfWork  `json:"proofs,omitempty"`
+	Pow          int            `json:"pow"`
 }
 
 type BountyCountResponse struct {
@@ -587,23 +591,31 @@ type WorkspaceCodeGraph struct {
 	UpdatedBy     string     `json:"updated_by"`
 }
 
+type FeatureStatus string
+
+const (
+	ActiveFeature   FeatureStatus = "active"
+	ArchivedFeature FeatureStatus = "archived"
+)
+
 type WorkspaceFeatures struct {
-	ID                     uint       `json:"id"`
-	Uuid                   string     `gorm:"unique;not null" json:"uuid"`
-	WorkspaceUuid          string     `gorm:"not null" json:"workspace_uuid"`
-	Name                   string     `gorm:"not null" json:"name"`
-	Brief                  string     `json:"brief"`
-	Requirements           string     `json:"requirements"`
-	Architecture           string     `json:"architecture"`
-	Url                    string     `json:"url"`
-	Priority               int        `json:"priority"`
-	Created                *time.Time `json:"created"`
-	Updated                *time.Time `json:"updated"`
-	CreatedBy              string     `json:"created_by"`
-	UpdatedBy              string     `json:"updated_by"`
-	BountiesCountCompleted int        `gorm:"-" json:"bounties_count_completed"`
-	BountiesCountAssigned  int        `gorm:"-" json:"bounties_count_assigned"`
-	BountiesCountOpen      int        `gorm:"-" json:"bounties_count_open"`
+	ID                     uint          `json:"id"`
+	Uuid                   string        `gorm:"unique;not null" json:"uuid"`
+	WorkspaceUuid          string        `gorm:"not null" json:"workspace_uuid"`
+	Name                   string        `gorm:"not null" json:"name"`
+	Brief                  string        `json:"brief"`
+	Requirements           string        `json:"requirements"`
+	Architecture           string        `json:"architecture"`
+	Url                    string        `json:"url"`
+	Priority               int           `json:"priority"`
+	Created                *time.Time    `json:"created"`
+	Updated                *time.Time    `json:"updated"`
+	CreatedBy              string        `json:"created_by"`
+	UpdatedBy              string        `json:"updated_by"`
+	BountiesCountCompleted int           `gorm:"-" json:"bounties_count_completed"`
+	BountiesCountAssigned  int           `gorm:"-" json:"bounties_count_assigned"`
+	BountiesCountOpen      int           `gorm:"-" json:"bounties_count_open"`
+	FeatStatus             FeatureStatus `gorm:"type:varchar(20);default:'active';not null" json:"feat_status"`
 }
 
 type FeaturePhase struct {
@@ -925,6 +937,16 @@ type FilterStattuCount struct {
 	Failed    int64 `json:"failed"`
 }
 
+type BountyStatus string
+
+const (
+	StatusTodo       BountyStatus = "TODO"
+	StatusInProgress BountyStatus = "IN_PROGRESS"
+	StatusInReview   BountyStatus = "IN_REVIEW"
+	StatusComplete   BountyStatus = "COMPLETED"
+	StatusPaid       BountyStatus = "PAID"
+)
+
 type BountyCard struct {
 	BountyID    uint              `json:"id"`
 	Title       string            `json:"title"`
@@ -932,6 +954,7 @@ type BountyCard struct {
 	Features    WorkspaceFeatures `json:"features"`
 	Phase       FeaturePhase      `json:"phase"`
 	Workspace   Workspace         `json:"workspace"`
+	Status      BountyStatus      `json:"status"`
 }
 
 type WfRequestStatus string
@@ -1077,12 +1100,69 @@ type ChatMessage struct {
 	Source      ChatSource        `json:"source"`
 }
 
+type ChatStatus string
+
+const (
+	ActiveStatus  ChatStatus = "active"
+	ArchiveStatus ChatStatus = "archived"
+)
+
 type Chat struct {
-	ID          string    `json:"id" gorm:"primaryKey"`
-	WorkspaceID string    `json:"workspaceId" gorm:"index"`
-	Title       string    `json:"title"`
-	CreatedAt   time.Time `json:"createdAt"`
-	UpdatedAt   time.Time `json:"updatedAt"`
+	ID          string     `json:"id" gorm:"primaryKey"`
+	WorkspaceID string     `json:"workspaceId" gorm:"index"`
+	Title       string     `json:"title"`
+	Status      ChatStatus `json:"status" gorm:"default:active"`
+	CreatedAt   time.Time  `json:"createdAt"`
+	UpdatedAt   time.Time  `json:"updatedAt"`
+}
+
+type ProofOfWorkStatus string
+
+const (
+	NewStatus             ProofOfWorkStatus = "New"
+	AcceptedStatus        ProofOfWorkStatus = "Accepted"
+	RejectedStatus        ProofOfWorkStatus = "Rejected"
+	ChangeRequestedStatus ProofOfWorkStatus = "Change Requested"
+)
+
+type ProofOfWork struct {
+	ID          uuid.UUID         `json:"id" gorm:"type:uuid;primaryKey"`
+	BountyID    uint              `json:"bounty_id"`
+	Description string            `json:"description" gorm:"type:text;not null"`
+	Status      ProofOfWorkStatus `json:"status" gorm:"type:varchar(20);default:'New'"`
+	CreatedAt   time.Time         `json:"created_at" gorm:"type:timestamp;default:current_timestamp"`
+	SubmittedAt time.Time         `json:"submitted_at" gorm:"type:timestamp;default:current_timestamp"`
+}
+
+type BountyTiming struct {
+	ID                   uuid.UUID  `json:"id" gorm:"type:uuid;primaryKey"`
+	BountyID             uint       `json:"bounty_id" gorm:"not null"`
+	TotalWorkTimeSeconds int        `json:"total_work_time_seconds" gorm:"default:0"`
+	TotalDurationSeconds int        `json:"total_duration_seconds" gorm:"default:0"`
+	TotalAttempts        int        `json:"total_attempts" gorm:"default:0"`
+	FirstAssignedAt      *time.Time `json:"first_assigned_at"`
+	LastPoWAt            *time.Time `json:"last_pow_at"`
+	ClosedAt             *time.Time `json:"closed_at"`
+	CreatedAt            time.Time  `json:"created_at" gorm:"default:current_timestamp"`
+	UpdatedAt            time.Time  `json:"updated_at" gorm:"default:current_timestamp"`
+}
+
+type FeatureFlag struct {
+	UUID        uuid.UUID  `gorm:"type:uuid;primaryKey" json:"uuid"`
+	Name        string     `gorm:"type:varchar(255);unique;not null" json:"name"`
+	Description string     `gorm:"type:text" json:"description"`
+	Enabled     bool       `gorm:"type:boolean;default:false" json:"enabled"`
+	Endpoints   []Endpoint `gorm:"foreignKey:FeatureFlagUUID" json:"endpoints,omitempty"`
+	CreatedAt   time.Time  `gorm:"type:timestamp;default:current_timestamp" json:"-"`
+	UpdatedAt   time.Time  `gorm:"type:timestamp;default:current_timestamp" json:"-"`
+}
+
+type Endpoint struct {
+	UUID            uuid.UUID `gorm:"type:uuid;primaryKey" json:"uuid"`
+	Path            string    `gorm:"type:varchar(255);not null" json:"path"`
+	FeatureFlagUUID uuid.UUID `gorm:"type:uuid;not null" json:"-"`
+	CreatedAt       time.Time `gorm:"type:timestamp;default:current_timestamp" json:"-"`
+	UpdatedAt       time.Time `gorm:"type:timestamp;default:current_timestamp" json:"-"`
 }
 
 func (Person) TableName() string {

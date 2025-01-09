@@ -109,7 +109,73 @@ func GetMemeChallenge() db.MemeChallenge {
 	return memeChallenge
 }
 
+type SignChallengeBody struct {
+	Message string `json:"message"`
+}
+
+type V2SignChallengeResponse struct {
+	Sig string `json:"sig"`
+}
+
 func SignChallenge(challenge string) db.RelaySignerResponse {
+
+	if config.V2BotUrl != "" {
+		url := fmt.Sprintf("%s/sign_base64", config.V2BotUrl)
+		client := &http.Client{}
+
+		challengeBody := SignChallengeBody{
+			Message: challenge,
+		}
+
+		jsonBody, _ := json.Marshal(challengeBody)
+
+		req, err := http.NewRequest(http.MethodPost, url, bytes.NewBuffer(jsonBody))
+		req.Header.Set("x-admin-token", config.V2BotToken)
+		req.Header.Set("Content-Type", "application/json")
+		res, _ := client.Do(req)
+
+		if err != nil {
+			log.Printf("[Sign Challenge for V2] Request Failed: %s", err)
+			return db.RelaySignerResponse{
+				Success:  false,
+				Response: db.SignerResponse(db.SignerResponse{Sig: ""}),
+			}
+		}
+
+		defer res.Body.Close()
+
+		body, err := io.ReadAll(res.Body)
+
+		if err != nil {
+			log.Printf("[Sign Challenge for V2] Reading sign challenge response body failed: %s", err)
+			return db.RelaySignerResponse{
+				Success:  false,
+				Response: db.SignerResponse(db.SignerResponse{Sig: ""}),
+			}
+		}
+
+		v2SignChallengeResponse := V2SignChallengeResponse{}
+
+		// Unmarshal result
+		err = json.Unmarshal(body, &v2SignChallengeResponse)
+
+		if err != nil {
+			log.Printf("[Sign Challenge for V2] Unmarshalling response body failed: %s", err)
+			return db.RelaySignerResponse{
+				Success:  false,
+				Response: db.SignerResponse(db.SignerResponse{Sig: ""}),
+			}
+		}
+
+		signerResponse := db.RelaySignerResponse{
+			Success:  true,
+			Response: db.SignerResponse(v2SignChallengeResponse),
+		}
+
+		return signerResponse
+
+	}
+
 	url := fmt.Sprintf("%s/signer/%s", config.RelayUrl, challenge)
 
 	client := &http.Client{}
@@ -142,10 +208,18 @@ func SignChallenge(challenge string) db.RelaySignerResponse {
 func GetMemeToken(id string, sig string) (string, db.MemeTokenSuccess) {
 	memeUrl := fmt.Sprintf("%s/verify", config.MemeUrl)
 
+	var pubkey string
+
+	if config.V2BotUrl != "" {
+		pubkey = config.GetV2ContactKey()
+	} else {
+		pubkey = config.RelayNodeKey
+	}
+
 	formData := url.Values{
 		"id":     {id},
 		"sig":    {sig},
-		"pubkey": {config.RelayNodeKey},
+		"pubkey": {pubkey},
 	}
 
 	res, err := http.PostForm(memeUrl, formData)

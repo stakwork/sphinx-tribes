@@ -40,6 +40,9 @@ func (db database) UpdateChat(chat *Chat) (Chat, error) {
 	if chat.Title != "" {
 		existingChat.Title = chat.Title
 	}
+	if chat.Status != "" {
+		existingChat.Status = chat.Status
+	}
 	existingChat.UpdatedAt = time.Now()
 
 	if err := db.db.Save(&existingChat).Error; err != nil {
@@ -123,10 +126,14 @@ func (db database) GetChatMessagesForChatID(chatID string) ([]ChatMessage, error
 	return chatMessages, nil
 }
 
-func (db database) GetChatsForWorkspace(workspaceID string) ([]Chat, error) {
+func (db database) GetChatsForWorkspace(workspaceID string, chatStatus string) ([]Chat, error) {
 	var chats []Chat
 
-	result := db.db.Where("workspace_id = ?", workspaceID).
+	if chatStatus == "" {
+		chatStatus = string(ActiveStatus)
+	}
+
+	result := db.db.Where("workspace_id = ? AND status = ?", workspaceID, chatStatus).
 		Order("updated_at DESC").
 		Find(&chats)
 
@@ -134,5 +141,16 @@ func (db database) GetChatsForWorkspace(workspaceID string) ([]Chat, error) {
 		return nil, fmt.Errorf("failed to fetch chats: %w", result.Error)
 	}
 
+	return chats, nil
+}
+
+func (db database) GetAllChatsForWorkspace(workspaceID string) ([]Chat, error) {
+	var chats []Chat
+	result := db.db.Where("workspace_id = ?", workspaceID).
+		Order("updated_at DESC").
+		Find(&chats)
+	if result.Error != nil {
+		return nil, fmt.Errorf("failed to fetch chats: %w", result.Error)
+	}
 	return chats, nil
 }

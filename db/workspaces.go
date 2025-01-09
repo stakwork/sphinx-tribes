@@ -217,26 +217,26 @@ func (db database) GetWorkspaceStatusBudget(workspace_uuid string) StatusBudget 
 	workspaceBudget := db.GetWorkspaceBudget(workspace_uuid)
 
 	var openBudget uint
-	db.db.Model(&NewBounty{}).Where("workspace_uuid = ?", workspace_uuid).Where("assignee = '' ").Where("paid != true").Select("SUM(price)").Row().Scan(&openBudget)
+	db.db.Model(&NewBounty{}).Where("workspace_uuid = ?", workspace_uuid).Where("assignee = '' ").Where("paid != ?", true).Select("SUM(price)").Row().Scan(&openBudget)
 
 	var openCount int64
-	db.db.Model(&NewBounty{}).Where("workspace_uuid = ?", workspace_uuid).Where("assignee = '' ").Where("paid != true").Count(&openCount)
+	db.db.Model(&NewBounty{}).Where("workspace_uuid = ?", workspace_uuid).Where("assignee = '' ").Where("paid != ?", true).Count(&openCount)
 
 	var openDifference int = int(workspaceBudget.TotalBudget - openBudget)
 
 	var assignedBudget uint
-	db.db.Model(&NewBounty{}).Where("workspace_uuid = ?", workspace_uuid).Where("assignee != '' ").Where("paid != true").Select("SUM(price)").Row().Scan(&assignedBudget)
+	db.db.Model(&NewBounty{}).Where("workspace_uuid = ?", workspace_uuid).Where("assignee != '' ").Where("paid != ?", true).Where("completed != ?", true).Select("SUM(price)").Row().Scan(&assignedBudget)
 
 	var assignedCount int64
-	db.db.Model(&NewBounty{}).Where("workspace_uuid = ?", workspace_uuid).Where("assignee != '' ").Where("paid != true").Count(&assignedCount)
+	db.db.Model(&NewBounty{}).Where("workspace_uuid = ?", workspace_uuid).Where("assignee != '' ").Where("paid != ?", true).Where("completed != ?", true).Count(&assignedCount)
 
 	var assignedDifference int = int(workspaceBudget.TotalBudget - assignedBudget)
 
 	var completedBudget uint
-	db.db.Model(&NewBounty{}).Where("workspace_uuid = ?", workspace_uuid).Where("completed = true ").Where("paid != true").Select("SUM(price)").Row().Scan(&completedBudget)
+	db.db.Model(&NewBounty{}).Where("workspace_uuid = ?", workspace_uuid).Where("completed = ?", true).Where("paid != ?", true).Select("SUM(price)").Row().Scan(&completedBudget)
 
 	var completedCount int64
-	db.db.Model(&NewBounty{}).Where("workspace_uuid = ?", workspace_uuid).Where("completed = true ").Where("paid != true").Count(&completedCount)
+	db.db.Model(&NewBounty{}).Where("workspace_uuid = ?", workspace_uuid).Where("completed = ?", true).Where("paid != ?", true).Count(&completedCount)
 
 	var completedDifference int = int(workspaceBudget.TotalBudget - completedBudget)
 
@@ -328,6 +328,27 @@ func (db database) ProcessUpdateBudget(non_tx_invoice NewInvoiceList) error {
 			totalBudget := workspaceBudget.TotalBudget
 			workspaceBudget.TotalBudget = totalBudget + paymentHistory.Amount
 
+			// check if the amount is greater than the total budget
+			log.Println("Budget Total Amount =====", totalBudget, workspace_uuid)
+
+			// get total deposits
+			var depositAmount uint
+			tx.Model(&NewPaymentHistory{}).Where("workspace_uuid = ?", workspace_uuid).Where("status = ?", true).Where("payment_type = ?", "deposit").Select("SUM(amount)").Row().Scan(&depositAmount)
+
+			log.Println("Budget DepositAmount =====", depositAmount, workspace_uuid)
+
+			var withdrawalAmount uint
+			tx.Model(&NewPaymentHistory{}).Where("workspace_uuid = ?", workspace_uuid).Where("status = ?", true).Where("payment_type = ?", "withdraw").Select("SUM(amount)").Row().Scan(&withdrawalAmount)
+
+			log.Println("Budget WithdrawalAmount =====", withdrawalAmount, workspace_uuid)
+
+			validAmount := depositAmount - withdrawalAmount
+
+			if validAmount <= totalBudget {
+				tx.Rollback()
+				return errors.New("cannot process payment")
+			}
+
 			if err = tx.Model(&NewBountyBudget{}).Where("workspace_uuid = ?", workspaceBudget.WorkspaceUuid).Updates(map[string]interface{}{
 				"total_budget": workspaceBudget.TotalBudget,
 			}).Error; err != nil {
@@ -354,6 +375,13 @@ func (db database) AddAndUpdateBudget(invoice NewInvoiceList) NewPaymentHistory 
 	paymentHistory := NewPaymentHistory{}
 	tx.Model(&NewPaymentHistory{}).Where("created = ?", created).Where("workspace_uuid = ? ", workspace_uuid).Find(&paymentHistory)
 
+	dbInvoice := NewInvoiceList{}
+	tx.Where("payment_request = ?", invoice.PaymentRequest).Find(&dbInvoice)
+
+	if invoice.Status {
+		tx.Rollback()
+	}
+
 	if paymentHistory.WorkspaceUuid != "" && paymentHistory.Amount != 0 {
 		paymentHistory.Status = true
 		db.db.Where("created = ?", created).Where("workspace_uuid = ? ", workspace_uuid).Updates(paymentHistory)
@@ -377,6 +405,26 @@ func (db database) AddAndUpdateBudget(invoice NewInvoiceList) NewPaymentHistory 
 		} else {
 			totalBudget := workspaceBudget.TotalBudget
 			workspaceBudget.TotalBudget = totalBudget + paymentHistory.Amount
+
+			// check if the amount is greater than the total budget
+			log.Println("Budget Total Amount =====", totalBudget, workspace_uuid)
+
+			// get total deposits
+			var depositAmount uint
+			tx.Model(&NewPaymentHistory{}).Where("workspace_uuid = ?", workspace_uuid).Where("status = ?", true).Where("payment_type = ?", "deposit").Select("SUM(amount)").Row().Scan(&depositAmount)
+
+			log.Println("Budget DepositAmount =====", depositAmount, workspace_uuid)
+
+			var withdrawalAmount uint
+			tx.Model(&NewPaymentHistory{}).Where("workspace_uuid = ?", workspace_uuid).Where("status = ?", true).Where("payment_type = ?", "withdraw").Select("SUM(amount)").Row().Scan(&withdrawalAmount)
+
+			log.Println("Budget WithdrawalAmount =====", withdrawalAmount, workspace_uuid)
+
+			validAmount := depositAmount - withdrawalAmount
+
+			if validAmount <= totalBudget {
+				tx.Rollback()
+			}
 
 			if err := tx.Model(&NewBountyBudget{}).Where("workspace_uuid = ?", workspaceBudget.WorkspaceUuid).Updates(map[string]interface{}{
 				"total_budget": workspaceBudget.TotalBudget,
@@ -465,10 +513,11 @@ func (db database) ProcessBountyPayment(payment NewPaymentHistory, bounty NewBou
 	}
 
 	if payment.PaymentStatus != PaymentFailed {
-		// get Workspace budget and subtract payment from total budget
-		WorkspaceBudget := db.GetWorkspaceBudget(payment.WorkspaceUuid)
-		totalBudget := WorkspaceBudget.TotalBudget
+		workspace_uuid := payment.WorkspaceUuid
 
+		// get Workspace budget and subtract payment from total budget
+		WorkspaceBudget := db.GetWorkspaceBudget(workspace_uuid)
+		totalBudget := WorkspaceBudget.TotalBudget
 		// update budget
 		WorkspaceBudget.TotalBudget = totalBudget - payment.Amount
 		if err = tx.Model(&NewBountyBudget{}).Where("workspace_uuid = ?", payment.WorkspaceUuid).Updates(map[string]interface{}{

@@ -7,12 +7,14 @@ import (
 	"net/http"
 	"net/http/httptest"
 	"testing"
+	"time"
 
 	"github.com/go-chi/chi"
 	"github.com/google/uuid"
 	"github.com/stakwork/sphinx-tribes/auth"
 	"github.com/stakwork/sphinx-tribes/db"
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
 func TestGetTicket(t *testing.T) {
@@ -467,5 +469,269 @@ func TestDeleteTicket(t *testing.T) {
 		_, err = db.TestDB.GetTicket(createdTicket.UUID.String())
 		assert.Error(t, err)
 		assert.Equal(t, "ticket not found", err.Error())
+	})
+}
+
+func TestTicketToBounty(t *testing.T) {
+	teardownSuite := SetupSuite(t)
+	defer teardownSuite(t)
+
+	tHandler := NewTicketHandler(&http.Client{}, db.TestDB)
+
+	workspace := db.Workspace{
+		Uuid:        uuid.New().String(),
+		Name:        "test-workspace",
+		OwnerPubKey: "test-pubkey",
+	}
+	_, err := db.TestDB.CreateOrEditWorkspace(workspace)
+	require.NoError(t, err)
+
+	feature := db.WorkspaceFeatures{
+		Uuid:          uuid.New().String(),
+		WorkspaceUuid: workspace.Uuid,
+		Name:          "test-feature",
+	}
+	_, err = db.TestDB.CreateOrEditFeature(feature)
+	require.NoError(t, err)
+
+	phase := db.FeaturePhase{
+		Uuid:        uuid.New().String(),
+		FeatureUuid: feature.Uuid,
+		Name:        "test-phase",
+	}
+	_, err = db.TestDB.CreateOrEditFeaturePhase(phase)
+	require.NoError(t, err)
+
+	ticket := db.Tickets{
+		UUID:        uuid.New(),
+		FeatureUUID: feature.Uuid,
+		PhaseUUID:   phase.Uuid,
+		Name:        "Test Ticket",
+		Description: "Test Description",
+		Status:      db.DraftTicket,
+	}
+	createdTicket, err := db.TestDB.UpdateTicket(ticket)
+	require.NoError(t, err)
+
+	tests := []struct {
+		name     string
+		ticket   string
+		auth     string
+		wantCode int
+		validate func(*testing.T, *httptest.ResponseRecorder)
+	}{
+		{
+			name:     "unauthorized - no auth token",
+			ticket:   createdTicket.UUID.String(),
+			auth:     "",
+			wantCode: http.StatusUnauthorized,
+		},
+		{
+			name:     "bad request - missing ticket UUID",
+			ticket:   "",
+			auth:     workspace.OwnerPubKey,
+			wantCode: http.StatusBadRequest,
+		},
+		{
+			name:     "not found - ticket doesn't exist",
+			ticket:   uuid.New().String(),
+			auth:     workspace.OwnerPubKey,
+			wantCode: http.StatusNotFound,
+		},
+		{
+			name:     "success - creates bounty from ticket",
+			ticket:   createdTicket.UUID.String(),
+			auth:     workspace.OwnerPubKey,
+			wantCode: http.StatusCreated,
+			validate: func(t *testing.T, rr *httptest.ResponseRecorder) {
+				var resp CreateBountyResponse
+				require.NoError(t, json.NewDecoder(rr.Body).Decode(&resp))
+
+				assert.True(t, resp.Success)
+				assert.NotZero(t, resp.BountyID)
+				assert.Equal(t, "Bounty created successfully", resp.Message)
+
+				bounty := db.TestDB.GetBounty(resp.BountyID)
+
+				assert.Equal(t, createdTicket.Name, bounty.Title)
+				assert.Equal(t, createdTicket.Description, bounty.Description)
+				assert.Equal(t, createdTicket.PhaseUUID, bounty.PhaseUuid)
+				assert.Equal(t, "freelance_job_request", bounty.Type)
+				assert.Equal(t, uint(21), bounty.Price)
+				assert.True(t, bounty.Show)
+			},
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			rr := httptest.NewRecorder()
+			req := httptest.NewRequest(http.MethodPost, "/tickets/bounty", nil)
+
+			if tt.ticket != "" {
+				rctx := chi.NewRouteContext()
+				rctx.URLParams.Add("ticket_uuid", tt.ticket)
+				req = req.WithContext(context.WithValue(req.Context(), chi.RouteCtxKey, rctx))
+			}
+
+			if tt.auth != "" {
+				req = req.WithContext(context.WithValue(req.Context(), auth.ContextKey, tt.auth))
+			}
+
+			tHandler.TicketToBounty(rr, req)
+
+			assert.Equal(t, tt.wantCode, rr.Code)
+			if tt.validate != nil {
+				tt.validate(t, rr)
+			}
+		})
+	}
+}
+
+func TestTicketToBountyConversionAndEditing(t *testing.T) {
+	teardownSuite := SetupSuite(t)
+	defer teardownSuite(t)
+
+	tHandler := NewTicketHandler(&http.Client{}, db.TestDB)
+	bHandler := NewBountyHandler(&http.Client{}, db.TestDB)
+
+	person := db.Person{
+		Uuid:        uuid.New().String(),
+		OwnerAlias:  "test-alias",
+		UniqueName:  "test-unique-name",
+		OwnerPubKey: "test-pubkey",
+		PriceToMeet: 0,
+		Description: "test-description",
+	}
+	_, err := db.TestDB.CreateOrEditPerson(person)
+	require.NoError(t, err)
+
+	workspaceName := "test-workspace-" + uuid.New().String()
+	workspace := db.Workspace{
+		Uuid:        uuid.New().String(),
+		Name:        workspaceName,
+		OwnerPubKey: person.OwnerPubKey,
+		Github:      "https://github.com/test",
+		Website:     "https://www.testwebsite.com",
+		Description: "test-description",
+	}
+	_, err = db.TestDB.CreateOrEditWorkspace(workspace)
+	require.NoError(t, err)
+
+	feature := db.WorkspaceFeatures{
+		Uuid:          uuid.New().String(),
+		WorkspaceUuid: workspace.Uuid,
+		Name:          "test-feature",
+		Url:           "https://github.com/test-feature",
+		Priority:      0,
+		CreatedBy:     person.OwnerPubKey,
+	}
+	_, err = db.TestDB.CreateOrEditFeature(feature)
+	require.NoError(t, err)
+
+	phase := db.FeaturePhase{
+		Uuid:        uuid.New().String(),
+		FeatureUuid: feature.Uuid,
+		Name:        "test-phase",
+		Priority:    0,
+	}
+	_, err = db.TestDB.CreateOrEditFeaturePhase(phase)
+	require.NoError(t, err)
+
+	ticketUUID := uuid.New()
+	ticket := db.Tickets{
+		UUID:        ticketUUID,
+		FeatureUUID: feature.Uuid,
+		PhaseUUID:   phase.Uuid,
+		Name:        "Test Ticket",
+		Description: "Test Description",
+		Status:      db.DraftTicket,
+		AuthorID:    &person.OwnerPubKey,
+		Features:    feature,
+	}
+	createdTicket, err := db.TestDB.CreateOrEditTicket(&ticket)
+	require.NoError(t, err)
+
+	t.Run("should create bounty from ticket and allow editing", func(t *testing.T) {
+		// Step 1: Create bounty from ticket
+		rr := httptest.NewRecorder()
+		req := httptest.NewRequest(http.MethodPost, "/tickets/"+ticketUUID.String()+"/bounty", nil)
+
+		rctx := chi.NewRouteContext()
+		rctx.URLParams.Add("ticket_uuid", createdTicket.UUID.String())
+		req = req.WithContext(context.WithValue(req.Context(), chi.RouteCtxKey, rctx))
+
+		// Add auth context
+		req = req.WithContext(context.WithValue(req.Context(), auth.ContextKey, person.OwnerPubKey))
+
+		tHandler.TicketToBounty(rr, req)
+
+		assert.Equal(t, http.StatusCreated, rr.Code)
+
+		var resp CreateBountyResponse
+		err := json.NewDecoder(rr.Body).Decode(&resp)
+		require.NoError(t, err)
+		assert.True(t, resp.Success)
+		assert.NotZero(t, resp.BountyID)
+
+		// Step 2: Edit bounty title
+		updatedTitle := "Updated Bounty Title"
+		now := time.Now()
+		bounty := db.NewBounty{
+			ID:          resp.BountyID,
+			Title:       updatedTitle,
+			Description: ticket.Description,
+			OwnerID:     person.OwnerPubKey,
+			Type:        "Other",
+			PhaseUuid:   phase.Uuid,
+			Show:        true,
+			Price:       21,
+			Created:     now.Unix(),
+			Updated:     &now,
+		}
+
+		rr = httptest.NewRecorder()
+		requestBody, err := json.Marshal(bounty)
+		require.NoError(t, err)
+
+		req = httptest.NewRequest(http.MethodPost, "/gobounties", bytes.NewReader(requestBody))
+		req.Header.Set("Content-Type", "application/json")
+		req = req.WithContext(context.WithValue(req.Context(), auth.ContextKey, person.OwnerPubKey))
+
+		bHandler.CreateOrEditBounty(rr, req)
+		assert.Equal(t, http.StatusOK, rr.Code)
+
+		// Verify title was updated
+		var updatedBounty db.NewBounty
+		err = json.NewDecoder(rr.Body).Decode(&updatedBounty)
+		require.NoError(t, err)
+		assert.Equal(t, updatedTitle, updatedBounty.Title)
+
+		// Step 3: Assign user to bounty
+		assignee := db.Person{
+			Uuid:        uuid.New().String(),
+			OwnerAlias:  "assignee-alias",
+			UniqueName:  "assignee-unique-name",
+			OwnerPubKey: "assignee-pubkey",
+		}
+		_, err = db.TestDB.CreateOrEditPerson(assignee)
+		require.NoError(t, err)
+
+		bounty.Assignee = assignee.OwnerPubKey
+		requestBody, err = json.Marshal(bounty)
+		require.NoError(t, err)
+
+		rr = httptest.NewRecorder()
+		req = httptest.NewRequest(http.MethodPost, "/gobounties", bytes.NewReader(requestBody))
+		req.Header.Set("Content-Type", "application/json")
+		req = req.WithContext(context.WithValue(req.Context(), auth.ContextKey, person.OwnerPubKey))
+
+		bHandler.CreateOrEditBounty(rr, req)
+		assert.Equal(t, http.StatusOK, rr.Code)
+
+		// Verify assignee was updated
+		err = json.NewDecoder(rr.Body).Decode(&updatedBounty)
+		require.NoError(t, err)
+		assert.Equal(t, assignee.OwnerPubKey, updatedBounty.Assignee)
 	})
 }

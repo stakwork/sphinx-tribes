@@ -109,6 +109,7 @@ func SetupSuite(_ *testing.T) func(tb testing.TB) {
 	db.InitTestDB()
 
 	return func(_ testing.TB) {
+		defer db.CloseTestDB()
 		log.Println("Teardown test")
 	}
 }
@@ -125,12 +126,15 @@ func TestCreateOrEditBounty(t *testing.T) {
 	teardownSuite := SetupSuite(t)
 	defer teardownSuite(t)
 
+	// create user
+	db.TestDB.CreateOrEditPerson(bountyOwner)
+
 	existingBounty := db.NewBounty{
 		Type:          "coding",
 		Title:         "existing bounty",
 		Description:   "existing bounty description",
 		WorkspaceUuid: "work-1",
-		OwnerID:       "first-user",
+		OwnerID:       bountyOwner.OwnerPubKey,
 		Price:         2000,
 	}
 
@@ -142,19 +146,19 @@ func TestCreateOrEditBounty(t *testing.T) {
 		Title:         "new bounty",
 		Description:   "new bounty description",
 		WorkspaceUuid: "work-1",
-		OwnerID:       "test-key",
+		OwnerID:       bountyOwner.OwnerPubKey,
 		Price:         1500,
 	}
 
 	failedBounty := db.NewBounty{
-		Type:          "coding",
 		Title:         "new bounty",
 		Description:   "failed bounty description",
 		WorkspaceUuid: "work-1",
+		OwnerID:       bountyOwner.OwnerPubKey,
 		Price:         1500,
 	}
 
-	ctx := context.WithValue(context.Background(), auth.ContextKey, "test-key")
+	ctx := context.WithValue(context.Background(), auth.ContextKey, bountyOwner.OwnerPubKey)
 	mockClient := mocks.NewHttpClient(t)
 	mockUserHasManageBountyRolesTrue := func(pubKeyFromAuth string, uuid string) bool {
 		return true
@@ -699,6 +703,7 @@ func TestGetBountyByCreated(t *testing.T) {
 		mockDb.On("GetPersonByPubkey", "owner-1").Return(db.Person{}).Once()
 		mockDb.On("GetPersonByPubkey", "user1").Return(db.Person{}).Once()
 		mockDb.On("GetWorkspaceByUuid", "work-1").Return(db.Workspace{}).Once()
+		mockDb.On("GetProofsByBountyID", bounty.ID).Return([]db.ProofOfWork{}).Once()
 		handler.ServeHTTP(rr, req)
 
 		var returnedBounty []db.BountyResponse
@@ -2391,4 +2396,868 @@ func TestGetBountyCards(t *testing.T) {
 		assert.Equal(t, bountyWithoutAssignee.Title, cardWithoutAssignee.Title)
 		assert.Empty(t, cardWithoutAssignee.AssigneePic)
 	})
+}
+
+func TestDeleteBountyAssignee(t *testing.T) {
+
+	teardownSuite := SetupSuite(t)
+	defer teardownSuite(t)
+
+	mockHttpClient := mocks.NewHttpClient(t)
+
+	bHandler := NewBountyHandler(mockHttpClient, db.TestDB)
+
+	db.CleanTestData()
+
+	db.TestDB.CreateOrEditBounty(db.NewBounty{
+		Type:          "coding",
+		Title:         "Bounty 1",
+		Description:   "Description for Bounty 1",
+		WorkspaceUuid: "work-1",
+		OwnerID:       "validOwner",
+		Price:         1500,
+		Created:       1234567890,
+	})
+
+	db.TestDB.CreateOrEditBounty(db.NewBounty{
+		Type:          "design",
+		Title:         "Bounty 2",
+		Description:   "Description for Bounty 2",
+		WorkspaceUuid: "work-2",
+		OwnerID:       "nonExistentOwner",
+		Price:         2000,
+		Created:       1234567891,
+	})
+
+	db.TestDB.CreateOrEditBounty(db.NewBounty{
+		Type:          "design",
+		Title:         "Bounty 2",
+		Description:   "Description for Bounty 2",
+		WorkspaceUuid: "work-2",
+		OwnerID:       "validOwner",
+		Price:         2000,
+		Created:       0,
+	})
+
+	tests := []struct {
+		name           string
+		input          interface{}
+		mockSetup      func()
+		expectedStatus int
+		expectedBody   bool
+	}{
+		{
+			name: "Valid Input - Successful Deletion",
+			input: db.DeleteBountyAssignee{
+				Owner_pubkey: "validOwner",
+				Created:      "1234567890",
+			},
+			expectedStatus: http.StatusOK,
+			expectedBody:   true,
+		},
+		{
+			name:           "Empty JSON Body",
+			input:          nil,
+			expectedStatus: http.StatusNotAcceptable,
+			expectedBody:   false,
+		},
+		{
+			name:           "Invalid JSON Format",
+			input:          `{"Owner_pubkey": "abc", "Created": }`,
+			expectedStatus: http.StatusNotAcceptable,
+			expectedBody:   false,
+		},
+		{
+			name: "Non-Existent Bounty",
+			input: db.DeleteBountyAssignee{
+				Owner_pubkey: "nonExistentOwner",
+				Created:      "1234567890",
+			},
+			expectedStatus: http.StatusBadRequest,
+			expectedBody:   false,
+		},
+		{
+			name: "Mismatched Owner Key",
+			input: db.DeleteBountyAssignee{
+				Owner_pubkey: "wrongOwner",
+				Created:      "1234567890",
+			},
+			expectedStatus: http.StatusBadRequest,
+			expectedBody:   false,
+		},
+		{
+			name: "Invalid Data Types",
+			input: db.DeleteBountyAssignee{
+				Owner_pubkey: "validOwners",
+				Created:      "invalidDate",
+			},
+			expectedStatus: http.StatusBadRequest,
+			expectedBody:   false,
+		},
+		{
+			name: "Null Values",
+			input: db.DeleteBountyAssignee{
+				Owner_pubkey: "",
+				Created:      "",
+			},
+			expectedStatus: http.StatusBadRequest,
+			expectedBody:   false,
+		},
+		{
+			name: "Large JSON Body",
+			input: map[string]interface{}{
+				"Owner_pubkey": "validOwner",
+				"Created":      "1234567890",
+				"Extra":        make([]byte, 10000),
+			},
+			expectedStatus: http.StatusOK,
+			expectedBody:   true,
+		},
+		{
+			name: "Boundary Date Value",
+			input: db.DeleteBountyAssignee{
+				Owner_pubkey: "validOwner",
+				Created:      "0",
+			},
+			expectedStatus: http.StatusOK,
+			expectedBody:   true,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+
+			var body []byte
+			if tt.input != nil {
+				switch v := tt.input.(type) {
+				case string:
+					body = []byte(v)
+				default:
+					var err error
+					body, err = json.Marshal(tt.input)
+					if err != nil {
+						t.Fatalf("Failed to marshal input: %v", err)
+					}
+				}
+			}
+
+			req := httptest.NewRequest(http.MethodDelete, "/gobounties/assignee", bytes.NewReader(body))
+
+			w := httptest.NewRecorder()
+
+			bHandler.DeleteBountyAssignee(w, req)
+
+			resp := w.Result()
+			defer resp.Body.Close()
+
+			assert.Equal(t, tt.expectedStatus, resp.StatusCode)
+
+			if resp.StatusCode == http.StatusOK || resp.StatusCode == http.StatusBadRequest {
+
+				var result bool
+				err := json.NewDecoder(resp.Body).Decode(&result)
+				if err != nil {
+					t.Fatalf("Failed to decode response body: %v", err)
+				}
+
+				assert.Equal(t, tt.expectedBody, result)
+			}
+		})
+	}
+
+}
+
+func TestBountyGetFilterCount(t *testing.T) {
+	teardownSuite := SetupSuite(t)
+	defer teardownSuite(t)
+
+	mockHttpClient := mocks.NewHttpClient(t)
+	bHandler := NewBountyHandler(mockHttpClient, db.TestDB)
+
+	tests := []struct {
+		name          string
+		setupBounties []db.NewBounty
+		expected      db.FilterStattuCount
+	}{
+		{
+			name:          "Empty Database",
+			setupBounties: []db.NewBounty{},
+			expected: db.FilterStattuCount{
+				Open: 0, Assigned: 0, Completed: 0,
+				Paid: 0, Pending: 0, Failed: 0,
+			},
+		},
+		{
+			name: "Only Open Bounties",
+			setupBounties: []db.NewBounty{
+				{
+					Show:     true,
+					Assignee: "",
+					Paid:     false,
+					OwnerID:  "test-owner-1",
+					Type:     "coding",
+					Title:    "Test Bounty 1",
+				},
+				{
+					Show:     true,
+					Assignee: "",
+					Paid:     false,
+					OwnerID:  "test-owner-2",
+					Type:     "coding",
+					Title:    "Test Bounty 2",
+				},
+			},
+			expected: db.FilterStattuCount{
+				Open:      2,
+				Assigned:  0,
+				Completed: 0,
+				Paid:      0,
+				Pending:   0,
+				Failed:    0,
+			},
+		},
+		{
+			name: "Only Assigned Bounties",
+			setupBounties: []db.NewBounty{
+				{
+					Show:      true,
+					Assignee:  "user1",
+					Paid:      false,
+					Completed: false,
+					OwnerID:   "test-owner-1",
+					Type:      "coding",
+					Title:     "Test Bounty 1",
+					Created:   time.Now().Unix(),
+				},
+				{
+					Show:      true,
+					Assignee:  "user2",
+					Paid:      false,
+					Completed: false,
+					OwnerID:   "test-owner-2",
+					Type:      "coding",
+					Title:     "Test Bounty 2",
+					Created:   time.Now().Unix(),
+				},
+			},
+			expected: db.FilterStattuCount{
+				Open:      0,
+				Assigned:  2,
+				Completed: 0,
+				Paid:      0,
+				Pending:   0,
+				Failed:    0,
+			},
+		},
+		{
+			name: "Only Completed Bounties",
+			setupBounties: []db.NewBounty{
+				{
+					Show:      true,
+					Assignee:  "user1",
+					Completed: true,
+					Paid:      false,
+					OwnerID:   "test-owner-1",
+					Type:      "coding",
+					Title:     "Test Bounty 1",
+					Created:   time.Now().Unix(),
+				},
+				{
+					Show:      true,
+					Assignee:  "user2",
+					Completed: true,
+					Paid:      false,
+					OwnerID:   "test-owner-2",
+					Type:      "coding",
+					Title:     "Test Bounty 2",
+					Created:   time.Now().Unix(),
+				},
+			},
+			expected: db.FilterStattuCount{
+				Open:      0,
+				Assigned:  2,
+				Completed: 2,
+				Paid:      0,
+				Pending:   0,
+				Failed:    0,
+			},
+		},
+		{
+			name: "Only Paid Bounties",
+			setupBounties: []db.NewBounty{
+				{
+					Show:     true,
+					Assignee: "user1",
+					Paid:     true,
+					OwnerID:  "test-owner-1",
+					Type:     "coding",
+					Title:    "Test Bounty 1",
+					Created:  time.Now().Unix(),
+				},
+				{
+					Show:     true,
+					Assignee: "user2",
+					Paid:     true,
+					OwnerID:  "test-owner-2",
+					Type:     "coding",
+					Title:    "Test Bounty 2",
+					Created:  time.Now().Unix(),
+				},
+			},
+			expected: db.FilterStattuCount{
+				Open: 0, Assigned: 0, Completed: 0,
+				Paid: 2, Pending: 0, Failed: 0,
+			},
+		},
+		{
+			name: "Only Pending Payment Bounties",
+			setupBounties: []db.NewBounty{
+				{
+					Show:           true,
+					Assignee:       "user1",
+					PaymentPending: true,
+					OwnerID:        "test-owner-1",
+					Type:           "coding",
+					Title:          "Test Bounty 1",
+					Created:        time.Now().Unix(),
+				},
+				{
+					Show:           true,
+					Assignee:       "user2",
+					PaymentPending: true,
+					OwnerID:        "test-owner-2",
+					Type:           "coding",
+					Title:          "Test Bounty 2",
+					Created:        time.Now().Unix(),
+				},
+			},
+			expected: db.FilterStattuCount{
+				Open: 0, Assigned: 2, Completed: 0,
+				Paid: 0, Pending: 2, Failed: 0,
+			},
+		},
+		{
+			name: "Only Failed Payment Bounties",
+			setupBounties: []db.NewBounty{
+				{
+					Show:          true,
+					Assignee:      "user1",
+					PaymentFailed: true,
+					OwnerID:       "test-owner-1",
+					Type:          "coding",
+					Title:         "Test Bounty 1",
+					Created:       time.Now().Unix(),
+				},
+				{
+					Show:          true,
+					Assignee:      "user2",
+					PaymentFailed: true,
+					OwnerID:       "test-owner-2",
+					Type:          "coding",
+					Title:         "Test Bounty 2",
+					Created:       time.Now().Unix(),
+				},
+			},
+			expected: db.FilterStattuCount{
+				Open: 0, Assigned: 2, Completed: 0,
+				Paid: 0, Pending: 0, Failed: 2,
+			},
+		},
+		{
+			name: "Hidden Bounties Should Not Count",
+			setupBounties: []db.NewBounty{
+				{
+					Show:     false,
+					Assignee: "",
+					Paid:     false,
+					OwnerID:  "test-owner-1",
+					Type:     "coding",
+					Title:    "Test Bounty 1",
+					Created:  time.Now().Unix(),
+				},
+				{
+					Show:      false,
+					Assignee:  "user1",
+					Completed: true,
+					OwnerID:   "test-owner-2",
+					Type:      "coding",
+					Title:     "Test Bounty 2",
+					Created:   time.Now().Unix(),
+				},
+			},
+			expected: db.FilterStattuCount{
+				Open: 0, Assigned: 0, Completed: 0,
+				Paid: 0, Pending: 0, Failed: 0,
+			},
+		},
+		{
+			name: "Mixed Status Bounties",
+			setupBounties: []db.NewBounty{
+				{
+					Show: true, Assignee: "", Paid: false,
+					OwnerID: "test-owner-1", Type: "coding", Title: "Open Bounty",
+					Created: time.Now().Unix(),
+				},
+				{
+					Show: true, Assignee: "user1", Paid: false,
+					OwnerID: "test-owner-2", Type: "coding", Title: "Assigned Bounty",
+					Created: time.Now().Unix(),
+				},
+				{
+					Show: true, Assignee: "user2", Completed: true, Paid: false,
+					OwnerID: "test-owner-3", Type: "coding", Title: "Completed Bounty",
+					Created: time.Now().Unix(),
+				},
+				{
+					Show: true, Assignee: "user3", Paid: true,
+					OwnerID: "test-owner-4", Type: "coding", Title: "Paid Bounty",
+					Created: time.Now().Unix(),
+				},
+				{
+					Show: true, Assignee: "user4", PaymentPending: true,
+					OwnerID: "test-owner-5", Type: "coding", Title: "Pending Bounty",
+					Created: time.Now().Unix(),
+				},
+				{
+					Show: true, Assignee: "user5", PaymentFailed: true,
+					OwnerID: "test-owner-6", Type: "coding", Title: "Failed Bounty",
+					Created: time.Now().Unix(),
+				},
+				{
+					Show: false, Assignee: "user6", Paid: true,
+					OwnerID: "test-owner-7", Type: "coding", Title: "Hidden Bounty",
+					Created: time.Now().Unix(),
+				},
+			},
+			expected: db.FilterStattuCount{
+				Open: 1, Assigned: 4, Completed: 1,
+				Paid: 1, Pending: 1, Failed: 1,
+			},
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+
+			db.TestDB.DeleteAllBounties()
+
+			for _, bounty := range tt.setupBounties {
+				_, err := db.TestDB.CreateOrEditBounty(bounty)
+				if err != nil {
+					t.Fatalf("Failed to create test bounty: %v", err)
+				}
+			}
+
+			rr := httptest.NewRecorder()
+			req, err := http.NewRequest(http.MethodGet, "/filter/count", nil)
+			if err != nil {
+				t.Fatal(err)
+			}
+
+			bHandler.GetFilterCount(rr, req)
+
+			assert.Equal(t, http.StatusOK, rr.Code)
+
+			var result db.FilterStattuCount
+			err = json.NewDecoder(rr.Body).Decode(&result)
+			if err != nil {
+				t.Fatalf("Failed to decode response: %v", err)
+			}
+
+			assert.Equal(t, tt.expected, result)
+		})
+	}
+}
+
+func TestGenerateBountyCardResponse(t *testing.T) {
+
+	teardownSuite := SetupSuite(t)
+	defer teardownSuite(t)
+
+	mockHttpClient := mocks.NewHttpClient(t)
+	bHandler := NewBountyHandler(mockHttpClient, db.TestDB)
+
+	db.CleanTestData()
+
+	workspace := db.Workspace{
+		ID:          1,
+		Uuid:        "test-workspace-uuid",
+		Name:        "Test Workspace",
+		Description: "Test Workspace Description",
+		OwnerPubKey: "test-owner",
+	}
+	_, err := db.TestDB.CreateOrEditWorkspace(workspace)
+	assert.NoError(t, err)
+
+	phase := db.FeaturePhase{
+		Uuid:        "test-phase-uuid",
+		Name:        "Test Phase",
+		FeatureUuid: "test-feature-uuid",
+	}
+	db.TestDB.CreateOrEditFeaturePhase(phase)
+
+	feature := db.WorkspaceFeatures{
+		Uuid:          "test-feature-uuid",
+		Name:          "Test Feature",
+		WorkspaceUuid: workspace.Uuid,
+	}
+	db.TestDB.CreateOrEditFeature(feature)
+
+	assignee := db.Person{
+		OwnerPubKey: "test-assignee",
+		Img:         "test-image-url",
+	}
+	db.TestDB.CreateOrEditPerson(assignee)
+
+	now := time.Now()
+
+	publicBounty := db.NewBounty{
+		ID:            1,
+		Type:          "coding",
+		Title:         "Public Bounty",
+		Description:   "Test Description",
+		WorkspaceUuid: workspace.Uuid,
+		PhaseUuid:     phase.Uuid,
+		Assignee:      assignee.OwnerPubKey,
+		Show:          true,
+		Created:       now.Unix(),
+		OwnerID:       "test-owner",
+		Price:         1000,
+	}
+	_, err = db.TestDB.CreateOrEditBounty(publicBounty)
+	assert.NoError(t, err)
+
+	privateBounty := db.NewBounty{
+		ID:            2,
+		Type:          "coding",
+		Title:         "Private Bounty",
+		Description:   "Test Description",
+		WorkspaceUuid: workspace.Uuid,
+		PhaseUuid:     phase.Uuid,
+		Assignee:      assignee.OwnerPubKey,
+		Show:          false,
+		Created:       now.Unix(),
+		OwnerID:       "test-owner",
+		Price:         2000,
+	}
+	_, err = db.TestDB.CreateOrEditBounty(privateBounty)
+	assert.NoError(t, err)
+
+	inputBounties := []db.NewBounty{publicBounty, privateBounty}
+
+	response := bHandler.GenerateBountyCardResponse(inputBounties)
+
+	assert.Equal(t, 2, len(response), "Should return cards for both bounties")
+
+	titles := make(map[string]bool)
+	for _, card := range response {
+		titles[card.Title] = true
+
+		assert.Equal(t, workspace.Uuid, card.Workspace.Uuid)
+		assert.Equal(t, assignee.Img, card.AssigneePic)
+		assert.Equal(t, phase.Uuid, card.Phase.Uuid)
+		assert.Equal(t, feature.Uuid, card.Features.Uuid)
+	}
+
+	assert.True(t, titles["Public Bounty"], "Public bounty should be present")
+	assert.True(t, titles["Private Bounty"], "Private bounty should be present")
+}
+
+func TestGetWorkspaceBountyCards(t *testing.T) {
+	teardownSuite := SetupSuite(t)
+	defer teardownSuite(t)
+
+	mockHttpClient := mocks.NewHttpClient(t)
+	bHandler := NewBountyHandler(mockHttpClient, db.TestDB)
+
+	db.CleanTestData()
+
+	workspace := db.Workspace{
+		ID:          1,
+		Uuid:        "test-workspace-uuid",
+		Name:        "Test Workspace",
+		Description: "Test Workspace Description",
+		OwnerPubKey: "test-owner",
+	}
+	_, err := db.TestDB.CreateOrEditWorkspace(workspace)
+	assert.NoError(t, err)
+
+	phase := db.FeaturePhase{
+		Uuid:        "test-phase-uuid",
+		Name:        "Test Phase",
+		FeatureUuid: "test-feature-uuid",
+	}
+	db.TestDB.CreateOrEditFeaturePhase(phase)
+
+	feature := db.WorkspaceFeatures{
+		Uuid:          "test-feature-uuid",
+		Name:          "Test Feature",
+		WorkspaceUuid: workspace.Uuid,
+	}
+	db.TestDB.CreateOrEditFeature(feature)
+
+	assignee := db.Person{
+		OwnerPubKey: "test-assignee",
+		Img:         "test-image-url",
+	}
+	db.TestDB.CreateOrEditPerson(assignee)
+
+	now := time.Now()
+
+	publicBounty := db.NewBounty{
+		ID:            1,
+		Type:          "coding",
+		Title:         "Public Bounty",
+		Description:   "Test Description",
+		WorkspaceUuid: workspace.Uuid,
+		PhaseUuid:     phase.Uuid,
+		Assignee:      assignee.OwnerPubKey,
+		Show:          true,
+		Created:       now.Unix(),
+		OwnerID:       "test-owner",
+		Price:         1000,
+	}
+
+	privateBounty := db.NewBounty{
+		ID:            2,
+		Type:          "coding",
+		Title:         "Private Bounty",
+		Description:   "Test Description",
+		WorkspaceUuid: workspace.Uuid,
+		PhaseUuid:     phase.Uuid,
+		Assignee:      assignee.OwnerPubKey,
+		Show:          false,
+		Created:       now.Add(time.Hour).Unix(),
+		OwnerID:       "test-owner",
+		Price:         2000,
+	}
+
+	fiveWeeksAgo := now.Add(-5 * 7 * 24 * time.Hour)
+	threeWeeksAgo := now.Add(-3 * 7 * 24 * time.Hour)
+
+	t.Run("should only get public bounty", func(t *testing.T) {
+		db.TestDB.DeleteAllBounties()
+		_, err := db.TestDB.CreateOrEditBounty(publicBounty)
+		assert.NoError(t, err)
+
+		rr := httptest.NewRecorder()
+		handler := http.HandlerFunc(bHandler.GetBountyCards)
+
+		req, err := http.NewRequest(http.MethodGet, "/gobounties/bounty-cards", nil)
+		assert.NoError(t, err)
+
+		handler.ServeHTTP(rr, req)
+
+		var response []db.BountyCard
+		err = json.Unmarshal(rr.Body.Bytes(), &response)
+		assert.NoError(t, err)
+		assert.Equal(t, http.StatusOK, rr.Code)
+		assert.Equal(t, 1, len(response))
+		assert.Equal(t, "Public Bounty", response[0].Title)
+	})
+
+	t.Run("should get private bounty in workspace context", func(t *testing.T) {
+		db.TestDB.DeleteAllBounties()
+		_, err := db.TestDB.CreateOrEditBounty(privateBounty)
+		assert.NoError(t, err)
+
+		rr := httptest.NewRecorder()
+		handler := http.HandlerFunc(bHandler.GetBountyCards)
+
+		req, err := http.NewRequest(http.MethodGet, fmt.Sprintf("/gobounties/bounty-cards?workspace_uuid=%s", workspace.Uuid), nil)
+		assert.NoError(t, err)
+
+		handler.ServeHTTP(rr, req)
+
+		var response []db.BountyCard
+		err = json.Unmarshal(rr.Body.Bytes(), &response)
+		assert.NoError(t, err)
+		assert.Equal(t, http.StatusOK, rr.Code)
+		assert.Equal(t, 1, len(response))
+		assert.Equal(t, "Private Bounty", response[0].Title)
+	})
+
+	t.Run("should include recent unpaid bounty", func(t *testing.T) {
+		db.TestDB.DeleteAllBounties()
+
+		recentUnpaidBounty := db.NewBounty{
+			ID:            1,
+			Type:          "coding",
+			Title:         "Recent Unpaid",
+			Description:   "Test Description",
+			WorkspaceUuid: workspace.Uuid,
+			PhaseUuid:     phase.Uuid,
+			Assignee:      assignee.OwnerPubKey,
+			Show:          true,
+			Created:       now.Unix(),
+			OwnerID:       "test-owner",
+			Price:         1000,
+			Updated:       &now,
+			Paid:          false,
+		}
+		_, err := db.TestDB.CreateOrEditBounty(recentUnpaidBounty)
+		assert.NoError(t, err)
+
+		rr := httptest.NewRecorder()
+		handler := http.HandlerFunc(bHandler.GetBountyCards)
+		req, err := http.NewRequest(http.MethodGet, fmt.Sprintf("/gobounties/bounty-cards?workspace_uuid=%s", workspace.Uuid), nil)
+		assert.NoError(t, err)
+
+		handler.ServeHTTP(rr, req)
+
+		var response []db.BountyCard
+		err = json.Unmarshal(rr.Body.Bytes(), &response)
+		assert.NoError(t, err)
+		assert.Equal(t, http.StatusOK, rr.Code)
+		assert.Equal(t, 1, len(response))
+		assert.Equal(t, "Recent Unpaid", response[0].Title)
+	})
+
+	t.Run("should include recent paid bounty", func(t *testing.T) {
+		db.TestDB.DeleteAllBounties()
+
+		recentPaidBounty := db.NewBounty{
+			ID:            1,
+			Type:          "coding",
+			Title:         "Recent Paid",
+			Description:   "Test Description",
+			WorkspaceUuid: workspace.Uuid,
+			PhaseUuid:     phase.Uuid,
+			Assignee:      assignee.OwnerPubKey,
+			Show:          true,
+			Created:       now.Unix(),
+			OwnerID:       "test-owner",
+			Price:         1000,
+			Updated:       &now,
+			Paid:          true,
+		}
+		_, err := db.TestDB.CreateOrEditBounty(recentPaidBounty)
+		assert.NoError(t, err)
+
+		rr := httptest.NewRecorder()
+		handler := http.HandlerFunc(bHandler.GetBountyCards)
+		req, err := http.NewRequest(http.MethodGet, fmt.Sprintf("/gobounties/bounty-cards?workspace_uuid=%s", workspace.Uuid), nil)
+		assert.NoError(t, err)
+
+		handler.ServeHTTP(rr, req)
+
+		var response []db.BountyCard
+		err = json.Unmarshal(rr.Body.Bytes(), &response)
+		assert.NoError(t, err)
+		assert.Equal(t, http.StatusOK, rr.Code)
+		assert.Equal(t, 1, len(response))
+		assert.Equal(t, "Recent Paid", response[0].Title)
+	})
+
+	t.Run("should exclude old unpaid bounty", func(t *testing.T) {
+		db.TestDB.DeleteAllBounties()
+
+		oldUnpaidBounty := db.NewBounty{
+			ID:            1,
+			Type:          "coding",
+			Title:         "Old Unpaid",
+			Description:   "Test Description",
+			WorkspaceUuid: workspace.Uuid,
+			PhaseUuid:     phase.Uuid,
+			Assignee:      assignee.OwnerPubKey,
+			Show:          true,
+			Created:       fiveWeeksAgo.Unix(),
+			OwnerID:       "test-owner",
+			Price:         1000,
+			Updated:       &fiveWeeksAgo,
+			Paid:          false,
+		}
+		_, err := db.TestDB.CreateOrEditBounty(oldUnpaidBounty)
+		assert.NoError(t, err)
+
+		rr := httptest.NewRecorder()
+		handler := http.HandlerFunc(bHandler.GetBountyCards)
+		req, err := http.NewRequest(http.MethodGet, fmt.Sprintf("/gobounties/bounty-cards?workspace_uuid=%s", workspace.Uuid), nil)
+		assert.NoError(t, err)
+
+		handler.ServeHTTP(rr, req)
+
+		var response []db.BountyCard
+		err = json.Unmarshal(rr.Body.Bytes(), &response)
+		assert.NoError(t, err)
+		assert.Equal(t, http.StatusOK, rr.Code)
+		assert.Equal(t, 0, len(response))
+	})
+
+	t.Run("should exclude old paid bounty", func(t *testing.T) {
+		db.TestDB.DeleteAllBounties()
+
+		oldPaidBounty := db.NewBounty{
+			ID:            1,
+			Type:          "coding",
+			Title:         "Old Paid",
+			Description:   "Test Description",
+			WorkspaceUuid: workspace.Uuid,
+			PhaseUuid:     phase.Uuid,
+			Assignee:      assignee.OwnerPubKey,
+			Show:          true,
+			Created:       threeWeeksAgo.Unix(),
+			OwnerID:       "test-owner",
+			Price:         1000,
+			Updated:       &threeWeeksAgo,
+			Paid:          true,
+		}
+		_, err := db.TestDB.CreateOrEditBounty(oldPaidBounty)
+		assert.NoError(t, err)
+
+		rr := httptest.NewRecorder()
+		handler := http.HandlerFunc(bHandler.GetBountyCards)
+		req, err := http.NewRequest(http.MethodGet, fmt.Sprintf("/gobounties/bounty-cards?workspace_uuid=%s", workspace.Uuid), nil)
+		assert.NoError(t, err)
+
+		handler.ServeHTTP(rr, req)
+
+		var response []db.BountyCard
+		err = json.Unmarshal(rr.Body.Bytes(), &response)
+		assert.NoError(t, err)
+		assert.Equal(t, http.StatusOK, rr.Code)
+		assert.Equal(t, 0, len(response))
+	})
+}
+
+func TestIsValidProofStatus(t *testing.T) {
+
+	tests := []struct {
+		name     string
+		status   db.ProofOfWorkStatus
+		expected bool
+	}{
+		{
+			name:     "Valid Status - New",
+			status:   db.NewStatus,
+			expected: true,
+		},
+		{
+			name:     "Valid Status - Accepted",
+			status:   db.AcceptedStatus,
+			expected: true,
+		},
+		{
+			name:     "Valid Status - Rejected",
+			status:   db.RejectedStatus,
+			expected: true,
+		},
+		{
+			name:     "Valid Status - Change Requested",
+			status:   db.ChangeRequestedStatus,
+			expected: true,
+		},
+		{
+			name:     "Invalid Status - Unknown Value",
+			status:   "999",
+			expected: false,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			result := isValidProofStatus(tt.status)
+			assert.Equal(t, tt.expected, result, "isValidProofStatus(%v) = %v; want %v", tt.status, result, tt.expected)
+		})
+	}
 }

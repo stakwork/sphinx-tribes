@@ -53,6 +53,16 @@ type UpdateTicketRequest struct {
 	Ticket *db.Tickets `json:"ticket"`
 }
 
+type UpdateTicketSequenceRequest struct {
+	Ticket *db.Tickets `json:"ticket"`
+}
+
+type CreateBountyResponse struct {
+	BountyID uint   `json:"bounty_id"`
+	Success  bool   `json:"success"`
+	Message  string `json:"message"`
+}
+
 func (th *ticketHandler) GetTicket(w http.ResponseWriter, r *http.Request) {
 	uuid := chi.URLParam(r, "uuid")
 	if uuid == "" {
@@ -200,6 +210,71 @@ func (th *ticketHandler) UpdateTicket(w http.ResponseWriter, r *http.Request) {
 
 	w.WriteHeader(http.StatusOK)
 	json.NewEncoder(w).Encode(createdTicket)
+}
+
+func (th *ticketHandler) UpdateTicketSequence(w http.ResponseWriter, r *http.Request) {
+	ctx := r.Context()
+	pubKeyFromAuth, _ := ctx.Value(auth.ContextKey).(string)
+
+	if pubKeyFromAuth == "" {
+		logger.Log.Info("[ticket] no pubkey from auth")
+		w.WriteHeader(http.StatusUnauthorized)
+		json.NewEncoder(w).Encode(map[string]string{"error": "Unauthorized"})
+		return
+	}
+
+	ticketGroupStr := chi.URLParam(r, "ticket_group")
+	if ticketGroupStr == "" {
+		w.WriteHeader(http.StatusBadRequest)
+		json.NewEncoder(w).Encode(map[string]string{"error": "ticket_group is required"})
+		return
+	}
+
+	ticketGroupUUID, err := uuid.Parse(ticketGroupStr)
+	if err != nil {
+		w.WriteHeader(http.StatusBadRequest)
+		json.NewEncoder(w).Encode(map[string]string{"error": "Invalid UUID format"})
+		return
+	}
+
+	body, err := io.ReadAll(r.Body)
+	if err != nil {
+		w.WriteHeader(http.StatusBadRequest)
+		json.NewEncoder(w).Encode(map[string]string{"error": "Error reading request body"})
+		return
+	}
+	defer r.Body.Close()
+
+	var updateRequest UpdateTicketSequenceRequest
+
+	if err := json.Unmarshal(body, &updateRequest); err != nil {
+		w.WriteHeader(http.StatusBadRequest)
+		json.NewEncoder(w).Encode(map[string]string{"error": "Error parsing request body"})
+		return
+	}
+
+	groupTickets, err := th.db.GetTicketsByGroup(ticketGroupUUID.String())
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		json.NewEncoder(w).Encode(map[string]string{"error": fmt.Sprintf("Failed to fetch tickets: %v", err)})
+		return
+	}
+
+	for _, ticket := range groupTickets {
+		ticket.Sequence = updateRequest.Ticket.Sequence
+		ticket.UpdatedAt = time.Now()
+
+		_, err := th.db.CreateOrEditTicket(&ticket)
+		if err != nil {
+			logger.Log.Error(fmt.Sprintf("Failed to update ticket UUID: %s, error: %v", ticket.UUID.String(), err))
+			w.WriteHeader(http.StatusInternalServerError)
+			json.NewEncoder(w).Encode(map[string]string{"error": fmt.Sprintf("Failed to update ticket sequences: %v", err)})
+			return
+		}
+	}
+
+	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode(map[string]string{"message": "Ticket sequences updated successfully"})
 }
 
 func (th *ticketHandler) DeleteTicket(w http.ResponseWriter, r *http.Request) {
@@ -668,4 +743,58 @@ func (th *ticketHandler) GetTicketsByPhaseUUID(w http.ResponseWriter, r *http.Re
 
 	w.WriteHeader(http.StatusOK)
 	json.NewEncoder(w).Encode(tickets)
+}
+
+func (th *ticketHandler) TicketToBounty(w http.ResponseWriter, r *http.Request) {
+	ctx := r.Context()
+	pubKeyFromAuth, _ := ctx.Value(auth.ContextKey).(string)
+	if pubKeyFromAuth == "" {
+		logger.Log.Error("no pubkey from auth")
+		w.WriteHeader(http.StatusUnauthorized)
+		return
+	}
+
+	ticketUUID := chi.URLParam(r, "ticket_uuid")
+	if ticketUUID == "" {
+		http.Error(w, "ticket UUID is required", http.StatusBadRequest)
+		return
+	}
+
+	if _, err := uuid.Parse(ticketUUID); err != nil {
+		http.Error(w, "invalid ticket UUID format", http.StatusBadRequest)
+		return
+	}
+
+	ticket, err := th.db.GetTicket(ticketUUID)
+	if err != nil {
+		logger.Log.Error("failed to fetch ticket", "error", err, "ticket_uuid", ticketUUID)
+		http.Error(w, "failed to fetch ticket", http.StatusNotFound)
+		return
+	}
+
+	logger.Log.Info("creating bounty from ticket",
+		"ticket_uuid", ticketUUID,
+		"pubkey", pubKeyFromAuth)
+
+	bounty, err := th.db.CreateBountyFromTicket(ticket, pubKeyFromAuth)
+	if err != nil {
+		logger.Log.Error("failed to create bounty",
+			"error", err,
+			"ticket_uuid", ticketUUID,
+			"pubkey", pubKeyFromAuth)
+		http.Error(w, "failed to create bounty", http.StatusInternalServerError)
+		return
+	}
+
+	logger.Log.Info("bounty created successfully",
+		"bounty_id", bounty.ID,
+		"owner_id", bounty.OwnerID)
+
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusCreated)
+	json.NewEncoder(w).Encode(CreateBountyResponse{
+		BountyID: bounty.ID,
+		Success:  true,
+		Message:  "Bounty created successfully",
+	})
 }

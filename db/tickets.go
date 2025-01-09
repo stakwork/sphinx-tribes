@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"github.com/google/uuid"
+	"github.com/lib/pq"
 	"github.com/stakwork/sphinx-tribes/logger"
 	"gorm.io/gorm"
 )
@@ -122,6 +123,17 @@ func (db database) UpdateTicket(ticket Tickets) (Tickets, error) {
 	return updatedTicket, nil
 }
 
+func (db database) GetTicketsByGroup(ticketGroupUUID string) ([]Tickets, error) {
+	var tickets []Tickets
+
+	result := db.db.Model(&Tickets{}).Where("ticket_group = ?", ticketGroupUUID).Find(&tickets)
+	if result.Error != nil {
+		return nil, fmt.Errorf("failed to fetch tickets by group: %w", result.Error)
+	}
+
+	return tickets, nil
+}
+
 func (db database) DeleteTicket(uuid string) error {
 	result := db.db.Where("uuid = ?", uuid).Delete(&Tickets{})
 	if result.Error != nil {
@@ -191,4 +203,33 @@ func (db database) UpdateTicketsWithoutGroup(ticket Tickets) error {
 	}
 
 	return nil
+}
+
+func (db database) CreateBountyFromTicket(ticket Tickets, pubkey string) (*NewBounty, error) {
+	now := time.Now()
+
+	feature := db.GetFeatureByUuid(ticket.FeatureUUID)
+
+	bounty := &NewBounty{
+		Title:           ticket.Name,
+		Description:     ticket.Description,
+		PhaseUuid:       ticket.PhaseUUID,
+		FeatureUuid:     ticket.FeatureUUID,
+		WorkspaceUuid:   feature.WorkspaceUuid,
+		OwnerID:         pubkey,
+		Type:            "freelance_job_request",
+		WantedType:      "Other",
+		Price:           21,
+		Created:         now.Unix(),
+		Updated:         &now,
+		Show:            true,
+		CodingLanguages: pq.StringArray{},
+	}
+
+	if err := db.db.Create(bounty).Error; err != nil {
+		logger.Log.Error("failed to create bounty", "error", err, "ticket_id", ticket.UUID)
+		return nil, fmt.Errorf("failed to create bounty: %w", err)
+	}
+
+	return bounty, nil
 }

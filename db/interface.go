@@ -3,6 +3,8 @@ package db
 import (
 	"net/http"
 	"time"
+
+	"github.com/google/uuid"
 )
 
 type Database interface {
@@ -195,6 +197,7 @@ type Database interface {
 	DeleteProcessingMap(id uint) error
 	ProcessReversePayments(paymentId uint) error
 	CreateOrEditTicket(ticket *Tickets) (Tickets, error)
+	GetTicketsByGroup(ticketGroupUUID string) ([]Tickets, error)
 	GetTicket(uuid string) (Tickets, error)
 	UpdateTicket(ticket Tickets) (Tickets, error)
 	DeleteTicket(uuid string) error
@@ -207,7 +210,7 @@ type Database interface {
 	AddChatMessage(message *ChatMessage) (ChatMessage, error)
 	UpdateChatMessage(message *ChatMessage) (ChatMessage, error)
 	GetChatMessagesForChatID(chatID string) ([]ChatMessage, error)
-	GetChatsForWorkspace(workspaceID string) ([]Chat, error)
+	GetChatsForWorkspace(workspaceID string, chatStatus string) ([]Chat, error)
 	GetCodeGraphByUUID(uuid string) (WorkspaceCodeGraph, error)
 	GetCodeGraphsByWorkspaceUuid(workspace_uuid string) ([]WorkspaceCodeGraph, error)
 	CreateOrEditCodeGraph(m WorkspaceCodeGraph) (WorkspaceCodeGraph, error)
@@ -217,4 +220,31 @@ type Database interface {
 	ProcessUpdateTicketsWithoutGroup()
 	GetNewHunters(r PaymentDateRange) int64
 	TotalPeopleByPeriod(r PaymentDateRange) int64
+	GetProofsByBountyID(bountyID uint) []ProofOfWork
+	CreateProof(proof ProofOfWork) error
+	DeleteProof(proofID string) error
+	UpdateProofStatus(proofID string, status ProofOfWorkStatus) error
+	IncrementProofCount(bountyID uint) error
+	DecrementProofCount(bountyID uint) error
+	CreateBountyTiming(bountyID uint) (*BountyTiming, error)
+	GetBountyTiming(bountyID uint) (*BountyTiming, error)
+	UpdateBountyTiming(timing *BountyTiming) error
+	StartBountyTiming(bountyID uint) error
+	CloseBountyTiming(bountyID uint) error
+	UpdateBountyTimingOnProof(bountyID uint) error
+	GetWorkspaceBountyCardsData(r *http.Request) []NewBounty
+	UpdateFeatureStatus(uuid string, status FeatureStatus) (WorkspaceFeatures, error)
+	CreateBountyFromTicket(ticket Tickets, pubkey string) (*NewBounty, error)
+	AddFeatureFlag(flag *FeatureFlag) (FeatureFlag, error)
+	UpdateFeatureFlag(flag *FeatureFlag) (FeatureFlag, error)
+	DeleteFeatureFlag(flagUUID uuid.UUID) error
+	GetFeatureFlags() ([]FeatureFlag, error)
+	GetFeatureFlagByUUID(flagUUID uuid.UUID) (FeatureFlag, error)
+	GetEndpointByUUID(uuid uuid.UUID) (Endpoint, error)
+	AddEndpoint(endpoint *Endpoint) (Endpoint, error)
+	UpdateEndpoint(endpoint *Endpoint) (Endpoint, error)
+	DeleteEndpoint(endpointUUID uuid.UUID) error
+	GetEndpointsByFeatureFlag(flagUUID uuid.UUID) ([]Endpoint, error)
+	GetEndpointByPath(path string) (Endpoint, error)
+	GetAllEndpoints() ([]Endpoint, error)
 }

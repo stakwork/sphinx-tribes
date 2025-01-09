@@ -78,6 +78,7 @@ func (oh *featureHandler) CreateOrEditFeatures(w http.ResponseWriter, r *http.Re
 
 	if features.Uuid == "" {
 		features.Uuid = xid.New().String()
+		features.FeatStatus = db.ActiveFeature
 	} else {
 		features.UpdatedBy = pubKeyFromAuth
 	}
@@ -697,4 +698,41 @@ func (oh *featureHandler) BriefSend(w http.ResponseWriter, r *http.Request) {
 
 	w.WriteHeader(resp.StatusCode)
 	w.Write(respBody)
+}
+
+func (oh *featureHandler) UpdateFeatureStatus(w http.ResponseWriter, r *http.Request) {
+	ctx := r.Context()
+	pubKeyFromAuth, _ := ctx.Value(auth.ContextKey).(string)
+	if pubKeyFromAuth == "" {
+		logger.Log.Info("no pubkey from auth")
+		w.WriteHeader(http.StatusUnauthorized)
+		return
+	}
+
+	uuid := chi.URLParam(r, "uuid")
+	var req struct {
+		Status db.FeatureStatus `json:"status"`
+	}
+
+	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
+		logger.Log.Error("invalid request body", err)
+		w.WriteHeader(http.StatusBadRequest)
+		return
+	}
+
+	if req.Status != db.ActiveFeature && req.Status != db.ArchivedFeature {
+		logger.Log.Info("invalid feature status")
+		w.WriteHeader(http.StatusBadRequest)
+		return
+	}
+
+	updatedFeature, err := oh.db.UpdateFeatureStatus(uuid, req.Status)
+	if err != nil {
+		logger.Log.Error("failed to update feature status", err)
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+
+	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode(updatedFeature)
 }

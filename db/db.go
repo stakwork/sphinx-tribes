@@ -6,6 +6,7 @@ package db
 import (
 	"errors"
 	"fmt"
+	"math"
 	"net/http"
 	"net/url"
 	"regexp"
@@ -810,6 +811,8 @@ func (db database) GetCreatedBounties(r *http.Request) ([]NewBounty, error) {
 
 	offset, limit, sortBy, direction, _ := utils.GetPaginationParams(r)
 	person := db.GetPersonByUuid(uuid)
+
+	fmt.Println("person", person)
 	pubkey := person.OwnerPubKey
 	keys := r.URL.Query()
 
@@ -862,6 +865,7 @@ func (db database) GetCreatedBounties(r *http.Request) ([]NewBounty, error) {
 	allQuery := query + " " + statusQuery + " " + orderQuery + " " + limitQuery
 
 	err := db.db.Raw(allQuery).Find(&ms).Error
+
 	return ms, err
 }
 
@@ -1884,4 +1888,164 @@ func (db database) DeleteAllBounties() error {
 		return err
 	}
 	return nil
+}
+
+func (db database) GetProofsByBountyID(bountyID uint) []ProofOfWork {
+	var proofs []ProofOfWork
+	db.db.Where("bounty_id = ?", bountyID).Find(&proofs)
+	return proofs
+}
+
+func (db database) CreateProof(proof ProofOfWork) error {
+	return db.db.Create(&proof).Error
+}
+
+func (db database) DeleteProof(proofID string) error {
+	return db.db.Delete(&ProofOfWork{}, "id = ?", proofID).Error
+}
+
+func (db database) UpdateProofStatus(proofID string, status ProofOfWorkStatus) error {
+	return db.db.Model(&ProofOfWork{}).Where("id = ?", proofID).Update("status", status).Error
+}
+
+func (db database) IncrementProofCount(bountyID uint) error { // Ensure bountyID is of type uint
+	var bounty NewBounty
+
+	if err := db.db.Where("id = ?", bountyID).First(&bounty).Error; err != nil {
+		return err
+	}
+
+	return db.db.Model(&bounty).
+		Updates(map[string]interface{}{
+			"proof_of_work_count": bounty.ProofOfWorkCount + 1,
+			"updated":             time.Now(),
+		}).Error
+}
+func (db database) DecrementProofCount(bountyID uint) error {
+	var bounty NewBounty
+	if err := db.db.Where("id = ?", bountyID).First(&bounty).Error; err != nil {
+		return err
+	}
+
+	newCount := int(math.Max(0, float64(bounty.ProofOfWorkCount-1)))
+
+	return db.db.Model(&bounty).
+		Updates(map[string]interface{}{
+			"proof_of_work_count": newCount,
+			"updated":             time.Now(),
+		}).Error
+}
+
+func (db database) CreateBountyTiming(bountyID uint) (*BountyTiming, error) {
+	timing := &BountyTiming{
+		BountyID: bountyID,
+	}
+	err := db.db.Create(timing).Error
+	return timing, err
+}
+
+func (db database) GetBountyTiming(bountyID uint) (*BountyTiming, error) {
+	var timing BountyTiming
+	err := db.db.Where("bounty_id = ?", bountyID).First(&timing).Error
+	if err != nil {
+		return nil, err
+	}
+	return &timing, nil
+}
+
+func (db database) UpdateBountyTiming(timing *BountyTiming) error {
+	return db.db.Save(timing).Error
+}
+
+func (db database) StartBountyTiming(bountyID uint) error {
+	now := time.Now()
+	timing, err := db.GetBountyTiming(bountyID)
+	if err != nil {
+
+		timing, err = db.CreateBountyTiming(bountyID)
+		if err != nil {
+			return err
+		}
+	}
+
+	if timing.FirstAssignedAt == nil {
+		timing.FirstAssignedAt = &now
+		return db.UpdateBountyTiming(timing)
+	}
+	return nil
+}
+
+func (db database) CloseBountyTiming(bountyID uint) error {
+	timing, err := db.GetBountyTiming(bountyID)
+	if err != nil {
+		return err
+	}
+
+	now := time.Now()
+	timing.ClosedAt = &now
+
+	if timing.FirstAssignedAt != nil {
+		timing.TotalDurationSeconds = int(now.Sub(*timing.FirstAssignedAt).Seconds())
+	}
+
+	return db.UpdateBountyTiming(timing)
+}
+
+func (db database) UpdateBountyTimingOnProof(bountyID uint) error {
+	timing, err := db.GetBountyTiming(bountyID)
+	if err != nil {
+		return err
+	}
+
+	now := time.Now()
+
+	if timing.LastPoWAt != nil {
+		workTime := int(now.Sub(*timing.LastPoWAt).Seconds())
+		timing.TotalWorkTimeSeconds += workTime
+	}
+
+	timing.LastPoWAt = &now
+	timing.TotalAttempts++
+
+	return db.UpdateBountyTiming(timing)
+}
+
+func (db database) GetWorkspaceBountyCardsData(r *http.Request) []NewBounty {
+	keys := r.URL.Query()
+	_, _, sortBy, direction, search := utils.GetPaginationParams(r)
+	workspaceUuid := keys.Get("workspace_uuid")
+
+	orderQuery := ""
+	searchQuery := ""
+	workspaceQuery := ""
+	timeFilterQuery := ""
+
+	timeFilterQuery = `
+		AND (
+			(NOT paid AND EXTRACT(EPOCH FROM updated::timestamp) > EXTRACT(EPOCH FROM (NOW() - INTERVAL '4 weeks')))
+			OR (paid AND EXTRACT(EPOCH FROM updated::timestamp) > EXTRACT(EPOCH FROM (NOW() - INTERVAL '2 weeks')))
+			OR updated IS NULL  -- Preserve existing records without updated timestamp
+		)`
+
+	if sortBy != "" && direction != "" {
+		orderQuery = "ORDER BY " + sortBy + " " + direction
+	} else {
+		orderQuery = "ORDER BY created DESC"
+	}
+
+	if search != "" {
+		searchQuery = fmt.Sprintf("AND LOWER(title) LIKE %s", "'%"+strings.ToLower(search)+"%'")
+	}
+
+	if workspaceUuid != "" {
+		workspaceQuery = "WHERE workspace_uuid = '" + workspaceUuid + "'"
+	}
+
+	query := "SELECT * FROM public.bounty"
+	allQuery := query + " " + workspaceQuery + timeFilterQuery + " " + searchQuery + " " + orderQuery
+
+	ms := []NewBounty{}
+	db.db.Raw(allQuery).Scan(&ms)
+
+	return ms
 }
