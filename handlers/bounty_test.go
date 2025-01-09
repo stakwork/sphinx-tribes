@@ -3216,3 +3216,45 @@ func TestGetWorkspaceBountyCards(t *testing.T) {
 		assert.Equal(t, 0, len(response))
 	})
 }
+
+func TestIsValidProofStatus(t *testing.T) {
+
+	tests := []struct {
+		name     string
+		status   db.ProofOfWorkStatus
+		expected bool
+	}{
+		{
+			name:     "Valid Status - New",
+			status:   db.NewStatus,
+			expected: true,
+		},
+		{
+			name:     "Valid Status - Accepted",
+			status:   db.AcceptedStatus,
+			expected: true,
+		},
+		{
+			name:     "Valid Status - Rejected",
+			status:   db.RejectedStatus,
+			expected: true,
+		},
+		{
+			name:     "Valid Status - Change Requested",
+			status:   db.ChangeRequestedStatus,
+			expected: true,
+		},
+		{
+			name:     "Invalid Status - Unknown Value",
+			status:   "999",
+			expected: false,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			result := isValidProofStatus(tt.status)
+			assert.Equal(t, tt.expected, result, "isValidProofStatus(%v) = %v; want %v", tt.status, result, tt.expected)
+		})
+	}
+}
