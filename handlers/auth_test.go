@@ -827,3 +827,191 @@ func TestCreateConnectionCode(t *testing.T) {
 		})
 	}
 }
+
+func TestReturnUserMap(t *testing.T) {
+
+	createdTimeStr := "2023-10-01T12:00:00Z"
+	createdTime, _ := time.Parse(time.RFC3339, createdTimeStr)
+
+	tests := []struct {
+		name     string
+		input    db.Person
+		expected map[string]interface{}
+	}{
+		{
+			name: "Standard Input Test",
+			input: db.Person{
+				ID:              1,
+				Uuid:            "123e4567-e89b-12d3-a456-426614174000",
+				Created:         &createdTime,
+				OwnerPubKey:     "owner_pubkey_value",
+				OwnerAlias:      "owner_alias_value",
+				OwnerContactKey: "contact_key_value",
+				Img:             "img_url",
+				Description:     "A sample description",
+				Tags:            []string{"tag1", "tag2"},
+				UniqueName:      "unique_name_value",
+				Extras:          map[string]interface{}{"key": "value"},
+				LastLogin:       123124353534,
+				PriceToMeet:     100,
+			},
+			expected: map[string]interface{}{
+				"id":            1,
+				"uuid":          "123e4567-e89b-12d3-a456-426614174000",
+				"created":       "2023-10-01T12:00:00Z",
+				"owner_pubkey":  "owner_pubkey_value",
+				"owner_alias":   "owner_alias_value",
+				"contact_key":   "contact_key_value",
+				"img":           "img_url",
+				"description":   "A sample description",
+				"tags":          []string{"tag1", "tag2"},
+				"unique_name":   "unique_name_value",
+				"pubkey":        "owner_pubkey_value",
+				"extras":        map[string]interface{}{"key": "value"},
+				"last_login":    "2023-10-02T12:00:00Z",
+				"price_to_meet": 100,
+				"alias":         "owner_alias_value",
+				"url":           config.Host,
+			},
+		},
+		{
+			name:  "Empty Fields Test",
+			input: db.Person{},
+			expected: map[string]interface{}{
+				"id":            nil,
+				"uuid":          "",
+				"created":       "",
+				"owner_pubkey":  "",
+				"owner_alias":   "",
+				"contact_key":   "",
+				"img":           "",
+				"description":   "",
+				"tags":          nil,
+				"unique_name":   "",
+				"pubkey":        "",
+				"extras":        nil,
+				"last_login":    "",
+				"price_to_meet": 0,
+				"alias":         "",
+				"url":           config.Host,
+			},
+		},
+		{
+			name: "Maximum Length Strings Test",
+			input: db.Person{
+				Uuid:            strings.Repeat("a", 255),
+				OwnerPubKey:     strings.Repeat("b", 255),
+				OwnerAlias:      strings.Repeat("c", 255),
+				OwnerContactKey: strings.Repeat("d", 255),
+				Img:             strings.Repeat("e", 255),
+				Description:     strings.Repeat("f", 255),
+				UniqueName:      strings.Repeat("g", 255),
+			},
+			expected: map[string]interface{}{
+				"uuid":         strings.Repeat("a", 255),
+				"owner_pubkey": strings.Repeat("b", 255),
+				"owner_alias":  strings.Repeat("c", 255),
+				"contact_key":  strings.Repeat("d", 255),
+				"img":          strings.Repeat("e", 255),
+				"description":  strings.Repeat("f", 255),
+				"unique_name":  strings.Repeat("g", 255),
+				"pubkey":       strings.Repeat("b", 255),
+				"alias":        strings.Repeat("c", 255),
+				"url":          config.Host,
+			},
+		},
+		{
+			name:  "Nil Input Test",
+			input: db.Person{},
+			expected: map[string]interface{}{
+				"id":            nil,
+				"uuid":          "",
+				"created":       "",
+				"owner_pubkey":  "",
+				"owner_alias":   "",
+				"contact_key":   "",
+				"img":           "",
+				"description":   "",
+				"tags":          nil,
+				"unique_name":   "",
+				"pubkey":        "",
+				"extras":        nil,
+				"last_login":    "",
+				"price_to_meet": 0,
+				"alias":         "",
+				"url":           config.Host,
+			},
+		},
+		{
+			name: "Invalid Data Types Test",
+			input: db.Person{
+				Uuid: "12345",
+			},
+			expected: map[string]interface{}{
+				"uuid": "12345",
+				"url":  config.Host,
+			},
+		},
+		{
+			name: "Large Number of Tags Test",
+			input: db.Person{
+				Tags: make([]string, 10000),
+			},
+			expected: map[string]interface{}{
+				"tags": make([]string, 10000),
+				"url":  config.Host,
+			},
+		},
+		{
+			name: "Special Characters in Strings Test",
+			input: db.Person{
+				Uuid:        "123e4567-e89b-12d3-a456-426614174000",
+				OwnerAlias:  "owner_alias_!@#$%^&*()",
+				Description: "Description with special characters: !@#$%^&*()",
+			},
+			expected: map[string]interface{}{
+				"uuid":        "123e4567-e89b-12d3-a456-426614174000",
+				"owner_alias": "owner_alias_!@#$%^&*()",
+				"description": "Description with special characters: !@#$%^&*()",
+				"url":         config.Host,
+			},
+		},
+		{
+			name:  "Config Dependency Test",
+			input: db.Person{},
+			expected: map[string]interface{}{
+				"url": config.Host,
+			},
+		},
+		{
+			name: "Null Values in Map Test",
+			input: db.Person{
+				Extras: map[string]interface{}{"key1": nil, "key2": "value"},
+			},
+			expected: map[string]interface{}{
+				"extras": map[string]interface{}{"key1": nil, "key2": "value"},
+				"url":    config.Host,
+			},
+		},
+		{
+			name: "Negative Price Test",
+			input: db.Person{
+				PriceToMeet: -50,
+			},
+			expected: map[string]interface{}{
+				"price_to_meet": -50,
+				"url":           config.Host,
+			},
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			result := returnUserMap(tt.input)
+			if expectedUuid, ok := tt.expected["uuid"]; ok {
+				assert.Equal(t, expectedUuid, result["uuid"])
+			}
+
+		})
+	}
+}
