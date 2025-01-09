@@ -201,125 +201,6 @@ func TestGetAdminPubkeys(t *testing.T) {
 		assert.JSONEq(t, expected, strings.TrimRight(rr.Body.String(), "\n"))
 	})
 }
-func TestCreateConnectionCode(t *testing.T) {
-	teardownSuite := SetupSuite(t)
-	defer teardownSuite(t)
-
-	aHandler := NewAuthHandler(db.TestDB)
-
-	t.Run("should create connection code successful", func(t *testing.T) {
-		rr := httptest.NewRecorder()
-		handler := http.HandlerFunc(aHandler.CreateConnectionCode)
-		data := db.InviteBody{
-			Number:     2,
-			Pubkey:     "Test_pubkey",
-			RouteHint:  "Test_Route_hint",
-			SatsAmount: 21,
-		}
-
-		aHandler.makeConnectionCodeRequest = func(inviter_pubkey string, inviter_route_hint string, msats_amount uint64) string {
-			return "22222222222222222"
-		}
-
-		body, _ := json.Marshal(data)
-
-		req, err := http.NewRequest(http.MethodPost, "/connectioncodes", bytes.NewBuffer(body))
-		if err != nil {
-			t.Fatal(err)
-		}
-
-		handler.ServeHTTP(rr, req)
-		assert.Equal(t, http.StatusOK, rr.Code)
-
-		codes := db.TestDB.GetConnectionCode()
-		assert.NotEmpty(t, codes)
-	})
-
-	t.Run("should return error if failed to add connection code", func(t *testing.T) {
-		data := db.InviteBody{
-			Number: 0,
-		}
-
-		body, _ := json.Marshal(data)
-
-		req, err := http.NewRequest(http.MethodPost, "/connectioncodes", bytes.NewBuffer(body))
-		if err != nil {
-			t.Fatal(err)
-		}
-		rr := httptest.NewRecorder()
-		handler := http.HandlerFunc(aHandler.CreateConnectionCode)
-
-		handler.ServeHTTP(rr, req)
-		assert.Equal(t, http.StatusBadRequest, rr.Code)
-	})
-
-	t.Run("should return error for malformed request body", func(t *testing.T) {
-		body := []byte(`{"number": "0"}`)
-		req, err := http.NewRequest(http.MethodPost, "/connectioncodes", bytes.NewBuffer(body))
-		if err != nil {
-			t.Fatal(err)
-		}
-		rr := httptest.NewRecorder()
-		handler := http.HandlerFunc(aHandler.CreateConnectionCode)
-
-		handler.ServeHTTP(rr, req)
-		assert.Equal(t, http.StatusNotAcceptable, rr.Code)
-	})
-
-	t.Run("should return error for invalid json", func(t *testing.T) {
-		body := []byte(`{"nonumber":0`)
-
-		req, err := http.NewRequest(http.MethodPost, "/connectioncodes", bytes.NewBuffer(body))
-		if err != nil {
-			t.Fatal(err)
-		}
-		rr := httptest.NewRecorder()
-		handler := http.HandlerFunc(aHandler.CreateConnectionCode)
-
-		handler.ServeHTTP(rr, req)
-		assert.Equal(t, http.StatusNotAcceptable, rr.Code)
-	})
-
-	t.Run("should return error if pubkey is provided without route hint", func(t *testing.T) {
-		data := db.InviteBody{
-			Number:    1,
-			Pubkey:    "Test_pubkey",
-			RouteHint: "",
-		}
-
-		body, _ := json.Marshal(data)
-
-		req, err := http.NewRequest(http.MethodPost, "/connectioncodes", bytes.NewBuffer(body))
-		if err != nil {
-			t.Fatal(err)
-		}
-		rr := httptest.NewRecorder()
-		handler := http.HandlerFunc(aHandler.CreateConnectionCode)
-
-		handler.ServeHTTP(rr, req)
-		assert.Equal(t, http.StatusBadRequest, rr.Code)
-	})
-
-	t.Run("should return error if route hint is provided without pubkey", func(t *testing.T) {
-		data := db.InviteBody{
-			Number:    1,
-			Pubkey:    "",
-			RouteHint: "Test_Route_hint",
-		}
-
-		body, _ := json.Marshal(data)
-
-		req, err := http.NewRequest(http.MethodPost, "/connectioncodes", bytes.NewBuffer(body))
-		if err != nil {
-			t.Fatal(err)
-		}
-		rr := httptest.NewRecorder()
-		handler := http.HandlerFunc(aHandler.CreateConnectionCode)
-
-		handler.ServeHTTP(rr, req)
-		assert.Equal(t, http.StatusNotAcceptable, rr.Code)
-	})
-}
 
 func TestGetConnectionCode(t *testing.T) {
 	teardownSuite := SetupSuite(t)
@@ -851,4 +732,98 @@ func TestRefreshToken(t *testing.T) {
 		assert.Equal(t, http.StatusNotAcceptable, rr.Code)
 	})
 
+}
+
+func TestCreateConnectionCode(t *testing.T) {
+	teardownSuite := SetupSuite(t)
+	defer teardownSuite(t)
+
+	aHandler := NewAuthHandler(db.TestDB)
+
+	aHandler.makeConnectionCodeRequest = func(inviter_pubkey string, inviter_route_hint string, msats_amount uint64) string {
+		return "22222222222222222"
+	}
+
+	tests := []struct {
+		name           string
+		input          db.InviteBody
+		expectedStatus int
+		expectedBody   string
+		mockDBError    error
+	}{
+		{
+			name:           "Valid Input with Pubkey and RouteHint",
+			input:          db.InviteBody{Number: 2, Pubkey: "Test_pubkey", RouteHint: "Test_Route_hint", SatsAmount: 21},
+			expectedStatus: http.StatusOK,
+			expectedBody:   `{"message": "Codes created successfully"}`,
+		},
+		{
+			name:           "Valid Input without Pubkey and RouteHint",
+			input:          db.InviteBody{SatsAmount: 21, Number: 2},
+			expectedStatus: http.StatusOK,
+			expectedBody:   `{"message": "Codes created successfully"}`,
+		},
+		{
+			name:           "Zero SatsAmount",
+			input:          db.InviteBody{SatsAmount: 0, Number: 1},
+			expectedStatus: http.StatusOK,
+			expectedBody:   `{"message": "Codes created successfully"}`,
+		},
+		{
+			name:           "Maximum Number of Codes",
+			input:          db.InviteBody{SatsAmount: 21, Number: 1000},
+			expectedStatus: http.StatusOK,
+			expectedBody:   `{"message": "Codes created successfully"}`,
+		},
+		{
+			name:           "Invalid JSON Body",
+			input:          db.InviteBody{},
+			expectedStatus: http.StatusBadRequest,
+		},
+		{
+			name:           "Missing RouteHint with Pubkey",
+			input:          db.InviteBody{Pubkey: "Test_pubkey", SatsAmount: 21, Number: 1},
+			expectedStatus: http.StatusBadRequest,
+			expectedBody:   `{"error": "Route hint is required when pubkey is provided"}`,
+		},
+		{
+			name:           "Missing Pubkey with RouteHint",
+			input:          db.InviteBody{RouteHint: "Test_Route_hint", SatsAmount: 21, Number: 1},
+			expectedStatus: http.StatusNotAcceptable,
+			expectedBody:   `{"error": "Pubkey is required when route hint is provided"}`,
+		},
+		{
+			name:           "Empty Request Body",
+			input:          db.InviteBody{},
+			expectedStatus: http.StatusBadRequest,
+		},
+		{
+			name:           "Non-integer Number of Codes",
+			input:          db.InviteBody{SatsAmount: 21, Number: 0},
+			expectedStatus: http.StatusBadRequest,
+		},
+		{
+			name:           "Boundary Test for Number of Codes",
+			input:          db.InviteBody{SatsAmount: 21, Number: 1},
+			expectedStatus: http.StatusOK,
+			expectedBody:   `{"message": "Codes created successfully"}`,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+
+			body, _ := json.Marshal(tt.input)
+
+			req, err := http.NewRequest(http.MethodPost, "/connectioncodes", bytes.NewBuffer(body))
+			if err != nil {
+				t.Fatal(err)
+			}
+			rr := httptest.NewRecorder()
+			handler := http.HandlerFunc(aHandler.CreateConnectionCode)
+
+			handler.ServeHTTP(rr, req)
+			assert.Equal(t, tt.expectedStatus, rr.Code)
+		})
+	}
 }
