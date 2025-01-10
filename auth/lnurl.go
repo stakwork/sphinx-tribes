@@ -14,6 +14,8 @@ type LnEncodeData struct {
 	K1     string
 }
 
+var EncodeLNURLFunc = EncodeLNURL
+
 func EncodeLNURL(host string) (LnEncodeData, error) {
 	hostUrl := config.Host
 	if !strings.Contains(host, "localhost") {
