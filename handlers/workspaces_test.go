@@ -502,6 +502,243 @@ func TestGetWorkspaceBudget(t *testing.T) {
 
 		assert.Equal(t, budgetAmount, responseBudget.CurrentBudget)
 	})
+
+	t.Run("Valid Request with Admin Access", func(t *testing.T) {
+		rr := httptest.NewRecorder()
+		handler := http.HandlerFunc(oHandler.GetWorkspaceBudget)
+
+		oHandler.userHasAccess = func(pubKeyFromAuth string, uuid string, role string) bool {
+			return true
+		}
+
+		ctx := context.WithValue(context.Background(), auth.ContextKey, workspace.OwnerPubKey)
+		rctx := chi.NewRouteContext()
+		rctx.URLParams.Add("uuid", workspace.Uuid)
+		req, err := http.NewRequestWithContext(context.WithValue(ctx, chi.RouteCtxKey, rctx),
+			http.MethodGet, "/budget/"+workspace.Uuid, nil)
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		handler.ServeHTTP(rr, req)
+
+		assert.Equal(t, http.StatusOK, rr.Code)
+
+		var responseBudget db.StatusBudget
+		err = json.Unmarshal(rr.Body.Bytes(), &responseBudget)
+		if err != nil {
+			t.Fatal(err)
+		}
+		assert.Equal(t, budgetAmount, responseBudget.CurrentBudget)
+	})
+
+	t.Run("Missing Public Key", func(t *testing.T) {
+		rr := httptest.NewRecorder()
+		handler := http.HandlerFunc(oHandler.GetWorkspaceBudget)
+
+		rctx := chi.NewRouteContext()
+		rctx.URLParams.Add("uuid", workspace.Uuid)
+		req, err := http.NewRequestWithContext(context.WithValue(context.Background(), chi.RouteCtxKey, rctx),
+			http.MethodGet, "/budget/"+workspace.Uuid, nil)
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		handler.ServeHTTP(rr, req)
+		assert.Equal(t, http.StatusUnauthorized, rr.Code)
+	})
+
+	t.Run("Unauthorized Access", func(t *testing.T) {
+		rr := httptest.NewRecorder()
+		handler := http.HandlerFunc(oHandler.GetWorkspaceBudget)
+
+		oHandler.userHasAccess = func(pubKeyFromAuth string, uuid string, role string) bool {
+			return false
+		}
+
+		ctx := context.WithValue(context.Background(), auth.ContextKey, "unauthorized_user")
+		rctx := chi.NewRouteContext()
+		rctx.URLParams.Add("uuid", workspace.Uuid)
+		req, err := http.NewRequestWithContext(context.WithValue(ctx, chi.RouteCtxKey, rctx),
+			http.MethodGet, "/budget/"+workspace.Uuid, nil)
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		handler.ServeHTTP(rr, req)
+		assert.Equal(t, http.StatusUnauthorized, rr.Code)
+	})
+
+	t.Run("Non-Existent UUID", func(t *testing.T) {
+		rr := httptest.NewRecorder()
+		handler := http.HandlerFunc(oHandler.GetWorkspaceBudget)
+
+		oHandler.userHasAccess = func(pubKeyFromAuth string, uuid string, role string) bool {
+			return true
+		}
+
+		nonExistentUUID := uuid.New().String()
+		ctx := context.WithValue(context.Background(), auth.ContextKey, workspace.OwnerPubKey)
+		rctx := chi.NewRouteContext()
+		rctx.URLParams.Add("uuid", nonExistentUUID)
+		req, err := http.NewRequestWithContext(context.WithValue(ctx, chi.RouteCtxKey, rctx),
+			http.MethodGet, "/budget/"+nonExistentUUID, nil)
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		handler.ServeHTTP(rr, req)
+		assert.Equal(t, http.StatusOK, rr.Code)
+
+		var responseBudget db.StatusBudget
+		err = json.Unmarshal(rr.Body.Bytes(), &responseBudget)
+		if err != nil {
+			t.Fatal(err)
+		}
+		assert.Equal(t, uint(0), responseBudget.CurrentBudget)
+	})
+
+	t.Run("Workspace Budget Not Set", func(t *testing.T) {
+
+		workspaceNoBudget := db.Workspace{
+			Uuid:        uuid.New().String(),
+			Name:        "Test No Budget Workspace " + uuid.New().String(),
+			OwnerPubKey: "test_no_budget_owner",
+		}
+		db.TestDB.CreateOrEditWorkspace(workspaceNoBudget)
+
+		rr := httptest.NewRecorder()
+		handler := http.HandlerFunc(oHandler.GetWorkspaceBudget)
+
+		oHandler.userHasAccess = func(pubKeyFromAuth string, uuid string, role string) bool {
+			return true
+		}
+
+		ctx := context.WithValue(context.Background(), auth.ContextKey, workspaceNoBudget.OwnerPubKey)
+		rctx := chi.NewRouteContext()
+		rctx.URLParams.Add("uuid", workspaceNoBudget.Uuid)
+		req, err := http.NewRequestWithContext(context.WithValue(ctx, chi.RouteCtxKey, rctx),
+			http.MethodGet, "/budget/"+workspaceNoBudget.Uuid, nil)
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		handler.ServeHTTP(rr, req)
+		assert.Equal(t, http.StatusOK, rr.Code)
+
+		var responseBudget db.StatusBudget
+		err = json.Unmarshal(rr.Body.Bytes(), &responseBudget)
+		if err != nil {
+			t.Fatal(err)
+		}
+		assert.Equal(t, uint(0), responseBudget.CurrentBudget)
+	})
+
+	t.Run("Empty UUID", func(t *testing.T) {
+		rr := httptest.NewRecorder()
+		handler := http.HandlerFunc(oHandler.GetWorkspaceBudget)
+
+		oHandler.userHasAccess = func(pubKeyFromAuth string, uuid string, role string) bool {
+			return true
+		}
+
+		ctx := context.WithValue(context.Background(), auth.ContextKey, workspace.OwnerPubKey)
+		rctx := chi.NewRouteContext()
+		rctx.URLParams.Add("uuid", "")
+		req, err := http.NewRequestWithContext(context.WithValue(ctx, chi.RouteCtxKey, rctx),
+			http.MethodGet, "/budget/", nil)
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		handler.ServeHTTP(rr, req)
+		assert.Equal(t, http.StatusOK, rr.Code)
+
+		var responseBudget db.StatusBudget
+		err = json.Unmarshal(rr.Body.Bytes(), &responseBudget)
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		assert.Equal(t, uint(0), responseBudget.CurrentBudget)
+	})
+
+	t.Run("Invalid UUID Format", func(t *testing.T) {
+		rr := httptest.NewRecorder()
+		handler := http.HandlerFunc(oHandler.GetWorkspaceBudget)
+
+		oHandler.userHasAccess = func(pubKeyFromAuth string, uuid string, role string) bool {
+			return true
+		}
+
+		invalidUUID := "invalid-uuid-format"
+		ctx := context.WithValue(context.Background(), auth.ContextKey, workspace.OwnerPubKey)
+		rctx := chi.NewRouteContext()
+		rctx.URLParams.Add("uuid", invalidUUID)
+		req, err := http.NewRequestWithContext(context.WithValue(ctx, chi.RouteCtxKey, rctx),
+			http.MethodGet, "/budget/"+invalidUUID, nil)
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		handler.ServeHTTP(rr, req)
+		assert.Equal(t, http.StatusOK, rr.Code)
+
+		var responseBudget db.StatusBudget
+		err = json.Unmarshal(rr.Body.Bytes(), &responseBudget)
+		if err != nil {
+			t.Fatal(err)
+		}
+		assert.Equal(t, uint(0), responseBudget.CurrentBudget)
+	})
+
+	t.Run("Large Number of Workspaces", func(t *testing.T) {
+
+		numWorkspaces := 100
+		workspaces := make([]db.Workspace, numWorkspaces)
+		for i := 0; i < numWorkspaces; i++ {
+			workspace := db.Workspace{
+				Uuid:        uuid.New().String(),
+				Name:        fmt.Sprintf("Test Budget Workspace %d", i),
+				OwnerPubKey: "test_budget_owner",
+			}
+			db.TestDB.CreateOrEditWorkspace(workspace)
+			workspaces[i] = workspace
+
+			budget := db.NewBountyBudget{
+				WorkspaceUuid: workspace.Uuid,
+				TotalBudget:   uint(1000 * (i + 1)),
+			}
+			db.TestDB.CreateWorkspaceBudget(budget)
+		}
+
+		rr := httptest.NewRecorder()
+		handler := http.HandlerFunc(oHandler.GetWorkspaceBudget)
+
+		oHandler.userHasAccess = func(pubKeyFromAuth string, uuid string, role string) bool {
+			return true
+		}
+
+		lastWorkspace := workspaces[numWorkspaces-1]
+		ctx := context.WithValue(context.Background(), auth.ContextKey, lastWorkspace.OwnerPubKey)
+		rctx := chi.NewRouteContext()
+		rctx.URLParams.Add("uuid", lastWorkspace.Uuid)
+		req, err := http.NewRequestWithContext(context.WithValue(ctx, chi.RouteCtxKey, rctx),
+			http.MethodGet, "/budget/"+lastWorkspace.Uuid, nil)
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		handler.ServeHTTP(rr, req)
+		assert.Equal(t, http.StatusOK, rr.Code)
+
+		var responseBudget db.StatusBudget
+		err = json.Unmarshal(rr.Body.Bytes(), &responseBudget)
+		if err != nil {
+			t.Fatal(err)
+		}
+		assert.Equal(t, uint(1000*numWorkspaces), responseBudget.CurrentBudget)
+	})
 }
 
 func TestGetWorkspaceBudgetHistory(t *testing.T) {
