@@ -2,14 +2,18 @@ package routes
 
 import (
 	"encoding/json"
+	"fmt"
 	"net/http"
 	"net/http/httptest"
+	"net/url"
 	"testing"
 
 	"github.com/stakwork/sphinx-tribes/config"
 	"github.com/stakwork/sphinx-tribes/utils"
 	"github.com/stretchr/testify/assert"
 )
+
+const defaultAuthURL = "http://auth:9090"
 
 func TestSendEdgeListToJarvis(t *testing.T) {
 	originalURL := config.JarvisUrl
@@ -227,6 +231,231 @@ func TestSendEdgeListToJarvis(t *testing.T) {
 				assert.Error(t, err)
 			} else {
 				assert.NoError(t, err)
+			}
+		})
+	}
+}
+
+var currentAuthURL = defaultAuthURL
+
+var originalGetFromAuth = getFromAuth
+
+func TestGetFromAuth(t *testing.T) {
+	originalClient := http.DefaultClient
+	defer func() {
+		http.DefaultClient = originalClient
+	}()
+
+	tests := []struct {
+		name           string
+		path           string
+		setupMock      func() *httptest.Server
+		expectedResult *extractResponse
+		expectedError  bool
+	}{
+		{
+			name: "Valid Path with Valid JSON Response",
+			path: "/valid",
+			setupMock: func() *httptest.Server {
+				return httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+					json.NewEncoder(w).Encode(map[string]interface{}{
+						"pubkey": "test-pubkey",
+						"valid":  true,
+					})
+				}))
+			},
+			expectedResult: &extractResponse{
+				Pubkey: "test-pubkey",
+				Valid:  true,
+			},
+			expectedError: false,
+		},
+		{
+			name: "Valid Path with JSON Response Missing pubkey",
+			path: "/missing-pubkey",
+			setupMock: func() *httptest.Server {
+				return httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+					json.NewEncoder(w).Encode(map[string]interface{}{
+						"valid": true,
+					})
+				}))
+			},
+			expectedResult: &extractResponse{
+				Pubkey: "",
+				Valid:  true,
+			},
+			expectedError: false,
+		},
+		{
+			name: "Valid Path with JSON Response Missing valid",
+			path: "/missing-valid",
+			setupMock: func() *httptest.Server {
+				return httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+					json.NewEncoder(w).Encode(map[string]interface{}{
+						"pubkey": "test-pubkey",
+					})
+				}))
+			},
+			expectedResult: &extractResponse{
+				Pubkey: "test-pubkey",
+				Valid:  false,
+			},
+			expectedError: false,
+		},
+		{
+			name: "HTTP Request Error",
+			path: "/error",
+			setupMock: func() *httptest.Server {
+				server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+					panic("Force connection close")
+				}))
+				server.Close()
+				return server
+			},
+			expectedResult: nil,
+			expectedError:  true,
+		},
+		{
+			name: "Invalid JSON Response",
+			path: "/invalid-json",
+			setupMock: func() *httptest.Server {
+				return httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+					w.Write([]byte("invalid json{"))
+				}))
+			},
+			expectedResult: nil,
+			expectedError:  true,
+		},
+		{
+			name: "Non-JSON Response",
+			path: "/non-json",
+			setupMock: func() *httptest.Server {
+				return httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+					w.Write([]byte("Plain text response"))
+				}))
+			},
+			expectedResult: nil,
+			expectedError:  true,
+		},
+		{
+			name: "HTTP Response with Status Code 404",
+			path: "/not-found",
+			setupMock: func() *httptest.Server {
+				return httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+					w.WriteHeader(http.StatusNotFound)
+				}))
+			},
+			expectedResult: nil,
+			expectedError:  true,
+		},
+		{
+			name: "HTTP Response with Status Code 500",
+			path: "/server-error",
+			setupMock: func() *httptest.Server {
+				return httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+					w.WriteHeader(http.StatusInternalServerError)
+				}))
+			},
+			expectedResult: nil,
+			expectedError:  true,
+		},
+		{
+			name: "Large JSON Response",
+			path: "/large-response",
+			setupMock: func() *httptest.Server {
+				return httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+
+					largeData := make(map[string]interface{})
+					largeData["pubkey"] = "test-pubkey"
+					largeData["valid"] = true
+					for i := 0; i < 50000; i++ {
+						largeData[fmt.Sprintf("key_%d", i)] = "large value"
+					}
+					json.NewEncoder(w).Encode(largeData)
+				}))
+			},
+			expectedResult: &extractResponse{
+				Pubkey: "test-pubkey",
+				Valid:  true,
+			},
+			expectedError: false,
+		},
+		{
+			name: "JSON Response with Additional Fields",
+			path: "/extra-fields",
+			setupMock: func() *httptest.Server {
+				return httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+					json.NewEncoder(w).Encode(map[string]interface{}{
+						"pubkey":  "test-pubkey",
+						"valid":   true,
+						"extra":   "field",
+						"another": 123,
+						"moreFields": map[string]interface{}{
+							"nested": "value",
+						},
+					})
+				}))
+			},
+			expectedResult: &extractResponse{
+				Pubkey: "test-pubkey",
+				Valid:  true,
+			},
+			expectedError: false,
+		},
+		{
+			name: "JSON Response with Null Values",
+			path: "/null-values",
+			setupMock: func() *httptest.Server {
+				return httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+					w.Write([]byte(`{"pubkey": null, "valid": null}`))
+				}))
+			},
+			expectedResult: &extractResponse{
+				Pubkey: "",
+				Valid:  false,
+			},
+			expectedError: false,
+		},
+		{
+			name: "JSON Response with Incorrect Data Types",
+			path: "/incorrect-types",
+			setupMock: func() *httptest.Server {
+				return httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+					json.NewEncoder(w).Encode(map[string]interface{}{
+						"pubkey": 12345,
+						"valid":  "not-a-bool",
+					})
+				}))
+			},
+			expectedResult: &extractResponse{
+				Pubkey: "",
+				Valid:  false,
+			},
+			expectedError: false,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			server := tt.setupMock()
+			defer server.Close()
+
+			http.DefaultClient = &http.Client{
+				Transport: &http.Transport{
+					Proxy: func(req *http.Request) (*url.URL, error) {
+						return url.Parse(server.URL)
+					},
+				},
+			}
+
+			result, err := getFromAuth(tt.path)
+
+			if tt.expectedError {
+				assert.Error(t, err)
+				assert.Nil(t, result)
+			} else {
+				assert.NoError(t, err)
+				assert.Equal(t, tt.expectedResult, result)
 			}
 		})
 	}
