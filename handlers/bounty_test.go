@@ -3527,7 +3527,7 @@ func TestGetBountiesLeaderboardHandler(t *testing.T) {
 
 					actual := actualBody[i]
 					if actual["owner_pubkey"] != expected["owner_pubkey"] {
-						t.Errorf("Expected owner_pubkey %v, got %v", expected["owner_pubkey"], actual["owner_pubkey"])
+						t.Errorf("Expected owner_pubkey %v, gots %v", expected["owner_pubkey"], actual["owner_pubkey"])
 					}
 					if actual["total_bounties_completed"] == expected["total_bounties_completed"] {
 						t.Errorf("Expected total_bounties_completed %v, got %v",
