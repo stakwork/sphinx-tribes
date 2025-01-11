@@ -3461,7 +3461,7 @@ func TestGetBountiesLeaderboardHandler(t *testing.T) {
 				db.TestDB.CreateOrEditBounty(bounty)
 			}
 
-			req, err := http.NewRequest("GET", "/gobounties/leaderboard", nil)
+			req, err := http.NewRequest("GET", "/people/bounty/leaderboard", nil)
 			assert.NoError(t, err)
 
 			rr := httptest.NewRecorder()
