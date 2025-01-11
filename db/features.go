@@ -88,6 +88,16 @@ func (db database) DeleteFeatureByUuid(uuid string) error {
 func (db database) CreateOrEditFeaturePhase(phase FeaturePhase) (FeaturePhase, error) {
 	phase.Name = strings.TrimSpace(phase.Name)
 
+	if phase.PhasePurpose != "" {
+		phase.PhasePurpose = strings.TrimSpace(phase.PhasePurpose)
+	}
+	if phase.PhaseOutcome != "" {
+		phase.PhaseOutcome = strings.TrimSpace(phase.PhaseOutcome)
+	}
+	if phase.PhaseScope != "" {
+		phase.PhaseScope = strings.TrimSpace(phase.PhaseScope)
+	}
+
 	now := time.Now()
 	phase.Updated = &now
 
@@ -116,10 +126,25 @@ func (db database) GetPhasesByFeatureUuid(featureUuid string) []FeaturePhase {
 
 func (db database) GetFeaturePhaseByUuid(featureUuid, phaseUuid string) (FeaturePhase, error) {
 	phase := FeaturePhase{}
-	result := db.db.Model(&FeaturePhase{}).Where("feature_uuid = ? AND uuid = ?", featureUuid, phaseUuid).First(&phase)
+	result := db.db.Model(&FeaturePhase{}).
+		Where("feature_uuid = ? AND uuid = ?", featureUuid, phaseUuid).
+		First(&phase)
+
 	if result.RowsAffected == 0 {
 		return phase, errors.New("no phase found")
 	}
+
+	phase.Name = strings.TrimSpace(phase.Name)
+	if phase.PhasePurpose != "" {
+		phase.PhasePurpose = strings.TrimSpace(phase.PhasePurpose)
+	}
+	if phase.PhaseOutcome != "" {
+		phase.PhaseOutcome = strings.TrimSpace(phase.PhaseOutcome)
+	}
+	if phase.PhaseScope != "" {
+		phase.PhaseScope = strings.TrimSpace(phase.PhaseScope)
+	}
+
 	return phase, nil
 }
 
