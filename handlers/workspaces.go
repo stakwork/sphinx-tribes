@@ -6,6 +6,7 @@ import (
 	"io"
 	"log"
 	"net/http"
+	"regexp"
 	"strings"
 	"time"
 
@@ -1043,6 +1044,13 @@ func (oh *workspaceHandler) DeleteWorkspaceRepository(w http.ResponseWriter, r *
 	w.WriteHeader(http.StatusOK)
 }
 
+func isValidUUID(uuid string) bool {
+
+	regexPattern := `^[a-zA-Z0-9\-]+$`
+	rgx := regexp.MustCompile(regexPattern)
+	return rgx.MatchString(uuid) && len(uuid) > 0
+}
+
 // New method for getting features by workspace uuid
 func (oh *workspaceHandler) GetFeaturesByWorkspaceUuid(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
@@ -1054,6 +1062,19 @@ func (oh *workspaceHandler) GetFeaturesByWorkspaceUuid(w http.ResponseWriter, r 
 	}
 
 	uuid := chi.URLParam(r, "workspace_uuid")
+
+	if uuid == "" {
+		logger.Log.Info("workspace_uuid parameter is missing")
+		http.Error(w, "Missing workspace_uuid parameter", http.StatusBadRequest)
+		return
+	}
+
+	if !isValidUUID(uuid) {
+		logger.Log.Info("invalid UUID format or contains special characters")
+		http.Error(w, "Invalid UUID format or contains special characters", http.StatusBadRequest)
+		return
+	}
+
 	workspaceFeatures := oh.db.GetFeaturesByWorkspaceUuid(uuid, r)
 
 	for i, feature := range workspaceFeatures {
