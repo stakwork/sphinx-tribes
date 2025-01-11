@@ -619,14 +619,17 @@ type WorkspaceFeatures struct {
 }
 
 type FeaturePhase struct {
-	Uuid        string     `json:"uuid" gorm:"primary_key"`
-	FeatureUuid string     `json:"feature_uuid"`
-	Name        string     `json:"name"`
-	Priority    int        `json:"priority"`
-	Created     *time.Time `json:"created"`
-	Updated     *time.Time `json:"updated"`
-	CreatedBy   string     `json:"created_by"`
-	UpdatedBy   string     `json:"updated_by"`
+	Uuid         string     `json:"uuid" gorm:"primary_key"`
+	FeatureUuid  string     `json:"feature_uuid"`
+	Name         string     `json:"name"`
+	Priority     int        `json:"priority"`
+	PhasePurpose string     `json:"phase_purpose,omitempty" gorm:"default:null"`
+	PhaseOutcome string     `json:"phase_outcome,omitempty" gorm:"default:null"`
+	PhaseScope   string     `json:"phase_scope,omitempty" gorm:"default:null"`
+	Created      *time.Time `json:"created"`
+	Updated      *time.Time `json:"updated"`
+	CreatedBy    string     `json:"created_by"`
+	UpdatedBy    string     `json:"updated_by"`
 }
 
 type BountyRoles struct {
