@@ -66,6 +66,7 @@ func InitTestDB() {
 	db.AutoMigrate(&Chat{})
 	db.AutoMigrate(&WorkspaceCodeGraph{})
 	db.AutoMigrate(&FeatureFlag{})
+	db.AutoMigrate(&Bounty{})
 
 	people := TestDB.GetAllPeople()
 	for _, p := range people {
@@ -94,6 +95,9 @@ func CleanTestData() {
 	TestDB.db.Exec("DELETE FROM feature_phases")
 
 	TestDB.db.Exec("DELETE FROM people")
+
+	TestDB.db.Exec("DELETE FROM tickets")
+
 }
 
 func DeleteAllChatMessages() {
