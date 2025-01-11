@@ -33,13 +33,6 @@ func GetListedOffers(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func GetBountiesLeaderboard(w http.ResponseWriter, _ *http.Request) {
-	leaderBoard := db.DB.GetBountiesLeaderboard()
-
-	w.WriteHeader(http.StatusOK)
-	json.NewEncoder(w).Encode(leaderBoard)
-}
-
 func MigrateBounties(w http.ResponseWriter, r *http.Request) {
 	peeps := db.DB.GetAllPeople()
 
