@@ -4,8 +4,10 @@ import (
 	"bytes"
 	"context"
 	"encoding/json"
+	"fmt"
 	"net/http"
 	"net/http/httptest"
+	"sort"
 	"testing"
 	"time"
 
@@ -201,89 +203,6 @@ func TestDeleteFeature(t *testing.T) {
 		deletedFeature := db.TestDB.GetFeatureByUuid(featureUUID)
 		assert.Equal(t, db.WorkspaceFeatures{}, deletedFeature)
 	})
-}
-
-func TestGetFeaturesByWorkspaceUuid(t *testing.T) {
-	teardownSuite := SetupSuite(t)
-	defer teardownSuite(t)
-
-	oHandler := NewWorkspaceHandler(db.TestDB)
-
-	t.Run("should return error if a user is not authorized", func(t *testing.T) {
-		rr := httptest.NewRecorder()
-		handler := http.HandlerFunc(oHandler.GetFeaturesByWorkspaceUuid)
-
-		ctx := context.WithValue(context.Background(), auth.ContextKey, "")
-		req, err := http.NewRequestWithContext(ctx, http.MethodGet, "/forworkspace/"+workspace.Uuid, nil)
-		if err != nil {
-			t.Fatal(err)
-		}
-
-		handler.ServeHTTP(rr, req)
-
-		assert.Equal(t, http.StatusUnauthorized, rr.Code)
-	})
-
-	t.Run("created feature should be present in the returned array", func(t *testing.T) {
-		rr := httptest.NewRecorder()
-		handler := http.HandlerFunc(oHandler.GetFeaturesByWorkspaceUuid)
-
-		person := db.Person{
-			Uuid:        uuid.New().String(),
-			OwnerAlias:  "alias",
-			UniqueName:  "unique_name",
-			OwnerPubKey: "pubkey",
-			PriceToMeet: 0,
-			Description: "description",
-		}
-		db.TestDB.CreateOrEditPerson(person)
-		workspace := db.Workspace{
-			Uuid:        uuid.New().String(),
-			Name:        "unique_workspace_name" + uuid.New().String(),
-			OwnerPubKey: person.OwnerPubKey,
-			Github:      "gtihub",
-			Website:     "website",
-			Description: "description",
-		}
-		db.TestDB.CreateOrEditWorkspace(workspace)
-		feature := db.WorkspaceFeatures{
-			Uuid:          uuid.New().String(),
-			WorkspaceUuid: workspace.Uuid,
-			Name:          "feature_name",
-			Url:           "https://www.bountieswebsite.com",
-			Priority:      0,
-		}
-		db.TestDB.CreateOrEditFeature(feature)
-
-		rctx := chi.NewRouteContext()
-		rctx.URLParams.Add("workspace_uuid", workspace.Uuid)
-		ctx := context.WithValue(context.Background(), auth.ContextKey, person.OwnerPubKey)
-		req, err := http.NewRequestWithContext(context.WithValue(ctx, chi.RouteCtxKey, rctx), http.MethodGet, "/forworkspace/"+workspace.Uuid, nil)
-		if err != nil {
-			t.Fatal(err)
-		}
-
-		handler.ServeHTTP(rr, req)
-
-		var returnedWorkspaceFeatures []db.WorkspaceFeatures
-		err = json.Unmarshal(rr.Body.Bytes(), &returnedWorkspaceFeatures)
-		assert.NoError(t, err)
-
-		assert.Equal(t, http.StatusOK, rr.Code)
-		// Verify that the created feature is present in the returned array
-		found := false
-		for _, f := range returnedWorkspaceFeatures {
-			if f.Uuid == feature.Uuid {
-				assert.Equal(t, feature.Name, f.Name)
-				assert.Equal(t, feature.Url, f.Url)
-				assert.Equal(t, feature.Priority, f.Priority)
-				found = true
-				break
-			}
-		}
-		assert.True(t, found, "The created feature should be present in the returned array")
-	})
-
 }
 
 func TestGetWorkspaceFeaturesCount(t *testing.T) {
@@ -1635,4 +1554,185 @@ func TestGetFeatureStories(t *testing.T) {
 		assert.Equal(t, int64(featureStoriesCount), int64(0))
 		assert.Equal(t, http.StatusNotAcceptable, rr.Code)
 	})
+}
+
+func TestGetFeaturesByWorkspaceUuid(t *testing.T) {
+	teardownSuite := SetupSuite(t)
+	defer teardownSuite(t)
+
+	oHandler := NewWorkspaceHandler(db.TestDB)
+
+	db.CleanTestData()
+
+	tests := []struct {
+		name           string
+		pubKeyFromAuth string
+		workspaceUUID  string
+		setupMocks     func() (string, interface{})
+		expectedStatus int
+	}{
+		{
+			name:           "should return error if a user is not authorized",
+			pubKeyFromAuth: "",
+			workspaceUUID:  "valid-uuid",
+			expectedStatus: http.StatusUnauthorized,
+		},
+		{
+			name:           "Missing UUID Parameter",
+			pubKeyFromAuth: "validPubKey",
+			expectedStatus: http.StatusBadRequest,
+		},
+		{
+			name:           "Special Characters in UUID",
+			pubKeyFromAuth: "validPubKey",
+			workspaceUUID:  "1234-5678-!@#$",
+			expectedStatus: http.StatusBadRequest,
+		},
+		{
+			name:           "Non-Existent UUID",
+			pubKeyFromAuth: "validPubKey",
+			workspaceUUID:  "nonexistentuuid",
+			expectedStatus: http.StatusOK,
+		},
+		{
+			name:           "created feature should be present in the returned array",
+			pubKeyFromAuth: "validPubKey",
+			workspaceUUID:  "valid-uuid",
+			setupMocks: func() (string, interface{}) {
+				person := db.Person{
+					Uuid:        uuid.New().String(),
+					OwnerAlias:  "alias",
+					UniqueName:  "unique_name",
+					OwnerPubKey: "validPubKey",
+					PriceToMeet: 0,
+					Description: "description",
+				}
+				db.TestDB.CreateOrEditPerson(person)
+
+				workspace := db.Workspace{
+					Uuid:        uuid.New().String(),
+					Name:        "unique_workspace_name",
+					OwnerPubKey: person.OwnerPubKey,
+					Github:      "github",
+					Website:     "website",
+					Description: "description",
+				}
+				db.TestDB.CreateOrEditWorkspace(workspace)
+
+				feature := db.WorkspaceFeatures{
+					Uuid:          "mock-feature-uuid1",
+					WorkspaceUuid: workspace.Uuid,
+					Name:          "feature_name",
+					Url:           "https://www.bountieswebsite.com",
+					Priority:      0,
+				}
+				db.TestDB.CreateOrEditFeature(feature)
+
+				return workspace.Uuid, []db.WorkspaceFeatures{
+					{
+						Uuid:     "mock-feature-uuid1",
+						Name:     "feature_name",
+						Url:      "https://www.bountieswebsite.com",
+						Priority: 0,
+					},
+				}
+			},
+			expectedStatus: http.StatusOK,
+		},
+		{
+			name:           "Large Number of Features",
+			pubKeyFromAuth: "validPubKey",
+			workspaceUUID:  "valid-uuid",
+			setupMocks: func() (string, interface{}) {
+				person := db.Person{
+					Uuid:        uuid.New().String(),
+					OwnerAlias:  "alias",
+					UniqueName:  "unique_name",
+					OwnerPubKey: "validPubKey",
+					PriceToMeet: 0,
+					Description: "description",
+				}
+				db.TestDB.CreateOrEditPerson(person)
+
+				workspace := db.Workspace{
+					Uuid:        uuid.New().String(),
+					Name:        "unique_workspace_name",
+					OwnerPubKey: person.OwnerPubKey,
+					Github:      "github",
+					Website:     "website",
+					Description: "description",
+				}
+				db.TestDB.CreateOrEditWorkspace(workspace)
+
+				var features []db.WorkspaceFeatures
+				for i := 0; i < 1000; i++ {
+					feature := db.WorkspaceFeatures{
+						Uuid:          uuid.New().String(),
+						WorkspaceUuid: workspace.Uuid,
+						Name:          fmt.Sprintf("feature_%d", i),
+						Url:           fmt.Sprintf("https://example.com/feature_%d", i),
+						Priority:      i,
+					}
+					db.TestDB.CreateOrEditFeature(feature)
+					features = append(features, feature)
+				}
+
+				return workspace.Uuid, features
+			},
+			expectedStatus: http.StatusOK,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			var workspaceUUID string
+			var expectedBody interface{}
+
+			if tt.setupMocks != nil {
+				workspaceUUID, expectedBody = tt.setupMocks()
+			}
+
+			req := httptest.NewRequest(http.MethodGet, "/features", nil)
+			req = req.WithContext(context.WithValue(req.Context(), auth.ContextKey, tt.pubKeyFromAuth))
+			rctx := chi.NewRouteContext()
+
+			if workspaceUUID != "" {
+				rctx.URLParams.Add("workspace_uuid", workspaceUUID)
+			} else {
+				rctx.URLParams.Add("workspace_uuid", tt.workspaceUUID)
+			}
+			req = req.WithContext(context.WithValue(req.Context(), chi.RouteCtxKey, rctx))
+			rec := httptest.NewRecorder()
+
+			oHandler.GetFeaturesByWorkspaceUuid(rec, req)
+
+			assert.Equal(t, tt.expectedStatus, rec.Code)
+
+			if expectedBody != nil {
+				var actualBody []db.WorkspaceFeatures
+				err := json.NewDecoder(rec.Body).Decode(&actualBody)
+				assert.NoError(t, err)
+
+				sort.Slice(expectedBody, func(i, j int) bool {
+					return expectedBody.([]db.WorkspaceFeatures)[i].Uuid < expectedBody.([]db.WorkspaceFeatures)[j].Uuid
+				})
+				sort.Slice(actualBody, func(i, j int) bool {
+					return actualBody[i].Uuid < actualBody[j].Uuid
+				})
+
+				assert.Len(t, actualBody, len(expectedBody.([]db.WorkspaceFeatures)))
+
+				for i, expectedFeature := range expectedBody.([]db.WorkspaceFeatures) {
+					actualFeature := actualBody[i]
+					assert.Equal(t, expectedFeature.Uuid, actualFeature.Uuid)
+					assert.Equal(t, expectedFeature.Name, actualFeature.Name)
+					assert.Equal(t, expectedFeature.Url, actualFeature.Url)
+					assert.Equal(t, expectedFeature.Priority, actualFeature.Priority)
+
+					assert.NotNil(t, actualFeature.Created)
+					assert.NotNil(t, actualFeature.Updated)
+				}
+			}
+		})
+	}
 }
