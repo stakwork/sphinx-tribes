@@ -15,6 +15,7 @@ func BountyRoutes() chi.Router {
 	bountyHandler := handlers.NewBountyHandler(http.DefaultClient, db.DB)
 	r.Group(func(r chi.Router) {
 		r.Get("/all", bountyHandler.GetAllBounties)
+		r.Get("/leaderboard", bountyHandler.GetBountiesLeaderboard)
 
 		r.Get("/id/{bountyId}", bountyHandler.GetBountyById)
 		r.Get("/index/{bountyId}", bountyHandler.GetBountyIndexById)

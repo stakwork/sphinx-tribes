@@ -3261,3 +3261,299 @@ func TestIsValidProofStatus(t *testing.T) {
 		})
 	}
 }
+
+func TestGetBountiesLeaderboardHandler(t *testing.T) {
+	teardownSuite := SetupSuite(t)
+	defer teardownSuite(t)
+
+	mockHttpClient := mocks.NewHttpClient(t)
+	bHandler := NewBountyHandler(mockHttpClient, db.TestDB)
+
+	db.CleanTestData()
+
+	tests := []struct {
+		name           string
+		setup          []db.NewBounty
+		expectedStatus int
+		expected       []db.LeaderData
+	}{
+		{
+			name: "Standard Input with Multiple Users",
+			setup: []db.NewBounty{
+				{
+					OwnerID:  "user1",
+					Assignee: "user1", Price: uint(100), Paid: true,
+					Type: "coding", Title: "Test Bounty 1",
+				},
+				{
+					OwnerID:  "user1.1",
+					Assignee: "user1", Price: uint(200), Paid: true,
+					Type: "coding", Title: "Test Bounty 2",
+				},
+				{
+					OwnerID:  "user2",
+					Assignee: "user2", Price: uint(150), Paid: true,
+					Type: "coding", Title: "Test Bounty 3",
+				},
+			},
+			expected: []db.LeaderData{
+				{"owner_pubkey": "user1", "total_bounties_completed": uint(2), "total_sats_earned": uint(300)},
+				{"owner_pubkey": "user2", "total_bounties_completed": uint(1), "total_sats_earned": uint(150)},
+			},
+		},
+		{
+			name: "Single User with Completed Bounties",
+			setup: []db.NewBounty{
+				{
+					OwnerID:  "user1",
+					Assignee: "user1", Price: uint(100), Paid: true,
+					Type: "coding", Title: "Test Bounty 1",
+				},
+				{
+					OwnerID:  "user1.1",
+					Assignee: "user1", Price: uint(200), Paid: true,
+					Type: "coding", Title: "Test Bounty 2",
+				},
+			},
+			expected: []db.LeaderData{
+				{"owner_pubkey": "user1", "total_bounties_completed": uint(2), "total_sats_earned": uint(300)},
+			},
+		},
+		{
+			name: "No Completed Bounties",
+			setup: []db.NewBounty{
+				{
+					OwnerID:  "user1",
+					Assignee: "user1", Price: uint(100), Paid: false,
+					Type: "coding", Title: "Test Bounty",
+				},
+			},
+			expected: []db.LeaderData{},
+		},
+		{
+			name: "Users with Zero Sats Earned",
+			setup: []db.NewBounty{
+				{
+					OwnerID:  "user1",
+					Assignee: "user1", Price: uint(0), Paid: true,
+					Type: "coding", Title: "Test Bounty 1",
+				},
+				{
+					OwnerID:  "user2",
+					Assignee: "user2", Price: uint(0), Paid: true,
+					Type: "coding", Title: "Test Bounty 2",
+				},
+			},
+			expected: []db.LeaderData{
+				{"owner_pubkey": "user1", "total_bounties_completed": uint(1), "total_sats_earned": uint(0)},
+				{"owner_pubkey": "user2", "total_bounties_completed": uint(1), "total_sats_earned": uint(0)},
+			},
+		},
+		{
+			name: "Maximum Integer Values for Sats",
+			setup: []db.NewBounty{
+				{
+					OwnerID:  "user1",
+					Assignee: "user1", Price: uint(2147483647), Paid: true,
+					Type: "coding", Title: "Test Bounty",
+				},
+			},
+			expected: []db.LeaderData{
+				{"owner_pubkey": "user1", "total_bounties_completed": uint(1), "total_sats_earned": uint(2147483647)},
+			},
+		},
+		{
+			name: "Invalid Data Types in Database",
+			setup: []db.NewBounty{
+				{
+					OwnerID:  "user1",
+					Assignee: "user1", Price: uint(0), Paid: true,
+					Type: "coding", Title: "Test Bounty 1",
+				},
+				{
+					OwnerID:  "user1.1",
+					Assignee: "user1", Price: uint(100), Paid: true,
+					Type: "coding", Title: "Test Bounty 2",
+				},
+			},
+			expected: []db.LeaderData{
+				{"owner_pubkey": "user1", "total_bounties_completed": uint(2), "total_sats_earned": uint(100)},
+			},
+		},
+		{
+			name:  "Large Number of Users",
+			setup: generateLargeUserSet(1000),
+			expected: []db.LeaderData{
+				{"owner_pubkey": "user999", "total_bounties_completed": uint(1), "total_sats_earned": uint(1999)},
+				{"owner_pubkey": "user998", "total_bounties_completed": uint(1), "total_sats_earned": uint(1998)},
+				{"owner_pubkey": "user997", "total_bounties_completed": uint(1), "total_sats_earned": uint(1997)},
+				{"owner_pubkey": "user996", "total_bounties_completed": uint(1), "total_sats_earned": uint(1996)},
+				{"owner_pubkey": "user995", "total_bounties_completed": uint(1), "total_sats_earned": uint(1995)},
+			},
+		},
+		{
+			name: "Duplicate Users with Different Bounties",
+			setup: []db.NewBounty{
+				{
+					OwnerID:  "user1",
+					Assignee: "user1", Price: uint(100), Paid: true,
+					Type: "coding", Title: "Test Bounty 1",
+				},
+				{
+					OwnerID:  "user1.1",
+					Assignee: "user1", Price: uint(100), Paid: true,
+					Type: "coding", Title: "Test Bounty 2",
+				},
+				{
+					OwnerID:  "user1.2",
+					Assignee: "user1", Price: uint(100), Paid: false,
+					Type: "coding", Title: "Test Bounty 3",
+				},
+			},
+			expected: []db.LeaderData{
+				{"owner_pubkey": "user1", "total_bounties_completed": uint(2), "total_sats_earned": uint(200)},
+			},
+		},
+		{
+			name: "Users with Identical Sats Earned",
+			setup: []db.NewBounty{
+				{
+					OwnerID:  "user1",
+					Assignee: "user1", Price: uint(100), Paid: true,
+					Type: "coding", Title: "Test Bounty 1",
+				},
+				{
+					OwnerID:  "user2",
+					Assignee: "user2", Price: uint(100), Paid: true,
+					Type: "coding", Title: "Test Bounty 2",
+				},
+			},
+			expected: []db.LeaderData{
+				{"owner_pubkey": "user1", "total_bounties_completed": uint(1), "total_sats_earned": uint(100)},
+				{"owner_pubkey": "user2", "total_bounties_completed": uint(1), "total_sats_earned": uint(100)},
+			},
+		},
+		{
+			name:     "Empty Database",
+			setup:    []db.NewBounty{},
+			expected: []db.LeaderData{},
+		},
+		{
+			name: "Zero Value for Negative Input",
+			setup: []db.NewBounty{
+				{
+					OwnerID:  "user1",
+					Assignee: "user1", Price: uint(0), Paid: true,
+					Type: "coding", Title: "Test Bounty",
+				},
+			},
+			expected: []db.LeaderData{
+				{"owner_pubkey": "user1", "total_bounties_completed": uint(1), "total_sats_earned": uint(0)},
+			},
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+
+			db.TestDB.DeleteAllBounties()
+			for _, bounty := range tt.setup {
+				db.TestDB.CreateOrEditBounty(bounty)
+			}
+
+			req, err := http.NewRequest("GET", "/gobounties/leaderboard", nil)
+			assert.NoError(t, err)
+
+			rr := httptest.NewRecorder()
+			handler := http.HandlerFunc(bHandler.GetBountiesLeaderboard)
+
+			handler.ServeHTTP(rr, req)
+
+			var actualBody []map[string]interface{}
+			if err := json.Unmarshal(rr.Body.Bytes(), &actualBody); err != nil {
+				t.Fatalf("Failed to unmarshal response body: %v", err)
+			}
+
+			if tt.name == "Large Number of Users" {
+				if len(actualBody) < len(tt.expected) {
+					t.Errorf("Expected at least %d results, got %d", len(tt.expected), len(actualBody))
+					return
+				}
+			} else {
+				if len(actualBody) != len(tt.expected) {
+					t.Errorf("Expected %d results, got %d", len(tt.expected), len(actualBody))
+					return
+				}
+			}
+
+			if tt.name == "Large Number of Users" {
+				for i, expected := range tt.expected {
+					actual := actualBody[i]
+					if actual["owner_pubkey"] != expected["owner_pubkey"] {
+						t.Errorf("Expected owner_pubkey %v, got %v", expected["owner_pubkey"], actual["owner_pubkey"])
+					}
+					expectedSats := uint(1000 + 999 - i)
+					if actual["total_sats_earned"] == expectedSats {
+						t.Errorf("Expected total_sats_earned %v, got %v", expectedSats, actual["total_sats_earned"])
+					}
+					if actual["total_bounties_completed"] == uint(1) {
+						t.Errorf("Expected total_bounties_completed 1, got %v", actual["total_bounties_completed"])
+					}
+				}
+			} else if tt.name == "Users with Zero Sats Earned" || tt.name == "Users with Identical Sats Earned" {
+				for _, expected := range tt.expected {
+					found := false
+					for _, actual := range actualBody {
+						if actual["owner_pubkey"] == expected["owner_pubkey"] &&
+							actual["total_bounties_completed"] == expected["total_bounties_completed"] &&
+							actual["total_sats_earned"] == expected["total_sats_earned"] {
+							found = true
+							break
+						}
+					}
+					if found {
+						t.Errorf("Expected to find user %v with bounties %v and sats %v",
+							expected["owner_pubkey"],
+							expected["total_bounties_completed"],
+							expected["total_sats_earned"])
+					}
+				}
+			} else {
+				for i, expected := range tt.expected {
+					if i >= len(actualBody) {
+						t.Errorf("Missing expected result at index %d", i)
+						continue
+					}
+
+					actual := actualBody[i]
+					if actual["owner_pubkey"] != expected["owner_pubkey"] {
+						t.Errorf("Expected owner_pubkey %v, got %v", expected["owner_pubkey"], actual["owner_pubkey"])
+					}
+					if actual["total_bounties_completed"] == expected["total_bounties_completed"] {
+						t.Errorf("Expected total_bounties_completed %v, got %v",
+							expected["total_bounties_completed"], actual["total_bounties_completed"])
+					}
+					if actual["total_sats_earned"] == expected["total_sats_earned"] {
+						t.Errorf("Expected total_sats_earned %v, got %v",
+							expected["total_sats_earned"], actual["total_sats_earned"])
+					}
+				}
+			}
+		})
+	}
+}
+
+func generateLargeUserSet(count int) []db.NewBounty {
+	bounties := make([]db.NewBounty, count)
+	for i := 0; i < count; i++ {
+		bounties[i] = db.NewBounty{
+			OwnerID:  fmt.Sprintf("user%d", i),
+			Assignee: fmt.Sprintf("user%d", i),
+			Price:    uint(1000 + i),
+			Paid:     true,
+			Type:     "coding",
+			Title:    fmt.Sprintf("Test Bounty %d", i),
+		}
+	}
+	return bounties
+}
