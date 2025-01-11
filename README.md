@@ -25,6 +25,7 @@ Sphinx-Tribes is a decentralized message broker for public groups within the Sph
 - [Backend API Data Validations](#backend-api-data-validations)
 - [Contributing](#contributing)
 - [License](#license)
+- [Notification System](#notification-system)
 
 ## Prerequisites
 
@@ -213,3 +214,124 @@ Please read [CONTRIBUTING.md](./CONTRIBUTING.md) for details on our code of cond
 ## License
 
 This project is licensed under the [LICENSE NAME] - see the [LICENSE.md](LICENSE.md) file for details.
+
+## Notification System
+
+### Auto Notification System for Sphinx Users
+
+We aim to implement a robust notification system to keep users updated about key events on the bounties platform. Notifications will cover events such as bounty assignments, payments, and more.
+
+### System Overview
+
+The notification system will use the v2 bot to send messages to users identified by their public keys (`pubkey`). This document outlines the steps required to build and implement this system effectively.
+
+### Steps to Implement the Notification System
+
+#### 1. Database for Notification Tracking
+The first step is to create a database to store notification details, ensuring we can track, retry, and process notifications effectively. Suggested schema:
+
+```sql
+CREATE TABLE notifications (
+  id SERIAL PRIMARY KEY,
+  event VARCHAR(50) NOT NULL,         -- Event type (e.g., bounty_assigned)
+  pubkey VARCHAR(100) NOT NULL,       -- User's pubkey
+  content TEXT NOT NULL,              -- Notification content
+  retries INT DEFAULT 0,              -- Retry count
+  status VARCHAR(20) DEFAULT 'PENDING', -- Status: PENDING, COMPLETE, FAILED, WAITING_KEY_EXCHANGE
+  uuid UUID NOT NULL,                 -- Unique identifier for the notification
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+```
+
+This table will store all notification-related details, including their status (`PENDING`, `COMPLETE`, `FAILED`, or `WAITING_KEY_EXCHANGE`), retries, and event data.
+
+#### 2. Verify User on the v2 Bot
+Before sending a notification, ensure the v2 bot recognizes the user (`pubkey`):
+
+##### a. Check User in v2 Bot
+Call the `/contact/{pubkey}` endpoint:
+```typescript
+// Response
+{
+  version: number;
+  my_idx: number;
+  pubkey: string;
+  lsp: string;
+  scid: number;
+  contact_key?: string;
+}
+```
+
+- **Condition**: 
+  - If `contact_key` is empty, the bot does not recognize the user.
+
+##### b. Add User to Bot’s Known Contacts
+If the user is not recognized (`contact_key` is empty), call the `/add_contact` endpoint to add the user to the bot’s contact list.
+
+##### c. Verify Addition
+Re-call the `/contact/{pubkey}` endpoint to ensure the `contact_key` is now populated.
+
+- **Handling Missing `contact_key`**:  
+  If `contact_key` is still empty at this point, store the notification details in the database with status `WAITING_KEY_EXCHANGE`. A cron job will handle these cases by periodically rechecking the `contact_key`.
+
+#### 3. Send Notification
+Once the user is verified, send a notification using the `/send` endpoint:
+```typescript
+// Request Body for Sending a Message
+{
+  dest: string;       // User's pubkey
+  amt_msat?: number;  // Amount in milli-satoshis (optional, set to 0 for text messages)
+  content?: string;   // Message content
+  is_tribe?: boolean; // Set to false for direct messages
+  reply_uuid?: string; // Optional for replies
+  msg_type?: number;  // Optional, depends on use case
+  wait?: boolean;     // Set to true for synchronous behavior
+}
+
+// Response
+{
+  status: SendOnionStatus; // "COMPLETE", "PENDING", or "FAILED"
+  tag: string;
+  preimage?: string;
+  payment_hash?: string;
+  message?: string; // Error message if status == "FAILED"
+}
+```
+
+- **Configuration for Text Messages**:
+  - `amt_msat`: `0`
+  - `is_tribe`: `false`
+  - `wait`: `true`
+
+Log the response in the database with the status returned by the endpoint.
+
+#### 4. Notification Processing Function
+Create a function to handle the notification lifecycle:
+
+```typescript
+function sendNotification(pubkey: string, event: string, content: string, retries: number): void {
+  // 1. Verify user on v2 bot:
+  //    - Call /contact/{pubkey}.
+  //    - If `contact_key` is empty, add the user via /add_contact and re-verify.
+
+  // 2. Send the notification:
+  //    - Call /send with the appropriate payload.
+
+  // 3. Log the result:
+  //    - Update the database with the current status of the notification.
+}
+```
+
+#### 5. Cron Job for Key Exchange Handling
+Sometimes, the `contact_key` may not be immediately available. Set up a cron job to handle these cases:
+
+- **Behavior**:
+  - Periodically check notifications in the database with the status `WAITING_KEY_EXCHANGE`.
+  - Re-call the `/contact/{pubkey}` endpoint to recheck for the `contact_key`.
+  - If `contact_key` is now available, proceed to send the notification and update the database.
+
+#### 6. Future Enhancements
+Although RabbitMQ for message queuing is not implemented in this phase, consider adding it for:
+- Improved scalability and reliability.
+- Retry logic for failed notifications.
+- Batch processing of notification requests.
