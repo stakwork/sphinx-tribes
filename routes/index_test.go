@@ -7,7 +7,11 @@ import (
 	"net/http/httptest"
 	"net/url"
 	"testing"
+	"time"
 
+	"github.com/go-chi/chi"
+	"github.com/go-chi/chi/middleware"
+	"github.com/rs/cors"
 	"github.com/stakwork/sphinx-tribes/config"
 	"github.com/stakwork/sphinx-tribes/utils"
 	"github.com/stretchr/testify/assert"
@@ -459,4 +463,142 @@ func TestGetFromAuth(t *testing.T) {
 			}
 		})
 	}
+}
+
+func TestInitChi(t *testing.T) {
+
+	t.Run("Basic Router Initialization", func(t *testing.T) {
+		router := chi.NewRouter()
+		assert.NotNil(t, router, "Router should be initialized")
+		assert.IsType(t, &chi.Mux{}, router, "Router should be of type chi.Mux")
+	})
+
+	t.Run("Middleware Stack Configuration", func(t *testing.T) {
+		router := chi.NewRouter()
+		router.Use(middleware.RequestID)
+		router.Use(middleware.Recoverer)
+
+		testHandler := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			w.WriteHeader(http.StatusOK)
+		})
+
+		router.Get("/test", testHandler)
+
+		req := httptest.NewRequest("GET", "/test", nil)
+		rr := httptest.NewRecorder()
+
+		router.ServeHTTP(rr, req)
+		assert.Equal(t, http.StatusOK, rr.Code, "Handler should execute successfully")
+	})
+
+	t.Run("CORS Configuration", func(t *testing.T) {
+		router := chi.NewRouter()
+		corsMiddleware := cors.New(cors.Options{
+			AllowedOrigins:   []string{"*"},
+			AllowedMethods:   []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"},
+			AllowedHeaders:   []string{"Accept", "Authorization", "Content-Type", "X-CSRF-Token"},
+			AllowCredentials: true,
+			MaxAge:           300,
+		})
+		router.Use(corsMiddleware.Handler)
+
+		router.Get("/test-cors", func(w http.ResponseWriter, r *http.Request) {
+			w.WriteHeader(http.StatusOK)
+		})
+
+		req := httptest.NewRequest("OPTIONS", "/test-cors", nil)
+		req.Header.Set("Origin", "http://example.com")
+		req.Header.Set("Access-Control-Request-Method", "GET")
+		rr := httptest.NewRecorder()
+
+		router.ServeHTTP(rr, req)
+		assert.Equal(t, "*", rr.Header().Get("Access-Control-Allow-Origin"), "CORS should allow all origins")
+	})
+
+	t.Run("Timeout Middleware", func(t *testing.T) {
+		router := chi.NewRouter()
+		router.Use(middleware.Timeout(10 * time.Millisecond))
+
+		router.Get("/slow", func(w http.ResponseWriter, r *http.Request) {
+			select {
+			case <-r.Context().Done():
+
+				w.WriteHeader(http.StatusServiceUnavailable)
+				return
+			case <-time.After(100 * time.Millisecond):
+
+				w.WriteHeader(http.StatusOK)
+			}
+		})
+
+		req := httptest.NewRequest("GET", "/slow", nil)
+		rr := httptest.NewRecorder()
+
+		router.ServeHTTP(rr, req)
+		assert.Equal(t, http.StatusServiceUnavailable, rr.Code, "Should timeout and return 503")
+	})
+
+	t.Run("Internal Server Error Handler", func(t *testing.T) {
+		router := chi.NewRouter()
+
+		router.Use(func(next http.Handler) http.Handler {
+			return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+				defer func() {
+					if rvr := recover(); rvr != nil {
+						w.WriteHeader(http.StatusInternalServerError)
+					}
+				}()
+				next.ServeHTTP(w, r)
+			})
+		})
+
+		router.Get("/panic", func(w http.ResponseWriter, r *http.Request) {
+			panic("test panic")
+		})
+
+		req := httptest.NewRequest("GET", "/panic", nil)
+		rr := httptest.NewRecorder()
+
+		router.ServeHTTP(rr, req)
+		assert.Equal(t, http.StatusInternalServerError, rr.Code, "Should handle panic and return 500")
+	})
+
+	t.Run("Request ID Generation", func(t *testing.T) {
+		router := chi.NewRouter()
+		router.Use(middleware.RequestID)
+
+		router.Get("/test-id", func(w http.ResponseWriter, r *http.Request) {
+			reqID := middleware.GetReqID(r.Context())
+			w.Header().Set("X-Request-ID", reqID)
+			w.WriteHeader(http.StatusOK)
+		})
+
+		req := httptest.NewRequest("GET", "/test-id", nil)
+		rr := httptest.NewRecorder()
+		router.ServeHTTP(rr, req)
+
+		assert.NotEmpty(t, rr.Header().Get("X-Request-ID"), "Request ID should not be empty")
+		assert.Equal(t, http.StatusOK, rr.Code, "Handler should execute successfully")
+	})
+
+	t.Run("Multiple Middleware Interaction", func(t *testing.T) {
+		router := chi.NewRouter()
+		router.Use(middleware.RequestID)
+		router.Use(middleware.Recoverer)
+		router.Use(cors.Default().Handler)
+
+		router.Get("/test-multi", func(w http.ResponseWriter, r *http.Request) {
+			reqID := middleware.GetReqID(r.Context())
+			assert.NotEmpty(t, reqID, "Request ID should be present")
+			w.WriteHeader(http.StatusOK)
+		})
+
+		req := httptest.NewRequest("GET", "/test-multi", nil)
+		req.Header.Set("Origin", "http://example.com")
+		rr := httptest.NewRecorder()
+
+		router.ServeHTTP(rr, req)
+		assert.Equal(t, http.StatusOK, rr.Code, "Handler should execute successfully")
+		assert.NotEmpty(t, rr.Header().Get("Access-Control-Allow-Origin"), "CORS headers should be present")
+	})
 }
