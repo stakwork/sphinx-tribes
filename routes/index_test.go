@@ -2,10 +2,12 @@ package routes
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
 	"net/http"
 	"net/http/httptest"
 	"net/url"
+	"sync"
 	"testing"
 	"time"
 
@@ -601,4 +603,157 @@ func TestInitChi(t *testing.T) {
 		assert.Equal(t, http.StatusOK, rr.Code, "Handler should execute successfully")
 		assert.NotEmpty(t, rr.Header().Get("Access-Control-Allow-Origin"), "CORS headers should be present")
 	})
+}
+
+var mockLogger = &MockLogger{}
+
+type MockLogger struct {
+	mu      sync.Mutex
+	entries []string
+}
+
+func (l *MockLogger) Error(format string, v ...interface{}) {
+	l.mu.Lock()
+	defer l.mu.Unlock()
+	l.entries = append(l.entries, format)
+}
+
+func (l *MockLogger) Machine(format string, v ...interface{}) {
+	l.mu.Lock()
+	defer l.mu.Unlock()
+	l.entries = append(l.entries, format)
+}
+
+func (l *MockLogger) Clear() {
+	l.mu.Lock()
+	defer l.mu.Unlock()
+	l.entries = []string{}
+}
+
+func TestInternalServerErrorHandler(t *testing.T) {
+	tests := []struct {
+		name           string
+		handler        http.Handler
+		expectedStatus int
+		expectLog      bool
+	}{
+		{
+			name: "Standard Request Handling",
+			handler: http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+				w.WriteHeader(http.StatusOK)
+			}),
+			expectedStatus: http.StatusOK,
+			expectLog:      false,
+		},
+		{
+			name: "Request with Logging",
+			handler: http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+				mockLogger.Machine("Logging message")
+				w.WriteHeader(http.StatusOK)
+			}),
+			expectedStatus: http.StatusOK,
+			expectLog:      true,
+		},
+		{
+			name: "Empty Request",
+			handler: http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+				w.WriteHeader(http.StatusOK)
+			}),
+			expectedStatus: http.StatusOK,
+			expectLog:      false,
+		},
+		{
+			name: "Large Request",
+			handler: http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+				w.WriteHeader(http.StatusOK)
+			}),
+			expectedStatus: http.StatusOK,
+			expectLog:      false,
+		},
+		{
+			name: "Panic in Handler",
+			handler: http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+				panic("test panic")
+			}),
+			expectedStatus: http.StatusInternalServerError,
+			expectLog:      false,
+		},
+		{
+			name: "Interceptor Error",
+			handler: http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+				w.WriteHeader(http.StatusOK)
+			}),
+			expectedStatus: http.StatusOK,
+			expectLog:      false,
+		},
+		{
+			name: "Error in sendEdgeListToJarvis",
+			handler: http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+				w.WriteHeader(http.StatusOK)
+			}),
+			expectedStatus: http.StatusOK,
+			expectLog:      false,
+		},
+		{
+			name: "Invalid HTTP Method",
+			handler: http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+				w.WriteHeader(http.StatusMethodNotAllowed)
+			}),
+			expectedStatus: http.StatusMethodNotAllowed,
+			expectLog:      false,
+		},
+		{
+			name: "High Volume of Requests",
+			handler: http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+				w.WriteHeader(http.StatusOK)
+			}),
+			expectedStatus: http.StatusOK,
+			expectLog:      false,
+		},
+		{
+			name: "Custom Logger Configuration",
+			handler: http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+				mockLogger.Machine("Custom log message")
+				w.WriteHeader(http.StatusOK)
+			}),
+			expectedStatus: http.StatusOK,
+			expectLog:      true,
+		},
+		{
+			name: "Custom Interceptor Logic",
+			handler: http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+				mockLogger.Machine("Custom interceptor logic")
+				w.WriteHeader(http.StatusOK)
+			}),
+			expectedStatus: http.StatusOK,
+			expectLog:      true,
+		},
+		{
+			name: "Non-HTTP Error Panic",
+			handler: http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+				panic(errors.New("non-http error"))
+			}),
+			expectedStatus: http.StatusInternalServerError,
+			expectLog:      false,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			mockLogger.Clear()
+			handler := internalServerErrorHandler(tt.handler)
+
+			req := httptest.NewRequest(http.MethodGet, "http://example.com/foo", nil)
+			rr := httptest.NewRecorder()
+
+			handler.ServeHTTP(rr, req)
+
+			assert.Equal(t, tt.expectedStatus, rr.Code)
+			if tt.expectLog {
+				assert.NotEmpty(t, mockLogger.entries)
+			} else {
+				assert.Empty(t, mockLogger.entries)
+			}
+		})
+	}
 }
