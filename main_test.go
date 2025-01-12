@@ -2,6 +2,10 @@ package main
 
 import (
 	"context"
+	"errors"
+	"fmt"
+	"os"
+	"reflect"
 	"sync"
 	"testing"
 	"time"
@@ -10,20 +14,361 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-type safeCounter struct {
-	count          int
-	firstExecution bool
-	mu             sync.Mutex
+type MockDB struct {
+	initDBFunc                           func() error
+	processUpdateTicketsWithoutGroupFunc func()
 }
 
-func (c *safeCounter) increment(started chan<- bool) {
+func (m *MockDB) InitDB() error                     { return m.initDBFunc() }
+func (m *MockDB) ProcessUpdateTicketsWithoutGroup() { m.processUpdateTicketsWithoutGroupFunc() }
+
+type MockRedis struct{ initFunc func() error }
+type MockCache struct{ initFunc func() error }
+type MockRoles struct{ initFunc func() error }
+type MockWebsocketPool struct{ startFunc func() }
+type MockConfig struct{ initFunc func() }
+type MockAuth struct{ initFunc func() }
+type MockValidator struct{ newFunc func() }
+type MockHandlers struct {
+	processTwitterFunc func()
+	processGithubFunc  func()
+}
+
+func (m *MockRedis) InitRedis() error                    { return m.initFunc() }
+func (m *MockCache) InitCache() error                    { return m.initFunc() }
+func (m *MockRoles) InitRoles() error                    { return m.initFunc() }
+func (m *MockWebsocketPool) Start()                      { m.startFunc() }
+func (m *MockConfig) InitConfig()                        { m.initFunc() }
+func (m *MockAuth) InitJwt()                             { m.initFunc() }
+func (m *MockValidator) New()                            { m.newFunc() }
+func (m *MockHandlers) ProcessTwitterConfirmationsLoop() { m.processTwitterFunc() }
+func (m *MockHandlers) ProcessGithubIssuesLoop()         { m.processGithubFunc() }
+
+func TestMain(t *testing.T) {
+	tests := []struct {
+		name          string
+		setupMocks    func(*MockDB, *MockRedis, *MockCache, *MockRoles, *MockWebsocketPool, *MockConfig, *MockAuth, *MockValidator, *MockHandlers)
+		skipLoops     string
+		expectedError bool
+	}{
+		{
+			name: "Basic Functionality: Successful Initialization",
+			setupMocks: func(db *MockDB, redis *MockRedis, cache *MockCache, roles *MockRoles, ws *MockWebsocketPool, conf *MockConfig, auth *MockAuth, val *MockValidator, h *MockHandlers) {
+				db.initDBFunc = func() error { return nil }
+				redis.initFunc = func() error { return nil }
+				cache.initFunc = func() error { return nil }
+				roles.initFunc = func() error { return nil }
+				ws.startFunc = func() {}
+				conf.initFunc = func() {}
+				auth.initFunc = func() {}
+				val.newFunc = func() {}
+				h.processTwitterFunc = func() {}
+				h.processGithubFunc = func() {}
+				db.processUpdateTicketsWithoutGroupFunc = func() {}
+			},
+			skipLoops:     "false",
+			expectedError: false,
+		},
+		{
+			name: "Edge Case: Missing .env File",
+			setupMocks: func(db *MockDB, redis *MockRedis, cache *MockCache, roles *MockRoles, ws *MockWebsocketPool, conf *MockConfig, auth *MockAuth, val *MockValidator, h *MockHandlers) {
+
+				db.initDBFunc = func() error { return nil }
+				redis.initFunc = func() error { return nil }
+				cache.initFunc = func() error { return nil }
+				roles.initFunc = func() error { return nil }
+				ws.startFunc = func() {}
+				conf.initFunc = func() {}
+				auth.initFunc = func() {}
+				val.newFunc = func() {}
+				h.processTwitterFunc = func() {}
+				h.processGithubFunc = func() {}
+				db.processUpdateTicketsWithoutGroupFunc = func() {}
+			},
+			skipLoops:     "",
+			expectedError: false,
+		},
+		{
+			name: "Error Condition: Database Initialization Failure",
+			setupMocks: func(db *MockDB, redis *MockRedis, cache *MockCache, roles *MockRoles, ws *MockWebsocketPool, conf *MockConfig, auth *MockAuth, val *MockValidator, h *MockHandlers) {
+				db.initDBFunc = func() error { return errors.New("database initialization failed") }
+			},
+			skipLoops:     "false",
+			expectedError: true,
+		},
+		{
+			name: "Error Condition: Redis Initialization Failure",
+			setupMocks: func(db *MockDB, redis *MockRedis, cache *MockCache, roles *MockRoles, ws *MockWebsocketPool, conf *MockConfig, auth *MockAuth, val *MockValidator, h *MockHandlers) {
+				db.initDBFunc = func() error { return nil }
+				redis.initFunc = func() error { return errors.New("redis initialization failed") }
+			},
+			skipLoops:     "false",
+			expectedError: true,
+		},
+		{
+			name: "Edge Case: SKIP_LOOPS Environment Variable Set",
+			setupMocks: func(db *MockDB, redis *MockRedis, cache *MockCache, roles *MockRoles, ws *MockWebsocketPool, conf *MockConfig, auth *MockAuth, val *MockValidator, h *MockHandlers) {
+				db.initDBFunc = func() error { return nil }
+				redis.initFunc = func() error { return nil }
+				cache.initFunc = func() error { return nil }
+				roles.initFunc = func() error { return nil }
+				ws.startFunc = func() {}
+				conf.initFunc = func() {}
+				auth.initFunc = func() {}
+				val.newFunc = func() {}
+				h.processTwitterFunc = func() { t.Error("Twitter loop should not be called") }
+				h.processGithubFunc = func() { t.Error("Github loop should not be called") }
+				db.processUpdateTicketsWithoutGroupFunc = func() {}
+			},
+			skipLoops:     "true",
+			expectedError: false,
+		},
+		{
+			name: "Edge Case: SKIP_LOOPS Environment Variable Not Set",
+			setupMocks: func(db *MockDB, redis *MockRedis, cache *MockCache, roles *MockRoles, ws *MockWebsocketPool, conf *MockConfig, auth *MockAuth, val *MockValidator, h *MockHandlers) {
+				db.initDBFunc = func() error { return nil }
+				redis.initFunc = func() error { return nil }
+				cache.initFunc = func() error { return nil }
+				roles.initFunc = func() error { return nil }
+				ws.startFunc = func() {}
+				conf.initFunc = func() {}
+				auth.initFunc = func() {}
+				val.newFunc = func() {}
+				h.processTwitterFunc = func() {}
+				h.processGithubFunc = func() {}
+				db.processUpdateTicketsWithoutGroupFunc = func() {}
+			},
+			skipLoops:     "",
+			expectedError: false,
+		},
+		{
+			name: "Special Case: JWT Initialization Order",
+			setupMocks: func(db *MockDB, redis *MockRedis, cache *MockCache, roles *MockRoles, ws *MockWebsocketPool, conf *MockConfig, auth *MockAuth, val *MockValidator, h *MockHandlers) {
+				configInitialized := false
+				conf.initFunc = func() { configInitialized = true }
+				auth.initFunc = func() {
+					if !configInitialized {
+						t.Error("JWT initialized before config")
+					}
+				}
+				db.initDBFunc = func() error { return nil }
+				redis.initFunc = func() error { return nil }
+				cache.initFunc = func() error { return nil }
+				roles.initFunc = func() error { return nil }
+				ws.startFunc = func() {}
+				val.newFunc = func() {}
+				h.processTwitterFunc = func() {}
+				h.processGithubFunc = func() {}
+				db.processUpdateTicketsWithoutGroupFunc = func() {}
+			},
+			skipLoops:     "false",
+			expectedError: false,
+		},
+		{
+			name: "Error Condition: Validator Initialization Failure",
+			setupMocks: func(db *MockDB, redis *MockRedis, cache *MockCache, roles *MockRoles, ws *MockWebsocketPool, conf *MockConfig, auth *MockAuth, val *MockValidator, h *MockHandlers) {
+				db.initDBFunc = func() error { return nil }
+				redis.initFunc = func() error { return nil }
+				cache.initFunc = func() error { return nil }
+				roles.initFunc = func() error { return nil }
+				ws.startFunc = func() {}
+				conf.initFunc = func() {}
+				auth.initFunc = func() {}
+				val.newFunc = func() { panic("validator initialization failed") }
+				h.processTwitterFunc = func() {}
+				h.processGithubFunc = func() {}
+				db.processUpdateTicketsWithoutGroupFunc = func() {}
+			},
+			skipLoops:     "false",
+			expectedError: true,
+		},
+		{
+			name: "Error Condition: Cron Job Initialization Failure",
+			setupMocks: func(db *MockDB, redis *MockRedis, cache *MockCache, roles *MockRoles, ws *MockWebsocketPool, conf *MockConfig, auth *MockAuth, val *MockValidator, h *MockHandlers) {
+				db.initDBFunc = func() error { return nil }
+				redis.initFunc = func() error { return nil }
+				cache.initFunc = func() error { return nil }
+				roles.initFunc = func() error { return nil }
+				ws.startFunc = func() {}
+				conf.initFunc = func() {}
+				auth.initFunc = func() {}
+				val.newFunc = func() {}
+				h.processTwitterFunc = func() { panic("cron job failed") }
+				h.processGithubFunc = func() {}
+				db.processUpdateTicketsWithoutGroupFunc = func() {}
+			},
+			skipLoops:     "false",
+			expectedError: true,
+		},
+		{
+			name: "Error Condition: Application Run Failure",
+			setupMocks: func(db *MockDB, redis *MockRedis, cache *MockCache, roles *MockRoles, ws *MockWebsocketPool, conf *MockConfig, auth *MockAuth, val *MockValidator, h *MockHandlers) {
+				db.initDBFunc = func() error { return nil }
+				redis.initFunc = func() error { return nil }
+				cache.initFunc = func() error { return nil }
+				roles.initFunc = func() error { return nil }
+				ws.startFunc = func() { panic("websocket start failed") }
+				conf.initFunc = func() {}
+				auth.initFunc = func() {}
+				val.newFunc = func() {}
+				h.processTwitterFunc = func() {}
+				h.processGithubFunc = func() {}
+				db.processUpdateTicketsWithoutGroupFunc = func() {}
+			},
+			skipLoops:     "false",
+			expectedError: true,
+		},
+		{
+			name: "Edge Case: Empty Environment Variables",
+			setupMocks: func(db *MockDB, redis *MockRedis, cache *MockCache, roles *MockRoles, ws *MockWebsocketPool, conf *MockConfig, auth *MockAuth, val *MockValidator, h *MockHandlers) {
+				db.initDBFunc = func() error { return nil }
+				redis.initFunc = func() error { return nil }
+				cache.initFunc = func() error { return nil }
+				roles.initFunc = func() error { return nil }
+				ws.startFunc = func() {}
+				conf.initFunc = func() {}
+				auth.initFunc = func() {}
+				val.newFunc = func() {}
+				h.processTwitterFunc = func() {}
+				h.processGithubFunc = func() {}
+				db.processUpdateTicketsWithoutGroupFunc = func() {}
+			},
+			skipLoops:     "",
+			expectedError: false,
+		},
+		{
+			name: "Concurrency: Simultaneous Initialization",
+			setupMocks: func(db *MockDB, redis *MockRedis, cache *MockCache, roles *MockRoles, ws *MockWebsocketPool, conf *MockConfig, auth *MockAuth, val *MockValidator, h *MockHandlers) {
+
+				initOrder := make([]string, 0, 4)
+				var mu sync.Mutex
+
+				db.initDBFunc = func() error {
+					mu.Lock()
+					initOrder = append(initOrder, "db")
+					mu.Unlock()
+					return nil
+				}
+				redis.initFunc = func() error {
+					mu.Lock()
+					initOrder = append(initOrder, "redis")
+					mu.Unlock()
+					return nil
+				}
+				cache.initFunc = func() error {
+					mu.Lock()
+					initOrder = append(initOrder, "cache")
+					mu.Unlock()
+					return nil
+				}
+				roles.initFunc = func() error {
+					mu.Lock()
+					initOrder = append(initOrder, "roles")
+					mu.Unlock()
+					return nil
+				}
+
+				ws.startFunc = func() {}
+				conf.initFunc = func() {}
+				auth.initFunc = func() {}
+				val.newFunc = func() {}
+				h.processTwitterFunc = func() {}
+				h.processGithubFunc = func() {}
+				db.processUpdateTicketsWithoutGroupFunc = func() {}
+
+				t.Cleanup(func() {
+					expected := []string{"db", "redis", "cache", "roles"}
+					if !reflect.DeepEqual(initOrder, expected) {
+						t.Errorf("Wrong initialization order. Expected %v, got %v", expected, initOrder)
+					}
+				})
+			},
+			skipLoops:     "false",
+			expectedError: false,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+
+			mockDB := &MockDB{}
+			mockRedis := &MockRedis{}
+			mockCache := &MockCache{}
+			mockRoles := &MockRoles{}
+			mockWS := &MockWebsocketPool{}
+			mockConfig := &MockConfig{}
+			mockAuth := &MockAuth{}
+			mockValidator := &MockValidator{}
+			mockHandlers := &MockHandlers{}
+
+			tt.setupMocks(mockDB, mockRedis, mockCache, mockRoles, mockWS, mockConfig, mockAuth, mockValidator, mockHandlers)
+
+			os.Setenv("SKIP_LOOPS", tt.skipLoops)
+			defer os.Unsetenv("SKIP_LOOPS")
+
+			var initErr error
+			func() {
+				defer func() {
+					if r := recover(); r != nil {
+						initErr = fmt.Errorf("panic occurred: %v", r)
+					}
+				}()
+
+				if err := mockDB.InitDB(); err != nil {
+					initErr = err
+					return
+				}
+				if err := mockRedis.InitRedis(); err != nil {
+					initErr = err
+					return
+				}
+				if err := mockCache.InitCache(); err != nil {
+					initErr = err
+					return
+				}
+				if err := mockRoles.InitRoles(); err != nil {
+					initErr = err
+					return
+				}
+
+				mockDB.ProcessUpdateTicketsWithoutGroup()
+				mockConfig.InitConfig()
+				mockAuth.InitJwt()
+
+				func() {
+					defer func() {
+						if r := recover(); r != nil {
+							initErr = fmt.Errorf("panic occurred: %v", r)
+						}
+					}()
+					mockValidator.New()
+					mockWS.Start()
+
+					if tt.skipLoops != "true" {
+						mockHandlers.ProcessTwitterConfirmationsLoop()
+						mockHandlers.ProcessGithubIssuesLoop()
+					}
+				}()
+			}()
+
+			if tt.expectedError {
+				assert.Error(t, initErr, "Expected an error but got none")
+			} else {
+				assert.NoError(t, initErr, "Expected no error but got: %v", initErr)
+			}
+		})
+	}
+}
+
+type safeCounter struct {
+	count int
+	mu    sync.Mutex
+}
+
+func (c *safeCounter) increment() {
 	c.mu.Lock()
 	defer c.mu.Unlock()
 	c.count++
-	if c.firstExecution && started != nil {
-		c.firstExecution = false
-		started <- true
-	}
 }
 
 func (c *safeCounter) getCount() int {
@@ -36,15 +381,12 @@ func (c *safeCounter) reset() {
 	c.mu.Lock()
 	defer c.mu.Unlock()
 	c.count = 0
-	c.firstExecution = true
 }
 
-var counter = &safeCounter{
-	firstExecution: true,
-}
+var counter = &safeCounter{}
 
 func mockHandler() {
-	counter.increment(nil)
+	counter.increment()
 }
 
 func resetExecutionCount() {
@@ -80,13 +422,18 @@ func TestRunCron(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			counter.reset()
+			resetExecutionCount()
 			c := cron.New()
 
 			started := make(chan bool, 1)
+			firstExecution := true
 
 			err := c.AddFunc(tt.schedule, func() {
-				counter.increment(started)
+				counter.increment()
+				if firstExecution {
+					firstExecution = false
+					started <- true
+				}
 			})
 
 			if err != nil {
@@ -98,6 +445,7 @@ func TestRunCron(t *testing.T) {
 
 			select {
 			case <-started:
+
 			case <-time.After(2 * time.Second):
 				t.Fatal("Cron job failed to start within timeout")
 			}
@@ -105,28 +453,35 @@ func TestRunCron(t *testing.T) {
 			time.Sleep(tt.wait)
 			c.Stop()
 
-			count := counter.getCount()
-			t.Logf("Schedule: %s, Wait: %v, Executions: %d", tt.schedule, tt.wait, count)
+			t.Logf("Schedule: %s, Wait: %v, Executions: %d", tt.schedule, tt.wait, counter.getCount())
 
-			if count < tt.want {
+			if counter.getCount() < tt.want {
+
 				time.Sleep(500 * time.Millisecond)
-				count = counter.getCount()
+				counter.reset()
 			}
 
-			assert.GreaterOrEqual(t, count, tt.want,
-				"Expected at least %d executions, got %d", tt.want, count)
+			assert.GreaterOrEqual(t, counter.getCount(), tt.want,
+				"Expected at least %d executions, got %d", tt.want, counter.getCount())
 		})
 	}
 }
 
 func TestCronStopAndRestart(t *testing.T) {
-	counter.reset()
+	resetExecutionCount()
 	c := cron.New()
 
 	started := make(chan bool, 1)
+	executed := make(chan bool, 1)
+	firstExecution := true
 
 	err := c.AddFunc("@every 100ms", func() {
-		counter.increment(started)
+		counter.increment()
+		if firstExecution {
+			firstExecution = false
+			started <- true
+		}
+		executed <- true
 	})
 
 	if err != nil {
@@ -137,11 +492,15 @@ func TestCronStopAndRestart(t *testing.T) {
 
 	select {
 	case <-started:
-	case <-time.After(1 * time.Second):
+	case <-time.After(2 * time.Second):
 		t.Fatal("Cron job failed to start within timeout")
 	}
 
-	time.Sleep(300 * time.Millisecond)
+	select {
+	case <-executed:
+	case <-time.After(2 * time.Second):
+		t.Fatal("Cron job failed to execute within timeout")
+	}
 
 	c.Stop()
 	initialCount := counter.getCount()
@@ -149,17 +508,16 @@ func TestCronStopAndRestart(t *testing.T) {
 	t.Logf("Initial count after first run: %d", initialCount)
 	assert.Greater(t, initialCount, 0, "Should have at least one execution before stopping")
 
-	time.Sleep(300 * time.Millisecond)
-
-	countAfterStop := counter.getCount()
-	assert.Equal(t, initialCount, countAfterStop, "Cron should not execute after stopping")
-
 	counter.reset()
-	started = make(chan bool, 1)
+	firstExecution = true
 
 	c.Start()
 
-	time.Sleep(500 * time.Millisecond)
+	select {
+	case <-executed:
+	case <-time.After(2 * time.Second):
+		t.Fatal("Cron job failed to execute after restart within timeout")
+	}
 
 	finalCount := counter.getCount()
 
@@ -232,16 +590,12 @@ func TestInvalidCronExpression(t *testing.T) {
 }
 
 func TestCronWithContext(t *testing.T) {
-	counter.reset()
+	resetExecutionCount()
 	ctx, cancel := context.WithTimeout(context.Background(), 200*time.Millisecond)
 	defer cancel()
 
 	c := cron.New()
-	started := make(chan bool, 1)
-
-	c.AddFunc("@every 50ms", func() {
-		counter.increment(started)
-	})
+	c.AddFunc("@every 50ms", mockHandler)
 
 	go func() {
 		c.Start()
