@@ -201,125 +201,6 @@ func TestGetAdminPubkeys(t *testing.T) {
 		assert.JSONEq(t, expected, strings.TrimRight(rr.Body.String(), "\n"))
 	})
 }
-func TestCreateConnectionCode(t *testing.T) {
-	teardownSuite := SetupSuite(t)
-	defer teardownSuite(t)
-
-	aHandler := NewAuthHandler(db.TestDB)
-
-	t.Run("should create connection code successful", func(t *testing.T) {
-		rr := httptest.NewRecorder()
-		handler := http.HandlerFunc(aHandler.CreateConnectionCode)
-		data := db.InviteBody{
-			Number:     2,
-			Pubkey:     "Test_pubkey",
-			RouteHint:  "Test_Route_hint",
-			SatsAmount: 21,
-		}
-
-		aHandler.makeConnectionCodeRequest = func(inviter_pubkey string, inviter_route_hint string, msats_amount uint64) string {
-			return "22222222222222222"
-		}
-
-		body, _ := json.Marshal(data)
-
-		req, err := http.NewRequest(http.MethodPost, "/connectioncodes", bytes.NewBuffer(body))
-		if err != nil {
-			t.Fatal(err)
-		}
-
-		handler.ServeHTTP(rr, req)
-		assert.Equal(t, http.StatusOK, rr.Code)
-
-		codes := db.TestDB.GetConnectionCode()
-		assert.NotEmpty(t, codes)
-	})
-
-	t.Run("should return error if failed to add connection code", func(t *testing.T) {
-		data := db.InviteBody{
-			Number: 0,
-		}
-
-		body, _ := json.Marshal(data)
-
-		req, err := http.NewRequest(http.MethodPost, "/connectioncodes", bytes.NewBuffer(body))
-		if err != nil {
-			t.Fatal(err)
-		}
-		rr := httptest.NewRecorder()
-		handler := http.HandlerFunc(aHandler.CreateConnectionCode)
-
-		handler.ServeHTTP(rr, req)
-		assert.Equal(t, http.StatusBadRequest, rr.Code)
-	})
-
-	t.Run("should return error for malformed request body", func(t *testing.T) {
-		body := []byte(`{"number": "0"}`)
-		req, err := http.NewRequest(http.MethodPost, "/connectioncodes", bytes.NewBuffer(body))
-		if err != nil {
-			t.Fatal(err)
-		}
-		rr := httptest.NewRecorder()
-		handler := http.HandlerFunc(aHandler.CreateConnectionCode)
-
-		handler.ServeHTTP(rr, req)
-		assert.Equal(t, http.StatusNotAcceptable, rr.Code)
-	})
-
-	t.Run("should return error for invalid json", func(t *testing.T) {
-		body := []byte(`{"nonumber":0`)
-
-		req, err := http.NewRequest(http.MethodPost, "/connectioncodes", bytes.NewBuffer(body))
-		if err != nil {
-			t.Fatal(err)
-		}
-		rr := httptest.NewRecorder()
-		handler := http.HandlerFunc(aHandler.CreateConnectionCode)
-
-		handler.ServeHTTP(rr, req)
-		assert.Equal(t, http.StatusNotAcceptable, rr.Code)
-	})
-
-	t.Run("should return error if pubkey is provided without route hint", func(t *testing.T) {
-		data := db.InviteBody{
-			Number:    1,
-			Pubkey:    "Test_pubkey",
-			RouteHint: "",
-		}
-
-		body, _ := json.Marshal(data)
-
-		req, err := http.NewRequest(http.MethodPost, "/connectioncodes", bytes.NewBuffer(body))
-		if err != nil {
-			t.Fatal(err)
-		}
-		rr := httptest.NewRecorder()
-		handler := http.HandlerFunc(aHandler.CreateConnectionCode)
-
-		handler.ServeHTTP(rr, req)
-		assert.Equal(t, http.StatusBadRequest, rr.Code)
-	})
-
-	t.Run("should return error if route hint is provided without pubkey", func(t *testing.T) {
-		data := db.InviteBody{
-			Number:    1,
-			Pubkey:    "",
-			RouteHint: "Test_Route_hint",
-		}
-
-		body, _ := json.Marshal(data)
-
-		req, err := http.NewRequest(http.MethodPost, "/connectioncodes", bytes.NewBuffer(body))
-		if err != nil {
-			t.Fatal(err)
-		}
-		rr := httptest.NewRecorder()
-		handler := http.HandlerFunc(aHandler.CreateConnectionCode)
-
-		handler.ServeHTTP(rr, req)
-		assert.Equal(t, http.StatusNotAcceptable, rr.Code)
-	})
-}
 
 func TestGetConnectionCode(t *testing.T) {
 	teardownSuite := SetupSuite(t)
@@ -851,4 +732,488 @@ func TestRefreshToken(t *testing.T) {
 		assert.Equal(t, http.StatusNotAcceptable, rr.Code)
 	})
 
+}
+
+func TestCreateConnectionCode(t *testing.T) {
+	teardownSuite := SetupSuite(t)
+	defer teardownSuite(t)
+
+	aHandler := NewAuthHandler(db.TestDB)
+
+	aHandler.makeConnectionCodeRequest = func(inviter_pubkey string, inviter_route_hint string, msats_amount uint64) string {
+		return "22222222222222222"
+	}
+
+	tests := []struct {
+		name           string
+		input          db.InviteBody
+		expectedStatus int
+		expectedBody   string
+		mockDBError    error
+	}{
+		{
+			name:           "Valid Input with Pubkey and RouteHint",
+			input:          db.InviteBody{Number: 2, Pubkey: "Test_pubkey", RouteHint: "Test_Route_hint", SatsAmount: 21},
+			expectedStatus: http.StatusOK,
+			expectedBody:   `{"message": "Codes created successfully"}`,
+		},
+		{
+			name:           "Valid Input without Pubkey and RouteHint",
+			input:          db.InviteBody{SatsAmount: 21, Number: 2},
+			expectedStatus: http.StatusOK,
+			expectedBody:   `{"message": "Codes created successfully"}`,
+		},
+		{
+			name:           "Zero SatsAmount",
+			input:          db.InviteBody{SatsAmount: 0, Number: 1},
+			expectedStatus: http.StatusOK,
+			expectedBody:   `{"message": "Codes created successfully"}`,
+		},
+		{
+			name:           "Maximum Number of Codes",
+			input:          db.InviteBody{SatsAmount: 21, Number: 1000},
+			expectedStatus: http.StatusOK,
+			expectedBody:   `{"message": "Codes created successfully"}`,
+		},
+		{
+			name:           "Invalid JSON Body",
+			input:          db.InviteBody{},
+			expectedStatus: http.StatusBadRequest,
+		},
+		{
+			name:           "Missing RouteHint with Pubkey",
+			input:          db.InviteBody{Pubkey: "Test_pubkey", SatsAmount: 21, Number: 1},
+			expectedStatus: http.StatusBadRequest,
+			expectedBody:   `{"error": "Route hint is required when pubkey is provided"}`,
+		},
+		{
+			name:           "Missing Pubkey with RouteHint",
+			input:          db.InviteBody{RouteHint: "Test_Route_hint", SatsAmount: 21, Number: 1},
+			expectedStatus: http.StatusNotAcceptable,
+			expectedBody:   `{"error": "Pubkey is required when route hint is provided"}`,
+		},
+		{
+			name:           "Empty Request Body",
+			input:          db.InviteBody{},
+			expectedStatus: http.StatusBadRequest,
+		},
+		{
+			name:           "Non-integer Number of Codes",
+			input:          db.InviteBody{SatsAmount: 21, Number: 0},
+			expectedStatus: http.StatusBadRequest,
+		},
+		{
+			name:           "Boundary Test for Number of Codes",
+			input:          db.InviteBody{SatsAmount: 21, Number: 1},
+			expectedStatus: http.StatusOK,
+			expectedBody:   `{"message": "Codes created successfully"}`,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+
+			body, _ := json.Marshal(tt.input)
+
+			req, err := http.NewRequest(http.MethodPost, "/connectioncodes", bytes.NewBuffer(body))
+			if err != nil {
+				t.Fatal(err)
+			}
+			rr := httptest.NewRecorder()
+			handler := http.HandlerFunc(aHandler.CreateConnectionCode)
+
+			handler.ServeHTTP(rr, req)
+			assert.Equal(t, tt.expectedStatus, rr.Code)
+		})
+	}
+}
+
+func TestReturnUserMap(t *testing.T) {
+
+	createdTimeStr := "2023-10-01T12:00:00Z"
+	createdTime, _ := time.Parse(time.RFC3339, createdTimeStr)
+
+	tests := []struct {
+		name     string
+		input    db.Person
+		expected map[string]interface{}
+	}{
+		{
+			name: "Standard Input Test",
+			input: db.Person{
+				ID:              1,
+				Uuid:            "123e4567-e89b-12d3-a456-426614174000",
+				Created:         &createdTime,
+				OwnerPubKey:     "owner_pubkey_value",
+				OwnerAlias:      "owner_alias_value",
+				OwnerContactKey: "contact_key_value",
+				Img:             "img_url",
+				Description:     "A sample description",
+				Tags:            []string{"tag1", "tag2"},
+				UniqueName:      "unique_name_value",
+				Extras:          map[string]interface{}{"key": "value"},
+				LastLogin:       123124353534,
+				PriceToMeet:     100,
+			},
+			expected: map[string]interface{}{
+				"id":            1,
+				"uuid":          "123e4567-e89b-12d3-a456-426614174000",
+				"created":       "2023-10-01T12:00:00Z",
+				"owner_pubkey":  "owner_pubkey_value",
+				"owner_alias":   "owner_alias_value",
+				"contact_key":   "contact_key_value",
+				"img":           "img_url",
+				"description":   "A sample description",
+				"tags":          []string{"tag1", "tag2"},
+				"unique_name":   "unique_name_value",
+				"pubkey":        "owner_pubkey_value",
+				"extras":        map[string]interface{}{"key": "value"},
+				"last_login":    "2023-10-02T12:00:00Z",
+				"price_to_meet": 100,
+				"alias":         "owner_alias_value",
+				"url":           config.Host,
+			},
+		},
+		{
+			name:  "Empty Fields Test",
+			input: db.Person{},
+			expected: map[string]interface{}{
+				"id":            nil,
+				"uuid":          "",
+				"created":       "",
+				"owner_pubkey":  "",
+				"owner_alias":   "",
+				"contact_key":   "",
+				"img":           "",
+				"description":   "",
+				"tags":          nil,
+				"unique_name":   "",
+				"pubkey":        "",
+				"extras":        nil,
+				"last_login":    "",
+				"price_to_meet": 0,
+				"alias":         "",
+				"url":           config.Host,
+			},
+		},
+		{
+			name: "Maximum Length Strings Test",
+			input: db.Person{
+				Uuid:            strings.Repeat("a", 255),
+				OwnerPubKey:     strings.Repeat("b", 255),
+				OwnerAlias:      strings.Repeat("c", 255),
+				OwnerContactKey: strings.Repeat("d", 255),
+				Img:             strings.Repeat("e", 255),
+				Description:     strings.Repeat("f", 255),
+				UniqueName:      strings.Repeat("g", 255),
+			},
+			expected: map[string]interface{}{
+				"uuid":         strings.Repeat("a", 255),
+				"owner_pubkey": strings.Repeat("b", 255),
+				"owner_alias":  strings.Repeat("c", 255),
+				"contact_key":  strings.Repeat("d", 255),
+				"img":          strings.Repeat("e", 255),
+				"description":  strings.Repeat("f", 255),
+				"unique_name":  strings.Repeat("g", 255),
+				"pubkey":       strings.Repeat("b", 255),
+				"alias":        strings.Repeat("c", 255),
+				"url":          config.Host,
+			},
+		},
+		{
+			name:  "Nil Input Test",
+			input: db.Person{},
+			expected: map[string]interface{}{
+				"id":            nil,
+				"uuid":          "",
+				"created":       "",
+				"owner_pubkey":  "",
+				"owner_alias":   "",
+				"contact_key":   "",
+				"img":           "",
+				"description":   "",
+				"tags":          nil,
+				"unique_name":   "",
+				"pubkey":        "",
+				"extras":        nil,
+				"last_login":    "",
+				"price_to_meet": 0,
+				"alias":         "",
+				"url":           config.Host,
+			},
+		},
+		{
+			name: "Invalid Data Types Test",
+			input: db.Person{
+				Uuid: "12345",
+			},
+			expected: map[string]interface{}{
+				"uuid": "12345",
+				"url":  config.Host,
+			},
+		},
+		{
+			name: "Large Number of Tags Test",
+			input: db.Person{
+				Tags: make([]string, 10000),
+			},
+			expected: map[string]interface{}{
+				"tags": make([]string, 10000),
+				"url":  config.Host,
+			},
+		},
+		{
+			name: "Special Characters in Strings Test",
+			input: db.Person{
+				Uuid:        "123e4567-e89b-12d3-a456-426614174000",
+				OwnerAlias:  "owner_alias_!@#$%^&*()",
+				Description: "Description with special characters: !@#$%^&*()",
+			},
+			expected: map[string]interface{}{
+				"uuid":        "123e4567-e89b-12d3-a456-426614174000",
+				"owner_alias": "owner_alias_!@#$%^&*()",
+				"description": "Description with special characters: !@#$%^&*()",
+				"url":         config.Host,
+			},
+		},
+		{
+			name:  "Config Dependency Test",
+			input: db.Person{},
+			expected: map[string]interface{}{
+				"url": config.Host,
+			},
+		},
+		{
+			name: "Null Values in Map Test",
+			input: db.Person{
+				Extras: map[string]interface{}{"key1": nil, "key2": "value"},
+			},
+			expected: map[string]interface{}{
+				"extras": map[string]interface{}{"key1": nil, "key2": "value"},
+				"url":    config.Host,
+			},
+		},
+		{
+			name: "Negative Price Test",
+			input: db.Person{
+				PriceToMeet: -50,
+			},
+			expected: map[string]interface{}{
+				"price_to_meet": -50,
+				"url":           config.Host,
+			},
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			result := returnUserMap(tt.input)
+			if expectedUuid, ok := tt.expected["uuid"]; ok {
+				assert.Equal(t, expectedUuid, result["uuid"])
+			}
+
+		})
+	}
+}
+
+func TestGetLnurlAuth(t *testing.T) {
+
+	originalStore := db.Store
+	defer func() {
+		db.Store = originalStore
+	}()
+
+	db.InitCache()
+
+	t.Run("Valid Request with Existing Socket Key", func(t *testing.T) {
+
+		existingSocketKey := "existing123"
+		db.Store.SetSocketConnections(db.Client{
+			Host: existingSocketKey,
+			Conn: nil,
+		})
+
+		req, err := http.NewRequest("GET", "/lnauth?socketKey="+existingSocketKey, nil)
+		assert.NoError(t, err)
+		req.Host = "test.com"
+
+		rr := httptest.NewRecorder()
+		handler := http.HandlerFunc(GetLnurlAuth)
+		handler.ServeHTTP(rr, req)
+
+		assert.Equal(t, http.StatusOK, rr.Code)
+
+		var response map[string]string
+		err = json.NewDecoder(rr.Body).Decode(&response)
+		assert.NoError(t, err)
+		assert.NotEmpty(t, response["k1"])
+		assert.NotEmpty(t, response["encode"])
+
+		socket, err := db.Store.GetSocketConnections(response["k1"][0:20])
+		assert.NoError(t, err)
+		assert.Equal(t, response["k1"][0:20], socket.Host)
+	})
+
+	t.Run("Valid Request with Non-Existing Socket Key", func(t *testing.T) {
+		nonExistingKey := "nonexistent456"
+		req, err := http.NewRequest("GET", "/lnauth?socketKey="+nonExistingKey, nil)
+		assert.NoError(t, err)
+		req.Host = "test.com"
+
+		rr := httptest.NewRecorder()
+		handler := http.HandlerFunc(GetLnurlAuth)
+		handler.ServeHTTP(rr, req)
+
+		assert.Equal(t, http.StatusOK, rr.Code)
+
+		var response map[string]string
+		err = json.NewDecoder(rr.Body).Decode(&response)
+		assert.NoError(t, err)
+		assert.NotEmpty(t, response["k1"])
+		assert.NotEmpty(t, response["encode"])
+
+		socket, err := db.Store.GetSocketConnections(response["k1"][0:20])
+		assert.NoError(t, err)
+		assert.Equal(t, response["k1"][0:20], socket.Host)
+	})
+
+	t.Run("Handles missing socketKey parameter", func(t *testing.T) {
+		req, err := http.NewRequest("GET", "/lnauth", nil)
+		assert.NoError(t, err)
+		req.Host = "test.com"
+
+		rr := httptest.NewRecorder()
+		handler := http.HandlerFunc(GetLnurlAuth)
+		handler.ServeHTTP(rr, req)
+
+		assert.Equal(t, http.StatusOK, rr.Code)
+
+		var response map[string]string
+		err = json.NewDecoder(rr.Body).Decode(&response)
+		assert.NoError(t, err)
+
+		assert.NotEmpty(t, response["k1"])
+		assert.NotEmpty(t, response["encode"])
+	})
+
+	t.Run("Successfully generates LNURL AUTH", func(t *testing.T) {
+		req, err := http.NewRequest("GET", "/lnauth?socketKey=test123", nil)
+		assert.NoError(t, err)
+
+		req.Host = "test.com"
+
+		rr := httptest.NewRecorder()
+		handler := http.HandlerFunc(GetLnurlAuth)
+		handler.ServeHTTP(rr, req)
+
+		assert.Equal(t, http.StatusOK, rr.Code)
+
+		var response map[string]string
+		err = json.NewDecoder(rr.Body).Decode(&response)
+		assert.NoError(t, err)
+
+		assert.NotEmpty(t, response["k1"])
+		assert.NotEmpty(t, response["encode"])
+
+		lnStore, err := db.Store.GetLnCache(response["k1"])
+		assert.NoError(t, err)
+		assert.Equal(t, response["k1"], lnStore.K1)
+		assert.Empty(t, lnStore.Key)
+		assert.False(t, lnStore.Status)
+
+		socket, err := db.Store.GetSocketConnections(response["k1"][0:20])
+		assert.NoError(t, err)
+		assert.Equal(t, response["k1"][0:20], socket.Host)
+	})
+
+	t.Run("Handles empty server host", func(t *testing.T) {
+		req, err := http.NewRequest("GET", "/lnauth?socketKey=test123", nil)
+		assert.NoError(t, err)
+
+		rr := httptest.NewRecorder()
+		handler := http.HandlerFunc(GetLnurlAuth)
+		handler.ServeHTTP(rr, req)
+
+		assert.Equal(t, http.StatusOK, rr.Code)
+
+		var response map[string]string
+		err = json.NewDecoder(rr.Body).Decode(&response)
+		assert.NoError(t, err)
+
+		assert.NotEmpty(t, response["k1"])
+		assert.NotEmpty(t, response["encode"])
+	})
+
+	t.Run("Verifies cache storage", func(t *testing.T) {
+		req, err := http.NewRequest("GET", "/lnauth?socketKey=test123", nil)
+		assert.NoError(t, err)
+		req.Host = "test.com"
+
+		rr := httptest.NewRecorder()
+		handler := http.HandlerFunc(GetLnurlAuth)
+		handler.ServeHTTP(rr, req)
+
+		var response map[string]string
+		err = json.NewDecoder(rr.Body).Decode(&response)
+		assert.NoError(t, err)
+
+		lnStore, err := db.Store.GetLnCache(response["k1"])
+		assert.NoError(t, err)
+		assert.Equal(t, response["k1"], lnStore.K1)
+		assert.Empty(t, lnStore.Key)
+		assert.False(t, lnStore.Status)
+
+		socket, err := db.Store.GetSocketConnections(response["k1"][0:20])
+		assert.NoError(t, err)
+		assert.Equal(t, response["k1"][0:20], socket.Host)
+	})
+
+	t.Run("Empty Socket Key", func(t *testing.T) {
+		req, err := http.NewRequest("GET", "/lnauth?socketKey=", nil)
+		assert.NoError(t, err)
+		req.Host = "test.com"
+
+		rr := httptest.NewRecorder()
+		handler := http.HandlerFunc(GetLnurlAuth)
+		handler.ServeHTTP(rr, req)
+
+		assert.Equal(t, http.StatusOK, rr.Code)
+
+		var response map[string]string
+		err = json.NewDecoder(rr.Body).Decode(&response)
+		assert.NoError(t, err)
+		assert.NotEmpty(t, response["k1"])
+		assert.NotEmpty(t, response["encode"])
+
+		socket, err := db.Store.GetSocketConnections(response["k1"][0:20])
+		assert.NoError(t, err)
+		assert.Equal(t, response["k1"][0:20], socket.Host)
+	})
+
+	t.Run("Handles LNURL encode failure", func(t *testing.T) {
+
+		originalEncodeLNURL := auth.EncodeLNURLFunc
+		auth.EncodeLNURLFunc = func(host string) (auth.LnEncodeData, error) {
+			return auth.LnEncodeData{}, fmt.Errorf("encoding failed")
+		}
+		defer func() {
+			auth.EncodeLNURLFunc = originalEncodeLNURL
+		}()
+
+		req, err := http.NewRequest("GET", "/lnauth?socketKey=test123", nil)
+		assert.NoError(t, err)
+		req.Host = "test.com"
+
+		rr := httptest.NewRecorder()
+		handler := http.HandlerFunc(GetLnurlAuth)
+		handler.ServeHTTP(rr, req)
+
+		assert.Equal(t, http.StatusBadRequest, rr.Code)
+
+		var response map[string]string
+		err = json.NewDecoder(rr.Body).Decode(&response)
+		assert.NoError(t, err)
+		assert.Empty(t, response["k1"])
+		assert.Empty(t, response["encode"])
+	})
 }

@@ -11,6 +11,7 @@ type TicketReviewRequest struct {
 		PhaseUUID         string `json:"phaseUUID"`
 		TicketUUID        string `json:"ticketUUID" validate:"required"`
 		TicketDescription string `json:"ticketDescription" validate:"required"`
+		TicketName        string `json:"ticketName,omitempty"`
 	} `json:"value"`
 	RequestUUID     string `json:"requestUUID"`
 	SourceWebsocket string `json:"sourceWebsocket"`

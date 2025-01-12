@@ -13,6 +13,7 @@ import (
 	"github.com/google/uuid"
 	"github.com/stakwork/sphinx-tribes/auth"
 	"github.com/stakwork/sphinx-tribes/db"
+	"github.com/stakwork/sphinx-tribes/utils"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
@@ -734,4 +735,219 @@ func TestTicketToBountyConversionAndEditing(t *testing.T) {
 		require.NoError(t, err)
 		assert.Equal(t, assignee.OwnerPubKey, updatedBounty.Assignee)
 	})
+}
+
+func TestProcessTicketReview(t *testing.T) {
+	teardownSuite := SetupSuite(t)
+	defer teardownSuite(t)
+
+	tHandler := NewTicketHandler(&http.Client{}, db.TestDB)
+
+	person := db.Person{
+		Uuid:        uuid.New().String(),
+		OwnerAlias:  "test-alias",
+		UniqueName:  "test-unique-name",
+		OwnerPubKey: "test-pubkey",
+		PriceToMeet: 0,
+		Description: "test-description",
+	}
+	_, err := db.TestDB.CreateOrEditPerson(person)
+	require.NoError(t, err)
+
+	workspace := db.Workspace{
+		Uuid:        uuid.New().String(),
+		Name:        "test-workspace" + uuid.New().String(),
+		OwnerPubKey: person.OwnerPubKey,
+		Github:      "https://github.com/test",
+		Website:     "https://www.testwebsite.com",
+		Description: "test-description",
+	}
+	_, err = db.TestDB.CreateOrEditWorkspace(workspace)
+	require.NoError(t, err)
+
+	feature := db.WorkspaceFeatures{
+		Uuid:          uuid.New().String(),
+		WorkspaceUuid: workspace.Uuid,
+		Name:          "test-feature",
+		Url:           "https://github.com/test-feature",
+		Priority:      0,
+	}
+	createdFeature, err := db.TestDB.CreateOrEditFeature(feature)
+	require.NoError(t, err)
+
+	featurePhase := db.FeaturePhase{
+		Uuid:        uuid.New().String(),
+		FeatureUuid: feature.Uuid,
+		Name:        "test-phase",
+		Priority:    0,
+	}
+	createdPhase, err := db.TestDB.CreateOrEditFeaturePhase(featurePhase)
+	require.NoError(t, err)
+
+	ticket := db.Tickets{
+		UUID:        uuid.New(),
+		FeatureUUID: createdFeature.Uuid,
+		PhaseUUID:   createdPhase.Uuid,
+		Name:        "Test Ticket",
+		Sequence:    1,
+		Description: "Test Description",
+		Status:      db.DraftTicket,
+		Version:     0,
+		CreatedAt:   time.Now(),
+		UpdatedAt:   time.Now(),
+	}
+	createdTicket, err := db.TestDB.CreateOrEditTicket(&ticket)
+	require.NoError(t, err)
+
+	tests := []struct {
+		name           string
+		requestBody    interface{}
+		expectedStatus int
+		expectedBody   func(*testing.T, *httptest.ResponseRecorder)
+	}{
+		{
+			name: "Valid Request",
+			requestBody: utils.TicketReviewRequest{
+				Value: struct {
+					FeatureUUID       string `json:"featureUUID"`
+					PhaseUUID         string `json:"phaseUUID"`
+					TicketUUID        string `json:"ticketUUID" validate:"required"`
+					TicketDescription string `json:"ticketDescription" validate:"required"`
+					TicketName        string `json:"ticketName,omitempty"`
+				}{
+					FeatureUUID:       createdFeature.Uuid,
+					PhaseUUID:         createdPhase.Uuid,
+					TicketUUID:        createdTicket.UUID.String(),
+					TicketDescription: "Updated Description",
+				},
+				SourceWebsocket: "test-websocket",
+			},
+			expectedStatus: http.StatusOK,
+			expectedBody: func(t *testing.T, rr *httptest.ResponseRecorder) {
+				assert.Equal(t, http.StatusOK, rr.Code)
+
+				var response struct {
+					Ticket db.Tickets `json:"ticket"`
+				}
+				err := json.Unmarshal(rr.Body.Bytes(), &response)
+				require.NoError(t, err)
+
+				returnedTicket := response.Ticket
+				assert.Equal(t, "Updated Description", returnedTicket.Description)
+			},
+		},
+		{
+			name:           "Empty Request Body",
+			requestBody:    nil,
+			expectedStatus: http.StatusBadRequest,
+			expectedBody: func(t *testing.T, rr *httptest.ResponseRecorder) {
+				assert.Equal(t, http.StatusBadRequest, rr.Code)
+			},
+		},
+		{
+			name:           "Malformed JSON",
+			requestBody:    "{invalid-json}",
+			expectedStatus: http.StatusBadRequest,
+			expectedBody: func(t *testing.T, rr *httptest.ResponseRecorder) {
+				assert.Equal(t, http.StatusBadRequest, rr.Code)
+				assert.Contains(t, rr.Body.String(), "Error parsing request body")
+			},
+		},
+		{
+			name: "Missing Required Fields",
+			requestBody: utils.TicketReviewRequest{
+				Value: struct {
+					FeatureUUID       string `json:"featureUUID"`
+					PhaseUUID         string `json:"phaseUUID"`
+					TicketUUID        string `json:"ticketUUID" validate:"required"`
+					TicketDescription string `json:"ticketDescription" validate:"required"`
+					TicketName        string `json:"ticketName,omitempty"`
+				}{
+					FeatureUUID:       createdFeature.Uuid,
+					PhaseUUID:         createdPhase.Uuid,
+					TicketDescription: "Updated Description",
+				},
+			},
+			expectedStatus: http.StatusBadRequest,
+			expectedBody: func(t *testing.T, rr *httptest.ResponseRecorder) {
+				assert.Equal(t, http.StatusBadRequest, rr.Code)
+				assert.Contains(t, rr.Body.String(), "ticketUUID is required")
+			},
+		},
+		{
+			name: "Non-existent TicketUUID",
+			requestBody: utils.TicketReviewRequest{
+				Value: struct {
+					FeatureUUID       string `json:"featureUUID"`
+					PhaseUUID         string `json:"phaseUUID"`
+					TicketUUID        string `json:"ticketUUID" validate:"required"`
+					TicketDescription string `json:"ticketDescription" validate:"required"`
+					TicketName        string `json:"ticketName,omitempty"`
+				}{
+					TicketUUID:        "non-existent-uuid",
+					TicketDescription: "New description",
+				},
+			},
+			expectedStatus: http.StatusNotFound,
+			expectedBody: func(t *testing.T, rr *httptest.ResponseRecorder) {
+				assert.Equal(t, http.StatusNotFound, rr.Code)
+				var response map[string]interface{}
+				err := json.Unmarshal(rr.Body.Bytes(), &response)
+				require.NoError(t, err)
+				assert.Equal(t, "Ticket not found", response["error"])
+			},
+		},
+		{
+			name: "Websocket Error",
+			requestBody: utils.TicketReviewRequest{
+				Value: struct {
+					FeatureUUID       string `json:"featureUUID"`
+					PhaseUUID         string `json:"phaseUUID"`
+					TicketUUID        string `json:"ticketUUID" validate:"required"`
+					TicketDescription string `json:"ticketDescription" validate:"required"`
+					TicketName        string `json:"ticketName,omitempty"`
+				}{
+					TicketUUID:        createdTicket.UUID.String(),
+					TicketDescription: "New description",
+				},
+				SourceWebsocket: "source-session-id",
+			},
+
+			expectedStatus: http.StatusOK,
+			expectedBody: func(t *testing.T, rr *httptest.ResponseRecorder) {
+				assert.Equal(t, http.StatusOK, rr.Code)
+
+				var response map[string]interface{}
+				err := json.Unmarshal(rr.Body.Bytes(), &response)
+				require.NoError(t, err)
+				assert.Equal(t, "client not found: source-session-id", response["websocket_error"])
+			},
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			rr := httptest.NewRecorder()
+
+			r := chi.NewRouter()
+			r.Mount("/bounties/ticket", func() http.Handler {
+				r := chi.NewRouter()
+				r.Post("/review", tHandler.ProcessTicketReview)
+				return r
+			}())
+
+			var req *http.Request
+			if tt.requestBody != nil {
+				requestBody, _ := json.Marshal(tt.requestBody)
+				req = httptest.NewRequest(http.MethodPost, "/bounties/ticket/review", bytes.NewBuffer(requestBody))
+				req.Header.Set("Content-Type", "application/json")
+			} else {
+				req = httptest.NewRequest(http.MethodPost, "/bounties/ticket/review", nil)
+			}
+
+			r.ServeHTTP(rr, req)
+			assert.Equal(t, tt.expectedStatus, rr.Code)
+			tt.expectedBody(t, rr)
+		})
+	}
 }

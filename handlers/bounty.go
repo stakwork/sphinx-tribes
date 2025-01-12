@@ -1843,3 +1843,10 @@ func (h *bountyHandler) CloseBountyTiming(w http.ResponseWriter, r *http.Request
 
 	w.WriteHeader(http.StatusOK)
 }
+
+func (h *bountyHandler) GetBountiesLeaderboard(w http.ResponseWriter, _ *http.Request) {
+	leaderBoard := h.db.GetBountiesLeaderboard()
+
+	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode(leaderBoard)
+}

@@ -650,7 +650,7 @@ func (th *ticketHandler) ProcessTicketReview(w http.ResponseWriter, r *http.Requ
 		TicketGroup: existingTicket.TicketGroup,
 		FeatureUUID: existingTicket.FeatureUUID,
 		PhaseUUID:   existingTicket.PhaseUUID,
-		Name:        existingTicket.Name,
+		Name:        reviewReq.Value.TicketName,
 		Sequence:    existingTicket.Sequence,
 		Dependency:  existingTicket.Dependency,
 		Description: reviewReq.Value.TicketDescription,
@@ -658,6 +658,10 @@ func (th *ticketHandler) ProcessTicketReview(w http.ResponseWriter, r *http.Requ
 		Version:     existingTicket.Version + 1,
 		CreatedAt:   time.Now(),
 		UpdatedAt:   time.Now(),
+	}
+
+	if reviewReq.Value.TicketName == "" {
+		newTicket.Name = existingTicket.Name
 	}
 
 	createdTicket, err := th.db.CreateOrEditTicket(&newTicket)
@@ -678,6 +682,7 @@ func (th *ticketHandler) ProcessTicketReview(w http.ResponseWriter, r *http.Requ
 			PhaseUUID:         reviewReq.Value.PhaseUUID,
 			TicketUUID:        createdTicket.UUID.String(),
 			TicketDescription: reviewReq.Value.TicketDescription,
+			TicketName:        reviewReq.Value.TicketName,
 		},
 	}
 
