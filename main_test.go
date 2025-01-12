@@ -426,13 +426,18 @@ func TestRunCron(t *testing.T) {
 			c := cron.New()
 
 			started := make(chan bool, 1)
+			var mu sync.Mutex
 			firstExecution := true
 
 			err := c.AddFunc(tt.schedule, func() {
 				counter.increment()
+				mu.Lock()
 				if firstExecution {
 					firstExecution = false
+					mu.Unlock()
 					started <- true
+				} else {
+					mu.Unlock()
 				}
 			})
 
@@ -441,11 +446,9 @@ func TestRunCron(t *testing.T) {
 			}
 
 			c.Start()
-			time.Sleep(100 * time.Millisecond)
 
 			select {
 			case <-started:
-
 			case <-time.After(2 * time.Second):
 				t.Fatal("Cron job failed to start within timeout")
 			}
@@ -453,16 +456,16 @@ func TestRunCron(t *testing.T) {
 			time.Sleep(tt.wait)
 			c.Stop()
 
-			t.Logf("Schedule: %s, Wait: %v, Executions: %d", tt.schedule, tt.wait, counter.getCount())
+			execCount := counter.getCount()
+			t.Logf("Schedule: %s, Wait: %v, Executions: %d", tt.schedule, tt.wait, execCount)
 
-			if counter.getCount() < tt.want {
-
+			if execCount < tt.want {
 				time.Sleep(500 * time.Millisecond)
-				counter.reset()
+				execCount = counter.getCount()
 			}
 
-			assert.GreaterOrEqual(t, counter.getCount(), tt.want,
-				"Expected at least %d executions, got %d", tt.want, counter.getCount())
+			assert.GreaterOrEqual(t, execCount, tt.want,
+				"Expected at least %d executions, got %d", tt.want, execCount)
 		})
 	}
 }
