@@ -229,7 +229,7 @@ func internalServerErrorHandler(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		rr := negroni.NewResponseWriter(w)
 
-		elements_chain := ""
+		var elements_chain strings.Builder
 		trap.AddInterceptor(&trap.Interceptor{
 			Pre: func(ctx context.Context, f *core.FuncInfo, args core.Object, results core.Object) (interface{}, error) {
 				index := strings.Index(f.File, "sphinx-tribes")
@@ -238,69 +238,65 @@ func internalServerErrorHandler(next http.Handler) http.Handler {
 					trimmed = f.File[index:]
 				}
 				//fmt.Printf("%s:%d %s\n", trimmed, f.Line, f.Name)
-				append_element := fmt.Sprintf("%s:%d %s,\n", trimmed, f.Line, f.Name)
-				elements_chain = fmt.Sprintf("%s%s", append_element, elements_chain)
+				elements_chain.WriteString(fmt.Sprintf("%s:%d %s,\n", trimmed, f.Line, f.Name))
 
 				return nil, nil
 			},
 		})
 
 		defer func() {
-			go func() {
-				posthog_key := os.Getenv("POSTHOG_KEY")
-				posthog_url := os.Getenv("POSTHOG_URL")
-				session_id := r.Header.Get("x-session-id")
-				if posthog_key != "" && posthog_url != "" && session_id != "" {
-					logger.Log.Info("Sending to Posthog")
-					client, _ := posthog.NewWithConfig(
-						posthog_key,
-						posthog.Config{
-							Endpoint: posthog_url,
-						},
-					)
-					defer client.Close()
-					hexCompressed, _ := compressToHex(elements_chain)
-					_ = client.Enqueue(posthog.Capture{
-						DistinctId: session_id,         // Unique ID for the user
-						Event:      "backend_api_call", // The event name
-						Properties: map[string]interface{}{
-							"$session_id":     session_id,
-							"$event_type":     "backend_api_call",
-							"$elements_chain": hexCompressed,
-						},
-					})
-				}
-			}()
+			posthog_key := os.Getenv("POSTHOG_KEY")
+			posthog_url := os.Getenv("POSTHOG_URL")
+			session_id := r.Header.Get("x-session-id")
+			if posthog_key != "" && posthog_url != "" && session_id != "" {
+				logger.Log.Info("Sending to Posthog")
+				client, _ := posthog.NewWithConfig(
+					posthog_key,
+					posthog.Config{
+						Endpoint: posthog_url,
+					},
+				)
+				defer client.Close()
+				elements_chain_string := elements_chain.String()
+				hexCompressed, _ := compressToHex(elements_chain_string)
+				_ = client.Enqueue(posthog.Capture{
+					DistinctId: session_id,         // Unique ID for the user
+					Event:      "backend_api_call", // The event name
+					Properties: map[string]interface{}{
+						"$session_id":     session_id,
+						"$event_type":     "backend_api_call",
+						"$elements_chain": hexCompressed,
+					},
+				})
+			}
 		}()
 
 		defer func() {
-			go func() {
-				if err := recover(); err != nil {
-					// Get stack trace
-					buf := make([]byte, 4096)
-					n := runtime.Stack(buf, true)
-					stackTrace := string(buf[:n])
+			if err := recover(); err != nil {
+				// Get stack trace
+				buf := make([]byte, 4096)
+				n := runtime.Stack(buf, true)
+				stackTrace := string(buf[:n])
 
-					// Format stack trace to edge list
-					edgeList := utils.FormatStacktraceToEdgeList(stackTrace, err)
+				// Format stack trace to edge list
+				edgeList := utils.FormatStacktraceToEdgeList(stackTrace, err)
 
-					logger.Log.Error("Internal Server Error: %s %s\nError: %v\nStack Trace:\n%s\nEdge List:\n%+v\n",
-						r.Method,
-						r.URL.Path,
-						err,
-						stackTrace,
-						utils.PrettyPrintEdgeList(edgeList),
-					)
+				logger.Log.Error("Internal Server Error: %s %s\nError: %v\nStack Trace:\n%s\nEdge List:\n%+v\n",
+					r.Method,
+					r.URL.Path,
+					err,
+					stackTrace,
+					utils.PrettyPrintEdgeList(edgeList),
+				)
 
-					go func() {
-						if err := sendEdgeListToJarvis(edgeList); err != nil {
-							logger.Log.Error("Error sending to Jarvis: %v\n", err)
-						}
-					}()
+				go func() {
+					if err := sendEdgeListToJarvis(edgeList); err != nil {
+						logger.Log.Error("Error sending to Jarvis: %v\n", err)
+					}
+				}()
 
-					http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
-				}
-			}()
+				http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
+			}
 		}()
 
 		next.ServeHTTP(rr, r)
