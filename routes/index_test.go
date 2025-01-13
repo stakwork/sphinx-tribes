@@ -218,6 +218,189 @@ func TestSendEdgeListToJarvis(t *testing.T) {
 			},
 			expectedError: true,
 		},
+		{
+			name: "Large Payload",
+			edgeList: utils.EdgeList{
+				EdgeList: func() []utils.Edge {
+					edges := make([]utils.Edge, 1000)
+					for i := 0; i < 1000; i++ {
+						edges[i] = utils.Edge{
+							Edge: utils.EdgeInfo{
+								EdgeType: fmt.Sprintf("test_%d", i),
+								Weight:   float64(i),
+							},
+							Source: utils.Node{
+								NodeType: "test",
+								NodeData: map[string]interface{}{
+									"data": strings.Repeat("large_payload", 100),
+								},
+							},
+						}
+					}
+					return edges
+				}(),
+			},
+			setupMock: func() *httptest.Server {
+				return httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+					w.WriteHeader(http.StatusOK)
+				}))
+			},
+			setupConfig: func() {
+				config.JarvisToken = "test-token"
+			},
+			expectedError: false,
+		},
+		{
+			name: "Slow Server Response",
+			edgeList: utils.EdgeList{
+				EdgeList: []utils.Edge{{
+					Edge: utils.EdgeInfo{
+						EdgeType: "test",
+						Weight:   1.0,
+					},
+				}},
+			},
+			setupMock: func() *httptest.Server {
+				return httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+					time.Sleep(11 * time.Second) // Longer than client timeout
+					w.WriteHeader(http.StatusOK)
+				}))
+			},
+			setupConfig: func() {
+				config.JarvisToken = "test-token"
+			},
+			expectedError: true,
+		},
+		{
+			name: "Special Characters in EdgeType",
+			edgeList: utils.EdgeList{
+				EdgeList: []utils.Edge{{
+					Edge: utils.EdgeInfo{
+						EdgeType: "test!@#$%^&*()",
+						Weight:   1.0,
+					},
+				}},
+			},
+			setupMock: func() *httptest.Server {
+				return httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+					w.WriteHeader(http.StatusOK)
+				}))
+			},
+			setupConfig: func() {
+				config.JarvisToken = "test-token"
+			},
+			expectedError: false,
+		},
+		{
+			name: "Unicode Characters in NodeData",
+			edgeList: utils.EdgeList{
+				EdgeList: []utils.Edge{{
+					Edge: utils.EdgeInfo{
+						EdgeType: "test",
+						Weight:   1.0,
+					},
+					Source: utils.Node{
+						NodeType: "test",
+						NodeData: map[string]interface{}{
+							"data": "测试データ",
+						},
+					},
+				}},
+			},
+			setupMock: func() *httptest.Server {
+				return httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+					w.WriteHeader(http.StatusOK)
+				}))
+			},
+			setupConfig: func() {
+				config.JarvisToken = "test-token"
+			},
+			expectedError: false,
+		},
+		{
+			name: "Malformed Response Body",
+			edgeList: utils.EdgeList{
+				EdgeList: []utils.Edge{{
+					Edge: utils.EdgeInfo{
+						EdgeType: "test",
+						Weight:   1.0,
+					},
+				}},
+			},
+			setupMock: func() *httptest.Server {
+				return httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+					w.Header().Set("Content-Length", "1000")
+					w.WriteHeader(http.StatusBadRequest)
+					w.Write([]byte("Malformed JSON{"))
+				}))
+			},
+			setupConfig: func() {
+				config.JarvisToken = "test-token"
+			},
+			expectedError: true,
+		},
+		{
+			name: "Empty Response Body with Success Status",
+			edgeList: utils.EdgeList{
+				EdgeList: []utils.Edge{{
+					Edge: utils.EdgeInfo{
+						EdgeType: "test",
+						Weight:   1.0,
+					},
+				}},
+			},
+			setupMock: func() *httptest.Server {
+				return httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+					w.WriteHeader(http.StatusOK)
+				}))
+			},
+			setupConfig: func() {
+				config.JarvisToken = "test-token"
+			},
+			expectedError: false,
+		},
+		{
+			name: "Invalid Content-Type Response",
+			edgeList: utils.EdgeList{
+				EdgeList: []utils.Edge{{
+					Edge: utils.EdgeInfo{
+						EdgeType: "test",
+						Weight:   1.0,
+					},
+				}},
+			},
+			setupMock: func() *httptest.Server {
+				return httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+					w.Header().Set("Content-Type", "text/plain")
+					w.WriteHeader(http.StatusOK)
+					w.Write([]byte("Not JSON"))
+				}))
+			},
+			setupConfig: func() {
+				config.JarvisToken = "test-token"
+			},
+			expectedError: false,
+		},
+		{
+			name: "Redirect Response",
+			edgeList: utils.EdgeList{
+				EdgeList: []utils.Edge{{
+					Edge: utils.EdgeInfo{
+						EdgeType: "test",
+						Weight:   1.0,
+					},
+				}},
+			},
+			setupMock: func() *httptest.Server {
+				return httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+					http.Redirect(w, r, "/new-location", http.StatusTemporaryRedirect)
+				}))
+			},
+			setupConfig: func() {
+				config.JarvisToken = "test-token"
+			},
+			expectedError: true,
+		},
 	}
 
 	for _, tt := range tests {
