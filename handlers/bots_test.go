@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"context"
 	"encoding/json"
+	"fmt"
 	"net/http"
 	"net/http/httptest"
 	"testing"
@@ -572,4 +573,159 @@ func TestGetListedBots(t *testing.T) {
 		assert.ElementsMatch(t, []db.Bot{bot}, returnedBots)
 	})
 
+	t.Run("Standard Input - Valid Request", func(t *testing.T) {
+		rr := httptest.NewRecorder()
+		handler := http.HandlerFunc(bHandler.GetListedBots)
+
+		db.TestDB.DeleteBot()
+
+		bot := db.Bot{
+			UUID:        "bot_uuid1",
+			OwnerPubKey: "your_pubkey1",
+			OwnerAlias:  "your_owner1",
+			Name:        "test_bot1",
+			UniqueName:  "test_bot1",
+			Description: "bot description 1",
+			Tags:        pq.StringArray{},
+			Unlisted:    false,
+		}
+
+		db.TestDB.CreateOrEditBot(bot)
+
+		req := httptest.NewRequest(http.MethodGet, "/", nil)
+		handler.ServeHTTP(rr, req)
+
+		var returnedBots []db.Bot
+		err := json.Unmarshal(rr.Body.Bytes(), &returnedBots)
+		assert.NoError(t, err)
+		assert.Equal(t, http.StatusOK, rr.Code)
+		assert.Len(t, returnedBots, 1)
+		assert.Equal(t, bot.UUID, returnedBots[0].UUID)
+	})
+
+	t.Run("Empty Bot List", func(t *testing.T) {
+		rr := httptest.NewRecorder()
+		handler := http.HandlerFunc(bHandler.GetListedBots)
+
+		db.TestDB.DeleteBot()
+
+		req := httptest.NewRequest(http.MethodGet, "/", nil)
+		handler.ServeHTTP(rr, req)
+
+		var returnedBots []db.Bot
+		err := json.Unmarshal(rr.Body.Bytes(), &returnedBots)
+		assert.NoError(t, err)
+		assert.Equal(t, http.StatusOK, rr.Code)
+		assert.Empty(t, returnedBots)
+	})
+
+	t.Run("Special Characters in Bot Names", func(t *testing.T) {
+		rr := httptest.NewRecorder()
+		handler := http.HandlerFunc(bHandler.GetListedBots)
+
+		db.TestDB.DeleteBot()
+
+		specialBot := db.Bot{
+			UUID:        "special_bot_uuid",
+			OwnerPubKey: "special_pubkey",
+			Name:        "!@#$%^&*()_+ Bot",
+			UniqueName:  "special_bot",
+			Description: "Bot with special チャラクターズ",
+			Tags:        pq.StringArray{"tag!@#", "タグ"},
+			Unlisted:    false,
+		}
+
+		db.TestDB.CreateOrEditBot(specialBot)
+
+		req := httptest.NewRequest(http.MethodGet, "/", nil)
+		handler.ServeHTTP(rr, req)
+
+		var returnedBots []db.Bot
+		err := json.Unmarshal(rr.Body.Bytes(), &returnedBots)
+		assert.NoError(t, err)
+		assert.Equal(t, http.StatusOK, rr.Code)
+		assert.Len(t, returnedBots, 1)
+		assert.Equal(t, specialBot.Name, returnedBots[0].Name)
+		assert.Equal(t, specialBot.Description, returnedBots[0].Description)
+	})
+
+	t.Run("Large Bot List", func(t *testing.T) {
+
+		handler := http.HandlerFunc(bHandler.GetListedBots)
+
+		db.TestDB.DeleteBot()
+
+		expectedBots := []db.Bot{}
+		for i := 1; i <= 100; i++ {
+			bot := db.Bot{
+				UUID:        fmt.Sprintf("bot_uuid_%d", i),
+				OwnerPubKey: fmt.Sprintf("pubkey_%d", i),
+				OwnerAlias:  fmt.Sprintf("owner_%d", i),
+				Name:        fmt.Sprintf("test_bot_%d", i),
+				UniqueName:  fmt.Sprintf("unique_bot_%d", i),
+				Description: fmt.Sprintf("description_%d", i),
+				Tags:        pq.StringArray{fmt.Sprintf("tag_%d", i)},
+				Unlisted:    false,
+
+				Tsv: fmt.Sprintf("'%d':3A,5B 'bot':2A 'descript':4B 'tag_%d' 'test':1A", i, i),
+			}
+			db.TestDB.CreateOrEditBot(bot)
+			expectedBots = append(expectedBots, bot)
+		}
+
+		testCases := []struct {
+			name          string
+			queryParams   string
+			expectedCount int
+			validateOrder func([]db.Bot) bool
+		}{
+			{
+				name:          "Default pagination",
+				queryParams:   "?limit=100",
+				expectedCount: 100,
+				validateOrder: nil,
+			},
+			{
+				name:          "Limited results",
+				queryParams:   "?limit=10",
+				expectedCount: 10,
+				validateOrder: nil,
+			},
+			{
+				name:          "With offset",
+				queryParams:   "?offset=50&limit=25",
+				expectedCount: 25,
+				validateOrder: nil,
+			},
+			{
+				name:          "Search filter",
+				queryParams:   "?search=test_bot_1&limit=100",
+				expectedCount: 12,
+				validateOrder: nil,
+			},
+		}
+
+		for _, tc := range testCases {
+			t.Run(tc.name, func(t *testing.T) {
+				req := httptest.NewRequest(http.MethodGet, "/"+tc.queryParams, nil)
+				rr := httptest.NewRecorder()
+				handler.ServeHTTP(rr, req)
+
+				var returnedBots []db.Bot
+				err := json.Unmarshal(rr.Body.Bytes(), &returnedBots)
+				assert.NoError(t, err)
+				assert.Equal(t, http.StatusOK, rr.Code)
+				assert.Len(t, returnedBots, tc.expectedCount)
+
+				for _, bot := range returnedBots {
+					assert.False(t, bot.Unlisted)
+					assert.False(t, bot.Deleted)
+				}
+
+				if tc.validateOrder != nil {
+					assert.True(t, tc.validateOrder(returnedBots), "Returned bots are not in the expected order")
+				}
+			})
+		}
+	})
 }
