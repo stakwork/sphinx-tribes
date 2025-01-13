@@ -59,7 +59,6 @@ require (
 	github.com/lightningnetwork/lnd/tlv v1.1.1 // indirect
 	github.com/lightningnetwork/lnd/tor v1.1.2 // indirect
 	github.com/onsi/gomega v1.26.0 // indirect
-	github.com/posthog/posthog-go v1.2.24 // indirect
 	github.com/robfig/cron v1.2.0
 	github.com/urfave/negroni v1.0.0 // indirect
 	github.com/xhd2015/xgo/runtime v1.0.52 // indirect

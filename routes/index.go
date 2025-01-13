@@ -4,7 +4,6 @@ import (
 	"bytes"
 	"context"
 	"encoding/json"
-	"encoding/hex"
 	"fmt"
 	"io"
 	"net/http"
@@ -12,7 +11,6 @@ import (
 	"runtime"
 	"strings"
 	"time"
-	"compress/gzip"
 
 	"github.com/go-chi/chi"
 	"github.com/go-chi/chi/middleware"
@@ -28,8 +26,6 @@ import (
 	"github.com/stakwork/sphinx-tribes/logger"
 	customMiddleware "github.com/stakwork/sphinx-tribes/middlewares"
 	"github.com/stakwork/sphinx-tribes/utils"
-
-	"github.com/posthog/posthog-go"
 )
 
 // NewRouter creates a chi router
@@ -200,36 +196,11 @@ func sendEdgeListToJarvis(edgeList utils.EdgeList) error {
 	return fmt.Errorf("jarvis returned non-success status: %d, body: %s", resp.StatusCode, string(body))
 }
 
-func compressToHex(input string) (string, error) {
-	// Create a buffer to hold the compressed data
-	var compressedBuffer bytes.Buffer
-
-	// Create a gzip writer
-	gzipWriter := gzip.NewWriter(&compressedBuffer)
-
-	// Write the input string to the gzip writer
-	_, err := gzipWriter.Write([]byte(input))
-	if err != nil {
-		return "", fmt.Errorf("failed to write to gzip writer: %w", err)
-	}
-
-	// Close the gzip writer to flush the data
-	err = gzipWriter.Close()
-	if err != nil {
-		return "", fmt.Errorf("failed to close gzip writer: %w", err)
-	}
-
-	// Encode the compressed data to hex
-	hexEncoded := hex.EncodeToString(compressedBuffer.Bytes())
-	return hexEncoded, nil
-}
-
 // Middleware to handle InternalServerError
 func internalServerErrorHandler(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		rr := negroni.NewResponseWriter(w)
 
-		elements_chain := ""
 		trap.AddInterceptor(&trap.Interceptor{
 			Pre: func(ctx context.Context, f *core.FuncInfo, args core.Object, results core.Object) (interface{}, error) {
 				index := strings.Index(f.File, "sphinx-tribes")
@@ -237,40 +208,11 @@ func internalServerErrorHandler(next http.Handler) http.Handler {
 				if index != -1 {
 					trimmed = f.File[index:]
 				}
-				//fmt.Printf("%s:%d %s\n", trimmed, f.Line, f.Name)
-				append_element := fmt.Sprintf("%s:%d %s,\n", trimmed, f.Line, f.Name)
-				elements_chain = fmt.Sprintf("%s%s", append_element, elements_chain)
+				logger.Log.Machine("%s:%d %s\n", trimmed, f.Line, f.Name)
 
 				return nil, nil
 			},
 		})
-
-		defer func() {
-			posthog_key := os.Getenv("POSTHOG_KEY")
-			posthog_url := os.Getenv("POSTHOG_URL")
-			session_id := r.Header.Get("x-session-id")
-			if posthog_key != "" && posthog_url != "" && session_id != "" {
-				logger.Log.Info("Sending to Posthog")
-				client, _ := posthog.NewWithConfig(
-					posthog_key,
-					posthog.Config{
-						Endpoint: posthog_url,
-					},
-				)
-				defer client.Close()
-				hexCompressed, _ := compressToHex(elements_chain)
-				_ = client.Enqueue(posthog.Capture{
-					DistinctId: session_id,         // Unique ID for the user
-					Event:      "backend_api_call", // The event name
-					Properties: map[string]interface{}{
-						"$session_id":     session_id,
-						"$event_type":     "backend_api_call",
-						"$elements_chain": hexCompressed,
-					},
-				})
-			}
-		}()
-
 		defer func() {
 			if err := recover(); err != nil {
 				// Get stack trace
