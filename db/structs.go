@@ -710,6 +710,7 @@ const (
 	Deposit  PaymentType = "deposit"
 	Withdraw PaymentType = "withdraw"
 	Payment  PaymentType = "payment"
+	Reversal PaymentType = "reversal"
 )
 
 type BudgetHistory struct {

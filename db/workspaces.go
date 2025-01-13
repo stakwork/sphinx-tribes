@@ -812,6 +812,25 @@ func (db database) ProcessReversePayments(paymentId uint) error {
 		if workspaceBudget.WorkspaceUuid == "" {
 			tx.Rollback()
 		} else {
+			// add reversal payment history
+			now := time.Now()
+			reversalPaymentHistory := NewPaymentHistory{
+				Amount:         paymentHistory.Amount,
+				SenderPubKey:   paymentHistory.SenderPubKey,
+				ReceiverPubKey: paymentHistory.ReceiverPubKey,
+				WorkspaceUuid:  workspace_uuid,
+				BountyId:       bounty_id,
+				Tag:            paymentHistory.Tag,
+				PaymentType:    Reversal,
+				Created:        &now,
+				Updated:        &now,
+				Status:         true,
+			}
+
+			if err = tx.Create(&reversalPaymentHistory).Error; err != nil {
+				tx.Rollback()
+			}
+
 			totalBudget := workspaceBudget.TotalBudget
 			workspaceBudget.TotalBudget = totalBudget + paymentHistory.Amount
 
