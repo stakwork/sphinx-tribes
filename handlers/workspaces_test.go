@@ -2620,3 +2620,410 @@ func TestPollUserWorkspacesBudget(t *testing.T) {
 		assert.Equal(t, workspaceBudget.TotalBudget, uint(amount*3))
 	})
 }
+
+func TestHandlerGetFeaturesByWorkspaceUuid(t *testing.T) {
+	teardownSuite := SetupSuite(t)
+	defer teardownSuite(t)
+	oHandler := NewWorkspaceHandler(db.TestDB)
+
+	workspace := db.Workspace{
+		Uuid:        uuid.New().String(),
+		Name:        "test-workspace-" + uuid.New().String(),
+		OwnerPubKey: "test-pubkey",
+		Github:      "https://github.com/test",
+		Website:     "https://www.testwebsite.com",
+		Description: "test-description",
+	}
+	db.TestDB.CreateOrEditWorkspace(workspace)
+
+	t.Run("should return unauthorized when no pubkey provided", func(t *testing.T) {
+		rr := httptest.NewRecorder()
+		handler := http.HandlerFunc(oHandler.GetFeaturesByWorkspaceUuid)
+
+		req, err := http.NewRequestWithContext(context.Background(), http.MethodGet, "/workspaces/"+workspace.Uuid+"/features", nil)
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		rctx := chi.NewRouteContext()
+		rctx.URLParams.Add("workspace_uuid", workspace.Uuid)
+		req = req.WithContext(context.WithValue(req.Context(), chi.RouteCtxKey, rctx))
+
+		handler.ServeHTTP(rr, req)
+		assert.Equal(t, http.StatusUnauthorized, rr.Code)
+	})
+
+	t.Run("should return bad request when workspace_uuid is missing", func(t *testing.T) {
+		rr := httptest.NewRecorder()
+		handler := http.HandlerFunc(oHandler.GetFeaturesByWorkspaceUuid)
+
+		ctx := context.WithValue(context.Background(), auth.ContextKey, "test-pubkey")
+		req, err := http.NewRequestWithContext(ctx, http.MethodGet, "/workspaces//features", nil)
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		rctx := chi.NewRouteContext()
+		rctx.URLParams.Add("workspace_uuid", "")
+		req = req.WithContext(context.WithValue(req.Context(), chi.RouteCtxKey, rctx))
+
+		handler.ServeHTTP(rr, req)
+		assert.Equal(t, http.StatusBadRequest, rr.Code)
+	})
+
+	t.Run("should return bad request when workspace_uuid contains invalid characters", func(t *testing.T) {
+		rr := httptest.NewRecorder()
+		handler := http.HandlerFunc(oHandler.GetFeaturesByWorkspaceUuid)
+
+		ctx := context.WithValue(context.Background(), auth.ContextKey, "test-pubkey")
+		req, err := http.NewRequestWithContext(ctx, http.MethodGet, "/workspaces/invalid!@#$/features", nil)
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		rctx := chi.NewRouteContext()
+		rctx.URLParams.Add("workspace_uuid", "invalid!@#$")
+		req = req.WithContext(context.WithValue(req.Context(), chi.RouteCtxKey, rctx))
+
+		handler.ServeHTTP(rr, req)
+		assert.Equal(t, http.StatusBadRequest, rr.Code)
+	})
+
+	t.Run("should return empty array when no features exist", func(t *testing.T) {
+		rr := httptest.NewRecorder()
+		handler := http.HandlerFunc(oHandler.GetFeaturesByWorkspaceUuid)
+
+		ctx := context.WithValue(context.Background(), auth.ContextKey, "test-pubkey")
+		req, err := http.NewRequestWithContext(ctx, http.MethodGet, "/workspaces/"+workspace.Uuid+"/features", nil)
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		rctx := chi.NewRouteContext()
+		rctx.URLParams.Add("workspace_uuid", workspace.Uuid)
+		req = req.WithContext(context.WithValue(req.Context(), chi.RouteCtxKey, rctx))
+
+		handler.ServeHTTP(rr, req)
+		assert.Equal(t, http.StatusOK, rr.Code)
+
+		var features []db.WorkspaceFeatures
+		err = json.Unmarshal(rr.Body.Bytes(), &features)
+		assert.NoError(t, err)
+		assert.Empty(t, features)
+	})
+
+	t.Run("should return features with correct bounty counts", func(t *testing.T) {
+
+		feature := db.WorkspaceFeatures{
+			Uuid:          uuid.New().String(),
+			WorkspaceUuid: workspace.Uuid,
+			Name:          "test-feature",
+			Brief:         "test brief",
+			FeatStatus:    db.ActiveFeature,
+		}
+		db.TestDB.CreateOrEditFeature(feature)
+
+		phase := db.FeaturePhase{
+			Uuid:        uuid.New().String(),
+			FeatureUuid: feature.Uuid,
+			Name:        "test-phase",
+		}
+		db.TestDB.CreateOrEditFeaturePhase(phase)
+
+		bounties := []db.NewBounty{
+			{
+				ID:            1,
+				Type:          "coding",
+				Title:         "open bounty",
+				Description:   "open bounty description",
+				WorkspaceUuid: workspace.Uuid,
+				PhaseUuid:     phase.Uuid,
+				Assignee:      "", // open
+				Created:       time.Now().Unix(),
+				OwnerID:       "test-owner",
+				Completed:     false,
+				Paid:          false,
+			},
+			{
+				ID:            2,
+				Type:          "coding",
+				Title:         "assigned bounty",
+				Description:   "assigned bounty description",
+				WorkspaceUuid: workspace.Uuid,
+				PhaseUuid:     phase.Uuid,
+				Assignee:      "test-assignee", // assigned
+				Created:       time.Now().Unix(),
+				OwnerID:       "test-owner",
+				Completed:     false,
+				Paid:          false,
+			},
+			{
+				ID:            3,
+				Type:          "coding",
+				Title:         "completed bounty",
+				Description:   "completed bounty description",
+				WorkspaceUuid: workspace.Uuid,
+				PhaseUuid:     phase.Uuid,
+				Assignee:      "test-assignee", // completed
+				Created:       time.Now().Unix(),
+				OwnerID:       "test-owner",
+				Completed:     true,
+				Paid:          false,
+			},
+		}
+
+		for _, bounty := range bounties {
+			db.TestDB.CreateOrEditBounty(bounty)
+		}
+
+		rr := httptest.NewRecorder()
+		handler := http.HandlerFunc(oHandler.GetFeaturesByWorkspaceUuid)
+
+		ctx := context.WithValue(context.Background(), auth.ContextKey, "test-pubkey")
+		req, err := http.NewRequestWithContext(ctx, http.MethodGet, "/workspaces/"+workspace.Uuid+"/features", nil)
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		rctx := chi.NewRouteContext()
+		rctx.URLParams.Add("workspace_uuid", workspace.Uuid)
+		req = req.WithContext(context.WithValue(req.Context(), chi.RouteCtxKey, rctx))
+
+		handler.ServeHTTP(rr, req)
+		assert.Equal(t, http.StatusOK, rr.Code)
+
+		var features []db.WorkspaceFeatures
+		err = json.Unmarshal(rr.Body.Bytes(), &features)
+		assert.NoError(t, err)
+		assert.Len(t, features, 1)
+
+		assert.Equal(t, 1, features[0].BountiesCountOpen)
+		assert.Equal(t, 1, features[0].BountiesCountAssigned)
+		assert.Equal(t, 1, features[0].BountiesCountCompleted)
+	})
+
+	t.Run("should return features without bounty counts when no phases exist", func(t *testing.T) {
+
+		feature := db.WorkspaceFeatures{
+			Uuid:          uuid.New().String(),
+			WorkspaceUuid: workspace.Uuid,
+			Name:          "test-feature-no-phases",
+			Brief:         "test brief",
+			FeatStatus:    db.ActiveFeature,
+		}
+		db.TestDB.CreateOrEditFeature(feature)
+
+		rr := httptest.NewRecorder()
+		handler := http.HandlerFunc(oHandler.GetFeaturesByWorkspaceUuid)
+
+		ctx := context.WithValue(context.Background(), auth.ContextKey, "test-pubkey")
+		req, err := http.NewRequestWithContext(ctx, http.MethodGet, "/workspaces/"+workspace.Uuid+"/features", nil)
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		rctx := chi.NewRouteContext()
+		rctx.URLParams.Add("workspace_uuid", workspace.Uuid)
+		req = req.WithContext(context.WithValue(req.Context(), chi.RouteCtxKey, rctx))
+
+		handler.ServeHTTP(rr, req)
+		assert.Equal(t, http.StatusOK, rr.Code)
+
+		var features []db.WorkspaceFeatures
+		err = json.Unmarshal(rr.Body.Bytes(), &features)
+		assert.NoError(t, err)
+
+		var testFeature *db.WorkspaceFeatures
+		for _, f := range features {
+			if f.Uuid == feature.Uuid {
+				testFeature = &f
+				break
+			}
+		}
+
+		assert.NotNil(t, testFeature)
+		assert.Equal(t, 0, testFeature.BountiesCountOpen)
+		assert.Equal(t, 0, testFeature.BountiesCountAssigned)
+		assert.Equal(t, 0, testFeature.BountiesCountCompleted)
+	})
+
+	t.Run("Valid Request with Phases but No Bounties", func(t *testing.T) {
+		feature := db.WorkspaceFeatures{
+			Uuid:          uuid.New().String(),
+			WorkspaceUuid: workspace.Uuid,
+			Name:          "feature-with-phases-no-bounties",
+			Brief:         "test brief",
+			FeatStatus:    db.ActiveFeature,
+		}
+		db.TestDB.CreateOrEditFeature(feature)
+
+		phase := db.FeaturePhase{
+			Uuid:        uuid.New().String(),
+			FeatureUuid: feature.Uuid,
+			Name:        "test-phase",
+		}
+		db.TestDB.CreateOrEditFeaturePhase(phase)
+
+		rr := httptest.NewRecorder()
+		handler := http.HandlerFunc(oHandler.GetFeaturesByWorkspaceUuid)
+
+		ctx := context.WithValue(context.Background(), auth.ContextKey, "test-pubkey")
+		req, err := http.NewRequestWithContext(ctx, http.MethodGet, "/workspaces/"+workspace.Uuid+"/features", nil)
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		rctx := chi.NewRouteContext()
+		rctx.URLParams.Add("workspace_uuid", workspace.Uuid)
+		req = req.WithContext(context.WithValue(req.Context(), chi.RouteCtxKey, rctx))
+
+		handler.ServeHTTP(rr, req)
+		assert.Equal(t, http.StatusOK, rr.Code)
+
+		var features []db.WorkspaceFeatures
+		err = json.Unmarshal(rr.Body.Bytes(), &features)
+		assert.NoError(t, err)
+
+		var testFeature *db.WorkspaceFeatures
+		for _, f := range features {
+			if f.Uuid == feature.Uuid {
+				testFeature = &f
+				break
+			}
+		}
+
+		assert.NotNil(t, testFeature)
+		assert.Equal(t, 0, testFeature.BountiesCountOpen)
+		assert.Equal(t, 0, testFeature.BountiesCountAssigned)
+		assert.Equal(t, 0, testFeature.BountiesCountCompleted)
+	})
+
+	t.Run("Large Number of Features and Phases", func(t *testing.T) {
+
+		for i := 0; i < 10; i++ {
+			feature := db.WorkspaceFeatures{
+				Uuid:          uuid.New().String(),
+				WorkspaceUuid: workspace.Uuid,
+				Name:          fmt.Sprintf("bulk-feature-%d", i),
+				Brief:         "test brief",
+				FeatStatus:    db.ActiveFeature,
+			}
+			db.TestDB.CreateOrEditFeature(feature)
+
+			for j := 0; j < 5; j++ {
+				phase := db.FeaturePhase{
+					Uuid:        uuid.New().String(),
+					FeatureUuid: feature.Uuid,
+					Name:        fmt.Sprintf("phase-%d", j),
+				}
+				db.TestDB.CreateOrEditFeaturePhase(phase)
+			}
+		}
+
+		rr := httptest.NewRecorder()
+		handler := http.HandlerFunc(oHandler.GetFeaturesByWorkspaceUuid)
+
+		ctx := context.WithValue(context.Background(), auth.ContextKey, "test-pubkey")
+		req, err := http.NewRequestWithContext(ctx, http.MethodGet, "/workspaces/"+workspace.Uuid+"/features", nil)
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		rctx := chi.NewRouteContext()
+		rctx.URLParams.Add("workspace_uuid", workspace.Uuid)
+		req = req.WithContext(context.WithValue(req.Context(), chi.RouteCtxKey, rctx))
+
+		handler.ServeHTTP(rr, req)
+		assert.Equal(t, http.StatusOK, rr.Code)
+
+		var features []db.WorkspaceFeatures
+		err = json.Unmarshal(rr.Body.Bytes(), &features)
+		assert.NoError(t, err)
+		assert.GreaterOrEqual(t, len(features), 10)
+	})
+
+	t.Run("Features with Mixed Bounty States", func(t *testing.T) {
+		feature := db.WorkspaceFeatures{
+			Uuid:          uuid.New().String(),
+			WorkspaceUuid: workspace.Uuid,
+			Name:          "mixed-states-feature",
+			Brief:         "test brief",
+			FeatStatus:    db.ActiveFeature,
+		}
+		db.TestDB.CreateOrEditFeature(feature)
+
+		phase := db.FeaturePhase{
+			Uuid:        uuid.New().String(),
+			FeatureUuid: feature.Uuid,
+			Name:        "test-phase",
+		}
+		db.TestDB.CreateOrEditFeaturePhase(phase)
+
+		bounties := []db.NewBounty{
+			{
+				ID:            10,
+				Type:          "coding",
+				Title:         "mixed state bounty 1",
+				Description:   "description",
+				WorkspaceUuid: workspace.Uuid,
+				PhaseUuid:     phase.Uuid,
+				Assignee:      "",
+				Created:       time.Now().Unix(),
+				OwnerID:       "test-owner",
+				Completed:     false,
+				Paid:          false,
+			},
+			{
+				ID:            11,
+				Type:          "coding",
+				Title:         "mixed state bounty 2",
+				Description:   "description",
+				WorkspaceUuid: workspace.Uuid,
+				PhaseUuid:     phase.Uuid,
+				Assignee:      "test-assignee",
+				Created:       time.Now().Unix(),
+				OwnerID:       "test-owner",
+				Completed:     true,
+				Paid:          true,
+			},
+		}
+
+		for _, bounty := range bounties {
+			db.TestDB.CreateOrEditBounty(bounty)
+		}
+
+		rr := httptest.NewRecorder()
+		handler := http.HandlerFunc(oHandler.GetFeaturesByWorkspaceUuid)
+
+		ctx := context.WithValue(context.Background(), auth.ContextKey, "test-pubkey")
+		req, err := http.NewRequestWithContext(ctx, http.MethodGet, "/workspaces/"+workspace.Uuid+"/features", nil)
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		rctx := chi.NewRouteContext()
+		rctx.URLParams.Add("workspace_uuid", workspace.Uuid)
+		req = req.WithContext(context.WithValue(req.Context(), chi.RouteCtxKey, rctx))
+
+		handler.ServeHTTP(rr, req)
+		assert.Equal(t, http.StatusOK, rr.Code)
+
+		var features []db.WorkspaceFeatures
+		err = json.Unmarshal(rr.Body.Bytes(), &features)
+		assert.NoError(t, err)
+
+		var testFeature *db.WorkspaceFeatures
+		for _, f := range features {
+			if f.Uuid == feature.Uuid {
+				testFeature = &f
+				break
+			}
+		}
+
+		assert.NotNil(t, testFeature)
+		assert.Equal(t, 1, testFeature.BountiesCountOpen)
+		assert.Equal(t, 0, testFeature.BountiesCountAssigned)
+		assert.Equal(t, 1, testFeature.BountiesCountCompleted)
+	})
+
+}
