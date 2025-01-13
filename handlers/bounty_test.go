@@ -3557,3 +3557,170 @@ func generateLargeUserSet(count int) []db.NewBounty {
 	}
 	return bounties
 }
+
+func TestGenerateBountyCardResponseAssigneeFields(t *testing.T) {
+	teardownSuite := SetupSuite(t)
+	defer teardownSuite(t)
+
+	mockHttpClient := mocks.NewHttpClient(t)
+	bHandler := NewBountyHandler(mockHttpClient, db.TestDB)
+
+	db.CleanTestData()
+
+	workspace := db.Workspace{
+		ID:          1,
+		Uuid:        "test-workspace-uuid",
+		Name:        "Test Workspace",
+		Description: "Test Workspace Description",
+		OwnerPubKey: "test-owner",
+	}
+	_, err := db.TestDB.CreateOrEditWorkspace(workspace)
+	assert.NoError(t, err)
+
+	assignee := db.Person{
+		OwnerPubKey: "test-assignee",
+		OwnerAlias:  "Test Assignee",
+		Img:         "test-image-url",
+	}
+	_, err = db.TestDB.CreateOrEditPerson(assignee)
+	assert.NoError(t, err)
+
+	now := time.Now()
+
+	testCases := []struct {
+		name         string
+		bounty       db.NewBounty
+		expectedCard db.BountyCard
+	}{
+		{
+			name: "Bounty with valid assignee",
+			bounty: db.NewBounty{
+				ID:            1,
+				Title:         "Test Bounty",
+				WorkspaceUuid: workspace.Uuid,
+				Assignee:      "test-assignee",
+				Created:       now.Unix(),
+				OwnerID:       "test-owner",
+				Type:          "coding",
+			},
+			expectedCard: db.BountyCard{
+				BountyID:     1,
+				Title:        "Test Bounty",
+				AssigneePic:  "test-image-url",
+				Assignee:     "test-assignee",
+				AssigneeName: "Test Assignee",
+			},
+		},
+		{
+			name: "Bounty with no assignee",
+			bounty: db.NewBounty{
+				ID:            2,
+				Title:         "Unassigned Bounty",
+				WorkspaceUuid: workspace.Uuid,
+				Created:       now.Unix(),
+				OwnerID:       "test-owner",
+				Type:          "coding",
+			},
+			expectedCard: db.BountyCard{
+				BountyID:     2,
+				Title:        "Unassigned Bounty",
+				AssigneePic:  "",
+				Assignee:     "",
+				AssigneeName: "",
+			},
+		},
+		{
+			name: "Bounty with invalid assignee",
+			bounty: db.NewBounty{
+				ID:            3,
+				Title:         "Invalid Assignee Bounty",
+				WorkspaceUuid: workspace.Uuid,
+				Assignee:      "non-existent-assignee",
+				Created:       now.Unix(),
+				OwnerID:       "test-owner",
+				Type:          "coding",
+			},
+			expectedCard: db.BountyCard{
+				BountyID:     3,
+				Title:        "Invalid Assignee Bounty",
+				AssigneePic:  "",
+				Assignee:     "",
+				AssigneeName: "",
+			},
+		},
+	}
+
+	for _, tc := range testCases {
+		t.Run(tc.name, func(t *testing.T) {
+			db.TestDB.DeleteAllBounties()
+			_, err := db.TestDB.CreateOrEditBounty(tc.bounty)
+			assert.NoError(t, err)
+
+			response := bHandler.GenerateBountyCardResponse([]db.NewBounty{tc.bounty})
+			assert.Equal(t, 1, len(response))
+
+			assert.Equal(t, tc.expectedCard.AssigneePic, response[0].AssigneePic)
+			assert.Equal(t, tc.expectedCard.Assignee, response[0].Assignee)
+			assert.Equal(t, tc.expectedCard.AssigneeName, response[0].AssigneeName)
+			assert.Equal(t, tc.expectedCard.Title, response[0].Title)
+			assert.Equal(t, tc.expectedCard.BountyID, response[0].BountyID)
+		})
+	}
+}
+
+func TestBountyCardResponsePerformance(t *testing.T) {
+	teardownSuite := SetupSuite(t)
+	defer teardownSuite(t)
+
+	mockHttpClient := mocks.NewHttpClient(t)
+	bHandler := NewBountyHandler(mockHttpClient, db.TestDB)
+
+	db.CleanTestData()
+
+	workspace := db.Workspace{
+		ID:          1,
+		Uuid:        "test-workspace-uuid",
+		Name:        "Test Workspace",
+		Description: "Test Workspace Description",
+		OwnerPubKey: "test-owner",
+	}
+	_, err := db.TestDB.CreateOrEditWorkspace(workspace)
+	assert.NoError(t, err)
+
+	assignee := db.Person{
+		OwnerPubKey: "test-assignee",
+		OwnerAlias:  "Test Assignee",
+		Img:         "test-image-url",
+	}
+	_, err = db.TestDB.CreateOrEditPerson(assignee)
+	assert.NoError(t, err)
+
+	now := time.Now()
+	bounties := make([]db.NewBounty, 100)
+	for i := 0; i < 100; i++ {
+		bounties[i] = db.NewBounty{
+			ID:            uint(i + 1),
+			Title:         fmt.Sprintf("Test Bounty %d", i),
+			WorkspaceUuid: workspace.Uuid,
+			Assignee:      "test-assignee",
+			Created:       now.Unix(),
+		}
+	}
+
+	start := time.Now()
+	response := bHandler.GenerateBountyCardResponse(bounties)
+	duration := time.Since(start)
+
+	assert.Equal(t, 100, len(response))
+	assert.Less(t, duration.Milliseconds(), int64(1000), "Response generation should take less than 1 second")
+
+	assert.Equal(t, "Test Bounty 0", response[0].Title)
+	assert.Equal(t, "test-assignee", response[0].Assignee)
+	assert.Equal(t, "Test Assignee", response[0].AssigneeName)
+	assert.Equal(t, "test-image-url", response[0].AssigneePic)
+
+	assert.Equal(t, "Test Bounty 99", response[99].Title)
+	assert.Equal(t, "test-assignee", response[99].Assignee)
+	assert.Equal(t, "Test Assignee", response[99].AssigneeName)
+	assert.Equal(t, "test-image-url", response[99].AssigneePic)
+}
