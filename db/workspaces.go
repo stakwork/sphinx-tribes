@@ -824,6 +824,7 @@ func (db database) ProcessReversePayments(paymentId uint) error {
 				PaymentType:    Reversal,
 				Created:        &now,
 				Updated:        &now,
+				Error:          "Payment has been reversed",
 				Status:         true,
 			}
 
