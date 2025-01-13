@@ -8,6 +8,7 @@ import (
 	"net/http"
 	"net/http/httptest"
 	"sort"
+	"strings"
 	"testing"
 	"time"
 
@@ -1874,4 +1875,312 @@ func TestGetFeaturesByWorkspaceUuid(t *testing.T) {
 			}
 		})
 	}
+}
+
+func TestUpdateFeatureStatus(t *testing.T) {
+	teardownSuite := SetupSuite(t)
+	defer teardownSuite(t)
+
+	fHandler := NewFeatureHandler(db.TestDB)
+
+	person := db.Person{
+		Uuid:        uuid.New().String(),
+		OwnerAlias:  "test-alias",
+		UniqueName:  "test-unique-name",
+		OwnerPubKey: "test-pubkey",
+		PriceToMeet: 0,
+		Description: "test-description",
+	}
+	db.TestDB.CreateOrEditPerson(person)
+
+	workspace := db.Workspace{
+		Uuid:        uuid.New().String(),
+		Name:        "test-workspace" + uuid.New().String(),
+		OwnerPubKey: person.OwnerPubKey,
+		Github:      "https://github.com/test",
+		Website:     "https://www.testwebsite.com",
+		Description: "test-description",
+	}
+	db.TestDB.CreateOrEditWorkspace(workspace)
+	workspace = db.TestDB.GetWorkspaceByUuid(workspace.Uuid)
+
+	feature := db.WorkspaceFeatures{
+		Uuid:          uuid.New().String(),
+		WorkspaceUuid: workspace.Uuid,
+		Name:          "test-feature",
+		Url:           "https://github.com/test-feature",
+		Priority:      0,
+		FeatStatus:    db.ActiveFeature,
+	}
+	db.TestDB.CreateOrEditFeature(feature)
+	feature = db.TestDB.GetFeatureByUuid(feature.Uuid)
+
+	t.Run("should return error if not authorized", func(t *testing.T) {
+		rr := httptest.NewRecorder()
+		handler := http.HandlerFunc(fHandler.UpdateFeatureStatus)
+
+		requestBody := map[string]string{"status": string(db.ArchivedFeature)}
+		body, _ := json.Marshal(requestBody)
+
+		rctx := chi.NewRouteContext()
+		rctx.URLParams.Add("uuid", feature.Uuid)
+		req, err := http.NewRequestWithContext(context.WithValue(context.Background(), chi.RouteCtxKey, rctx),
+			http.MethodPut, "/features/"+feature.Uuid+"/status", bytes.NewReader(body))
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		handler.ServeHTTP(rr, req)
+		assert.Equal(t, http.StatusUnauthorized, rr.Code)
+	})
+
+	t.Run("should return bad request if body is not valid json", func(t *testing.T) {
+		rr := httptest.NewRecorder()
+		handler := http.HandlerFunc(fHandler.UpdateFeatureStatus)
+
+		invalidJson := []byte(`{"status": "archived"`)
+
+		ctx := context.WithValue(context.Background(), auth.ContextKey, person.OwnerPubKey)
+		rctx := chi.NewRouteContext()
+		rctx.URLParams.Add("uuid", feature.Uuid)
+		req, err := http.NewRequestWithContext(context.WithValue(ctx, chi.RouteCtxKey, rctx),
+			http.MethodPut, "/features/"+feature.Uuid+"/status", bytes.NewReader(invalidJson))
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		handler.ServeHTTP(rr, req)
+		assert.Equal(t, http.StatusBadRequest, rr.Code)
+	})
+
+	t.Run("should return bad request if status is invalid", func(t *testing.T) {
+		rr := httptest.NewRecorder()
+		handler := http.HandlerFunc(fHandler.UpdateFeatureStatus)
+
+		requestBody := map[string]string{"status": "invalid_status"}
+		body, _ := json.Marshal(requestBody)
+
+		ctx := context.WithValue(context.Background(), auth.ContextKey, person.OwnerPubKey)
+		rctx := chi.NewRouteContext()
+		rctx.URLParams.Add("uuid", feature.Uuid)
+		req, err := http.NewRequestWithContext(context.WithValue(ctx, chi.RouteCtxKey, rctx),
+			http.MethodPut, "/features/"+feature.Uuid+"/status", bytes.NewReader(body))
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		handler.ServeHTTP(rr, req)
+		assert.Equal(t, http.StatusBadRequest, rr.Code)
+	})
+
+	t.Run("should return internal server error if feature not found", func(t *testing.T) {
+		rr := httptest.NewRecorder()
+		handler := http.HandlerFunc(fHandler.UpdateFeatureStatus)
+
+		requestBody := map[string]string{"status": string(db.ArchivedFeature)}
+		body, _ := json.Marshal(requestBody)
+
+		ctx := context.WithValue(context.Background(), auth.ContextKey, person.OwnerPubKey)
+		rctx := chi.NewRouteContext()
+		rctx.URLParams.Add("uuid", "non-existent-uuid")
+		req, err := http.NewRequestWithContext(context.WithValue(ctx, chi.RouteCtxKey, rctx),
+			http.MethodPut, "/features/non-existent-uuid/status", bytes.NewReader(body))
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		handler.ServeHTTP(rr, req)
+		assert.Equal(t, http.StatusInternalServerError, rr.Code)
+	})
+
+	t.Run("should successfully update feature status", func(t *testing.T) {
+		rr := httptest.NewRecorder()
+		handler := http.HandlerFunc(fHandler.UpdateFeatureStatus)
+
+		requestBody := map[string]string{"status": string(db.ArchivedFeature)}
+		body, _ := json.Marshal(requestBody)
+
+		ctx := context.WithValue(context.Background(), auth.ContextKey, person.OwnerPubKey)
+		rctx := chi.NewRouteContext()
+		rctx.URLParams.Add("uuid", feature.Uuid)
+		req, err := http.NewRequestWithContext(context.WithValue(ctx, chi.RouteCtxKey, rctx),
+			http.MethodPut, "/features/"+feature.Uuid+"/status", bytes.NewReader(body))
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		handler.ServeHTTP(rr, req)
+		assert.Equal(t, http.StatusOK, rr.Code)
+
+		var updatedFeature db.WorkspaceFeatures
+		err = json.NewDecoder(rr.Body).Decode(&updatedFeature)
+		assert.NoError(t, err)
+		assert.Equal(t, db.ArchivedFeature, updatedFeature.FeatStatus)
+		assert.Equal(t, feature.Uuid, updatedFeature.Uuid)
+	})
+
+	t.Run("Empty UUID Parameter", func(t *testing.T) {
+		rr := httptest.NewRecorder()
+		handler := http.HandlerFunc(fHandler.UpdateFeatureStatus)
+
+		requestBody := map[string]string{"status": string(db.ActiveFeature)}
+		body, _ := json.Marshal(requestBody)
+
+		ctx := context.WithValue(context.Background(), auth.ContextKey, person.OwnerPubKey)
+		rctx := chi.NewRouteContext()
+		rctx.URLParams.Add("uuid", "")
+		req, err := http.NewRequestWithContext(context.WithValue(ctx, chi.RouteCtxKey, rctx),
+			http.MethodPut, "/features//status", bytes.NewReader(body))
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		handler.ServeHTTP(rr, req)
+		assert.Equal(t, http.StatusBadRequest, rr.Code)
+
+		var response map[string]string
+		err = json.NewDecoder(rr.Body).Decode(&response)
+		assert.NoError(t, err)
+		assert.Equal(t, "Missing uuid parameter", response["error"])
+	})
+
+	t.Run("Boundary UUID Length", func(t *testing.T) {
+		rr := httptest.NewRecorder()
+		handler := http.HandlerFunc(fHandler.UpdateFeatureStatus)
+
+		requestBody := map[string]string{"status": string(db.ActiveFeature)}
+		body, _ := json.Marshal(requestBody)
+
+		longUUID := strings.Repeat("a", 100)
+		ctx := context.WithValue(context.Background(), auth.ContextKey, person.OwnerPubKey)
+		rctx := chi.NewRouteContext()
+		rctx.URLParams.Add("uuid", longUUID)
+		req, err := http.NewRequestWithContext(context.WithValue(ctx, chi.RouteCtxKey, rctx),
+			http.MethodPut, "/features/"+longUUID+"/status", bytes.NewReader(body))
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		handler.ServeHTTP(rr, req)
+		assert.Equal(t, http.StatusInternalServerError, rr.Code)
+	})
+
+	t.Run("Null Request Body", func(t *testing.T) {
+		rr := httptest.NewRecorder()
+		handler := http.HandlerFunc(fHandler.UpdateFeatureStatus)
+
+		ctx := context.WithValue(context.Background(), auth.ContextKey, person.OwnerPubKey)
+		rctx := chi.NewRouteContext()
+		rctx.URLParams.Add("uuid", feature.Uuid)
+		req, err := http.NewRequestWithContext(context.WithValue(ctx, chi.RouteCtxKey, rctx),
+			http.MethodPut, "/features/"+feature.Uuid+"/status", nil)
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		handler.ServeHTTP(rr, req)
+
+		assert.Equal(t, http.StatusBadRequest, rr.Code)
+
+		var response struct {
+			Error string `json:"error"`
+		}
+		err = json.NewDecoder(rr.Body).Decode(&response)
+		assert.NoError(t, err)
+		assert.Equal(t, "Request body is required", response.Error)
+	})
+
+	t.Run("Empty Request Body", func(t *testing.T) {
+		rr := httptest.NewRecorder()
+		handler := http.HandlerFunc(fHandler.UpdateFeatureStatus)
+
+		emptyBody := map[string]string{}
+		body, _ := json.Marshal(emptyBody)
+
+		ctx := context.WithValue(context.Background(), auth.ContextKey, person.OwnerPubKey)
+		rctx := chi.NewRouteContext()
+		rctx.URLParams.Add("uuid", feature.Uuid)
+		req, err := http.NewRequestWithContext(context.WithValue(ctx, chi.RouteCtxKey, rctx),
+			http.MethodPut, "/features/"+feature.Uuid+"/status", bytes.NewReader(body))
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		handler.ServeHTTP(rr, req)
+		assert.Equal(t, http.StatusBadRequest, rr.Code)
+	})
+
+	t.Run("Unauthorized Access with Invalid PubKey", func(t *testing.T) {
+		rr := httptest.NewRecorder()
+		handler := http.HandlerFunc(fHandler.UpdateFeatureStatus)
+
+		requestBody := map[string]string{"status": string(db.ActiveFeature)}
+		body, _ := json.Marshal(requestBody)
+
+		ctx := context.WithValue(context.Background(), auth.ContextKey, "invalid-pubkey")
+		rctx := chi.NewRouteContext()
+		rctx.URLParams.Add("uuid", feature.Uuid)
+		req, err := http.NewRequestWithContext(context.WithValue(ctx, chi.RouteCtxKey, rctx),
+			http.MethodPut, "/features/"+feature.Uuid+"/status", bytes.NewReader(body))
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		handler.ServeHTTP(rr, req)
+
+		assert.Equal(t, http.StatusUnauthorized, rr.Code)
+
+		var response struct {
+			Error string `json:"error"`
+		}
+		err = json.NewDecoder(rr.Body).Decode(&response)
+		assert.NoError(t, err)
+		assert.Equal(t, "Unauthorized: invalid pubkey", response.Error)
+	})
+
+	t.Run("Invalid UUID Format", func(t *testing.T) {
+		rr := httptest.NewRecorder()
+		handler := http.HandlerFunc(fHandler.UpdateFeatureStatus)
+
+		requestBody := map[string]string{"status": string(db.ActiveFeature)}
+		body, _ := json.Marshal(requestBody)
+
+		ctx := context.WithValue(context.Background(), auth.ContextKey, person.OwnerPubKey)
+		rctx := chi.NewRouteContext()
+		rctx.URLParams.Add("uuid", "invalid-uuid-format")
+		req, err := http.NewRequestWithContext(context.WithValue(ctx, chi.RouteCtxKey, rctx),
+			http.MethodPut, "/features/invalid-uuid-format/status", bytes.NewReader(body))
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		handler.ServeHTTP(rr, req)
+		assert.Equal(t, http.StatusInternalServerError, rr.Code)
+	})
+
+	t.Run("Valid Request with Active Status", func(t *testing.T) {
+		rr := httptest.NewRecorder()
+		handler := http.HandlerFunc(fHandler.UpdateFeatureStatus)
+
+		requestBody := map[string]string{"status": string(db.ActiveFeature)}
+		body, _ := json.Marshal(requestBody)
+
+		ctx := context.WithValue(context.Background(), auth.ContextKey, person.OwnerPubKey)
+		rctx := chi.NewRouteContext()
+		rctx.URLParams.Add("uuid", feature.Uuid)
+		req, err := http.NewRequestWithContext(context.WithValue(ctx, chi.RouteCtxKey, rctx),
+			http.MethodPut, "/features/"+feature.Uuid+"/status", bytes.NewReader(body))
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		handler.ServeHTTP(rr, req)
+		assert.Equal(t, http.StatusOK, rr.Code)
+
+		var updatedFeature db.WorkspaceFeatures
+		err = json.NewDecoder(rr.Body).Decode(&updatedFeature)
+		assert.NoError(t, err)
+		assert.Equal(t, db.ActiveFeature, updatedFeature.FeatStatus)
+		assert.Equal(t, feature.Uuid, updatedFeature.Uuid)
+	})
 }
