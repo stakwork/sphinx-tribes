@@ -7,6 +7,7 @@ import (
 	"net/http"
 	"net/http/httptest"
 	"net/url"
+	"strings"
 	"sync"
 	"testing"
 	"time"
@@ -436,6 +437,313 @@ func TestGetFromAuth(t *testing.T) {
 			expectedResult: &extractResponse{
 				Pubkey: "",
 				Valid:  false,
+			},
+			expectedError: false,
+		},
+		{
+			name: "Empty Response Body",
+			path: "/empty-body",
+			setupMock: func() *httptest.Server {
+				return httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+					w.WriteHeader(http.StatusOK)
+				}))
+			},
+			expectedResult: nil,
+			expectedError:  true,
+		},
+		{
+			name: "Slow Response",
+			path: "/slow-response",
+			setupMock: func() *httptest.Server {
+				return httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+					time.Sleep(2 * time.Second)
+					json.NewEncoder(w).Encode(map[string]interface{}{
+						"pubkey": "test-pubkey",
+						"valid":  true,
+					})
+				}))
+			},
+			expectedResult: &extractResponse{
+				Pubkey: "test-pubkey",
+				Valid:  true,
+			},
+			expectedError: false,
+		},
+		{
+			name: "Malformed URL Path",
+			path: "/%invalid-path",
+			setupMock: func() *httptest.Server {
+				return httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+					w.WriteHeader(http.StatusBadRequest)
+				}))
+			},
+			expectedResult: nil,
+			expectedError:  true,
+		},
+		{
+			name: "Unicode Characters in Response",
+			path: "/unicode",
+			setupMock: func() *httptest.Server {
+				return httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+					json.NewEncoder(w).Encode(map[string]interface{}{
+						"pubkey": "测试-pubkey",
+						"valid":  true,
+					})
+				}))
+			},
+			expectedResult: &extractResponse{
+				Pubkey: "测试-pubkey",
+				Valid:  true,
+			},
+			expectedError: false,
+		},
+		{
+			name: "Very Long Path",
+			path: "/" + strings.Repeat("a", 2048),
+			setupMock: func() *httptest.Server {
+				return httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+					w.WriteHeader(http.StatusRequestURITooLong)
+				}))
+			},
+			expectedResult: nil,
+			expectedError:  true,
+		},
+		{
+			name: "Response with Whitespace",
+			path: "/whitespace",
+			setupMock: func() *httptest.Server {
+				return httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+					w.Write([]byte(`{
+						"pubkey": "  test-pubkey  ",
+						"valid": true
+					}`))
+				}))
+			},
+			expectedResult: &extractResponse{
+				Pubkey: "  test-pubkey  ",
+				Valid:  true,
+			},
+			expectedError: false,
+		},
+		{
+			name: "Response with Zero Values",
+			path: "/zero-values",
+			setupMock: func() *httptest.Server {
+				return httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+					json.NewEncoder(w).Encode(map[string]interface{}{
+						"pubkey": "",
+						"valid":  false,
+					})
+				}))
+			},
+			expectedResult: &extractResponse{
+				Pubkey: "",
+				Valid:  false,
+			},
+			expectedError: false,
+		},
+		{
+			name: "Chunked Response",
+			path: "/chunked",
+			setupMock: func() *httptest.Server {
+				return httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+					flusher, ok := w.(http.Flusher)
+					if !ok {
+						return
+					}
+					w.Header().Set("Transfer-Encoding", "chunked")
+					fmt.Fprintf(w, `{"pubkey": "`)
+					flusher.Flush()
+					time.Sleep(100 * time.Millisecond)
+					fmt.Fprintf(w, `test-pubkey", "valid": true}`)
+					flusher.Flush()
+				}))
+			},
+			expectedResult: &extractResponse{
+				Pubkey: "test-pubkey",
+				Valid:  true,
+			},
+			expectedError: false,
+		},
+		{
+			name: "Response with Escaped Characters",
+			path: "/escaped",
+			setupMock: func() *httptest.Server {
+				return httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+					w.Write([]byte(`{"pubkey": "test\npubkey\twith\"escaped\"chars", "valid": true}`))
+				}))
+			},
+			expectedResult: &extractResponse{
+				Pubkey: "test\npubkey\twith\"escaped\"chars",
+				Valid:  true,
+			},
+			expectedError: false,
+		},
+		{
+			name: "Empty Path",
+			path: "",
+			setupMock: func() *httptest.Server {
+				return httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+					w.WriteHeader(http.StatusBadRequest)
+				}))
+			},
+			expectedResult: nil,
+			expectedError:  true,
+		},
+		{
+			name: "Path with Special Characters",
+			path: "/test@#$%^&*()",
+			setupMock: func() *httptest.Server {
+				return httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+					w.WriteHeader(http.StatusBadRequest)
+				}))
+			},
+			expectedResult: nil,
+			expectedError:  true,
+		},
+		{
+			name: "Network Error (Connection Refused)",
+			path: "/network-error",
+			setupMock: func() *httptest.Server {
+				return httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {}))
+			},
+			expectedResult: nil,
+			expectedError:  true,
+		},
+		{
+			name: "Empty JSON Response",
+			path: "/empty-json",
+			setupMock: func() *httptest.Server {
+				return httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+					w.Header().Set("Content-Type", "application/json")
+					w.Write([]byte("{}"))
+				}))
+			},
+			expectedResult: &extractResponse{
+				Pubkey: "",
+				Valid:  false,
+			},
+			expectedError: false,
+		},
+		{
+			name: "Non-Boolean Valid Field",
+			path: "/non-boolean-valid",
+			setupMock: func() *httptest.Server {
+				return httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+					json.NewEncoder(w).Encode(map[string]interface{}{
+						"pubkey": "test-pubkey",
+						"valid":  "true",
+					})
+				}))
+			},
+			expectedResult: &extractResponse{
+				Pubkey: "test-pubkey",
+				Valid:  false,
+			},
+			expectedError: false,
+		},
+		{
+			name: "Non-String Pubkey Field",
+			path: "/non-string-pubkey",
+			setupMock: func() *httptest.Server {
+				return httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+					json.NewEncoder(w).Encode(map[string]interface{}{
+						"pubkey": 12345,
+						"valid":  true,
+					})
+				}))
+			},
+			expectedResult: &extractResponse{
+				Pubkey: "",
+				Valid:  true,
+			},
+			expectedError: false,
+		},
+		{
+			name: "Response with Mixed Types",
+			path: "/mixed-types",
+			setupMock: func() *httptest.Server {
+				return httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+					json.NewEncoder(w).Encode(map[string]interface{}{
+						"pubkey": []interface{}{"test-pubkey"},
+						"valid":  1,
+					})
+				}))
+			},
+			expectedResult: &extractResponse{
+				Pubkey: "",
+				Valid:  false,
+			},
+			expectedError: false,
+		},
+		{
+			name: "Response with Nested JSON",
+			path: "/nested-json",
+			setupMock: func() *httptest.Server {
+				return httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+					json.NewEncoder(w).Encode(map[string]interface{}{
+						"pubkey": "test-pubkey",
+						"valid":  true,
+						"nested": map[string]interface{}{
+							"additional": "data",
+						},
+					})
+				}))
+			},
+			expectedResult: &extractResponse{
+				Pubkey: "test-pubkey",
+				Valid:  true,
+			},
+			expectedError: false,
+		},
+		{
+			name: "Response with Array Values",
+			path: "/array-values",
+			setupMock: func() *httptest.Server {
+				return httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+					json.NewEncoder(w).Encode(map[string]interface{}{
+						"pubkey": []string{"test-pubkey"},
+						"valid":  []bool{true},
+					})
+				}))
+			},
+			expectedResult: &extractResponse{
+				Pubkey: "",
+				Valid:  false,
+			},
+			expectedError: false,
+		},
+		{
+			name: "Response with Empty Strings",
+			path: "/empty-strings",
+			setupMock: func() *httptest.Server {
+				return httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+					json.NewEncoder(w).Encode(map[string]interface{}{
+						"pubkey": "",
+						"valid":  true,
+					})
+				}))
+			},
+			expectedResult: &extractResponse{
+				Pubkey: "",
+				Valid:  true,
+			},
+			expectedError: false,
+		},
+		{
+			name: "Response with Special Characters in Values",
+			path: "/special-chars-values",
+			setupMock: func() *httptest.Server {
+				return httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+					json.NewEncoder(w).Encode(map[string]interface{}{
+						"pubkey": "test-pubkey!@#$%^&*()",
+						"valid":  true,
+					})
+				}))
+			},
+			expectedResult: &extractResponse{
+				Pubkey: "test-pubkey!@#$%^&*()",
+				Valid:  true,
 			},
 			expectedError: false,
 		},
