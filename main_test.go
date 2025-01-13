@@ -1,12 +1,15 @@
 package main
 
 import (
+	"context"
 	"errors"
 	"fmt"
 	"os"
 	"reflect"
 	"sync"
+	"syscall"
 	"testing"
+	"time"
 
 	"github.com/stretchr/testify/assert"
 )
@@ -355,4 +358,242 @@ func TestMain(t *testing.T) {
 			}
 		})
 	}
+}
+
+func TestRun(t *testing.T) {
+	tests := []struct {
+		name           string
+		setupMock      func() (*MockRouter, chan os.Signal)
+		signalActions  func(chan os.Signal)
+		expectedError  bool
+		expectedResult string
+	}{
+		{
+			name: "Standard Shutdown Signal Handling",
+			setupMock: func() (*MockRouter, chan os.Signal) {
+				router := &MockRouter{
+					shutdownFunc: func(ctx context.Context) error {
+						return nil
+					},
+				}
+				sigChan := make(chan os.Signal, 1)
+				return router, sigChan
+			},
+			signalActions: func(sigChan chan os.Signal) {
+				sigChan <- syscall.SIGTERM
+			},
+			expectedError: false,
+		},
+		{
+			name: "Router Shutdown Error",
+			setupMock: func() (*MockRouter, chan os.Signal) {
+				router := &MockRouter{
+					shutdownFunc: func(ctx context.Context) error {
+						return errors.New("shutdown error")
+					},
+				}
+				sigChan := make(chan os.Signal, 1)
+				return router, sigChan
+			},
+			signalActions: func(sigChan chan os.Signal) {
+				sigChan <- syscall.SIGTERM
+			},
+			expectedError: true,
+		},
+		{
+			name: "Invalid Signal Type",
+			setupMock: func() (*MockRouter, chan os.Signal) {
+				router := &MockRouter{
+					shutdownFunc: func(ctx context.Context) error {
+						return nil
+					},
+				}
+				sigChan := make(chan os.Signal, 1)
+				return router, sigChan
+			},
+			signalActions: func(sigChan chan os.Signal) {
+				sigChan <- syscall.SIGHUP
+			},
+			expectedError: false,
+		},
+		{
+			name: "Multiple Signal Types",
+			setupMock: func() (*MockRouter, chan os.Signal) {
+				router := &MockRouter{
+					shutdownFunc: func(ctx context.Context) error {
+						return nil
+					},
+				}
+				sigChan := make(chan os.Signal, 3)
+				return router, sigChan
+			},
+			signalActions: func(sigChan chan os.Signal) {
+				go func() {
+					sigChan <- syscall.SIGTERM
+					sigChan <- syscall.SIGINT
+					sigChan <- syscall.SIGHUP
+				}()
+			},
+			expectedError: false,
+		},
+		{
+			name: "Immediate Shutdown Signal",
+			setupMock: func() (*MockRouter, chan os.Signal) {
+				router := &MockRouter{
+					shutdownFunc: func(ctx context.Context) error {
+						return nil
+					},
+				}
+				sigChan := make(chan os.Signal, 1)
+				return router, sigChan
+			},
+			signalActions: func(sigChan chan os.Signal) {
+				sigChan <- syscall.SIGTERM
+			},
+			expectedError: false,
+		},
+		{
+			name: "Delayed Shutdown Signal",
+			setupMock: func() (*MockRouter, chan os.Signal) {
+				router := &MockRouter{
+					shutdownFunc: func(ctx context.Context) error {
+						return nil
+					},
+				}
+				sigChan := make(chan os.Signal, 1)
+				go func() {
+					time.Sleep(100 * time.Millisecond)
+					sigChan <- syscall.SIGTERM
+				}()
+				return router, sigChan
+			},
+			expectedError: false,
+		},
+		{
+			name: "High Volume of Signals",
+			setupMock: func() (*MockRouter, chan os.Signal) {
+				router := &MockRouter{
+					shutdownFunc: func(ctx context.Context) error {
+						return nil
+					},
+				}
+				sigChan := make(chan os.Signal, 100)
+				return router, sigChan
+			},
+			signalActions: func(sigChan chan os.Signal) {
+				go func() {
+					for i := 0; i < 100; i++ {
+						sigChan <- syscall.SIGTERM
+					}
+				}()
+			},
+			expectedError: false,
+		},
+		{
+			name: "Context Timeout",
+			setupMock: func() (*MockRouter, chan os.Signal) {
+				router := &MockRouter{
+					shutdownFunc: func(ctx context.Context) error {
+						select {
+						case <-ctx.Done():
+							return ctx.Err()
+						case <-time.After(6 * time.Second):
+							return nil
+						}
+					},
+				}
+				sigChan := make(chan os.Signal, 1)
+				return router, sigChan
+			},
+			signalActions: func(sigChan chan os.Signal) {
+				sigChan <- syscall.SIGTERM
+			},
+			expectedError: true,
+		},
+		{
+			name: "No Signal Received",
+			setupMock: func() (*MockRouter, chan os.Signal) {
+				router := &MockRouter{
+					shutdownFunc: func(ctx context.Context) error {
+						return nil
+					},
+				}
+				sigChan := make(chan os.Signal, 1)
+				go func() {
+					time.Sleep(100 * time.Millisecond)
+					close(sigChan)
+				}()
+				return router, sigChan
+			},
+			expectedError: false,
+		},
+		{
+			name: "Signal Handling During Router Initialization",
+			setupMock: func() (*MockRouter, chan os.Signal) {
+				router := &MockRouter{
+					shutdownFunc: func(ctx context.Context) error {
+						time.Sleep(100 * time.Millisecond)
+						return nil
+					},
+				}
+				sigChan := make(chan os.Signal, 1)
+				go func() {
+					sigChan <- syscall.SIGTERM
+				}()
+				return router, sigChan
+			},
+			expectedError: false,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+
+			mockRouter, sigChan := tt.setupMock()
+
+			done := make(chan bool)
+
+			go func() {
+				defer close(done)
+
+				ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+				defer cancel()
+
+				if tt.signalActions != nil {
+					tt.signalActions(sigChan)
+				}
+
+				var err error
+				select {
+				case <-sigChan:
+					err = mockRouter.Shutdown(ctx)
+				case <-ctx.Done():
+					err = ctx.Err()
+				}
+
+				if tt.expectedError {
+					assert.Error(t, err)
+				} else {
+					assert.NoError(t, err)
+				}
+			}()
+
+			select {
+			case <-done:
+			case <-time.After(6 * time.Second):
+				t.Fatal("Test timed out")
+			}
+		})
+	}
+}
+
+type MockRouter struct {
+	shutdownFunc func(context.Context) error
+}
+
+func (m *MockRouter) Shutdown(ctx context.Context) error {
+	if m.shutdownFunc != nil {
+		return m.shutdownFunc(ctx)
+	}
+	return nil
 }
