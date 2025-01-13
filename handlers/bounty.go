@@ -1550,7 +1550,16 @@ func (h *bountyHandler) GenerateBountyCardResponse(bounties []db.NewBounty) []db
 	for i := 0; i < len(bounties); i++ {
 		bounty := bounties[i]
 
-		assignee := h.db.GetPersonByPubkey(bounty.Assignee)
+		var assigneePic, assigneeName, assigneePubkey string
+		if bounty.Assignee != "" {
+			assignee := h.db.GetPersonByPubkey(bounty.Assignee)
+			if assignee.OwnerPubKey != "" {
+				assigneePic = assignee.Img
+				assigneeName = assignee.OwnerAlias
+				assigneePubkey = assignee.OwnerPubKey
+			}
+		}
+
 		workspace := h.db.GetWorkspaceByUuid(bounty.WorkspaceUuid)
 
 		var phase db.FeaturePhase
@@ -1567,13 +1576,15 @@ func (h *bountyHandler) GenerateBountyCardResponse(bounties []db.NewBounty) []db
 		status := calculateBountyStatus(bounty)
 
 		b := db.BountyCard{
-			BountyID:    bounty.ID,
-			Title:       bounty.Title,
-			AssigneePic: assignee.Img,
-			Features:    feature,
-			Phase:       phase,
-			Workspace:   workspace,
-			Status:      status,
+			BountyID:     bounty.ID,
+			Title:        bounty.Title,
+			AssigneePic:  assigneePic,
+			Assignee:     assigneePubkey,
+			AssigneeName: assigneeName,
+			Features:     feature,
+			Phase:        phase,
+			Workspace:    workspace,
+			Status:       status,
 		}
 
 		bountyCardResponse = append(bountyCardResponse, b)
