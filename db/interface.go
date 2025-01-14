@@ -247,4 +247,6 @@ type Database interface {
 	GetEndpointsByFeatureFlag(flagUUID uuid.UUID) ([]Endpoint, error)
 	GetEndpointByPath(path string) (Endpoint, error)
 	GetAllEndpoints() ([]Endpoint, error)
+	GetLatestTicketByGroup(ticketGroup uuid.UUID) (Tickets, error)
+	GetAllTicketGroups() ([]uuid.UUID, error)
 }
