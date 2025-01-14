@@ -44,6 +44,10 @@ func ServeWs(pool *Pool, w http.ResponseWriter, r *http.Request) { // get url qu
 		fmt.Fprintf(w, "%+v\n", err)
 	}
 
+	if uniqueId == "" {
+		return
+	}
+
 	client := &Client{
 		Host: uniqueId,
 		Conn: conn,
