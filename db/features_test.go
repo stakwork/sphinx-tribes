@@ -1424,7 +1424,7 @@ func TestDeleteFeaturePhase(t *testing.T) {
 			expectedRowsAffected: 0,
 		},
 		{
-			name:        "Concurrent Deletion",
+			name:        "Concurrent Deletions",
 			featureUuid: "valid-feature-uuid",
 			phaseUuid:   "valid-phase-uuid",
 			setup: func(featureUuid, phaseUuid string) {
