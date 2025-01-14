@@ -669,3 +669,280 @@ func TestDeleteFeatureByUuid(t *testing.T) {
 		})
 	}
 }
+
+func TestGetProductBrief(t *testing.T) {
+	InitTestDB()
+	defer CloseTestDB()
+
+	CleanTestData()
+
+	tests := []struct {
+		name          string
+		workspaceUuid string
+		setup         func() error
+		expected      string
+		expectError   bool
+	}{
+		{
+			name:          "Valid UUID with Complete Data",
+			workspaceUuid: "valid-uuid-1",
+			setup: func() error {
+				workspace := Workspace{
+					Uuid:    "valid-uuid-1",
+					Name:    "Product1",
+					Mission: "Mission1",
+					Tactics: "Tactics1",
+				}
+				return TestDB.db.Create(&workspace).Error
+			},
+			expected:    "Product: Product1. Product Brief:\n Mission: Mission1.\n\n Objectives: Tactics1",
+			expectError: false,
+		},
+		{
+			name:          "Valid UUID with Partial Data",
+			workspaceUuid: "valid-uuid-2",
+			setup: func() error {
+				workspace := Workspace{
+					Uuid:    "valid-uuid-2",
+					Name:    "Product2",
+					Mission: "",
+					Tactics: "Tactics2",
+				}
+				return TestDB.db.Create(&workspace).Error
+			},
+			expected:    "Product: Product2. Product Brief:\n Mission: .\n\n Objectives: Tactics2",
+			expectError: false,
+		},
+		{
+			name:          "Empty UUID",
+			workspaceUuid: "",
+			setup:         func() error { return nil },
+			expected:      "",
+			expectError:   true,
+		},
+		{
+			name:          "Non-Existent UUID",
+			workspaceUuid: "non-existent-uuid",
+			setup:         func() error { return nil },
+			expected:      "",
+			expectError:   true,
+		},
+		{
+			name:          "Case Sensitivity",
+			workspaceUuid: "VALID-UUID-5",
+			setup: func() error {
+				workspace := Workspace{
+					Uuid:    "valid-uuid-5",
+					Name:    "Product5",
+					Mission: "Mission5",
+					Tactics: "Tactics5",
+				}
+				return TestDB.db.Create(&workspace).Error
+			},
+			expected:    "",
+			expectError: true,
+		},
+		{
+			name:          "Whitespace in UUID",
+			workspaceUuid: " valid-uuid-6 ",
+			setup: func() error {
+				workspace := Workspace{
+					Uuid:    "valid-uuid-6",
+					Name:    "Product6",
+					Mission: "Mission6",
+					Tactics: "Tactics6",
+				}
+				return TestDB.db.Create(&workspace).Error
+			},
+			expected:    "",
+			expectError: true,
+		},
+		{
+			name:          "UUID with Special Characters",
+			workspaceUuid: "valid-uuid-special-123",
+			setup: func() error {
+				workspace := Workspace{
+					Uuid:    "valid-uuid-special-123",
+					Name:    "ProductSpecial",
+					Mission: "MissionSpecial",
+					Tactics: "TacticsSpecial",
+				}
+				return TestDB.db.Create(&workspace).Error
+			},
+			expected:    "Product: ProductSpecial. Product Brief:\n Mission: MissionSpecial.\n\n Objectives: TacticsSpecial",
+			expectError: false,
+		},
+		{
+			name:          "Null UUID",
+			workspaceUuid: "",
+			setup:         func() error { return nil },
+			expected:      "",
+			expectError:   true,
+		},
+		{
+			name:          "Invalid UUID Format",
+			workspaceUuid: "invalid-uuid-!@#",
+			setup:         func() error { return nil },
+			expected:      "",
+			expectError:   true,
+		},
+		{
+			name:          "Concurrent Access",
+			workspaceUuid: "valid-uuid-7",
+			setup: func() error {
+				workspace := Workspace{
+					Uuid:    "valid-uuid-7",
+					Name:    "Product7",
+					Mission: "Mission7",
+					Tactics: "Tactics7",
+				}
+				return TestDB.db.Create(&workspace).Error
+			},
+			expected:    "Product: Product7. Product Brief:\n Mission: Mission7.\n\n Objectives: Tactics7",
+			expectError: false,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if err := tt.setup(); err != nil {
+				t.Fatalf("setup failed: %v", err)
+			}
+
+			result, err := TestDB.GetProductBrief(tt.workspaceUuid)
+
+			if tt.expectError {
+				assert.Error(t, err)
+			} else {
+				assert.NoError(t, err)
+				assert.Equal(t, tt.expected, result)
+			}
+		})
+		CleanTestData()
+	}
+}
+
+func TestGetFeatureBrief(t *testing.T) {
+	InitTestDB()
+	defer CloseTestDB()
+
+	CleanTestData()
+
+	tests := []struct {
+		name        string
+		featureUuid string
+		setup       func() error
+		expected    string
+		expectError bool
+	}{
+		{
+			name:        "Valid UUID with Complete Data",
+			featureUuid: "valid-uuid-1",
+			setup: func() error {
+				feature := WorkspaceFeatures{
+					Uuid:  "valid-uuid-1",
+					Name:  "Feature1",
+					Brief: "This is a test feature",
+				}
+				return TestDB.db.Create(&feature).Error
+			},
+			expected:    "Feature: Feature1. Brief: This is a test feature",
+			expectError: false,
+		},
+		{
+			name:        "Empty UUID",
+			featureUuid: "",
+			setup:       func() error { return nil },
+			expected:    "",
+			expectError: true,
+		},
+		{
+			name:        "Non-Existent UUID",
+			featureUuid: "non-existent-uuid",
+			setup:       func() error { return nil },
+			expected:    "",
+			expectError: true,
+		},
+		{
+			name:        "Case Sensitivity",
+			featureUuid: "VALID-UUID-2",
+			setup: func() error {
+				feature := WorkspaceFeatures{
+					Uuid:  "valid-uuid-2",
+					Name:  "Feature2",
+					Brief: "This is another test feature",
+				}
+				return TestDB.db.Create(&feature).Error
+			},
+			expected:    "",
+			expectError: true,
+		},
+		{
+			name:        "Whitespace in UUID",
+			featureUuid: " valid-uuid-3 ",
+			setup: func() error {
+				feature := WorkspaceFeatures{
+					Uuid:  "valid-uuid-3",
+					Name:  "Feature3",
+					Brief: "Feature brief with spaces",
+				}
+				return TestDB.db.Create(&feature).Error
+			},
+			expected:    "",
+			expectError: true,
+		},
+		{
+			name:        "UUID with Special Characters",
+			featureUuid: "valid-uuid-special-123",
+			setup: func() error {
+				feature := WorkspaceFeatures{
+					Uuid:  "valid-uuid-special-123",
+					Name:  "SpecialFeature",
+					Brief: "Feature with special characters",
+				}
+				return TestDB.db.Create(&feature).Error
+			},
+			expected:    "Feature: SpecialFeature. Brief: Feature with special characters",
+			expectError: false,
+		},
+		{
+			name:        "Feature with Empty Fields",
+			featureUuid: "uuid-with-empty-fields",
+			setup: func() error {
+				feature := WorkspaceFeatures{
+					Uuid:  "uuid-with-empty-fields",
+					Name:  "",
+					Brief: "",
+				}
+				return TestDB.db.Create(&feature).Error
+			},
+			expected:    "Feature: . Brief: ",
+			expectError: false,
+		},
+		{
+			name:        "Invalid UUID Format",
+			featureUuid: "invalid-uuid-!@#",
+			setup:       func() error { return nil },
+			expected:    "",
+			expectError: true,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if err := tt.setup(); err != nil {
+				t.Fatalf("setup failed: %v", err)
+			}
+
+			result, err := TestDB.GetFeatureBrief(tt.featureUuid)
+
+			if tt.expectError {
+				assert.Error(t, err)
+			} else {
+				assert.NoError(t, err)
+				assert.Equal(t, tt.expected, result)
+			}
+		})
+		CleanTestData()
+	}
+}
