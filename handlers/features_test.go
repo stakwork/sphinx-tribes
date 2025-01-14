@@ -2131,6 +2131,201 @@ func TestGetFeaturesByWorkspaceUuid(t *testing.T) {
 			},
 			expectedStatus: http.StatusOK,
 		},
+		{
+			name:           "Empty Workspace with Status Filter",
+			pubKeyFromAuth: "validPubKey",
+			workspaceUUID:  "valid-uuid",
+			setupMocks: func() (string, interface{}) {
+				person := db.Person{
+					Uuid:        uuid.New().String(),
+					OwnerPubKey: "validPubKey",
+				}
+				db.TestDB.CreateOrEditPerson(person)
+
+				workspace := db.Workspace{
+					Uuid:        uuid.New().String(),
+					OwnerPubKey: person.OwnerPubKey,
+				}
+				db.TestDB.CreateOrEditWorkspace(workspace)
+
+				return workspace.Uuid, []db.WorkspaceFeatures{}
+			},
+			expectedStatus: http.StatusOK,
+		},
+		{
+			name:           "Features with Different Statuses",
+			pubKeyFromAuth: "validPubKey",
+			workspaceUUID:  "valid-uuid",
+			setupMocks: func() (string, interface{}) {
+				person := db.Person{
+					Uuid:        uuid.New().String(),
+					OwnerPubKey: "validPubKey",
+				}
+				db.TestDB.CreateOrEditPerson(person)
+
+				workspace := db.Workspace{
+					Uuid:        uuid.New().String(),
+					OwnerPubKey: person.OwnerPubKey,
+				}
+				db.TestDB.CreateOrEditWorkspace(workspace)
+
+				activeFeature := db.WorkspaceFeatures{
+					Uuid:          uuid.New().String(),
+					WorkspaceUuid: workspace.Uuid,
+					Name:          "Active Feature",
+					FeatStatus:    db.ActiveFeature,
+				}
+				db.TestDB.CreateOrEditFeature(activeFeature)
+
+				archivedFeature := db.WorkspaceFeatures{
+					Uuid:          uuid.New().String(),
+					WorkspaceUuid: workspace.Uuid,
+					Name:          "Archived Feature",
+					FeatStatus:    db.ArchivedFeature,
+				}
+				db.TestDB.CreateOrEditFeature(archivedFeature)
+
+				return workspace.Uuid, []db.WorkspaceFeatures{activeFeature}
+			},
+			expectedStatus: http.StatusOK,
+		},
+		{
+			name:           "Features with Custom Sorting",
+			pubKeyFromAuth: "validPubKey",
+			workspaceUUID:  "valid-uuid",
+			setupMocks: func() (string, interface{}) {
+				person := db.Person{
+					Uuid:        uuid.New().String(),
+					OwnerPubKey: "validPubKey",
+				}
+				db.TestDB.CreateOrEditPerson(person)
+
+				workspace := db.Workspace{
+					Uuid:        uuid.New().String(),
+					OwnerPubKey: person.OwnerPubKey,
+				}
+				db.TestDB.CreateOrEditWorkspace(workspace)
+
+				features := []db.WorkspaceFeatures{
+					{
+						Uuid:          uuid.New().String(),
+						WorkspaceUuid: workspace.Uuid,
+						Name:          "Feature A",
+						Priority:      3,
+					},
+					{
+						Uuid:          uuid.New().String(),
+						WorkspaceUuid: workspace.Uuid,
+						Name:          "Feature B",
+						Priority:      1,
+					},
+					{
+						Uuid:          uuid.New().String(),
+						WorkspaceUuid: workspace.Uuid,
+						Name:          "Feature C",
+						Priority:      2,
+					},
+				}
+
+				for _, f := range features {
+					db.TestDB.CreateOrEditFeature(f)
+				}
+
+				return workspace.Uuid, features
+			},
+			expectedStatus: http.StatusOK,
+		},
+		{
+			name:           "Features with Pagination",
+			pubKeyFromAuth: "validPubKey",
+			workspaceUUID:  "valid-uuid",
+			setupMocks: func() (string, interface{}) {
+				person := db.Person{
+					Uuid:        uuid.New().String(),
+					OwnerPubKey: "validPubKey",
+				}
+				db.TestDB.CreateOrEditPerson(person)
+
+				workspace := db.Workspace{
+					Uuid:        uuid.New().String(),
+					OwnerPubKey: person.OwnerPubKey,
+				}
+				db.TestDB.CreateOrEditWorkspace(workspace)
+
+				var features []db.WorkspaceFeatures
+				for i := 0; i < 25; i++ {
+					feature := db.WorkspaceFeatures{
+						Uuid:          uuid.New().String(),
+						WorkspaceUuid: workspace.Uuid,
+						Name:          fmt.Sprintf("Feature %d", i),
+						Priority:      i,
+					}
+					db.TestDB.CreateOrEditFeature(feature)
+					features = append(features, feature)
+				}
+
+				return workspace.Uuid, features
+			},
+			expectedStatus: http.StatusOK,
+		},
+		{
+			name:           "Features with Special Characters in Names",
+			pubKeyFromAuth: "validPubKey",
+			workspaceUUID:  "valid-uuid",
+			setupMocks: func() (string, interface{}) {
+				person := db.Person{
+					Uuid:        uuid.New().String(),
+					OwnerPubKey: "validPubKey",
+				}
+				db.TestDB.CreateOrEditPerson(person)
+
+				workspace := db.Workspace{
+					Uuid:        uuid.New().String(),
+					OwnerPubKey: person.OwnerPubKey,
+				}
+				db.TestDB.CreateOrEditWorkspace(workspace)
+
+				feature := db.WorkspaceFeatures{
+					Uuid:          uuid.New().String(),
+					WorkspaceUuid: workspace.Uuid,
+					Name:          "Feature !@#$%^&*()",
+					Priority:      1,
+				}
+				db.TestDB.CreateOrEditFeature(feature)
+
+				return workspace.Uuid, []db.WorkspaceFeatures{feature}
+			},
+			expectedStatus: http.StatusOK,
+		},
+		{
+			name:           "Features with Unicode Characters",
+			pubKeyFromAuth: "validPubKey",
+			workspaceUUID:  "valid-uuid",
+			setupMocks: func() (string, interface{}) {
+				person := db.Person{
+					Uuid:        uuid.New().String(),
+					OwnerPubKey: "validPubKey",
+				}
+				db.TestDB.CreateOrEditPerson(person)
+
+				workspace := db.Workspace{
+					Uuid:        uuid.New().String(),
+					OwnerPubKey: person.OwnerPubKey,
+				}
+				db.TestDB.CreateOrEditWorkspace(workspace)
+
+				feature := db.WorkspaceFeatures{
+					Uuid:          uuid.New().String(),
+					WorkspaceUuid: workspace.Uuid,
+					Name:          "测试Feature テスト",
+					Priority:      1,
+				}
+				db.TestDB.CreateOrEditFeature(feature)
+
+				return workspace.Uuid, []db.WorkspaceFeatures{feature}
+			},
+			expectedStatus: http.StatusOK,
+		},
 	}
 
 	for _, tt := range tests {
