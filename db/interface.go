@@ -247,4 +247,9 @@ type Database interface {
 	GetEndpointsByFeatureFlag(flagUUID uuid.UUID) ([]Endpoint, error)
 	GetEndpointByPath(path string) (Endpoint, error)
 	GetAllEndpoints() ([]Endpoint, error)
+	GetFeaturedBountyById(id string) (FeaturedBounty, error)
+	GetAllFeaturedBounties() ([]FeaturedBounty, error)
+	CreateFeaturedBounty(bounty FeaturedBounty) error
+	UpdateFeaturedBounty(bountyID string, bounty FeaturedBounty) error
+	DeleteFeaturedBounty(bountyID string) error
 }
