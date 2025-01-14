@@ -709,7 +709,36 @@ func (oh *featureHandler) UpdateFeatureStatus(w http.ResponseWriter, r *http.Req
 		return
 	}
 
+	person := oh.db.GetPersonByPubkey(pubKeyFromAuth)
+	if person.OwnerPubKey == "" {
+		logger.Log.Info("invalid pubkey")
+		w.WriteHeader(http.StatusUnauthorized)
+		json.NewEncoder(w).Encode(map[string]string{
+			"error": "Unauthorized: invalid pubkey",
+		})
+		return
+	}
+
 	uuid := chi.URLParam(r, "uuid")
+
+	if uuid == "" {
+		logger.Log.Info("uuid parameter is missing")
+		w.WriteHeader(http.StatusBadRequest)
+		json.NewEncoder(w).Encode(map[string]string{
+			"error": "Missing uuid parameter",
+		})
+		return
+	}
+
+	if r.Body == nil {
+		logger.Log.Info("request body is nil")
+		w.WriteHeader(http.StatusBadRequest)
+		json.NewEncoder(w).Encode(map[string]string{
+			"error": "Request body is required",
+		})
+		return
+	}
+
 	var req struct {
 		Status db.FeatureStatus `json:"status"`
 	}

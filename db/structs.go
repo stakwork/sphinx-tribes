@@ -951,13 +951,15 @@ const (
 )
 
 type BountyCard struct {
-	BountyID    uint              `json:"id"`
-	Title       string            `json:"title"`
-	AssigneePic string            `json:"assignee_img,omitempty"`
-	Features    WorkspaceFeatures `json:"features"`
-	Phase       FeaturePhase      `json:"phase"`
-	Workspace   Workspace         `json:"workspace"`
-	Status      BountyStatus      `json:"status"`
+	BountyID     uint              `json:"id"`
+	Title        string            `json:"title"`
+	AssigneePic  string            `json:"assignee_img,omitempty"`
+	Assignee     string            `json:"assignee"`
+	AssigneeName string            `json:"assignee_name"`
+	Features     WorkspaceFeatures `json:"features"`
+	Phase        FeaturePhase      `json:"phase"`
+	Workspace    Workspace         `json:"workspace"`
+	Status       BountyStatus      `json:"status"`
 }
 
 type WfRequestStatus string
