@@ -244,6 +244,8 @@ func TestGetConnectionCode(t *testing.T) {
 
 		fetchedCodes := db.TestDB.GetConnectionCode()
 
+		fmt.Println("fetchedCodes", fetchedCodes)
+
 		handler.ServeHTTP(rr, req)
 
 		assert.Equal(t, http.StatusOK, rr.Code)

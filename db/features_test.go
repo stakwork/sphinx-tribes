@@ -947,6 +947,341 @@ func TestGetFeatureBrief(t *testing.T) {
 	}
 }
 
+func TestGetPhaseByUuid(t *testing.T) {
+	teardownSuite := SetupSuite(t)
+	defer teardownSuite(t)
+
+	currentTime := time.Now()
+	tests := []struct {
+		name          string
+		setup         func() string
+		expectedPhase *FeaturePhase
+		expectError   bool
+		errorMessage  string
+	}{
+		{
+			name: "Successfully get phase with all fields populated",
+			setup: func() string {
+				phase := FeaturePhase{
+					Uuid:         uuid.New().String(),
+					FeatureUuid:  uuid.New().String(),
+					Name:         "Test Phase",
+					Priority:     1,
+					PhasePurpose: "Test Purpose",
+					PhaseOutcome: "Test Outcome",
+					PhaseScope:   "Test Scope",
+					Created:      &currentTime,
+					Updated:      &currentTime,
+					CreatedBy:    "test-user",
+					UpdatedBy:    "test-user",
+				}
+				TestDB.db.Create(&phase)
+				return phase.Uuid
+			},
+			expectedPhase: &FeaturePhase{
+				Name:         "Test Phase",
+				Priority:     1,
+				PhasePurpose: "Test Purpose",
+				PhaseOutcome: "Test Outcome",
+				PhaseScope:   "Test Scope",
+				CreatedBy:    "test-user",
+				UpdatedBy:    "test-user",
+			},
+			expectError: false,
+		},
+		{
+			name: "Phase not found",
+			setup: func() string {
+				return uuid.New().String()
+			},
+			expectedPhase: nil,
+			expectError:   true,
+			errorMessage:  "no phase found",
+		},
+		{
+			name: "Empty UUID",
+			setup: func() string {
+				return ""
+			},
+			expectedPhase: nil,
+			expectError:   true,
+			errorMessage:  "no phase found",
+		},
+		{
+			name: "Phase with special characters in fields",
+			setup: func() string {
+				phase := FeaturePhase{
+					Uuid:         uuid.New().String(),
+					FeatureUuid:  uuid.New().String(),
+					Name:         "Special !@#$%^&*()",
+					Priority:     1,
+					PhasePurpose: "Purpose !@#$%^&*()",
+					PhaseOutcome: "Outcome !@#$%^&*()",
+					PhaseScope:   "Scope !@#$%^&*()",
+					Created:      &currentTime,
+					Updated:      &currentTime,
+					CreatedBy:    "test-user!@#",
+					UpdatedBy:    "test-user!@#",
+				}
+				TestDB.db.Create(&phase)
+				return phase.Uuid
+			},
+			expectedPhase: &FeaturePhase{
+				Name:         "Special !@#$%^&*()",
+				Priority:     1,
+				PhasePurpose: "Purpose !@#$%^&*()",
+				PhaseOutcome: "Outcome !@#$%^&*()",
+				PhaseScope:   "Scope !@#$%^&*()",
+				CreatedBy:    "test-user!@#",
+				UpdatedBy:    "test-user!@#",
+			},
+			expectError: false,
+		},
+		{
+			name: "Phase with Unicode characters",
+			setup: func() string {
+				phase := FeaturePhase{
+					Uuid:         uuid.New().String(),
+					FeatureUuid:  uuid.New().String(),
+					Name:         "测试阶段",
+					Priority:     1,
+					PhasePurpose: "目的 🎯",
+					PhaseOutcome: "结果 ✨",
+					PhaseScope:   "范围 🌟",
+					Created:      &currentTime,
+					Updated:      &currentTime,
+					CreatedBy:    "用户",
+					UpdatedBy:    "用户",
+				}
+				TestDB.db.Create(&phase)
+				return phase.Uuid
+			},
+			expectedPhase: &FeaturePhase{
+				Name:         "测试阶段",
+				Priority:     1,
+				PhasePurpose: "目的 🎯",
+				PhaseOutcome: "结果 ✨",
+				PhaseScope:   "范围 🌟",
+				CreatedBy:    "用户",
+				UpdatedBy:    "用户",
+			},
+			expectError: false,
+		},
+		{
+			name: "Phase with maximum length strings",
+			setup: func() string {
+				longString := strings.Repeat("a", 255)
+				phase := FeaturePhase{
+					Uuid:         uuid.New().String(),
+					FeatureUuid:  uuid.New().String(),
+					Name:         longString,
+					Priority:     1,
+					PhasePurpose: longString,
+					PhaseOutcome: longString,
+					PhaseScope:   longString,
+					Created:      &currentTime,
+					Updated:      &currentTime,
+					CreatedBy:    longString,
+					UpdatedBy:    longString,
+				}
+				TestDB.db.Create(&phase)
+				return phase.Uuid
+			},
+			expectedPhase: &FeaturePhase{
+				Name:         strings.Repeat("a", 255),
+				Priority:     1,
+				PhasePurpose: strings.Repeat("a", 255),
+				PhaseOutcome: strings.Repeat("a", 255),
+				PhaseScope:   strings.Repeat("a", 255),
+				CreatedBy:    strings.Repeat("a", 255),
+				UpdatedBy:    strings.Repeat("a", 255),
+			},
+			expectError: false,
+		},
+		{
+			name: "UUID with Leading and Trailing Spaces",
+			setup: func() string {
+				phase := FeaturePhase{
+					Uuid:        uuid.New().String(),
+					FeatureUuid: uuid.New().String(),
+					Name:        "Space Test Phase",
+					Priority:    1,
+					Created:     &currentTime,
+					Updated:     &currentTime,
+					CreatedBy:   "test-user",
+				}
+				TestDB.db.Create(&phase)
+				return "  " + phase.Uuid + "  "
+			},
+			expectedPhase: &FeaturePhase{
+				Name:      "Space Test Phase",
+				Priority:  1,
+				CreatedBy: "test-user",
+			},
+			expectError:  true,
+			errorMessage: "no phase found",
+		},
+		{
+			name: "Case Sensitivity in UUID",
+			setup: func() string {
+				originalUuid := "12345678-ABCD-EFGH-IJKL-MNOPQRSTUVWX"
+				phase := FeaturePhase{
+					Uuid:        originalUuid,
+					FeatureUuid: uuid.New().String(),
+					Name:        "Case Sensitivity Test",
+					Priority:    1,
+					Created:     &currentTime,
+					Updated:     &currentTime,
+					CreatedBy:   "test-user",
+				}
+				TestDB.db.Create(&phase)
+				return strings.ToLower(originalUuid)
+			},
+			expectedPhase: &FeaturePhase{
+				Name:      "Case Sensitivity Test",
+				Priority:  1,
+				CreatedBy: "test-user",
+			},
+			expectError:  true,
+			errorMessage: "no phase found",
+		},
+		{
+			name: "With Large UUID String",
+			setup: func() string {
+				largeUuid := strings.Repeat("a", 1000)
+				return largeUuid
+			},
+			expectedPhase: nil,
+			expectError:   true,
+			errorMessage:  "no phase found",
+		},
+		{
+			name: "UUID with Invalid Format",
+			setup: func() string {
+				return "not-a-valid-uuid-format"
+			},
+			expectedPhase: nil,
+			expectError:   true,
+			errorMessage:  "no phase found",
+		},
+		{
+			name: "UUID with SQL Injection Attempt",
+			setup: func() string {
+				return "' OR '1'='1"
+			},
+			expectedPhase: nil,
+			expectError:   true,
+			errorMessage:  "no phase found",
+		},
+		{
+			name: "UUID with Null Characters",
+			setup: func() string {
+				return "12345678-abcd-efgh-ijkl-mnopqrstuvwx\x00"
+			},
+			expectedPhase: nil,
+			expectError:   true,
+			errorMessage:  "no phase found",
+		},
+		{
+			name: "UUID with HTML Characters",
+			setup: func() string {
+				return "<script>alert('test')</script>"
+			},
+			expectedPhase: nil,
+			expectError:   true,
+			errorMessage:  "no phase found",
+		},
+		{
+			name: "Multiple Identical UUIDs Attempt",
+			setup: func() string {
+				sharedUuid := uuid.New().String()
+
+				phase1 := FeaturePhase{
+					Uuid:        sharedUuid,
+					FeatureUuid: uuid.New().String(),
+					Name:        "First Phase",
+					Priority:    1,
+					Created:     &currentTime,
+					Updated:     &currentTime,
+					CreatedBy:   "test-user",
+					UpdatedBy:   "test-user",
+				}
+				err := TestDB.db.Create(&phase1).Error
+				if err != nil {
+					return sharedUuid
+				}
+
+				phase2 := FeaturePhase{
+					Uuid:        sharedUuid,
+					FeatureUuid: uuid.New().String(),
+					Name:        "Second Phase",
+					Priority:    2,
+					Created:     &currentTime,
+					Updated:     &currentTime,
+					CreatedBy:   "test-user-2",
+					UpdatedBy:   "test-user-2",
+				}
+				_ = TestDB.db.Create(&phase2)
+
+				return sharedUuid
+			},
+			expectedPhase: &FeaturePhase{
+				Name:      "First Phase",
+				Priority:  1,
+				CreatedBy: "test-user",
+				UpdatedBy: "test-user",
+			},
+			expectError: false,
+		},
+		{
+			name: "UUID with Mixed Case and Special Characters",
+			setup: func() string {
+				complexUuid := "Ab#12$Cd-EfGh-IjKl-MnOp-QrStUvWxYz"
+				phase := FeaturePhase{
+					Uuid:        complexUuid,
+					FeatureUuid: uuid.New().String(),
+					Name:        "Complex UUID Test",
+					Priority:    1,
+					Created:     &currentTime,
+					CreatedBy:   "test-user",
+				}
+				TestDB.db.Create(&phase)
+				return "ab#12$cd-efgh-ijkl-mnop-qrstuvwxyz"
+			},
+			expectedPhase: nil,
+			expectError:   true,
+			errorMessage:  "no phase found",
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+
+			TestDB.db.Exec("DELETE FROM feature_phases")
+
+			phaseUuid := tt.setup()
+			phase, err := TestDB.GetPhaseByUuid(phaseUuid)
+
+			if tt.expectError {
+				assert.Error(t, err)
+				assert.Equal(t, tt.errorMessage, err.Error())
+			} else {
+				assert.NoError(t, err)
+				assert.Equal(t, phaseUuid, phase.Uuid)
+				assert.Equal(t, tt.expectedPhase.Name, phase.Name)
+				assert.Equal(t, tt.expectedPhase.Priority, phase.Priority)
+				assert.Equal(t, tt.expectedPhase.PhasePurpose, phase.PhasePurpose)
+				assert.Equal(t, tt.expectedPhase.PhaseOutcome, phase.PhaseOutcome)
+				assert.Equal(t, tt.expectedPhase.PhaseScope, phase.PhaseScope)
+				assert.Equal(t, tt.expectedPhase.CreatedBy, phase.CreatedBy)
+				assert.Equal(t, tt.expectedPhase.UpdatedBy, phase.UpdatedBy)
+				assert.NotNil(t, phase.Created)
+				assert.NotNil(t, phase.Updated)
+			}
+		})
+	}
+}
+
 func TestGetBountiesByPhaseUuid(t *testing.T) {
 	teardownSuite := SetupSuite(t)
 	defer teardownSuite(t)
