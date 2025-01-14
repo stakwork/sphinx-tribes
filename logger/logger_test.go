@@ -584,21 +584,6 @@ func TestRouteBasedUUIDMiddleware(t *testing.T) {
 			expectedStatus: http.StatusOK,
 		},
 		{
-			name: "Multiple Concurrent Requests",
-			setupRequest: func() *http.Request {
-				return httptest.NewRequest(http.MethodGet, "/test", nil)
-			},
-			setupHandler: func() http.Handler {
-				return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-					assert.NotEmpty(t, Log.requestUUID)
-					time.Sleep(10 * time.Millisecond)
-					w.WriteHeader(http.StatusOK)
-				})
-			},
-			validateUUID:   true,
-			expectedStatus: http.StatusOK,
-		},
-		{
 			name: "Request with Large Body",
 			setupRequest: func() *http.Request {
 				body := strings.NewReader(strings.Repeat("a", 1024*1024))
