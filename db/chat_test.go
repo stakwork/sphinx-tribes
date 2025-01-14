@@ -125,7 +125,7 @@ func TestGetChatMessagesForChatID(t *testing.T) {
 		expectError bool
 	}{
 		{
-			name: "Successfully get messages for chat",
+			name: "Successfully geting messages for chat",
 			setup: func() string {
 				chatID := "chat123"
 				messages := []ChatMessage{
