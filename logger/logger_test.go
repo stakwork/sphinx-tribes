@@ -540,3 +540,241 @@ func TestMachine(t *testing.T) {
 		})
 	}
 }
+
+func TestClearRequestUUID(t *testing.T) {
+	tests := []struct {
+		name           string
+		setup          func(*Logger)
+		concurrent     bool
+		concurrentNum  int
+		validateBefore func(*testing.T, *Logger)
+		validateAfter  func(*testing.T, *Logger)
+	}{
+		{
+			name: "Clear existing UUID",
+			setup: func(l *Logger) {
+				l.SetRequestUUID("test-uuid")
+			},
+			validateBefore: func(t *testing.T, l *Logger) {
+				assert.Equal(t, "test-uuid", l.requestUUID)
+			},
+			validateAfter: func(t *testing.T, l *Logger) {
+				assert.Empty(t, l.requestUUID)
+			},
+		},
+		{
+			name: "Clear empty UUID",
+			setup: func(l *Logger) {
+				l.requestUUID = ""
+			},
+			validateBefore: func(t *testing.T, l *Logger) {
+				assert.Empty(t, l.requestUUID)
+			},
+			validateAfter: func(t *testing.T, l *Logger) {
+				assert.Empty(t, l.requestUUID)
+			},
+		},
+		{
+			name: "Clear with concurrent access",
+			setup: func(l *Logger) {
+				l.SetRequestUUID("concurrent-test-uuid")
+			},
+			concurrent:    true,
+			concurrentNum: 100,
+			validateBefore: func(t *testing.T, l *Logger) {
+				assert.Equal(t, "concurrent-test-uuid", l.requestUUID)
+			},
+			validateAfter: func(t *testing.T, l *Logger) {
+				assert.Empty(t, l.requestUUID)
+			},
+		},
+		{
+			name: "Clear with long UUID",
+			setup: func(l *Logger) {
+				l.SetRequestUUID(strings.Repeat("a", 1000))
+			},
+			validateBefore: func(t *testing.T, l *Logger) {
+				assert.Equal(t, strings.Repeat("a", 1000), l.requestUUID)
+			},
+			validateAfter: func(t *testing.T, l *Logger) {
+				assert.Empty(t, l.requestUUID)
+			},
+		},
+		{
+			name: "Clear with special characters",
+			setup: func(l *Logger) {
+				l.SetRequestUUID("!@#$%^&*()_+{}[]|\\:;\"'<>,.?/~`")
+			},
+			validateBefore: func(t *testing.T, l *Logger) {
+				assert.Equal(t, "!@#$%^&*()_+{}[]|\\:;\"'<>,.?/~`", l.requestUUID)
+			},
+			validateAfter: func(t *testing.T, l *Logger) {
+				assert.Empty(t, l.requestUUID)
+			},
+		},
+		{
+			name: "Multiple clear calls",
+			setup: func(l *Logger) {
+				l.SetRequestUUID("multiple-clear-test")
+			},
+			validateBefore: func(t *testing.T, l *Logger) {
+				assert.Equal(t, "multiple-clear-test", l.requestUUID)
+			},
+			validateAfter: func(t *testing.T, l *Logger) {
+				l.ClearRequestUUID()
+				l.ClearRequestUUID()
+				assert.Empty(t, l.requestUUID)
+			},
+		},
+		{
+			name: "Clear with Unicode characters",
+			setup: func(l *Logger) {
+				l.SetRequestUUID("你好👋Привет")
+			},
+			validateBefore: func(t *testing.T, l *Logger) {
+				assert.Equal(t, "你好👋Привет", l.requestUUID)
+			},
+			validateAfter: func(t *testing.T, l *Logger) {
+				assert.Empty(t, l.requestUUID)
+			},
+		},
+		{
+			name: "Basic Functionality",
+			setup: func(l *Logger) {
+				l.SetRequestUUID("basic-test-uuid")
+			},
+			validateBefore: func(t *testing.T, l *Logger) {
+				assert.Equal(t, "basic-test-uuid", l.requestUUID)
+			},
+			validateAfter: func(t *testing.T, l *Logger) {
+				assert.Empty(t, l.requestUUID)
+			},
+		},
+		{
+			name: "Edge Case - Already Empty UUID",
+			setup: func(l *Logger) {
+				l.ClearRequestUUID()
+			},
+			validateBefore: func(t *testing.T, l *Logger) {
+				assert.Empty(t, l.requestUUID)
+			},
+			validateAfter: func(t *testing.T, l *Logger) {
+				assert.Empty(t, l.requestUUID)
+			},
+		},
+		{
+			name: "Concurrency Test",
+			setup: func(l *Logger) {
+				l.SetRequestUUID("concurrent-uuid")
+			},
+			concurrent:    true,
+			concurrentNum: 1000,
+			validateBefore: func(t *testing.T, l *Logger) {
+				assert.Equal(t, "concurrent-uuid", l.requestUUID)
+			},
+			validateAfter: func(t *testing.T, l *Logger) {
+				assert.Empty(t, l.requestUUID)
+			},
+		},
+		{
+			name: "Performance Under Load",
+			setup: func(l *Logger) {
+				l.SetRequestUUID("performance-test-uuid")
+			},
+			validateBefore: func(t *testing.T, l *Logger) {
+				start := time.Now()
+				for i := 0; i < 10000; i++ {
+					l.ClearRequestUUID()
+					l.SetRequestUUID("performance-test-uuid")
+				}
+				duration := time.Since(start)
+				assert.Less(t, duration, 1*time.Second, "Performance test took too long")
+			},
+			validateAfter: func(t *testing.T, l *Logger) {
+				assert.Empty(t, l.requestUUID)
+			},
+		},
+		{
+			name: "Logger Initialization",
+			setup: func(l *Logger) {
+				newLogger := &Logger{
+					mu: sync.Mutex{},
+				}
+				newLogger.ClearRequestUUID()
+				assert.Empty(t, newLogger.requestUUID)
+			},
+			validateAfter: func(t *testing.T, l *Logger) {
+				assert.Empty(t, l.requestUUID)
+			},
+		},
+		{
+			name: "Large UUID String",
+			setup: func(l *Logger) {
+				largeUUID := strings.Repeat("abcdef0123456789", 1000)
+				l.SetRequestUUID(largeUUID)
+			},
+			validateBefore: func(t *testing.T, l *Logger) {
+				assert.Equal(t, strings.Repeat("abcdef0123456789", 1000), l.requestUUID)
+			},
+			validateAfter: func(t *testing.T, l *Logger) {
+				assert.Empty(t, l.requestUUID)
+			},
+		},
+		{
+			name: "Repeated Calls",
+			setup: func(l *Logger) {
+				l.SetRequestUUID("repeated-test")
+			},
+			validateBefore: func(t *testing.T, l *Logger) {
+				for i := 0; i < 100; i++ {
+					l.ClearRequestUUID()
+					assert.Empty(t, l.requestUUID)
+					l.SetRequestUUID("repeated-test")
+					assert.Equal(t, "repeated-test", l.requestUUID)
+				}
+			},
+			validateAfter: func(t *testing.T, l *Logger) {
+				assert.Empty(t, l.requestUUID)
+			},
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+
+			logger := &Logger{
+				mu: sync.Mutex{},
+			}
+
+			if tt.setup != nil {
+				tt.setup(logger)
+			}
+
+			if tt.validateBefore != nil {
+				tt.validateBefore(t, logger)
+			}
+
+			if tt.concurrent {
+
+				var wg sync.WaitGroup
+				for i := 0; i < tt.concurrentNum; i++ {
+					wg.Add(1)
+					go func() {
+						defer wg.Done()
+						logger.ClearRequestUUID()
+					}()
+				}
+				wg.Wait()
+			} else {
+				logger.ClearRequestUUID()
+			}
+
+			if tt.validateAfter != nil {
+				tt.validateAfter(t, logger)
+			}
+
+			logger.mu.Lock()
+			logger.mu.Unlock()
+		})
+	}
+}
