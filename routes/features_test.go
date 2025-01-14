@@ -103,7 +103,7 @@ func TestFeatureRoutes(t *testing.T) {
 			expectedStatus: http.StatusOK,
 		},
 		{
-			name:           "Test GET /workspace/count/{uuid} Route",
+			name:           "Test GET /workspace/count/{uuid} Routes",
 			method:         http.MethodGet,
 			path:           "/workspace/count/1234",
 			expectedStatus: http.StatusOK,
