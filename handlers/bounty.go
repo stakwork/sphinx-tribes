@@ -1538,10 +1538,55 @@ func (h *bountyHandler) GetBountyCards(w http.ResponseWriter, r *http.Request) {
 		bounties = h.db.GetAllBounties(r)
 	}
 
-	var bountyCardResponse []db.BountyCard = h.GenerateBountyCardResponse(bounties)
+	bountyCardResponse := h.GenerateBountyCardResponse(bounties)
+
+	ticketCards, err := h.GenerateTicketCardResponse(workspaceUuid)
+	if err != nil {
+		logger.Log.Error("failed to generate ticket cards", "error", err)
+	} else {
+		bountyCardResponse = append(bountyCardResponse, ticketCards...)
+	}
 
 	w.WriteHeader(http.StatusOK)
 	json.NewEncoder(w).Encode(bountyCardResponse)
+}
+
+func (h *bountyHandler) GenerateTicketCardResponse(workspaceUuid string) ([]db.BountyCard, error) {
+	var ticketCards []db.BountyCard
+
+	ticketGroups, err := h.db.GetAllTicketGroups()
+	if err != nil {
+		return nil, fmt.Errorf("failed to get ticket groups: %w", err)
+	}
+
+	for _, group := range ticketGroups {
+		ticket, err := h.db.GetLatestTicketByGroup(group)
+		if err != nil {
+			logger.Log.Error("failed to get latest ticket", "group", group, "error", err)
+			continue
+		}
+
+		feature := h.db.GetFeatureByUuid(ticket.FeatureUUID)
+		phase, _ := h.db.GetFeaturePhaseByUuid(ticket.FeatureUUID, ticket.PhaseUUID)
+		workspace := h.db.GetWorkspaceByUuid(feature.WorkspaceUuid)
+		bountyID := uint(ticket.UUID.ID())
+
+		ticketCard := db.BountyCard{
+			BountyID:     bountyID,
+			Title:        ticket.Name,
+			AssigneePic:  "",
+			Assignee:     "",
+			AssigneeName: "",
+			Features:     feature,
+			Phase:        phase,
+			Workspace:    workspace,
+			Status:       db.StatusDraft,
+		}
+
+		ticketCards = append(ticketCards, ticketCard)
+	}
+
+	return ticketCards, nil
 }
 
 func (h *bountyHandler) GenerateBountyCardResponse(bounties []db.NewBounty) []db.BountyCard {

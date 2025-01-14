@@ -11911,3 +11911,111 @@ func (_c *Database_GetTicketsByGroup_Call) RunAndReturn(run func(string) ([]db.T
 	_c.Call.Return(run)
 	return _c
 }
+
+func (_m *Database) GetAllTicketGroups() ([]uuid.UUID, error) {
+	ret := _m.Called()
+
+	if len(ret) == 0 {
+		panic("no return value specified for GetAllTicketGroups")
+	}
+
+	var r0 []uuid.UUID
+	var r1 error
+	if rf, ok := ret.Get(0).(func() ([]uuid.UUID, error)); ok {
+		return rf()
+	}
+	if rf, ok := ret.Get(0).(func() []uuid.UUID); ok {
+		r0 = rf()
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).([]uuid.UUID)
+		}
+	}
+
+	if rf, ok := ret.Get(1).(func() error); ok {
+		r1 = rf()
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
+type Database_GetAllTicketGroups_Call struct {
+	*mock.Call
+}
+
+func (_e *Database_Expecter) GetAllTicketGroups() *Database_GetAllTicketGroups_Call {
+	return &Database_GetAllTicketGroups_Call{Call: _e.mock.On("GetAllTicketGroups")}
+}
+
+func (_c *Database_GetAllTicketGroups_Call) Run(run func()) *Database_GetAllTicketGroups_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run()
+	})
+	return _c
+}
+
+func (_c *Database_GetAllTicketGroups_Call) Return(_a0 []uuid.UUID, _a1 error) *Database_GetAllTicketGroups_Call {
+	_c.Call.Return(_a0, _a1)
+	return _c
+}
+
+func (_c *Database_GetAllTicketGroups_Call) RunAndReturn(run func() ([]uuid.UUID, error)) *Database_GetAllTicketGroups_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
+
+func (_m *Database) GetLatestTicketByGroup(ticketGroup uuid.UUID) (db.Tickets, error) {
+	ret := _m.Called(ticketGroup)
+
+	if len(ret) == 0 {
+		panic("no return value specified for GetLatestTicketByGroup")
+	}
+
+	var r0 db.Tickets
+	var r1 error
+	if rf, ok := ret.Get(0).(func(uuid.UUID) (db.Tickets, error)); ok {
+		return rf(ticketGroup)
+	}
+	if rf, ok := ret.Get(0).(func(uuid.UUID) db.Tickets); ok {
+		r0 = rf(ticketGroup)
+	} else {
+		r0 = ret.Get(0).(db.Tickets)
+	}
+
+	if rf, ok := ret.Get(1).(func(uuid.UUID) error); ok {
+		r1 = rf(ticketGroup)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
+type Database_GetLatestTicketByGroup_Call struct {
+	*mock.Call
+}
+
+
+func (_e *Database_Expecter) GetLatestTicketByGroup(ticketGroup interface{}) *Database_GetLatestTicketByGroup_Call {
+	return &Database_GetLatestTicketByGroup_Call{Call: _e.mock.On("GetLatestTicketByGroup", ticketGroup)}
+}
+
+func (_c *Database_GetLatestTicketByGroup_Call) Run(run func(ticketGroup uuid.UUID)) *Database_GetLatestTicketByGroup_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(uuid.UUID))
+	})
+	return _c
+}
+
+func (_c *Database_GetLatestTicketByGroup_Call) Return(_a0 db.Tickets, _a1 error) *Database_GetLatestTicketByGroup_Call {
+	_c.Call.Return(_a0, _a1)
+	return _c
+}
+
+func (_c *Database_GetLatestTicketByGroup_Call) RunAndReturn(run func(uuid.UUID) (db.Tickets, error)) *Database_GetLatestTicketByGroup_Call {
+	_c.Call.Return(run)
+	return _c
+}
