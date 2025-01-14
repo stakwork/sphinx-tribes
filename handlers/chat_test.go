@@ -9,6 +9,8 @@ import (
 	"net/http"
 	"net/http/httptest"
 	"net/url"
+	"strings"
+	"sync"
 	"testing"
 	"time"
 
@@ -157,6 +159,328 @@ func TestUpdateChat(t *testing.T) {
 		assert.Equal(t, http.StatusNotFound, rr.Code)
 		assert.False(t, response.Success)
 		assert.Equal(t, "Chat not found", response.Message)
+	})
+
+	t.Run("should handle empty request body", func(t *testing.T) {
+		rr := httptest.NewRecorder()
+		handler := http.HandlerFunc(chatHandler.UpdateChat)
+
+		chat := &db.Chat{
+			ID:          uuid.New().String(),
+			WorkspaceID: uuid.New().String(),
+			Title:       "Original Title",
+		}
+		db.TestDB.AddChat(chat)
+
+		rctx := chi.NewRouteContext()
+		rctx.URLParams.Add("chat_id", chat.ID)
+		req, err := http.NewRequestWithContext(
+			context.WithValue(context.Background(), chi.RouteCtxKey, rctx),
+			http.MethodPut,
+			"/hivechat/"+chat.ID,
+			bytes.NewReader([]byte{}),
+		)
+		assert.NoError(t, err)
+
+		handler.ServeHTTP(rr, req)
+
+		var response ChatResponse
+		err = json.NewDecoder(rr.Body).Decode(&response)
+		assert.NoError(t, err)
+		assert.Equal(t, http.StatusBadRequest, rr.Code)
+		assert.False(t, response.Success)
+		assert.Equal(t, "Invalid request body", response.Message)
+	})
+
+	t.Run("should handle title with special characters", func(t *testing.T) {
+		rr := httptest.NewRecorder()
+		handler := http.HandlerFunc(chatHandler.UpdateChat)
+
+		chat := &db.Chat{
+			ID:          uuid.New().String(),
+			WorkspaceID: uuid.New().String(),
+			Title:       "Original Title",
+		}
+		db.TestDB.AddChat(chat)
+
+		specialTitle := "!@#$%^&*()_+-=[]{}|;:'\",.<>?/"
+		requestBody := map[string]string{
+			"workspaceId": chat.WorkspaceID,
+			"title":       specialTitle,
+		}
+		bodyBytes, _ := json.Marshal(requestBody)
+
+		rctx := chi.NewRouteContext()
+		rctx.URLParams.Add("chat_id", chat.ID)
+		req, err := http.NewRequestWithContext(
+			context.WithValue(context.Background(), chi.RouteCtxKey, rctx),
+			http.MethodPut,
+			"/hivechat/"+chat.ID,
+			bytes.NewReader(bodyBytes),
+		)
+		assert.NoError(t, err)
+
+		handler.ServeHTTP(rr, req)
+
+		var response ChatResponse
+		err = json.NewDecoder(rr.Body).Decode(&response)
+		assert.NoError(t, err)
+		assert.Equal(t, http.StatusOK, rr.Code)
+		assert.True(t, response.Success)
+		responseData, ok := response.Data.(map[string]interface{})
+		assert.True(t, ok)
+		assert.Equal(t, specialTitle, responseData["title"])
+	})
+
+	t.Run("should handle title with unicode characters", func(t *testing.T) {
+		rr := httptest.NewRecorder()
+		handler := http.HandlerFunc(chatHandler.UpdateChat)
+
+		chat := &db.Chat{
+			ID:          uuid.New().String(),
+			WorkspaceID: uuid.New().String(),
+			Title:       "Original Title",
+		}
+		db.TestDB.AddChat(chat)
+
+		unicodeTitle := "测试标题 テストタイトル"
+		requestBody := map[string]string{
+			"workspaceId": chat.WorkspaceID,
+			"title":       unicodeTitle,
+		}
+		bodyBytes, _ := json.Marshal(requestBody)
+
+		rctx := chi.NewRouteContext()
+		rctx.URLParams.Add("chat_id", chat.ID)
+		req, err := http.NewRequestWithContext(
+			context.WithValue(context.Background(), chi.RouteCtxKey, rctx),
+			http.MethodPut,
+			"/hivechat/"+chat.ID,
+			bytes.NewReader(bodyBytes),
+		)
+		assert.NoError(t, err)
+
+		handler.ServeHTTP(rr, req)
+
+		var response ChatResponse
+		err = json.NewDecoder(rr.Body).Decode(&response)
+		assert.NoError(t, err)
+		assert.Equal(t, http.StatusOK, rr.Code)
+		assert.True(t, response.Success)
+		responseData, ok := response.Data.(map[string]interface{})
+		assert.True(t, ok)
+		assert.Equal(t, unicodeTitle, responseData["title"])
+	})
+
+	t.Run("should handle concurrent update requests", func(t *testing.T) {
+		chat := &db.Chat{
+			ID:          uuid.New().String(),
+			WorkspaceID: uuid.New().String(),
+			Title:       "Original Title",
+		}
+		db.TestDB.AddChat(chat)
+
+		var wg sync.WaitGroup
+		responses := make([]string, 5)
+
+		for i := 0; i < 5; i++ {
+			wg.Add(1)
+			go func(index int) {
+				defer wg.Done()
+				rr := httptest.NewRecorder()
+				handler := http.HandlerFunc(chatHandler.UpdateChat)
+
+				requestBody := map[string]string{
+					"workspaceId": chat.WorkspaceID,
+					"title":       fmt.Sprintf("New Title %d", index),
+				}
+				bodyBytes, _ := json.Marshal(requestBody)
+
+				rctx := chi.NewRouteContext()
+				rctx.URLParams.Add("chat_id", chat.ID)
+				req, _ := http.NewRequestWithContext(
+					context.WithValue(context.Background(), chi.RouteCtxKey, rctx),
+					http.MethodPut,
+					"/hivechat/"+chat.ID,
+					bytes.NewReader(bodyBytes),
+				)
+
+				handler.ServeHTTP(rr, req)
+
+				var response ChatResponse
+				json.NewDecoder(rr.Body).Decode(&response)
+				if response.Success {
+					responseData := response.Data.(map[string]interface{})
+					responses[index] = responseData["title"].(string)
+				}
+			}(i)
+		}
+		wg.Wait()
+
+		updatedChat, err := db.TestDB.GetChatByChatID(chat.ID)
+		assert.NoError(t, err)
+		assert.Contains(t, updatedChat.Title, "New Title")
+	})
+
+	t.Run("should handle very long title", func(t *testing.T) {
+		rr := httptest.NewRecorder()
+		handler := http.HandlerFunc(chatHandler.UpdateChat)
+
+		chat := &db.Chat{
+			ID:          uuid.New().String(),
+			WorkspaceID: uuid.New().String(),
+			Title:       "Original Title",
+		}
+		db.TestDB.AddChat(chat)
+
+		longTitle := strings.Repeat("a", 1000)
+		requestBody := map[string]string{
+			"workspaceId": chat.WorkspaceID,
+			"title":       longTitle,
+		}
+		bodyBytes, _ := json.Marshal(requestBody)
+
+		rctx := chi.NewRouteContext()
+		rctx.URLParams.Add("chat_id", chat.ID)
+		req := httptest.NewRequest(
+			http.MethodPut,
+			"/hivechat/"+chat.ID,
+			bytes.NewReader(bodyBytes),
+		)
+		req = req.WithContext(context.WithValue(req.Context(), chi.RouteCtxKey, rctx))
+
+		handler.ServeHTTP(rr, req)
+
+		var response ChatResponse
+		_ = json.Unmarshal(rr.Body.Bytes(), &response)
+		assert.Equal(t, http.StatusOK, rr.Code)
+		assert.True(t, response.Success)
+		responseData, ok := response.Data.(map[string]interface{})
+		assert.True(t, ok)
+		assert.Equal(t, longTitle, responseData["title"])
+	})
+
+	t.Run("should handle special characters in title", func(t *testing.T) {
+		rr := httptest.NewRecorder()
+		handler := http.HandlerFunc(chatHandler.UpdateChat)
+
+		chat := &db.Chat{
+			ID:          uuid.New().String(),
+			WorkspaceID: uuid.New().String(),
+			Title:       "Original Title",
+		}
+		db.TestDB.AddChat(chat)
+
+		specialTitle := "!@#$%^&*()_+-=[]{}|;:'\",.<>?/\\`~"
+		requestBody := map[string]string{
+			"workspaceId": chat.WorkspaceID,
+			"title":       specialTitle,
+		}
+		bodyBytes, _ := json.Marshal(requestBody)
+
+		rctx := chi.NewRouteContext()
+		rctx.URLParams.Add("chat_id", chat.ID)
+		req := httptest.NewRequest(
+			http.MethodPut,
+			"/hivechat/"+chat.ID,
+			bytes.NewReader(bodyBytes),
+		)
+		req = req.WithContext(context.WithValue(req.Context(), chi.RouteCtxKey, rctx))
+
+		handler.ServeHTTP(rr, req)
+
+		var response ChatResponse
+		_ = json.Unmarshal(rr.Body.Bytes(), &response)
+		assert.Equal(t, http.StatusOK, rr.Code)
+		assert.True(t, response.Success)
+		responseData, ok := response.Data.(map[string]interface{})
+		assert.True(t, ok)
+		assert.Equal(t, specialTitle, responseData["title"])
+	})
+
+	t.Run("should handle unicode characters in title", func(t *testing.T) {
+		rr := httptest.NewRecorder()
+		handler := http.HandlerFunc(chatHandler.UpdateChat)
+
+		chat := &db.Chat{
+			ID:          uuid.New().String(),
+			WorkspaceID: uuid.New().String(),
+			Title:       "Original Title",
+		}
+		db.TestDB.AddChat(chat)
+
+		unicodeTitle := "测试标题 🌟 привет มาลอง"
+		requestBody := map[string]string{
+			"workspaceId": chat.WorkspaceID,
+			"title":       unicodeTitle,
+		}
+		bodyBytes, _ := json.Marshal(requestBody)
+
+		rctx := chi.NewRouteContext()
+		rctx.URLParams.Add("chat_id", chat.ID)
+		req := httptest.NewRequest(
+			http.MethodPut,
+			"/hivechat/"+chat.ID,
+			bytes.NewReader(bodyBytes),
+		)
+		req = req.WithContext(context.WithValue(req.Context(), chi.RouteCtxKey, rctx))
+
+		handler.ServeHTTP(rr, req)
+
+		var response ChatResponse
+		_ = json.Unmarshal(rr.Body.Bytes(), &response)
+		assert.Equal(t, http.StatusOK, rr.Code)
+		assert.True(t, response.Success)
+		responseData, ok := response.Data.(map[string]interface{})
+		assert.True(t, ok)
+		assert.Equal(t, unicodeTitle, responseData["title"])
+	})
+
+	t.Run("should handle malformed JSON request", func(t *testing.T) {
+		rr := httptest.NewRecorder()
+		handler := http.HandlerFunc(chatHandler.UpdateChat)
+
+		malformedJSON := `{"workspaceId": "123", "title": "Test"`
+
+		rctx := chi.NewRouteContext()
+		rctx.URLParams.Add("chat_id", uuid.New().String())
+		req := httptest.NewRequest(
+			http.MethodPut,
+			"/hivechat/"+uuid.New().String(),
+			strings.NewReader(malformedJSON),
+		)
+		req = req.WithContext(context.WithValue(req.Context(), chi.RouteCtxKey, rctx))
+
+		handler.ServeHTTP(rr, req)
+
+		var response ChatResponse
+		_ = json.Unmarshal(rr.Body.Bytes(), &response)
+		assert.Equal(t, http.StatusBadRequest, rr.Code)
+		assert.False(t, response.Success)
+		assert.Equal(t, "Invalid request body", response.Message)
+	})
+
+	t.Run("should handle invalid content type", func(t *testing.T) {
+		rr := httptest.NewRecorder()
+		handler := http.HandlerFunc(chatHandler.UpdateChat)
+
+		rctx := chi.NewRouteContext()
+		rctx.URLParams.Add("chat_id", uuid.New().String())
+		req := httptest.NewRequest(
+			http.MethodPut,
+			"/hivechat/"+uuid.New().String(),
+			strings.NewReader("plain text body"),
+		)
+		req.Header.Set("Content-Type", "text/plain")
+		req = req.WithContext(context.WithValue(req.Context(), chi.RouteCtxKey, rctx))
+
+		handler.ServeHTTP(rr, req)
+
+		var response ChatResponse
+		_ = json.Unmarshal(rr.Body.Bytes(), &response)
+		assert.Equal(t, http.StatusBadRequest, rr.Code)
+		assert.False(t, response.Success)
+		assert.Equal(t, "Invalid request body", response.Message)
 	})
 }
 
