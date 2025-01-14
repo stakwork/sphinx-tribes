@@ -1371,7 +1371,7 @@ func TestDeleteFeaturePhase(t *testing.T) {
 			featureUuid: "VALID-FEATURE-UUID",
 			phaseUuid:   "VALID-PHASE-UUID",
 			setup: func(featureUuid, phaseUuid string) {
-				// Create feature and phase with different case
+
 				feature := WorkspaceFeatures{
 					Uuid: "valid-feature-uuid",
 					Name: "Test Feature",
