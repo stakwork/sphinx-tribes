@@ -3,10 +3,14 @@ package logger
 import (
 	"bytes"
 	"fmt"
+	"io"
 	"log"
+	"net/http"
+	"net/http/httptest"
 	"os"
 	"strings"
 	"sync"
+	"sync/atomic"
 	"testing"
 	"time"
 
@@ -537,6 +541,676 @@ func TestMachine(t *testing.T) {
 			} else {
 				assert.Empty(t, output, "Expected no log output but got some")
 			}
+		})
+	}
+}
+
+func TestRouteBasedUUIDMiddleware(t *testing.T) {
+	tests := []struct {
+		name           string
+		setupRequest   func() *http.Request
+		setupHandler   func() http.Handler
+		validateUUID   bool
+		expectedStatus int
+	}{
+		{
+			name: "Standard GET Request",
+			setupRequest: func() *http.Request {
+				return httptest.NewRequest(http.MethodGet, "/test", nil)
+			},
+			setupHandler: func() http.Handler {
+				return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+					assert.NotEmpty(t, Log.requestUUID)
+					w.WriteHeader(http.StatusOK)
+				})
+			},
+			validateUUID:   true,
+			expectedStatus: http.StatusOK,
+		},
+		{
+			name: "Request with Existing UUID Header",
+			setupRequest: func() *http.Request {
+				req := httptest.NewRequest(http.MethodPost, "/test", nil)
+				req.Header.Set("X-Request-ID", "existing-uuid")
+				return req
+			},
+			setupHandler: func() http.Handler {
+				return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+					assert.NotEmpty(t, Log.requestUUID)
+					w.WriteHeader(http.StatusOK)
+				})
+			},
+			validateUUID:   true,
+			expectedStatus: http.StatusOK,
+		},
+		{
+			name: "Multiple Concurrent Requests",
+			setupRequest: func() *http.Request {
+				return httptest.NewRequest(http.MethodGet, "/test", nil)
+			},
+			setupHandler: func() http.Handler {
+				return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+					assert.NotEmpty(t, Log.requestUUID)
+					time.Sleep(10 * time.Millisecond)
+					w.WriteHeader(http.StatusOK)
+				})
+			},
+			validateUUID:   true,
+			expectedStatus: http.StatusOK,
+		},
+		{
+			name: "Request with Large Body",
+			setupRequest: func() *http.Request {
+				body := strings.NewReader(strings.Repeat("a", 1024*1024))
+				return httptest.NewRequest(http.MethodPost, "/test", body)
+			},
+			setupHandler: func() http.Handler {
+				return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+					assert.NotEmpty(t, Log.requestUUID)
+					w.WriteHeader(http.StatusOK)
+				})
+			},
+			validateUUID:   true,
+			expectedStatus: http.StatusOK,
+		},
+		{
+			name: "Request with Special Characters in URL",
+			setupRequest: func() *http.Request {
+				return httptest.NewRequest(http.MethodGet, "/test!@#$%^&*()", nil)
+			},
+			setupHandler: func() http.Handler {
+				return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+					assert.NotEmpty(t, Log.requestUUID)
+					w.WriteHeader(http.StatusOK)
+				})
+			},
+			validateUUID:   true,
+			expectedStatus: http.StatusOK,
+		},
+		{
+			name: "Long Running Request",
+			setupRequest: func() *http.Request {
+				return httptest.NewRequest(http.MethodGet, "/test", nil)
+			},
+			setupHandler: func() http.Handler {
+				return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+					assert.NotEmpty(t, Log.requestUUID)
+					time.Sleep(100 * time.Millisecond)
+					w.WriteHeader(http.StatusOK)
+				})
+			},
+			validateUUID:   true,
+			expectedStatus: http.StatusOK,
+		},
+		{
+			name: "Standard Request Handling",
+			setupRequest: func() *http.Request {
+				req := httptest.NewRequest(http.MethodGet, "/api/test", nil)
+				req.Header.Set("Accept", "application/json")
+				return req
+			},
+			setupHandler: func() http.Handler {
+				return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+					assert.NotEmpty(t, Log.requestUUID)
+					w.Header().Set("Content-Type", "application/json")
+					w.WriteHeader(http.StatusOK)
+				})
+			},
+			validateUUID:   true,
+			expectedStatus: http.StatusOK,
+		},
+		{
+			name: "Empty Request",
+			setupRequest: func() *http.Request {
+				return httptest.NewRequest(http.MethodGet, "", nil)
+			},
+			setupHandler: func() http.Handler {
+				return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+					assert.NotEmpty(t, Log.requestUUID)
+					w.WriteHeader(http.StatusOK)
+				})
+			},
+			validateUUID:   true,
+			expectedStatus: http.StatusOK,
+		},
+		{
+			name: "Request with Headers",
+			setupRequest: func() *http.Request {
+				req := httptest.NewRequest(http.MethodPost, "/api/test", nil)
+				req.Header.Set("Content-Type", "application/json")
+				req.Header.Set("Authorization", "Bearer test-token")
+				req.Header.Set("X-Custom-Header", "test-value")
+				req.Header.Set("Accept-Language", "en-US")
+				return req
+			},
+			setupHandler: func() http.Handler {
+				return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+					assert.NotEmpty(t, Log.requestUUID)
+					assert.Equal(t, "application/json", r.Header.Get("Content-Type"))
+					assert.Equal(t, "Bearer test-token", r.Header.Get("Authorization"))
+					assert.Equal(t, "test-value", r.Header.Get("X-Custom-Header"))
+					w.WriteHeader(http.StatusOK)
+				})
+			},
+			validateUUID:   true,
+			expectedStatus: http.StatusOK,
+		},
+		{
+			name: "Request with Body",
+			setupRequest: func() *http.Request {
+				body := strings.NewReader(`{"key":"value"}`)
+				req := httptest.NewRequest(http.MethodPost, "/api/test", body)
+				req.Header.Set("Content-Type", "application/json")
+				return req
+			},
+			setupHandler: func() http.Handler {
+				return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+					assert.NotEmpty(t, Log.requestUUID)
+
+					bodyBytes, err := io.ReadAll(r.Body)
+					assert.NoError(t, err)
+					assert.Equal(t, `{"key":"value"}`, string(bodyBytes))
+
+					w.WriteHeader(http.StatusOK)
+				})
+			},
+			validateUUID:   true,
+			expectedStatus: http.StatusOK,
+		},
+		{
+			name: "Request with Query Parameters",
+			setupRequest: func() *http.Request {
+				req := httptest.NewRequest(http.MethodGet, "/api/test?param1=value1&param2=value2", nil)
+				return req
+			},
+			setupHandler: func() http.Handler {
+				return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+					assert.NotEmpty(t, Log.requestUUID)
+					assert.Equal(t, "value1", r.URL.Query().Get("param1"))
+					assert.Equal(t, "value2", r.URL.Query().Get("param2"))
+					w.WriteHeader(http.StatusOK)
+				})
+			},
+			validateUUID:   true,
+			expectedStatus: http.StatusOK,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+
+			recorder := httptest.NewRecorder()
+			handler := RouteBasedUUIDMiddleware(tt.setupHandler())
+			done := make(chan bool)
+
+			go func() {
+				defer func() {
+					if r := recover(); r != nil {
+						t.Logf("Panic recovered in test: %v", r)
+					}
+					done <- true
+				}()
+
+				handler.ServeHTTP(recorder, tt.setupRequest())
+			}()
+
+			<-done
+
+			assert.Equal(t, tt.expectedStatus, recorder.Code)
+
+			assert.Empty(t, Log.requestUUID, "UUID should be cleared after request")
+
+			if tt.name == "Multiple Concurrent Requests" {
+				var wg sync.WaitGroup
+				for i := 0; i < 10; i++ {
+					wg.Add(1)
+					go func() {
+						defer wg.Done()
+						rec := httptest.NewRecorder()
+						handler.ServeHTTP(rec, tt.setupRequest())
+						assert.Equal(t, tt.expectedStatus, rec.Code)
+					}()
+				}
+				wg.Wait()
+			}
+		})
+	}
+}
+
+func TestClearRequestUUID(t *testing.T) {
+	tests := []struct {
+		name           string
+		setup          func(*Logger)
+		concurrent     bool
+		concurrentNum  int
+		validateBefore func(*testing.T, *Logger)
+		validateAfter  func(*testing.T, *Logger)
+	}{
+		{
+			name: "Clear existing UUID",
+			setup: func(l *Logger) {
+				l.SetRequestUUID("test-uuid")
+			},
+			validateBefore: func(t *testing.T, l *Logger) {
+				assert.Equal(t, "test-uuid", l.requestUUID)
+			},
+			validateAfter: func(t *testing.T, l *Logger) {
+				assert.Empty(t, l.requestUUID)
+			},
+		},
+		{
+			name: "Clear empty UUID",
+			setup: func(l *Logger) {
+				l.requestUUID = ""
+			},
+			validateBefore: func(t *testing.T, l *Logger) {
+				assert.Empty(t, l.requestUUID)
+			},
+			validateAfter: func(t *testing.T, l *Logger) {
+				assert.Empty(t, l.requestUUID)
+			},
+		},
+		{
+			name: "Clear with concurrent access",
+			setup: func(l *Logger) {
+				l.SetRequestUUID("concurrent-test-uuid")
+			},
+			concurrent:    true,
+			concurrentNum: 100,
+			validateBefore: func(t *testing.T, l *Logger) {
+				assert.Equal(t, "concurrent-test-uuid", l.requestUUID)
+			},
+			validateAfter: func(t *testing.T, l *Logger) {
+				assert.Empty(t, l.requestUUID)
+			},
+		},
+		{
+			name: "Clear with long UUID",
+			setup: func(l *Logger) {
+				l.SetRequestUUID(strings.Repeat("a", 1000))
+			},
+			validateBefore: func(t *testing.T, l *Logger) {
+				assert.Equal(t, strings.Repeat("a", 1000), l.requestUUID)
+			},
+			validateAfter: func(t *testing.T, l *Logger) {
+				assert.Empty(t, l.requestUUID)
+			},
+		},
+		{
+			name: "Clear with special characters",
+			setup: func(l *Logger) {
+				l.SetRequestUUID("!@#$%^&*()_+{}[]|\\:;\"'<>,.?/~`")
+			},
+			validateBefore: func(t *testing.T, l *Logger) {
+				assert.Equal(t, "!@#$%^&*()_+{}[]|\\:;\"'<>,.?/~`", l.requestUUID)
+			},
+			validateAfter: func(t *testing.T, l *Logger) {
+				assert.Empty(t, l.requestUUID)
+			},
+		},
+		{
+			name: "Multiple clear calls",
+			setup: func(l *Logger) {
+				l.SetRequestUUID("multiple-clear-test")
+			},
+			validateBefore: func(t *testing.T, l *Logger) {
+				assert.Equal(t, "multiple-clear-test", l.requestUUID)
+			},
+			validateAfter: func(t *testing.T, l *Logger) {
+				l.ClearRequestUUID()
+				l.ClearRequestUUID()
+				assert.Empty(t, l.requestUUID)
+			},
+		},
+		{
+			name: "Clear with Unicode characters",
+			setup: func(l *Logger) {
+				l.SetRequestUUID("你好👋Привет")
+			},
+			validateBefore: func(t *testing.T, l *Logger) {
+				assert.Equal(t, "你好👋Привет", l.requestUUID)
+			},
+			validateAfter: func(t *testing.T, l *Logger) {
+				assert.Empty(t, l.requestUUID)
+			},
+		},
+		{
+			name: "Basic Functionality",
+			setup: func(l *Logger) {
+				l.SetRequestUUID("basic-test-uuid")
+			},
+			validateBefore: func(t *testing.T, l *Logger) {
+				assert.Equal(t, "basic-test-uuid", l.requestUUID)
+			},
+			validateAfter: func(t *testing.T, l *Logger) {
+				assert.Empty(t, l.requestUUID)
+			},
+		},
+		{
+			name: "Edge Case - Already Empty UUID",
+			setup: func(l *Logger) {
+				l.ClearRequestUUID()
+			},
+			validateBefore: func(t *testing.T, l *Logger) {
+				assert.Empty(t, l.requestUUID)
+			},
+			validateAfter: func(t *testing.T, l *Logger) {
+				assert.Empty(t, l.requestUUID)
+			},
+		},
+		{
+			name: "Concurrency Test",
+			setup: func(l *Logger) {
+				l.SetRequestUUID("concurrent-uuid")
+			},
+			concurrent:    true,
+			concurrentNum: 1000,
+			validateBefore: func(t *testing.T, l *Logger) {
+				assert.Equal(t, "concurrent-uuid", l.requestUUID)
+			},
+			validateAfter: func(t *testing.T, l *Logger) {
+				assert.Empty(t, l.requestUUID)
+			},
+		},
+		{
+			name: "Performance Under Load",
+			setup: func(l *Logger) {
+				l.SetRequestUUID("performance-test-uuid")
+			},
+			validateBefore: func(t *testing.T, l *Logger) {
+				start := time.Now()
+				for i := 0; i < 10000; i++ {
+					l.ClearRequestUUID()
+					l.SetRequestUUID("performance-test-uuid")
+				}
+				duration := time.Since(start)
+				assert.Less(t, duration, 1*time.Second, "Performance test took too long")
+			},
+			validateAfter: func(t *testing.T, l *Logger) {
+				assert.Empty(t, l.requestUUID)
+			},
+		},
+		{
+			name: "Logger Initialization",
+			setup: func(l *Logger) {
+				newLogger := &Logger{
+					mu: sync.Mutex{},
+				}
+				newLogger.ClearRequestUUID()
+				assert.Empty(t, newLogger.requestUUID)
+			},
+			validateAfter: func(t *testing.T, l *Logger) {
+				assert.Empty(t, l.requestUUID)
+			},
+		},
+		{
+			name: "Large UUID String",
+			setup: func(l *Logger) {
+				largeUUID := strings.Repeat("abcdef0123456789", 1000)
+				l.SetRequestUUID(largeUUID)
+			},
+			validateBefore: func(t *testing.T, l *Logger) {
+				assert.Equal(t, strings.Repeat("abcdef0123456789", 1000), l.requestUUID)
+			},
+			validateAfter: func(t *testing.T, l *Logger) {
+				assert.Empty(t, l.requestUUID)
+			},
+		},
+		{
+			name: "Repeated Calls",
+			setup: func(l *Logger) {
+				l.SetRequestUUID("repeated-test")
+			},
+			validateBefore: func(t *testing.T, l *Logger) {
+				for i := 0; i < 100; i++ {
+					l.ClearRequestUUID()
+					assert.Empty(t, l.requestUUID)
+					l.SetRequestUUID("repeated-test")
+					assert.Equal(t, "repeated-test", l.requestUUID)
+				}
+			},
+			validateAfter: func(t *testing.T, l *Logger) {
+				assert.Empty(t, l.requestUUID)
+			},
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+
+			logger := &Logger{
+				mu: sync.Mutex{},
+			}
+
+			if tt.setup != nil {
+				tt.setup(logger)
+			}
+
+			if tt.validateBefore != nil {
+				tt.validateBefore(t, logger)
+			}
+
+			if tt.concurrent {
+
+				var wg sync.WaitGroup
+				for i := 0; i < tt.concurrentNum; i++ {
+					wg.Add(1)
+					go func() {
+						defer wg.Done()
+						logger.ClearRequestUUID()
+					}()
+				}
+				wg.Wait()
+			} else {
+				logger.ClearRequestUUID()
+			}
+
+			if tt.validateAfter != nil {
+				tt.validateAfter(t, logger)
+			}
+
+			logger.mu.Lock()
+			logger.mu.Unlock()
+		})
+	}
+}
+
+func TestSetRequestUUID(t *testing.T) {
+	tests := []struct {
+		name          string
+		uuidString    string
+		setup         func(*Logger)
+		concurrent    bool
+		concurrentNum int
+		validate      func(*testing.T, *Logger)
+	}{
+		{
+			name:       "Set Standard UUID",
+			uuidString: "123e4567-e89b-12d3-a456-426614174000",
+			validate: func(t *testing.T, l *Logger) {
+				assert.Equal(t, "123e4567-e89b-12d3-a456-426614174000", l.requestUUID)
+			},
+		},
+		{
+			name:       "Set Empty UUID",
+			uuidString: "",
+			validate: func(t *testing.T, l *Logger) {
+				assert.Empty(t, l.requestUUID)
+			},
+		},
+		{
+			name:       "Set UUID with Special Characters",
+			uuidString: "test!@#$%^&*()_+-=[]{}|;:,.<>?",
+			validate: func(t *testing.T, l *Logger) {
+				assert.Equal(t, "test!@#$%^&*()_+-=[]{}|;:,.<>?", l.requestUUID)
+			},
+		},
+		{
+			name:       "Set Very Long UUID",
+			uuidString: strings.Repeat("a", 10000),
+			validate: func(t *testing.T, l *Logger) {
+				assert.Equal(t, strings.Repeat("a", 10000), l.requestUUID)
+			},
+		},
+		{
+			name:       "Set Unicode UUID",
+			uuidString: "你好👋Привет",
+			validate: func(t *testing.T, l *Logger) {
+				assert.Equal(t, "你好👋Привет", l.requestUUID)
+			},
+		},
+		{
+			name:          "Concurrent UUID Setting",
+			uuidString:    "concurrent-test",
+			concurrent:    true,
+			concurrentNum: 100,
+			validate: func(t *testing.T, l *Logger) {
+
+				assert.Regexp(t, `^concurrent-test-\d+$`, l.requestUUID)
+			},
+		},
+		{
+			name: "Overwrite Existing UUID",
+			setup: func(l *Logger) {
+				l.SetRequestUUID("existing-uuid")
+			},
+			uuidString: "new-uuid",
+			validate: func(t *testing.T, l *Logger) {
+				assert.Equal(t, "new-uuid", l.requestUUID)
+			},
+		},
+		{
+			name:       "Set Null Characters",
+			uuidString: "test\x00uuid\x00",
+			validate: func(t *testing.T, l *Logger) {
+				assert.Equal(t, "test\x00uuid\x00", l.requestUUID)
+			},
+		},
+		{
+			name:       "Set Multiple Times",
+			uuidString: "final-uuid",
+			setup: func(l *Logger) {
+				for i := 0; i < 1000; i++ {
+					l.SetRequestUUID(fmt.Sprintf("uuid-%d", i))
+				}
+			},
+			validate: func(t *testing.T, l *Logger) {
+				assert.Equal(t, "final-uuid", l.requestUUID)
+			},
+		},
+		{
+			name:       "Performance Test",
+			uuidString: "performance-test",
+			setup: func(l *Logger) {
+				start := time.Now()
+				for i := 0; i < 10000; i++ {
+					l.SetRequestUUID(fmt.Sprintf("perf-uuid-%d", i))
+				}
+				duration := time.Since(start)
+				assert.Less(t, duration, 1*time.Second, "Performance test took too long")
+			},
+			validate: func(t *testing.T, l *Logger) {
+				assert.Equal(t, "performance-test", l.requestUUID)
+			},
+		},
+		{
+			name:       "Standard UUID Input",
+			uuidString: "550e8400-e29b-41d4-a716-446655440000",
+			validate: func(t *testing.T, l *Logger) {
+				assert.Equal(t, "550e8400-e29b-41d4-a716-446655440000", l.requestUUID)
+			},
+		},
+		{
+			name:       "Empty String Input",
+			uuidString: "",
+			setup: func(l *Logger) {
+				l.SetRequestUUID("previous-uuid")
+			},
+			validate: func(t *testing.T, l *Logger) {
+				assert.Empty(t, l.requestUUID)
+			},
+		},
+		{
+			name:       "Maximum Length String",
+			uuidString: strings.Repeat("x", 65536),
+			validate: func(t *testing.T, l *Logger) {
+				assert.Equal(t, strings.Repeat("x", 65536), l.requestUUID)
+			},
+		},
+		{
+			name:       "Special Characters in UUID",
+			uuidString: "~!@#$%^&*()_+`-={}[]|\\:;\"'<>,.?/",
+			validate: func(t *testing.T, l *Logger) {
+				assert.Equal(t, "~!@#$%^&*()_+`-={}[]|\\:;\"'<>,.?/", l.requestUUID)
+			},
+		},
+		{
+			name:       "Repeated Calls with Same UUID",
+			uuidString: "repeat-uuid",
+			setup: func(l *Logger) {
+				for i := 0; i < 100; i++ {
+					l.SetRequestUUID("repeat-uuid")
+				}
+			},
+			validate: func(t *testing.T, l *Logger) {
+				assert.Equal(t, "repeat-uuid", l.requestUUID)
+			},
+		},
+		{
+			name:       "UUID with Leading and Trailing Spaces",
+			uuidString: "   space-uuid   ",
+			validate: func(t *testing.T, l *Logger) {
+				assert.Equal(t, "   space-uuid   ", l.requestUUID)
+			},
+		},
+		{
+			name:       "Unicode Characters in UUID",
+			uuidString: "🌟星🌙月☀️日⭐",
+			validate: func(t *testing.T, l *Logger) {
+				assert.Equal(t, "🌟星🌙月☀️日⭐", l.requestUUID)
+			},
+		},
+		{
+			name:       "Null Character in UUID",
+			uuidString: "before\x00after",
+			validate: func(t *testing.T, l *Logger) {
+				assert.Equal(t, "before\x00after", l.requestUUID)
+			},
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			logger := &Logger{
+				mu: sync.Mutex{},
+			}
+
+			if tt.setup != nil {
+				tt.setup(logger)
+			}
+
+			if tt.concurrent {
+				var wg sync.WaitGroup
+				var counter int32
+				for i := 0; i < tt.concurrentNum; i++ {
+					wg.Add(1)
+					go func() {
+						defer wg.Done()
+						index := atomic.AddInt32(&counter, 1) - 1
+						logger.SetRequestUUID(fmt.Sprintf("%s-%d", tt.uuidString, index))
+					}()
+				}
+				wg.Wait()
+			} else {
+				logger.SetRequestUUID(tt.uuidString)
+			}
+
+			if tt.validate != nil {
+				tt.validate(t, logger)
+			}
+
+			logger.mu.Lock()
+			logger.mu.Unlock()
 		})
 	}
 }
