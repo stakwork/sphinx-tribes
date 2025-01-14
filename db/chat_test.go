@@ -222,7 +222,7 @@ func TestGetChatMessagesForChatID(t *testing.T) {
 			expectError: false,
 		},
 		{
-			name: "Chat with Unicode messages",
+			name: "Chat with the Unicode messages",
 			setup: func() string {
 				chatID := "chat789"
 				messages := []ChatMessage{
