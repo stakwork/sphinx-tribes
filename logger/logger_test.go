@@ -3,7 +3,10 @@ package logger
 import (
 	"bytes"
 	"fmt"
+	"io"
 	"log"
+	"net/http"
+	"net/http/httptest"
 	"os"
 	"strings"
 	"sync"
@@ -976,6 +979,223 @@ func TestSetRequestUUID(t *testing.T) {
 
 			logger.mu.Lock()
 			logger.mu.Unlock()
+		})
+	}
+}
+
+func TestRouteBasedUUIDMiddleware(t *testing.T) {
+	tests := []struct {
+		name           string
+		setupRequest   func() *http.Request
+		setupHandler   func() http.Handler
+		validateUUID   bool
+		expectedStatus int
+	}{
+		{
+			name: "Standard GET Request",
+			setupRequest: func() *http.Request {
+				return httptest.NewRequest(http.MethodGet, "/test", nil)
+			},
+			setupHandler: func() http.Handler {
+				return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+					assert.NotEmpty(t, Log.requestUUID)
+					w.WriteHeader(http.StatusOK)
+				})
+			},
+			validateUUID:   true,
+			expectedStatus: http.StatusOK,
+		},
+		{
+			name: "Request with Existing UUID Header",
+			setupRequest: func() *http.Request {
+				req := httptest.NewRequest(http.MethodPost, "/test", nil)
+				req.Header.Set("X-Request-ID", "existing-uuid")
+				return req
+			},
+			setupHandler: func() http.Handler {
+				return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+					assert.NotEmpty(t, Log.requestUUID)
+					w.WriteHeader(http.StatusOK)
+				})
+			},
+			validateUUID:   true,
+			expectedStatus: http.StatusOK,
+		},
+		{
+			name: "Request with Large Body",
+			setupRequest: func() *http.Request {
+				body := strings.NewReader(strings.Repeat("a", 1024*1024))
+				return httptest.NewRequest(http.MethodPost, "/test", body)
+			},
+			setupHandler: func() http.Handler {
+				return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+					assert.NotEmpty(t, Log.requestUUID)
+					w.WriteHeader(http.StatusOK)
+				})
+			},
+			validateUUID:   true,
+			expectedStatus: http.StatusOK,
+		},
+		{
+			name: "Request with Special Characters in URL",
+			setupRequest: func() *http.Request {
+				return httptest.NewRequest(http.MethodGet, "/test!@#$%^&*()", nil)
+			},
+			setupHandler: func() http.Handler {
+				return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+					assert.NotEmpty(t, Log.requestUUID)
+					w.WriteHeader(http.StatusOK)
+				})
+			},
+			validateUUID:   true,
+			expectedStatus: http.StatusOK,
+		},
+		{
+			name: "Long Running Request",
+			setupRequest: func() *http.Request {
+				return httptest.NewRequest(http.MethodGet, "/test", nil)
+			},
+			setupHandler: func() http.Handler {
+				return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+					assert.NotEmpty(t, Log.requestUUID)
+					time.Sleep(100 * time.Millisecond)
+					w.WriteHeader(http.StatusOK)
+				})
+			},
+			validateUUID:   true,
+			expectedStatus: http.StatusOK,
+		},
+		{
+			name: "Standard Request Handling",
+			setupRequest: func() *http.Request {
+				req := httptest.NewRequest(http.MethodGet, "/api/test", nil)
+				req.Header.Set("Accept", "application/json")
+				return req
+			},
+			setupHandler: func() http.Handler {
+				return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+					assert.NotEmpty(t, Log.requestUUID)
+					w.Header().Set("Content-Type", "application/json")
+					w.WriteHeader(http.StatusOK)
+				})
+			},
+			validateUUID:   true,
+			expectedStatus: http.StatusOK,
+		},
+		{
+			name: "Empty Request",
+			setupRequest: func() *http.Request {
+				return httptest.NewRequest(http.MethodGet, "", nil)
+			},
+			setupHandler: func() http.Handler {
+				return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+					assert.NotEmpty(t, Log.requestUUID)
+					w.WriteHeader(http.StatusOK)
+				})
+			},
+			validateUUID:   true,
+			expectedStatus: http.StatusOK,
+		},
+		{
+			name: "Request with Headers",
+			setupRequest: func() *http.Request {
+				req := httptest.NewRequest(http.MethodPost, "/api/test", nil)
+				req.Header.Set("Content-Type", "application/json")
+				req.Header.Set("Authorization", "Bearer test-token")
+				req.Header.Set("X-Custom-Header", "test-value")
+				req.Header.Set("Accept-Language", "en-US")
+				return req
+			},
+			setupHandler: func() http.Handler {
+				return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+					assert.NotEmpty(t, Log.requestUUID)
+					assert.Equal(t, "application/json", r.Header.Get("Content-Type"))
+					assert.Equal(t, "Bearer test-token", r.Header.Get("Authorization"))
+					assert.Equal(t, "test-value", r.Header.Get("X-Custom-Header"))
+					w.WriteHeader(http.StatusOK)
+				})
+			},
+			validateUUID:   true,
+			expectedStatus: http.StatusOK,
+		},
+		{
+			name: "Request with Body",
+			setupRequest: func() *http.Request {
+				body := strings.NewReader(`{"key":"value"}`)
+				req := httptest.NewRequest(http.MethodPost, "/api/test", body)
+				req.Header.Set("Content-Type", "application/json")
+				return req
+			},
+			setupHandler: func() http.Handler {
+				return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+					assert.NotEmpty(t, Log.requestUUID)
+
+					bodyBytes, err := io.ReadAll(r.Body)
+					assert.NoError(t, err)
+					assert.Equal(t, `{"key":"value"}`, string(bodyBytes))
+
+					w.WriteHeader(http.StatusOK)
+				})
+			},
+			validateUUID:   true,
+			expectedStatus: http.StatusOK,
+		},
+		{
+			name: "Request with Query Parameters",
+			setupRequest: func() *http.Request {
+				req := httptest.NewRequest(http.MethodGet, "/api/test?param1=value1&param2=value2", nil)
+				return req
+			},
+			setupHandler: func() http.Handler {
+				return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+					assert.NotEmpty(t, Log.requestUUID)
+					assert.Equal(t, "value1", r.URL.Query().Get("param1"))
+					assert.Equal(t, "value2", r.URL.Query().Get("param2"))
+					w.WriteHeader(http.StatusOK)
+				})
+			},
+			validateUUID:   true,
+			expectedStatus: http.StatusOK,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+
+			recorder := httptest.NewRecorder()
+			handler := RouteBasedUUIDMiddleware(tt.setupHandler())
+			done := make(chan bool)
+
+			go func() {
+				defer func() {
+					if r := recover(); r != nil {
+						t.Logf("Panic recovered in test: %v", r)
+					}
+					done <- true
+				}()
+
+				handler.ServeHTTP(recorder, tt.setupRequest())
+			}()
+
+			<-done
+
+			assert.Equal(t, tt.expectedStatus, recorder.Code)
+
+			assert.Empty(t, Log.requestUUID, "UUID should be cleared after request")
+
+			if tt.name == "Multiple Concurrent Requests" {
+				var wg sync.WaitGroup
+				for i := 0; i < 10; i++ {
+					wg.Add(1)
+					go func() {
+						defer wg.Done()
+						rec := httptest.NewRecorder()
+						handler.ServeHTTP(rec, tt.setupRequest())
+						assert.Equal(t, tt.expectedStatus, rec.Code)
+					}()
+				}
+				wg.Wait()
+			}
 		})
 	}
 }
