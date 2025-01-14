@@ -7,7 +7,6 @@ import (
 
 	"github.com/gorilla/websocket"
 	"github.com/stakwork/sphinx-tribes/config"
-	"github.com/stakwork/sphinx-tribes/utils"
 )
 
 var WebsocketPool = NewPool()
@@ -35,8 +34,9 @@ func Upgrade(w http.ResponseWriter, r *http.Request) (*websocket.Conn, error) {
 	return conn, nil
 }
 
-func ServeWs(pool *Pool, w http.ResponseWriter, r *http.Request) {
-	websocketToken := utils.GetRandomToken(40)
+func ServeWs(pool *Pool, w http.ResponseWriter, r *http.Request) { // get url query params
+	queryParams := r.URL.Query()
+	uniqueId := queryParams.Get("uniqueId")
 
 	conn, err := Upgrade(w, r)
 	if err != nil {
@@ -45,7 +45,7 @@ func ServeWs(pool *Pool, w http.ResponseWriter, r *http.Request) {
 	}
 
 	client := &Client{
-		Host: websocketToken,
+		Host: uniqueId,
 		Conn: conn,
 		Pool: pool,
 	}
