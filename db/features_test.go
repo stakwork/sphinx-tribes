@@ -59,7 +59,7 @@ func TestDeleteFeatureStoryByUuid(t *testing.T) {
 			errorMsg:    "",
 		},
 		{
-			name: "Try to delete non-existent feature story",
+			name: "Try to delete non existent feature story",
 			setup: func() (string, string) {
 				return uuid.New().String(), uuid.New().String()
 			},
