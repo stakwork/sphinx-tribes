@@ -7,7 +7,9 @@ import (
 	"fmt"
 	"net/http"
 	"net/http/httptest"
+	"net/url"
 	"sort"
+	"strings"
 	"testing"
 	"time"
 
@@ -1257,6 +1259,8 @@ func TestGetBountiesByFeatureAndPhaseUuid(t *testing.T) {
 
 	fHandler := NewFeatureHandler(db.TestDB)
 
+	db.CleanTestData()
+
 	person := db.Person{
 		Uuid:        uuid.New().String(),
 		OwnerAlias:  "test-alias",
@@ -1433,6 +1437,313 @@ func TestGetBountiesByFeatureAndPhaseUuid(t *testing.T) {
 		if err != nil {
 			t.Fatal(err)
 		}
+
+		rr := httptest.NewRecorder()
+		http.HandlerFunc(fHandler.GetBountiesByFeatureAndPhaseUuid).ServeHTTP(rr, req)
+
+		assert.Equal(t, http.StatusNotFound, rr.Code)
+	})
+
+	t.Run("should handle pagination correctly", func(t *testing.T) {
+		rctx := chi.NewRouteContext()
+		rctx.URLParams.Add("feature_uuid", feature.Uuid)
+		rctx.URLParams.Add("phase_uuid", featurePhase.Uuid)
+		req, err := http.NewRequestWithContext(context.WithValue(ctx, chi.RouteCtxKey, rctx),
+			http.MethodGet,
+			fmt.Sprintf("/features/%s/phase/%s/bounty?limit=1&offset=0", feature.Uuid, featurePhase.Uuid),
+			nil)
+		assert.NoError(t, err)
+
+		rr := httptest.NewRecorder()
+		http.HandlerFunc(fHandler.GetBountiesByFeatureAndPhaseUuid).ServeHTTP(rr, req)
+
+		assert.Equal(t, http.StatusOK, rr.Code)
+	})
+
+	t.Run("should handle search parameter", func(t *testing.T) {
+		rctx := chi.NewRouteContext()
+		rctx.URLParams.Add("feature_uuid", feature.Uuid)
+		rctx.URLParams.Add("phase_uuid", featurePhase.Uuid)
+		req, err := http.NewRequestWithContext(context.WithValue(ctx, chi.RouteCtxKey, rctx),
+			http.MethodGet,
+			fmt.Sprintf("/features/%s/phase/%s/bounty?search=test", feature.Uuid, featurePhase.Uuid),
+			nil)
+		assert.NoError(t, err)
+
+		rr := httptest.NewRecorder()
+		http.HandlerFunc(fHandler.GetBountiesByFeatureAndPhaseUuid).ServeHTTP(rr, req)
+
+		assert.Equal(t, http.StatusOK, rr.Code)
+	})
+
+	t.Run("should handle status filters", func(t *testing.T) {
+		testCases := []struct {
+			name   string
+			query  string
+			status string
+		}{
+			{"open bounties", "Open=true", ""},
+			{"assigned bounties", "Assigned=true", person.OwnerPubKey},
+			{"completed bounties", "Completed=true", person.OwnerPubKey},
+			{"paid bounties", "Paid=true", person.OwnerPubKey},
+		}
+
+		for _, tc := range testCases {
+			t.Run(tc.name, func(t *testing.T) {
+
+				statusBounty := bounty
+				statusBounty.Assignee = tc.status
+				if tc.name == "completed bounties" {
+					statusBounty.Completed = true
+				}
+				if tc.name == "paid bounties" {
+					statusBounty.Paid = true
+				}
+				db.TestDB.CreateOrEditBounty(statusBounty)
+
+				rctx := chi.NewRouteContext()
+				rctx.URLParams.Add("feature_uuid", feature.Uuid)
+				rctx.URLParams.Add("phase_uuid", featurePhase.Uuid)
+				req, err := http.NewRequestWithContext(context.WithValue(ctx, chi.RouteCtxKey, rctx),
+					http.MethodGet,
+					fmt.Sprintf("/features/%s/phase/%s/bounty?%s", feature.Uuid, featurePhase.Uuid, tc.query),
+					nil)
+				assert.NoError(t, err)
+
+				rr := httptest.NewRecorder()
+				http.HandlerFunc(fHandler.GetBountiesByFeatureAndPhaseUuid).ServeHTTP(rr, req)
+
+				assert.Equal(t, http.StatusOK, rr.Code)
+			})
+		}
+	})
+
+	t.Run("should handle language filters", func(t *testing.T) {
+
+		langBounty := bounty
+		langBounty.CodingLanguages = pq.StringArray{"golang", "javascript"}
+		db.TestDB.CreateOrEditBounty(langBounty)
+
+		rctx := chi.NewRouteContext()
+		rctx.URLParams.Add("feature_uuid", feature.Uuid)
+		rctx.URLParams.Add("phase_uuid", featurePhase.Uuid)
+		req, err := http.NewRequestWithContext(context.WithValue(ctx, chi.RouteCtxKey, rctx),
+			http.MethodGet,
+			fmt.Sprintf("/features/%s/phase/%s/bounty?languages=golang", feature.Uuid, featurePhase.Uuid),
+			nil)
+		assert.NoError(t, err)
+
+		rr := httptest.NewRecorder()
+		http.HandlerFunc(fHandler.GetBountiesByFeatureAndPhaseUuid).ServeHTTP(rr, req)
+
+		assert.Equal(t, http.StatusOK, rr.Code)
+	})
+
+	t.Run("should handle tags filter", func(t *testing.T) {
+
+		taggedBounty := db.NewBounty{
+			OwnerID:       person.OwnerPubKey,
+			WorkspaceUuid: workspace.Uuid,
+			Title:         "tagged-test-bounty",
+			PhaseUuid:     featurePhase.Uuid,
+			Description:   "test-description-with-tags",
+			Price:         1000,
+			Type:          "coding_task",
+			Assignee:      "",
+		}
+		db.TestDB.CreateOrEditBounty(taggedBounty)
+
+		rctx := chi.NewRouteContext()
+		rctx.URLParams.Add("feature_uuid", feature.Uuid)
+		rctx.URLParams.Add("phase_uuid", featurePhase.Uuid)
+		req, err := http.NewRequestWithContext(context.WithValue(ctx, chi.RouteCtxKey, rctx),
+			http.MethodGet,
+			fmt.Sprintf("/features/%s/phase/%s/bounty?tags=urgent", feature.Uuid, featurePhase.Uuid),
+			nil)
+		assert.NoError(t, err)
+
+		rr := httptest.NewRecorder()
+		http.HandlerFunc(fHandler.GetBountiesByFeatureAndPhaseUuid).ServeHTTP(rr, req)
+
+		assert.Equal(t, http.StatusOK, rr.Code)
+	})
+
+	t.Run("should handle sorting parameters", func(t *testing.T) {
+		rctx := chi.NewRouteContext()
+		rctx.URLParams.Add("feature_uuid", feature.Uuid)
+		rctx.URLParams.Add("phase_uuid", featurePhase.Uuid)
+		req, err := http.NewRequestWithContext(context.WithValue(ctx, chi.RouteCtxKey, rctx),
+			http.MethodGet,
+			fmt.Sprintf("/features/%s/phase/%s/bounty?sortBy=price&direction=DESC", feature.Uuid, featurePhase.Uuid),
+			nil)
+		assert.NoError(t, err)
+
+		rr := httptest.NewRecorder()
+		http.HandlerFunc(fHandler.GetBountiesByFeatureAndPhaseUuid).ServeHTTP(rr, req)
+
+		assert.Equal(t, http.StatusOK, rr.Code)
+	})
+
+	t.Run("should handle multiple filters together", func(t *testing.T) {
+
+		multiBounty := db.NewBounty{
+			ID:              1,
+			OwnerID:         person.OwnerPubKey,
+			WorkspaceUuid:   workspace.Uuid,
+			Title:           "multi-filter-test-bounty",
+			PhaseUuid:       featurePhase.Uuid,
+			FeatureUuid:     feature.Uuid,
+			Description:     "test-description-multi-filter",
+			Price:           1000,
+			Type:            "coding_task",
+			Assignee:        "",
+			CodingLanguages: pq.StringArray{"golang", "javascript"},
+			Paid:            false,
+			Completed:       false,
+		}
+		_, err := db.TestDB.CreateOrEditBounty(multiBounty)
+		assert.NoError(t, err)
+
+		bounties, err := db.TestDB.GetBountiesByFeatureAndPhaseUuid(feature.Uuid, featurePhase.Uuid, &http.Request{URL: &url.URL{RawQuery: ""}})
+		assert.NoError(t, err)
+		assert.NotEmpty(t, bounties)
+
+		rctx := chi.NewRouteContext()
+		rctx.URLParams.Add("feature_uuid", feature.Uuid)
+		rctx.URLParams.Add("phase_uuid", featurePhase.Uuid)
+
+		reqURL := fmt.Sprintf("/features/%s/phase/%s/bounty?Open=true&languages=golang&sortBy=price&direction=DESC",
+			feature.Uuid, featurePhase.Uuid)
+		req, err := http.NewRequestWithContext(
+			context.WithValue(ctx, chi.RouteCtxKey, rctx),
+			http.MethodGet,
+			reqURL,
+			nil,
+		)
+		assert.NoError(t, err)
+
+		rr := httptest.NewRecorder()
+		http.HandlerFunc(fHandler.GetBountiesByFeatureAndPhaseUuid).ServeHTTP(rr, req)
+
+		assert.Equal(t, http.StatusOK, rr.Code)
+
+		var returnedBounties []db.BountyResponse
+		err = json.Unmarshal(rr.Body.Bytes(), &returnedBounties)
+		assert.NoError(t, err)
+		assert.NotEmpty(t, returnedBounties)
+		assert.Equal(t, multiBounty.Title, returnedBounties[0].Bounty.Title)
+	})
+
+	t.Run("Valid Feature and Phase UUIDs with No Bounties", func(t *testing.T) {
+		emptyFeature := db.WorkspaceFeatures{
+			Uuid:          uuid.New().String(),
+			WorkspaceUuid: workspace.Uuid,
+			Name:          "empty-feature",
+		}
+		db.TestDB.CreateOrEditFeature(emptyFeature)
+
+		emptyPhase := db.FeaturePhase{
+			Uuid:        uuid.New().String(),
+			FeatureUuid: emptyFeature.Uuid,
+			Name:        "empty-phase",
+		}
+		db.TestDB.CreateOrEditFeaturePhase(emptyPhase)
+
+		rctx := chi.NewRouteContext()
+		rctx.URLParams.Add("feature_uuid", emptyFeature.Uuid)
+		rctx.URLParams.Add("phase_uuid", emptyPhase.Uuid)
+		req, err := http.NewRequestWithContext(context.WithValue(ctx, chi.RouteCtxKey, rctx),
+			http.MethodGet,
+			fmt.Sprintf("/features/%s/phase/%s/bounty", emptyFeature.Uuid, emptyPhase.Uuid),
+			nil)
+		assert.NoError(t, err)
+
+		rr := httptest.NewRecorder()
+		http.HandlerFunc(fHandler.GetBountiesByFeatureAndPhaseUuid).ServeHTTP(rr, req)
+
+		assert.Equal(t, http.StatusNotFound, rr.Code)
+	})
+
+	t.Run("Empty Feature UUID", func(t *testing.T) {
+		rctx := chi.NewRouteContext()
+		rctx.URLParams.Add("feature_uuid", "")
+		rctx.URLParams.Add("phase_uuid", featurePhase.Uuid)
+		req, err := http.NewRequestWithContext(context.WithValue(ctx, chi.RouteCtxKey, rctx),
+			http.MethodGet,
+			fmt.Sprintf("/features/%s/phase/%s/bounty", "", featurePhase.Uuid),
+			nil)
+		assert.NoError(t, err)
+
+		rr := httptest.NewRecorder()
+		http.HandlerFunc(fHandler.GetBountiesByFeatureAndPhaseUuid).ServeHTTP(rr, req)
+
+		assert.Equal(t, http.StatusNotFound, rr.Code)
+	})
+
+	t.Run("Empty Phase UUID", func(t *testing.T) {
+		rctx := chi.NewRouteContext()
+		rctx.URLParams.Add("feature_uuid", feature.Uuid)
+		rctx.URLParams.Add("phase_uuid", "")
+		req, err := http.NewRequestWithContext(context.WithValue(ctx, chi.RouteCtxKey, rctx),
+			http.MethodGet,
+			fmt.Sprintf("/features/%s/phase/%s/bounty", feature.Uuid, ""),
+			nil)
+		assert.NoError(t, err)
+
+		rr := httptest.NewRecorder()
+		http.HandlerFunc(fHandler.GetBountiesByFeatureAndPhaseUuid).ServeHTTP(rr, req)
+
+		assert.Equal(t, http.StatusNotFound, rr.Code)
+	})
+
+	t.Run("Invalid UUID Format", func(t *testing.T) {
+		rctx := chi.NewRouteContext()
+		rctx.URLParams.Add("feature_uuid", "invalid-uuid-format")
+		rctx.URLParams.Add("phase_uuid", "invalid-uuid-format")
+		req, err := http.NewRequestWithContext(context.WithValue(ctx, chi.RouteCtxKey, rctx),
+			http.MethodGet,
+			"/features/invalid-uuid-format/phase/invalid-uuid-format/bounty",
+			nil)
+		assert.NoError(t, err)
+
+		rr := httptest.NewRecorder()
+		http.HandlerFunc(fHandler.GetBountiesByFeatureAndPhaseUuid).ServeHTTP(rr, req)
+
+		assert.Equal(t, http.StatusNotFound, rr.Code)
+	})
+
+	t.Run("Feature and Phase UUIDs with Special Characters", func(t *testing.T) {
+		specialFeatureUUID := "test!@#$%^&*()"
+		specialPhaseUUID := "phase!@#$%^&*()"
+
+		rctx := chi.NewRouteContext()
+		rctx.URLParams.Add("feature_uuid", specialFeatureUUID)
+		rctx.URLParams.Add("phase_uuid", specialPhaseUUID)
+
+		encodedFeatureUUID := url.QueryEscape(specialFeatureUUID)
+		encodedPhaseUUID := url.QueryEscape(specialPhaseUUID)
+
+		req, err := http.NewRequestWithContext(context.WithValue(ctx, chi.RouteCtxKey, rctx),
+			http.MethodGet,
+			fmt.Sprintf("/features/%s/phase/%s/bounty", encodedFeatureUUID, encodedPhaseUUID),
+			nil)
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		rr := httptest.NewRecorder()
+		http.HandlerFunc(fHandler.GetBountiesByFeatureAndPhaseUuid).ServeHTTP(rr, req)
+
+		assert.Equal(t, http.StatusNotFound, rr.Code)
+	})
+
+	t.Run("Null Feature and Phase UUIDs", func(t *testing.T) {
+		rctx := chi.NewRouteContext()
+		req, err := http.NewRequestWithContext(context.WithValue(ctx, chi.RouteCtxKey, rctx),
+			http.MethodGet,
+			"/features/null/phase/null/bounty",
+			nil)
+		assert.NoError(t, err)
 
 		rr := httptest.NewRecorder()
 		http.HandlerFunc(fHandler.GetBountiesByFeatureAndPhaseUuid).ServeHTTP(rr, req)
@@ -1874,4 +2185,312 @@ func TestGetFeaturesByWorkspaceUuid(t *testing.T) {
 			}
 		})
 	}
+}
+
+func TestUpdateFeatureStatus(t *testing.T) {
+	teardownSuite := SetupSuite(t)
+	defer teardownSuite(t)
+
+	fHandler := NewFeatureHandler(db.TestDB)
+
+	person := db.Person{
+		Uuid:        uuid.New().String(),
+		OwnerAlias:  "test-alias",
+		UniqueName:  "test-unique-name",
+		OwnerPubKey: "test-pubkey",
+		PriceToMeet: 0,
+		Description: "test-description",
+	}
+	db.TestDB.CreateOrEditPerson(person)
+
+	workspace := db.Workspace{
+		Uuid:        uuid.New().String(),
+		Name:        "test-workspace" + uuid.New().String(),
+		OwnerPubKey: person.OwnerPubKey,
+		Github:      "https://github.com/test",
+		Website:     "https://www.testwebsite.com",
+		Description: "test-description",
+	}
+	db.TestDB.CreateOrEditWorkspace(workspace)
+	workspace = db.TestDB.GetWorkspaceByUuid(workspace.Uuid)
+
+	feature := db.WorkspaceFeatures{
+		Uuid:          uuid.New().String(),
+		WorkspaceUuid: workspace.Uuid,
+		Name:          "test-feature",
+		Url:           "https://github.com/test-feature",
+		Priority:      0,
+		FeatStatus:    db.ActiveFeature,
+	}
+	db.TestDB.CreateOrEditFeature(feature)
+	feature = db.TestDB.GetFeatureByUuid(feature.Uuid)
+
+	t.Run("should return error if not authorized", func(t *testing.T) {
+		rr := httptest.NewRecorder()
+		handler := http.HandlerFunc(fHandler.UpdateFeatureStatus)
+
+		requestBody := map[string]string{"status": string(db.ArchivedFeature)}
+		body, _ := json.Marshal(requestBody)
+
+		rctx := chi.NewRouteContext()
+		rctx.URLParams.Add("uuid", feature.Uuid)
+		req, err := http.NewRequestWithContext(context.WithValue(context.Background(), chi.RouteCtxKey, rctx),
+			http.MethodPut, "/features/"+feature.Uuid+"/status", bytes.NewReader(body))
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		handler.ServeHTTP(rr, req)
+		assert.Equal(t, http.StatusUnauthorized, rr.Code)
+	})
+
+	t.Run("should return bad request if body is not valid json", func(t *testing.T) {
+		rr := httptest.NewRecorder()
+		handler := http.HandlerFunc(fHandler.UpdateFeatureStatus)
+
+		invalidJson := []byte(`{"status": "archived"`)
+
+		ctx := context.WithValue(context.Background(), auth.ContextKey, person.OwnerPubKey)
+		rctx := chi.NewRouteContext()
+		rctx.URLParams.Add("uuid", feature.Uuid)
+		req, err := http.NewRequestWithContext(context.WithValue(ctx, chi.RouteCtxKey, rctx),
+			http.MethodPut, "/features/"+feature.Uuid+"/status", bytes.NewReader(invalidJson))
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		handler.ServeHTTP(rr, req)
+		assert.Equal(t, http.StatusBadRequest, rr.Code)
+	})
+
+	t.Run("should return bad request if status is invalid", func(t *testing.T) {
+		rr := httptest.NewRecorder()
+		handler := http.HandlerFunc(fHandler.UpdateFeatureStatus)
+
+		requestBody := map[string]string{"status": "invalid_status"}
+		body, _ := json.Marshal(requestBody)
+
+		ctx := context.WithValue(context.Background(), auth.ContextKey, person.OwnerPubKey)
+		rctx := chi.NewRouteContext()
+		rctx.URLParams.Add("uuid", feature.Uuid)
+		req, err := http.NewRequestWithContext(context.WithValue(ctx, chi.RouteCtxKey, rctx),
+			http.MethodPut, "/features/"+feature.Uuid+"/status", bytes.NewReader(body))
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		handler.ServeHTTP(rr, req)
+		assert.Equal(t, http.StatusBadRequest, rr.Code)
+	})
+
+	t.Run("should return internal server error if feature not found", func(t *testing.T) {
+		rr := httptest.NewRecorder()
+		handler := http.HandlerFunc(fHandler.UpdateFeatureStatus)
+
+		requestBody := map[string]string{"status": string(db.ArchivedFeature)}
+		body, _ := json.Marshal(requestBody)
+
+		ctx := context.WithValue(context.Background(), auth.ContextKey, person.OwnerPubKey)
+		rctx := chi.NewRouteContext()
+		rctx.URLParams.Add("uuid", "non-existent-uuid")
+		req, err := http.NewRequestWithContext(context.WithValue(ctx, chi.RouteCtxKey, rctx),
+			http.MethodPut, "/features/non-existent-uuid/status", bytes.NewReader(body))
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		handler.ServeHTTP(rr, req)
+		assert.Equal(t, http.StatusInternalServerError, rr.Code)
+	})
+
+	t.Run("should successfully update feature status", func(t *testing.T) {
+		rr := httptest.NewRecorder()
+		handler := http.HandlerFunc(fHandler.UpdateFeatureStatus)
+
+		requestBody := map[string]string{"status": string(db.ArchivedFeature)}
+		body, _ := json.Marshal(requestBody)
+
+		ctx := context.WithValue(context.Background(), auth.ContextKey, person.OwnerPubKey)
+		rctx := chi.NewRouteContext()
+		rctx.URLParams.Add("uuid", feature.Uuid)
+		req, err := http.NewRequestWithContext(context.WithValue(ctx, chi.RouteCtxKey, rctx),
+			http.MethodPut, "/features/"+feature.Uuid+"/status", bytes.NewReader(body))
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		handler.ServeHTTP(rr, req)
+		assert.Equal(t, http.StatusOK, rr.Code)
+
+		var updatedFeature db.WorkspaceFeatures
+		err = json.NewDecoder(rr.Body).Decode(&updatedFeature)
+		assert.NoError(t, err)
+		assert.Equal(t, db.ArchivedFeature, updatedFeature.FeatStatus)
+		assert.Equal(t, feature.Uuid, updatedFeature.Uuid)
+	})
+
+	t.Run("Empty UUID Parameter", func(t *testing.T) {
+		rr := httptest.NewRecorder()
+		handler := http.HandlerFunc(fHandler.UpdateFeatureStatus)
+
+		requestBody := map[string]string{"status": string(db.ActiveFeature)}
+		body, _ := json.Marshal(requestBody)
+
+		ctx := context.WithValue(context.Background(), auth.ContextKey, person.OwnerPubKey)
+		rctx := chi.NewRouteContext()
+		rctx.URLParams.Add("uuid", "")
+		req, err := http.NewRequestWithContext(context.WithValue(ctx, chi.RouteCtxKey, rctx),
+			http.MethodPut, "/features//status", bytes.NewReader(body))
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		handler.ServeHTTP(rr, req)
+		assert.Equal(t, http.StatusBadRequest, rr.Code)
+
+		var response map[string]string
+		err = json.NewDecoder(rr.Body).Decode(&response)
+		assert.NoError(t, err)
+		assert.Equal(t, "Missing uuid parameter", response["error"])
+	})
+
+	t.Run("Boundary UUID Length", func(t *testing.T) {
+		rr := httptest.NewRecorder()
+		handler := http.HandlerFunc(fHandler.UpdateFeatureStatus)
+
+		requestBody := map[string]string{"status": string(db.ActiveFeature)}
+		body, _ := json.Marshal(requestBody)
+
+		longUUID := strings.Repeat("a", 100)
+		ctx := context.WithValue(context.Background(), auth.ContextKey, person.OwnerPubKey)
+		rctx := chi.NewRouteContext()
+		rctx.URLParams.Add("uuid", longUUID)
+		req, err := http.NewRequestWithContext(context.WithValue(ctx, chi.RouteCtxKey, rctx),
+			http.MethodPut, "/features/"+longUUID+"/status", bytes.NewReader(body))
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		handler.ServeHTTP(rr, req)
+		assert.Equal(t, http.StatusInternalServerError, rr.Code)
+	})
+
+	t.Run("Null Request Body", func(t *testing.T) {
+		rr := httptest.NewRecorder()
+		handler := http.HandlerFunc(fHandler.UpdateFeatureStatus)
+
+		ctx := context.WithValue(context.Background(), auth.ContextKey, person.OwnerPubKey)
+		rctx := chi.NewRouteContext()
+		rctx.URLParams.Add("uuid", feature.Uuid)
+		req, err := http.NewRequestWithContext(context.WithValue(ctx, chi.RouteCtxKey, rctx),
+			http.MethodPut, "/features/"+feature.Uuid+"/status", nil)
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		handler.ServeHTTP(rr, req)
+
+		assert.Equal(t, http.StatusBadRequest, rr.Code)
+
+		var response struct {
+			Error string `json:"error"`
+		}
+		err = json.NewDecoder(rr.Body).Decode(&response)
+		assert.NoError(t, err)
+		assert.Equal(t, "Request body is required", response.Error)
+	})
+
+	t.Run("Empty Request Body", func(t *testing.T) {
+		rr := httptest.NewRecorder()
+		handler := http.HandlerFunc(fHandler.UpdateFeatureStatus)
+
+		emptyBody := map[string]string{}
+		body, _ := json.Marshal(emptyBody)
+
+		ctx := context.WithValue(context.Background(), auth.ContextKey, person.OwnerPubKey)
+		rctx := chi.NewRouteContext()
+		rctx.URLParams.Add("uuid", feature.Uuid)
+		req, err := http.NewRequestWithContext(context.WithValue(ctx, chi.RouteCtxKey, rctx),
+			http.MethodPut, "/features/"+feature.Uuid+"/status", bytes.NewReader(body))
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		handler.ServeHTTP(rr, req)
+		assert.Equal(t, http.StatusBadRequest, rr.Code)
+	})
+
+	t.Run("Unauthorized Access with Invalid PubKey", func(t *testing.T) {
+		rr := httptest.NewRecorder()
+		handler := http.HandlerFunc(fHandler.UpdateFeatureStatus)
+
+		requestBody := map[string]string{"status": string(db.ActiveFeature)}
+		body, _ := json.Marshal(requestBody)
+
+		ctx := context.WithValue(context.Background(), auth.ContextKey, "invalid-pubkey")
+		rctx := chi.NewRouteContext()
+		rctx.URLParams.Add("uuid", feature.Uuid)
+		req, err := http.NewRequestWithContext(context.WithValue(ctx, chi.RouteCtxKey, rctx),
+			http.MethodPut, "/features/"+feature.Uuid+"/status", bytes.NewReader(body))
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		handler.ServeHTTP(rr, req)
+
+		assert.Equal(t, http.StatusUnauthorized, rr.Code)
+
+		var response struct {
+			Error string `json:"error"`
+		}
+		err = json.NewDecoder(rr.Body).Decode(&response)
+		assert.NoError(t, err)
+		assert.Equal(t, "Unauthorized: invalid pubkey", response.Error)
+	})
+
+	t.Run("Invalid UUID Format", func(t *testing.T) {
+		rr := httptest.NewRecorder()
+		handler := http.HandlerFunc(fHandler.UpdateFeatureStatus)
+
+		requestBody := map[string]string{"status": string(db.ActiveFeature)}
+		body, _ := json.Marshal(requestBody)
+
+		ctx := context.WithValue(context.Background(), auth.ContextKey, person.OwnerPubKey)
+		rctx := chi.NewRouteContext()
+		rctx.URLParams.Add("uuid", "invalid-uuid-format")
+		req, err := http.NewRequestWithContext(context.WithValue(ctx, chi.RouteCtxKey, rctx),
+			http.MethodPut, "/features/invalid-uuid-format/status", bytes.NewReader(body))
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		handler.ServeHTTP(rr, req)
+		assert.Equal(t, http.StatusInternalServerError, rr.Code)
+	})
+
+	t.Run("Valid Request with Active Status", func(t *testing.T) {
+		rr := httptest.NewRecorder()
+		handler := http.HandlerFunc(fHandler.UpdateFeatureStatus)
+
+		requestBody := map[string]string{"status": string(db.ActiveFeature)}
+		body, _ := json.Marshal(requestBody)
+
+		ctx := context.WithValue(context.Background(), auth.ContextKey, person.OwnerPubKey)
+		rctx := chi.NewRouteContext()
+		rctx.URLParams.Add("uuid", feature.Uuid)
+		req, err := http.NewRequestWithContext(context.WithValue(ctx, chi.RouteCtxKey, rctx),
+			http.MethodPut, "/features/"+feature.Uuid+"/status", bytes.NewReader(body))
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		handler.ServeHTTP(rr, req)
+		assert.Equal(t, http.StatusOK, rr.Code)
+
+		var updatedFeature db.WorkspaceFeatures
+		err = json.NewDecoder(rr.Body).Decode(&updatedFeature)
+		assert.NoError(t, err)
+		assert.Equal(t, db.ActiveFeature, updatedFeature.FeatStatus)
+		assert.Equal(t, feature.Uuid, updatedFeature.Uuid)
+	})
 }
