@@ -522,7 +522,7 @@ func TestAddedValue(t *testing.T) {
 			},
 		},
 		{
-			name: "Large Number of Destinations",
+			name: "Large Number of the Destinations",
 			value: &Value{
 				Model: Model{
 					Type:      "lightning",
