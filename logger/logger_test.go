@@ -2,6 +2,7 @@ package logger
 
 import (
 	"bytes"
+	"fmt"
 	"log"
 	"os"
 	"strings"
@@ -341,4 +342,201 @@ func TestLoggerConcurrency(t *testing.T) {
 	}
 
 	wg.Wait()
+}
+
+func TestMachine(t *testing.T) {
+
+	originalLogLevel := config.LogLevel
+	defer func() {
+		config.LogLevel = originalLogLevel
+	}()
+
+	tests := []struct {
+		name         string
+		logLevel     string
+		format       string
+		args         []interface{}
+		expectedLogs bool
+		setup        func(*Logger)
+	}{
+		{
+			name:         "Machine level enabled with simple message",
+			logLevel:     "MACHINE",
+			format:       "Test message",
+			args:         []interface{}{},
+			expectedLogs: true,
+		},
+		{
+			name:         "Machine level disabled",
+			logLevel:     "INFO",
+			format:       "Test message",
+			args:         []interface{}{},
+			expectedLogs: false,
+		},
+		{
+			name:         "Machine level with format parameters",
+			logLevel:     "MACHINE",
+			format:       "Test message %s %d",
+			args:         []interface{}{"param", 123},
+			expectedLogs: true,
+		},
+		{
+			name:         "Machine level with special characters",
+			logLevel:     "MACHINE",
+			format:       "Test !@#$%^&*()",
+			args:         []interface{}{},
+			expectedLogs: true,
+		},
+		{
+			name:         "Machine level with empty message",
+			logLevel:     "MACHINE",
+			format:       "",
+			args:         []interface{}{},
+			expectedLogs: true,
+		},
+		{
+			name:         "Machine level with nil arguments",
+			logLevel:     "MACHINE",
+			format:       "Test with nil: %v",
+			args:         []interface{}{nil},
+			expectedLogs: true,
+		},
+		{
+			name:         "Machine level with multiple arguments",
+			logLevel:     "MACHINE",
+			format:       "%v %v %v %v",
+			args:         []interface{}{1, "two", true, 4.5},
+			expectedLogs: true,
+		},
+		{
+			name:         "Machine level with Unicode characters",
+			logLevel:     "MACHINE",
+			format:       "Unicode test: %s",
+			args:         []interface{}{"你好 👋 Привет"},
+			expectedLogs: true,
+		},
+		{
+			name:         "Machine level with large message",
+			logLevel:     "MACHINE",
+			format:       "Large message: %s",
+			args:         []interface{}{strings.Repeat("a", 1000)},
+			expectedLogs: true,
+		},
+		{
+			name:         "Machine level with invalid format specifier",
+			logLevel:     "MACHINE",
+			format:       "Invalid format %z",
+			args:         []interface{}{"test"},
+			expectedLogs: true,
+		},
+		{
+			name:         "Standard Logging with MACHINE LogLevel",
+			logLevel:     "MACHINE",
+			format:       "Standard log message: %s",
+			args:         []interface{}{"test"},
+			expectedLogs: true,
+		},
+		{
+			name:         "LogLevel Case Sensitivity",
+			logLevel:     "machine",
+			format:       "Case sensitivity test",
+			args:         []interface{}{},
+			expectedLogs: false,
+		},
+		{
+			name:         "Large Number of Arguments",
+			logLevel:     "MACHINE",
+			format:       "%v %v %v %v %v %v %v %v %v %v",
+			args:         []interface{}{1, 2, 3, 4, 5, 6, 7, 8, 9, 10},
+			expectedLogs: true,
+		},
+		{
+			name:         "Long Format String",
+			logLevel:     "MACHINE",
+			format:       strings.Repeat("Very long message with placeholder %s ", 100),
+			args:         []interface{}{strings.Repeat("test", 100)},
+			expectedLogs: true,
+		},
+		{
+			name:         "Format String with Special Characters",
+			logLevel:     "MACHINE",
+			format:       "Special chars: %s\n\t\r\b\f%s",
+			args:         []interface{}{"test1", "test2"},
+			expectedLogs: true,
+		},
+		{
+			name:         "Format String with Incorrect Placeholders",
+			logLevel:     "MACHINE",
+			format:       "Incorrect placeholders: %d %s",
+			args:         []interface{}{"string", 123},
+			expectedLogs: true,
+		},
+		{
+			name:         "Invalid LogLevel",
+			logLevel:     "INVALID_LEVEL",
+			format:       "Test message",
+			args:         []interface{}{},
+			expectedLogs: false,
+		},
+		{
+			name:         "Mixed Type Arguments",
+			logLevel:     "MACHINE",
+			format:       "%v %v %v %v %v",
+			args:         []interface{}{123, "string", true, 45.67, struct{ Name string }{"test"}},
+			expectedLogs: true,
+		},
+		{
+			name:         "Format String with Unicode Placeholders",
+			logLevel:     "MACHINE",
+			format:       "Unicode: %s 你好 %s Привет %s",
+			args:         []interface{}{"Hello", "World", "!"},
+			expectedLogs: true,
+		},
+		{
+			name:         "Zero Values Arguments",
+			logLevel:     "MACHINE",
+			format:       "Zero values: %v %v %v %v",
+			args:         []interface{}{0, "", false, nil},
+			expectedLogs: true,
+		},
+		{
+			name:         "Escaped Percent Signs",
+			logLevel:     "MACHINE",
+			format:       "Escaped %%s %%d test %s",
+			args:         []interface{}{"actual"},
+			expectedLogs: true,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+
+			var buf bytes.Buffer
+
+			logger := &Logger{
+				machineLogger: log.New(&buf, "", 0),
+			}
+
+			config.LogLevel = tt.logLevel
+
+			if tt.setup != nil {
+				tt.setup(logger)
+			}
+
+			logger.Machine(tt.format, tt.args...)
+
+			output := buf.String()
+
+			if tt.expectedLogs {
+				assert.NotEmpty(t, output, "Expected log output but got none")
+
+				expectedOutput := fmt.Sprintf(tt.format, tt.args...)
+				assert.Contains(t, output, expectedOutput,
+					"Log output doesn't contain expected message")
+
+			} else {
+				assert.Empty(t, output, "Expected no log output but got some")
+			}
+		})
+	}
 }
