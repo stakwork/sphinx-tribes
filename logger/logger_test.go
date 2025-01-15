@@ -932,7 +932,7 @@ func TestSetRequestUUID(t *testing.T) {
 			},
 		},
 		{
-			name:       "Unicode Characters in UUID",
+			name:       "Unicode Characters in the UUID",
 			uuidString: "🌟星🌙月☀️日⭐",
 			validate: func(t *testing.T, l *Logger) {
 				assert.Equal(t, "🌟星🌙月☀️日⭐", l.requestUUID)
