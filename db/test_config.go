@@ -67,6 +67,7 @@ func InitTestDB() {
 	db.AutoMigrate(&WorkspaceCodeGraph{})
 	db.AutoMigrate(&FeatureFlag{})
 	db.AutoMigrate(&Bounty{})
+	db.AutoMigrate(&Notification{})
 
 	people := TestDB.GetAllPeople()
 	for _, p := range people {

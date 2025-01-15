@@ -12271,3 +12271,440 @@ func (_c *Database_GetLatestTicketByGroup_Call) RunAndReturn(run func(uuid.UUID)
 	_c.Call.Return(run)
 	return _c
 }
+
+func (_m *Database) CreateNotification(n *db.Notification) error {
+	ret := _m.Called(n)
+
+	if len(ret) == 0 {
+		panic("no return value specified for CreateNotification")
+	}
+
+	var r0 error
+	if rf, ok := ret.Get(0).(func(*db.Notification) error); ok {
+		r0 = rf(n)
+	} else {
+		r0 = ret.Error(0)
+	}
+
+	return r0
+}
+
+type Database_CreateNotification_Call struct {
+	*mock.Call
+}
+
+func (_e *Database_Expecter) CreateNotification(n interface{}) *Database_CreateNotification_Call {
+	return &Database_CreateNotification_Call{Call: _e.mock.On("CreateNotification", n)}
+}
+
+func (_c *Database_CreateNotification_Call) Run(run func(n *db.Notification)) *Database_CreateNotification_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(*db.Notification))
+	})
+	return _c
+}
+
+func (_c *Database_CreateNotification_Call) Return(_a0 error) *Database_CreateNotification_Call {
+	_c.Call.Return(_a0)
+	return _c
+}
+
+func (_c *Database_CreateNotification_Call) RunAndReturn(run func(*db.Notification) error) *Database_CreateNotification_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
+func (_m *Database) GetNotification(_a0 string) (*db.Notification, error) {
+	ret := _m.Called(_a0)
+
+	if len(ret) == 0 {
+		panic("no return value specified for GetNotification")
+	}
+
+	var r0 *db.Notification
+	var r1 error
+	if rf, ok := ret.Get(0).(func(string) (*db.Notification, error)); ok {
+		return rf(_a0)
+	}
+	if rf, ok := ret.Get(0).(func(string) *db.Notification); ok {
+		r0 = rf(_a0)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(*db.Notification)
+		}
+	}
+
+	if rf, ok := ret.Get(1).(func(string) error); ok {
+		r1 = rf(_a0)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
+type Database_GetNotification_Call struct {
+	*mock.Call
+}
+
+func (_e *Database_Expecter) GetNotification(_a0 interface{}) *Database_GetNotification_Call {
+	return &Database_GetNotification_Call{Call: _e.mock.On("GetNotification", _a0)}
+}
+
+func (_c *Database_GetNotification_Call) Run(run func(_a0 string)) *Database_GetNotification_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(string))
+	})
+	return _c
+}
+
+func (_c *Database_GetNotification_Call) Return(_a0 *db.Notification, _a1 error) *Database_GetNotification_Call {
+	_c.Call.Return(_a0, _a1)
+	return _c
+}
+
+func (_c *Database_GetNotification_Call) RunAndReturn(run func(string) (*db.Notification, error)) *Database_GetNotification_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
+func (_m *Database) UpdateNotification(_a0 string, updates map[string]interface{}) error {
+	ret := _m.Called(_a0, updates)
+
+	if len(ret) == 0 {
+		panic("no return value specified for UpdateNotification")
+	}
+
+	var r0 error
+	if rf, ok := ret.Get(0).(func(string, map[string]interface{}) error); ok {
+		r0 = rf(_a0, updates)
+	} else {
+		r0 = ret.Error(0)
+	}
+
+	return r0
+}
+
+type Database_UpdateNotification_Call struct {
+	*mock.Call
+}
+
+func (_e *Database_Expecter) UpdateNotification(_a0 interface{}, updates interface{}) *Database_UpdateNotification_Call {
+	return &Database_UpdateNotification_Call{Call: _e.mock.On("UpdateNotification", _a0, updates)}
+}
+
+func (_c *Database_UpdateNotification_Call) Run(run func(_a0 string, updates map[string]interface{})) *Database_UpdateNotification_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(string), args[1].(map[string]interface{}))
+	})
+	return _c
+}
+
+func (_c *Database_UpdateNotification_Call) Return(_a0 error) *Database_UpdateNotification_Call {
+	_c.Call.Return(_a0)
+	return _c
+}
+
+func (_c *Database_UpdateNotification_Call) RunAndReturn(run func(string, map[string]interface{}) error) *Database_UpdateNotification_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
+func (_m *Database) DeleteNotification(_a0 string) error {
+	ret := _m.Called(_a0)
+
+	if len(ret) == 0 {
+		panic("no return value specified for DeleteNotification")
+	}
+
+	var r0 error
+	if rf, ok := ret.Get(0).(func(string) error); ok {
+		r0 = rf(_a0)
+	} else {
+		r0 = ret.Error(0)
+	}
+
+	return r0
+}
+
+type Database_DeleteNotification_Call struct {
+	*mock.Call
+}
+
+func (_e *Database_Expecter) DeleteNotification(_a0 interface{}) *Database_DeleteNotification_Call {
+	return &Database_DeleteNotification_Call{Call: _e.mock.On("DeleteNotification", _a0)}
+}
+
+func (_c *Database_DeleteNotification_Call) Run(run func(_a0 string)) *Database_DeleteNotification_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(string))
+	})
+	return _c
+}
+
+func (_c *Database_DeleteNotification_Call) Return(_a0 error) *Database_DeleteNotification_Call {
+	_c.Call.Return(_a0)
+	return _c
+}
+
+func (_c *Database_DeleteNotification_Call) RunAndReturn(run func(string) error) *Database_DeleteNotification_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
+func (_m *Database) GetPendingNotifications() ([]db.Notification, error) {
+	ret := _m.Called()
+
+	if len(ret) == 0 {
+		panic("no return value specified for GetPendingNotifications")
+	}
+
+	var r0 []db.Notification
+	var r1 error
+	if rf, ok := ret.Get(0).(func() ([]db.Notification, error)); ok {
+		return rf()
+	}
+	if rf, ok := ret.Get(0).(func() []db.Notification); ok {
+		r0 = rf()
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).([]db.Notification)
+		}
+	}
+
+	if rf, ok := ret.Get(1).(func() error); ok {
+		r1 = rf()
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
+type Database_GetPendingNotifications_Call struct {
+	*mock.Call
+}
+
+func (_e *Database_Expecter) GetPendingNotifications() *Database_GetPendingNotifications_Call {
+	return &Database_GetPendingNotifications_Call{Call: _e.mock.On("GetPendingNotifications")}
+}
+
+func (_c *Database_GetPendingNotifications_Call) Run(run func()) *Database_GetPendingNotifications_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run()
+	})
+	return _c
+}
+
+func (_c *Database_GetPendingNotifications_Call) Return(_a0 []db.Notification, _a1 error) *Database_GetPendingNotifications_Call {
+	_c.Call.Return(_a0, _a1)
+	return _c
+}
+
+func (_c *Database_GetPendingNotifications_Call) RunAndReturn(run func() ([]db.Notification, error)) *Database_GetPendingNotifications_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
+func (_m *Database) GetFailedNotifications(maxRetries int) ([]db.Notification, error) {
+	ret := _m.Called(maxRetries)
+
+	if len(ret) == 0 {
+		panic("no return value specified for GetFailedNotifications")
+	}
+
+	var r0 []db.Notification
+	var r1 error
+	if rf, ok := ret.Get(0).(func(int) ([]db.Notification, error)); ok {
+		return rf(maxRetries)
+	}
+	if rf, ok := ret.Get(0).(func(int) []db.Notification); ok {
+		r0 = rf(maxRetries)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).([]db.Notification)
+		}
+	}
+
+	if rf, ok := ret.Get(1).(func(int) error); ok {
+		r1 = rf(maxRetries)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
+type Database_GetFailedNotifications_Call struct {
+	*mock.Call
+}
+
+func (_e *Database_Expecter) GetFailedNotifications(maxRetries interface{}) *Database_GetFailedNotifications_Call {
+	return &Database_GetFailedNotifications_Call{Call: _e.mock.On("GetFailedNotifications", maxRetries)}
+}
+
+func (_c *Database_GetFailedNotifications_Call) Run(run func(maxRetries int)) *Database_GetFailedNotifications_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(int))
+	})
+	return _c
+}
+
+func (_c *Database_GetFailedNotifications_Call) Return(_a0 []db.Notification, _a1 error) *Database_GetFailedNotifications_Call {
+	_c.Call.Return(_a0, _a1)
+	return _c
+}
+
+func (_c *Database_GetFailedNotifications_Call) RunAndReturn(run func(int) ([]db.Notification, error)) *Database_GetFailedNotifications_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
+func (_m *Database) GetNotificationsByPubKey(pubKey string, limit int, offset int) ([]db.Notification, error) {
+	ret := _m.Called(pubKey, limit, offset)
+
+	if len(ret) == 0 {
+		panic("no return value specified for GetNotificationsByPubKey")
+	}
+
+	var r0 []db.Notification
+	var r1 error
+	if rf, ok := ret.Get(0).(func(string, int, int) ([]db.Notification, error)); ok {
+		return rf(pubKey, limit, offset)
+	}
+	if rf, ok := ret.Get(0).(func(string, int, int) []db.Notification); ok {
+		r0 = rf(pubKey, limit, offset)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).([]db.Notification)
+		}
+	}
+
+	if rf, ok := ret.Get(1).(func(string, int, int) error); ok {
+		r1 = rf(pubKey, limit, offset)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
+type Database_GetNotificationsByPubKey_Call struct {
+	*mock.Call
+}
+
+
+func (_e *Database_Expecter) GetNotificationsByPubKey(pubKey interface{}, limit interface{}, offset interface{}) *Database_GetNotificationsByPubKey_Call {
+	return &Database_GetNotificationsByPubKey_Call{Call: _e.mock.On("GetNotificationsByPubKey", pubKey, limit, offset)}
+}
+
+func (_c *Database_GetNotificationsByPubKey_Call) Run(run func(pubKey string, limit int, offset int)) *Database_GetNotificationsByPubKey_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(string), args[1].(int), args[2].(int))
+	})
+	return _c
+}
+
+func (_c *Database_GetNotificationsByPubKey_Call) Return(_a0 []db.Notification, _a1 error) *Database_GetNotificationsByPubKey_Call {
+	_c.Call.Return(_a0, _a1)
+	return _c
+}
+
+func (_c *Database_GetNotificationsByPubKey_Call) RunAndReturn(run func(string, int, int) ([]db.Notification, error)) *Database_GetNotificationsByPubKey_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
+func (_m *Database) IncrementRetryCount(_a0 string) error {
+	ret := _m.Called(_a0)
+
+	if len(ret) == 0 {
+		panic("no return value specified for IncrementRetryCount")
+	}
+
+	var r0 error
+	if rf, ok := ret.Get(0).(func(string) error); ok {
+		r0 = rf(_a0)
+	} else {
+		r0 = ret.Error(0)
+	}
+
+	return r0
+}
+
+type Database_IncrementRetryCount_Call struct {
+	*mock.Call
+}
+
+func (_e *Database_Expecter) IncrementRetryCount(_a0 interface{}) *Database_IncrementRetryCount_Call {
+	return &Database_IncrementRetryCount_Call{Call: _e.mock.On("IncrementRetryCount", _a0)}
+}
+
+func (_c *Database_IncrementRetryCount_Call) Run(run func(_a0 string)) *Database_IncrementRetryCount_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(string))
+	})
+	return _c
+}
+
+func (_c *Database_IncrementRetryCount_Call) Return(_a0 error) *Database_IncrementRetryCount_Call {
+	_c.Call.Return(_a0)
+	return _c
+}
+
+func (_c *Database_IncrementRetryCount_Call) RunAndReturn(run func(string) error) *Database_IncrementRetryCount_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
+func (_m *Database) GetNotificationCount(pubKey string) (int64, error) {
+	ret := _m.Called(pubKey)
+
+	if len(ret) == 0 {
+		panic("no return value specified for GetNotificationCount")
+	}
+
+	var r0 int64
+	var r1 error
+	if rf, ok := ret.Get(0).(func(string) (int64, error)); ok {
+		return rf(pubKey)
+	}
+	if rf, ok := ret.Get(0).(func(string) int64); ok {
+		r0 = rf(pubKey)
+	} else {
+		r0 = ret.Get(0).(int64)
+	}
+
+	if rf, ok := ret.Get(1).(func(string) error); ok {
+		r1 = rf(pubKey)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
+type Database_GetNotificationCount_Call struct {
+	*mock.Call
+}
+
+func (_e *Database_Expecter) GetNotificationCount(pubKey interface{}) *Database_GetNotificationCount_Call {
+	return &Database_GetNotificationCount_Call{Call: _e.mock.On("GetNotificationCount", pubKey)}
+}
+
+func (_c *Database_GetNotificationCount_Call) Run(run func(pubKey string)) *Database_GetNotificationCount_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(string))
+	})
+	return _c
+}
+
+func (_c *Database_GetNotificationCount_Call) Return(_a0 int64, _a1 error) *Database_GetNotificationCount_Call {
+	_c.Call.Return(_a0, _a1)
+	return _c
+}
+
+func (_c *Database_GetNotificationCount_Call) RunAndReturn(run func(string) (int64, error)) *Database_GetNotificationCount_Call {
+	_c.Call.Return(run)
+	return _c
+}
