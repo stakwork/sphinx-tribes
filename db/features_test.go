@@ -1476,7 +1476,7 @@ func TestGetBountiesByPhaseUuid(t *testing.T) {
 			},
 		},
 		{
-			name: "Phase UUID with SQL Injection Attempt",
+			name: "Phase UUID with SQL Injection Attempts",
 			setup: func() string {
 				phaseUuid := "'; DROP TABLE bounties; --"
 				bounty := Bounty{
