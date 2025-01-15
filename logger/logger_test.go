@@ -1037,7 +1037,7 @@ func TestRouteBasedUUIDMiddleware(t *testing.T) {
 			expectedStatus: http.StatusOK,
 		},
 		{
-			name: "Request with Special Characters in URL",
+			name: "Request with the Special Characters in URL",
 			setupRequest: func() *http.Request {
 				return httptest.NewRequest(http.MethodGet, "/test!@#$%^&*()", nil)
 			},
