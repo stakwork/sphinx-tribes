@@ -2049,3 +2049,27 @@ func (db database) GetWorkspaceBountyCardsData(r *http.Request) []NewBounty {
 
 	return ms
 }
+
+func (db database) GetFeaturedBountyById(id string) (FeaturedBounty, error) {
+	var bounty FeaturedBounty
+	err := db.db.Where("bounty_id = ?", id).First(&bounty).Error
+	return bounty, err
+}
+
+func (db database) GetAllFeaturedBounties() ([]FeaturedBounty, error) {
+	var bounties []FeaturedBounty
+	err := db.db.Order("added_at DESC").Find(&bounties).Error
+	return bounties, err
+}
+
+func (db database) CreateFeaturedBounty(bounty FeaturedBounty) error {
+	return db.db.Create(&bounty).Error
+}
+
+func (db database) UpdateFeaturedBounty(bountyID string, bounty FeaturedBounty) error {
+	return db.db.Model(&FeaturedBounty{}).Where("bounty_id = ?", bountyID).Updates(bounty).Error
+}
+
+func (db database) DeleteFeaturedBounty(bountyID string) error {
+	return db.db.Where("bounty_id = ?", bountyID).Delete(&FeaturedBounty{}).Error
+}

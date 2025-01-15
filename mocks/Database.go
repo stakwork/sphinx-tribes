@@ -11911,3 +11911,255 @@ func (_c *Database_GetTicketsByGroup_Call) RunAndReturn(run func(string) ([]db.T
 	_c.Call.Return(run)
 	return _c
 }
+
+// GetAllFeaturedBounties provides a mock function with given fields:
+func (_m *Database) GetAllFeaturedBounties() ([]db.FeaturedBounty, error) {
+	ret := _m.Called()
+
+	if len(ret) == 0 {
+		panic("no return value specified for GetAllFeaturedBounties")
+	}
+
+	var r0 []db.FeaturedBounty
+	var r1 error
+	if rf, ok := ret.Get(0).(func() ([]db.FeaturedBounty, error)); ok {
+		return rf()
+	}
+	if rf, ok := ret.Get(0).(func() []db.FeaturedBounty); ok {
+		r0 = rf()
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).([]db.FeaturedBounty)
+		}
+	}
+
+	if rf, ok := ret.Get(1).(func() error); ok {
+		r1 = rf()
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
+// Database_GetAllFeaturedBounties_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'GetAllFeaturedBounties'
+type Database_GetAllFeaturedBounties_Call struct {
+	*mock.Call
+}
+
+// GetAllFeaturedBounties is a helper method to define mock.On call
+func (_e *Database_Expecter) GetAllFeaturedBounties() *Database_GetAllFeaturedBounties_Call {
+	return &Database_GetAllFeaturedBounties_Call{Call: _e.mock.On("GetAllFeaturedBounties")}
+}
+
+func (_c *Database_GetAllFeaturedBounties_Call) Run(run func()) *Database_GetAllFeaturedBounties_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run()
+	})
+	return _c
+}
+
+func (_c *Database_GetAllFeaturedBounties_Call) Return(_a0 []db.FeaturedBounty, _a1 error) *Database_GetAllFeaturedBounties_Call {
+	_c.Call.Return(_a0, _a1)
+	return _c
+}
+
+func (_c *Database_GetAllFeaturedBounties_Call) RunAndReturn(run func() ([]db.FeaturedBounty, error)) *Database_GetAllFeaturedBounties_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
+// CreateFeaturedBounty provides a mock function with given fields: bounty
+func (_m *Database) CreateFeaturedBounty(bounty db.FeaturedBounty) error {
+	ret := _m.Called(bounty)
+
+	if len(ret) == 0 {
+		panic("no return value specified for CreateFeaturedBounty")
+	}
+
+	var r0 error
+	if rf, ok := ret.Get(0).(func(db.FeaturedBounty) error); ok {
+		r0 = rf(bounty)
+	} else {
+		r0 = ret.Error(0)
+	}
+
+	return r0
+}
+
+// Database_CreateFeaturedBounty_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'CreateFeaturedBounty'
+type Database_CreateFeaturedBounty_Call struct {
+	*mock.Call
+}
+
+// CreateFeaturedBounty is a helper method to define mock.On call
+//   - bounty db.FeaturedBounty
+func (_e *Database_Expecter) CreateFeaturedBounty(bounty interface{}) *Database_CreateFeaturedBounty_Call {
+	return &Database_CreateFeaturedBounty_Call{Call: _e.mock.On("CreateFeaturedBounty", bounty)}
+}
+
+func (_c *Database_CreateFeaturedBounty_Call) Run(run func(bounty db.FeaturedBounty)) *Database_CreateFeaturedBounty_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(db.FeaturedBounty))
+	})
+	return _c
+}
+
+func (_c *Database_CreateFeaturedBounty_Call) Return(_a0 error) *Database_CreateFeaturedBounty_Call {
+	_c.Call.Return(_a0)
+	return _c
+}
+
+func (_c *Database_CreateFeaturedBounty_Call) RunAndReturn(run func(db.FeaturedBounty) error) *Database_CreateFeaturedBounty_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
+// UpdateFeaturedBounty provides a mock function with given fields: bountyID, bounty
+func (_m *Database) UpdateFeaturedBounty(bountyID string, bounty db.FeaturedBounty) error {
+	ret := _m.Called(bountyID, bounty)
+
+	if len(ret) == 0 {
+		panic("no return value specified for UpdateFeaturedBounty")
+	}
+
+	var r0 error
+	if rf, ok := ret.Get(0).(func(string, db.FeaturedBounty) error); ok {
+		r0 = rf(bountyID, bounty)
+	} else {
+		r0 = ret.Error(0)
+	}
+
+	return r0
+}
+
+// Database_UpdateFeaturedBounty_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'UpdateFeaturedBounty'
+type Database_UpdateFeaturedBounty_Call struct {
+	*mock.Call
+}
+
+// UpdateFeaturedBounty is a helper method to define mock.On call
+//   - bountyID string
+//   - bounty db.FeaturedBounty
+func (_e *Database_Expecter) UpdateFeaturedBounty(bountyID interface{}, bounty interface{}) *Database_UpdateFeaturedBounty_Call {
+	return &Database_UpdateFeaturedBounty_Call{Call: _e.mock.On("UpdateFeaturedBounty", bountyID, bounty)}
+}
+
+func (_c *Database_UpdateFeaturedBounty_Call) Run(run func(bountyID string, bounty db.FeaturedBounty)) *Database_UpdateFeaturedBounty_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(string), args[1].(db.FeaturedBounty))
+	})
+	return _c
+}
+
+func (_c *Database_UpdateFeaturedBounty_Call) Return(_a0 error) *Database_UpdateFeaturedBounty_Call {
+	_c.Call.Return(_a0)
+	return _c
+}
+
+func (_c *Database_UpdateFeaturedBounty_Call) RunAndReturn(run func(string, db.FeaturedBounty) error) *Database_UpdateFeaturedBounty_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
+// DeleteFeaturedBounty provides a mock function with given fields: bountyID
+func (_m *Database) DeleteFeaturedBounty(bountyID string) error {
+	ret := _m.Called(bountyID)
+
+	if len(ret) == 0 {
+		panic("no return value specified for DeleteFeaturedBounty")
+	}
+
+	var r0 error
+	if rf, ok := ret.Get(0).(func(string) error); ok {
+		r0 = rf(bountyID)
+	} else {
+		r0 = ret.Error(0)
+	}
+
+	return r0
+}
+
+// Database_DeleteFeaturedBounty_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'DeleteFeaturedBounty'
+type Database_DeleteFeaturedBounty_Call struct {
+	*mock.Call
+}
+
+// DeleteFeaturedBounty is a helper method to define mock.On call
+//   - bountyID string
+func (_e *Database_Expecter) DeleteFeaturedBounty(bountyID interface{}) *Database_DeleteFeaturedBounty_Call {
+	return &Database_DeleteFeaturedBounty_Call{Call: _e.mock.On("DeleteFeaturedBounty", bountyID)}
+}
+
+func (_c *Database_DeleteFeaturedBounty_Call) Run(run func(bountyID string)) *Database_DeleteFeaturedBounty_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(string))
+	})
+	return _c
+}
+
+func (_c *Database_DeleteFeaturedBounty_Call) Return(_a0 error) *Database_DeleteFeaturedBounty_Call {
+	_c.Call.Return(_a0)
+	return _c
+}
+
+func (_c *Database_DeleteFeaturedBounty_Call) RunAndReturn(run func(string) error) *Database_DeleteFeaturedBounty_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
+// GetFeaturedBountyById provides a mock function with given fields: id
+func (_m *Database) GetFeaturedBountyById(id string) (db.FeaturedBounty, error) {
+	ret := _m.Called(id)
+
+	if len(ret) == 0 {
+		panic("no return value specified for GetFeaturedBountyById")
+	}
+
+	var r0 db.FeaturedBounty
+	var r1 error
+	if rf, ok := ret.Get(0).(func(string) (db.FeaturedBounty, error)); ok {
+		return rf(id)
+	}
+	if rf, ok := ret.Get(0).(func(string) db.FeaturedBounty); ok {
+		r0 = rf(id)
+	} else {
+		r0 = ret.Get(0).(db.FeaturedBounty)
+	}
+
+	if rf, ok := ret.Get(1).(func(string) error); ok {
+		r1 = rf(id)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
+// Database_GetFeaturedBountyById_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'GetFeaturedBountyById'
+type Database_GetFeaturedBountyById_Call struct {
+	*mock.Call
+}
+
+// GetFeaturedBountyById is a helper method to define mock.On call
+//   - id string
+func (_e *Database_Expecter) GetFeaturedBountyById(id interface{}) *Database_GetFeaturedBountyById_Call {
+	return &Database_GetFeaturedBountyById_Call{Call: _e.mock.On("GetFeaturedBountyById", id)}
+}
+
+func (_c *Database_GetFeaturedBountyById_Call) Run(run func(id string)) *Database_GetFeaturedBountyById_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(string))
+	})
+	return _c
+}
+
+func (_c *Database_GetFeaturedBountyById_Call) Return(_a0 db.FeaturedBounty, _a1 error) *Database_GetFeaturedBountyById_Call {
+	_c.Call.Return(_a0, _a1)
+	return _c
+}
+
+func (_c *Database_GetFeaturedBountyById_Call) RunAndReturn(run func(string) (db.FeaturedBounty, error)) *Database_GetFeaturedBountyById_Call {
+	_c.Call.Return(run)
+	return _c
+}
