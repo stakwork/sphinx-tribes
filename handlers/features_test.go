@@ -1046,7 +1046,7 @@ func TestCreateOrEditStory(t *testing.T) {
 		assert.Equal(t, http.StatusNotAcceptable, rr.Code)
 	})
 
-	t.Run("should successfully add feature story if request is valids", func(t *testing.T) {
+	t.Run("should successfully add feature story if request is valid", func(t *testing.T) {
 		rr := httptest.NewRecorder()
 		handler := http.HandlerFunc(fHandler.CreateOrEditStory)
 
