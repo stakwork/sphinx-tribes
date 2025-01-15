@@ -1,9 +1,8 @@
 package routes
 
 import (
-	"net/http"
-
 	"github.com/stakwork/sphinx-tribes/auth"
+	"net/http"
 
 	"github.com/go-chi/chi"
 	"github.com/stakwork/sphinx-tribes/db"
@@ -34,6 +33,11 @@ func BountyRoutes() chi.Router {
 	})
 	r.Group(func(r chi.Router) {
 		r.Use(auth.PubKeyContext)
+
+		r.Get("/featured/all", bountyHandler.GetAllFeaturedBounties)
+		r.Post("/featured/create", bountyHandler.CreateFeaturedBounty)
+		r.Put("/featured/update", bountyHandler.UpdateFeaturedBounty)
+		r.Delete("/featured/delete/{bountyId}", bountyHandler.DeleteFeaturedBounty)
 
 		r.Get("/bounty-cards", bountyHandler.GetBountyCards)
 		r.Post("/budget/withdraw", bountyHandler.BountyBudgetWithdraw)
