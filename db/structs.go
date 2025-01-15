@@ -949,6 +949,7 @@ const (
 	StatusInReview   BountyStatus = "IN_REVIEW"
 	StatusComplete   BountyStatus = "COMPLETED"
 	StatusPaid       BountyStatus = "PAID"
+	StatusDraft      BountyStatus = "DRAFT"
 )
 
 type BountyCard struct {
