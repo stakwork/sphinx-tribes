@@ -233,3 +233,34 @@ func (db database) CreateBountyFromTicket(ticket Tickets, pubkey string) (*NewBo
 
 	return bounty, nil
 }
+
+func (db database) GetLatestTicketByGroup(ticketGroup uuid.UUID) (Tickets, error) {
+	var ticket Tickets
+	result := db.db.Where("ticket_group = ?", ticketGroup).
+		Order("version DESC").
+		Limit(1).
+		First(&ticket)
+
+	if result.Error != nil {
+		if errors.Is(result.Error, gorm.ErrRecordNotFound) {
+			return Tickets{}, fmt.Errorf("no tickets found for group %s", ticketGroup)
+		}
+		return Tickets{}, fmt.Errorf("failed to fetch latest ticket: %w", result.Error)
+	}
+
+	return ticket, nil
+}
+
+func (db database) GetAllTicketGroups() ([]uuid.UUID, error) {
+	var groups []uuid.UUID
+	result := db.db.Model(&Tickets{}).
+		Select("DISTINCT ticket_group").
+		Where("ticket_group IS NOT NULL").
+		Find(&groups)
+
+	if result.Error != nil {
+		return nil, fmt.Errorf("failed to fetch ticket groups: %w", result.Error)
+	}
+
+	return groups, nil
+}
