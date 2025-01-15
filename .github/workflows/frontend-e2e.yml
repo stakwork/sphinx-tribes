@@ -55,6 +55,10 @@ jobs:
         run: |
           git clone --single-branch --branch change_v2_ports https://github.com/stakwork/sphinx-stack.git stack
 
+      - name: Clone Sphinx Tribes Frontend
+        run: |
+          git clone https://github.com/stakwork/sphinx-tribes-frontend.git sphinx-tribes-frontend
+
       - name: Give Permissions to Stack
         working-directory: ./stack
         run: |
@@ -85,13 +89,13 @@ jobs:
         uses: canastro/copy-file-action@master
         with:
           source: "stack/relay/NODES.json"
-          target: "sphinx-tribes-frontend/cypress/fixtures/nodes.json"
+          target: "tribes-frontend/cypress/fixtures/nodes.json"
 
       - name: Copy V2Node.json
         uses: canastro/copy-file-action@master
         with:
           source: "stack/relay/V2NODES.json"
-          target: "sphinx-tribes-frontend/cypress/fixtures/v2nodes.json"
+          target: "tribes-frontend/cypress/fixtures/v2nodes.json"
       
       - name: Sanitize Test File Path
         run: echo "SANITIZED_FILE=$(echo ${{ matrix.file }} | sed 's/\//_/g')" >> $GITHUB_ENV
