@@ -98,6 +98,8 @@ func CleanTestData() {
 
 	TestDB.db.Exec("DELETE FROM tickets")
 
+	TestDB.db.Exec("DELETE FROM chats")
+
 }
 
 func DeleteAllChatMessages() {
