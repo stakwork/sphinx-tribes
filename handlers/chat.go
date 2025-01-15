@@ -309,8 +309,8 @@ func (ch *ChatHandler) SendMessage(w http.ResponseWriter, r *http.Request) {
 		},
 	}
 
-	if err := ch.sendToStakwork(stakworkPayload); err != nil {
-
+	projectID, err := ch.sendToStakwork(stakworkPayload)
+	if err != nil {
 		createdMessage.Status = "error"
 		ch.db.UpdateChatMessage(&createdMessage)
 
@@ -320,6 +320,17 @@ func (ch *ChatHandler) SendMessage(w http.ResponseWriter, r *http.Request) {
 			Message: fmt.Sprintf("Failed to process message: %v", err),
 		})
 		return
+	}
+
+	projectMsg := websocket.TicketMessage{
+		BroadcastType:   "direct",
+		SourceSessionID: request.SourceWebsocketID,
+		Message:         fmt.Sprintf("https://jobs.stakwork.com/admin/projects/%d", projectID),
+		Action:          "swrun",
+	}
+
+	if err := websocket.WebsocketPool.SendTicketMessage(projectMsg); err != nil {
+		log.Printf("Failed to send Stakwork project WebSocket message: %v", err)
 	}
 
 	wsMessage := websocket.TicketMessage{
@@ -342,10 +353,11 @@ func (ch *ChatHandler) SendMessage(w http.ResponseWriter, r *http.Request) {
 	})
 }
 
-func (ch *ChatHandler) sendToStakwork(payload StakworkChatPayload) error {
+func (ch *ChatHandler) sendToStakwork(payload StakworkChatPayload) (int64, error) {
+
 	payloadJSON, err := json.Marshal(payload)
 	if err != nil {
-		return fmt.Errorf("error marshaling payload: %v", err)
+		return 0, fmt.Errorf("error marshaling payload: %v", err)
 	}
 
 	req, err := http.NewRequest(
@@ -354,12 +366,12 @@ func (ch *ChatHandler) sendToStakwork(payload StakworkChatPayload) error {
 		bytes.NewBuffer(payloadJSON),
 	)
 	if err != nil {
-		return fmt.Errorf("error creating request: %v", err)
+		return 0, fmt.Errorf("error creating request: %v", err)
 	}
 
 	apiKey := os.Getenv("SWWFKEY")
 	if apiKey == "" {
-		return fmt.Errorf("SWWFKEY environment variable not set")
+		return 0, fmt.Errorf("SWWFKEY environment variable not set")
 	}
 
 	req.Header.Set("Authorization", "Token token="+apiKey)
@@ -367,16 +379,21 @@ func (ch *ChatHandler) sendToStakwork(payload StakworkChatPayload) error {
 
 	resp, err := ch.httpClient.Do(req)
 	if err != nil {
-		return fmt.Errorf("error sending request: %v", err)
+		return 0, fmt.Errorf("error sending request: %v", err)
 	}
 	defer resp.Body.Close()
 
 	if resp.StatusCode != http.StatusOK {
 		body, _ := io.ReadAll(resp.Body)
-		return fmt.Errorf("stakwork API error: %s", string(body))
+		return 0, fmt.Errorf("stakwork API error: %s", string(body))
 	}
 
-	return nil
+	var stakworkResp StakworkResponse
+	if err := json.NewDecoder(resp.Body).Decode(&stakworkResp); err != nil {
+		return 0, fmt.Errorf("error decoding response: %v", err)
+	}
+
+	return stakworkResp.Data.ProjectID, nil
 }
 
 func (ch *ChatHandler) GetChat(w http.ResponseWriter, r *http.Request) {
