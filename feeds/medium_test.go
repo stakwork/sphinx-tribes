@@ -70,7 +70,7 @@ func TestParseMediumFeed(t *testing.T) {
 			wantErr: false,
 		},
 		{
-			name: "Empty the Feed",
+			name: "Empty Feed",
 			url:  "https://medium.com/feed",
 			bod: []byte(`<?xml version="1.0" encoding="UTF-8"?>
 				<rss>
