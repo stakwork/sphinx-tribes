@@ -92,6 +92,7 @@ func InitDB() {
 	db.AutoMigrate(&BountyTiming{})
 	db.AutoMigrate(&FeatureFlag{})
 	db.AutoMigrate(&Endpoint{})
+	db.AutoMigrate(&FeaturedBounty{})
 
 	DB.MigrateTablesWithOrgUuid()
 	DB.MigrateOrganizationToWorkspace()
