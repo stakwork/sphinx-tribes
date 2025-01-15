@@ -659,3 +659,145 @@ func TestGetAllChatsForWorkspace(t *testing.T) {
 		})
 	}
 }
+
+func TestUpdateChatMessage(t *testing.T) {
+	InitTestDB()
+	currentTime := time.Now()
+
+	tests := []struct {
+		name        string
+		setup       func() ChatMessage
+		input       ChatMessage
+		expected    ChatMessage
+		expectError bool
+	}{
+		{
+			name: "Update All Fields",
+			setup: func() ChatMessage {
+				msg := ChatMessage{
+					ID:        "msg1",
+					Message:   "Old Message",
+					Status:    "Old Status",
+					Role:      UserRole,
+					Timestamp: currentTime,
+					Source:    UserSource,
+				}
+				TestDB.db.Create(&msg)
+				return msg
+			},
+			input: ChatMessage{
+				ID:      "msg1",
+				Message: "New Message",
+				Status:  "New Status",
+				Role:    AssistantRole,
+			},
+			expected: ChatMessage{
+				ID:      "msg1",
+				Message: "New Message",
+				Status:  "New Status",
+				Role:    AssistantRole,
+				Source:  UserSource,
+			},
+			expectError: false,
+		},
+		{
+			name: "Update Only Message",
+			setup: func() ChatMessage {
+				msg := ChatMessage{
+					ID:        "msg2",
+					Message:   "Old Message",
+					Status:    SentStatus,
+					Role:      UserRole,
+					Timestamp: currentTime,
+					Source:    UserSource,
+				}
+				TestDB.db.Create(&msg)
+				return msg
+			},
+			input: ChatMessage{
+				ID:      "msg2",
+				Message: "New Message",
+			},
+			expected: ChatMessage{
+				ID:      "msg2",
+				Message: "New Message",
+				Status:  SentStatus,
+				Role:    UserRole,
+				Source:  UserSource,
+			},
+			expectError: false,
+		},
+		{
+			name: "Empty ID",
+			setup: func() ChatMessage {
+				return ChatMessage{}
+			},
+			input: ChatMessage{
+				ID:      "",
+				Message: "New Message",
+			},
+			expected:    ChatMessage{},
+			expectError: true,
+		},
+		{
+			name: "Non-Existent ID",
+			setup: func() ChatMessage {
+				return ChatMessage{}
+			},
+			input: ChatMessage{
+				ID:      "nonexistent",
+				Message: "New Message",
+			},
+			expected:    ChatMessage{},
+			expectError: true,
+		},
+		{
+			name: "Large Message Content",
+			setup: func() ChatMessage {
+				msg := ChatMessage{
+					ID:        "msg3",
+					Message:   "Old Message",
+					Status:    SentStatus,
+					Role:      UserRole,
+					Timestamp: currentTime,
+					Source:    UserSource,
+				}
+				TestDB.db.Create(&msg)
+				return msg
+			},
+			input: ChatMessage{
+				ID:      "msg3",
+				Message: strings.Repeat("a", 10000),
+			},
+			expected: ChatMessage{
+				ID:      "msg3",
+				Message: strings.Repeat("a", 10000),
+				Status:  SentStatus,
+				Role:    UserRole,
+				Source:  UserSource,
+			},
+			expectError: false,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			TestDB.db.Exec("DELETE FROM chat_messages")
+
+			original := tt.setup()
+			updatedMsg, err := TestDB.UpdateChatMessage(&tt.input)
+
+			if tt.expectError {
+				assert.Error(t, err)
+			} else {
+				assert.NoError(t, err)
+				assert.Equal(t, tt.expected.ID, updatedMsg.ID)
+				assert.Equal(t, tt.expected.Message, updatedMsg.Message)
+				assert.Equal(t, tt.expected.Status, updatedMsg.Status)
+				assert.Equal(t, tt.expected.Role, updatedMsg.Role)
+				assert.Equal(t, tt.expected.Source, updatedMsg.Source)
+				assert.True(t, updatedMsg.Timestamp.After(original.Timestamp))
+			}
+		})
+	}
+}
