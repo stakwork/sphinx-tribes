@@ -254,4 +254,13 @@ type Database interface {
 	CreateFeaturedBounty(bounty FeaturedBounty) error
 	UpdateFeaturedBounty(bountyID string, bounty FeaturedBounty) error
 	DeleteFeaturedBounty(bountyID string) error
+	CreateNotification(notification *Notification) error
+	GetNotification(uuid string) (*Notification, error)
+	UpdateNotification(uuid string, updates map[string]interface{}) error
+	DeleteNotification(uuid string) error
+	GetPendingNotifications() ([]Notification, error)
+	GetFailedNotifications(maxRetries int) ([]Notification, error)
+	GetNotificationsByPubKey(pubKey string, limit, offset int) ([]Notification, error)
+	IncrementRetryCount(uuid string) error
+	GetNotificationCount(pubKey string) (int64, error)
 }
