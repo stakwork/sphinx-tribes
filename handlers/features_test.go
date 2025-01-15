@@ -819,7 +819,7 @@ func TestDeleteFeaturePhase(t *testing.T) {
 		expectedBody   map[string]string
 	}{
 		{
-			name:           "Valid Request with Existing Feature and Phase UUIDs",
+			name:           "Valid Request with Existing Feature and Phase UUID",
 			featureUuid:    "validFeatureUuid",
 			phaseUuid:      "validPhaseUuid",
 			pubKeyFromAuth: "validPubKey",
