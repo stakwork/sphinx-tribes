@@ -558,7 +558,7 @@ func TestGetAllChatsForWorkspace(t *testing.T) {
 		expectError bool
 	}{
 		{
-			name:        "Valid Workspace ID with Chats",
+			name:        "Valid Workspace ID with Chat",
 			workspaceID: "validWorkspaceWithChats",
 			setup: func(workspaceID string) {
 				TestDB.db.Create(&Chat{ID: "1", WorkspaceID: workspaceID, UpdatedAt: currentTime})
