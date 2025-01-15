@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"context"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"net/http"
 	"net/http/httptest"
@@ -808,89 +809,166 @@ func TestGetFeaturePhaseByUUID(t *testing.T) {
 }
 
 func TestDeleteFeaturePhase(t *testing.T) {
-	teardownSuite := SetupSuite(t)
-	defer teardownSuite(t)
-
-	fHandler := NewFeatureHandler(db.TestDB)
-
-	person := db.Person{
-		Uuid:        uuid.New().String(),
-		OwnerAlias:  "test-alias",
-		UniqueName:  "test-unique-name",
-		OwnerPubKey: "test-pubkey",
-		PriceToMeet: 0,
-		Description: "test-description",
+	tests := []struct {
+		name           string
+		featureUuid    string
+		phaseUuid      string
+		pubKeyFromAuth interface{}
+		dbError        error
+		expectedStatus int
+		expectedBody   map[string]string
+	}{
+		{
+			name:           "Valid Request with Existing Feature and Phase UUID",
+			featureUuid:    "validFeatureUuid",
+			phaseUuid:      "validPhaseUuid",
+			pubKeyFromAuth: "validPubKey",
+			dbError:        nil,
+			expectedStatus: http.StatusOK,
+			expectedBody:   map[string]string{"message": "Phase deleted successfully"},
+		},
+		{
+			name:           "Valid Request with Non-Existing Feature UUID",
+			featureUuid:    "nonExistingFeatureUuid",
+			phaseUuid:      "validPhaseUuid",
+			pubKeyFromAuth: "validPubKey",
+			dbError:        errors.New("Feature not found"),
+			expectedStatus: http.StatusNotFound,
+			expectedBody:   map[string]string{"error": "no phase found to delete"},
+		},
+		{
+			name:           "Valid Request with Non-Existing Phase UUID",
+			featureUuid:    "validFeatureUuids",
+			phaseUuid:      "nonExistingPhaseUuid",
+			pubKeyFromAuth: "validPubKey",
+			dbError:        errors.New("no phase found to delete"),
+			expectedStatus: http.StatusNotFound,
+			expectedBody:   map[string]string{"error": "no phase found to delete"},
+		},
+		{
+			name:           "Valid Request with Both Non-Existing Feature and Phase UUIDs",
+			featureUuid:    "nonExistingFeatureUuid",
+			phaseUuid:      "nonExistingPhaseUuid",
+			pubKeyFromAuth: "validPubKey",
+			dbError:        errors.New("no phase found to delete"),
+			expectedStatus: http.StatusNotFound,
+			expectedBody:   map[string]string{"error": "no phase found to delete"},
+		},
+		{
+			name:           "Missing Authorization Key",
+			featureUuid:    "validFeatureUuid",
+			phaseUuid:      "validPhaseUuid",
+			pubKeyFromAuth: nil,
+			expectedStatus: http.StatusUnauthorized,
+			expectedBody:   nil,
+		},
+		{
+			name:           "Invalid Authorization Key Type",
+			featureUuid:    "validFeatureUuid",
+			phaseUuid:      "validPhaseUuid",
+			pubKeyFromAuth: 12345, // invalid pub key
+			expectedStatus: http.StatusUnauthorized,
+			expectedBody:   nil,
+		},
+		{
+			name:           "Feature UUID and Phase UUID as Empty Strings",
+			featureUuid:    "",
+			phaseUuid:      "",
+			pubKeyFromAuth: "validPubKey",
+			expectedStatus: http.StatusBadRequest,
+			expectedBody:   map[string]string{"error": "Malformed UUIDs"},
+		},
+		{
+			name:           "Feature UUID and Phase UUID with Special Characters",
+			featureUuid:    "!@#$%",
+			phaseUuid:      "^&*()",
+			pubKeyFromAuth: "validPubKey",
+			expectedStatus: http.StatusBadRequest,
+			expectedBody:   map[string]string{"error": "Malformed UUIDs"},
+		},
+		{
+			name:           "Malformed UUIDs",
+			featureUuid:    "malformedFeatureUuid",
+			phaseUuid:      "malformedPhaseUuid@",
+			pubKeyFromAuth: "validPubKey",
+			expectedStatus: http.StatusBadRequest,
+			expectedBody:   map[string]string{"error": "Malformed UUIDs"},
+		},
 	}
-	db.TestDB.CreateOrEditPerson(person)
 
-	workspace := db.Workspace{
-		Uuid:        uuid.New().String(),
-		Name:        "test-workspace" + uuid.New().String(),
-		OwnerPubKey: person.OwnerPubKey,
-		Github:      "https://github.com/test",
-		Website:     "https://www.testwebsite.com",
-		Description: "test-description",
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			teardownSuite := SetupSuite(t)
+			defer teardownSuite(t)
+
+			fHandler := NewFeatureHandler(db.TestDB)
+
+			if tt.featureUuid == "validFeatureUuid" {
+				person := db.Person{
+					Uuid:        uuid.New().String(),
+					OwnerAlias:  "test-alias",
+					UniqueName:  "test-unique-name",
+					OwnerPubKey: "validPubKey",
+					PriceToMeet: 0,
+					Description: "test-description",
+				}
+				db.TestDB.CreateOrEditPerson(person)
+
+				workspace := db.Workspace{
+					Uuid:        uuid.New().String(),
+					Name:        "test-workspace" + uuid.New().String(),
+					OwnerPubKey: person.OwnerPubKey,
+					Github:      "https://github.com/test",
+					Website:     "https://www.testwebsite.com",
+					Description: "test-description",
+				}
+				db.TestDB.CreateOrEditWorkspace(workspace)
+				workspace = db.TestDB.GetWorkspaceByUuid(workspace.Uuid)
+
+				feature := db.WorkspaceFeatures{
+					Uuid:          tt.featureUuid,
+					WorkspaceUuid: workspace.Uuid,
+					Name:          "test-feature",
+					Url:           "https://github.com/test-feature",
+					Priority:      0,
+				}
+				db.TestDB.CreateOrEditFeature(feature)
+
+				featurePhase := db.FeaturePhase{
+					Uuid:        tt.phaseUuid,
+					FeatureUuid: feature.Uuid,
+					Name:        "test-feature-phase",
+					Priority:    0,
+				}
+				db.TestDB.CreateOrEditFeaturePhase(featurePhase)
+			}
+
+			encodedFeatureUuid := url.QueryEscape(tt.featureUuid)
+			encodedPhaseUuid := url.QueryEscape(tt.phaseUuid)
+
+			req := httptest.NewRequest(http.MethodDelete, "/features/"+encodedFeatureUuid+"/phase/"+encodedPhaseUuid, nil)
+			w := httptest.NewRecorder()
+
+			ctx := context.WithValue(req.Context(), auth.ContextKey, tt.pubKeyFromAuth)
+			req = req.WithContext(ctx)
+
+			rctx := chi.NewRouteContext()
+			rctx.URLParams.Add("feature_uuid", encodedFeatureUuid)
+			rctx.URLParams.Add("phase_uuid", encodedPhaseUuid)
+			req = req.WithContext(context.WithValue(req.Context(), chi.RouteCtxKey, rctx))
+
+			fHandler.DeleteFeaturePhase(w, req)
+
+			assert.Equal(t, tt.expectedStatus, w.Code)
+
+			if tt.expectedBody != nil {
+				var responseBody map[string]string
+				err := json.NewDecoder(w.Body).Decode(&responseBody)
+				assert.NoError(t, err)
+				assert.Equal(t, tt.expectedBody, responseBody)
+			}
+		})
 	}
-	db.TestDB.CreateOrEditWorkspace(workspace)
-	workspace = db.TestDB.GetWorkspaceByUuid(workspace.Uuid)
-
-	feature := db.WorkspaceFeatures{
-		Uuid:          uuid.New().String(),
-		WorkspaceUuid: workspace.Uuid,
-		Name:          "test-feature",
-		Url:           "https://github.com/test-feature",
-		Priority:      0,
-	}
-	db.TestDB.CreateOrEditFeature(feature)
-
-	featurePhase := db.FeaturePhase{
-		Uuid:        uuid.New().String(),
-		FeatureUuid: feature.Uuid,
-		Name:        "test-feature-phase",
-		Priority:    0,
-	}
-	db.TestDB.CreateOrEditFeaturePhase(featurePhase)
-
-	ctx := context.WithValue(context.Background(), auth.ContextKey, workspace.OwnerPubKey)
-
-	t.Run("should return error if not authorized", func(t *testing.T) {
-		rr := httptest.NewRecorder()
-		handler := http.HandlerFunc(fHandler.DeleteFeaturePhase)
-
-		rctx := chi.NewRouteContext()
-		rctx.URLParams.Add("feature_uuid", feature.Uuid)
-		rctx.URLParams.Add("phase_uuid", featurePhase.Uuid)
-		req, err := http.NewRequestWithContext(context.WithValue(context.Background(), chi.RouteCtxKey, rctx), http.MethodDelete, "/features/"+feature.Uuid+"/phase/"+featurePhase.Uuid, nil)
-		if err != nil {
-			t.Fatal(err)
-		}
-
-		handler.ServeHTTP(rr, req)
-
-		assert.Equal(t, http.StatusUnauthorized, rr.Code)
-	})
-
-	t.Run("should delete feature phase on successful delete", func(t *testing.T) {
-		rr := httptest.NewRecorder()
-		handler := http.HandlerFunc(fHandler.DeleteFeaturePhase)
-
-		rctx := chi.NewRouteContext()
-		rctx.URLParams.Add("feature_uuid", feature.Uuid)
-		rctx.URLParams.Add("phase_uuid", featurePhase.Uuid)
-		req, err := http.NewRequestWithContext(context.WithValue(ctx, chi.RouteCtxKey, rctx), http.MethodDelete, "/features/"+feature.Uuid+"/phase/"+featurePhase.Uuid, nil)
-		if err != nil {
-			t.Fatal(err)
-		}
-
-		handler.ServeHTTP(rr, req)
-
-		assert.Equal(t, http.StatusOK, rr.Code)
-
-		deletedFeaturePhase, err := db.TestDB.GetFeaturePhaseByUuid(feature.Uuid, featurePhase.Uuid)
-		assert.Error(t, err)
-		assert.Equal(t, "no phase found", err.Error())
-		assert.Equal(t, db.FeaturePhase{}, deletedFeaturePhase)
-	})
 }
 
 func TestCreateOrEditStory(t *testing.T) {

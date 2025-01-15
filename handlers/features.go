@@ -337,6 +337,13 @@ func (oh *featureHandler) DeleteFeaturePhase(w http.ResponseWriter, r *http.Requ
 	featureUuid := chi.URLParam(r, "feature_uuid")
 	phaseUuid := chi.URLParam(r, "phase_uuid")
 
+	if !isValidUUID(featureUuid) || !isValidUUID(phaseUuid) {
+		logger.Log.Info("Malformed UUIDs")
+		w.WriteHeader(http.StatusBadRequest)
+		json.NewEncoder(w).Encode(map[string]string{"error": "Malformed UUIDs"})
+		return
+	}
+
 	err := oh.db.DeleteFeaturePhase(featureUuid, phaseUuid)
 	if err != nil {
 		w.WriteHeader(http.StatusNotFound)
