@@ -3,6 +3,7 @@ package db
 import (
 	"errors"
 	"fmt"
+	"strconv"
 	"strings"
 	"sync"
 	"testing"
@@ -1279,6 +1280,179 @@ func TestGetPhaseByUuid(t *testing.T) {
 				assert.NotNil(t, phase.Updated)
 			}
 		})
+	}
+}
+
+func TestDeleteFeaturePhase(t *testing.T) {
+	InitTestDB()
+	defer CloseTestDB()
+	CleanTestData()
+
+	tests := []struct {
+		name                 string
+		featureUuid          string
+		phaseUuid            string
+		setup                func(featureUuid, phaseUuid string)
+		expectError          bool
+		expectedRowsAffected int64
+	}{
+		{
+			name:        "Valid feature and phase UUIDs",
+			featureUuid: uuid.New().String(),
+			phaseUuid:   uuid.New().String(),
+			setup: func(featureUuid, phaseUuid string) {
+
+				feature := WorkspaceFeatures{
+					Uuid:          featureUuid,
+					Name:          "Test Feature",
+					WorkspaceUuid: "workspace1",
+				}
+				TestDB.CreateOrEditFeature(feature)
+
+				phase := FeaturePhase{
+					Uuid:        phaseUuid,
+					FeatureUuid: featureUuid,
+					Name:        "Phase 1",
+				}
+				TestDB.CreateOrEditFeaturePhase(phase)
+			},
+			expectError:          false,
+			expectedRowsAffected: 0,
+		},
+		{
+			name:        "Non-Existent Phase",
+			featureUuid: uuid.New().String(),
+			phaseUuid:   uuid.New().String(),
+			setup: func(featureUuid, _ string) {
+
+				feature := WorkspaceFeatures{
+					Uuid: featureUuid,
+					Name: "Test Feature",
+				}
+				TestDB.CreateOrEditFeature(feature)
+			},
+			expectError:          true,
+			expectedRowsAffected: 0,
+		},
+		{
+			name:                 "Non-Existent Feature",
+			featureUuid:          uuid.New().String(),
+			phaseUuid:            uuid.New().String(),
+			setup:                func(_, _ string) {},
+			expectError:          true,
+			expectedRowsAffected: 0,
+		},
+		{
+			name:                 "Both UUIDs Non-Existent",
+			featureUuid:          uuid.New().String(),
+			phaseUuid:            uuid.New().String(),
+			setup:                func(_, _ string) {},
+			expectError:          true,
+			expectedRowsAffected: 0,
+		},
+		{
+			name:                 "Empty UUIDs",
+			featureUuid:          "",
+			phaseUuid:            "",
+			setup:                func(featureUuid, phaseUuid string) {},
+			expectError:          true,
+			expectedRowsAffected: 0,
+		},
+		{
+			name:                 "Invalid UUID Format",
+			featureUuid:          "invalid-uuid-format",
+			phaseUuid:            "invalid-uuid-format",
+			setup:                func(featureUuid, phaseUuid string) {},
+			expectError:          true,
+			expectedRowsAffected: 0,
+		},
+		{
+			name:        "Case Sensitivity",
+			featureUuid: "VALID-FEATURE-UUID",
+			phaseUuid:   "VALID-PHASE-UUID",
+			setup: func(featureUuid, phaseUuid string) {
+
+				feature := WorkspaceFeatures{
+					Uuid: "valid-feature-uuid",
+					Name: "Test Feature",
+				}
+				TestDB.CreateOrEditFeature(feature)
+				phase := FeaturePhase{
+					Uuid:        "valid-phase-uuid",
+					FeatureUuid: "valid-feature-uuid",
+					Name:        "Phase 1",
+				}
+				TestDB.CreateOrEditFeaturePhase(phase)
+			},
+			expectError:          true,
+			expectedRowsAffected: 0,
+		},
+		{
+			name:        "SQL Injection Attempt",
+			featureUuid: "valid-feature-uuid'; DROP TABLE FeaturePhase; --",
+			phaseUuid:   "valid-phase-uuid",
+			setup: func(featureUuid, phaseUuid string) {
+				feature := WorkspaceFeatures{
+					Uuid: "valid-feature-uuid4",
+					Name: "Test Feature",
+				}
+				TestDB.CreateOrEditFeature(feature)
+
+				phase := FeaturePhase{
+					Uuid:        "valid-phase-uuid4",
+					FeatureUuid: "valid-feature-uuid",
+					Name:        "Phase 1",
+				}
+				TestDB.CreateOrEditFeaturePhase(phase)
+			},
+			expectError:          true,
+			expectedRowsAffected: 0,
+		},
+		{
+			name:        "Large Number of Phases",
+			featureUuid: "valid-feature-uuid",
+			phaseUuid:   "valid-phase-uuid",
+			setup: func(featureUuid, phaseUuid string) {
+				phases := make(map[string]bool)
+				for i := 0; i < 1000000; i++ {
+					phases[strconv.Itoa(i)] = true
+				}
+				phases["valid-phase-uuid"] = true
+				TestDB.CreateOrEditFeaturePhase(FeaturePhase{Uuid: "valid-phase-uuid", FeatureUuid: featureUuid, Name: "Phase 1"})
+			},
+			expectError:          false,
+			expectedRowsAffected: 0,
+		},
+		{
+			name:        "Concurrent Deletions",
+			featureUuid: "valid-feature-uuid",
+			phaseUuid:   "valid-phase-uuid",
+			setup: func(featureUuid, phaseUuid string) {
+
+				TestDB.CreateOrEditFeaturePhase(FeaturePhase{Uuid: phaseUuid, FeatureUuid: featureUuid, Name: "Phase 1"})
+			},
+			expectError:          false,
+			expectedRowsAffected: 0,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			tt.setup(tt.featureUuid, tt.phaseUuid)
+
+			err := TestDB.DeleteFeaturePhase(tt.featureUuid, tt.phaseUuid)
+
+			if tt.expectError {
+				assert.Error(t, err)
+			} else {
+				assert.NoError(t, err)
+
+				var count int64
+				TestDB.db.Model(&FeaturePhase{}).Where("uuid = ? AND feature_uuid = ?", tt.phaseUuid, tt.featureUuid).Count(&count)
+				assert.Equal(t, tt.expectedRowsAffected, count)
+			}
+		})
+		CleanTestData()
 	}
 }
 

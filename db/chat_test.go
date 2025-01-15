@@ -1,6 +1,7 @@
 package db
 
 import (
+	"fmt"
 	"strings"
 	"testing"
 	"time"
@@ -536,6 +537,123 @@ func TestGetChatMessagesForChatID(t *testing.T) {
 					if len(expectedMsg.ContextTags) > 0 {
 						assert.Equal(t, expectedMsg.ContextTags, messages[i].ContextTags)
 					}
+				}
+			}
+		})
+	}
+}
+
+func TestGetAllChatsForWorkspace(t *testing.T) {
+	InitTestDB()
+
+	CleanTestData()
+
+	currentTime := time.Now()
+
+	tests := []struct {
+		name        string
+		workspaceID string
+		setup       func(workspaceID string)
+		expected    []Chat
+		expectError bool
+	}{
+		{
+			name:        "Valid Workspace ID with Chats",
+			workspaceID: "validWorkspaceWithChats",
+			setup: func(workspaceID string) {
+				TestDB.db.Create(&Chat{ID: "1", WorkspaceID: workspaceID, UpdatedAt: currentTime})
+				TestDB.db.Create(&Chat{ID: "2", WorkspaceID: workspaceID, UpdatedAt: currentTime.Add(-time.Hour)})
+			},
+			expected: []Chat{
+				{ID: "1", WorkspaceID: "validWorkspaceWithChats", UpdatedAt: currentTime},
+				{ID: "2", WorkspaceID: "validWorkspaceWithChats", UpdatedAt: currentTime.Add(-time.Hour)},
+			},
+			expectError: false,
+		},
+		{
+			name:        "Valid Workspace ID with No Chats",
+			workspaceID: "validWorkspaceNoChats",
+			setup:       func(workspaceID string) {},
+			expected:    []Chat{},
+			expectError: false,
+		},
+		{
+			name:        "Empty Workspace ID",
+			workspaceID: "",
+			setup:       func(workspaceID string) {},
+			expected:    []Chat{},
+			expectError: false,
+		},
+		{
+			name:        "Large Number of Chats",
+			workspaceID: "workspaceWithManyChats",
+			setup: func(workspaceID string) {
+				for i := 0; i < 1000; i++ {
+					TestDB.db.Create(&Chat{ID: fmt.Sprintf("%d", i), WorkspaceID: workspaceID, UpdatedAt: currentTime})
+				}
+			},
+			expected: func() []Chat {
+				chats := make([]Chat, 1000)
+				for i := 0; i < 1000; i++ {
+					chats[i] = Chat{ID: fmt.Sprintf("%d", i), WorkspaceID: "workspaceWithManyChats", UpdatedAt: currentTime}
+				}
+				return chats
+			}(),
+			expectError: false,
+		},
+		{
+			name:        "Special Characters in Workspace ID",
+			workspaceID: "special!@#$%^&*()_+{}|:<>?",
+			setup: func(workspaceID string) {
+				TestDB.db.Create(&Chat{ID: "1", WorkspaceID: workspaceID, UpdatedAt: currentTime})
+			},
+			expected: []Chat{
+				{ID: "1", WorkspaceID: "special!@#$%^&*()_+{}|:<>?", UpdatedAt: currentTime},
+			},
+			expectError: false,
+		},
+		{
+			name:        "SQL Injection Attempt",
+			workspaceID: "1; DROP TABLE chats; --",
+			setup:       func(workspaceID string) {},
+			expected:    []Chat{},
+			expectError: false,
+		},
+		{
+			name:        "Whitespace in Workspace ID",
+			workspaceID: "  validWorkspace  ",
+			setup: func(workspaceID string) {
+				TestDB.db.Create(&Chat{ID: "1", WorkspaceID: "validWorkspace", UpdatedAt: currentTime})
+			},
+			expected:    []Chat{},
+			expectError: false,
+		},
+		{
+			name:        "Non-Existent Workspace ID",
+			workspaceID: "nonExistentWorkspace",
+			setup:       func(workspaceID string) {},
+			expected:    []Chat{},
+			expectError: false,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			CleanTestData()
+			tt.setup(tt.workspaceID)
+
+			chats, err := TestDB.GetAllChatsForWorkspace(tt.workspaceID)
+
+			if tt.expectError {
+				assert.Error(t, err)
+			} else {
+				assert.NoError(t, err)
+				assert.Equal(t, len(tt.expected), len(chats))
+
+				for i, expectedChat := range tt.expected {
+					assert.Equal(t, expectedChat.ID, chats[i].ID)
+					assert.Equal(t, expectedChat.WorkspaceID, chats[i].WorkspaceID)
+					assert.WithinDuration(t, expectedChat.UpdatedAt, chats[i].UpdatedAt, time.Second)
 				}
 			}
 		})

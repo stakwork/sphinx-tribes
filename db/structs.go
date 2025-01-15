@@ -949,6 +949,7 @@ const (
 	StatusInReview   BountyStatus = "IN_REVIEW"
 	StatusComplete   BountyStatus = "COMPLETED"
 	StatusPaid       BountyStatus = "PAID"
+	StatusDraft      BountyStatus = "DRAFT"
 )
 
 type BountyCard struct {
@@ -1169,6 +1170,15 @@ type Endpoint struct {
 	FeatureFlagUUID uuid.UUID `gorm:"type:uuid;not null" json:"-"`
 	CreatedAt       time.Time `gorm:"type:timestamp;default:current_timestamp" json:"-"`
 	UpdatedAt       time.Time `gorm:"type:timestamp;default:current_timestamp" json:"-"`
+}
+
+type FeaturedBounty struct {
+	BountyID  string    `json:"bountyId" gorm:"uniqueIndex; unique; not null"`
+	URL       string    `gorm:"not null" json:"url"`
+	AddedAt   int64     `json:"addedAt"`
+	Title     string    `json:"title"`
+	CreatedAt time.Time `json:"created_at" gorm:"default:current_timestamp"`
+	UpdatedAt time.Time `json:"updated_at" gorm:"default:current_timestamp"`
 }
 
 func (Person) TableName() string {

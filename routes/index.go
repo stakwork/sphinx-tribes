@@ -2,7 +2,9 @@ package routes
 
 import (
 	"bytes"
+	"compress/gzip"
 	"context"
+	"encoding/hex"
 	"encoding/json"
 	"fmt"
 	"io"
@@ -26,6 +28,8 @@ import (
 	"github.com/stakwork/sphinx-tribes/logger"
 	customMiddleware "github.com/stakwork/sphinx-tribes/middlewares"
 	"github.com/stakwork/sphinx-tribes/utils"
+
+	"github.com/posthog/posthog-go"
 )
 
 // NewRouter creates a chi router
@@ -196,11 +200,37 @@ func sendEdgeListToJarvis(edgeList utils.EdgeList) error {
 	return fmt.Errorf("jarvis returned non-success status: %d, body: %s", resp.StatusCode, string(body))
 }
 
+func compressToHex(input string) (string, error) {
+	// Create a buffer to hold the compressed data
+	var compressedBuffer bytes.Buffer
+
+	// Create a gzip writer
+	gzipWriter := gzip.NewWriter(&compressedBuffer)
+
+	// Write the input string to the gzip writer
+	_, err := gzipWriter.Write([]byte(input))
+	if err != nil {
+		return "", fmt.Errorf("failed to write to gzip writer: %w", err)
+	}
+
+	// Close the gzip writer to flush the data
+	err = gzipWriter.Close()
+	if err != nil {
+		return "", fmt.Errorf("failed to close gzip writer: %w", err)
+	}
+
+	// Encode the compressed data to hex
+	hexEncoded := hex.EncodeToString(compressedBuffer.Bytes())
+	return hexEncoded, nil
+}
+
 // Middleware to handle InternalServerError
 func internalServerErrorHandler(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		rr := negroni.NewResponseWriter(w)
 
+		var elements_chain strings.Builder
+		isExceedingLimit := false
 		trap.AddInterceptor(&trap.Interceptor{
 			Pre: func(ctx context.Context, f *core.FuncInfo, args core.Object, results core.Object) (interface{}, error) {
 				index := strings.Index(f.File, "sphinx-tribes")
@@ -208,11 +238,47 @@ func internalServerErrorHandler(next http.Handler) http.Handler {
 				if index != -1 {
 					trimmed = f.File[index:]
 				}
-				logger.Log.Machine("%s:%d %s\n", trimmed, f.Line, f.Name)
+				//fmt.Printf("%s:%d %s\n", trimmed, f.Line, f.Name)
+				newContent := fmt.Sprintf("%s:%d %s,\n", trimmed, f.Line, f.Name)
+				if elements_chain.Len()+len(newContent) <= 512000 {
+					elements_chain.WriteString(newContent)
+				} else if isExceedingLimit == false {
+					// Optionally, you could log or handle this case differently if needed
+					fmt.Printf("elements_chain length exceeded 500KB, skipping further additions.\n")
+					isExceedingLimit = true
+				}
 
 				return nil, nil
 			},
 		})
+
+		defer func() {
+			posthog_key := os.Getenv("POSTHOG_KEY")
+			posthog_url := os.Getenv("POSTHOG_URL")
+			session_id := r.Header.Get("x-session-id")
+			if posthog_key != "" && posthog_url != "" && session_id != "" {
+				logger.Log.Info("Sending to Posthog")
+				client, _ := posthog.NewWithConfig(
+					posthog_key,
+					posthog.Config{
+						Endpoint: posthog_url,
+					},
+				)
+				defer client.Close()
+				elements_chain_string := elements_chain.String()
+				hexCompressed, _ := compressToHex(elements_chain_string)
+				_ = client.Enqueue(posthog.Capture{
+					DistinctId: session_id,         // Unique ID for the user
+					Event:      "backend_api_call", // The event name
+					Properties: map[string]interface{}{
+						"$session_id":     session_id,
+						"$event_type":     "backend_api_call",
+						"$elements_chain": hexCompressed,
+					},
+				})
+			}
+		}()
+
 		defer func() {
 			if err := recover(); err != nil {
 				// Get stack trace

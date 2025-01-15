@@ -1538,10 +1538,55 @@ func (h *bountyHandler) GetBountyCards(w http.ResponseWriter, r *http.Request) {
 		bounties = h.db.GetAllBounties(r)
 	}
 
-	var bountyCardResponse []db.BountyCard = h.GenerateBountyCardResponse(bounties)
+	bountyCardResponse := h.GenerateBountyCardResponse(bounties)
+
+	ticketCards, err := h.GenerateTicketCardResponse(workspaceUuid)
+	if err != nil {
+		logger.Log.Error("failed to generate ticket cards", "error", err)
+	} else {
+		bountyCardResponse = append(bountyCardResponse, ticketCards...)
+	}
 
 	w.WriteHeader(http.StatusOK)
 	json.NewEncoder(w).Encode(bountyCardResponse)
+}
+
+func (h *bountyHandler) GenerateTicketCardResponse(workspaceUuid string) ([]db.BountyCard, error) {
+	var ticketCards []db.BountyCard
+
+	ticketGroups, err := h.db.GetAllTicketGroups()
+	if err != nil {
+		return nil, fmt.Errorf("failed to get ticket groups: %w", err)
+	}
+
+	for _, group := range ticketGroups {
+		ticket, err := h.db.GetLatestTicketByGroup(group)
+		if err != nil {
+			logger.Log.Error("failed to get latest ticket", "group", group, "error", err)
+			continue
+		}
+
+		feature := h.db.GetFeatureByUuid(ticket.FeatureUUID)
+		phase, _ := h.db.GetFeaturePhaseByUuid(ticket.FeatureUUID, ticket.PhaseUUID)
+		workspace := h.db.GetWorkspaceByUuid(feature.WorkspaceUuid)
+		bountyID := uint(ticket.UUID.ID())
+
+		ticketCard := db.BountyCard{
+			BountyID:     bountyID,
+			Title:        ticket.Name,
+			AssigneePic:  "",
+			Assignee:     "",
+			AssigneeName: "",
+			Features:     feature,
+			Phase:        phase,
+			Workspace:    workspace,
+			Status:       db.StatusDraft,
+		}
+
+		ticketCards = append(ticketCards, ticketCard)
+	}
+
+	return ticketCards, nil
 }
 
 func (h *bountyHandler) GenerateBountyCardResponse(bounties []db.NewBounty) []db.BountyCard {
@@ -1860,4 +1905,148 @@ func (h *bountyHandler) GetBountiesLeaderboard(w http.ResponseWriter, _ *http.Re
 
 	w.WriteHeader(http.StatusOK)
 	json.NewEncoder(w).Encode(leaderBoard)
+}
+
+func (h *bountyHandler) GetAllFeaturedBounties(w http.ResponseWriter, r *http.Request) {
+	bounties, err := h.db.GetAllFeaturedBounties()
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		json.NewEncoder(w).Encode(map[string]string{"error": err.Error()})
+		return
+	}
+	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode(bounties)
+}
+
+func (h *bountyHandler) CreateFeaturedBounty(w http.ResponseWriter, r *http.Request) {
+	var bounty db.FeaturedBounty
+	if err := json.NewDecoder(r.Body).Decode(&bounty); err != nil {
+		w.WriteHeader(http.StatusBadRequest)
+		json.NewEncoder(w).Encode(map[string]string{"error": "Invalid payload"})
+		return
+	}
+
+	if bounty.BountyID == "" {
+		w.WriteHeader(http.StatusBadRequest)
+		json.NewEncoder(w).Encode(map[string]string{"error": "BountyID is required"})
+		return
+	}
+
+	if bounty.URL == "" {
+		w.WriteHeader(http.StatusBadRequest)
+		json.NewEncoder(w).Encode(map[string]string{"error": "URL is required"})
+		return
+	}
+
+	if _, err := url.ParseRequestURI(bounty.URL); err != nil {
+		w.WriteHeader(http.StatusBadRequest)
+		json.NewEncoder(w).Encode(map[string]string{"error": "Invalid URL format"})
+		return
+	}
+
+	existingBounty, _ := h.db.GetFeaturedBountyById(bounty.BountyID)
+	if existingBounty.BountyID != "" {
+		w.WriteHeader(http.StatusConflict)
+		json.NewEncoder(w).Encode(map[string]string{"error": "BountyID already exists"})
+		return
+	}
+
+	bounty.AddedAt = time.Now().UnixMilli()
+	bounty.CreatedAt = time.Now()
+	bounty.UpdatedAt = time.Now()
+
+	if err := h.db.CreateFeaturedBounty(bounty); err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		json.NewEncoder(w).Encode(map[string]string{"error": err.Error()})
+		return
+	}
+
+	w.WriteHeader(http.StatusCreated)
+	json.NewEncoder(w).Encode(map[string]interface{}{
+		"data": map[string]interface{}{
+			"bountyId": bounty.BountyID,
+			"url":      bounty.URL,
+			"addedAt":  bounty.AddedAt,
+			"title":    bounty.Title,
+		},
+	})
+}
+
+func (h *bountyHandler) UpdateFeaturedBounty(w http.ResponseWriter, r *http.Request) {
+
+	var bounty db.FeaturedBounty
+	if err := json.NewDecoder(r.Body).Decode(&bounty); err != nil {
+		w.WriteHeader(http.StatusBadRequest)
+		json.NewEncoder(w).Encode(map[string]string{"error": "Invalid payload"})
+		return
+	}
+
+	if bounty.BountyID == "" {
+		w.WriteHeader(http.StatusBadRequest)
+		json.NewEncoder(w).Encode(map[string]string{"error": "BountyID is required in the request body"})
+		return
+	}
+	if bounty.URL == "" {
+		w.WriteHeader(http.StatusBadRequest)
+		json.NewEncoder(w).Encode(map[string]string{"error": "URL is required"})
+		return
+	}
+
+	if _, err := url.ParseRequestURI(bounty.URL); err != nil {
+		w.WriteHeader(http.StatusBadRequest)
+		json.NewEncoder(w).Encode(map[string]string{"error": "Invalid URL format"})
+		return
+	}
+
+	existingBounty, _ := h.db.GetFeaturedBountyById(bounty.BountyID)
+	if existingBounty.BountyID == "" {
+		w.WriteHeader(http.StatusNotFound)
+		json.NewEncoder(w).Encode(map[string]string{"error": "Bounty not found"})
+		return
+	}
+
+	existingBounty.URL = bounty.URL
+	existingBounty.Title = bounty.Title
+	existingBounty.UpdatedAt = time.Now()
+
+	if err := h.db.UpdateFeaturedBounty(bounty.BountyID, existingBounty); err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		json.NewEncoder(w).Encode(map[string]string{"error": err.Error()})
+		return
+	}
+
+	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode(map[string]interface{}{
+		"data": map[string]interface{}{
+			"bountyId": existingBounty.BountyID,
+			"url":      existingBounty.URL,
+			"addedAt":  existingBounty.AddedAt,
+			"title":    existingBounty.Title,
+		},
+	})
+}
+
+func (h *bountyHandler) DeleteFeaturedBounty(w http.ResponseWriter, r *http.Request) {
+	bountyID := chi.URLParam(r, "bountyId")
+
+	if bountyID == "" {
+		w.WriteHeader(http.StatusBadRequest)
+		json.NewEncoder(w).Encode(map[string]string{"error": "BountyID is required in the URL"})
+		return
+	}
+
+	existingBounty, _ := h.db.GetFeaturedBountyById(bountyID)
+	if existingBounty.BountyID == "" {
+		w.WriteHeader(http.StatusNotFound)
+		json.NewEncoder(w).Encode(map[string]string{"error": "Bounty not found"})
+		return
+	}
+
+	if err := h.db.DeleteFeaturedBounty(bountyID); err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		json.NewEncoder(w).Encode(map[string]string{"error": err.Error()})
+		return
+	}
+
+	w.WriteHeader(http.StatusNoContent)
 }
