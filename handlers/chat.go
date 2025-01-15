@@ -330,7 +330,7 @@ func (ch *ChatHandler) SendMessage(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if err := websocket.WebsocketPool.SendTicketMessage(projectMsg); err != nil {
-		log.Printf("Failed to send Stakwork project WebSocket messages: %v", err)
+		log.Printf("Failed to send Stakwork project WebSocket message: %v", err)
 	}
 
 	wsMessage := websocket.TicketMessage{
