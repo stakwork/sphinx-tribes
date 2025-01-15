@@ -67,6 +67,7 @@ func InitTestDB() {
 	db.AutoMigrate(&WorkspaceCodeGraph{})
 	db.AutoMigrate(&FeatureFlag{})
 	db.AutoMigrate(&Bounty{})
+	db.AutoMigrate(&Notification{})
 
 	people := TestDB.GetAllPeople()
 	for _, p := range people {
@@ -100,6 +101,7 @@ func CleanTestData() {
 
 	TestDB.db.Exec("DELETE FROM chats")
 
+	TestDB.db.Exec("DELETE FROM notifications")
 }
 
 func DeleteAllChatMessages() {
