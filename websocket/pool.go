@@ -26,6 +26,11 @@ func (pool *Pool) Start() {
 	for {
 		select {
 		case client := <-pool.Register:
+			// ceck to acoid nil pointer
+			if pool.Clients == nil {
+				pool.Clients = make(map[string]*ClientData)
+			}
+
 			pool.Clients[client.Host] = &ClientData{
 				Client: client,
 				Status: true,
@@ -42,15 +47,22 @@ func (pool *Pool) Start() {
 				fmt.Println("Websocket pool client save error")
 			}
 		case client := <-pool.Unregister:
-			pool.Clients[client.Host].Client.Conn.WriteJSON(Message{Type: 1, Body: "User Disconnected..."})
-			delete(pool.Clients, client.Host)
-			fmt.Println("Size of Connection Pool: ", len(pool.Clients))
+			// ceck to acoid nil pointer
+			if pool.Clients[client.Host] != nil {
+				pool.Clients[client.Host].Client.Conn.WriteJSON(Message{Type: 1, Body: "User Disconnected..."})
+				delete(pool.Clients, client.Host)
+				fmt.Println("Size of Connection Pool: ", len(pool.Clients))
+			}
+
 		case message := <-pool.Broadcast:
 			fmt.Println("Sending message to all clients in Pool")
-			for client, _ := range pool.Clients {
-				if err := pool.Clients[client].Client.Conn.WriteJSON(message); err != nil {
-					fmt.Println(err)
-					return
+			// ceck to acoid nil pointer
+			if pool.Clients != nil {
+				for client, _ := range pool.Clients {
+					if err := pool.Clients[client].Client.Conn.WriteJSON(message); err != nil {
+						fmt.Println(err)
+						return
+					}
 				}
 			}
 		}
@@ -59,7 +71,7 @@ func (pool *Pool) Start() {
 
 func (pool *Pool) SendTicketMessage(message TicketMessage) error {
 	if message.BroadcastType == "direct" {
-
+		// check if client
 		if client, ok := pool.Clients[message.SourceSessionID]; ok {
 			return client.Client.Conn.WriteJSON(message)
 		}
