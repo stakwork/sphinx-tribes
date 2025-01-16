@@ -14,6 +14,7 @@ func BountyRoutes() chi.Router {
 	bountyHandler := handlers.NewBountyHandler(http.DefaultClient, db.DB)
 	r.Group(func(r chi.Router) {
 		r.Get("/all", bountyHandler.GetAllBounties)
+		r.Get("/featured/all", bountyHandler.GetAllFeaturedBounties)
 
 		r.Get("/id/{bountyId}", bountyHandler.GetBountyById)
 		r.Get("/index/{bountyId}", bountyHandler.GetBountyIndexById)
@@ -34,7 +35,6 @@ func BountyRoutes() chi.Router {
 	r.Group(func(r chi.Router) {
 		r.Use(auth.PubKeyContext)
 
-		r.Get("/featured/all", bountyHandler.GetAllFeaturedBounties)
 		r.Post("/featured/create", bountyHandler.CreateFeaturedBounty)
 		r.Put("/featured/update", bountyHandler.UpdateFeaturedBounty)
 		r.Delete("/featured/delete/{bountyId}", bountyHandler.DeleteFeaturedBounty)
