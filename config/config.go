@@ -115,6 +115,7 @@ func InitConfig() {
 	}
 
 	if JwtKey == "" {
+		fmt.Println("JwtKey is empty , no Jwt found =================================")
 		JwtKey = GenerateRandomString()
 	}
 
