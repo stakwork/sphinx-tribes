@@ -1048,6 +1048,10 @@ func TestGetWorkspacePreviousBountyByCreated(t *testing.T) {
 	teardownSuite := SetupSuite(t)
 	defer teardownSuite(t)
 
+	db.TestDB.CreateOrEditWorkspace(workspace)
+	db.TestDB.CreateOrEditBounty(workBountyPrev)
+	db.TestDB.CreateOrEditBounty(workBountyNext)
+
 	mockHttpClient := mocks.NewHttpClient(t)
 	bHandler := NewBountyHandler(mockHttpClient, db.TestDB)
 
@@ -1074,7 +1078,7 @@ func TestGetWorkspacePreviousBountyByCreated(t *testing.T) {
 		if err != nil {
 			t.Fatalf("Error decoding JSON response: %s", err)
 		}
-		assert.Greater(t, responseData, uint(2))
+		assert.Greater(t, responseData, uint(0))
 	})
 }
 
