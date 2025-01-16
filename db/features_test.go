@@ -1617,7 +1617,7 @@ func TestGetBountiesByPhaseUuid(t *testing.T) {
 			},
 		},
 		{
-			name: "Phase UUID with Special Characters",
+			name: "Phase UUID with the Special Characters",
 			setup: func() string {
 				phaseUuid := "special!@#$%^&*()"
 				bounty := Bounty{
