@@ -274,7 +274,7 @@ func (ah *authHandler) RefreshToken(w http.ResponseWriter, r *http.Request) {
 	claims, err := ah.decodeJwt(token)
 
 	if err != nil {
-		logger.Log.Error("[auth] Failed to parse JWT")
+		logger.Log.Error("[auth] Failed to parse JWT", err)
 		w.WriteHeader(http.StatusUnauthorized)
 		json.NewEncoder(w).Encode(err.Error())
 		return

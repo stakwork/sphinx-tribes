@@ -53,12 +53,14 @@ func PubKeyContext(next http.Handler) http.Handler {
 			claims, err := DecodeJwt(token)
 
 			if err != nil {
-				logger.Log.Info("Failed to parse JWT")
+				fmt.Println("JWT error =================================", err)
+				logger.Log.Info("Failed to parse JWT", token)
 				http.Error(w, http.StatusText(http.StatusUnauthorized), http.StatusUnauthorized)
 				return
 			}
 
 			if claims.VerifyExpiresAt(time.Now().UnixNano(), true) {
+				fmt.Println("Token has expired =================================")
 				logger.Log.Info("Token has expired")
 				http.Error(w, http.StatusText(http.StatusUnauthorized), http.StatusUnauthorized)
 				return
@@ -109,7 +111,8 @@ func PubKeyContextSuperAdmin(next http.Handler) http.Handler {
 			claims, err := DecodeJwt(token)
 
 			if err != nil {
-				logger.Log.Info("Failed to parse JWT")
+				fmt.Println("JWT error =================================", err)
+				logger.Log.Info("Failed to parse JWT", token)
 				http.Error(w, http.StatusText(http.StatusUnauthorized), http.StatusUnauthorized)
 				return
 			}
