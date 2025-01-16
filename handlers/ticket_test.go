@@ -951,3 +951,125 @@ func TestProcessTicketReview(t *testing.T) {
 		})
 	}
 }
+
+func TestGetTicketsByGroup(t *testing.T) {
+	teardownSuite := SetupSuite(t)
+	defer teardownSuite(t)
+
+	tHandler := NewTicketHandler(&http.Client{}, db.TestDB)
+
+	person := db.Person{
+		Uuid:        uuid.New().String(),
+		OwnerAlias:  "test-alias",
+		UniqueName:  "test-unique-name",
+		OwnerPubKey: "test-pubkey",
+		PriceToMeet: 0,
+		Description: "test-description",
+	}
+	db.TestDB.CreateOrEditPerson(person)
+
+	workspace := db.Workspace{
+		Uuid:        uuid.New().String(),
+		Name:        "test-workspace" + uuid.New().String(),
+		OwnerPubKey: person.OwnerPubKey,
+		Github:      "https://github.com/test",
+		Website:     "https://www.testwebsite.com",
+		Description: "test-description",
+	}
+	db.TestDB.CreateOrEditWorkspace(workspace)
+
+	feature := db.WorkspaceFeatures{
+		Uuid:          uuid.New().String(),
+		WorkspaceUuid: workspace.Uuid,
+		Name:          "test-feature",
+		Url:           "https://github.com/test-feature",
+		Priority:      0,
+	}
+	createdFeature, err := db.TestDB.CreateOrEditFeature(feature)
+	require.NoError(t, err)
+
+	phase := db.FeaturePhase{
+		Uuid:        uuid.New().String(),
+		FeatureUuid: createdFeature.Uuid,
+		Name:        "test-phase",
+		Priority:    0,
+	}
+	createdPhase, err := db.TestDB.CreateOrEditFeaturePhase(phase)
+	require.NoError(t, err)
+
+	groupUUID := uuid.New()
+	ticket := db.Tickets{
+		UUID:        uuid.New(),
+		TicketGroup: &groupUUID,
+		FeatureUUID: createdFeature.Uuid,
+		PhaseUUID:   createdPhase.Uuid,
+		Name:        "Test Ticket",
+		Description: "Test Description",
+		Status:      db.DraftTicket,
+		Version:     1,
+	}
+	createdTicket, err := db.TestDB.CreateOrEditTicket(&ticket)
+	require.NoError(t, err, "Failed to create test ticket")
+
+	tests := []struct {
+		name       string
+		groupUUID  string
+		auth       string
+		wantCode   int
+		wantTicket bool
+	}{
+		{
+			name:       "success",
+			groupUUID:  groupUUID.String(),
+			auth:       person.OwnerPubKey,
+			wantCode:   http.StatusOK,
+			wantTicket: true,
+		},
+		{
+			name:      "unauthorized - no auth token",
+			groupUUID: groupUUID.String(),
+			auth:      "",
+			wantCode:  http.StatusUnauthorized,
+		},
+		{
+			name:      "bad request - invalid UUID",
+			groupUUID: "invalid-uuid",
+			auth:      person.OwnerPubKey,
+			wantCode:  http.StatusBadRequest,
+		},
+		{
+			name:       "not found - group doesn't exist",
+			groupUUID:  uuid.New().String(),
+			auth:       person.OwnerPubKey,
+			wantCode:   http.StatusOK,
+			wantTicket: false,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			rr := httptest.NewRecorder()
+			req := httptest.NewRequest(http.MethodGet, "/tickets/group/"+tt.groupUUID, nil)
+
+			rctx := chi.NewRouteContext()
+			rctx.URLParams.Add("group_uuid", tt.groupUUID)
+			req = req.WithContext(context.WithValue(req.Context(), chi.RouteCtxKey, rctx))
+
+			if tt.auth != "" {
+				req = req.WithContext(context.WithValue(req.Context(), auth.ContextKey, tt.auth))
+			}
+
+			tHandler.GetTicketsByGroup(rr, req)
+
+			assert.Equal(t, tt.wantCode, rr.Code)
+
+			if tt.wantTicket {
+				var tickets []db.Tickets
+				err := json.NewDecoder(rr.Body).Decode(&tickets)
+				require.NoError(t, err)
+				require.NotEmpty(t, tickets, "Expected non-empty tickets array")
+				assert.Equal(t, createdTicket.UUID, tickets[0].UUID)
+			}
+		})
+	}
+}
