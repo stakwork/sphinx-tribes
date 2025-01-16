@@ -27,6 +27,7 @@ func TicketRoutes() chi.Router {
 		r.Post("/{ticket_group}/sequence", ticketHandler.UpdateTicketSequence)
 		r.Post("/{ticket_uuid}/bounty", ticketHandler.TicketToBounty)
 		r.Delete("/{uuid}", ticketHandler.DeleteTicket)
+		r.Get("/group/{group_uuid}", ticketHandler.GetTicketsByGroup)
 	})
 
 	return r
