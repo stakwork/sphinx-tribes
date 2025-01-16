@@ -3728,3 +3728,216 @@ func TestBountyCardResponsePerformance(t *testing.T) {
 	assert.Equal(t, "Test Assignee", response[99].AssigneeName)
 	assert.Equal(t, "test-image-url", response[99].AssigneePic)
 }
+
+func TestBountyTiming(t *testing.T) {
+	teardownSuite := SetupSuite(t)
+	defer teardownSuite(t)
+
+	mockHttpClient := mocks.NewHttpClient(t)
+	mockDB := dbMocks.NewDatabase(t)
+	bHandler := NewBountyHandler(mockHttpClient, mockDB)
+
+	t.Run("GetBountyTimingStats", func(t *testing.T) {
+		t.Run("should return 400 for invalid bounty ID", func(t *testing.T) {
+			rr := httptest.NewRecorder()
+			handler := http.HandlerFunc(bHandler.GetBountyTimingStats)
+
+			rctx := chi.NewRouteContext()
+			rctx.URLParams.Add("id", "invalid")
+			req, err := http.NewRequestWithContext(
+				context.WithValue(context.Background(), chi.RouteCtxKey, rctx),
+				http.MethodGet,
+				"/timing",
+				nil,
+			)
+			assert.NoError(t, err)
+
+			handler.ServeHTTP(rr, req)
+			assert.Equal(t, http.StatusBadRequest, rr.Code)
+		})
+
+		t.Run("should return 500 when database fails", func(t *testing.T) {
+			rr := httptest.NewRecorder()
+			handler := http.HandlerFunc(bHandler.GetBountyTimingStats)
+
+			rctx := chi.NewRouteContext()
+			rctx.URLParams.Add("id", "1")
+			req, err := http.NewRequestWithContext(
+				context.WithValue(context.Background(), chi.RouteCtxKey, rctx),
+				http.MethodGet,
+				"/timing",
+				nil,
+			)
+			assert.NoError(t, err)
+
+			mockDB.On("GetBountyTiming", uint(1)).Return(nil, fmt.Errorf("database error")).Once()
+
+			handler.ServeHTTP(rr, req)
+			assert.Equal(t, http.StatusInternalServerError, rr.Code)
+			mockDB.AssertExpectations(t)
+		})
+
+		t.Run("should return timing stats successfully", func(t *testing.T) {
+			rr := httptest.NewRecorder()
+			handler := http.HandlerFunc(bHandler.GetBountyTimingStats)
+
+			rctx := chi.NewRouteContext()
+			rctx.URLParams.Add("id", "1")
+			req, err := http.NewRequestWithContext(
+				context.WithValue(context.Background(), chi.RouteCtxKey, rctx),
+				http.MethodGet,
+				"/timing",
+				nil,
+			)
+			assert.NoError(t, err)
+
+			now := time.Now()
+			mockTiming := &db.BountyTiming{
+				BountyID:             1,
+				TotalWorkTimeSeconds: 3600,
+				TotalDurationSeconds: 7200,
+				TotalAttempts:        5,
+				FirstAssignedAt:      &now,
+				LastPoWAt:            &now,
+				ClosedAt:             &now,
+			}
+
+			mockDB.On("GetBountyTiming", uint(1)).Return(mockTiming, nil).Once()
+
+			handler.ServeHTTP(rr, req)
+
+			assert.Equal(t, http.StatusOK, rr.Code)
+
+			var response BountyTimingResponse
+			err = json.NewDecoder(rr.Body).Decode(&response)
+			assert.NoError(t, err)
+			assert.Equal(t, mockTiming.TotalWorkTimeSeconds, response.TotalWorkTimeSeconds)
+			assert.Equal(t, mockTiming.TotalAttempts, response.TotalAttempts)
+			mockDB.AssertExpectations(t)
+		})
+	})
+
+	t.Run("StartBountyTiming", func(t *testing.T) {
+		t.Run("should return 400 for invalid bounty ID", func(t *testing.T) {
+			rr := httptest.NewRecorder()
+			handler := http.HandlerFunc(bHandler.StartBountyTiming)
+
+			rctx := chi.NewRouteContext()
+			rctx.URLParams.Add("id", "invalid")
+			req, err := http.NewRequestWithContext(
+				context.WithValue(context.Background(), chi.RouteCtxKey, rctx),
+				http.MethodPut,
+				"/timing/start",
+				nil,
+			)
+			assert.NoError(t, err)
+
+			handler.ServeHTTP(rr, req)
+			assert.Equal(t, http.StatusBadRequest, rr.Code)
+		})
+
+		t.Run("should return 500 when database fails", func(t *testing.T) {
+			rr := httptest.NewRecorder()
+			handler := http.HandlerFunc(bHandler.StartBountyTiming)
+
+			rctx := chi.NewRouteContext()
+			rctx.URLParams.Add("id", "1")
+			req, err := http.NewRequestWithContext(
+				context.WithValue(context.Background(), chi.RouteCtxKey, rctx),
+				http.MethodPut,
+				"/timing/start",
+				nil,
+			)
+			assert.NoError(t, err)
+
+			mockDB.On("StartBountyTiming", uint(1)).Return(fmt.Errorf("database error")).Once()
+
+			handler.ServeHTTP(rr, req)
+			assert.Equal(t, http.StatusInternalServerError, rr.Code)
+			mockDB.AssertExpectations(t)
+		})
+
+		t.Run("should start timing successfully", func(t *testing.T) {
+			rr := httptest.NewRecorder()
+			handler := http.HandlerFunc(bHandler.StartBountyTiming)
+
+			rctx := chi.NewRouteContext()
+			rctx.URLParams.Add("id", "1")
+			req, err := http.NewRequestWithContext(
+				context.WithValue(context.Background(), chi.RouteCtxKey, rctx),
+				http.MethodPut,
+				"/timing/start",
+				nil,
+			)
+			assert.NoError(t, err)
+
+			mockDB.On("StartBountyTiming", uint(1)).Return(nil).Once()
+
+			handler.ServeHTTP(rr, req)
+			assert.Equal(t, http.StatusOK, rr.Code)
+			mockDB.AssertExpectations(t)
+		})
+	})
+
+	t.Run("CloseBountyTiming", func(t *testing.T) {
+		t.Run("should return 400 for invalid bounty ID", func(t *testing.T) {
+			rr := httptest.NewRecorder()
+			handler := http.HandlerFunc(bHandler.CloseBountyTiming)
+
+			rctx := chi.NewRouteContext()
+			rctx.URLParams.Add("id", "invalid")
+			req, err := http.NewRequestWithContext(
+				context.WithValue(context.Background(), chi.RouteCtxKey, rctx),
+				http.MethodPut,
+				"/timing/close",
+				nil,
+			)
+			assert.NoError(t, err)
+
+			handler.ServeHTTP(rr, req)
+			assert.Equal(t, http.StatusBadRequest, rr.Code)
+		})
+
+		t.Run("should return 500 when database fails", func(t *testing.T) {
+			rr := httptest.NewRecorder()
+			handler := http.HandlerFunc(bHandler.CloseBountyTiming)
+
+			rctx := chi.NewRouteContext()
+			rctx.URLParams.Add("id", "1")
+			req, err := http.NewRequestWithContext(
+				context.WithValue(context.Background(), chi.RouteCtxKey, rctx),
+				http.MethodPut,
+				"/timing/close",
+				nil,
+			)
+			assert.NoError(t, err)
+
+			mockDB.On("CloseBountyTiming", uint(1)).Return(fmt.Errorf("database error")).Once()
+
+			handler.ServeHTTP(rr, req)
+			assert.Equal(t, http.StatusInternalServerError, rr.Code)
+			mockDB.AssertExpectations(t)
+		})
+
+		t.Run("should close timing successfully", func(t *testing.T) {
+			rr := httptest.NewRecorder()
+			handler := http.HandlerFunc(bHandler.CloseBountyTiming)
+
+			rctx := chi.NewRouteContext()
+			rctx.URLParams.Add("id", "1")
+			req, err := http.NewRequestWithContext(
+				context.WithValue(context.Background(), chi.RouteCtxKey, rctx),
+				http.MethodPut,
+				"/timing/close",
+				nil,
+			)
+			assert.NoError(t, err)
+
+			mockDB.On("CloseBountyTiming", uint(1)).Return(nil).Once()
+
+			handler.ServeHTTP(rr, req)
+			assert.Equal(t, http.StatusOK, rr.Code)
+			mockDB.AssertExpectations(t)
+		})
+	})
+}

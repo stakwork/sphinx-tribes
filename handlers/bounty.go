@@ -57,6 +57,20 @@ func NewBountyHandler(httpClient HttpClient, database db.Database) *bountyHandle
 	}
 }
 
+type TimingError struct {
+	Operation string `json:"operation"`
+	Error     string `json:"error"`
+}
+
+func handleTimingError(w http.ResponseWriter, operation string, err error) {
+	logger.Log.Error("[bounty_timing] %s failed: %v", operation, err)
+	w.WriteHeader(http.StatusInternalServerError)
+	json.NewEncoder(w).Encode(TimingError{
+		Operation: operation,
+		Error:     err.Error(),
+	})
+}
+
 func (h *bountyHandler) GetAllBounties(w http.ResponseWriter, r *http.Request) {
 	bounties := h.db.GetAllBounties(r)
 	var bountyResponse []db.BountyResponse = h.GenerateBountyResponse(bounties)
@@ -262,6 +276,12 @@ func (h *bountyHandler) CreateOrEditBounty(w http.ResponseWriter, r *http.Reques
 	if bounty.Assignee != "" {
 		now := time.Now()
 		bounty.AssignedDate = &now
+
+		if bounty.ID != 0 {
+			if err := h.db.StartBountyTiming(bounty.ID); err != nil {
+				handleTimingError(w, "start_timing", err)
+			}
+		}
 	}
 
 	if bounty.Tribe == "" {
@@ -1685,7 +1705,11 @@ func (h *bountyHandler) AddProofOfWork(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if err := h.db.IncrementProofCount(proof.BountyID); err != nil { // Pass the correct type (uint) here
+	if err := h.db.UpdateBountyTimingOnProof(proof.BountyID); err != nil {
+		handleTimingError(w, "update_timing_on_proof", err)
+	}
+
+	if err := h.db.IncrementProofCount(proof.BountyID); err != nil {
 		http.Error(w, "Failed to update bounty proof count", http.StatusInternalServerError)
 		return
 	}
@@ -1824,6 +1848,10 @@ func (h *bountyHandler) DeleteBountyAssignee(w http.ResponseWriter, r *http.Requ
 		b.BountyExpires = ""
 
 		h.db.UpdateBounty(b)
+
+		if err := h.db.CloseBountyTiming(b.ID); err != nil {
+			handleTimingError(w, "close_timing", err)
+		}
 
 		deletedAssignee = true
 	} else {
