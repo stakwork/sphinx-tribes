@@ -1964,21 +1964,24 @@ func (db database) StartBountyTiming(bountyID uint) error {
 
 		timing, err = db.CreateBountyTiming(bountyID)
 		if err != nil {
-			return err
+			return fmt.Errorf("failed to create bounty timing: %w", err)
 		}
 	}
 
 	if timing.FirstAssignedAt == nil {
 		timing.FirstAssignedAt = &now
-		return db.UpdateBountyTiming(timing)
+		if err := db.UpdateBountyTiming(timing); err != nil {
+			return fmt.Errorf("failed to update bounty timing: %w", err)
+		}
 	}
+
 	return nil
 }
 
 func (db database) CloseBountyTiming(bountyID uint) error {
 	timing, err := db.GetBountyTiming(bountyID)
 	if err != nil {
-		return err
+		return fmt.Errorf("failed to retrieve bounty timing: %w", err)
 	}
 
 	now := time.Now()
@@ -1988,13 +1991,17 @@ func (db database) CloseBountyTiming(bountyID uint) error {
 		timing.TotalDurationSeconds = int(now.Sub(*timing.FirstAssignedAt).Seconds())
 	}
 
-	return db.UpdateBountyTiming(timing)
+	if err := db.UpdateBountyTiming(timing); err != nil {
+		return fmt.Errorf("failed to close bounty timing: %w", err)
+	}
+
+	return nil
 }
 
 func (db database) UpdateBountyTimingOnProof(bountyID uint) error {
 	timing, err := db.GetBountyTiming(bountyID)
 	if err != nil {
-		return err
+		return fmt.Errorf("failed to retrieve bounty timing: %w", err)
 	}
 
 	now := time.Now()
@@ -2007,7 +2014,11 @@ func (db database) UpdateBountyTimingOnProof(bountyID uint) error {
 	timing.LastPoWAt = &now
 	timing.TotalAttempts++
 
-	return db.UpdateBountyTiming(timing)
+	if err := db.UpdateBountyTiming(timing); err != nil {
+		return fmt.Errorf("failed to update bounty timing: %w", err)
+	}
+
+	return nil
 }
 
 func (db database) GetWorkspaceBountyCardsData(r *http.Request) []NewBounty {
