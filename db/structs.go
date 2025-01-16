@@ -1181,6 +1181,27 @@ type FeaturedBounty struct {
 	UpdatedAt time.Time `json:"updated_at" gorm:"default:current_timestamp"`
 }
 
+type NotificationStatus string
+
+const (
+	NotificationStatusPending            NotificationStatus = "PENDING"
+	NotificationStatusComplete           NotificationStatus = "COMPLETE"
+	NotificationStatusFailed             NotificationStatus = "FAILED"
+	NotificationStatusWaitingKeyExchange NotificationStatus = "WAITING_KEY_EXCHANGE"
+)
+
+type Notification struct {
+	ID        uint               `json:"id" gorm:"primaryKey;autoIncrement"`
+	UUID      string             `json:"uuid" gorm:"type:uuid;uniqueIndex;not null"`
+	Event     string             `json:"event" gorm:"type:varchar(50);not null"`
+	PubKey    string             `json:"pub_key" gorm:"type:varchar(100);not null;index"`
+	Content   string             `json:"content" gorm:"type:text;not null"`
+	Retries   int                `json:"retries" gorm:"default:0"`
+	Status    NotificationStatus `json:"status" gorm:"type:varchar(20);default:'PENDING'"`
+	CreatedAt *time.Time         `json:"created_at" gorm:"default:current_timestamp"`
+	UpdatedAt *time.Time         `json:"updated_at" gorm:"default:current_timestamp"`
+}
+
 func (Person) TableName() string {
 	return "people"
 }

@@ -803,3 +803,37 @@ func (th *ticketHandler) TicketToBounty(w http.ResponseWriter, r *http.Request) 
 		Message:  "Bounty created successfully",
 	})
 }
+
+func (th *ticketHandler) GetTicketsByGroup(w http.ResponseWriter, r *http.Request) {
+	ctx := r.Context()
+	pubKeyFromAuth, _ := ctx.Value(auth.ContextKey).(string)
+
+	if pubKeyFromAuth == "" {
+		logger.Log.Error("no pubkey from auth")
+		w.WriteHeader(http.StatusUnauthorized)
+		return
+	}
+
+	groupUUID := chi.URLParam(r, "group_uuid")
+	if groupUUID == "" {
+		http.Error(w, "group UUID is required", http.StatusBadRequest)
+		return
+	}
+
+	parsedUUID, err := uuid.Parse(groupUUID)
+	if err != nil {
+		http.Error(w, "invalid group UUID format", http.StatusBadRequest)
+		return
+	}
+
+	tickets, err := th.db.GetTicketsByGroup(parsedUUID.String())
+	if err != nil {
+		logger.Log.Error("failed to fetch tickets by group", "error", err, "group_uuid", groupUUID)
+		http.Error(w, "failed to fetch tickets", http.StatusInternalServerError)
+		return
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode(tickets)
+}

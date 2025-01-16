@@ -384,6 +384,8 @@ func TestGetWantedsHeader(t *testing.T) {
 
 	db.DB = db.TestDB
 
+	db.CleanTestData()
+
 	tests := []struct {
 		name           string
 		setupTestData  func(t *testing.T)
@@ -514,7 +516,7 @@ func TestGetWantedsHeader(t *testing.T) {
 			},
 		},
 		{
-			name: "Large Number of Developers and Bounties",
+			name: "Large Number Developers and Bounties",
 			setupTestData: func(t *testing.T) {
 
 				for i := 1; i <= 500; i++ {
@@ -622,8 +624,6 @@ func TestGetWantedsHeader(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 
-			db.CleanTestData()
-
 			tt.setupTestData(t)
 
 			req := httptest.NewRequest(http.MethodGet, "/wanteds/header", nil)
@@ -635,5 +635,6 @@ func TestGetWantedsHeader(t *testing.T) {
 
 			tt.validate(t, w.Body.Bytes())
 		})
+		db.CleanTestData()
 	}
 }
