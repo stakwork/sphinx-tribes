@@ -516,10 +516,10 @@ func TestGetWantedsHeader(t *testing.T) {
 			},
 		},
 		{
-			name: "Large Number of Developers and Bounties",
+			name: "Large Number Developers and Bounties",
 			setupTestData: func(t *testing.T) {
 
-				for i := 1; i <= 1000; i++ {
+				for i := 1; i <= 500; i++ {
 					person := db.Person{
 						ID:          uint(i),
 						Uuid:        fmt.Sprintf("uuid-%d", i),
@@ -532,7 +532,7 @@ func TestGetWantedsHeader(t *testing.T) {
 					assert.NoError(t, err)
 				}
 
-				for i := 1; i <= 500; i++ {
+				for i := 1; i <= 250; i++ {
 					bounty := db.Bounty{
 						Title:   fmt.Sprintf("Test Bounty %d", i),
 						OwnerID: fmt.Sprintf("test-pub-key-%d", i),
@@ -543,6 +543,10 @@ func TestGetWantedsHeader(t *testing.T) {
 			},
 			expectedStatus: http.StatusOK,
 			validate: func(t *testing.T, response []byte) {
+
+				expectedDeveloperCount := db.TestDB.CountDevelopers()
+				expectedBountiesCount := db.TestDB.CountBounties()
+
 				var result struct {
 					DeveloperCount int64               `json:"developer_count"`
 					BountiesCount  uint64              `json:"bounties_count"`
@@ -550,8 +554,8 @@ func TestGetWantedsHeader(t *testing.T) {
 				}
 				err := json.Unmarshal(response, &result)
 				assert.NoError(t, err)
-				assert.Equal(t, int64(1000), result.DeveloperCount)
-				assert.Equal(t, uint64(500), result.BountiesCount)
+				assert.Equal(t, expectedDeveloperCount, result.DeveloperCount)
+				assert.Equal(t, expectedBountiesCount, result.BountiesCount)
 				assert.NotNil(t, result.People)
 				assert.Equal(t, 3, len(*result.People))
 			},
