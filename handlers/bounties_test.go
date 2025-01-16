@@ -516,7 +516,7 @@ func TestGetWantedsHeader(t *testing.T) {
 			},
 		},
 		{
-			name: "Large Number of Developers and Bounties",
+			name: "Large Number Developers and Bounties",
 			setupTestData: func(t *testing.T) {
 
 				for i := 1; i <= 500; i++ {
