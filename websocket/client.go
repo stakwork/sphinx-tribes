@@ -46,9 +46,12 @@ type TicketData struct {
 
 func (c *Client) Read() {
 	defer func() {
-		c.Pool.Unregister <- c
-		c.Conn.Close()
-		db.Store.DeleteCache(c.Host)
+		// ceck to acoid nil pointer
+		if c.Pool != nil {
+			c.Pool.Unregister <- c
+			c.Conn.Close()
+			db.Store.DeleteCache(c.Host)
+		}
 	}()
 
 	for {
