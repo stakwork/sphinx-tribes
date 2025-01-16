@@ -274,6 +274,7 @@ func internalServerErrorHandler(next http.Handler) http.Handler {
 						"$session_id":     session_id,
 						"$event_type":     "backend_api_call",
 						"$elements_chain": hexCompressed,
+						"$current_url": r.URL.Path,
 					},
 				})
 			}
