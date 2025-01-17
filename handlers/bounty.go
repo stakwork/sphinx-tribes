@@ -1593,6 +1593,8 @@ func (h *bountyHandler) GenerateTicketCardResponse(workspaceUuid string) ([]db.B
 
 		ticketCard := db.BountyCard{
 			BountyID:     bountyID,
+			TicketUUID:   &ticket.UUID,
+			TicketGroup:  ticket.TicketGroup,
 			Title:        ticket.Name,
 			AssigneePic:  "",
 			Assignee:     "",

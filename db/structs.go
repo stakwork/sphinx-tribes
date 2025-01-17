@@ -954,6 +954,8 @@ const (
 
 type BountyCard struct {
 	BountyID     uint              `json:"id"`
+	TicketUUID   *uuid.UUID        `json:"ticket_uuid,omitempty"`
+	TicketGroup  *uuid.UUID        `json:"ticket_group,omitempty"`
 	Title        string            `json:"title"`
 	AssigneePic  string            `json:"assignee_img,omitempty"`
 	Assignee     string            `json:"assignee"`
