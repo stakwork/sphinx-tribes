@@ -15,6 +15,7 @@ import (
 	"time"
 
 	"github.com/go-chi/chi"
+	"github.com/google/uuid"
 	"github.com/lib/pq"
 	_ "github.com/lib/pq"
 	"github.com/rs/xid"
@@ -1938,6 +1939,7 @@ func (db database) DecrementProofCount(bountyID uint) error {
 
 func (db database) CreateBountyTiming(bountyID uint) (*BountyTiming, error) {
 	timing := &BountyTiming{
+		ID:       uuid.New(),
 		BountyID: bountyID,
 	}
 	err := db.db.Create(timing).Error
