@@ -174,6 +174,13 @@ func (oh *featureHandler) GetFeatureByUuid(w http.ResponseWriter, r *http.Reques
 	}
 
 	uuid := chi.URLParam(r, "uuid")
+
+	if uuid == "" {
+		logger.Log.Info("missing uuid parameter")
+		http.Error(w, "uuid parameter is required", http.StatusBadRequest)
+		return
+	}
+
 	workspaceFeature := oh.db.GetFeatureByUuid(uuid)
 
 	w.WriteHeader(http.StatusOK)
@@ -765,7 +772,7 @@ func (oh *featureHandler) UpdateFeatureStatus(w http.ResponseWriter, r *http.Req
 	updatedFeature, err := oh.db.UpdateFeatureStatus(uuid, req.Status)
 	if err != nil {
 		logger.Log.Error("failed to update feature status", err)
-		w.WriteHeader(http.StatusInternalServerError)
+		w.WriteHeader(http.StatusNotFound)
 		return
 	}
 
