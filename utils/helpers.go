@@ -3,6 +3,8 @@ package utils
 import (
 	"crypto/rand"
 	"encoding/base32"
+	"github.com/go-chi/chi"
+	"net/http"
 	"strconv"
 	"strings"
 	"time"
@@ -112,4 +114,13 @@ func GetHoursDifference(createdDate int64, endDate *time.Time) int64 {
 
 	hours := int64(difference.Hours())
 	return hours
+}
+
+func isValidUUID(uuid string) bool {
+	return len(uuid) == 36
+}
+
+func ValidateUUID(r *http.Request) bool {
+	uuid := chi.URLParam(r, "uuid")
+	return isValidUUID(uuid)
 }

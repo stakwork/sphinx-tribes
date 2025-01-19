@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
+	"github.com/stakwork/sphinx-tribes/utils"
 	"io"
 	"log"
 	"net/http"
@@ -157,7 +158,21 @@ func (oh *featureHandler) GetWorkspaceFeaturesCount(w http.ResponseWriter, r *ht
 		return
 	}
 
+	if !utils.ValidateUUID(r) {
+		logger.Log.Info("invalid or missing uuid")
+		w.WriteHeader(http.StatusBadRequest)
+		json.NewEncoder(w).Encode(map[string]string{"error": "invalid or missing uuid"})
+		return
+	}
+
 	uuid := chi.URLParam(r, "uuid")
+	if uuid == "" {
+		logger.Log.Info("missing or empty uuid")
+		w.WriteHeader(http.StatusBadRequest)
+		json.NewEncoder(w).Encode(map[string]string{"error": "missing or empty uuid"})
+		return
+	}
+
 	workspaceFeatures := oh.db.GetWorkspaceFeaturesCount(uuid)
 
 	w.WriteHeader(http.StatusOK)
