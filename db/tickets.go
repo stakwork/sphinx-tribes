@@ -251,11 +251,12 @@ func (db database) GetLatestTicketByGroup(ticketGroup uuid.UUID) (Tickets, error
 	return ticket, nil
 }
 
-func (db database) GetAllTicketGroups() ([]uuid.UUID, error) {
+func (db database) GetAllTicketGroups(workspaceUuid string) ([]uuid.UUID, error) {
 	var groups []uuid.UUID
 	result := db.db.Model(&Tickets{}).
-		Select("DISTINCT ticket_group").
-		Where("ticket_group IS NOT NULL").
+		Joins("JOIN workspace_features ON tickets.feature_uuid = workspace_features.uuid").
+		Where("workspace_features.workspace_uuid = ? AND tickets.ticket_group IS NOT NULL", workspaceUuid).
+		Select("DISTINCT tickets.ticket_group").
 		Find(&groups)
 
 	if result.Error != nil {
