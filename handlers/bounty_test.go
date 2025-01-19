@@ -4167,7 +4167,7 @@ func TestWorkspaceIsolation(t *testing.T) {
 		assert.Empty(t, response, "Response should be empty for workspace with only features")
 	})
 
-	t.Run("should verify ticket lastest versions in workspace 1", func(t *testing.T) {
+	t.Run("should verify the ticket lastest versions in workspace 1", func(t *testing.T) {
 		rr := httptest.NewRecorder()
 		handler := http.HandlerFunc(bHandler.GetBountyCards)
 
