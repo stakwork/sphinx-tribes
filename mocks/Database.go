@@ -3294,9 +3294,9 @@ func (_c *Database_GetAllFeaturedBounties_Call) RunAndReturn(run func() ([]db.Fe
 	return _c
 }
 
-// GetAllTicketGroups provides a mock function with no fields
-func (_m *Database) GetAllTicketGroups() ([]uuid.UUID, error) {
-	ret := _m.Called()
+// GetAllTicketGroups provides a mock function with given fields: workspaceUuid
+func (_m *Database) GetAllTicketGroups(workspaceUuid string) ([]uuid.UUID, error) {
+	ret := _m.Called(workspaceUuid)
 
 	if len(ret) == 0 {
 		panic("no return value specified for GetAllTicketGroups")
@@ -3304,19 +3304,19 @@ func (_m *Database) GetAllTicketGroups() ([]uuid.UUID, error) {
 
 	var r0 []uuid.UUID
 	var r1 error
-	if rf, ok := ret.Get(0).(func() ([]uuid.UUID, error)); ok {
-		return rf()
+	if rf, ok := ret.Get(0).(func(string) ([]uuid.UUID, error)); ok {
+		return rf(workspaceUuid)
 	}
-	if rf, ok := ret.Get(0).(func() []uuid.UUID); ok {
-		r0 = rf()
+	if rf, ok := ret.Get(0).(func(string) []uuid.UUID); ok {
+		r0 = rf(workspaceUuid)
 	} else {
 		if ret.Get(0) != nil {
 			r0 = ret.Get(0).([]uuid.UUID)
 		}
 	}
 
-	if rf, ok := ret.Get(1).(func() error); ok {
-		r1 = rf()
+	if rf, ok := ret.Get(1).(func(string) error); ok {
+		r1 = rf(workspaceUuid)
 	} else {
 		r1 = ret.Error(1)
 	}
@@ -3330,13 +3330,14 @@ type Database_GetAllTicketGroups_Call struct {
 }
 
 // GetAllTicketGroups is a helper method to define mock.On call
-func (_e *Database_Expecter) GetAllTicketGroups() *Database_GetAllTicketGroups_Call {
-	return &Database_GetAllTicketGroups_Call{Call: _e.mock.On("GetAllTicketGroups")}
+//   - workspaceUuid string
+func (_e *Database_Expecter) GetAllTicketGroups(workspaceUuid interface{}) *Database_GetAllTicketGroups_Call {
+	return &Database_GetAllTicketGroups_Call{Call: _e.mock.On("GetAllTicketGroups", workspaceUuid)}
 }
 
-func (_c *Database_GetAllTicketGroups_Call) Run(run func()) *Database_GetAllTicketGroups_Call {
+func (_c *Database_GetAllTicketGroups_Call) Run(run func(workspaceUuid string)) *Database_GetAllTicketGroups_Call {
 	_c.Call.Run(func(args mock.Arguments) {
-		run()
+		run(args[0].(string))
 	})
 	return _c
 }
@@ -3346,7 +3347,7 @@ func (_c *Database_GetAllTicketGroups_Call) Return(_a0 []uuid.UUID, _a1 error) *
 	return _c
 }
 
-func (_c *Database_GetAllTicketGroups_Call) RunAndReturn(run func() ([]uuid.UUID, error)) *Database_GetAllTicketGroups_Call {
+func (_c *Database_GetAllTicketGroups_Call) RunAndReturn(run func(string) ([]uuid.UUID, error)) *Database_GetAllTicketGroups_Call {
 	_c.Call.Return(run)
 	return _c
 }
