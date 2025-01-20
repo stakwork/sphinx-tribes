@@ -1574,7 +1574,7 @@ func (h *bountyHandler) GetBountyCards(w http.ResponseWriter, r *http.Request) {
 func (h *bountyHandler) GenerateTicketCardResponse(workspaceUuid string) ([]db.BountyCard, error) {
 	var ticketCards []db.BountyCard
 
-	ticketGroups, err := h.db.GetAllTicketGroups()
+	ticketGroups, err := h.db.GetAllTicketGroups(workspaceUuid)
 	if err != nil {
 		return nil, fmt.Errorf("failed to get ticket groups: %w", err)
 	}
@@ -1587,6 +1587,10 @@ func (h *bountyHandler) GenerateTicketCardResponse(workspaceUuid string) ([]db.B
 		}
 
 		feature := h.db.GetFeatureByUuid(ticket.FeatureUUID)
+		if feature.WorkspaceUuid != workspaceUuid {
+			continue
+		}
+
 		phase, _ := h.db.GetFeaturePhaseByUuid(ticket.FeatureUUID, ticket.PhaseUUID)
 		workspace := h.db.GetWorkspaceByUuid(feature.WorkspaceUuid)
 		bountyID := uint(ticket.UUID.ID())

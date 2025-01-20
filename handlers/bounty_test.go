@@ -3941,3 +3941,298 @@ func TestBountyTiming(t *testing.T) {
 		})
 	})
 }
+
+func TestWorkspaceIsolation(t *testing.T) {
+	teardownSuite := SetupSuite(t)
+	defer teardownSuite(t)
+
+	mockHttpClient := mocks.NewHttpClient(t)
+	bHandler := NewBountyHandler(mockHttpClient, db.TestDB)
+
+	db.CleanTestData()
+
+	// Create Workspace 1 and its components
+	workspace1 := db.Workspace{
+		ID:          1,
+		Uuid:        "test-workspace-1",
+		Name:        "Test Workspace 1",
+		Description: "Test Workspace 1 Description",
+		OwnerPubKey: "test-owner-1",
+	}
+	db.TestDB.CreateOrEditWorkspace(workspace1)
+
+	feature1 := db.WorkspaceFeatures{
+		Uuid:          "feature-1-uuid",
+		Name:          "Feature One",
+		WorkspaceUuid: workspace1.Uuid,
+	}
+	db.TestDB.CreateOrEditFeature(feature1)
+
+	phase1 := db.FeaturePhase{
+		Uuid:        "phase-1-uuid",
+		Name:        "Feature One Phase",
+		FeatureUuid: feature1.Uuid,
+	}
+	db.TestDB.CreateOrEditFeaturePhase(phase1)
+
+	// Create Workspace 2 and its components
+	workspace2 := db.Workspace{
+		ID:          2,
+		Uuid:        "test-workspace-2",
+		Name:        "Test Workspace 2",
+		Description: "Test Workspace 2 Description",
+		OwnerPubKey: "test-owner-2",
+	}
+	db.TestDB.CreateOrEditWorkspace(workspace2)
+
+	feature2 := db.WorkspaceFeatures{
+		Uuid:          "feature-2-uuid",
+		Name:          "Feature Two",
+		WorkspaceUuid: workspace2.Uuid,
+	}
+	db.TestDB.CreateOrEditFeature(feature2)
+
+	phase2 := db.FeaturePhase{
+		Uuid:        "phase-2-uuid",
+		Name:        "Feature Two Phase",
+		FeatureUuid: feature2.Uuid,
+	}
+	db.TestDB.CreateOrEditFeaturePhase(phase2)
+
+	// Create tickets for Workspace 1
+	ticket1Group := uuid.New()
+	ticket1 := db.Tickets{
+		UUID:        uuid.New(),
+		TicketGroup: &ticket1Group,
+		Name:        "Ticket 1",
+		FeatureUUID: feature1.Uuid,
+		PhaseUUID:   phase1.Uuid,
+		Status:      db.DraftTicket,
+	}
+	db.TestDB.CreateOrEditTicket(&ticket1)
+
+	ticket2 := db.Tickets{
+		UUID:        uuid.New(),
+		TicketGroup: &ticket1Group,
+		Name:        "Ticket 2",
+		FeatureUUID: feature1.Uuid,
+		PhaseUUID:   phase1.Uuid,
+		Status:      db.DraftTicket,
+		Version:     2,
+	}
+	db.TestDB.CreateOrEditTicket(&ticket2)
+
+	// Create tickets for Workspace 2
+	ticket3Group := uuid.New()
+	ticket3 := db.Tickets{
+		UUID:        uuid.New(),
+		TicketGroup: &ticket3Group,
+		Name:        "Phase 2 Ticket 1",
+		FeatureUUID: feature2.Uuid,
+		PhaseUUID:   phase2.Uuid,
+		Status:      db.DraftTicket,
+	}
+	db.TestDB.CreateOrEditTicket(&ticket3)
+
+	ticket4 := db.Tickets{
+		UUID:        uuid.New(),
+		TicketGroup: &ticket3Group,
+		Name:        "Phase 2 Ticket 2",
+		FeatureUUID: feature2.Uuid,
+		PhaseUUID:   phase2.Uuid,
+		Status:      db.DraftTicket,
+	}
+	db.TestDB.CreateOrEditTicket(&ticket4)
+
+	t.Run("should only return workspace 1 tickets", func(t *testing.T) {
+		rr := httptest.NewRecorder()
+		handler := http.HandlerFunc(bHandler.GetBountyCards)
+
+		req, err := http.NewRequest(http.MethodGet, "/gobounties/bounty-cards?workspace_uuid="+workspace1.Uuid, nil)
+		assert.NoError(t, err)
+
+		handler.ServeHTTP(rr, req)
+
+		var response []db.BountyCard
+		err = json.Unmarshal(rr.Body.Bytes(), &response)
+		assert.NoError(t, err)
+		assert.Equal(t, http.StatusOK, rr.Code)
+
+		// Should only contain tickets from workspace 1
+		for _, card := range response {
+			if card.TicketUUID != nil {
+				assert.Equal(t, workspace1.Uuid, card.Features.WorkspaceUuid)
+				assert.Contains(t, []string{"Ticket 1", "Ticket 2"}, card.Title)
+				assert.NotContains(t, []string{"Phase 2 Ticket 1", "Phase 2 Ticket 2"}, card.Title)
+			}
+		}
+	})
+
+	t.Run("should only return workspace 2 tickets", func(t *testing.T) {
+		rr := httptest.NewRecorder()
+		handler := http.HandlerFunc(bHandler.GetBountyCards)
+
+		req, err := http.NewRequest(http.MethodGet, "/gobounties/bounty-cards?workspace_uuid="+workspace2.Uuid, nil)
+		assert.NoError(t, err)
+
+		handler.ServeHTTP(rr, req)
+
+		var response []db.BountyCard
+		err = json.Unmarshal(rr.Body.Bytes(), &response)
+		assert.NoError(t, err)
+		assert.Equal(t, http.StatusOK, rr.Code)
+
+		// Should only contain tickets from workspace 2
+		for _, card := range response {
+			if card.TicketUUID != nil {
+				assert.Equal(t, workspace2.Uuid, card.Features.WorkspaceUuid)
+				assert.Contains(t, []string{"Phase 2 Ticket 1", "Phase 2 Ticket 2"}, card.Title)
+				assert.NotContains(t, []string{"Ticket 1", "Ticket 2"}, card.Title)
+			}
+		}
+	})
+
+	t.Run("should handle non-existent workspace", func(t *testing.T) {
+		rr := httptest.NewRecorder()
+		handler := http.HandlerFunc(bHandler.GetBountyCards)
+
+		req, err := http.NewRequest(http.MethodGet, "/gobounties/bounty-cards?workspace_uuid=non-existent", nil)
+		assert.NoError(t, err)
+
+		handler.ServeHTTP(rr, req)
+
+		var response []db.BountyCard
+		err = json.Unmarshal(rr.Body.Bytes(), &response)
+		assert.NoError(t, err)
+		assert.Equal(t, http.StatusOK, rr.Code)
+		assert.Empty(t, response, "Response should be empty for non-existent workspace")
+	})
+
+	t.Run("should handle workspace with no tickets", func(t *testing.T) {
+
+		emptyWorkspace := db.Workspace{
+			ID:          3,
+			Uuid:        "empty-workspace",
+			Name:        "Empty Workspace",
+			Description: "Workspace with no tickets",
+			OwnerPubKey: "test-owner-3",
+		}
+		db.TestDB.CreateOrEditWorkspace(emptyWorkspace)
+
+		rr := httptest.NewRecorder()
+		handler := http.HandlerFunc(bHandler.GetBountyCards)
+
+		req, err := http.NewRequest(http.MethodGet, "/gobounties/bounty-cards?workspace_uuid="+emptyWorkspace.Uuid, nil)
+		assert.NoError(t, err)
+
+		handler.ServeHTTP(rr, req)
+
+		var response []db.BountyCard
+		err = json.Unmarshal(rr.Body.Bytes(), &response)
+		assert.NoError(t, err)
+		assert.Equal(t, http.StatusOK, rr.Code)
+		assert.Empty(t, response, "Response should be empty for workspace with no tickets")
+	})
+
+	t.Run("should handle workspace with only features but no tickets", func(t *testing.T) {
+
+		featureOnlyWorkspace := db.Workspace{
+			ID:          4,
+			Uuid:        "feature-only-workspace",
+			Name:        "Feature Only Workspace",
+			Description: "Workspace with features but no tickets",
+			OwnerPubKey: "test-owner-4",
+		}
+		db.TestDB.CreateOrEditWorkspace(featureOnlyWorkspace)
+
+		featureOnly := db.WorkspaceFeatures{
+			Uuid:          "feature-only-uuid",
+			Name:          "Feature Without Tickets",
+			WorkspaceUuid: featureOnlyWorkspace.Uuid,
+		}
+		db.TestDB.CreateOrEditFeature(featureOnly)
+
+		rr := httptest.NewRecorder()
+		handler := http.HandlerFunc(bHandler.GetBountyCards)
+
+		req, err := http.NewRequest(http.MethodGet, "/gobounties/bounty-cards?workspace_uuid="+featureOnlyWorkspace.Uuid, nil)
+		assert.NoError(t, err)
+
+		handler.ServeHTTP(rr, req)
+
+		var response []db.BountyCard
+		err = json.Unmarshal(rr.Body.Bytes(), &response)
+		assert.NoError(t, err)
+		assert.Equal(t, http.StatusOK, rr.Code)
+		assert.Empty(t, response, "Response should be empty for workspace with only features")
+	})
+
+	t.Run("should verify the ticket lastest versions in workspace 1", func(t *testing.T) {
+		rr := httptest.NewRecorder()
+		handler := http.HandlerFunc(bHandler.GetBountyCards)
+
+		req, err := http.NewRequest(http.MethodGet, "/gobounties/bounty-cards?workspace_uuid="+workspace1.Uuid, nil)
+		assert.NoError(t, err)
+
+		handler.ServeHTTP(rr, req)
+
+		var response []db.BountyCard
+		err = json.Unmarshal(rr.Body.Bytes(), &response)
+		assert.NoError(t, err)
+
+		var foundVersion2 bool
+		for _, card := range response {
+			if card.Title == "Ticket 2" {
+				foundVersion2 = true
+				break
+			}
+		}
+		assert.True(t, foundVersion2, "Should find ticket with version 2")
+	})
+
+	t.Run("should verify feature and phase relationships", func(t *testing.T) {
+		rr := httptest.NewRecorder()
+		handler := http.HandlerFunc(bHandler.GetBountyCards)
+
+		req, err := http.NewRequest(http.MethodGet, "/gobounties/bounty-cards?workspace_uuid="+workspace1.Uuid, nil)
+		assert.NoError(t, err)
+
+		handler.ServeHTTP(rr, req)
+
+		var response []db.BountyCard
+		err = json.Unmarshal(rr.Body.Bytes(), &response)
+		assert.NoError(t, err)
+
+		for _, card := range response {
+			if card.TicketUUID != nil {
+
+				assert.Equal(t, feature1.Uuid, card.Features.Uuid, "Feature UUID should match")
+				assert.Equal(t, feature1.Name, card.Features.Name, "Feature name should match")
+
+				assert.Equal(t, phase1.Uuid, card.Phase.Uuid, "Phase UUID should match")
+				assert.Equal(t, phase1.Name, card.Phase.Name, "Phase name should match")
+				assert.Equal(t, phase1.FeatureUuid, card.Phase.FeatureUuid, "Phase's feature UUID should match")
+			}
+		}
+	})
+
+	t.Run("should verify ticket status is draft", func(t *testing.T) {
+		rr := httptest.NewRecorder()
+		handler := http.HandlerFunc(bHandler.GetBountyCards)
+
+		req, err := http.NewRequest(http.MethodGet, "/gobounties/bounty-cards?workspace_uuid="+workspace1.Uuid, nil)
+		assert.NoError(t, err)
+
+		handler.ServeHTTP(rr, req)
+
+		var response []db.BountyCard
+		err = json.Unmarshal(rr.Body.Bytes(), &response)
+		assert.NoError(t, err)
+
+		for _, card := range response {
+			if card.TicketUUID != nil {
+				assert.Equal(t, db.StatusDraft, card.Status, "Ticket status should be draft")
+			}
+		}
+	})
+}
