@@ -248,7 +248,7 @@ type Database interface {
 	GetEndpointByPath(path string) (Endpoint, error)
 	GetAllEndpoints() ([]Endpoint, error)
 	GetLatestTicketByGroup(ticketGroup uuid.UUID) (Tickets, error)
-	GetAllTicketGroups() ([]uuid.UUID, error)
+	GetAllTicketGroups(workspaceUuid string) ([]uuid.UUID, error)
 	GetFeaturedBountyById(id string) (FeaturedBounty, error)
 	GetAllFeaturedBounties() ([]FeaturedBounty, error)
 	CreateFeaturedBounty(bounty FeaturedBounty) error
