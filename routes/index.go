@@ -257,7 +257,6 @@ func internalServerErrorHandler(next http.Handler) http.Handler {
 			posthog_url := os.Getenv("POSTHOG_URL")
 			session_id := r.Header.Get("x-session-id")
 			if posthog_key != "" && posthog_url != "" && session_id != "" {
-				logger.Log.Info("Sending to Posthog")
 				client, _ := posthog.NewWithConfig(
 					posthog_key,
 					posthog.Config{
@@ -267,16 +266,21 @@ func internalServerErrorHandler(next http.Handler) http.Handler {
 				defer client.Close()
 				elements_chain_string := elements_chain.String()
 				hexCompressed, _ := compressToHex(elements_chain_string)
-				_ = client.Enqueue(posthog.Capture{
+				err := client.Enqueue(posthog.Capture{
 					DistinctId: session_id,         // Unique ID for the user
 					Event:      "backend_api_call", // The event name
 					Properties: map[string]interface{}{
 						"$session_id":     session_id,
 						"$event_type":     "backend_api_call",
 						"$elements_chain": hexCompressed,
-						"$current_url": r.URL.Path,
+						"$current_url":    r.URL.Path,
 					},
 				})
+				if err != nil {
+					logger.Log.Error("Posthog failed", err)
+
+				}
+				logger.Log.Info("Sent to Posthog")
 			}
 		}()
 
