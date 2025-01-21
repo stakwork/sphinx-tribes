@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"context"
 	"encoding/json"
+	"fmt"
 	"net/http"
 	"net/http/httptest"
 	"testing"
@@ -1069,6 +1070,476 @@ func TestGetTicketsByGroup(t *testing.T) {
 				require.NoError(t, err)
 				require.NotEmpty(t, tickets, "Expected non-empty tickets array")
 				assert.Equal(t, createdTicket.UUID, tickets[0].UUID)
+			}
+		})
+	}
+}
+
+func TestCreateWorkspaceDraftTicket(t *testing.T) {
+	teardownSuite := SetupSuite(t)
+	defer teardownSuite(t)
+
+	tHandler := NewTicketHandler(&http.Client{}, db.TestDB)
+
+	person := db.Person{
+		Uuid:        uuid.New().String(),
+		OwnerAlias:  "test-alias",
+		UniqueName:  "test-unique-name",
+		OwnerPubKey: "test-pubkey",
+	}
+	db.TestDB.CreateOrEditPerson(person)
+
+	workspace := db.Workspace{
+		Uuid:        uuid.New().String(),
+		Name:        "test-workspace" + uuid.New().String(),
+		OwnerPubKey: person.OwnerPubKey,
+	}
+	db.TestDB.CreateOrEditWorkspace(workspace)
+
+	tests := []struct {
+		name          string
+		workspaceUuid string
+		auth          string
+		requestBody   interface{}
+		expectedCode  int
+		validateResp  func(*testing.T, *httptest.ResponseRecorder)
+	}{
+		{
+			name:          "success",
+			workspaceUuid: workspace.Uuid,
+			auth:          person.OwnerPubKey,
+			requestBody: map[string]string{
+				"name":        "Test Draft Ticket",
+				"description": "Test Description",
+			},
+			expectedCode: http.StatusCreated,
+			validateResp: func(t *testing.T, rr *httptest.ResponseRecorder) {
+				var ticket db.Tickets
+				err := json.NewDecoder(rr.Body).Decode(&ticket)
+				require.NoError(t, err)
+				assert.NotEmpty(t, ticket.UUID)
+				assert.Equal(t, "Test Draft Ticket", ticket.Name)
+				assert.Equal(t, "Test Description", ticket.Description)
+				assert.Equal(t, db.DraftTicket, ticket.Status)
+				assert.Equal(t, workspace.Uuid, ticket.WorkspaceUuid)
+				assert.Empty(t, ticket.FeatureUUID)
+				assert.Empty(t, ticket.PhaseUUID)
+			},
+		},
+		{
+			name:          "unauthorized - no auth token",
+			workspaceUuid: workspace.Uuid,
+			auth:          "",
+			requestBody: map[string]string{
+				"name": "Test Ticket",
+			},
+			expectedCode: http.StatusUnauthorized,
+		},
+		{
+			name:          "bad request - missing name",
+			workspaceUuid: workspace.Uuid,
+			auth:          person.OwnerPubKey,
+			requestBody: map[string]string{
+				"description": "Test Description",
+			},
+			expectedCode: http.StatusBadRequest,
+		},
+		{
+			name:          "not found - workspace doesn't exist",
+			workspaceUuid: uuid.New().String(),
+			auth:          person.OwnerPubKey,
+			requestBody: map[string]string{
+				"name": "Test Ticket",
+			},
+			expectedCode: http.StatusNotFound,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			rr := httptest.NewRecorder()
+
+			requestBody, _ := json.Marshal(tt.requestBody)
+			req := httptest.NewRequest(http.MethodPost, "/bounties/ticket/workspace/"+tt.workspaceUuid+"/draft", bytes.NewReader(requestBody))
+
+			rctx := chi.NewRouteContext()
+			rctx.URLParams.Add("workspace_uuid", tt.workspaceUuid)
+			req = req.WithContext(context.WithValue(req.Context(), chi.RouteCtxKey, rctx))
+
+			if tt.auth != "" {
+				req = req.WithContext(context.WithValue(req.Context(), auth.ContextKey, tt.auth))
+			}
+
+			tHandler.CreateWorkspaceDraftTicket(rr, req)
+
+			assert.Equal(t, tt.expectedCode, rr.Code)
+			if tt.validateResp != nil {
+				tt.validateResp(t, rr)
+			}
+		})
+	}
+}
+
+func TestGetWorkspaceDraftTicket(t *testing.T) {
+	teardownSuite := SetupSuite(t)
+	defer teardownSuite(t)
+
+	db.CleanTestData()
+	tHandler := NewTicketHandler(&http.Client{}, db.TestDB)
+
+	person := db.Person{
+		Uuid:        uuid.New().String(),
+		OwnerPubKey: "test-pubkey",
+	}
+	db.TestDB.CreateOrEditPerson(person)
+
+	workspace := db.Workspace{
+		Uuid:        uuid.New().String(),
+		OwnerPubKey: person.OwnerPubKey,
+	}
+	db.TestDB.CreateOrEditWorkspace(workspace)
+
+	ticket := db.Tickets{
+		UUID:          uuid.New(),
+		WorkspaceUuid: workspace.Uuid,
+		Name:          "Test Draft Ticket",
+		Description:   "Test Description",
+		Status:        db.DraftTicket,
+	}
+	createdTicket, _ := db.TestDB.CreateWorkspaceDraftTicket(&ticket)
+
+	tests := []struct {
+		name          string
+		workspaceUuid string
+		ticketUuid    string
+		auth          string
+		expectedCode  int
+		validateResp  func(*testing.T, *httptest.ResponseRecorder)
+	}{
+		{
+			name:          "success",
+			workspaceUuid: workspace.Uuid,
+			ticketUuid:    createdTicket.UUID.String(),
+			auth:          person.OwnerPubKey,
+			expectedCode:  http.StatusOK,
+			validateResp: func(t *testing.T, rr *httptest.ResponseRecorder) {
+				var ticket db.Tickets
+				err := json.NewDecoder(rr.Body).Decode(&ticket)
+				require.NoError(t, err)
+				assert.Equal(t, createdTicket.UUID, ticket.UUID)
+				assert.Equal(t, createdTicket.Name, ticket.Name)
+			},
+		},
+		{
+			name:          "unauthorized",
+			workspaceUuid: workspace.Uuid,
+			ticketUuid:    createdTicket.UUID.String(),
+			auth:          "",
+			expectedCode:  http.StatusUnauthorized,
+		},
+		{
+			name:          "not found - ticket",
+			workspaceUuid: workspace.Uuid,
+			ticketUuid:    uuid.New().String(),
+			auth:          person.OwnerPubKey,
+			expectedCode:  http.StatusNotFound,
+		},
+		{
+			name:          "not found - workspace",
+			workspaceUuid: uuid.New().String(),
+			ticketUuid:    createdTicket.UUID.String(),
+			auth:          person.OwnerPubKey,
+			expectedCode:  http.StatusNotFound,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			rr := httptest.NewRecorder()
+			req := httptest.NewRequest(http.MethodGet, "/workspace/"+tt.workspaceUuid+"/draft/"+tt.ticketUuid, nil)
+
+			rctx := chi.NewRouteContext()
+			rctx.URLParams.Add("workspace_uuid", tt.workspaceUuid)
+			rctx.URLParams.Add("uuid", tt.ticketUuid)
+			req = req.WithContext(context.WithValue(req.Context(), chi.RouteCtxKey, rctx))
+
+			if tt.auth != "" {
+				req = req.WithContext(context.WithValue(req.Context(), auth.ContextKey, tt.auth))
+			}
+
+			tHandler.GetWorkspaceDraftTicket(rr, req)
+
+			assert.Equal(t, tt.expectedCode, rr.Code)
+			if tt.validateResp != nil {
+				tt.validateResp(t, rr)
+			}
+		})
+	}
+}
+
+func TestUpdateWorkspaceDraftTicket(t *testing.T) {
+	teardownSuite := SetupSuite(t)
+	defer teardownSuite(t)
+
+	db.CleanTestData()
+
+	tHandler := NewTicketHandler(&http.Client{}, db.TestDB)
+
+	person := db.Person{
+		Uuid:        uuid.New().String(),
+		OwnerAlias:  "test-alias",
+		UniqueName:  "test-unique-name",
+		OwnerPubKey: "test-pubkey",
+	}
+	_, err := db.TestDB.CreateOrEditPerson(person)
+	require.NoError(t, err)
+
+	workspace := db.Workspace{
+		Uuid:        uuid.New().String(),
+		Name:        "test-workspace" + uuid.New().String(),
+		OwnerPubKey: person.OwnerPubKey,
+	}
+	_, err = db.TestDB.CreateOrEditWorkspace(workspace)
+	require.NoError(t, err)
+
+	draftTicket := &db.Tickets{
+		UUID:          uuid.New(),
+		WorkspaceUuid: workspace.Uuid,
+		Name:          "Original Draft Ticket",
+		Description:   "Original Description",
+		Status:        db.DraftTicket,
+	}
+	createdTicket, err := db.TestDB.CreateWorkspaceDraftTicket(draftTicket)
+	require.NoError(t, err)
+
+	require.NotEqual(t, uuid.Nil, createdTicket.UUID)
+	require.Equal(t, workspace.Uuid, createdTicket.WorkspaceUuid)
+
+	tests := []struct {
+		name          string
+		workspaceUuid string
+		ticketUuid    string
+		auth          string
+		requestBody   interface{}
+		expectedCode  int
+		validateResp  func(*testing.T, *httptest.ResponseRecorder)
+	}{
+		{
+			name:          "success - update name and description",
+			workspaceUuid: workspace.Uuid,
+			ticketUuid:    createdTicket.UUID.String(),
+			auth:          person.OwnerPubKey,
+			requestBody: map[string]interface{}{
+				"name":        "Updated Draft Ticket",
+				"description": "Updated Description",
+				"status":      string(db.DraftTicket),
+			},
+			expectedCode: http.StatusOK,
+			validateResp: func(t *testing.T, rr *httptest.ResponseRecorder) {
+				var response struct {
+					Ticket         db.Tickets `json:"ticket"`
+					WebsocketError string     `json:"websocket_error,omitempty"`
+				}
+				err := json.NewDecoder(rr.Body).Decode(&response)
+				require.NoError(t, err)
+
+				updatedTicket := response.Ticket
+
+				assert.Equal(t, createdTicket.UUID, updatedTicket.UUID)
+				assert.Equal(t, "Updated Draft Ticket", updatedTicket.Name)
+				assert.Equal(t, "Updated Description", updatedTicket.Description)
+				assert.Equal(t, db.DraftTicket, updatedTicket.Status)
+				assert.Equal(t, workspace.Uuid, updatedTicket.WorkspaceUuid)
+				assert.Equal(t, createdTicket.Version+1, updatedTicket.Version)
+
+				dbTicket, err := db.TestDB.GetWorkspaceDraftTicket(workspace.Uuid, updatedTicket.UUID.String())
+				require.NoError(t, err)
+				assert.Equal(t, "Updated Draft Ticket", dbTicket.Name)
+				assert.Equal(t, "Updated Description", dbTicket.Description)
+				assert.Equal(t, db.DraftTicket, dbTicket.Status)
+			},
+		},
+		{
+			name:          "success - update status",
+			workspaceUuid: workspace.Uuid,
+			ticketUuid:    createdTicket.UUID.String(),
+			auth:          person.OwnerPubKey,
+			requestBody: map[string]interface{}{
+				"status": string(db.ReadyTicket),
+			},
+			expectedCode: http.StatusOK,
+			validateResp: func(t *testing.T, rr *httptest.ResponseRecorder) {
+				var response struct {
+					Ticket         db.Tickets `json:"ticket"`
+					WebsocketError string     `json:"websocket_error,omitempty"`
+				}
+				err := json.NewDecoder(rr.Body).Decode(&response)
+				require.NoError(t, err)
+
+				updatedTicket := response.Ticket
+				assert.Equal(t, db.ReadyTicket, updatedTicket.Status)
+
+				dbTicket, err := db.TestDB.GetWorkspaceDraftTicket(workspace.Uuid, updatedTicket.UUID.String())
+				require.NoError(t, err)
+				assert.Equal(t, db.ReadyTicket, dbTicket.Status)
+			},
+		},
+		{
+			name:          "unauthorized - no auth token",
+			workspaceUuid: workspace.Uuid,
+			ticketUuid:    createdTicket.UUID.String(),
+			auth:          "",
+			requestBody: map[string]string{
+				"name": "Unauthorized Update",
+			},
+			expectedCode: http.StatusUnauthorized,
+		},
+		{
+			name:          "not found - ticket doesn't exist",
+			workspaceUuid: workspace.Uuid,
+			ticketUuid:    uuid.New().String(),
+			auth:          person.OwnerPubKey,
+			requestBody: map[string]string{
+				"name": "Non-existent Ticket",
+			},
+			expectedCode: http.StatusNotFound,
+		},
+		{
+			name:          "bad request - invalid status",
+			workspaceUuid: workspace.Uuid,
+			ticketUuid:    createdTicket.UUID.String(),
+			auth:          person.OwnerPubKey,
+			requestBody: map[string]string{
+				"status": "INVALID_STATUS",
+			},
+			expectedCode: http.StatusBadRequest,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			rr := httptest.NewRecorder()
+
+			requestBody, err := json.Marshal(tt.requestBody)
+			require.NoError(t, err)
+
+			req := httptest.NewRequest(
+				http.MethodPost,
+				fmt.Sprintf("/bounties/ticket/workspace/%s/draft/%s", tt.workspaceUuid, tt.ticketUuid),
+				bytes.NewReader(requestBody),
+			)
+			req.Header.Set("Content-Type", "application/json")
+
+			rctx := chi.NewRouteContext()
+			rctx.URLParams.Add("workspace_uuid", tt.workspaceUuid)
+			rctx.URLParams.Add("uuid", tt.ticketUuid)
+			req = req.WithContext(context.WithValue(req.Context(), chi.RouteCtxKey, rctx))
+
+			if tt.auth != "" {
+				req = req.WithContext(context.WithValue(req.Context(), auth.ContextKey, tt.auth))
+			}
+
+			tHandler.UpdateWorkspaceDraftTicket(rr, req)
+
+			assert.Equal(t, tt.expectedCode, rr.Code)
+			if tt.validateResp != nil {
+				tt.validateResp(t, rr)
+			}
+		})
+	}
+}
+
+func TestDeleteWorkspaceDraftTicket(t *testing.T) {
+	teardownSuite := SetupSuite(t)
+	defer teardownSuite(t)
+
+	db.CleanTestData()
+
+	tHandler := NewTicketHandler(&http.Client{}, db.TestDB)
+
+	person := db.Person{
+		Uuid:        uuid.New().String(),
+		OwnerPubKey: "test-pubkey",
+	}
+	db.TestDB.CreateOrEditPerson(person)
+
+	workspace := db.Workspace{
+		Uuid:        uuid.New().String(),
+		OwnerPubKey: person.OwnerPubKey,
+	}
+	db.TestDB.CreateOrEditWorkspace(workspace)
+
+	ticket := db.Tickets{
+		UUID:          uuid.New(),
+		WorkspaceUuid: workspace.Uuid,
+		Name:          "Test Draft Ticket",
+		Status:        db.DraftTicket,
+	}
+	createdTicket, _ := db.TestDB.CreateWorkspaceDraftTicket(&ticket)
+
+	tests := []struct {
+		name          string
+		workspaceUuid string
+		ticketUuid    string
+		auth          string
+		expectedCode  int
+		validateResp  func(*testing.T, *httptest.ResponseRecorder)
+	}{
+		{
+			name:          "success",
+			workspaceUuid: workspace.Uuid,
+			ticketUuid:    createdTicket.UUID.String(),
+			auth:          person.OwnerPubKey,
+			expectedCode:  http.StatusNoContent,
+			validateResp: func(t *testing.T, rr *httptest.ResponseRecorder) {
+
+				_, err := db.TestDB.GetWorkspaceDraftTicket(workspace.Uuid, createdTicket.UUID.String())
+				assert.Error(t, err)
+				assert.Contains(t, err.Error(), "draft ticket not found")
+			},
+		},
+		{
+			name:          "unauthorized",
+			workspaceUuid: workspace.Uuid,
+			ticketUuid:    createdTicket.UUID.String(),
+			auth:          "",
+			expectedCode:  http.StatusUnauthorized,
+		},
+		{
+			name:          "not found - ticket",
+			workspaceUuid: workspace.Uuid,
+			ticketUuid:    uuid.New().String(),
+			auth:          person.OwnerPubKey,
+			expectedCode:  http.StatusNotFound,
+		},
+		{
+			name:          "not found - workspace",
+			workspaceUuid: uuid.New().String(),
+			ticketUuid:    createdTicket.UUID.String(),
+			auth:          person.OwnerPubKey,
+			expectedCode:  http.StatusNotFound,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			rr := httptest.NewRecorder()
+			req := httptest.NewRequest(http.MethodDelete, "/bounties/ticket/workspace/"+tt.workspaceUuid+"/draft/"+tt.ticketUuid, nil)
+
+			rctx := chi.NewRouteContext()
+			rctx.URLParams.Add("workspace_uuid", tt.workspaceUuid)
+			rctx.URLParams.Add("uuid", tt.ticketUuid)
+			req = req.WithContext(context.WithValue(req.Context(), chi.RouteCtxKey, rctx))
+
+			if tt.auth != "" {
+				req = req.WithContext(context.WithValue(req.Context(), auth.ContextKey, tt.auth))
+			}
+
+			tHandler.DeleteWorkspaceDraftTicket(rr, req)
+
+			assert.Equal(t, tt.expectedCode, rr.Code)
+			if tt.validateResp != nil {
+				tt.validateResp(t, rr)
 			}
 		})
 	}

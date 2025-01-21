@@ -12751,3 +12751,204 @@ func NewDatabase(t interface {
 
 	return mock
 }
+
+func (_m *Database) GetWorkspaceDraftTicket(workspaceUuid string, _a1 string) (db.Tickets, error) {
+	ret := _m.Called(workspaceUuid, _a1)
+
+	if len(ret) == 0 {
+		panic("no return value specified for GetWorkspaceDraftTicket")
+	}
+
+	var r0 db.Tickets
+	var r1 error
+	if rf, ok := ret.Get(0).(func(string, string) (db.Tickets, error)); ok {
+		return rf(workspaceUuid, _a1)
+	}
+	if rf, ok := ret.Get(0).(func(string, string) db.Tickets); ok {
+		r0 = rf(workspaceUuid, _a1)
+	} else {
+		r0 = ret.Get(0).(db.Tickets)
+	}
+
+	if rf, ok := ret.Get(1).(func(string, string) error); ok {
+		r1 = rf(workspaceUuid, _a1)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
+type Database_GetWorkspaceDraftTicket_Call struct {
+	*mock.Call
+}
+
+func (_e *Database_Expecter) GetWorkspaceDraftTicket(workspaceUuid interface{}, _a1 interface{}) *Database_GetWorkspaceDraftTicket_Call {
+	return &Database_GetWorkspaceDraftTicket_Call{Call: _e.mock.On("GetWorkspaceDraftTicket", workspaceUuid, _a1)}
+}
+
+func (_c *Database_GetWorkspaceDraftTicket_Call) Run(run func(workspaceUuid string, _a1 string)) *Database_GetWorkspaceDraftTicket_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(string), args[1].(string))
+	})
+	return _c
+}
+
+func (_c *Database_GetWorkspaceDraftTicket_Call) Return(_a0 db.Tickets, _a1 error) *Database_GetWorkspaceDraftTicket_Call {
+	_c.Call.Return(_a0, _a1)
+	return _c
+}
+
+func (_c *Database_GetWorkspaceDraftTicket_Call) RunAndReturn(run func(string, string) (db.Tickets, error)) *Database_GetWorkspaceDraftTicket_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
+
+func (_m *Database) CreateWorkspaceDraftTicket(ticket *db.Tickets) (db.Tickets, error) {
+	ret := _m.Called(ticket)
+
+	if len(ret) == 0 {
+		panic("no return value specified for CreateWorkspaceDraftTicket")
+	}
+
+	var r0 db.Tickets
+	var r1 error
+	if rf, ok := ret.Get(0).(func(*db.Tickets) (db.Tickets, error)); ok {
+		return rf(ticket)
+	}
+	if rf, ok := ret.Get(0).(func(*db.Tickets) db.Tickets); ok {
+		r0 = rf(ticket)
+	} else {
+		r0 = ret.Get(0).(db.Tickets)
+	}
+
+	if rf, ok := ret.Get(1).(func(*db.Tickets) error); ok {
+		r1 = rf(ticket)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
+type Database_CreateWorkspaceDraftTicket_Call struct {
+	*mock.Call
+}
+
+func (_e *Database_Expecter) CreateWorkspaceDraftTicket(ticket interface{}) *Database_CreateWorkspaceDraftTicket_Call {
+	return &Database_CreateWorkspaceDraftTicket_Call{Call: _e.mock.On("CreateWorkspaceDraftTicket", ticket)}
+}
+
+func (_c *Database_CreateWorkspaceDraftTicket_Call) Run(run func(ticket *db.Tickets)) *Database_CreateWorkspaceDraftTicket_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(*db.Tickets))
+	})
+	return _c
+}
+
+func (_c *Database_CreateWorkspaceDraftTicket_Call) Return(_a0 db.Tickets, _a1 error) *Database_CreateWorkspaceDraftTicket_Call {
+	_c.Call.Return(_a0, _a1)
+	return _c
+}
+
+func (_c *Database_CreateWorkspaceDraftTicket_Call) RunAndReturn(run func(*db.Tickets) (db.Tickets, error)) *Database_CreateWorkspaceDraftTicket_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
+
+func (_m *Database) UpdateWorkspaceDraftTicket(ticket *db.Tickets) (db.Tickets, error) {
+	ret := _m.Called(ticket)
+
+	if len(ret) == 0 {
+		panic("no return value specified for UpdateWorkspaceDraftTicket")
+	}
+
+	var r0 db.Tickets
+	var r1 error
+	if rf, ok := ret.Get(0).(func(*db.Tickets) (db.Tickets, error)); ok {
+		return rf(ticket)
+	}
+	if rf, ok := ret.Get(0).(func(*db.Tickets) db.Tickets); ok {
+		r0 = rf(ticket)
+	} else {
+		r0 = ret.Get(0).(db.Tickets)
+	}
+
+	if rf, ok := ret.Get(1).(func(*db.Tickets) error); ok {
+		r1 = rf(ticket)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
+type Database_UpdateWorkspaceDraftTicket_Call struct {
+	*mock.Call
+}
+
+func (_e *Database_Expecter) UpdateWorkspaceDraftTicket(ticket interface{}) *Database_UpdateWorkspaceDraftTicket_Call {
+	return &Database_UpdateWorkspaceDraftTicket_Call{Call: _e.mock.On("UpdateWorkspaceDraftTicket", ticket)}
+}
+
+func (_c *Database_UpdateWorkspaceDraftTicket_Call) Run(run func(ticket *db.Tickets)) *Database_UpdateWorkspaceDraftTicket_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(*db.Tickets))
+	})
+	return _c
+}
+
+func (_c *Database_UpdateWorkspaceDraftTicket_Call) Return(_a0 db.Tickets, _a1 error) *Database_UpdateWorkspaceDraftTicket_Call {
+	_c.Call.Return(_a0, _a1)
+	return _c
+}
+
+func (_c *Database_UpdateWorkspaceDraftTicket_Call) RunAndReturn(run func(*db.Tickets) (db.Tickets, error)) *Database_UpdateWorkspaceDraftTicket_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
+
+func (_m *Database) DeleteWorkspaceDraftTicket(workspaceUuid string, _a1 string) error {
+	ret := _m.Called(workspaceUuid, _a1)
+
+	if len(ret) == 0 {
+		panic("no return value specified for DeleteWorkspaceDraftTicket")
+	}
+
+	var r0 error
+	if rf, ok := ret.Get(0).(func(string, string) error); ok {
+		r0 = rf(workspaceUuid, _a1)
+	} else {
+		r0 = ret.Error(0)
+	}
+
+	return r0
+}
+
+type Database_DeleteWorkspaceDraftTicket_Call struct {
+	*mock.Call
+}
+
+func (_e *Database_Expecter) DeleteWorkspaceDraftTicket(workspaceUuid interface{}, _a1 interface{}) *Database_DeleteWorkspaceDraftTicket_Call {
+	return &Database_DeleteWorkspaceDraftTicket_Call{Call: _e.mock.On("DeleteWorkspaceDraftTicket", workspaceUuid, _a1)}
+}
+
+func (_c *Database_DeleteWorkspaceDraftTicket_Call) Run(run func(workspaceUuid string, _a1 string)) *Database_DeleteWorkspaceDraftTicket_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(string), args[1].(string))
+	})
+	return _c
+}
+
+func (_c *Database_DeleteWorkspaceDraftTicket_Call) Return(_a0 error) *Database_DeleteWorkspaceDraftTicket_Call {
+	_c.Call.Return(_a0)
+	return _c
+}
+
+func (_c *Database_DeleteWorkspaceDraftTicket_Call) RunAndReturn(run func(string, string) error) *Database_DeleteWorkspaceDraftTicket_Call {
+	_c.Call.Return(run)
+	return _c
+}

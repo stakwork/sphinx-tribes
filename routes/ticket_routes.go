@@ -1,10 +1,10 @@
 package routes
 
 import (
-	"github.com/stakwork/sphinx-tribes/auth"
 	"net/http"
 
 	"github.com/go-chi/chi"
+	"github.com/stakwork/sphinx-tribes/auth"
 	"github.com/stakwork/sphinx-tribes/db"
 	"github.com/stakwork/sphinx-tribes/handlers"
 )
@@ -28,6 +28,11 @@ func TicketRoutes() chi.Router {
 		r.Post("/{ticket_uuid}/bounty", ticketHandler.TicketToBounty)
 		r.Delete("/{uuid}", ticketHandler.DeleteTicket)
 		r.Get("/group/{group_uuid}", ticketHandler.GetTicketsByGroup)
+
+		r.Post("/workspace/{workspace_uuid}/draft", ticketHandler.CreateWorkspaceDraftTicket)
+		r.Get("/workspace/{workspace_uuid}/draft/{uuid}", ticketHandler.GetWorkspaceDraftTicket)
+		r.Post("/workspace/{workspace_uuid}/draft/{uuid}", ticketHandler.UpdateWorkspaceDraftTicket)
+		r.Delete("/workspace/{workspace_uuid}/draft/{uuid}", ticketHandler.DeleteWorkspaceDraftTicket)
 	})
 
 	return r
