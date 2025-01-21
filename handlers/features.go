@@ -4,11 +4,12 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
-	"github.com/stakwork/sphinx-tribes/utils"
 	"io"
 	"log"
 	"net/http"
 	"time"
+
+	"github.com/stakwork/sphinx-tribes/utils"
 
 	"os"
 
@@ -675,7 +676,8 @@ func (oh *featureHandler) BriefSend(w http.ResponseWriter, r *http.Request) {
 
 	host := os.Getenv("HOST")
 	if host == "" {
-		panic("HOST environment variable not set")
+		logger.Log.Error("[BriefSend] HOST environment variable not set")
+		w.WriteHeader(http.StatusNotAcceptable)
 		return
 	}
 
@@ -689,7 +691,8 @@ func (oh *featureHandler) BriefSend(w http.ResponseWriter, r *http.Request) {
 
 	apiKey := os.Getenv("SWWFKEY")
 	if apiKey == "" {
-		panic("API key not set in environment")
+		logger.Log.Error("[BriefSend] API key not set in environment")
+		w.WriteHeader(http.StatusNotAcceptable)
 		return
 	}
 
