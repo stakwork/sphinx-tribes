@@ -12952,3 +12952,271 @@ func (_c *Database_DeleteWorkspaceDraftTicket_Call) RunAndReturn(run func(string
 	_c.Call.Return(run)
 	return _c
 }
+
+
+// CreateSnippet provides a mock function with given fields: snippet
+func (_m *Database) CreateSnippet(snippet *db.TextSnippet) (*db.TextSnippet, error) {
+	ret := _m.Called(snippet)
+
+	if len(ret) == 0 {
+		panic("no return value specified for CreateSnippet")
+	}
+
+	var r0 *db.TextSnippet
+	var r1 error
+	if rf, ok := ret.Get(0).(func(*db.TextSnippet) (*db.TextSnippet, error)); ok {
+		return rf(snippet)
+	}
+	if rf, ok := ret.Get(0).(func(*db.TextSnippet) *db.TextSnippet); ok {
+		r0 = rf(snippet)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(*db.TextSnippet)
+		}
+	}
+
+	if rf, ok := ret.Get(1).(func(*db.TextSnippet) error); ok {
+		r1 = rf(snippet)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
+type Database_CreateSnippet_Call struct {
+	*mock.Call
+}
+
+func (_e *Database_Expecter) CreateSnippet(snippet interface{}) *Database_CreateSnippet_Call {
+	return &Database_CreateSnippet_Call{Call: _e.mock.On("CreateSnippet", snippet)}
+}
+
+func (_c *Database_CreateSnippet_Call) Run(run func(snippet *db.TextSnippet)) *Database_CreateSnippet_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(*db.TextSnippet))
+	})
+	return _c
+}
+
+func (_c *Database_CreateSnippet_Call) Return(_a0 *db.TextSnippet, _a1 error) *Database_CreateSnippet_Call {
+	_c.Call.Return(_a0, _a1)
+	return _c
+}
+
+func (_c *Database_CreateSnippet_Call) RunAndReturn(run func(*db.TextSnippet) (*db.TextSnippet, error)) *Database_CreateSnippet_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
+
+func (_m *Database) GetSnippetsByWorkspace(workspaceUUID string) ([]db.TextSnippet, error) {
+	ret := _m.Called(workspaceUUID)
+
+	if len(ret) == 0 {
+		panic("no return value specified for GetSnippetsByWorkspace")
+	}
+
+	var r0 []db.TextSnippet
+	var r1 error
+	if rf, ok := ret.Get(0).(func(string) ([]db.TextSnippet, error)); ok {
+		return rf(workspaceUUID)
+	}
+	if rf, ok := ret.Get(0).(func(string) []db.TextSnippet); ok {
+		r0 = rf(workspaceUUID)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).([]db.TextSnippet)
+		}
+	}
+
+	if rf, ok := ret.Get(1).(func(string) error); ok {
+		r1 = rf(workspaceUUID)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
+type Database_GetSnippetsByWorkspace_Call struct {
+	*mock.Call
+}
+
+func (_e *Database_Expecter) GetSnippetsByWorkspace(workspaceUUID interface{}) *Database_GetSnippetsByWorkspace_Call {
+	return &Database_GetSnippetsByWorkspace_Call{Call: _e.mock.On("GetSnippetsByWorkspace", workspaceUUID)}
+}
+
+func (_c *Database_GetSnippetsByWorkspace_Call) Run(run func(workspaceUUID string)) *Database_GetSnippetsByWorkspace_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(string))
+	})
+	return _c
+}
+
+func (_c *Database_GetSnippetsByWorkspace_Call) Return(_a0 []db.TextSnippet, _a1 error) *Database_GetSnippetsByWorkspace_Call {
+	_c.Call.Return(_a0, _a1)
+	return _c
+}
+
+func (_c *Database_GetSnippetsByWorkspace_Call) RunAndReturn(run func(string) ([]db.TextSnippet, error)) *Database_GetSnippetsByWorkspace_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
+
+
+// GetSnippetByID provides a mock function with given fields: id
+func (_m *Database) GetSnippetByID(id uint) (*db.TextSnippet, error) {
+	ret := _m.Called(id)
+
+	if len(ret) == 0 {
+		panic("no return value specified for GetSnippetByID")
+	}
+
+	var r0 *db.TextSnippet
+	var r1 error
+	if rf, ok := ret.Get(0).(func(uint) (*db.TextSnippet, error)); ok {
+		return rf(id)
+	}
+	if rf, ok := ret.Get(0).(func(uint) *db.TextSnippet); ok {
+		r0 = rf(id)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(*db.TextSnippet)
+		}
+	}
+
+	if rf, ok := ret.Get(1).(func(uint) error); ok {
+		r1 = rf(id)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
+type Database_GetSnippetByID_Call struct {
+	*mock.Call
+}
+
+func (_e *Database_Expecter) GetSnippetByID(id interface{}) *Database_GetSnippetByID_Call {
+	return &Database_GetSnippetByID_Call{Call: _e.mock.On("GetSnippetByID", id)}
+}
+
+func (_c *Database_GetSnippetByID_Call) Run(run func(id uint)) *Database_GetSnippetByID_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(uint))
+	})
+	return _c
+}
+
+func (_c *Database_GetSnippetByID_Call) Return(_a0 *db.TextSnippet, _a1 error) *Database_GetSnippetByID_Call {
+	_c.Call.Return(_a0, _a1)
+	return _c
+}
+
+func (_c *Database_GetSnippetByID_Call) RunAndReturn(run func(uint) (*db.TextSnippet, error)) *Database_GetSnippetByID_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
+
+// UpdateSnippet provides a mock function with given fields: snippet
+func (_m *Database) UpdateSnippet(snippet *db.TextSnippet) (*db.TextSnippet, error) {
+	ret := _m.Called(snippet)
+
+	if len(ret) == 0 {
+		panic("no return value specified for UpdateSnippet")
+	}
+
+	var r0 *db.TextSnippet
+	var r1 error
+	if rf, ok := ret.Get(0).(func(*db.TextSnippet) (*db.TextSnippet, error)); ok {
+		return rf(snippet)
+	}
+	if rf, ok := ret.Get(0).(func(*db.TextSnippet) *db.TextSnippet); ok {
+		r0 = rf(snippet)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(*db.TextSnippet)
+		}
+	}
+
+	if rf, ok := ret.Get(1).(func(*db.TextSnippet) error); ok {
+		r1 = rf(snippet)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
+type Database_UpdateSnippet_Call struct {
+	*mock.Call
+}
+
+func (_e *Database_Expecter) UpdateSnippet(snippet interface{}) *Database_UpdateSnippet_Call {
+	return &Database_UpdateSnippet_Call{Call: _e.mock.On("UpdateSnippet", snippet)}
+}
+
+func (_c *Database_UpdateSnippet_Call) Run(run func(snippet *db.TextSnippet)) *Database_UpdateSnippet_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(*db.TextSnippet))
+	})
+	return _c
+}
+
+func (_c *Database_UpdateSnippet_Call) Return(_a0 *db.TextSnippet, _a1 error) *Database_UpdateSnippet_Call {
+	_c.Call.Return(_a0, _a1)
+	return _c
+}
+
+func (_c *Database_UpdateSnippet_Call) RunAndReturn(run func(*db.TextSnippet) (*db.TextSnippet, error)) *Database_UpdateSnippet_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
+
+// DeleteSnippet provides a mock function with given fields: id
+func (_m *Database) DeleteSnippet(id uint) error {
+	ret := _m.Called(id)
+
+	if len(ret) == 0 {
+		panic("no return value specified for DeleteSnippet")
+	}
+
+	var r0 error
+	if rf, ok := ret.Get(0).(func(uint) error); ok {
+		r0 = rf(id)
+	} else {
+		r0 = ret.Error(0)
+	}
+
+	return r0
+}
+
+type Database_DeleteSnippet_Call struct {
+	*mock.Call
+}
+
+func (_e *Database_Expecter) DeleteSnippet(id interface{}) *Database_DeleteSnippet_Call {
+	return &Database_DeleteSnippet_Call{Call: _e.mock.On("DeleteSnippet", id)}
+}
+
+func (_c *Database_DeleteSnippet_Call) Run(run func(id uint)) *Database_DeleteSnippet_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(uint))
+	})
+	return _c
+}
+
+func (_c *Database_DeleteSnippet_Call) Return(_a0 error) *Database_DeleteSnippet_Call {
+	_c.Call.Return(_a0)
+	return _c
+}
+
+func (_c *Database_DeleteSnippet_Call) RunAndReturn(run func(uint) error) *Database_DeleteSnippet_Call {
+	_c.Call.Return(run)
+	return _c
+}

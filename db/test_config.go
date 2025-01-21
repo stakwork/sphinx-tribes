@@ -79,6 +79,7 @@ func InitTestDB() {
 	db.AutoMigrate(&Bounty{})
 	db.AutoMigrate(&Notification{})
 	db.AutoMigrate(&BountyTiming{})
+	db.AutoMigrate(&TextSnippet{})
 
 	people := TestDB.GetAllPeople()
 	for _, p := range people {
@@ -113,6 +114,8 @@ func CleanTestData() {
 	TestDB.db.Exec("DELETE FROM chats")
 
 	TestDB.db.Exec("DELETE FROM notifications")
+
+	TestDB.db.Exec("DELETE FROM text_snippets")
 }
 
 func DeleteAllChatMessages() {

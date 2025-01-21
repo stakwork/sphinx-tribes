@@ -57,6 +57,7 @@ func NewRouter() *http.Server {
 	r.Mount("/hivechat", ChatRoutes())
 	r.Mount("/test", TestRoutes())
 	r.Mount("/feature-flags", FeatureFlagRoutes())
+	r.Mount("/snippet", SnippetRoutes())
 
 	r.Group(func(r chi.Router) {
 		r.Get("/tribe_by_feed", tribeHandlers.GetFirstTribeByFeed)
@@ -274,7 +275,7 @@ func internalServerErrorHandler(next http.Handler) http.Handler {
 						"$session_id":     session_id,
 						"$event_type":     "backend_api_call",
 						"$elements_chain": hexCompressed,
-						"$current_url": r.URL.Path,
+						"$current_url":    r.URL.Path,
 					},
 				})
 			}

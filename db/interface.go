@@ -267,4 +267,9 @@ type Database interface {
 	CreateWorkspaceDraftTicket(ticket *Tickets) (Tickets, error)
 	UpdateWorkspaceDraftTicket(ticket *Tickets) (Tickets, error)
 	DeleteWorkspaceDraftTicket(workspaceUuid string, uuid string) error
+	CreateSnippet(snippet *TextSnippet) (*TextSnippet, error)
+	GetSnippetsByWorkspace(workspaceUUID string) ([]TextSnippet, error)
+	GetSnippetByID(id uint) (*TextSnippet, error)
+	UpdateSnippet(snippet *TextSnippet) (*TextSnippet, error)
+	DeleteSnippet(id uint) error
 }
