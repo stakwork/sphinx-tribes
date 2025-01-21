@@ -464,6 +464,19 @@ func UpdateLeaderBoard(w http.ResponseWriter, r *http.Request) {
 }
 
 func GenerateInvoice(w http.ResponseWriter, r *http.Request) {
+	invoiceRes, invoiceErr := db.InvoiceResponse{}, db.InvoiceError{}
+
+	if config.IsV2Payment {
+		invoiceRes, invoiceErr = GenerateV2Invoice(w, r)
+	} else {
+		invoiceRes, invoiceErr = GenerateV1Invoice(w, r)
+	}
+
+	if invoiceErr.Error != "" {
+		w.WriteHeader(http.StatusInternalServerError)
+		json.NewEncoder(w).Encode(invoiceErr)
+	}
+
 	invoice := db.InvoiceRequest{}
 	body, err := io.ReadAll(r.Body)
 
@@ -486,47 +499,9 @@ func GenerateInvoice(w http.ResponseWriter, r *http.Request) {
 	pub_key := invoice.User_pubkey
 	owner_key := invoice.Owner_pubkey
 	date, _ := utils.ConvertStringToInt(invoice.Created)
-	memo := invoice.Memo
 	invoiceType := invoice.Type
 	routeHint := invoice.Route_hint
 	amount, _ := utils.ConvertStringToUint(invoice.Amount)
-
-	url := fmt.Sprintf("%s/invoices", config.RelayUrl)
-
-	bodyData := fmt.Sprintf(`{"amount": %d, "memo": "%s"}`, amount, memo)
-
-	jsonBody := []byte(bodyData)
-
-	client := &http.Client{}
-	req, _ := http.NewRequest(http.MethodPost, url, bytes.NewBuffer(jsonBody))
-
-	req.Header.Set("x-user-token", config.RelayAuthKey)
-	req.Header.Set("Content-Type", "application/json")
-	res, _ := client.Do(req)
-
-	if err != nil {
-		log.Printf("Request Failed: %s", err)
-		return
-	}
-
-	defer res.Body.Close()
-
-	body, err = io.ReadAll(res.Body)
-
-	if err != nil {
-		log.Printf("Reading body failed: %s", err)
-		return
-	}
-
-	// Unmarshal result
-	invoiceRes := db.InvoiceResponse{}
-
-	err = json.Unmarshal(body, &invoiceRes)
-
-	if err != nil {
-		log.Printf("Unmarshal body failed: %s", err)
-		return
-	}
 
 	paymentRequest := invoiceRes.Response.Invoice
 	now := time.Now()
@@ -552,6 +527,133 @@ func GenerateInvoice(w http.ResponseWriter, r *http.Request) {
 
 	w.WriteHeader(http.StatusOK)
 	json.NewEncoder(w).Encode(invoiceRes)
+}
+
+func GenerateV1Invoice(w http.ResponseWriter, r *http.Request) (db.InvoiceResponse, db.InvoiceError) {
+	invoice := db.InvoiceRequest{}
+	body, err := io.ReadAll(r.Body)
+
+	r.Body.Close()
+
+	if err != nil {
+		logger.Log.Error("%v", err)
+		return db.InvoiceResponse{}, db.InvoiceError{Success: false, Error: err.Error()}
+	}
+
+	err = json.Unmarshal(body, &invoice)
+
+	if err != nil {
+		logger.Log.Error("%v", err)
+		return db.InvoiceResponse{}, db.InvoiceError{Success: false, Error: err.Error()}
+	}
+
+	memo := invoice.Memo
+	amount, _ := utils.ConvertStringToUint(invoice.Amount)
+
+	url := fmt.Sprintf("%s/invoices", config.RelayUrl)
+
+	bodyData := fmt.Sprintf(`{"amount": %d, "memo": "%s"}`, amount, memo)
+
+	jsonBody := []byte(bodyData)
+
+	client := &http.Client{}
+	req, _ := http.NewRequest(http.MethodPost, url, bytes.NewBuffer(jsonBody))
+
+	req.Header.Set("x-user-token", config.RelayAuthKey)
+	req.Header.Set("Content-Type", "application/json")
+	res, _ := client.Do(req)
+
+	if err != nil {
+		log.Printf("Request Failed: %s", err)
+		return db.InvoiceResponse{}, db.InvoiceError{Success: false, Error: err.Error()}
+	}
+
+	defer res.Body.Close()
+
+	body, err = io.ReadAll(res.Body)
+
+	if err != nil {
+		log.Printf("Reading body failed: %s", err)
+		return db.InvoiceResponse{}, db.InvoiceError{Success: false, Error: err.Error()}
+	}
+
+	// Unmarshal result
+	invoiceRes := db.InvoiceResponse{}
+
+	err = json.Unmarshal(body, &invoiceRes)
+
+	if err != nil {
+		log.Printf("Unmarshal body failed: %s", err)
+		return db.InvoiceResponse{}, db.InvoiceError{Success: false, Error: err.Error()}
+	}
+
+	return invoiceRes, db.InvoiceError{Success: true}
+}
+
+func GenerateV2Invoice(w http.ResponseWriter, r *http.Request) (db.InvoiceResponse, db.InvoiceError) {
+	invoice := db.InvoiceRequest{}
+
+	var err error
+	body, err := io.ReadAll(r.Body)
+
+	r.Body.Close()
+
+	if err != nil {
+		logger.Log.Error("%v", err)
+		return db.InvoiceResponse{}, db.InvoiceError{Success: false, Error: err.Error()}
+	}
+
+	err = json.Unmarshal(body, &invoice)
+
+	if err != nil {
+		logger.Log.Error("%v", err)
+		return db.InvoiceResponse{}, db.InvoiceError{Success: false, Error: err.Error()}
+	}
+
+	url := fmt.Sprintf("%s/invoice", config.V2BotUrl)
+
+	amount, _ := utils.ConvertStringToUint(invoice.Amount)
+
+	amountMsat := amount * 1000
+
+	bodyData := fmt.Sprintf(`{"amt_msat": %d}`, amountMsat)
+
+	jsonBody := []byte(bodyData)
+
+	client := &http.Client{}
+	req, _ := http.NewRequest(http.MethodPost, url, bytes.NewBuffer(jsonBody))
+
+	req.Header.Set("x-admin-token", config.V2BotToken)
+	req.Header.Set("Content-Type", "application/json")
+	res, err := client.Do(req)
+
+	if err != nil {
+		log.Printf("Client Request Failed: %s", err)
+		return db.InvoiceResponse{}, db.InvoiceError{Success: false, Error: err.Error()}
+	}
+
+	defer res.Body.Close()
+
+	body, err = io.ReadAll(res.Body)
+
+	if err != nil {
+		log.Printf("Reading body failed: %s", err)
+		return db.InvoiceResponse{}, db.InvoiceError{Success: false, Error: err.Error()}
+	}
+
+	// Unmarshal result
+	v2InvoiceRes := db.V2CreateInvoiceResponse{}
+	err = json.Unmarshal(body, &v2InvoiceRes)
+
+	if err != nil {
+		log.Printf("Json Unmarshal failed: %s", err)
+		return db.InvoiceResponse{}, db.InvoiceError{Success: false, Error: err.Error()}
+	}
+	return db.InvoiceResponse{
+		Response: db.Invoice{
+			Invoice: v2InvoiceRes.Bolt11,
+		},
+	}, db.InvoiceError{Success: true}
 }
 
 func (th *tribeHandler) GenerateBudgetInvoice(w http.ResponseWriter, r *http.Request) {
