@@ -451,6 +451,12 @@ func (th *ticketHandler) PostTicketDataToStakwork(w http.ResponseWriter, r *http
 
 	}
 
+	phase, err := th.db.GetPhaseByUuid(ticket.PhaseUUID)
+	if err != nil {
+		w.WriteHeader(http.StatusNotFound)
+		return
+	}
+
 	stakworkPayload := map[string]interface{}{
 		"name":        "Hive Ticket Builder",
 		"workflow_id": 37324,
@@ -461,6 +467,9 @@ func (th *ticketHandler) PostTicketDataToStakwork(w http.ResponseWriter, r *http
 						"featureUUID":       ticket.FeatureUUID,
 						"phaseUUID":         ticket.PhaseUUID,
 						"ticketUUID":        ticket.UUID.String(),
+						"phaseOutcome":      phase.PhaseOutcome,
+						"phasePurpose":      phase.PhasePurpose,
+						"phaseScope":        phase.PhaseScope,
 						"ticketName":        ticket.Name,
 						"ticketDescription": ticket.Description,
 						"productBrief":      productBrief,
