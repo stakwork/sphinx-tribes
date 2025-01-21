@@ -10,7 +10,6 @@ import (
 	"io"
 	"net/http"
 	"os"
-	"reflect"
 	"runtime"
 	"strings"
 	"time"
@@ -241,49 +240,24 @@ func internalServerErrorHandler(next http.Handler) http.Handler {
 				}
 
 				newContent := fmt.Sprintf("%s:%d %s,\n", trimmed, f.Line, f.Name)
-				if elements_chain.Len()+len(newContent) <= 512000 {
+				maxByteSize := 177000
+				if elements_chain.Len()+len(newContent) <= maxByteSize && isExceedingLimit == false {
 					elements_chain.WriteString(newContent)
+					if args != nil && args.NumField() != 0 {
+						for i := 0; i < args.NumField(); i++ {
+							thingWeWantToPrint := args.GetFieldIndex(i)
+							argNameAndValue := fmt.Sprintf("Name: %s Value: %#v\n", thingWeWantToPrint.Name(), thingWeWantToPrint.Value())
+							if elements_chain.Len()+len(argNameAndValue) <= maxByteSize {
+								elements_chain.WriteString(argNameAndValue)
+							} else {
+								fmt.Printf("elements_chain length exceeded 500KB, skipping further additions.\n")
+								isExceedingLimit = true
+							}
+						}
+					}
 				} else if isExceedingLimit == false {
-					// Optionally, you could log or handle this case differently if needed
 					fmt.Printf("elements_chain length exceeded 500KB, skipping further additions.\n")
 					isExceedingLimit = true
-				}
-
-
-				if args != nil {
-					var variableLog []string
-
-					v := reflect.ValueOf(args)
-					if v.Kind() == reflect.Ptr {
-						v = v.Elem()
-					}
-
-					if v.Kind() == reflect.Struct {
-						for i := 0; i < v.NumField(); i++ {
-							field := v.Type().Field(i)
-							value := v.Field(i)
-
-							// Convert value to string safely
-							var valueStr string
-							switch value.Kind() {
-							case reflect.String:
-								valueStr = value.String()
-							case reflect.Int, reflect.Int64:
-								valueStr = fmt.Sprintf("%d", value.Int())
-							case reflect.Bool:
-								valueStr = fmt.Sprintf("%v", value.Bool())
-							default:
-								valueStr = fmt.Sprintf("%v", value.Interface())
-							}
-
-							variableLog = append(variableLog,
-								fmt.Sprintf("[Machine] %s: %v", field.Name, valueStr))
-						}
-
-						if len(variableLog) > 0 && config.LogLevel == "MACHINE" {
-							fmt.Printf("Variables: %s\n", strings.Join(variableLog, ", "))
-						}
-					}
 				}
 
 				return nil, nil
@@ -312,7 +286,7 @@ func internalServerErrorHandler(next http.Handler) http.Handler {
 						"$session_id":     session_id,
 						"$event_type":     "backend_api_call",
 						"$elements_chain": hexCompressed,
-						"$current_url": r.URL.Path,
+						"$current_url":    r.URL.Path,
 					},
 				})
 			}
