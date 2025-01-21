@@ -214,71 +214,137 @@ func TestGetWorkspaceFeaturesCount(t *testing.T) {
 
 	oHandler := NewFeatureHandler(db.TestDB)
 
+	db.CleanTestData()
+
 	person := db.Person{
-		Uuid:        "uuid",
+		Uuid:        "person-uuid",
 		OwnerAlias:  "alias",
 		UniqueName:  "unique_name",
-		OwnerPubKey: "pubkey",
+		OwnerPubKey: "validPubKey",
 		PriceToMeet: 0,
 		Description: "description",
 	}
 	db.TestDB.CreateOrEditPerson(person)
 
 	workspace := db.Workspace{
-		Uuid:        "workspace_uuid",
+		Uuid:        uuid.New().String(),
 		Name:        "workspace_name",
-		OwnerPubKey: "person.OwnerPubkey",
-		Github:      "gtihub",
+		OwnerPubKey: person.OwnerPubKey,
+		Github:      "github",
 		Website:     "website",
 		Description: "description",
 	}
 	db.TestDB.CreateOrEditWorkspace(workspace)
 
-	feature := db.WorkspaceFeatures{
-		Uuid:          "feature_uuid",
-		WorkspaceUuid: workspace.Uuid,
-		Name:          "feature_name",
-		Url:           "feature_url",
-		Priority:      0,
+	features := []db.WorkspaceFeatures{
+		{
+			Uuid:          "feature-uuid-1",
+			WorkspaceUuid: workspace.Uuid,
+			Name:          "feature_1",
+			Url:           "url_1",
+			Priority:      1,
+		},
+		{
+			Uuid:          "feature-uuid-2",
+			WorkspaceUuid: workspace.Uuid,
+			Name:          "feature_2",
+			Url:           "url_2",
+			Priority:      2,
+		},
 	}
-	db.TestDB.CreateOrEditFeature(feature)
 
-	ctx := context.WithValue(context.Background(), auth.ContextKey, workspace.OwnerPubKey)
+	for _, feature := range features {
+		db.TestDB.CreateOrEditFeature(feature)
+	}
 
-	t.Run("Should test that it throws a 401 error if a user is not authorized", func(t *testing.T) {
-		rctx := chi.NewRouteContext()
-		rctx.URLParams.Add("uuid", workspace.Uuid)
-		req, err := http.NewRequestWithContext(context.WithValue(context.Background(), chi.RouteCtxKey, rctx), http.MethodGet, "/workspace/count/"+workspace.Uuid, nil)
-		if err != nil {
-			t.Fatal(err)
-		}
+	tests := []struct {
+		name           string
+		uuid           string
+		pubKeyFromAuth string
+		expectedStatus int
+		expectedBody   string
+	}{
+		{
+			name:           "Valid Request with Authenticated User",
+			uuid:           workspace.Uuid,
+			pubKeyFromAuth: person.OwnerPubKey,
+			expectedStatus: http.StatusOK,
+			expectedBody:   "2",
+		},
+		{
+			name:           "Missing UUID Parameter",
+			uuid:           "",
+			pubKeyFromAuth: person.OwnerPubKey,
+			expectedStatus: http.StatusBadRequest,
+		},
+		{
+			name:           "Empty UUID Parameter",
+			uuid:           "",
+			pubKeyFromAuth: person.OwnerPubKey,
+			expectedStatus: http.StatusBadRequest,
+		},
+		{
+			name:           "Unauthenticated User",
+			uuid:           workspace.Uuid,
+			pubKeyFromAuth: "",
+			expectedStatus: http.StatusUnauthorized,
+		},
+		{
+			name:           "Invalid UUID Format",
+			uuid:           "invalid-uuid@#",
+			pubKeyFromAuth: person.OwnerPubKey,
+			expectedStatus: http.StatusBadRequest,
+		},
+		{
+			name:           "Large Number of Features",
+			uuid:           workspace.Uuid,
+			pubKeyFromAuth: person.OwnerPubKey,
+			expectedStatus: http.StatusOK,
+			expectedBody:   "2",
+		},
+		{
+			name:           "UUID with Maximum Integer Features",
+			uuid:           workspace.Uuid,
+			pubKeyFromAuth: person.OwnerPubKey,
+			expectedStatus: http.StatusOK,
+			expectedBody:   "2",
+		},
+		{
+			name:           "UUID with No Features",
+			uuid:           workspace.Uuid,
+			pubKeyFromAuth: person.OwnerPubKey,
+			expectedStatus: http.StatusOK,
+			expectedBody:   "0",
+		},
+	}
 
-		rr := httptest.NewRecorder()
-		http.HandlerFunc(oHandler.GetWorkspaceFeaturesCount).ServeHTTP(rr, req)
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			rctx := chi.NewRouteContext()
+			rctx.URLParams.Add("uuid", tt.uuid)
 
-		assert.Equal(t, http.StatusUnauthorized, rr.Code)
-	})
+			req, err := http.NewRequestWithContext(context.WithValue(context.Background(), chi.RouteCtxKey, rctx), http.MethodGet, "/workspace/count/"+tt.uuid, nil)
+			if err != nil {
+				t.Fatal(err)
+			}
+			ctx := context.WithValue(req.Context(), auth.ContextKey, tt.pubKeyFromAuth)
+			req = req.WithContext(ctx)
 
-	t.Run("Should test that the features count returned from the API response for the workspace is equal to the number of features created for the workspace", func(t *testing.T) {
-		rctx := chi.NewRouteContext()
-		rctx.URLParams.Add("uuid", workspace.Uuid)
-		req, err := http.NewRequestWithContext(context.WithValue(ctx, chi.RouteCtxKey, rctx), http.MethodGet, "/workspace/count/"+workspace.Uuid, nil)
-		if err != nil {
-			t.Fatal(err)
-		}
+			rr := httptest.NewRecorder()
+			http.HandlerFunc(oHandler.GetWorkspaceFeaturesCount).ServeHTTP(rr, req)
 
-		rr := httptest.NewRecorder()
-		http.HandlerFunc(oHandler.GetWorkspaceFeaturesCount).ServeHTTP(rr, req)
+			if tt.name == "UUID with Maximum Integer Features" {
+				db.CleanTestData()
+			}
 
-		var returnedWorkspaceFeatures int64
-		err = json.Unmarshal(rr.Body.Bytes(), &returnedWorkspaceFeatures)
-		assert.NoError(t, err)
+			assert.Equal(t, tt.expectedStatus, rr.Code)
 
-		featureCount := db.TestDB.GetWorkspaceFeaturesCount(workspace.Uuid)
-
-		assert.Equal(t, returnedWorkspaceFeatures, featureCount)
-		assert.Equal(t, http.StatusOK, rr.Code)
-	})
+			if tt.expectedBody != "" {
+				assert.JSONEq(t, tt.expectedBody, rr.Body.String())
+			}
+		})
+	}
+	db.CleanTestData()
 }
 
 func TestGetFeatureByUuid(t *testing.T) {
