@@ -6,9 +6,11 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"io"
 	"net/http"
 	"net/http/httptest"
 	"net/url"
+	"os"
 	"sort"
 	"strings"
 	"testing"
@@ -2964,6 +2966,155 @@ func TestUpdateFeatureBrief(t *testing.T) {
 					assert.Fail(t, "Response body does not contain 'featureBrief' field")
 				}
 			}
+		})
+	}
+}
+
+func TestBriefSend(t *testing.T) {
+	teardownSuite := SetupSuite(t)
+	defer teardownSuite(t)
+
+	db.CleanTestData()
+
+	fHandler := NewFeatureHandler(db.TestDB)
+
+	tests := []struct {
+		name           string
+		contextKey     interface{}
+		contextValue   string
+		body           string
+		envHost        string
+		envSWWFKEY     string
+		mockError      error
+		expectedStatus int
+		expectedBody   string
+		expectedPanic  string
+	}{
+		{
+			name:           "Valid Request with All Required Fields",
+			contextKey:     auth.ContextKey,
+			contextValue:   "validPubKey",
+			body:           `{"audioLink":"link","featureUUID":"uuid","source":"source","examples":["example1"]}`,
+			envHost:        "http://localhost",
+			envSWWFKEY:     "validKey",
+			expectedStatus: http.StatusUnauthorized,
+			expectedBody:   "{\"success\":false,\"error\":{\"message\":\"Unauthorized\"}}",
+		},
+		{
+			name:           "Empty JSON Body",
+			contextKey:     auth.ContextKey,
+			contextValue:   "validPubKey",
+			body:           ``,
+			expectedStatus: http.StatusNotAcceptable,
+			expectedBody:   "Invalid JSON format\n",
+		},
+		{
+			name:           "Missing Required JSON Fields",
+			contextKey:     auth.ContextKey,
+			contextValue:   "validPubKey",
+			body:           `{"audioLink":"link"}`,
+			envHost:        "http://localhost",
+			envSWWFKEY:     "",
+			expectedStatus: http.StatusNotAcceptable,
+			expectedBody:   "",
+		},
+		{
+			name:           "No pubKeyFromAuth in Context",
+			contextKey:     "",
+			contextValue:   "",
+			expectedStatus: http.StatusUnauthorized,
+			expectedBody:   "",
+		},
+		{
+			name:           "Invalid JSON Format",
+			contextKey:     auth.ContextKey,
+			contextValue:   "validPubKey",
+			body:           `{"audioLink":}`,
+			expectedStatus: http.StatusNotAcceptable,
+			expectedBody:   "Invalid JSON format\n",
+		},
+		{
+			name:           "Environment Variable HOST Not Set",
+			contextKey:     auth.ContextKey,
+			contextValue:   "validPubKey",
+			body:           `{"audioLink":"link","featureUUID":"uuid","source":"source","examples":["example1"]}`,
+			envHost:        "",
+			envSWWFKEY:     "validKey",
+			expectedStatus: http.StatusNotAcceptable,
+		},
+		{
+			name:           "Environment Variable SWWFKEY Not Set",
+			contextKey:     auth.ContextKey,
+			contextValue:   "validPubKey",
+			body:           `{"audioLink":"link","featureUUID":"uuid","source":"source","examples":["example1"]}`,
+			envHost:        "",
+			envSWWFKEY:     "validKey",
+			expectedStatus: http.StatusNotAcceptable,
+		},
+		{
+			name:           "Stakwork API Request Creation Failure",
+			contextKey:     auth.ContextKey,
+			contextValue:   "validPubKey",
+			body:           `{"audioLink":"link","featureUUID":"uuid","source":"source","examples":["example1"]}`,
+			envHost:        "http://localhost",
+			envSWWFKEY:     "validKey",
+			expectedStatus: http.StatusUnauthorized,
+			expectedBody:   "{\"success\":false,\"error\":{\"message\":\"Unauthorized\"}}",
+		},
+		{
+			name:           "Stakwork API Request Sending Failure",
+			contextKey:     auth.ContextKey,
+			contextValue:   "validPubKey",
+			body:           `{"audioLink":"link","featureUUID":"uuid","source":"source","examples":["example1"]}`,
+			envHost:        "http://localhost",
+			envSWWFKEY:     "validKey",
+			expectedStatus: http.StatusUnauthorized,
+			expectedBody:   "{\"success\":false,\"error\":{\"message\":\"Unauthorized\"}}",
+		},
+		{
+			name:           "Stakwork API Response Reading Failure",
+			contextKey:     auth.ContextKey,
+			contextValue:   "validPubKey",
+			body:           `{"audioLink":"link","featureUUID":"uuid","source":"source","examples":["example1"]}`,
+			envHost:        "http://localhost",
+			envSWWFKEY:     "validKey",
+			expectedStatus: http.StatusUnauthorized,
+			expectedBody:   "{\"success\":false,\"error\":{\"message\":\"Unauthorized\"}}",
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if tt.envHost != "" {
+				os.Setenv("HOST", tt.envHost)
+			}
+			if tt.envSWWFKEY != "" {
+				os.Setenv("SWWFKEY", tt.envSWWFKEY)
+			}
+
+			req := httptest.NewRequest(http.MethodPost, "/brief/send", bytes.NewBufferString(tt.body))
+			req = req.WithContext(context.WithValue(req.Context(), tt.contextKey, tt.contextValue))
+			w := httptest.NewRecorder()
+
+			if tt.expectedPanic != "" {
+				assert.PanicsWithValue(t, tt.expectedPanic, func() {
+					fHandler.BriefSend(w, req)
+				})
+			} else {
+				fHandler.BriefSend(w, req)
+				resp := w.Result()
+				body, _ := io.ReadAll(resp.Body)
+				assert.Equal(t, tt.expectedStatus, resp.StatusCode)
+				assert.Equal(t, tt.expectedBody, string(body))
+			}
+
+			if tt.envHost != "" {
+				os.Setenv("HOST", "")
+			}
+			if tt.envSWWFKEY != "" {
+				os.Setenv("SWWFKEY", "")
+			}
+
 		})
 	}
 }
