@@ -1206,6 +1206,15 @@ type Notification struct {
 	UpdatedAt *time.Time         `json:"updated_at" gorm:"default:current_timestamp"`
 }
 
+type TextSnippet struct {
+	ID            uint      `json:"id" gorm:"primarykey"`
+	WorkspaceUUID string    `json:"workspace_uuid" gorm:"type:uuid;not null;index"`
+	Title         string    `json:"title" gorm:"type:varchar(255);not null"`
+	Snippet       string    `json:"snippet" gorm:"type:text;not null"`
+	DateCreated   time.Time `json:"date_created" gorm:"autoCreateTime"`
+	LastEdited    time.Time `json:"last_edited" gorm:"autoUpdateTime"`
+}
+
 func (Person) TableName() string {
 	return "people"
 }
