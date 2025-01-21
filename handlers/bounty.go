@@ -356,6 +356,12 @@ func (h *bountyHandler) CreateOrEditBounty(w http.ResponseWriter, r *http.Reques
 		return
 	}
 
+	if bounty.ID == 0 && bounty.Assignee != "" {
+		if err := h.db.StartBountyTiming(b.ID); err != nil {
+			handleTimingError(w, "start_timing", err)
+		}
+	}
+
 	w.WriteHeader(http.StatusOK)
 	json.NewEncoder(w).Encode(b)
 }
