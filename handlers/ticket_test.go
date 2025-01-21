@@ -541,7 +541,7 @@ func TestTicketToBounty(t *testing.T) {
 			wantCode: http.StatusNotFound,
 		},
 		{
-			name:     "success - creates bounty from ticket",
+			name:     "success - creates bounty from ticket and deletes ticket",
 			ticket:   createdTicket.UUID.String(),
 			auth:     workspace.OwnerPubKey,
 			wantCode: http.StatusCreated,
@@ -551,16 +551,21 @@ func TestTicketToBounty(t *testing.T) {
 
 				assert.True(t, resp.Success)
 				assert.NotZero(t, resp.BountyID)
-				assert.Equal(t, "Bounty created successfully", resp.Message)
+				assert.Equal(t, "Bounty created successfully and ticket deleted", resp.Message)
 
+				// Verify bounty was created correctly
 				bounty := db.TestDB.GetBounty(resp.BountyID)
-
 				assert.Equal(t, createdTicket.Name, bounty.Title)
 				assert.Equal(t, createdTicket.Description, bounty.Description)
 				assert.Equal(t, createdTicket.PhaseUUID, bounty.PhaseUuid)
 				assert.Equal(t, "freelance_job_request", bounty.Type)
 				assert.Equal(t, uint(21), bounty.Price)
 				assert.True(t, bounty.Show)
+
+				// Verify ticket was deleted
+				_, err := db.TestDB.GetTicket(createdTicket.UUID.String())
+				assert.Error(t, err)
+				assert.Equal(t, "ticket not found", err.Error())
 			},
 		},
 	}
