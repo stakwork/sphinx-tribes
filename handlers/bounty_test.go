@@ -2413,7 +2413,7 @@ func TestDeleteBountyAssignee(t *testing.T) {
 
 	db.CleanTestData()
 
-	db.TestDB.CreateOrEditBounty(db.NewBounty{
+	bounty1 := db.NewBounty{
 		Type:          "coding",
 		Title:         "Bounty 1",
 		Description:   "Description for Bounty 1",
@@ -2421,9 +2421,17 @@ func TestDeleteBountyAssignee(t *testing.T) {
 		OwnerID:       "validOwner",
 		Price:         1500,
 		Created:       1234567890,
-	})
+	}
 
-	db.TestDB.CreateOrEditBounty(db.NewBounty{
+	db.TestDB.CreateOrEditBounty(bounty1)
+
+	// get bounty by created
+	getBounty, err := db.TestDB.GetBountyByCreated(uint(bounty1.Created))
+	assert.NoError(t, err)
+
+	db.TestDB.CreateBountyTiming(getBounty.ID)
+
+	bounty2 := db.NewBounty{
 		Type:          "design",
 		Title:         "Bounty 2",
 		Description:   "Description for Bounty 2",
@@ -2431,9 +2439,16 @@ func TestDeleteBountyAssignee(t *testing.T) {
 		OwnerID:       "nonExistentOwner",
 		Price:         2000,
 		Created:       1234567891,
-	})
+	}
+	db.TestDB.CreateOrEditBounty(bounty2)
 
-	db.TestDB.CreateOrEditBounty(db.NewBounty{
+	// get bounty by created
+	getBounty2, err := db.TestDB.GetBountyByCreated(uint(bounty2.Created))
+	assert.NoError(t, err)
+
+	db.TestDB.CreateBountyTiming(getBounty2.ID)
+
+	bounty3 := db.NewBounty{
 		Type:          "design",
 		Title:         "Bounty 2",
 		Description:   "Description for Bounty 2",
@@ -2441,7 +2456,14 @@ func TestDeleteBountyAssignee(t *testing.T) {
 		OwnerID:       "validOwner",
 		Price:         2000,
 		Created:       0,
-	})
+	}
+	db.TestDB.CreateOrEditBounty(bounty3)
+
+	// get bounty by created
+	getBounty3, err := db.TestDB.GetBountyByCreated(uint(bounty3.Created))
+	assert.NoError(t, err)
+
+	db.TestDB.CreateBountyTiming(getBounty3.ID)
 
 	tests := []struct {
 		name           string
