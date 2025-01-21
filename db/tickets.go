@@ -17,6 +17,10 @@ func (db database) CreateOrEditTicket(ticket *Tickets) (Tickets, error) {
 		return Tickets{}, errors.New("ticket UUID is required")
 	}
 
+	if ticket.FeatureUUID == "" {
+		return Tickets{}, errors.New("feature UUID is required")
+	}
+
 	if ticket.Status != "" && !IsValidTicketStatus(ticket.Status) {
 		return Tickets{}, errors.New("invalid ticket status")
 	}
