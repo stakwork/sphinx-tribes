@@ -837,3 +837,243 @@ func (th *ticketHandler) GetTicketsByGroup(w http.ResponseWriter, r *http.Reques
 	w.WriteHeader(http.StatusOK)
 	json.NewEncoder(w).Encode(tickets)
 }
+
+func (th *ticketHandler) CreateWorkspaceDraftTicket(w http.ResponseWriter, r *http.Request) {
+	ctx := r.Context()
+	workspaceUuid := chi.URLParam(r, "workspace_uuid")
+	pubKeyFromAuth, _ := ctx.Value(auth.ContextKey).(string)
+
+	if pubKeyFromAuth == "" {
+		logger.Log.Info("[ticket] no pubkey from auth")
+		w.WriteHeader(http.StatusUnauthorized)
+		json.NewEncoder(w).Encode(map[string]string{"error": "Unauthorized"})
+		return
+	}
+
+	if workspaceUuid == "" {
+		w.WriteHeader(http.StatusBadRequest)
+		json.NewEncoder(w).Encode(map[string]string{"error": "workspace UUID is required"})
+		return
+	}
+
+	workspace := th.db.GetWorkspaceByUuid(workspaceUuid)
+	if workspace.ID == 0 {
+		w.WriteHeader(http.StatusNotFound)
+		json.NewEncoder(w).Encode(map[string]string{"error": "workspace not found"})
+		return
+	}
+
+	var ticketRequest struct {
+		Name        string `json:"name"`
+		Description string `json:"description"`
+	}
+
+	if err := json.NewDecoder(r.Body).Decode(&ticketRequest); err != nil {
+		w.WriteHeader(http.StatusBadRequest)
+		json.NewEncoder(w).Encode(map[string]string{"error": "invalid request body"})
+		return
+	}
+
+	if ticketRequest.Name == "" {
+		w.WriteHeader(http.StatusBadRequest)
+		json.NewEncoder(w).Encode(map[string]string{"error": "name is required"})
+		return
+	}
+
+	ticket := &db.Tickets{
+		UUID:          uuid.New(),
+		WorkspaceUuid: workspaceUuid,
+		Name:          ticketRequest.Name,
+		Description:   ticketRequest.Description,
+		Status:        db.DraftTicket,
+	}
+
+	createdTicket, err := th.db.CreateWorkspaceDraftTicket(ticket)
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		json.NewEncoder(w).Encode(map[string]string{"error": err.Error()})
+		return
+	}
+
+	w.WriteHeader(http.StatusCreated)
+	json.NewEncoder(w).Encode(createdTicket)
+}
+
+func (th *ticketHandler) GetWorkspaceDraftTicket(w http.ResponseWriter, r *http.Request) {
+	ctx := r.Context()
+	workspaceUuid := chi.URLParam(r, "workspace_uuid")
+	ticketUuid := chi.URLParam(r, "uuid")
+	pubKeyFromAuth, _ := ctx.Value(auth.ContextKey).(string)
+
+	if pubKeyFromAuth == "" {
+		logger.Log.Info("[ticket] no pubkey from auth")
+		w.WriteHeader(http.StatusUnauthorized)
+		json.NewEncoder(w).Encode(map[string]string{"error": "Unauthorized"})
+		return
+	}
+
+	workspace := th.db.GetWorkspaceByUuid(workspaceUuid)
+	if workspace.ID == 0 {
+		w.WriteHeader(http.StatusNotFound)
+		json.NewEncoder(w).Encode(map[string]string{"error": "workspace not found"})
+		return
+	}
+
+	ticket, err := th.db.GetWorkspaceDraftTicket(workspaceUuid, ticketUuid)
+	if err != nil {
+		status := http.StatusInternalServerError
+		if err.Error() == "draft ticket not found" {
+			status = http.StatusNotFound
+		}
+		w.WriteHeader(status)
+		json.NewEncoder(w).Encode(map[string]string{"error": err.Error()})
+		return
+	}
+
+	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode(ticket)
+}
+
+func (th *ticketHandler) UpdateWorkspaceDraftTicket(w http.ResponseWriter, r *http.Request) {
+	ctx := r.Context()
+	workspaceUuid := chi.URLParam(r, "workspace_uuid")
+	ticketUuid := chi.URLParam(r, "uuid")
+	pubKeyFromAuth, _ := ctx.Value(auth.ContextKey).(string)
+
+	if pubKeyFromAuth == "" {
+		logger.Log.Info("[ticket] no pubkey from auth")
+		w.WriteHeader(http.StatusUnauthorized)
+		json.NewEncoder(w).Encode(map[string]string{"error": "Unauthorized"})
+		return
+	}
+
+	if workspaceUuid == "" || ticketUuid == "" {
+		w.WriteHeader(http.StatusBadRequest)
+		json.NewEncoder(w).Encode(map[string]string{"error": "workspace UUID and ticket UUID are required"})
+		return
+	}
+
+	workspace := th.db.GetWorkspaceByUuid(workspaceUuid)
+	if workspace.ID == 0 {
+		w.WriteHeader(http.StatusNotFound)
+		json.NewEncoder(w).Encode(map[string]string{"error": "workspace not found"})
+		return
+	}
+
+	var ticketRequest struct {
+		Name        string          `json:"name"`
+		Description string          `json:"description"`
+		Status      db.TicketStatus `json:"status,omitempty"`
+	}
+
+	if err := json.NewDecoder(r.Body).Decode(&ticketRequest); err != nil {
+		w.WriteHeader(http.StatusBadRequest)
+		json.NewEncoder(w).Encode(map[string]string{"error": "invalid request body"})
+		return
+	}
+
+	existingTicket, err := th.db.GetWorkspaceDraftTicket(workspaceUuid, ticketUuid)
+	if err != nil {
+		w.WriteHeader(http.StatusNotFound)
+		json.NewEncoder(w).Encode(map[string]string{"error": "ticket not found"})
+		return
+	}
+
+	if ticketRequest.Name != "" {
+		existingTicket.Name = ticketRequest.Name
+	}
+	if ticketRequest.Description != "" {
+		existingTicket.Description = ticketRequest.Description
+	}
+	if ticketRequest.Status != "" {
+		if !db.IsValidTicketStatus(ticketRequest.Status) {
+			w.WriteHeader(http.StatusBadRequest)
+			json.NewEncoder(w).Encode(map[string]string{"error": "invalid ticket status"})
+			return
+		}
+		existingTicket.Status = ticketRequest.Status
+	}
+
+	updatedTicket, err := th.db.UpdateWorkspaceDraftTicket(&existingTicket)
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		json.NewEncoder(w).Encode(map[string]string{"error": err.Error()})
+		return
+	}
+
+	ticketMsg := websocket.TicketMessage{
+		BroadcastType: "direct",
+		Action:        "update",
+		TicketDetails: websocket.TicketData{
+			TicketUUID:        updatedTicket.UUID.String(),
+			TicketName:        updatedTicket.Name,
+			TicketDescription: updatedTicket.Description,
+		},
+	}
+
+	if err := websocket.WebsocketPool.SendTicketMessage(ticketMsg); err != nil {
+		w.WriteHeader(http.StatusOK)
+		json.NewEncoder(w).Encode(map[string]interface{}{
+			"ticket":          updatedTicket,
+			"websocket_error": err.Error(),
+		})
+		return
+	}
+
+	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode(updatedTicket)
+}
+
+func (th *ticketHandler) DeleteWorkspaceDraftTicket(w http.ResponseWriter, r *http.Request) {
+	ctx := r.Context()
+	workspaceUuid := chi.URLParam(r, "workspace_uuid")
+	ticketUuid := chi.URLParam(r, "uuid")
+	pubKeyFromAuth, _ := ctx.Value(auth.ContextKey).(string)
+
+	if pubKeyFromAuth == "" {
+		logger.Log.Info("[ticket] no pubkey from auth")
+		w.WriteHeader(http.StatusUnauthorized)
+		json.NewEncoder(w).Encode(map[string]string{"error": "Unauthorized"})
+		return
+	}
+
+	if workspaceUuid == "" || ticketUuid == "" {
+		w.WriteHeader(http.StatusBadRequest)
+		json.NewEncoder(w).Encode(map[string]string{"error": "workspace UUID and ticket UUID are required"})
+		return
+	}
+
+	workspace := th.db.GetWorkspaceByUuid(workspaceUuid)
+	if workspace.ID == 0 {
+		w.WriteHeader(http.StatusNotFound)
+		json.NewEncoder(w).Encode(map[string]string{"error": "workspace not found"})
+		return
+	}
+
+	_, err := th.db.GetWorkspaceDraftTicket(workspaceUuid, ticketUuid)
+	if err != nil {
+		w.WriteHeader(http.StatusNotFound)
+		json.NewEncoder(w).Encode(map[string]string{"error": "ticket not found"})
+		return
+	}
+
+	if err := th.db.DeleteWorkspaceDraftTicket(workspaceUuid, ticketUuid); err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		json.NewEncoder(w).Encode(map[string]string{"error": err.Error()})
+		return
+	}
+
+	ticketMsg := websocket.TicketMessage{
+		BroadcastType: "direct",
+		Action:        "delete",
+		TicketDetails: websocket.TicketData{
+			TicketUUID: ticketUuid,
+		},
+	}
+
+	if err := websocket.WebsocketPool.SendTicketMessage(ticketMsg); err != nil {
+		logger.Log.Error("Failed to send websocket message", "error", err)
+	}
+
+	w.WriteHeader(http.StatusNoContent)
+}

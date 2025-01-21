@@ -38,6 +38,16 @@ func InitTestDB() {
 
 	logger.Log.Info("DB CONNECTED")
 
+	db.Exec(`
+		DO $$ BEGIN
+			ALTER TABLE tickets 
+				ALTER COLUMN feature_uuid DROP NOT NULL,
+				ALTER COLUMN phase_uuid DROP NOT NULL;
+		EXCEPTION
+			WHEN others THEN null;
+		END $$;
+	`)
+
 	// migrate table changes
 	db.AutoMigrate(&Tribe{})
 	db.AutoMigrate(&Person{})
