@@ -263,4 +263,8 @@ type Database interface {
 	GetNotificationsByPubKey(pubKey string, limit, offset int) ([]Notification, error)
 	IncrementRetryCount(uuid string) error
 	GetNotificationCount(pubKey string) (int64, error)
+	GetWorkspaceDraftTicket(workspaceUuid string, uuid string) (Tickets, error)
+	CreateWorkspaceDraftTicket(ticket *Tickets) (Tickets, error)
+	UpdateWorkspaceDraftTicket(ticket *Tickets) (Tickets, error)
+	DeleteWorkspaceDraftTicket(workspaceUuid string, uuid string) error
 }

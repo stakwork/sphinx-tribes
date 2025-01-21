@@ -265,3 +265,95 @@ func (db database) GetAllTicketGroups(workspaceUuid string) ([]uuid.UUID, error)
 
 	return groups, nil
 }
+
+func (db database) GetWorkspaceDraftTicket(workspaceUuid string, uuid string) (Tickets, error) {
+	var ticket Tickets
+
+	result := db.db.
+		Where("workspace_uuid = ? AND uuid = ? AND feature_uuid IS NULL AND phase_uuid IS NULL",
+			workspaceUuid, uuid).
+		First(&ticket)
+
+	if result.Error != nil {
+		if errors.Is(result.Error, gorm.ErrRecordNotFound) {
+			return Tickets{}, fmt.Errorf("draft ticket not found")
+		}
+		return Tickets{}, fmt.Errorf("failed to fetch draft ticket: %w", result.Error)
+	}
+
+	return ticket, nil
+}
+
+func (db database) CreateWorkspaceDraftTicket(ticket *Tickets) (Tickets, error) {
+	if ticket.UUID == uuid.Nil {
+		return Tickets{}, errors.New("ticket UUID is required")
+	}
+
+	if ticket.WorkspaceUuid == "" {
+		return Tickets{}, errors.New("workspace UUID is required")
+	}
+
+	now := time.Now()
+	ticket.CreatedAt = now
+	ticket.UpdatedAt = now
+	ticket.Status = DraftTicket
+	ticket.Version = 1
+
+	if err := db.db.Omit("Features", "FeaturePhase").Create(ticket).Error; err != nil {
+		return Tickets{}, fmt.Errorf("failed to create draft ticket: %w", err)
+	}
+
+	var createdTicket Tickets
+	if err := db.db.Where("uuid = ?", ticket.UUID).First(&createdTicket).Error; err != nil {
+		return Tickets{}, fmt.Errorf("failed to fetch created ticket: %w", err)
+	}
+
+	return createdTicket, nil
+}
+
+func (db database) UpdateWorkspaceDraftTicket(ticket *Tickets) (Tickets, error) {
+	var existingTicket Tickets
+	result := db.db.Where("uuid = ? AND workspace_uuid = ?",
+		ticket.UUID, ticket.WorkspaceUuid).First(&existingTicket)
+
+	if result.Error != nil {
+		return Tickets{}, fmt.Errorf("failed to find draft ticket: %w", result.Error)
+	}
+
+	ticket.UpdatedAt = time.Now()
+	ticket.Version = existingTicket.Version + 1
+
+	if err := db.db.Model(&existingTicket).
+		Omit("Features", "FeaturePhase").
+		Updates(map[string]interface{}{
+			"name":        ticket.Name,
+			"description": ticket.Description,
+			"status":      ticket.Status,
+			"updated_at":  ticket.UpdatedAt,
+			"version":     ticket.Version,
+		}).Error; err != nil {
+		return Tickets{}, fmt.Errorf("failed to update draft ticket: %w", err)
+	}
+
+	var updatedTicket Tickets
+	if err := db.db.Where("uuid = ?", ticket.UUID).First(&updatedTicket).Error; err != nil {
+		return Tickets{}, fmt.Errorf("failed to fetch updated ticket: %w", err)
+	}
+
+	return updatedTicket, nil
+}
+
+func (db database) DeleteWorkspaceDraftTicket(workspaceUuid string, uuid string) error {
+	result := db.db.Where("workspace_uuid = ? AND uuid = ? AND feature_uuid IS NULL AND phase_uuid IS NULL",
+		workspaceUuid, uuid).Delete(&Tickets{})
+
+	if result.Error != nil {
+		return fmt.Errorf("failed to delete draft ticket: %w", result.Error)
+	}
+
+	if result.RowsAffected == 0 {
+		return errors.New("draft ticket not found")
+	}
+
+	return nil
+}
