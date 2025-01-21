@@ -891,7 +891,6 @@ func TestGenerateBudgetInvoice(t *testing.T) {
 	})
 
 	t.Run("Should test that the amount passed by the user is equal to the amount sent for invoice generation", func(t *testing.T) {
-
 		userAmount := float64(1000)
 
 		ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
@@ -966,7 +965,6 @@ func TestGenerateBudgetInvoice(t *testing.T) {
 	})
 
 	t.Run("Should test V1 payment path with valid request", func(t *testing.T) {
-
 		ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 			w.WriteHeader(http.StatusOK)
 			json.NewEncoder(w).Encode(invoiceResponse)
@@ -999,7 +997,6 @@ func TestGenerateBudgetInvoice(t *testing.T) {
 	})
 
 	t.Run("Should test V2 payment path with valid request", func(t *testing.T) {
-
 		ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 			w.WriteHeader(http.StatusOK)
 			json.NewEncoder(w).Encode(map[string]interface{}{
