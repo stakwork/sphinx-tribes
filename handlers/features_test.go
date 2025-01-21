@@ -10,6 +10,7 @@ import (
 	"net/http/httptest"
 	"net/url"
 	"sort"
+	"strings"
 	"testing"
 	"time"
 
@@ -2681,6 +2682,220 @@ func TestUpdateFeatureStatus(t *testing.T) {
 					assert.Equal(t, expectedBody["status"], status, "Status field does not match")
 				} else {
 					assert.Fail(t, "Response body does not contain 'status' field")
+				}
+			}
+		})
+	}
+}
+
+func TestUpdateFeatureBrief(t *testing.T) {
+	teardownSuite := SetupSuite(t)
+	defer teardownSuite(t)
+
+	db.CleanTestData()
+
+	fHandler := NewFeatureHandler(db.TestDB)
+
+	person := db.Person{
+		Uuid:        uuid.New().String(),
+		OwnerAlias:  "test-alias",
+		UniqueName:  "test-unique-name",
+		OwnerPubKey: "test-pubkey",
+		PriceToMeet: 0,
+		Description: "test-description",
+	}
+	db.TestDB.CreateOrEditPerson(person)
+
+	workspace := db.Workspace{
+		Uuid:        uuid.New().String(),
+		Name:        "test-workspace" + uuid.New().String(),
+		OwnerPubKey: person.OwnerPubKey,
+		Github:      "https://github.com/test",
+		Website:     "https://www.testwebsite.com",
+		Description: "test-description",
+	}
+	db.TestDB.CreateOrEditWorkspace(workspace)
+	workspace = db.TestDB.GetWorkspaceByUuid(workspace.Uuid)
+
+	feature := db.WorkspaceFeatures{
+		ID:            1,
+		Uuid:          uuid.New().String(),
+		WorkspaceUuid: workspace.Uuid,
+		Name:          "test-feature1",
+		Brief:         "brief",
+		Architecture:  "architecture",
+		Requirements:  "requirements",
+		Url:           "https://github.com/test-feature",
+		Priority:      0,
+	}
+	db.TestDB.CreateOrEditFeature(feature)
+
+	tests := []struct {
+		name           string
+		contextKey     interface{}
+		contextValue   interface{}
+		uuid           string
+		body           map[string]interface{}
+		expectedStatus int
+		expectedBody   string
+	}{
+		{
+			name:           "Valid Request with Existing Brief",
+			contextKey:     auth.ContextKey,
+			contextValue:   person.OwnerPubKey,
+			uuid:           feature.Uuid,
+			body:           map[string]interface{}{"output": map[string]interface{}{"featureBrief": "Updated feature brief", "audioLink": "http://example.com/audio", "featureUUID": feature.Uuid}},
+			expectedStatus: http.StatusOK,
+			expectedBody:   `{"brief":"brief\n\n* Generated Feature Brief *\n\nUpdated feature brief"}`,
+		},
+		{
+			name:           "Valid Request with Empty Brief",
+			contextKey:     auth.ContextKey,
+			contextValue:   person.OwnerPubKey,
+			uuid:           feature.Uuid,
+			body:           map[string]interface{}{"output": map[string]interface{}{"featureBrief": "", "audioLink": "http://example.com/audio", "featureUUID": feature.Uuid}},
+			expectedStatus: http.StatusBadRequest,
+			expectedBody:   "",
+		},
+		{
+			name:           "Missing UUID Parameter",
+			contextKey:     auth.ContextKey,
+			contextValue:   person.OwnerPubKey,
+			uuid:           "",
+			body:           map[string]interface{}{"output": map[string]interface{}{"featureBrief": "Updated feature brief", "audioLink": "http://example.com/audio", "featureUUID": ""}},
+			expectedStatus: http.StatusBadRequest,
+			expectedBody:   "",
+		},
+		{
+			name:           "Empty Request Body",
+			contextKey:     auth.ContextKey,
+			contextValue:   person.OwnerPubKey,
+			uuid:           feature.Uuid,
+			body:           nil,
+			expectedStatus: http.StatusBadRequest,
+			expectedBody:   "",
+		},
+		{
+			name:           "Valid Request with Non-Existent UUID",
+			contextKey:     auth.ContextKey,
+			contextValue:   person.OwnerPubKey,
+			uuid:           "nonExistentUUID",
+			body:           map[string]interface{}{"output": map[string]interface{}{"featureBrief": "Updated feature brief", "audioLink": "http://example.com/audio", "featureUUID": "nonExistentUUID"}},
+			expectedStatus: http.StatusNotFound,
+			expectedBody:   "",
+		},
+		{
+			name:         "Unauthorized Access (No Context Value)",
+			contextKey:   "",
+			contextValue: "",
+			uuid:         feature.Uuid,
+			body: map[string]interface{}{
+				"output": map[string]interface{}{
+					"featureBrief": "Unauthorized request",
+					"audioLink":    "http://example.com/audio",
+					"featureUUID":  feature.Uuid,
+				},
+			},
+			expectedStatus: http.StatusUnauthorized,
+			expectedBody:   "",
+		},
+		{
+			name:         "FeatureUUID with Excessively Long String",
+			contextKey:   auth.ContextKey,
+			contextValue: person.OwnerPubKey,
+			uuid:         strings.Repeat("a", 500),
+			body: map[string]interface{}{
+				"output": map[string]interface{}{
+					"featureBrief": "Excessively long UUID",
+					"audioLink":    "http://example.com/audio",
+					"featureUUID":  strings.Repeat("a", 500),
+				},
+			},
+			expectedStatus: http.StatusNotFound,
+			expectedBody:   "",
+		},
+		{
+			name:         "FeatureBrief with JSON Special Characters",
+			contextKey:   auth.ContextKey,
+			contextValue: person.OwnerPubKey,
+			uuid:         feature.Uuid,
+			body: map[string]interface{}{
+				"output": map[string]interface{}{
+					"featureBrief": `{"key":"value", "nested":{"key":"value"}}`,
+					"audioLink":    "http://example.com/audio",
+					"featureUUID":  feature.Uuid,
+				},
+			},
+			expectedStatus: http.StatusOK,
+			expectedBody:   `{"brief":"brief\n\n* Generated Feature Brief *\n\nUpdated feature brief\n\n* Generated Feature Brief *\n\n{\"key\":\"value\", \"nested\":{\"key\":\"value\"}}"}`,
+		},
+		{
+			name:         "Simultaneous Update by Multiple Users",
+			contextKey:   auth.ContextKey,
+			contextValue: person.OwnerPubKey,
+			uuid:         feature.Uuid,
+			body: map[string]interface{}{
+				"output": map[string]interface{}{
+					"featureBrief": "Simultaneous updates test",
+					"audioLink":    "http://example.com/audio",
+					"featureUUID":  feature.Uuid,
+				},
+			},
+			expectedStatus: http.StatusOK,
+			expectedBody:   `{"brief":"brief\n\n* Generated Feature Brief *\n\nUpdated feature brief\n\n* Generated Feature Brief *\n\n{\"key\":\"value\", \"nested\":{\"key\":\"value\"}}\n\n* Generated Feature Brief *\n\nSimultaneous updates test"}`,
+		},
+		{
+			name:           "Empty Request Body with Valid Context",
+			contextKey:     auth.ContextKey,
+			contextValue:   person.OwnerPubKey,
+			uuid:           feature.Uuid,
+			body:           nil, // Empty body
+			expectedStatus: http.StatusBadRequest,
+			expectedBody:   "",
+		},
+		{
+			name:         "Request with Missing Required Fields in Body",
+			contextKey:   auth.ContextKey,
+			contextValue: person.OwnerPubKey,
+			uuid:         feature.Uuid,
+			body: map[string]interface{}{
+				"output": map[string]interface{}{
+					"featureUUID": feature.Uuid,
+				},
+			},
+			expectedStatus: http.StatusBadRequest,
+			expectedBody:   "",
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			reqBody, _ := json.Marshal(tt.body)
+			req := httptest.NewRequest(http.MethodPut, "/features/brief", bytes.NewBuffer(reqBody))
+			req = req.WithContext(context.WithValue(req.Context(), tt.contextKey, tt.contextValue))
+
+			rctx := chi.NewRouteContext()
+			rctx.URLParams.Add("uuid", tt.uuid)
+			req = req.WithContext(context.WithValue(req.Context(), chi.RouteCtxKey, rctx))
+
+			rr := httptest.NewRecorder()
+			http.HandlerFunc(fHandler.UpdateFeatureBrief).ServeHTTP(rr, req)
+
+			assert.Equal(t, tt.expectedStatus, rr.Code)
+
+			if tt.expectedBody != "" {
+				var responseBody db.WorkspaceFeatures
+				err := json.NewDecoder(rr.Body).Decode(&responseBody)
+				assert.NoError(t, err, "Failed to decode response body")
+
+				if brief := responseBody.Brief; brief != "" {
+					var expectedBody map[string]interface{}
+					err := json.Unmarshal([]byte(tt.expectedBody), &expectedBody)
+					assert.NoError(t, err, "Failed to unmarshal expected body")
+
+					assert.Equal(t, expectedBody["brief"], brief, "Brief field does not match")
+				} else {
+					assert.Fail(t, "Response body does not contain 'featureBrief' field")
 				}
 			}
 		})
