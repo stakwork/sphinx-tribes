@@ -81,7 +81,7 @@ func TestCreateSnippet(t *testing.T) {
 			expectedCode: http.StatusUnauthorized,
 		},
 		{
-			name: "bad request - missing workspace_uuid",
+			name: "bad request missing workspace_uuid",
 			requestBody: map[string]string{
 				"title":   "Test Snippet",
 				"snippet": "Test Content",
