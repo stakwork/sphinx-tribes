@@ -239,12 +239,24 @@ func internalServerErrorHandler(next http.Handler) http.Handler {
 				if index != -1 {
 					trimmed = f.File[index:]
 				}
-				//fmt.Printf("%s:%d %s\n", trimmed, f.Line, f.Name)
+
 				newContent := fmt.Sprintf("%s:%d %s,\n", trimmed, f.Line, f.Name)
-				if elements_chain.Len()+len(newContent) <= 512000 {
+				maxByteSize := 177000
+				if elements_chain.Len()+len(newContent) <= maxByteSize && isExceedingLimit == false {
 					elements_chain.WriteString(newContent)
+					if args != nil && args.NumField() != 0 {
+						for i := 0; i < args.NumField(); i++ {
+							thingWeWantToPrint := args.GetFieldIndex(i)
+							argNameAndValue := fmt.Sprintf("Name: %s Value: %#v\n", thingWeWantToPrint.Name(), thingWeWantToPrint.Value())
+							if elements_chain.Len()+len(argNameAndValue) <= maxByteSize {
+								elements_chain.WriteString(argNameAndValue)
+							} else {
+								fmt.Printf("elements_chain length exceeded 500KB, skipping further additions.\n")
+								isExceedingLimit = true
+							}
+						}
+					}
 				} else if isExceedingLimit == false {
-					// Optionally, you could log or handle this case differently if needed
 					fmt.Printf("elements_chain length exceeded 500KB, skipping further additions.\n")
 					isExceedingLimit = true
 				}
