@@ -1458,6 +1458,358 @@ func TestDeleteStory(t *testing.T) {
 
 	})
 
+	t.Run("should handle non-existent feature UUID", func(t *testing.T) {
+		rr := httptest.NewRecorder()
+		handler := http.HandlerFunc(fHandler.DeleteStory)
+
+		nonExistentFeatureUUID := uuid.New().String()
+		ctx := context.WithValue(context.Background(), auth.ContextKey, person.OwnerPubKey)
+		rctx := chi.NewRouteContext()
+		rctx.URLParams.Add("feature_uuid", nonExistentFeatureUUID)
+		rctx.URLParams.Add("story_uuid", featureStory.Uuid)
+		req, err := http.NewRequestWithContext(context.WithValue(ctx, chi.RouteCtxKey, rctx),
+			http.MethodDelete,
+			fmt.Sprintf("/%s/story/%s", nonExistentFeatureUUID, featureStory.Uuid),
+			nil)
+		assert.NoError(t, err)
+
+		handler.ServeHTTP(rr, req)
+		assert.Equal(t, http.StatusNotFound, rr.Code)
+	})
+
+	t.Run("should handle non-existent story UUID", func(t *testing.T) {
+		rr := httptest.NewRecorder()
+		handler := http.HandlerFunc(fHandler.DeleteStory)
+
+		nonExistentStoryUUID := uuid.New().String()
+		ctx := context.WithValue(context.Background(), auth.ContextKey, person.OwnerPubKey)
+		rctx := chi.NewRouteContext()
+		rctx.URLParams.Add("feature_uuid", feature.Uuid)
+		rctx.URLParams.Add("story_uuid", nonExistentStoryUUID)
+		req, err := http.NewRequestWithContext(context.WithValue(ctx, chi.RouteCtxKey, rctx),
+			http.MethodDelete,
+			fmt.Sprintf("/%s/story/%s", feature.Uuid, nonExistentStoryUUID),
+			nil)
+		assert.NoError(t, err)
+
+		handler.ServeHTTP(rr, req)
+		assert.Equal(t, http.StatusNotFound, rr.Code)
+	})
+
+	t.Run("should handle empty feature UUID", func(t *testing.T) {
+		rr := httptest.NewRecorder()
+		handler := http.HandlerFunc(fHandler.DeleteStory)
+
+		ctx := context.WithValue(context.Background(), auth.ContextKey, person.OwnerPubKey)
+		rctx := chi.NewRouteContext()
+		rctx.URLParams.Add("feature_uuid", "")
+		rctx.URLParams.Add("story_uuid", featureStory.Uuid)
+		req, err := http.NewRequestWithContext(context.WithValue(ctx, chi.RouteCtxKey, rctx),
+			http.MethodDelete,
+			fmt.Sprintf("/%s/story/%s", "", featureStory.Uuid),
+			nil)
+		assert.NoError(t, err)
+
+		handler.ServeHTTP(rr, req)
+		assert.Equal(t, http.StatusNotFound, rr.Code)
+	})
+
+	t.Run("should handle empty story UUID", func(t *testing.T) {
+		rr := httptest.NewRecorder()
+		handler := http.HandlerFunc(fHandler.DeleteStory)
+
+		ctx := context.WithValue(context.Background(), auth.ContextKey, person.OwnerPubKey)
+		rctx := chi.NewRouteContext()
+		rctx.URLParams.Add("feature_uuid", feature.Uuid)
+		rctx.URLParams.Add("story_uuid", "")
+		req, err := http.NewRequestWithContext(context.WithValue(ctx, chi.RouteCtxKey, rctx),
+			http.MethodDelete,
+			fmt.Sprintf("/%s/story/%s", feature.Uuid, ""),
+			nil)
+		assert.NoError(t, err)
+
+		handler.ServeHTTP(rr, req)
+		assert.Equal(t, http.StatusNotFound, rr.Code)
+	})
+
+	t.Run("should handle invalid UUID format", func(t *testing.T) {
+		rr := httptest.NewRecorder()
+		handler := http.HandlerFunc(fHandler.DeleteStory)
+
+		ctx := context.WithValue(context.Background(), auth.ContextKey, person.OwnerPubKey)
+		rctx := chi.NewRouteContext()
+		rctx.URLParams.Add("feature_uuid", "invalid-uuid")
+		rctx.URLParams.Add("story_uuid", "invalid-uuid")
+		req, err := http.NewRequestWithContext(context.WithValue(ctx, chi.RouteCtxKey, rctx),
+			http.MethodDelete,
+			"/invalid-uuid/story/invalid-uuid",
+			nil)
+		assert.NoError(t, err)
+
+		handler.ServeHTTP(rr, req)
+		assert.Equal(t, http.StatusNotFound, rr.Code)
+	})
+
+	t.Run("should handle missing URL parameters", func(t *testing.T) {
+		rr := httptest.NewRecorder()
+		handler := http.HandlerFunc(fHandler.DeleteStory)
+
+		ctx := context.WithValue(context.Background(), auth.ContextKey, person.OwnerPubKey)
+		req, err := http.NewRequestWithContext(ctx,
+			http.MethodDelete,
+			"/story/",
+			nil)
+		assert.NoError(t, err)
+
+		handler.ServeHTTP(rr, req)
+		assert.Equal(t, http.StatusNotFound, rr.Code)
+	})
+
+	t.Run("should handle invalid auth token format", func(t *testing.T) {
+		rr := httptest.NewRecorder()
+		handler := http.HandlerFunc(fHandler.DeleteStory)
+
+		ctx := context.WithValue(context.Background(), auth.ContextKey, 12345)
+		rctx := chi.NewRouteContext()
+		rctx.URLParams.Add("feature_uuid", feature.Uuid)
+		rctx.URLParams.Add("story_uuid", featureStory.Uuid)
+		req, err := http.NewRequestWithContext(context.WithValue(ctx, chi.RouteCtxKey, rctx),
+			http.MethodDelete,
+			fmt.Sprintf("/%s/story/%s", feature.Uuid, featureStory.Uuid),
+			nil)
+		assert.NoError(t, err)
+
+		handler.ServeHTTP(rr, req)
+		assert.Equal(t, http.StatusUnauthorized, rr.Code)
+	})
+
+	t.Run("should handle concurrent delete requests", func(t *testing.T) {
+
+		concurrentStory := db.FeatureStory{
+			Uuid:        uuid.New().String(),
+			FeatureUuid: feature.Uuid,
+			Description: "concurrent-test-description",
+			Priority:    0,
+		}
+		db.TestDB.CreateOrEditFeatureStory(concurrentStory)
+
+		var wg sync.WaitGroup
+		numRequests := 5
+		wg.Add(numRequests)
+
+		for i := 0; i < numRequests; i++ {
+			go func() {
+				defer wg.Done()
+				rr := httptest.NewRecorder()
+				handler := http.HandlerFunc(fHandler.DeleteStory)
+
+				ctx := context.WithValue(context.Background(), auth.ContextKey, person.OwnerPubKey)
+				rctx := chi.NewRouteContext()
+				rctx.URLParams.Add("feature_uuid", feature.Uuid)
+				rctx.URLParams.Add("story_uuid", concurrentStory.Uuid)
+				req, err := http.NewRequestWithContext(context.WithValue(ctx, chi.RouteCtxKey, rctx),
+					http.MethodDelete,
+					fmt.Sprintf("/%s/story/%s", feature.Uuid, concurrentStory.Uuid),
+					nil)
+				if err != nil {
+					t.Error(err)
+					return
+				}
+
+				handler.ServeHTTP(rr, req)
+				// First request should succeed, others should fail with NotFound
+				assert.Contains(t, []int{http.StatusOK, http.StatusNotFound}, rr.Code)
+			}()
+		}
+
+		wg.Wait()
+	})
+
+	t.Run("Valid Request with Existing Story", func(t *testing.T) {
+
+		testStory := db.FeatureStory{
+			Uuid:        uuid.New().String(),
+			FeatureUuid: feature.Uuid,
+			Description: "test-valid-story",
+			Priority:    1,
+		}
+		db.TestDB.CreateOrEditFeatureStory(testStory)
+
+		rr := httptest.NewRecorder()
+		handler := http.HandlerFunc(fHandler.DeleteStory)
+
+		ctx := context.WithValue(context.Background(), auth.ContextKey, person.OwnerPubKey)
+		rctx := chi.NewRouteContext()
+		rctx.URLParams.Add("feature_uuid", feature.Uuid)
+		rctx.URLParams.Add("story_uuid", testStory.Uuid)
+		req, err := http.NewRequestWithContext(context.WithValue(ctx, chi.RouteCtxKey, rctx),
+			http.MethodDelete,
+			fmt.Sprintf("/%s/story/%s", feature.Uuid, testStory.Uuid),
+			nil)
+		assert.NoError(t, err)
+
+		handler.ServeHTTP(rr, req)
+		assert.Equal(t, http.StatusOK, rr.Code)
+
+		deletedStory, _ := db.TestDB.GetFeatureStoryByUuid(feature.Uuid, testStory.Uuid)
+		assert.Equal(t, db.FeatureStory{}, deletedStory)
+	})
+
+	t.Run("Valid Request with Non-Existing Story", func(t *testing.T) {
+		nonExistentUUID := uuid.New().String()
+		rr := httptest.NewRecorder()
+		handler := http.HandlerFunc(fHandler.DeleteStory)
+
+		ctx := context.WithValue(context.Background(), auth.ContextKey, person.OwnerPubKey)
+		rctx := chi.NewRouteContext()
+		rctx.URLParams.Add("feature_uuid", feature.Uuid)
+		rctx.URLParams.Add("story_uuid", nonExistentUUID)
+		req, err := http.NewRequestWithContext(context.WithValue(ctx, chi.RouteCtxKey, rctx),
+			http.MethodDelete,
+			fmt.Sprintf("/%s/story/%s", feature.Uuid, nonExistentUUID),
+			nil)
+		assert.NoError(t, err)
+
+		handler.ServeHTTP(rr, req)
+		assert.Equal(t, http.StatusNotFound, rr.Code)
+	})
+
+	t.Run("Empty feature_uuid and story_uuid", func(t *testing.T) {
+		rr := httptest.NewRecorder()
+		handler := http.HandlerFunc(fHandler.DeleteStory)
+
+		ctx := context.WithValue(context.Background(), auth.ContextKey, person.OwnerPubKey)
+		rctx := chi.NewRouteContext()
+		rctx.URLParams.Add("feature_uuid", "")
+		rctx.URLParams.Add("story_uuid", "")
+		req, err := http.NewRequestWithContext(context.WithValue(ctx, chi.RouteCtxKey, rctx),
+			http.MethodDelete,
+			"/story/",
+			nil)
+		assert.NoError(t, err)
+
+		handler.ServeHTTP(rr, req)
+		assert.Equal(t, http.StatusNotFound, rr.Code)
+	})
+
+	t.Run("Unauthorized Request with Valid UUIDs", func(t *testing.T) {
+		rr := httptest.NewRecorder()
+		handler := http.HandlerFunc(fHandler.DeleteStory)
+
+		rctx := chi.NewRouteContext()
+		rctx.URLParams.Add("feature_uuid", feature.Uuid)
+		rctx.URLParams.Add("story_uuid", featureStory.Uuid)
+		req, err := http.NewRequestWithContext(context.WithValue(context.Background(), chi.RouteCtxKey, rctx),
+			http.MethodDelete,
+			fmt.Sprintf("/%s/story/%s", feature.Uuid, featureStory.Uuid),
+			nil)
+		assert.NoError(t, err)
+
+		handler.ServeHTTP(rr, req)
+		assert.Equal(t, http.StatusUnauthorized, rr.Code)
+	})
+
+	t.Run("Invalid UUID Format for Both Parameters", func(t *testing.T) {
+		invalidUUIDs := []string{
+			"invalid-uuid",
+			"123-456-789",
+			"not-a-uuid-at-all",
+			"12345",
+			"",
+		}
+
+		for _, invalidUUID := range invalidUUIDs {
+			rr := httptest.NewRecorder()
+			handler := http.HandlerFunc(fHandler.DeleteStory)
+
+			ctx := context.WithValue(context.Background(), auth.ContextKey, person.OwnerPubKey)
+			rctx := chi.NewRouteContext()
+			rctx.URLParams.Add("feature_uuid", invalidUUID)
+			rctx.URLParams.Add("story_uuid", invalidUUID)
+			req, err := http.NewRequestWithContext(context.WithValue(ctx, chi.RouteCtxKey, rctx),
+				http.MethodDelete,
+				fmt.Sprintf("/%s/story/%s", invalidUUID, invalidUUID),
+				nil)
+			assert.NoError(t, err)
+
+			handler.ServeHTTP(rr, req)
+			assert.Equal(t, http.StatusNotFound, rr.Code)
+		}
+	})
+
+	t.Run("Missing UUID Parameters in Context", func(t *testing.T) {
+		rr := httptest.NewRecorder()
+		handler := http.HandlerFunc(fHandler.DeleteStory)
+
+		ctx := context.WithValue(context.Background(), auth.ContextKey, person.OwnerPubKey)
+
+		req, err := http.NewRequestWithContext(ctx,
+			http.MethodDelete,
+			"/story/",
+			nil)
+		assert.NoError(t, err)
+
+		handler.ServeHTTP(rr, req)
+		assert.Equal(t, http.StatusNotFound, rr.Code)
+	})
+
+	t.Run("Valid feature_uuid with Invalid story_uuid", func(t *testing.T) {
+		rr := httptest.NewRecorder()
+		handler := http.HandlerFunc(fHandler.DeleteStory)
+
+		ctx := context.WithValue(context.Background(), auth.ContextKey, person.OwnerPubKey)
+		rctx := chi.NewRouteContext()
+		rctx.URLParams.Add("feature_uuid", feature.Uuid)
+		rctx.URLParams.Add("story_uuid", "invalid-story-uuid")
+		req, err := http.NewRequestWithContext(context.WithValue(ctx, chi.RouteCtxKey, rctx),
+			http.MethodDelete,
+			fmt.Sprintf("/%s/story/invalid-story-uuid", feature.Uuid),
+			nil)
+		assert.NoError(t, err)
+
+		handler.ServeHTTP(rr, req)
+		assert.Equal(t, http.StatusNotFound, rr.Code)
+	})
+
+	t.Run("Invalid feature_uuid with Valid story_uuid", func(t *testing.T) {
+		rr := httptest.NewRecorder()
+		handler := http.HandlerFunc(fHandler.DeleteStory)
+
+		ctx := context.WithValue(context.Background(), auth.ContextKey, person.OwnerPubKey)
+		rctx := chi.NewRouteContext()
+		rctx.URLParams.Add("feature_uuid", "invalid-feature-uuid")
+		rctx.URLParams.Add("story_uuid", featureStory.Uuid)
+		req, err := http.NewRequestWithContext(context.WithValue(ctx, chi.RouteCtxKey, rctx),
+			http.MethodDelete,
+			fmt.Sprintf("/invalid-feature-uuid/story/%s", featureStory.Uuid),
+			nil)
+		assert.NoError(t, err)
+
+		handler.ServeHTTP(rr, req)
+		assert.Equal(t, http.StatusNotFound, rr.Code)
+	})
+
+	t.Run("Case Sensitivity in UUIDs", func(t *testing.T) {
+		rr := httptest.NewRecorder()
+		handler := http.HandlerFunc(fHandler.DeleteStory)
+
+		upperFeatureUUID := strings.ToUpper(feature.Uuid)
+		upperStoryUUID := strings.ToUpper(featureStory.Uuid)
+
+		ctx := context.WithValue(context.Background(), auth.ContextKey, person.OwnerPubKey)
+		rctx := chi.NewRouteContext()
+		rctx.URLParams.Add("feature_uuid", upperFeatureUUID)
+		rctx.URLParams.Add("story_uuid", upperStoryUUID)
+		req, err := http.NewRequestWithContext(context.WithValue(ctx, chi.RouteCtxKey, rctx),
+			http.MethodDelete,
+			fmt.Sprintf("/%s/story/%s", upperFeatureUUID, upperStoryUUID),
+			nil)
+		assert.NoError(t, err)
+
+		handler.ServeHTTP(rr, req)
+		assert.Equal(t, http.StatusNotFound, rr.Code)
+	})
+
 }
 
 func TestGetBountiesByFeatureAndPhaseUuid(t *testing.T) {
