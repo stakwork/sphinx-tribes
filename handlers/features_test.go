@@ -3706,3 +3706,116 @@ func TestBriefSend(t *testing.T) {
 		})
 	}
 }
+
+func TestStoriesSend(t *testing.T) {
+	teardownSuite := SetupSuite(t)
+	defer teardownSuite(t)
+
+	db.CleanTestData()
+
+	fHandler := NewFeatureHandler(db.TestDB)
+
+	tests := []struct {
+		name           string
+		body           string
+		envSWWFKEY     string
+		expectedStatus int
+		expectedBody   string
+		expectedPanic  string
+	}{
+		{
+			name:           "Empty JSON Body",
+			body:           ``,
+			envSWWFKEY:     "valid_api_key",
+			expectedStatus: http.StatusBadRequest,
+			expectedBody:   "Invalid JSON format\n",
+		},
+		{
+			name:           "Invalid JSON Format",
+			body:           `{"productBrief": "Test", "featureName": "Feature"`,
+			envSWWFKEY:     "valid_api_key",
+			expectedStatus: http.StatusBadRequest,
+			expectedBody:   "Invalid JSON format\n",
+		},
+		{
+			name:           "Missing API Key",
+			body:           `{"productBrief": "Test", "featureName": "Feature"}`,
+			envSWWFKEY:     "",
+			expectedStatus: http.StatusBadRequest,
+			expectedBody:   "API key not set in environment\n",
+		},
+		{
+			name:           "Failed to Read Request Body",
+			body:           `{"productBrief": "Test", "featureName": "Feature"`,
+			envSWWFKEY:     "valid_api_key",
+			expectedStatus: http.StatusBadRequest,
+			expectedBody:   "Invalid JSON format\n",
+		},
+		{
+			name:           "Failed to Marshal Payload",
+			body:           `{"productBrief": "Test", "featureName": "Feature"}`,
+			envSWWFKEY:     "valid_api_key",
+			expectedStatus: http.StatusUnauthorized,
+			expectedBody:   "{\"success\":false,\"error\":{\"message\":\"Unauthorized\"}}",
+		},
+		{
+			name:           "Failed to Create HTTP Request",
+			body:           `{"productBrief": "Test", "featureName": "Feature"}`,
+			envSWWFKEY:     "valid_api_key",
+			expectedStatus: http.StatusUnauthorized,
+			expectedBody:   "{\"success\":false,\"error\":{\"message\":\"Unauthorized\"}}",
+		},
+		{
+			name:           "Failed to Send HTTP Request",
+			body:           `{"productBrief": "Test", "featureName": "Feature"}`,
+			envSWWFKEY:     "valid_api_key",
+			expectedStatus: http.StatusUnauthorized,
+			expectedBody:   "{\"success\":false,\"error\":{\"message\":\"Unauthorized\"}}",
+		},
+		{
+			name:           "Failed to Read Response Body",
+			body:           `{"productBrief": "Test", "featureName": "Feature"}`,
+			envSWWFKEY:     "valid_api_key",
+			expectedStatus: http.StatusUnauthorized,
+			expectedBody:   "{\"success\":false,\"error\":{\"message\":\"Unauthorized\"}}",
+		},
+		{
+			name:           "Unexpected HTTP Status from Stakwork API",
+			body:           `{"productBrief": "Test", "featureName": "Feature"}`,
+			envSWWFKEY:     "valid_api_key",
+			expectedStatus: http.StatusUnauthorized,
+			expectedBody:   "{\"success\":false,\"error\":{\"message\":\"Unauthorized\"}}",
+		},
+		{
+			name:           "Invalid Content-Type Header",
+			body:           `{"productBrief": "Test", "featureName": "Feature"}`,
+			envSWWFKEY:     "valid_api_key",
+			expectedStatus: http.StatusUnauthorized,
+			expectedBody:   "{\"success\":false,\"error\":{\"message\":\"Unauthorized\"}}",
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if tt.envSWWFKEY != "" {
+				os.Setenv("SWWFKEY", tt.envSWWFKEY)
+			}
+
+			req := httptest.NewRequest("POST", "/stories/send", bytes.NewBufferString(tt.body))
+			req.Header.Set("Content-Type", "application/json")
+			w := httptest.NewRecorder()
+
+			fHandler.StoriesSend(w, req)
+
+			resp := w.Result()
+			body, _ := io.ReadAll(resp.Body)
+
+			assert.Equal(t, tt.expectedStatus, resp.StatusCode)
+			assert.Equal(t, tt.expectedBody, string(body))
+
+			if tt.name == "Invalid JSON Format" {
+				os.Setenv("SWWFKEY", "")
+			}
+		})
+	}
+}

@@ -596,13 +596,14 @@ func (oh *featureHandler) StoriesSend(w http.ResponseWriter, r *http.Request) {
 	err = json.Unmarshal(body, &postData)
 	if err != nil {
 		logger.Log.Error("[StoriesSend] JSON Unmarshal error: %v", err)
-		http.Error(w, "Invalid JSON format", http.StatusNotAcceptable)
+		http.Error(w, "Invalid JSON format", http.StatusBadRequest)
 		return
 	}
 
 	apiKey := os.Getenv("SWWFKEY")
 	if apiKey == "" {
-		panic("API key not set in environment")
+		logger.Log.Error("API key not set in environment")
+		http.Error(w, "API key not set in environment", http.StatusBadRequest)
 		return
 	}
 
