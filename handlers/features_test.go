@@ -2483,7 +2483,7 @@ func TestGetFeatureStories(t *testing.T) {
 		assert.Equal(t, http.StatusNotAcceptable, rr.Code)
 	})
 
-	t.Run("Should not add user stories if request body is empty", func(t *testing.T) {
+	t.Run("Should not add the user stories if request body is empty", func(t *testing.T) {
 		rctx := chi.NewRouteContext()
 		req, err := http.NewRequestWithContext(context.WithValue(ctx, chi.RouteCtxKey, rctx),
 			http.MethodPost, "/features/stories", bytes.NewReader([]byte{}))
