@@ -115,6 +115,8 @@ func CleanTestData() {
 
 	TestDB.db.Exec("DELETE FROM notifications")
 
+	TestDB.db.Exec("DELETE FROM feature_stories")
+
 	TestDB.db.Exec("DELETE FROM text_snippets")
 }
 
