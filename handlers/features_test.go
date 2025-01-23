@@ -3334,7 +3334,7 @@ func TestGetFeaturesByWorkspaceUuid(t *testing.T) {
 			expectedStatus: http.StatusBadRequest,
 		},
 		{
-			name:           "Non Existent UUID",
+			name:           "Non-Existent UUID",
 			pubKeyFromAuth: "validPubKey",
 			workspaceUUID:  "nonexistentuuid",
 			expectedStatus: http.StatusOK,
