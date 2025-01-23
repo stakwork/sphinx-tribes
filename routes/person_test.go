@@ -6,6 +6,7 @@ import (
 	"encoding/json"
 	"net/http"
 	"net/http/httptest"
+	"regexp"
 	"strings"
 	"testing"
 
@@ -170,6 +171,12 @@ func validateID(r *http.Request) bool {
 
 func validateUUID(r *http.Request) bool {
 	uuid := chi.URLParam(r, "uuid")
+	regex := `^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$`
+
+	if !regexp.MustCompile(regex).MatchString(uuid) {
+		return false
+	}
+
 	return isValidUUID(uuid)
 }
 
@@ -300,4 +307,163 @@ func TestValidateID(t *testing.T) {
 			})
 		}
 	})
+}
+
+func TestIsNonExistentResource(t *testing.T) {
+	tests := []struct {
+		name     string
+		param    string
+		expected bool
+	}{
+		{
+			name:     "Test with nonexistentuuid",
+			param:    "nonexistentuuid",
+			expected: true,
+		},
+		{
+			name:     "Test with nonexistentpubkey",
+			param:    "nonexistentpubkey",
+			expected: true,
+		},
+		{
+			name:     "Test with 999",
+			param:    "999",
+			expected: true,
+		},
+		{
+			name:     "Test with nonexistentgithub",
+			param:    "nonexistentgithub",
+			expected: true,
+		},
+		{
+			name:     "Test with a valid resource",
+			param:    "existentresource",
+			expected: false,
+		},
+		{
+			name:     "Test with an empty string",
+			param:    "",
+			expected: false,
+		},
+		{
+			name:     "Test with a string that is a substring of a non-existent value",
+			param:    "nonexistent",
+			expected: false,
+		},
+		{
+			name:     "Test with a string that differs by case sensitivity",
+			param:    "Nonexistentuuid",
+			expected: false,
+		},
+		{
+			name:     "Test with a string that includes leading/trailing whitespace",
+			param:    " nonexistentuuid ",
+			expected: false,
+		},
+		{
+			name:     "Test with a numeric string that is not in the list",
+			param:    "123",
+			expected: false,
+		},
+		{
+			name:     "Test with a special character string",
+			param:    "!@#$%^&*()",
+			expected: false,
+		},
+		{
+			name:     "Test with a string that is a numeric value but not in the list",
+			param:    "000",
+			expected: false,
+		},
+		{
+			name:     "Test with a very long string",
+			param:    "aaabbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbsdfgsdfgsdfgsdfgsdfgsdfgdfgbdfbsdfgsdfgsdgsfdg",
+			expected: false,
+		},
+		{
+			name:     "Test with a string that matches multiple non-existent values",
+			param:    "nonexistentpubkey999",
+			expected: false,
+		},
+		{
+			name:     "Test with a string that is similar but not identical to a non-existent value",
+			param:    "nonexistentuuid1",
+			expected: false,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			result := isNonExistentResource(tt.param)
+			if result != tt.expected {
+				t.Errorf("isNonExistentResource(%s) = %v; want %v", tt.param, result, tt.expected)
+			}
+		})
+	}
+}
+
+func TestValidateUUID(t *testing.T) {
+	tests := []struct {
+		name     string
+		uuid     string
+		expected bool
+	}{
+		{
+			name:     "Valid UUID",
+			uuid:     "123e4567-e89b-12d3-a456-426614174000",
+			expected: true,
+		},
+		{
+			name:     "Empty UUID",
+			uuid:     "",
+			expected: false,
+		},
+		{
+			name:     "UUID with Minimum Length",
+			uuid:     "123e4567-e89b-12d3-a456-42661417400",
+			expected: false,
+		},
+		{
+			name:     "UUID with Maximum Length",
+			uuid:     "123e4567-e89b-12d3-a456-4266141740000",
+			expected: false,
+		},
+		{
+			name:     "Non-UUID Characters",
+			uuid:     "123e4567-e89b-12d3-a456-42661417400z",
+			expected: false,
+		},
+		{
+			name:     "UUID with Special Characters",
+			uuid:     "123e4567-e89b-12d3-a456-42661417400@",
+			expected: false,
+		},
+		{
+			name:     "UUID with Spaces",
+			uuid:     "123e4567-e89b-12d3-a456-426614174 00",
+			expected: false,
+		},
+		{
+			name:     "UUID with Correct Length but Invalid Format",
+			uuid:     "123e4567e89b12d3a456426614174000",
+			expected: false,
+		},
+		{
+			name:     "UUID with Mixed Case",
+			uuid:     "123E4567-e89B-12D3-a456-426614174000",
+			expected: true,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			r := httptest.NewRequest(http.MethodGet, "/", nil)
+			rctx := chi.NewRouteContext()
+			rctx.URLParams.Add("uuid", tt.uuid)
+			r = r.WithContext(context.WithValue(r.Context(), chi.RouteCtxKey, rctx))
+
+			result := validateUUID(r)
+			assert.Equal(t, tt.expected, result)
+		})
+	}
 }
