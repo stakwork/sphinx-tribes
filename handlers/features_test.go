@@ -3724,11 +3724,11 @@ func TestStoriesSend(t *testing.T) {
 		expectedPanic  string
 	}{
 		{
-			name:           "Empty JSON Body",
-			body:           ``,
+			name:           "Valid JSON Input",
+			body:           `{"productBrief": "Test", "featureName": "Feature", "description": "Desc", "examples": ["ex1"], "webhook_url": "http://example.com", "featureUUID": "uuid"}`,
 			envSWWFKEY:     "valid_api_key",
-			expectedStatus: http.StatusBadRequest,
-			expectedBody:   "Invalid JSON format\n",
+			expectedStatus: http.StatusUnauthorized,
+			expectedBody:   `{"success":false,"error":{"message":"Unauthorized"}}`,
 		},
 		{
 			name:           "Invalid JSON Format",
@@ -3743,6 +3743,13 @@ func TestStoriesSend(t *testing.T) {
 			envSWWFKEY:     "",
 			expectedStatus: http.StatusBadRequest,
 			expectedBody:   "API key not set in environment\n",
+		},
+		{
+			name:           "Empty JSON Body",
+			body:           ``,
+			envSWWFKEY:     "valid_api_key",
+			expectedStatus: http.StatusBadRequest,
+			expectedBody:   "Invalid JSON format\n",
 		},
 		{
 			name:           "Failed to Read Request Body",
