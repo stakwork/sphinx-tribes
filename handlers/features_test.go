@@ -877,6 +877,14 @@ func TestGetFeaturePhaseByUUID(t *testing.T) {
 			validateFunc:   nil,
 		},
 		{
+			name:           "Invalid Authentication Key",
+			featureUuid:    feature.Uuid,
+			phaseUuid:      featurePhase.Uuid,
+			pubKeyFromAuth: "Invalid-Authentication-Key",
+			expectedStatus: http.StatusUnauthorized,
+			validateFunc:   nil,
+		},
+		{
 			name:           "Feature UUID Does Not Exist",
 			featureUuid:    "non-existent-feature-uuid",
 			phaseUuid:      featurePhase.Uuid,
