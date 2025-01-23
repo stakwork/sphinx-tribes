@@ -1049,6 +1049,281 @@ func TestGetFeaturePhases(t *testing.T) {
 		assert.Equal(t, returnedFeaturePhases, updatedFeaturePhases)
 		assert.Equal(t, http.StatusOK, rr.Code)
 	})
+
+	t.Run("Should handle non-existent feature UUID", func(t *testing.T) {
+		nonExistentUUID := uuid.New().String()
+		rctx := chi.NewRouteContext()
+		rctx.URLParams.Add("feature_uuid", nonExistentUUID)
+		req, err := http.NewRequestWithContext(context.WithValue(ctx, chi.RouteCtxKey, rctx),
+			http.MethodGet, "/features/"+nonExistentUUID+"/phase", nil)
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		rr := httptest.NewRecorder()
+		http.HandlerFunc(oHandler.GetFeaturePhases).ServeHTTP(rr, req)
+
+		var returnedFeaturePhases []db.FeaturePhase
+		err = json.Unmarshal(rr.Body.Bytes(), &returnedFeaturePhases)
+		assert.NoError(t, err)
+		assert.Empty(t, returnedFeaturePhases)
+		assert.Equal(t, http.StatusOK, rr.Code)
+	})
+
+	t.Run("Should handle multiple phases for a feature", func(t *testing.T) {
+
+		for i := 1; i <= 3; i++ {
+			phase := db.FeaturePhase{
+				Uuid:        fmt.Sprintf("multi_phase_uuid_%d", i),
+				FeatureUuid: feature.Uuid,
+				Name:        fmt.Sprintf("Phase %d", i),
+				Priority:    i,
+			}
+			db.TestDB.CreateOrEditFeaturePhase(phase)
+		}
+
+		rctx := chi.NewRouteContext()
+		rctx.URLParams.Add("feature_uuid", feature.Uuid)
+		req, err := http.NewRequestWithContext(context.WithValue(ctx, chi.RouteCtxKey, rctx),
+			http.MethodGet, "/features/"+feature.Uuid+"/phase", nil)
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		rr := httptest.NewRecorder()
+		http.HandlerFunc(oHandler.GetFeaturePhases).ServeHTTP(rr, req)
+
+		var returnedFeaturePhases []db.FeaturePhase
+		err = json.Unmarshal(rr.Body.Bytes(), &returnedFeaturePhases)
+		assert.NoError(t, err)
+		assert.GreaterOrEqual(t, len(returnedFeaturePhases), 3)
+		assert.Equal(t, http.StatusOK, rr.Code)
+	})
+
+	t.Run("Should handle empty feature UUID", func(t *testing.T) {
+		rctx := chi.NewRouteContext()
+		rctx.URLParams.Add("feature_uuid", "")
+		req, err := http.NewRequestWithContext(context.WithValue(ctx, chi.RouteCtxKey, rctx),
+			http.MethodGet, "/features//phase", nil)
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		rr := httptest.NewRecorder()
+		http.HandlerFunc(oHandler.GetFeaturePhases).ServeHTTP(rr, req)
+
+		var returnedFeaturePhases []db.FeaturePhase
+		err = json.Unmarshal(rr.Body.Bytes(), &returnedFeaturePhases)
+		assert.NoError(t, err)
+		assert.Empty(t, returnedFeaturePhases)
+		assert.Equal(t, http.StatusOK, rr.Code)
+	})
+
+	t.Run("Should handle feature with no phases", func(t *testing.T) {
+
+		emptyFeature := db.WorkspaceFeatures{
+			Uuid:          "empty_feature_uuid",
+			WorkspaceUuid: workspace.Uuid,
+			Name:          "Empty Feature",
+			Url:           "empty_feature_url",
+			Priority:      0,
+		}
+		db.TestDB.CreateOrEditFeature(emptyFeature)
+
+		rctx := chi.NewRouteContext()
+		rctx.URLParams.Add("feature_uuid", emptyFeature.Uuid)
+		req, err := http.NewRequestWithContext(context.WithValue(ctx, chi.RouteCtxKey, rctx),
+			http.MethodGet, "/features/"+emptyFeature.Uuid+"/phase", nil)
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		rr := httptest.NewRecorder()
+		http.HandlerFunc(oHandler.GetFeaturePhases).ServeHTTP(rr, req)
+
+		var returnedFeaturePhases []db.FeaturePhase
+		err = json.Unmarshal(rr.Body.Bytes(), &returnedFeaturePhases)
+		assert.NoError(t, err)
+		assert.Empty(t, returnedFeaturePhases)
+		assert.Equal(t, http.StatusOK, rr.Code)
+	})
+
+	t.Run("Should handle invalid authorization token", func(t *testing.T) {
+		invalidCtx := context.WithValue(context.Background(), auth.ContextKey, "invalid-token")
+		rctx := chi.NewRouteContext()
+		rctx.URLParams.Add("feature_uuid", feature.Uuid)
+		req, err := http.NewRequestWithContext(context.WithValue(invalidCtx, chi.RouteCtxKey, rctx),
+			http.MethodGet, "/features/"+feature.Uuid+"/phase", nil)
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		rr := httptest.NewRecorder()
+		http.HandlerFunc(oHandler.GetFeaturePhases).ServeHTTP(rr, req)
+
+		assert.Equal(t, http.StatusOK, rr.Code)
+	})
+
+	t.Run("Should handle concurrent requests", func(t *testing.T) {
+		numRequests := 5
+		var wg sync.WaitGroup
+		wg.Add(numRequests)
+
+		for i := 0; i < numRequests; i++ {
+			go func() {
+				defer wg.Done()
+				rctx := chi.NewRouteContext()
+				rctx.URLParams.Add("feature_uuid", feature.Uuid)
+				req, err := http.NewRequestWithContext(context.WithValue(ctx, chi.RouteCtxKey, rctx),
+					http.MethodGet, "/features/"+feature.Uuid+"/phase", nil)
+				if err != nil {
+					t.Error(err)
+					return
+				}
+
+				rr := httptest.NewRecorder()
+				http.HandlerFunc(oHandler.GetFeaturePhases).ServeHTTP(rr, req)
+
+				assert.Equal(t, http.StatusOK, rr.Code)
+			}()
+		}
+
+		wg.Wait()
+	})
+
+	t.Run("Valid Request with Authenticated User", func(t *testing.T) {
+		db.CleanTestData()
+
+		db.TestDB.CreateOrEditPerson(person)
+		db.TestDB.CreateOrEditWorkspace(workspace)
+		db.TestDB.CreateOrEditFeature(feature)
+		db.TestDB.CreateOrEditFeaturePhase(featurePhase)
+
+		rctx := chi.NewRouteContext()
+		rctx.URLParams.Add("feature_uuid", feature.Uuid)
+		req, err := http.NewRequestWithContext(context.WithValue(ctx, chi.RouteCtxKey, rctx),
+			http.MethodGet, "/features/"+feature.Uuid+"/phase", nil)
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		rr := httptest.NewRecorder()
+		http.HandlerFunc(oHandler.GetFeaturePhases).ServeHTTP(rr, req)
+
+		var returnedFeaturePhases []db.FeaturePhase
+		err = json.Unmarshal(rr.Body.Bytes(), &returnedFeaturePhases)
+		assert.NoError(t, err)
+		assert.NotEmpty(t, returnedFeaturePhases)
+		assert.Equal(t, http.StatusOK, rr.Code)
+	})
+
+	t.Run("Large Number of Phases", func(t *testing.T) {
+
+		db.CleanTestData()
+		db.TestDB.CreateOrEditPerson(person)
+		db.TestDB.CreateOrEditWorkspace(workspace)
+		db.TestDB.CreateOrEditFeature(feature)
+
+		for i := 0; i < 100; i++ {
+			phase := db.FeaturePhase{
+				Uuid:        fmt.Sprintf("large_phase_uuid_%d", i),
+				FeatureUuid: feature.Uuid,
+				Name:        fmt.Sprintf("Large Phase %d", i),
+				Priority:    i,
+			}
+			db.TestDB.CreateOrEditFeaturePhase(phase)
+		}
+
+		rctx := chi.NewRouteContext()
+		rctx.URLParams.Add("feature_uuid", feature.Uuid)
+		req, err := http.NewRequestWithContext(context.WithValue(ctx, chi.RouteCtxKey, rctx),
+			http.MethodGet, "/features/"+feature.Uuid+"/phase", nil)
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		rr := httptest.NewRecorder()
+		http.HandlerFunc(oHandler.GetFeaturePhases).ServeHTTP(rr, req)
+
+		var returnedFeaturePhases []db.FeaturePhase
+		err = json.Unmarshal(rr.Body.Bytes(), &returnedFeaturePhases)
+		assert.NoError(t, err)
+		assert.Equal(t, 100, len(returnedFeaturePhases))
+		assert.Equal(t, http.StatusOK, rr.Code)
+	})
+
+	t.Run("Missing Public Key in Context", func(t *testing.T) {
+		rctx := chi.NewRouteContext()
+		rctx.URLParams.Add("feature_uuid", feature.Uuid)
+		emptyCtx := context.WithValue(context.Background(), chi.RouteCtxKey, rctx)
+		req, err := http.NewRequestWithContext(emptyCtx,
+			http.MethodGet, "/features/"+feature.Uuid+"/phase", nil)
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		rr := httptest.NewRecorder()
+		http.HandlerFunc(oHandler.GetFeaturePhases).ServeHTTP(rr, req)
+
+		assert.Equal(t, http.StatusUnauthorized, rr.Code)
+	})
+
+	t.Run("Invalid Feature UUID Format", func(t *testing.T) {
+		rctx := chi.NewRouteContext()
+		rctx.URLParams.Add("feature_uuid", "invalid-uuid-format-123")
+		req, err := http.NewRequestWithContext(context.WithValue(ctx, chi.RouteCtxKey, rctx),
+			http.MethodGet, "/features/invalid-uuid-format-123/phase", nil)
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		rr := httptest.NewRecorder()
+		http.HandlerFunc(oHandler.GetFeaturePhases).ServeHTTP(rr, req)
+
+		var returnedFeaturePhases []db.FeaturePhase
+		err = json.Unmarshal(rr.Body.Bytes(), &returnedFeaturePhases)
+		assert.NoError(t, err)
+		assert.Empty(t, returnedFeaturePhases)
+		assert.Equal(t, http.StatusOK, rr.Code)
+	})
+
+	t.Run("Context Cancellation", func(t *testing.T) {
+
+		ctxWithCancel, cancel := context.WithCancel(ctx)
+		defer cancel()
+
+		rctx := chi.NewRouteContext()
+		rctx.URLParams.Add("feature_uuid", feature.Uuid)
+		req, err := http.NewRequestWithContext(context.WithValue(ctxWithCancel, chi.RouteCtxKey, rctx),
+			http.MethodGet, "/features/"+feature.Uuid+"/phase", nil)
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		cancel()
+
+		rr := httptest.NewRecorder()
+		http.HandlerFunc(oHandler.GetFeaturePhases).ServeHTTP(rr, req)
+
+		assert.Equal(t, http.StatusOK, rr.Code)
+	})
+
+	t.Run("Invalid Context Key Type", func(t *testing.T) {
+		rctx := chi.NewRouteContext()
+		rctx.URLParams.Add("feature_uuid", feature.Uuid)
+
+		invalidCtx := context.WithValue(context.Background(), auth.ContextKey, 123)
+		req, err := http.NewRequestWithContext(context.WithValue(invalidCtx, chi.RouteCtxKey, rctx),
+			http.MethodGet, "/features/"+feature.Uuid+"/phase", nil)
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		rr := httptest.NewRecorder()
+		http.HandlerFunc(oHandler.GetFeaturePhases).ServeHTTP(rr, req)
+
+		assert.Equal(t, http.StatusUnauthorized, rr.Code)
+	})
 }
 
 func TestGetFeaturePhaseByUUID(t *testing.T) {
@@ -2582,6 +2857,232 @@ func TestGetBountiesByFeatureAndPhaseUuid(t *testing.T) {
 		http.HandlerFunc(fHandler.GetBountiesByFeatureAndPhaseUuid).ServeHTTP(rr, req)
 
 		assert.Equal(t, http.StatusNotFound, rr.Code)
+	})
+	t.Run("Valid Request with Bounties", func(t *testing.T) {
+		rctx := chi.NewRouteContext()
+		rctx.URLParams.Add("feature_uuid", feature.Uuid)
+		rctx.URLParams.Add("phase_uuid", featurePhase.Uuid)
+		req, err := http.NewRequestWithContext(context.WithValue(ctx, chi.RouteCtxKey, rctx),
+			http.MethodGet,
+			fmt.Sprintf("/features/%s/phase/%s/bounty", feature.Uuid, featurePhase.Uuid),
+			nil)
+		assert.NoError(t, err)
+
+		rr := httptest.NewRecorder()
+		http.HandlerFunc(fHandler.GetBountiesByFeatureAndPhaseUuid).ServeHTTP(rr, req)
+
+		var returnedBounties []db.BountyResponse
+		err = json.Unmarshal(rr.Body.Bytes(), &returnedBounties)
+		assert.NoError(t, err)
+		assert.Equal(t, http.StatusOK, rr.Code)
+		assert.NotEmpty(t, returnedBounties)
+	})
+
+	t.Run("Non-Existent Feature UUID", func(t *testing.T) {
+		nonExistentUUID := uuid.New().String()
+		rctx := chi.NewRouteContext()
+		rctx.URLParams.Add("feature_uuid", nonExistentUUID)
+		rctx.URLParams.Add("phase_uuid", featurePhase.Uuid)
+		req, err := http.NewRequestWithContext(context.WithValue(ctx, chi.RouteCtxKey, rctx),
+			http.MethodGet,
+			fmt.Sprintf("/features/%s/phase/%s/bounty", nonExistentUUID, featurePhase.Uuid),
+			nil)
+		assert.NoError(t, err)
+
+		rr := httptest.NewRecorder()
+		http.HandlerFunc(fHandler.GetBountiesByFeatureAndPhaseUuid).ServeHTTP(rr, req)
+
+		assert.Equal(t, http.StatusNotFound, rr.Code)
+	})
+
+	t.Run("Non-Existent Phase UUID", func(t *testing.T) {
+		nonExistentUUID := uuid.New().String()
+		rctx := chi.NewRouteContext()
+		rctx.URLParams.Add("feature_uuid", feature.Uuid)
+		rctx.URLParams.Add("phase_uuid", nonExistentUUID)
+		req, err := http.NewRequestWithContext(context.WithValue(ctx, chi.RouteCtxKey, rctx),
+			http.MethodGet,
+			fmt.Sprintf("/features/%s/phase/%s/bounty", feature.Uuid, nonExistentUUID),
+			nil)
+		assert.NoError(t, err)
+
+		rr := httptest.NewRecorder()
+		http.HandlerFunc(fHandler.GetBountiesByFeatureAndPhaseUuid).ServeHTTP(rr, req)
+
+		assert.Equal(t, http.StatusNotFound, rr.Code)
+	})
+
+	t.Run("Valid UUIDs but Different Case", func(t *testing.T) {
+		upperCaseFeatureUUID := strings.ToUpper(feature.Uuid)
+		upperCasePhaseUUID := strings.ToUpper(featurePhase.Uuid)
+
+		rctx := chi.NewRouteContext()
+		rctx.URLParams.Add("feature_uuid", upperCaseFeatureUUID)
+		rctx.URLParams.Add("phase_uuid", upperCasePhaseUUID)
+		req, err := http.NewRequestWithContext(context.WithValue(ctx, chi.RouteCtxKey, rctx),
+			http.MethodGet,
+			fmt.Sprintf("/features/%s/phase/%s/bounty", upperCaseFeatureUUID, upperCasePhaseUUID),
+			nil)
+		assert.NoError(t, err)
+
+		rr := httptest.NewRecorder()
+		http.HandlerFunc(fHandler.GetBountiesByFeatureAndPhaseUuid).ServeHTTP(rr, req)
+
+		assert.Equal(t, http.StatusNotFound, rr.Code)
+	})
+
+	t.Run("Malformed UUIDs", func(t *testing.T) {
+		malformedUUIDs := []string{
+			"not-a-uuid",
+			"123e4567-e89b-12d3-a456",
+			"123e4567-e89b-12d3-a456-426614174000-extra",
+			"123e4567-e89b-12d3-a456-42661417400g",
+		}
+
+		for _, malformedUUID := range malformedUUIDs {
+			t.Run(fmt.Sprintf("Malformed UUID: %s", malformedUUID), func(t *testing.T) {
+				rctx := chi.NewRouteContext()
+				rctx.URLParams.Add("feature_uuid", malformedUUID)
+				rctx.URLParams.Add("phase_uuid", malformedUUID)
+				req, err := http.NewRequestWithContext(context.WithValue(ctx, chi.RouteCtxKey, rctx),
+					http.MethodGet,
+					fmt.Sprintf("/features/%s/phase/%s/bounty", malformedUUID, malformedUUID),
+					nil)
+				assert.NoError(t, err)
+
+				rr := httptest.NewRecorder()
+				http.HandlerFunc(fHandler.GetBountiesByFeatureAndPhaseUuid).ServeHTTP(rr, req)
+
+				assert.Equal(t, http.StatusNotFound, rr.Code)
+			})
+		}
+	})
+
+	t.Run("Valid Request with No Bounties", func(t *testing.T) {
+
+		emptyFeature := db.WorkspaceFeatures{
+			Uuid:          uuid.New().String(),
+			WorkspaceUuid: workspace.Uuid,
+			Name:          "feature-without-bounties",
+		}
+		db.TestDB.CreateOrEditFeature(emptyFeature)
+
+		emptyPhase := db.FeaturePhase{
+			Uuid:        uuid.New().String(),
+			FeatureUuid: emptyFeature.Uuid,
+			Name:        "phase-without-bounties",
+		}
+		db.TestDB.CreateOrEditFeaturePhase(emptyPhase)
+
+		rctx := chi.NewRouteContext()
+		rctx.URLParams.Add("feature_uuid", emptyFeature.Uuid)
+		rctx.URLParams.Add("phase_uuid", emptyPhase.Uuid)
+		req, err := http.NewRequestWithContext(context.WithValue(ctx, chi.RouteCtxKey, rctx),
+			http.MethodGet,
+			fmt.Sprintf("/features/%s/phase/%s/bounty", emptyFeature.Uuid, emptyPhase.Uuid),
+			nil)
+		assert.NoError(t, err)
+
+		rr := httptest.NewRecorder()
+		http.HandlerFunc(fHandler.GetBountiesByFeatureAndPhaseUuid).ServeHTTP(rr, req)
+
+		assert.Equal(t, http.StatusNotFound, rr.Code)
+	})
+
+	t.Run("Empty Feature UUID", func(t *testing.T) {
+		rctx := chi.NewRouteContext()
+		rctx.URLParams.Add("feature_uuid", "")
+		rctx.URLParams.Add("phase_uuid", featurePhase.Uuid)
+		req, err := http.NewRequestWithContext(context.WithValue(ctx, chi.RouteCtxKey, rctx),
+			http.MethodGet,
+			"/features//phase/"+featurePhase.Uuid+"/bounty",
+			nil)
+		assert.NoError(t, err)
+
+		rr := httptest.NewRecorder()
+		http.HandlerFunc(fHandler.GetBountiesByFeatureAndPhaseUuid).ServeHTTP(rr, req)
+
+		assert.Equal(t, http.StatusNotFound, rr.Code)
+	})
+
+	t.Run("Empty Phase UUID", func(t *testing.T) {
+		rctx := chi.NewRouteContext()
+		rctx.URLParams.Add("feature_uuid", feature.Uuid)
+		rctx.URLParams.Add("phase_uuid", "")
+		req, err := http.NewRequestWithContext(context.WithValue(ctx, chi.RouteCtxKey, rctx),
+			http.MethodGet,
+			"/features/"+feature.Uuid+"/phase//bounty",
+			nil)
+		assert.NoError(t, err)
+
+		rr := httptest.NewRecorder()
+		http.HandlerFunc(fHandler.GetBountiesByFeatureAndPhaseUuid).ServeHTTP(rr, req)
+
+		assert.Equal(t, http.StatusNotFound, rr.Code)
+	})
+
+	t.Run("Unauthorized Access", func(t *testing.T) {
+
+		rctx := chi.NewRouteContext()
+		rctx.URLParams.Add("feature_uuid", feature.Uuid)
+		rctx.URLParams.Add("phase_uuid", featurePhase.Uuid)
+		req, err := http.NewRequestWithContext(context.WithValue(context.Background(), chi.RouteCtxKey, rctx),
+			http.MethodGet,
+			fmt.Sprintf("/features/%s/phase/%s/bounty", feature.Uuid, featurePhase.Uuid),
+			nil)
+		assert.NoError(t, err)
+
+		rr := httptest.NewRecorder()
+		http.HandlerFunc(fHandler.GetBountiesByFeatureAndPhaseUuid).ServeHTTP(rr, req)
+
+		assert.Equal(t, http.StatusUnauthorized, rr.Code)
+	})
+
+	t.Run("Invalid UUID Format", func(t *testing.T) {
+		invalidUUIDs := []struct {
+			name        string
+			featureUUID string
+			phaseUUID   string
+		}{
+			{
+				name:        "Invalid Feature UUID",
+				featureUUID: "invalid-uuid",
+				phaseUUID:   featurePhase.Uuid,
+			},
+			{
+				name:        "Invalid Phase UUID",
+				featureUUID: feature.Uuid,
+				phaseUUID:   "invalid-uuid",
+			},
+			{
+				name:        "Both Invalid UUIDs",
+				featureUUID: "invalid-uuid-1",
+				phaseUUID:   "invalid-uuid-2",
+			},
+			{
+				name:        "UUID with Special Characters",
+				featureUUID: "123e4567-e89b-12d3-a456-426614174000!",
+				phaseUUID:   "123e4567-e89b-12d3-a456-426614174000@",
+			},
+		}
+
+		for _, tc := range invalidUUIDs {
+			t.Run(tc.name, func(t *testing.T) {
+				rctx := chi.NewRouteContext()
+				rctx.URLParams.Add("feature_uuid", tc.featureUUID)
+				rctx.URLParams.Add("phase_uuid", tc.phaseUUID)
+				req, err := http.NewRequestWithContext(context.WithValue(ctx, chi.RouteCtxKey, rctx),
+					http.MethodGet,
+					fmt.Sprintf("/features/%s/phase/%s/bounty", tc.featureUUID, tc.phaseUUID),
+					nil)
+				assert.NoError(t, err)
+
+				rr := httptest.NewRecorder()
+				http.HandlerFunc(fHandler.GetBountiesByFeatureAndPhaseUuid).ServeHTTP(rr, req)
+
+				assert.Equal(t, http.StatusNotFound, rr.Code)
+			})
+		}
 	})
 }
 
