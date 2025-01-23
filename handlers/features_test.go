@@ -687,6 +687,280 @@ func TestCreateOrEditFeaturePhase(t *testing.T) {
 		assert.Equal(t, "", createdFeaturePhase.PhaseOutcome)
 		assert.Equal(t, featurePhase.PhaseScope, createdFeaturePhase.PhaseScope)
 	})
+
+	t.Run("should handle empty request body", func(t *testing.T) {
+		rr := httptest.NewRecorder()
+		handler := http.HandlerFunc(fHandler.CreateOrEditFeaturePhase)
+
+		ctx := context.WithValue(context.Background(), auth.ContextKey, workspace.OwnerPubKey)
+		req, err := http.NewRequestWithContext(ctx, http.MethodPost, "/features/phase", bytes.NewReader([]byte{}))
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		handler.ServeHTTP(rr, req)
+		assert.Equal(t, http.StatusNotAcceptable, rr.Code)
+	})
+
+	t.Run("should handle invalid priority value", func(t *testing.T) {
+		rr := httptest.NewRecorder()
+		handler := http.HandlerFunc(fHandler.CreateOrEditFeaturePhase)
+
+		featurePhase := db.FeaturePhase{
+			Uuid:        "feature_phase_uuid_priority",
+			FeatureUuid: feature.Uuid,
+			Name:        "feature_phase_name",
+			Priority:    -1,
+		}
+
+		requestBody, _ := json.Marshal(featurePhase)
+
+		ctx := context.WithValue(context.Background(), auth.ContextKey, workspace.OwnerPubKey)
+		req, err := http.NewRequestWithContext(ctx, http.MethodPost, "/features/phase", bytes.NewReader(requestBody))
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		handler.ServeHTTP(rr, req)
+		assert.Equal(t, http.StatusCreated, rr.Code)
+	})
+
+	t.Run("should handle updating existing phase", func(t *testing.T) {
+
+		existingPhase := db.FeaturePhase{
+			Uuid:        "existing_phase_uuid",
+			FeatureUuid: feature.Uuid,
+			Name:        "original_name",
+			Priority:    0,
+		}
+		db.TestDB.CreateOrEditFeaturePhase(existingPhase)
+
+		rr := httptest.NewRecorder()
+		handler := http.HandlerFunc(fHandler.CreateOrEditFeaturePhase)
+
+		updatedPhase := existingPhase
+		updatedPhase.Name = "updated_name"
+		updatedPhase.Priority = 1
+
+		requestBody, _ := json.Marshal(updatedPhase)
+
+		ctx := context.WithValue(context.Background(), auth.ContextKey, workspace.OwnerPubKey)
+		req, err := http.NewRequestWithContext(ctx, http.MethodPost, "/features/phase", bytes.NewReader(requestBody))
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		handler.ServeHTTP(rr, req)
+
+		assert.Equal(t, http.StatusCreated, rr.Code)
+
+		updatedFeaturePhase, _ := db.TestDB.GetFeaturePhaseByUuid(feature.Uuid, existingPhase.Uuid)
+		assert.Equal(t, "updated_name", updatedFeaturePhase.Name)
+		assert.Equal(t, 1, updatedFeaturePhase.Priority)
+	})
+
+	t.Run("should handle extremely long field values", func(t *testing.T) {
+		rr := httptest.NewRecorder()
+		handler := http.HandlerFunc(fHandler.CreateOrEditFeaturePhase)
+
+		longString := strings.Repeat("a", 1000)
+		featurePhase := db.FeaturePhase{
+			Uuid:         "feature_phase_uuid_long",
+			FeatureUuid:  feature.Uuid,
+			Name:         longString,
+			Priority:     0,
+			PhasePurpose: longString,
+			PhaseOutcome: longString,
+			PhaseScope:   longString,
+		}
+
+		requestBody, _ := json.Marshal(featurePhase)
+
+		ctx := context.WithValue(context.Background(), auth.ContextKey, workspace.OwnerPubKey)
+		req, err := http.NewRequestWithContext(ctx, http.MethodPost, "/features/phase", bytes.NewReader(requestBody))
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		handler.ServeHTTP(rr, req)
+		assert.Equal(t, http.StatusCreated, rr.Code)
+	})
+
+	t.Run("should handle special characters in fields", func(t *testing.T) {
+		rr := httptest.NewRecorder()
+		handler := http.HandlerFunc(fHandler.CreateOrEditFeaturePhase)
+
+		specialChars := "!@#$%^&*()?><,./;'[]\\{}|`~"
+		featurePhase := db.FeaturePhase{
+			Uuid:         "feature_phase_uuid_special",
+			FeatureUuid:  feature.Uuid,
+			Name:         "Name with " + specialChars,
+			Priority:     0,
+			PhasePurpose: "Purpose with " + specialChars,
+			PhaseOutcome: "Outcome with " + specialChars,
+			PhaseScope:   "Scope with " + specialChars,
+		}
+
+		requestBody, _ := json.Marshal(featurePhase)
+
+		ctx := context.WithValue(context.Background(), auth.ContextKey, workspace.OwnerPubKey)
+		req, err := http.NewRequestWithContext(ctx, http.MethodPost, "/features/phase", bytes.NewReader(requestBody))
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		handler.ServeHTTP(rr, req)
+		assert.Equal(t, http.StatusCreated, rr.Code)
+
+		createdFeaturePhase, _ := db.TestDB.GetFeaturePhaseByUuid(feature.Uuid, featurePhase.Uuid)
+		assert.Equal(t, featurePhase.Name, createdFeaturePhase.Name)
+	})
+
+	t.Run("should handle invalid auth token type", func(t *testing.T) {
+		rr := httptest.NewRecorder()
+		handler := http.HandlerFunc(fHandler.CreateOrEditFeaturePhase)
+
+		featurePhase := db.FeaturePhase{
+			Uuid:        "feature_phase_uuid_auth",
+			FeatureUuid: feature.Uuid,
+			Name:        "feature_phase_name",
+			Priority:    0,
+		}
+
+		requestBody, _ := json.Marshal(featurePhase)
+
+		ctx := context.WithValue(context.Background(), auth.ContextKey, 12345)
+		req, err := http.NewRequestWithContext(ctx, http.MethodPost, "/features/phase", bytes.NewReader(requestBody))
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		handler.ServeHTTP(rr, req)
+		assert.Equal(t, http.StatusUnauthorized, rr.Code)
+	})
+
+	t.Run("Valid Input with New Phase", func(t *testing.T) {
+		rr := httptest.NewRecorder()
+		handler := http.HandlerFunc(fHandler.CreateOrEditFeaturePhase)
+
+		newPhase := db.FeaturePhase{
+			FeatureUuid:  feature.Uuid,
+			Name:         "new_phase_name",
+			Priority:     1,
+			PhasePurpose: "New phase purpose",
+			PhaseOutcome: "New phase outcome",
+			PhaseScope:   "New phase scope",
+		}
+
+		requestBody, _ := json.Marshal(newPhase)
+
+		ctx := context.WithValue(context.Background(), auth.ContextKey, workspace.OwnerPubKey)
+		req, err := http.NewRequestWithContext(ctx, http.MethodPost, "/features/phase", bytes.NewReader(requestBody))
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		handler.ServeHTTP(rr, req)
+		assert.Equal(t, http.StatusCreated, rr.Code)
+
+		var response db.FeaturePhase
+		err = json.NewDecoder(rr.Body).Decode(&response)
+		assert.NoError(t, err)
+		assert.NotEmpty(t, response.Uuid)
+	})
+
+	t.Run("Empty UUID in Input", func(t *testing.T) {
+		rr := httptest.NewRecorder()
+		handler := http.HandlerFunc(fHandler.CreateOrEditFeaturePhase)
+
+		emptyUUIDPhase := db.FeaturePhase{
+			Uuid:        "",
+			FeatureUuid: feature.Uuid,
+			Name:        "empty_uuid_phase",
+			Priority:    0,
+		}
+
+		requestBody, _ := json.Marshal(emptyUUIDPhase)
+
+		ctx := context.WithValue(context.Background(), auth.ContextKey, workspace.OwnerPubKey)
+		req, err := http.NewRequestWithContext(ctx, http.MethodPost, "/features/phase", bytes.NewReader(requestBody))
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		handler.ServeHTTP(rr, req)
+		assert.Equal(t, http.StatusCreated, rr.Code)
+
+		var response db.FeaturePhase
+		err = json.NewDecoder(rr.Body).Decode(&response)
+		assert.NoError(t, err)
+		assert.NotEmpty(t, response.Uuid)
+	})
+
+	t.Run("No Public Key in Context", func(t *testing.T) {
+		rr := httptest.NewRecorder()
+		handler := http.HandlerFunc(fHandler.CreateOrEditFeaturePhase)
+
+		phase := db.FeaturePhase{
+			Uuid:        uuid.New().String(),
+			FeatureUuid: feature.Uuid,
+			Name:        "no_pubkey_phase",
+			Priority:    0,
+		}
+
+		requestBody, _ := json.Marshal(phase)
+
+		req, err := http.NewRequestWithContext(context.Background(), http.MethodPost, "/features/phase", bytes.NewReader(requestBody))
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		handler.ServeHTTP(rr, req)
+		assert.Equal(t, http.StatusUnauthorized, rr.Code)
+	})
+
+	t.Run("Invalid JSON Body", func(t *testing.T) {
+		rr := httptest.NewRecorder()
+		handler := http.HandlerFunc(fHandler.CreateOrEditFeaturePhase)
+
+		invalidJSON := []byte(`{
+        "uuid": "invalid_json,
+        "feature_uuid": "missing_quote
+    }`)
+
+		ctx := context.WithValue(context.Background(), auth.ContextKey, workspace.OwnerPubKey)
+		req, err := http.NewRequestWithContext(ctx, http.MethodPost, "/features/phase", bytes.NewReader(invalidJSON))
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		handler.ServeHTTP(rr, req)
+		assert.Equal(t, http.StatusNotAcceptable, rr.Code)
+	})
+
+	t.Run("Feature Does Not Exist", func(t *testing.T) {
+		rr := httptest.NewRecorder()
+		handler := http.HandlerFunc(fHandler.CreateOrEditFeaturePhase)
+
+		nonExistentFeaturePhase := db.FeaturePhase{
+			Uuid:        uuid.New().String(),
+			FeatureUuid: uuid.New().String(),
+			Name:        "non_existent_feature_phase",
+			Priority:    0,
+		}
+
+		requestBody, _ := json.Marshal(nonExistentFeaturePhase)
+
+		ctx := context.WithValue(context.Background(), auth.ContextKey, workspace.OwnerPubKey)
+		req, err := http.NewRequestWithContext(ctx, http.MethodPost, "/features/phase", bytes.NewReader(requestBody))
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		handler.ServeHTTP(rr, req)
+		assert.Equal(t, http.StatusUnauthorized, rr.Code)
+	})
+
 }
 
 func TestGetFeaturePhases(t *testing.T) {
