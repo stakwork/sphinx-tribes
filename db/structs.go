@@ -1208,7 +1208,7 @@ type Notification struct {
 
 type TextSnippet struct {
 	ID            uint      `json:"id" gorm:"primarykey"`
-	WorkspaceUUID string    `json:"workspace_uuid" gorm:"type:uuid;not null;index"`
+	WorkspaceUUID string    `json:"workspace_uuid" gorm:"type:varchar(255);not null;index"`
 	Title         string    `json:"title" gorm:"type:varchar(255);not null"`
 	Snippet       string    `json:"snippet" gorm:"type:text;not null"`
 	DateCreated   time.Time `json:"date_created" gorm:"autoCreateTime"`
