@@ -70,7 +70,15 @@ func (pool *Pool) Start() {
 }
 
 func (pool *Pool) SendTicketMessage(message TicketMessage) error {
+
+	if pool == nil {
+		return fmt.Errorf("pool is nil")
+	}
+
 	if message.BroadcastType == "direct" {
+		if message.SourceSessionID == "" {
+			return fmt.Errorf("client not found")
+		}
 		// check if client
 		if client, ok := pool.Clients[message.SourceSessionID]; ok {
 			return client.Client.Conn.WriteJSON(message)
