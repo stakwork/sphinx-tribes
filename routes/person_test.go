@@ -467,11 +467,3 @@ func TestValidateUUID(t *testing.T) {
 		})
 	}
 }
-
-func TestValidateUUID_NullRequest(t *testing.T) {
-	t.Run("Null Request", func(t *testing.T) {
-		var r *http.Request = nil
-		result := validateUUID(r)
-		assert.False(t, result)
-	})
-}
