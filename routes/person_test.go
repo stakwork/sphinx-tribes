@@ -2,6 +2,7 @@ package routes
 
 import (
 	"bytes"
+	"context"
 	"encoding/json"
 	"net/http"
 	"net/http/httptest"
@@ -170,4 +171,133 @@ func validateID(r *http.Request) bool {
 func validateUUID(r *http.Request) bool {
 	uuid := chi.URLParam(r, "uuid")
 	return isValidUUID(uuid)
+}
+
+func TestValidateID(t *testing.T) {
+	t.Run("Valid ID Parameter", func(t *testing.T) {
+		r := httptest.NewRequest(http.MethodGet, "/person/id/123", nil)
+		rctx := chi.NewRouteContext()
+		rctx.URLParams.Add("id", "123")
+		r = r.WithContext(context.WithValue(r.Context(), chi.RouteCtxKey, rctx))
+
+		result := validateID(r)
+		assert.True(t, result)
+	})
+
+	t.Run("Invalid ID Parameter", func(t *testing.T) {
+		r := httptest.NewRequest(http.MethodGet, "/person/id/invalid", nil)
+		rctx := chi.NewRouteContext()
+		rctx.URLParams.Add("id", "invalid")
+		r = r.WithContext(context.WithValue(r.Context(), chi.RouteCtxKey, rctx))
+
+		result := validateID(r)
+		assert.False(t, result)
+	})
+
+	t.Run("Empty ID Parameter", func(t *testing.T) {
+		r := httptest.NewRequest(http.MethodGet, "/person/id/", nil)
+		rctx := chi.NewRouteContext()
+		rctx.URLParams.Add("id", "")
+		r = r.WithContext(context.WithValue(r.Context(), chi.RouteCtxKey, rctx))
+
+		result := validateID(r)
+		assert.True(t, result, "Empty ID should not be considered 'invalid'")
+	})
+
+	t.Run("Special Characters in ID", func(t *testing.T) {
+		r := httptest.NewRequest(http.MethodGet, "/person/id/123@#$", nil)
+		rctx := chi.NewRouteContext()
+		rctx.URLParams.Add("id", "123@#$")
+		r = r.WithContext(context.WithValue(r.Context(), chi.RouteCtxKey, rctx))
+
+		result := validateID(r)
+		assert.True(t, result, "Special characters should be allowed if not 'invalid'")
+	})
+
+	t.Run("Numeric ID Parameter", func(t *testing.T) {
+		r := httptest.NewRequest(http.MethodGet, "/person/id/12345", nil)
+		rctx := chi.NewRouteContext()
+		rctx.URLParams.Add("id", "12345")
+		r = r.WithContext(context.WithValue(r.Context(), chi.RouteCtxKey, rctx))
+
+		result := validateID(r)
+		assert.True(t, result)
+	})
+
+	t.Run("Missing ID Parameter", func(t *testing.T) {
+		r := httptest.NewRequest(http.MethodGet, "/person/id/", nil)
+		rctx := chi.NewRouteContext()
+		r = r.WithContext(context.WithValue(r.Context(), chi.RouteCtxKey, rctx))
+
+		result := validateID(r)
+		assert.True(t, result, "Missing ID should not be considered 'invalid'")
+	})
+
+	t.Run("Very Long ID Parameter", func(t *testing.T) {
+		longID := strings.Repeat("1", 1000)
+		r := httptest.NewRequest(http.MethodGet, "/person/id/"+longID, nil)
+		rctx := chi.NewRouteContext()
+		rctx.URLParams.Add("id", longID)
+		r = r.WithContext(context.WithValue(r.Context(), chi.RouteCtxKey, rctx))
+
+		result := validateID(r)
+		assert.True(t, result, "Long ID should be valid if not 'invalid'")
+	})
+
+	t.Run("Case Sensitivity", func(t *testing.T) {
+		r := httptest.NewRequest(http.MethodGet, "/person/id/INVALID", nil)
+		rctx := chi.NewRouteContext()
+		rctx.URLParams.Add("id", "INVALID")
+		r = r.WithContext(context.WithValue(r.Context(), chi.RouteCtxKey, rctx))
+
+		result := validateID(r)
+		assert.True(t, result, "INVALID in uppercase should be valid")
+	})
+
+	t.Run("Whitespace in ID Parameter", func(t *testing.T) {
+		// Use URL encoded space (%20) in the URL
+		r := httptest.NewRequest(http.MethodGet, "/person/id/123%20456", nil)
+		rctx := chi.NewRouteContext()
+		// Use actual space in the URL parameter
+		rctx.URLParams.Add("id", "123 456")
+		r = r.WithContext(context.WithValue(r.Context(), chi.RouteCtxKey, rctx))
+
+		result := validateID(r)
+		assert.True(t, result, "ID with spaces should be valid if not 'invalid'")
+	})
+
+	t.Run("ID Parameter with Only Whitespace", func(t *testing.T) {
+		r := httptest.NewRequest(http.MethodGet, "/person/id/%20", nil)
+		rctx := chi.NewRouteContext()
+		rctx.URLParams.Add("id", " ")
+		r = r.WithContext(context.WithValue(r.Context(), chi.RouteCtxKey, rctx))
+
+		result := validateID(r)
+		assert.True(t, result, "Whitespace-only ID should not be considered 'invalid'")
+	})
+
+	t.Run("ID Parameter with Mixed Case 'Invalid'", func(t *testing.T) {
+		testCases := []string{
+			"InVaLiD",
+			"iNvAlId",
+			"INVALID",
+			"invalid",
+		}
+
+		for _, tc := range testCases {
+			t.Run(tc, func(t *testing.T) {
+				r := httptest.NewRequest(http.MethodGet, "/person/id/"+tc, nil)
+				rctx := chi.NewRouteContext()
+				rctx.URLParams.Add("id", tc)
+				r = r.WithContext(context.WithValue(r.Context(), chi.RouteCtxKey, rctx))
+
+				result := validateID(r)
+				if tc == "invalid" {
+					assert.False(t, result, "lowercase 'invalid' should be invalid")
+				} else {
+					assert.True(t, result, "other cases of 'invalid' should be valid")
+				}
+			})
+		}
+	})
 }
