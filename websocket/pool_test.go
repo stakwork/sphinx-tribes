@@ -241,7 +241,7 @@ func TestSendTicketMessage(t *testing.T) {
 		assert.NoError(t, err)
 	})
 
-	t.Run("Multiple Clients with Same SessionID", func(t *testing.T) {
+	t.Run("Multiple Clients with the Same SessionID", func(t *testing.T) {
 		pool := NewPool()
 		ws1, server1 := setupTestWebsocket(t)
 		ws2, server2 := setupTestWebsocket(t)
