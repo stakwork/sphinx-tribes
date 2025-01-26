@@ -14,6 +14,7 @@ import (
 	"os"
 	"path/filepath"
 	"strconv"
+	"strings"
 	"time"
 
 	"github.com/google/uuid"
@@ -756,7 +757,16 @@ func (ch *ChatHandler) DeleteFile(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if err := ch.db.DeleteFileAsset(uint(idUint)); err != nil {
+	err = ch.db.DeleteFileAsset(uint(idUint))
+	if err != nil {
+		if strings.Contains(err.Error(), "file not found") {
+			w.WriteHeader(http.StatusNotFound)
+			json.NewEncoder(w).Encode(ChatResponse{
+				Success: false,
+				Message: "File not found",
+			})
+			return
+		}
 		w.WriteHeader(http.StatusInternalServerError)
 		json.NewEncoder(w).Encode(ChatResponse{
 			Success: false,
