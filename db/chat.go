@@ -252,11 +252,25 @@ func (db database) UpdateFileAsset(asset *FileAsset) error {
 }
 
 func (db database) DeleteFileAsset(id uint) error {
+
+	var asset FileAsset
+	if err := db.db.First(&asset, id).Error; err != nil {
+		return fmt.Errorf("file not found: %w", err)
+	}
+
 	now := time.Now()
-	return db.db.Model(&FileAsset{}).
+	result := db.db.Model(&FileAsset{}).
 		Where("id = ?", id).
 		Updates(map[string]interface{}{
 			"status":     DeletedFileStatus,
 			"deleted_at": &now,
-		}).Error
+		})
+
+	if result.Error != nil {
+		return result.Error
+	}
+	if result.RowsAffected == 0 {
+		return fmt.Errorf("no file asset found with id %d", id)
+	}
+	return nil
 }

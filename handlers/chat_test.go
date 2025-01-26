@@ -6,9 +6,12 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"mime/multipart"
 	"net/http"
 	"net/http/httptest"
+	"net/textproto"
 	"net/url"
+	"os"
 	"strings"
 	"sync"
 	"testing"
@@ -18,6 +21,7 @@ import (
 	"github.com/google/uuid"
 	"github.com/stakwork/sphinx-tribes/db"
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
 type Chat struct {
@@ -1518,5 +1522,691 @@ func TestArchiveChat(t *testing.T) {
 		assert.Equal(t, http.StatusBadRequest, rr.Code)
 		assert.False(t, response.Success)
 		assert.Equal(t, "Chat ID is required", response.Message)
+	})
+}
+
+func TestUploadFile(t *testing.T) {
+	teardownSuite := SetupSuite(t)
+	defer teardownSuite(t)
+
+	db.CleanTestData()
+
+	mockStorage := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != http.MethodPost {
+			t.Error("Expected POST request")
+			w.WriteHeader(http.StatusBadRequest)
+			return
+		}
+
+		if err := r.ParseMultipartForm(32 << 20); err != nil {
+			t.Error("Failed to parse multipart form")
+			w.WriteHeader(http.StatusBadRequest)
+			return
+		}
+
+		file, _, err := r.FormFile("file")
+		if err != nil {
+			w.WriteHeader(http.StatusBadRequest)
+			return
+		}
+		defer file.Close()
+
+		w.Header().Set("Content-Type", "application/json")
+		w.WriteHeader(http.StatusOK)
+		response := map[string]interface{}{
+			"success": true,
+			"url":     "https://meme.sphinx.chat/public/test123.txt",
+		}
+		json.NewEncoder(w).Encode(response)
+	}))
+	defer mockStorage.Close()
+
+	originalURL := os.Getenv("MEME_SERVER_URL")
+	os.Setenv("MEME_SERVER_URL", mockStorage.URL)
+	defer os.Setenv("MEME_SERVER_URL", originalURL)
+
+	chatHandler := NewChatHandler(&http.Client{}, db.TestDB)
+
+	createUploadRequest := func(filename, contentType string, content []byte, workspaceID string) (*http.Request, *httptest.ResponseRecorder) {
+		body := &bytes.Buffer{}
+		writer := multipart.NewWriter(body)
+
+		h := make(textproto.MIMEHeader)
+		h.Set("Content-Disposition", fmt.Sprintf(`form-data; name="file"; filename="%s"`, filename))
+		h.Set("Content-Type", contentType)
+
+		part, err := writer.CreatePart(h)
+		require.NoError(t, err)
+
+		_, err = part.Write(content)
+		require.NoError(t, err)
+
+		err = writer.Close()
+		require.NoError(t, err)
+
+		url := "/chat/upload"
+		if workspaceID != "" {
+			url = fmt.Sprintf("%s?workspaceId=%s", url, workspaceID)
+		}
+
+		req := httptest.NewRequest(http.MethodPost, url, body)
+		req.Header.Set("Content-Type", writer.FormDataContentType())
+		ctx := context.WithValue(req.Context(), "pubkey", "test-pubkey-123")
+		req = req.WithContext(ctx)
+
+		return req, httptest.NewRecorder()
+	}
+
+	t.Run("should successfully upload new file", func(t *testing.T) {
+		fileContent := []byte("test file content")
+
+		req, rr := createUploadRequest(
+			"test.txt",
+			"text/plain",
+			fileContent,
+			"test-workspace-123",
+		)
+
+		chatHandler.UploadFile(rr, req)
+
+		require.Equal(t, http.StatusOK, rr.Code, "Response body: %s", rr.Body.String())
+
+		var response FileResponse
+		err := json.NewDecoder(rr.Body).Decode(&response)
+		require.NoError(t, err)
+
+		assert.True(t, response.Success)
+		assert.False(t, response.IsExisting)
+		assert.Equal(t, "https://meme.sphinx.chat/public/test123.txt", response.URL)
+
+		assert.NotZero(t, response.Asset.ID)
+		assert.Equal(t, "test.txt", response.Asset.OriginFilename)
+		assert.Equal(t, "text/plain", response.Asset.MimeType)
+		assert.Equal(t, db.ActiveFileStatus, response.Asset.Status)
+		assert.Equal(t, "test-pubkey-123", response.Asset.UploadedBy)
+		assert.Equal(t, "test-workspace-123", response.Asset.WorkspaceID)
+		assert.NotEmpty(t, response.Asset.FileHash)
+		assert.NotEmpty(t, response.Asset.UploadFilename)
+		assert.Equal(t, int64(len(fileContent)), response.Asset.FileSize)
+		assert.NotZero(t, response.Asset.UploadTime)
+		assert.NotZero(t, response.Asset.LastReferenced)
+		assert.Equal(t, "https://meme.sphinx.chat/public/test123.txt", response.Asset.StoragePath)
+
+		storedAsset, err := db.TestDB.GetFileAssetByID(response.Asset.ID)
+		require.NoError(t, err)
+		assert.Equal(t, response.Asset.FileHash, storedAsset.FileHash)
+	})
+
+	t.Run("should reject file with unsupported mime type", func(t *testing.T) {
+		req, rr := createUploadRequest(
+			"test.xyz",
+			"application/xyz",
+			[]byte("test content"),
+			"test-workspace-123",
+		)
+
+		chatHandler.UploadFile(rr, req)
+
+		require.Equal(t, http.StatusBadRequest, rr.Code)
+		var response ChatResponse
+		err := json.NewDecoder(rr.Body).Decode(&response)
+		require.NoError(t, err)
+		assert.False(t, response.Success)
+		assert.Equal(t, "File type not allowed", response.Message)
+	})
+
+	t.Run("should handle missing file in request", func(t *testing.T) {
+		req := httptest.NewRequest(http.MethodPost, "/chat/upload", nil)
+		req.Header.Set("Content-Type", "multipart/form-data")
+		ctx := context.WithValue(req.Context(), "pubkey", "test-pubkey-123")
+		req = req.WithContext(ctx)
+
+		rr := httptest.NewRecorder()
+		chatHandler.UploadFile(rr, req)
+
+		require.Equal(t, http.StatusBadRequest, rr.Code)
+		var response ChatResponse
+		err := json.NewDecoder(rr.Body).Decode(&response)
+		require.NoError(t, err)
+		assert.False(t, response.Success)
+		assert.Equal(t, "No file provided", response.Message)
+	})
+
+	t.Run("should handle storage service failure", func(t *testing.T) {
+		failingStorage := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			w.Header().Set("Content-Type", "application/json")
+			w.WriteHeader(http.StatusInternalServerError)
+			json.NewEncoder(w).Encode(map[string]interface{}{
+				"success": false,
+				"error":   "Storage service error",
+			})
+		}))
+		defer failingStorage.Close()
+
+		failingHandler := NewChatHandler(&http.Client{}, db.TestDB)
+		os.Setenv("MEME_SERVER_URL", failingStorage.URL)
+
+		req, rr := createUploadRequest(
+			"test.txt",
+			"text/plain",
+			[]byte("test content"),
+			"test-workspace-123",
+		)
+
+		failingHandler.UploadFile(rr, req)
+
+		require.Equal(t, http.StatusInternalServerError, rr.Code, "Response body: %s", rr.Body.String())
+		var response ChatResponse
+		err := json.NewDecoder(rr.Body).Decode(&response)
+		require.NoError(t, err)
+		assert.False(t, response.Success)
+		assert.Contains(t, response.Message, "Failed to upload file")
+
+		os.Setenv("MEME_SERVER_URL", mockStorage.URL)
+	})
+
+	t.Run("should handle supported image types", func(t *testing.T) {
+		imageTypes := []struct {
+			ext         string
+			contentType string
+			content     []byte
+		}{
+			{"jpg", "image/jpeg", []byte("fake jpeg content")},
+			{"png", "image/png", []byte("fake png content")},
+			{"gif", "image/gif", []byte("fake gif content")},
+		}
+
+		for _, img := range imageTypes {
+			t.Run(img.ext, func(t *testing.T) {
+
+				imgStorage := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+					w.Header().Set("Content-Type", "application/json")
+					w.WriteHeader(http.StatusOK)
+					json.NewEncoder(w).Encode(map[string]interface{}{
+						"success": true,
+						"url":     fmt.Sprintf("https://meme.sphinx.chat/public/test.%s", img.ext),
+					})
+				}))
+				defer imgStorage.Close()
+
+				os.Setenv("MEME_SERVER_URL", imgStorage.URL)
+				imgHandler := NewChatHandler(&http.Client{}, db.TestDB)
+
+				req, rr := createUploadRequest(
+					fmt.Sprintf("test.%s", img.ext),
+					img.contentType,
+					img.content,
+					"test-workspace-123",
+				)
+
+				imgHandler.UploadFile(rr, req)
+
+				require.Equal(t, http.StatusOK, rr.Code, "Response body: %s", rr.Body.String())
+				var response FileResponse
+				err := json.NewDecoder(rr.Body).Decode(&response)
+				require.NoError(t, err)
+				assert.True(t, response.Success)
+				assert.Equal(t, img.contentType, response.Asset.MimeType)
+			})
+		}
+
+		os.Setenv("MEME_SERVER_URL", mockStorage.URL)
+	})
+}
+
+func TestGetFile(t *testing.T) {
+	teardownSuite := SetupSuite(t)
+	defer teardownSuite(t)
+
+	db.CleanTestData()
+	chatHandler := NewChatHandler(&http.Client{}, db.TestDB)
+
+	createTestFileAsset := func(t *testing.T, uploadFilename string) *db.FileAsset {
+		if uploadFilename == "" {
+			uploadFilename = fmt.Sprintf("test-upload-%d", time.Now().UnixNano())
+		}
+
+		asset := &db.FileAsset{
+			OriginFilename: "test.txt",
+			FileHash:       fmt.Sprintf("test-hash-%s", uploadFilename),
+			UploadFilename: uploadFilename,
+			FileSize:       100,
+			MimeType:       "text/plain",
+			StoragePath:    "https://meme.sphinx.chat/public/test123.txt",
+			WorkspaceID:    "test-workspace-123",
+			UploadedBy:     "test-pubkey-123",
+			Status:         db.ActiveFileStatus,
+		}
+
+		createdAsset, err := db.TestDB.CreateFileAsset(asset)
+		require.NoError(t, err)
+		return createdAsset
+	}
+
+	createGetRequest := func(fileID string) (*http.Request, *httptest.ResponseRecorder) {
+		req := httptest.NewRequest(http.MethodGet, "/file/"+fileID, nil)
+		ctx := context.WithValue(req.Context(), "pubkey", "test-pubkey-123")
+		req = req.WithContext(ctx)
+		rctx := chi.NewRouteContext()
+		rctx.URLParams.Add("id", fileID)
+		req = req.WithContext(context.WithValue(req.Context(), chi.RouteCtxKey, rctx))
+		return req, httptest.NewRecorder()
+	}
+
+	t.Run("should successfully get file", func(t *testing.T) {
+		asset := createTestFileAsset(t, "")
+
+		req, rr := createGetRequest(fmt.Sprintf("%d", asset.ID))
+		chatHandler.GetFile(rr, req)
+
+		require.Equal(t, http.StatusOK, rr.Code)
+
+		var response FileResponse
+		err := json.NewDecoder(rr.Body).Decode(&response)
+		require.NoError(t, err)
+
+		assert.True(t, response.Success)
+		assert.True(t, response.IsExisting)
+		assert.Equal(t, asset.StoragePath, response.URL)
+		assert.Equal(t, asset.ID, response.Asset.ID)
+		assert.Equal(t, asset.OriginFilename, response.Asset.OriginFilename)
+		assert.Equal(t, asset.MimeType, response.Asset.MimeType)
+		assert.Equal(t, asset.Status, response.Asset.Status)
+		assert.Equal(t, asset.WorkspaceID, response.Asset.WorkspaceID)
+	})
+
+	t.Run("should handle missing file ID", func(t *testing.T) {
+		req, rr := createGetRequest("")
+		chatHandler.GetFile(rr, req)
+
+		require.Equal(t, http.StatusBadRequest, rr.Code)
+
+		var response ChatResponse
+		err := json.NewDecoder(rr.Body).Decode(&response)
+		require.NoError(t, err)
+		assert.False(t, response.Success)
+		assert.Equal(t, "File ID is required", response.Message)
+	})
+
+	t.Run("should handle invalid file ID format", func(t *testing.T) {
+		req, rr := createGetRequest("invalid-id")
+		chatHandler.GetFile(rr, req)
+
+		require.Equal(t, http.StatusBadRequest, rr.Code)
+
+		var response ChatResponse
+		err := json.NewDecoder(rr.Body).Decode(&response)
+		require.NoError(t, err)
+		assert.False(t, response.Success)
+		assert.Equal(t, "Invalid file ID", response.Message)
+	})
+
+	t.Run("should handle non-existent file ID", func(t *testing.T) {
+		req, rr := createGetRequest("999999")
+		chatHandler.GetFile(rr, req)
+
+		require.Equal(t, http.StatusNotFound, rr.Code)
+
+		var response ChatResponse
+		err := json.NewDecoder(rr.Body).Decode(&response)
+		require.NoError(t, err)
+		assert.False(t, response.Success)
+		assert.Equal(t, "File not found", response.Message)
+	})
+
+	t.Run("should handle deleted file", func(t *testing.T) {
+
+		asset := createTestFileAsset(t, "test-upload-deleted")
+		err := db.TestDB.DeleteFileAsset(asset.ID)
+		require.NoError(t, err)
+
+		req, rr := createGetRequest(fmt.Sprintf("%d", asset.ID))
+		chatHandler.GetFile(rr, req)
+
+		require.Equal(t, http.StatusOK, rr.Code)
+
+		var response FileResponse
+		err = json.NewDecoder(rr.Body).Decode(&response)
+		require.NoError(t, err)
+
+		assert.True(t, response.Success)
+		assert.True(t, response.IsExisting)
+		assert.Equal(t, db.DeletedFileStatus, response.Asset.Status)
+	})
+
+	t.Run("should handle file with different workspace", func(t *testing.T) {
+
+		asset := &db.FileAsset{
+			OriginFilename: "test.txt",
+			FileHash:       "test-hash-diff-workspace",
+			UploadFilename: fmt.Sprintf("test-upload-diff-workspace-%d", time.Now().UnixNano()),
+			FileSize:       100,
+			MimeType:       "text/plain",
+			StoragePath:    "https://meme.sphinx.chat/public/test123.txt",
+			WorkspaceID:    "different-workspace-123",
+			UploadedBy:     "test-pubkey-123",
+			Status:         db.ActiveFileStatus,
+		}
+		createdAsset, err := db.TestDB.CreateFileAsset(asset)
+		require.NoError(t, err)
+
+		req, rr := createGetRequest(fmt.Sprintf("%d", createdAsset.ID))
+		chatHandler.GetFile(rr, req)
+
+		require.Equal(t, http.StatusOK, rr.Code)
+
+		var response FileResponse
+		err = json.NewDecoder(rr.Body).Decode(&response)
+		require.NoError(t, err)
+
+		assert.True(t, response.Success)
+		assert.True(t, response.IsExisting)
+		assert.Equal(t, "different-workspace-123", response.Asset.WorkspaceID)
+	})
+
+	t.Run("should handle zero ID", func(t *testing.T) {
+		req, rr := createGetRequest("0")
+		chatHandler.GetFile(rr, req)
+
+		require.Equal(t, http.StatusNotFound, rr.Code)
+
+		var response ChatResponse
+		err := json.NewDecoder(rr.Body).Decode(&response)
+		require.NoError(t, err)
+		assert.False(t, response.Success)
+		assert.Equal(t, "File not found", response.Message)
+	})
+}
+
+func TestListFiles(t *testing.T) {
+	teardownSuite := SetupSuite(t)
+	defer teardownSuite(t)
+
+	db.CleanTestData()
+	chatHandler := NewChatHandler(&http.Client{}, db.TestDB)
+
+	createTestFileAsset := func(t *testing.T, opts map[string]string) *db.FileAsset {
+		uploadFilename := fmt.Sprintf("test-upload-%d", time.Now().UnixNano())
+
+		asset := &db.FileAsset{
+			OriginFilename: opts["originFilename"],
+			FileHash:       fmt.Sprintf("test-hash-%s", uploadFilename),
+			UploadFilename: uploadFilename,
+			FileSize:       100,
+			MimeType:       opts["mimeType"],
+			StoragePath:    "https://meme.sphinx.chat/public/test123.txt",
+			WorkspaceID:    opts["workspaceId"],
+			UploadedBy:     "test-pubkey-123",
+			Status:         db.FileStatus(opts["status"]),
+		}
+
+		createdAsset, err := db.TestDB.CreateFileAsset(asset)
+		require.NoError(t, err)
+		return createdAsset
+	}
+
+	createListRequest := func(queryParams map[string]string) (*http.Request, *httptest.ResponseRecorder) {
+		url := "/chat/files?"
+		for key, value := range queryParams {
+			url += fmt.Sprintf("%s=%s&", key, value)
+		}
+		req := httptest.NewRequest(http.MethodGet, url, nil)
+		return req, httptest.NewRecorder()
+	}
+
+	t.Run("should list files with default pagination", func(t *testing.T) {
+
+		for i := 0; i < 3; i++ {
+			createTestFileAsset(t, map[string]string{
+				"originFilename": fmt.Sprintf("test%d.txt", i),
+				"mimeType":       "text/plain",
+				"workspaceId":    "test-workspace-123",
+				"status":         string(db.ActiveFileStatus),
+			})
+		}
+
+		req, rr := createListRequest(map[string]string{})
+		chatHandler.ListFiles(rr, req)
+
+		require.Equal(t, http.StatusOK, rr.Code)
+
+		var response map[string]interface{}
+		err := json.NewDecoder(rr.Body).Decode(&response)
+		require.NoError(t, err)
+
+		assert.True(t, response["success"].(bool))
+		assert.NotNil(t, response["data"])
+		assert.NotNil(t, response["pagination"])
+
+		pagination := response["pagination"].(map[string]interface{})
+		assert.Equal(t, float64(1), pagination["currentPage"])
+		assert.Equal(t, float64(50), pagination["pageSize"])
+		assert.GreaterOrEqual(t, pagination["totalItems"].(float64), float64(3))
+	})
+
+	t.Run("should filter by status", func(t *testing.T) {
+
+		createTestFileAsset(t, map[string]string{
+			"originFilename": "active.txt",
+			"mimeType":       "text/plain",
+			"workspaceId":    "test-workspace-123",
+			"status":         string(db.ActiveFileStatus),
+		})
+		deletedAsset := createTestFileAsset(t, map[string]string{
+			"originFilename": "deleted.txt",
+			"mimeType":       "text/plain",
+			"workspaceId":    "test-workspace-123",
+			"status":         string(db.ActiveFileStatus),
+		})
+		err := db.TestDB.DeleteFileAsset(deletedAsset.ID)
+		require.NoError(t, err)
+
+		req, rr := createListRequest(map[string]string{
+			"status": string(db.DeletedFileStatus),
+		})
+		chatHandler.ListFiles(rr, req)
+
+		require.Equal(t, http.StatusOK, rr.Code)
+
+		var response map[string]interface{}
+		err = json.NewDecoder(rr.Body).Decode(&response)
+		require.NoError(t, err)
+
+		data := response["data"].([]interface{})
+		for _, item := range data {
+			asset := item.(map[string]interface{})
+			assert.Equal(t, string(db.DeletedFileStatus), asset["status"])
+		}
+	})
+
+	t.Run("should handle custom pagination", func(t *testing.T) {
+
+		for i := 0; i < 15; i++ {
+			createTestFileAsset(t, map[string]string{
+				"originFilename": fmt.Sprintf("page%d.txt", i),
+				"mimeType":       "text/plain",
+				"workspaceId":    "test-workspace-123",
+				"status":         string(db.ActiveFileStatus),
+			})
+		}
+
+		req, rr := createListRequest(map[string]string{
+			"page":     "2",
+			"pageSize": "5",
+		})
+		chatHandler.ListFiles(rr, req)
+
+		require.Equal(t, http.StatusOK, rr.Code)
+
+		var response map[string]interface{}
+		err := json.NewDecoder(rr.Body).Decode(&response)
+		require.NoError(t, err)
+
+		pagination := response["pagination"].(map[string]interface{})
+		assert.Equal(t, float64(2), pagination["currentPage"])
+		assert.Equal(t, float64(5), pagination["pageSize"])
+		data := response["data"].([]interface{})
+		assert.LessOrEqual(t, len(data), 5)
+	})
+
+	t.Run("should handle invalid pagination parameters", func(t *testing.T) {
+		req, rr := createListRequest(map[string]string{
+			"page":     "-1",
+			"pageSize": "0",
+		})
+		chatHandler.ListFiles(rr, req)
+
+		require.Equal(t, http.StatusOK, rr.Code)
+
+		var response map[string]interface{}
+		err := json.NewDecoder(rr.Body).Decode(&response)
+		require.NoError(t, err)
+
+		pagination := response["pagination"].(map[string]interface{})
+		assert.Equal(t, float64(1), pagination["currentPage"])
+		assert.Equal(t, float64(50), pagination["pageSize"])
+	})
+
+	t.Run("should handle empty result set", func(t *testing.T) {
+		req, rr := createListRequest(map[string]string{
+			"mimeType": "application/nonexistent",
+		})
+		chatHandler.ListFiles(rr, req)
+
+		require.Equal(t, http.StatusOK, rr.Code)
+
+		var response map[string]interface{}
+		err := json.NewDecoder(rr.Body).Decode(&response)
+		require.NoError(t, err)
+
+		data := response["data"].([]interface{})
+		assert.Empty(t, data)
+		pagination := response["pagination"].(map[string]interface{})
+		assert.Equal(t, float64(0), pagination["totalItems"])
+	})
+}
+
+func TestDeleteFile(t *testing.T) {
+	teardownSuite := SetupSuite(t)
+	defer teardownSuite(t)
+
+	db.CleanTestData()
+	chatHandler := NewChatHandler(&http.Client{}, db.TestDB)
+
+	createTestFileAsset := func(t *testing.T) *db.FileAsset {
+		uploadFilename := fmt.Sprintf("test-upload-%d", time.Now().UnixNano())
+		asset := &db.FileAsset{
+			OriginFilename: "test.txt",
+			FileHash:       fmt.Sprintf("test-hash-%s", uploadFilename),
+			UploadFilename: uploadFilename,
+			FileSize:       100,
+			MimeType:       "text/plain",
+			StoragePath:    "https://meme.sphinx.chat/public/test123.txt",
+			WorkspaceID:    "test-workspace-123",
+			UploadedBy:     "test-pubkey-123",
+			Status:         db.ActiveFileStatus,
+		}
+
+		createdAsset, err := db.TestDB.CreateFileAsset(asset)
+		require.NoError(t, err)
+		return createdAsset
+	}
+
+	createDeleteRequest := func(fileID string) (*http.Request, *httptest.ResponseRecorder) {
+		req := httptest.NewRequest(http.MethodDelete, "/file/"+fileID, nil)
+		rctx := chi.NewRouteContext()
+		rctx.URLParams.Add("id", fileID)
+		req = req.WithContext(context.WithValue(req.Context(), chi.RouteCtxKey, rctx))
+		return req, httptest.NewRecorder()
+	}
+
+	t.Run("should successfully delete file", func(t *testing.T) {
+
+		asset := createTestFileAsset(t)
+
+		req, rr := createDeleteRequest(fmt.Sprintf("%d", asset.ID))
+		chatHandler.DeleteFile(rr, req)
+
+		require.Equal(t, http.StatusOK, rr.Code)
+
+		var response ChatResponse
+		err := json.NewDecoder(rr.Body).Decode(&response)
+		require.NoError(t, err)
+		assert.True(t, response.Success)
+		assert.Equal(t, "File deleted successfully", response.Message)
+
+		deletedAsset, err := db.TestDB.GetFileAssetByID(asset.ID)
+		require.NoError(t, err)
+		assert.Equal(t, db.DeletedFileStatus, deletedAsset.Status)
+		assert.NotNil(t, deletedAsset.DeletedAt)
+	})
+
+	t.Run("should handle missing file ID", func(t *testing.T) {
+		req, rr := createDeleteRequest("")
+		chatHandler.DeleteFile(rr, req)
+
+		require.Equal(t, http.StatusBadRequest, rr.Code)
+
+		var response ChatResponse
+		err := json.NewDecoder(rr.Body).Decode(&response)
+		require.NoError(t, err)
+		assert.False(t, response.Success)
+		assert.Equal(t, "File ID is required", response.Message)
+	})
+
+	t.Run("should handle invalid file ID format", func(t *testing.T) {
+		req, rr := createDeleteRequest("invalid-id")
+		chatHandler.DeleteFile(rr, req)
+
+		require.Equal(t, http.StatusBadRequest, rr.Code)
+
+		var response ChatResponse
+		err := json.NewDecoder(rr.Body).Decode(&response)
+		require.NoError(t, err)
+		assert.False(t, response.Success)
+		assert.Equal(t, "Invalid file ID", response.Message)
+	})
+
+	t.Run("should handle non-existent file ID", func(t *testing.T) {
+
+		db.CleanTestData()
+
+		nonExistentID := uint(999999)
+
+		_, err := db.TestDB.GetFileAssetByID(nonExistentID)
+		require.Error(t, err)
+
+		req, rr := createDeleteRequest(fmt.Sprintf("%d", nonExistentID))
+		chatHandler.DeleteFile(rr, req)
+
+		require.Equal(t, http.StatusNotFound, rr.Code, "Should return 404 for non-existent file")
+
+		var response ChatResponse
+		err = json.NewDecoder(rr.Body).Decode(&response)
+		require.NoError(t, err)
+		assert.False(t, response.Success)
+		assert.Equal(t, "File not found", response.Message)
+	})
+
+	t.Run("should handle already deleted file", func(t *testing.T) {
+
+		asset := createTestFileAsset(t)
+		err := db.TestDB.DeleteFileAsset(asset.ID)
+		require.NoError(t, err)
+
+		req, rr := createDeleteRequest(fmt.Sprintf("%d", asset.ID))
+		chatHandler.DeleteFile(rr, req)
+
+		require.Equal(t, http.StatusOK, rr.Code)
+
+		var response ChatResponse
+		err = json.NewDecoder(rr.Body).Decode(&response)
+		require.NoError(t, err)
+		assert.True(t, response.Success)
+		assert.Equal(t, "File deleted successfully", response.Message)
+
+		deletedAsset, err := db.TestDB.GetFileAssetByID(asset.ID)
+		require.NoError(t, err)
+		assert.Equal(t, db.DeletedFileStatus, deletedAsset.Status)
 	})
 }
