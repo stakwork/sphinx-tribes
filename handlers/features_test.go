@@ -4691,6 +4691,16 @@ func TestBriefSend(t *testing.T) {
 
 	db.CleanTestData()
 
+	person := db.Person{
+		Uuid:        uuid.New().String(),
+		OwnerAlias:  "test-alias",
+		UniqueName:  "test-unique-name",
+		OwnerPubKey: "test-pubkey",
+		PriceToMeet: 0,
+		Description: "test-description",
+	}
+	db.TestDB.CreateOrEditPerson(person)
+
 	fHandler := NewFeatureHandler(db.TestDB)
 
 	tests := []struct {
@@ -4708,7 +4718,7 @@ func TestBriefSend(t *testing.T) {
 		{
 			name:           "Valid Request with All Required Fields",
 			contextKey:     auth.ContextKey,
-			contextValue:   "validPubKey",
+			contextValue:   "test-pubkey",
 			body:           `{"audioLink":"link","featureUUID":"uuid","source":"source","examples":["example1"]}`,
 			envHost:        "http://localhost",
 			envSWWFKEY:     "validKey",
@@ -4718,7 +4728,7 @@ func TestBriefSend(t *testing.T) {
 		{
 			name:           "Empty JSON Body",
 			contextKey:     auth.ContextKey,
-			contextValue:   "validPubKey",
+			contextValue:   "test-pubkey",
 			body:           ``,
 			expectedStatus: http.StatusNotAcceptable,
 			expectedBody:   "Invalid JSON format\n",
@@ -4726,7 +4736,7 @@ func TestBriefSend(t *testing.T) {
 		{
 			name:           "Missing Required JSON Fields",
 			contextKey:     auth.ContextKey,
-			contextValue:   "validPubKey",
+			contextValue:   "test-pubkey",
 			body:           `{"audioLink":"link"}`,
 			envHost:        "http://localhost",
 			envSWWFKEY:     "",
@@ -4743,7 +4753,7 @@ func TestBriefSend(t *testing.T) {
 		{
 			name:           "Invalid JSON Format",
 			contextKey:     auth.ContextKey,
-			contextValue:   "validPubKey",
+			contextValue:   "test-pubkey",
 			body:           `{"audioLink":}`,
 			expectedStatus: http.StatusNotAcceptable,
 			expectedBody:   "Invalid JSON format\n",
@@ -4751,7 +4761,7 @@ func TestBriefSend(t *testing.T) {
 		{
 			name:           "Environment Variable HOST Not Set",
 			contextKey:     auth.ContextKey,
-			contextValue:   "validPubKey",
+			contextValue:   "test-pubkey",
 			body:           `{"audioLink":"link","featureUUID":"uuid","source":"source","examples":["example1"]}`,
 			envHost:        "",
 			envSWWFKEY:     "validKey",
@@ -4760,7 +4770,7 @@ func TestBriefSend(t *testing.T) {
 		{
 			name:           "Environment Variable SWWFKEY Not Set",
 			contextKey:     auth.ContextKey,
-			contextValue:   "validPubKey",
+			contextValue:   "test-pubkey",
 			body:           `{"audioLink":"link","featureUUID":"uuid","source":"source","examples":["example1"]}`,
 			envHost:        "",
 			envSWWFKEY:     "validKey",
@@ -4769,7 +4779,7 @@ func TestBriefSend(t *testing.T) {
 		{
 			name:           "Stakwork API Request Creation Failure",
 			contextKey:     auth.ContextKey,
-			contextValue:   "validPubKey",
+			contextValue:   "test-pubkey",
 			body:           `{"audioLink":"link","featureUUID":"uuid","source":"source","examples":["example1"]}`,
 			envHost:        "http://localhost",
 			envSWWFKEY:     "validKey",
@@ -4779,7 +4789,7 @@ func TestBriefSend(t *testing.T) {
 		{
 			name:           "Stakwork API Request Sending Failure",
 			contextKey:     auth.ContextKey,
-			contextValue:   "validPubKey",
+			contextValue:   "test-pubkey",
 			body:           `{"audioLink":"link","featureUUID":"uuid","source":"source","examples":["example1"]}`,
 			envHost:        "http://localhost",
 			envSWWFKEY:     "validKey",
@@ -4789,7 +4799,7 @@ func TestBriefSend(t *testing.T) {
 		{
 			name:           "Stakwork API Response Reading Failure",
 			contextKey:     auth.ContextKey,
-			contextValue:   "validPubKey",
+			contextValue:   "test-pubkey",
 			body:           `{"audioLink":"link","featureUUID":"uuid","source":"source","examples":["example1"]}`,
 			envHost:        "http://localhost",
 			envSWWFKEY:     "validKey",
