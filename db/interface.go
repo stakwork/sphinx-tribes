@@ -272,4 +272,11 @@ type Database interface {
 	GetSnippetByID(id uint) (*TextSnippet, error)
 	UpdateSnippet(snippet *TextSnippet) (*TextSnippet, error)
 	DeleteSnippet(id uint) error
+	CreateFileAsset(asset *FileAsset) (*FileAsset, error)
+	GetFileAssetByHash(fileHash string) (*FileAsset, error)
+	GetFileAssetByID(id uint) (*FileAsset, error)
+	UpdateFileAssetReference(id uint) error
+	ListFileAssets(params ListFileAssetsParams) ([]FileAsset, int64, error)
+	UpdateFileAsset(asset *FileAsset) error
+	DeleteFileAsset(id uint) error
 }

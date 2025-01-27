@@ -1049,166 +1049,492 @@ func TestGetFeaturePhases(t *testing.T) {
 		assert.Equal(t, returnedFeaturePhases, updatedFeaturePhases)
 		assert.Equal(t, http.StatusOK, rr.Code)
 	})
+
+	t.Run("Should handle non-existent feature UUID", func(t *testing.T) {
+		nonExistentUUID := uuid.New().String()
+		rctx := chi.NewRouteContext()
+		rctx.URLParams.Add("feature_uuid", nonExistentUUID)
+		req, err := http.NewRequestWithContext(context.WithValue(ctx, chi.RouteCtxKey, rctx),
+			http.MethodGet, "/features/"+nonExistentUUID+"/phase", nil)
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		rr := httptest.NewRecorder()
+		http.HandlerFunc(oHandler.GetFeaturePhases).ServeHTTP(rr, req)
+
+		var returnedFeaturePhases []db.FeaturePhase
+		err = json.Unmarshal(rr.Body.Bytes(), &returnedFeaturePhases)
+		assert.NoError(t, err)
+		assert.Empty(t, returnedFeaturePhases)
+		assert.Equal(t, http.StatusOK, rr.Code)
+	})
+
+	t.Run("Should handle multiple phases for a feature", func(t *testing.T) {
+
+		for i := 1; i <= 3; i++ {
+			phase := db.FeaturePhase{
+				Uuid:        fmt.Sprintf("multi_phase_uuid_%d", i),
+				FeatureUuid: feature.Uuid,
+				Name:        fmt.Sprintf("Phase %d", i),
+				Priority:    i,
+			}
+			db.TestDB.CreateOrEditFeaturePhase(phase)
+		}
+
+		rctx := chi.NewRouteContext()
+		rctx.URLParams.Add("feature_uuid", feature.Uuid)
+		req, err := http.NewRequestWithContext(context.WithValue(ctx, chi.RouteCtxKey, rctx),
+			http.MethodGet, "/features/"+feature.Uuid+"/phase", nil)
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		rr := httptest.NewRecorder()
+		http.HandlerFunc(oHandler.GetFeaturePhases).ServeHTTP(rr, req)
+
+		var returnedFeaturePhases []db.FeaturePhase
+		err = json.Unmarshal(rr.Body.Bytes(), &returnedFeaturePhases)
+		assert.NoError(t, err)
+		assert.GreaterOrEqual(t, len(returnedFeaturePhases), 3)
+		assert.Equal(t, http.StatusOK, rr.Code)
+	})
+
+	t.Run("Should handle empty feature UUID", func(t *testing.T) {
+		rctx := chi.NewRouteContext()
+		rctx.URLParams.Add("feature_uuid", "")
+		req, err := http.NewRequestWithContext(context.WithValue(ctx, chi.RouteCtxKey, rctx),
+			http.MethodGet, "/features//phase", nil)
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		rr := httptest.NewRecorder()
+		http.HandlerFunc(oHandler.GetFeaturePhases).ServeHTTP(rr, req)
+
+		var returnedFeaturePhases []db.FeaturePhase
+		err = json.Unmarshal(rr.Body.Bytes(), &returnedFeaturePhases)
+		assert.NoError(t, err)
+		assert.Empty(t, returnedFeaturePhases)
+		assert.Equal(t, http.StatusOK, rr.Code)
+	})
+
+	t.Run("Should handle feature with no phases", func(t *testing.T) {
+
+		emptyFeature := db.WorkspaceFeatures{
+			Uuid:          "empty_feature_uuid",
+			WorkspaceUuid: workspace.Uuid,
+			Name:          "Empty Feature",
+			Url:           "empty_feature_url",
+			Priority:      0,
+		}
+		db.TestDB.CreateOrEditFeature(emptyFeature)
+
+		rctx := chi.NewRouteContext()
+		rctx.URLParams.Add("feature_uuid", emptyFeature.Uuid)
+		req, err := http.NewRequestWithContext(context.WithValue(ctx, chi.RouteCtxKey, rctx),
+			http.MethodGet, "/features/"+emptyFeature.Uuid+"/phase", nil)
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		rr := httptest.NewRecorder()
+		http.HandlerFunc(oHandler.GetFeaturePhases).ServeHTTP(rr, req)
+
+		var returnedFeaturePhases []db.FeaturePhase
+		err = json.Unmarshal(rr.Body.Bytes(), &returnedFeaturePhases)
+		assert.NoError(t, err)
+		assert.Empty(t, returnedFeaturePhases)
+		assert.Equal(t, http.StatusOK, rr.Code)
+	})
+
+	t.Run("Should handle invalid authorization token", func(t *testing.T) {
+		invalidCtx := context.WithValue(context.Background(), auth.ContextKey, "invalid-token")
+		rctx := chi.NewRouteContext()
+		rctx.URLParams.Add("feature_uuid", feature.Uuid)
+		req, err := http.NewRequestWithContext(context.WithValue(invalidCtx, chi.RouteCtxKey, rctx),
+			http.MethodGet, "/features/"+feature.Uuid+"/phase", nil)
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		rr := httptest.NewRecorder()
+		http.HandlerFunc(oHandler.GetFeaturePhases).ServeHTTP(rr, req)
+
+		assert.Equal(t, http.StatusOK, rr.Code)
+	})
+
+	t.Run("Should handle concurrent requests", func(t *testing.T) {
+		numRequests := 5
+		var wg sync.WaitGroup
+		wg.Add(numRequests)
+
+		for i := 0; i < numRequests; i++ {
+			go func() {
+				defer wg.Done()
+				rctx := chi.NewRouteContext()
+				rctx.URLParams.Add("feature_uuid", feature.Uuid)
+				req, err := http.NewRequestWithContext(context.WithValue(ctx, chi.RouteCtxKey, rctx),
+					http.MethodGet, "/features/"+feature.Uuid+"/phase", nil)
+				if err != nil {
+					t.Error(err)
+					return
+				}
+
+				rr := httptest.NewRecorder()
+				http.HandlerFunc(oHandler.GetFeaturePhases).ServeHTTP(rr, req)
+
+				assert.Equal(t, http.StatusOK, rr.Code)
+			}()
+		}
+
+		wg.Wait()
+	})
+
+	t.Run("Valid Request with Authenticated User", func(t *testing.T) {
+		db.CleanTestData()
+
+		db.TestDB.CreateOrEditPerson(person)
+		db.TestDB.CreateOrEditWorkspace(workspace)
+		db.TestDB.CreateOrEditFeature(feature)
+		db.TestDB.CreateOrEditFeaturePhase(featurePhase)
+
+		rctx := chi.NewRouteContext()
+		rctx.URLParams.Add("feature_uuid", feature.Uuid)
+		req, err := http.NewRequestWithContext(context.WithValue(ctx, chi.RouteCtxKey, rctx),
+			http.MethodGet, "/features/"+feature.Uuid+"/phase", nil)
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		rr := httptest.NewRecorder()
+		http.HandlerFunc(oHandler.GetFeaturePhases).ServeHTTP(rr, req)
+
+		var returnedFeaturePhases []db.FeaturePhase
+		err = json.Unmarshal(rr.Body.Bytes(), &returnedFeaturePhases)
+		assert.NoError(t, err)
+		assert.NotEmpty(t, returnedFeaturePhases)
+		assert.Equal(t, http.StatusOK, rr.Code)
+	})
+
+	t.Run("Large Number of Phases", func(t *testing.T) {
+
+		db.CleanTestData()
+		db.TestDB.CreateOrEditPerson(person)
+		db.TestDB.CreateOrEditWorkspace(workspace)
+		db.TestDB.CreateOrEditFeature(feature)
+
+		for i := 0; i < 100; i++ {
+			phase := db.FeaturePhase{
+				Uuid:        fmt.Sprintf("large_phase_uuid_%d", i),
+				FeatureUuid: feature.Uuid,
+				Name:        fmt.Sprintf("Large Phase %d", i),
+				Priority:    i,
+			}
+			db.TestDB.CreateOrEditFeaturePhase(phase)
+		}
+
+		rctx := chi.NewRouteContext()
+		rctx.URLParams.Add("feature_uuid", feature.Uuid)
+		req, err := http.NewRequestWithContext(context.WithValue(ctx, chi.RouteCtxKey, rctx),
+			http.MethodGet, "/features/"+feature.Uuid+"/phase", nil)
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		rr := httptest.NewRecorder()
+		http.HandlerFunc(oHandler.GetFeaturePhases).ServeHTTP(rr, req)
+
+		var returnedFeaturePhases []db.FeaturePhase
+		err = json.Unmarshal(rr.Body.Bytes(), &returnedFeaturePhases)
+		assert.NoError(t, err)
+		assert.Equal(t, 100, len(returnedFeaturePhases))
+		assert.Equal(t, http.StatusOK, rr.Code)
+	})
+
+	t.Run("Missing Public Key in Context", func(t *testing.T) {
+		rctx := chi.NewRouteContext()
+		rctx.URLParams.Add("feature_uuid", feature.Uuid)
+		emptyCtx := context.WithValue(context.Background(), chi.RouteCtxKey, rctx)
+		req, err := http.NewRequestWithContext(emptyCtx,
+			http.MethodGet, "/features/"+feature.Uuid+"/phase", nil)
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		rr := httptest.NewRecorder()
+		http.HandlerFunc(oHandler.GetFeaturePhases).ServeHTTP(rr, req)
+
+		assert.Equal(t, http.StatusUnauthorized, rr.Code)
+	})
+
+	t.Run("Invalid Feature UUID Format", func(t *testing.T) {
+		rctx := chi.NewRouteContext()
+		rctx.URLParams.Add("feature_uuid", "invalid-uuid-format-123")
+		req, err := http.NewRequestWithContext(context.WithValue(ctx, chi.RouteCtxKey, rctx),
+			http.MethodGet, "/features/invalid-uuid-format-123/phase", nil)
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		rr := httptest.NewRecorder()
+		http.HandlerFunc(oHandler.GetFeaturePhases).ServeHTTP(rr, req)
+
+		var returnedFeaturePhases []db.FeaturePhase
+		err = json.Unmarshal(rr.Body.Bytes(), &returnedFeaturePhases)
+		assert.NoError(t, err)
+		assert.Empty(t, returnedFeaturePhases)
+		assert.Equal(t, http.StatusOK, rr.Code)
+	})
+
+	t.Run("Context Cancellation", func(t *testing.T) {
+
+		ctxWithCancel, cancel := context.WithCancel(ctx)
+		defer cancel()
+
+		rctx := chi.NewRouteContext()
+		rctx.URLParams.Add("feature_uuid", feature.Uuid)
+		req, err := http.NewRequestWithContext(context.WithValue(ctxWithCancel, chi.RouteCtxKey, rctx),
+			http.MethodGet, "/features/"+feature.Uuid+"/phase", nil)
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		cancel()
+
+		rr := httptest.NewRecorder()
+		http.HandlerFunc(oHandler.GetFeaturePhases).ServeHTTP(rr, req)
+
+		assert.Equal(t, http.StatusOK, rr.Code)
+	})
+
+	t.Run("Invalid Context Key Type", func(t *testing.T) {
+		rctx := chi.NewRouteContext()
+		rctx.URLParams.Add("feature_uuid", feature.Uuid)
+
+		invalidCtx := context.WithValue(context.Background(), auth.ContextKey, 123)
+		req, err := http.NewRequestWithContext(context.WithValue(invalidCtx, chi.RouteCtxKey, rctx),
+			http.MethodGet, "/features/"+feature.Uuid+"/phase", nil)
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		rr := httptest.NewRecorder()
+		http.HandlerFunc(oHandler.GetFeaturePhases).ServeHTTP(rr, req)
+
+		assert.Equal(t, http.StatusUnauthorized, rr.Code)
+	})
 }
 
 func TestGetFeaturePhaseByUUID(t *testing.T) {
 	teardownSuite := SetupSuite(t)
 	defer teardownSuite(t)
 
-	fHandler := NewFeatureHandler(db.TestDB)
+	db.CleanTestData()
+
+	dbHandler := NewFeatureHandler(db.TestDB)
 
 	person := db.Person{
-		Uuid:        "uuid",
-		OwnerAlias:  "alias",
-		UniqueName:  "unique_name",
-		OwnerPubKey: "pubkey",
+		Uuid:        "test-person-uuid",
+		OwnerAlias:  "test-alias",
+		UniqueName:  "test-unique-name",
+		OwnerPubKey: "test-pubkey",
 		PriceToMeet: 0,
-		Description: "description",
+		Description: "test-description",
 	}
 	db.TestDB.CreateOrEditPerson(person)
 
 	workspace := db.Workspace{
-		Uuid:        "workspace_uuid",
-		Name:        "workspace_name",
-		OwnerPubKey: "person.OwnerPubkey",
-		Github:      "gtihub",
-		Website:     "website",
-		Description: "description",
+		Uuid:        "test-workspace-uuid",
+		Name:        "test-workspace",
+		OwnerPubKey: person.OwnerPubKey,
+		Github:      "test-github",
+		Website:     "test-website",
+		Description: "test-description",
 	}
 	db.TestDB.CreateOrEditWorkspace(workspace)
 
 	feature := db.WorkspaceFeatures{
-		Uuid:          "feature_uuid",
+		Uuid:          "test-feature-uuid",
 		WorkspaceUuid: workspace.Uuid,
-		Name:          "feature_name",
-		Url:           "feature_url",
+		Name:          "test-feature",
+		Url:           "test-url",
 		Priority:      0,
 	}
 	db.TestDB.CreateOrEditFeature(feature)
 
 	featurePhase := db.FeaturePhase{
-		Uuid:        "feature_phase_uuid",
-		FeatureUuid: feature.Uuid,
-		Name:        "feature_phase_name",
-		Priority:    0,
+		Uuid:         "test-feature-phase-uuid",
+		FeatureUuid:  feature.Uuid,
+		Name:         "test-phase",
+		Priority:     0,
+		PhasePurpose: "Initial test purpose",
+		PhaseOutcome: "Expected initial outcome",
+		PhaseScope:   "Initial scope",
 	}
 	db.TestDB.CreateOrEditFeaturePhase(featurePhase)
 
+	fullFeaturePhase := db.FeaturePhase{
+		Uuid:         "feature_phase_uuid_full_get",
+		FeatureUuid:  feature.Uuid,
+		Name:         "Full Feature Phase",
+		Priority:     1,
+		PhasePurpose: "Test phase purpose",
+		PhaseOutcome: "Expected test outcome",
+		PhaseScope:   "Test phase scope",
+	}
+	db.TestDB.CreateOrEditFeaturePhase(fullFeaturePhase)
+
+	minimalFeaturePhase := db.FeaturePhase{
+		Uuid:        "feature_phase_uuid_minimal_get",
+		FeatureUuid: feature.Uuid,
+		Name:        "Minimal Feature Phase",
+		Priority:    2,
+	}
+	db.TestDB.CreateOrEditFeaturePhase(minimalFeaturePhase)
+
 	ctx := context.WithValue(context.Background(), auth.ContextKey, workspace.OwnerPubKey)
 
-	t.Run("Should test that it throws a 401 error if a user is not authorized", func(t *testing.T) {
-		rctx := chi.NewRouteContext()
-		rctx.URLParams.Add("phase_uuid", featurePhase.Uuid)
-		rctx.URLParams.Add("feature_uuid", feature.Uuid)
-		req, err := http.NewRequestWithContext(context.WithValue(context.Background(), chi.RouteCtxKey, rctx), http.MethodGet, feature.Uuid+"/phase/"+featurePhase.Uuid, nil)
-		if err != nil {
-			t.Fatal(err)
-		}
+	tests := []struct {
+		name           string
+		featureUuid    string
+		phaseUuid      string
+		pubKeyFromAuth string
+		expectedStatus int
+		mockReturn     db.FeaturePhase
+		mockError      error
+		validateFunc   func(t *testing.T, body []byte)
+	}{
+		{
+			name:           "Valid Request with Existing Feature and Phase UUIDs",
+			featureUuid:    feature.Uuid,
+			phaseUuid:      featurePhase.Uuid,
+			pubKeyFromAuth: workspace.OwnerPubKey,
+			expectedStatus: http.StatusOK,
+			validateFunc: func(t *testing.T, body []byte) {
+				var returnedFeaturePhase db.FeaturePhase
+				assert.NoError(t, json.Unmarshal(body, &returnedFeaturePhase))
+				assert.Equal(t, featurePhase.Uuid, returnedFeaturePhase.Uuid)
+			},
+		},
+		{
+			name:           "Unauthorized Request",
+			featureUuid:    feature.Uuid,
+			phaseUuid:      featurePhase.Uuid,
+			pubKeyFromAuth: "",
+			expectedStatus: http.StatusUnauthorized,
+			validateFunc:   nil,
+		},
+		{
+			name:           "Invalid Authentication Key",
+			featureUuid:    feature.Uuid,
+			phaseUuid:      featurePhase.Uuid,
+			pubKeyFromAuth: "Invalid-Authentication-Key",
+			expectedStatus: http.StatusUnauthorized,
+			validateFunc:   nil,
+		},
+		{
+			name:           "Feature UUID Does Not Exist",
+			featureUuid:    "non-existent-feature-uuid",
+			phaseUuid:      featurePhase.Uuid,
+			pubKeyFromAuth: workspace.OwnerPubKey,
+			expectedStatus: http.StatusNotFound,
+			validateFunc:   nil,
+		},
+		{
+			name:           "Phase UUID Does Not Exist",
+			featureUuid:    feature.Uuid,
+			phaseUuid:      "non-existent-phase-uuid",
+			pubKeyFromAuth: workspace.OwnerPubKey,
+			expectedStatus: http.StatusNotFound,
+			validateFunc:   nil,
+		},
+		{
+			name:           "Both Feature and Phase UUIDs Do Not Exist",
+			featureUuid:    "non-existent-feature-uuid",
+			phaseUuid:      "non-existent-phase-uuid",
+			pubKeyFromAuth: workspace.OwnerPubKey,
+			expectedStatus: http.StatusNotFound,
+			validateFunc:   nil,
+		},
+		{
+			name:           "Invalid UUID Format for Feature or Phase",
+			featureUuid:    "invalid-format",
+			phaseUuid:      "test-feature-phase-uuid",
+			pubKeyFromAuth: workspace.OwnerPubKey,
+			expectedStatus: http.StatusNotFound,
+			validateFunc:   nil,
+		},
+		{
+			name:           "Feature and Phase UUIDs Are the Same",
+			featureUuid:    featurePhase.Uuid,
+			phaseUuid:      featurePhase.Uuid,
+			pubKeyFromAuth: workspace.OwnerPubKey,
+			expectedStatus: http.StatusNotFound,
+			validateFunc:   nil,
+		},
+		{
+			name:           "Empty UUIDs",
+			featureUuid:    "",
+			phaseUuid:      "",
+			pubKeyFromAuth: workspace.OwnerPubKey,
+			expectedStatus: http.StatusNotFound,
+			validateFunc:   nil,
+		},
+		{
+			name:           "Should return feature phase with all new fields",
+			featureUuid:    feature.Uuid,
+			phaseUuid:      fullFeaturePhase.Uuid,
+			pubKeyFromAuth: workspace.OwnerPubKey,
+			expectedStatus: http.StatusOK,
+			validateFunc: func(t *testing.T, body []byte) {
+				var returnedFeaturePhase db.FeaturePhase
+				assert.NoError(t, json.Unmarshal(body, &returnedFeaturePhase))
 
-		rr := httptest.NewRecorder()
-		http.HandlerFunc(fHandler.GetFeaturePhaseByUUID).ServeHTTP(rr, req)
+				assert.Equal(t, fullFeaturePhase.Uuid, returnedFeaturePhase.Uuid)
+				assert.Equal(t, fullFeaturePhase.PhasePurpose, returnedFeaturePhase.PhasePurpose)
+				assert.Equal(t, fullFeaturePhase.PhaseOutcome, returnedFeaturePhase.PhaseOutcome)
+				assert.Equal(t, fullFeaturePhase.PhaseScope, returnedFeaturePhase.PhaseScope)
+			},
+		},
+		{
+			name:           "Should handle empty optional fields correctly",
+			featureUuid:    feature.Uuid,
+			phaseUuid:      minimalFeaturePhase.Uuid,
+			pubKeyFromAuth: workspace.OwnerPubKey,
+			expectedStatus: http.StatusOK,
+			validateFunc: func(t *testing.T, body []byte) {
+				var returnedFeaturePhase db.FeaturePhase
+				assert.NoError(t, json.Unmarshal(body, &returnedFeaturePhase))
 
-		assert.Equal(t, http.StatusUnauthorized, rr.Code)
-	})
+				assert.Equal(t, minimalFeaturePhase.Uuid, returnedFeaturePhase.Uuid)
+				assert.Empty(t, returnedFeaturePhase.PhasePurpose)
+				assert.Empty(t, returnedFeaturePhase.PhaseOutcome)
+				assert.Empty(t, returnedFeaturePhase.PhaseScope)
+			},
+		},
+	}
 
-	t.Run("Should test that the workspace features phases returned from the API has the feature phases created", func(t *testing.T) {
-		rctx := chi.NewRouteContext()
-		rctx.URLParams.Add("phase_uuid", featurePhase.Uuid)
-		rctx.URLParams.Add("feature_uuid", feature.Uuid)
-		req, err := http.NewRequestWithContext(context.WithValue(ctx, chi.RouteCtxKey, rctx), http.MethodGet, feature.Uuid+"/phase/"+featurePhase.Uuid, nil)
-		if err != nil {
-			t.Fatal(err)
-		}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			rctx := chi.NewRouteContext()
+			rctx.URLParams.Add("feature_uuid", tt.featureUuid)
+			rctx.URLParams.Add("phase_uuid", tt.phaseUuid)
 
-		rr := httptest.NewRecorder()
-		http.HandlerFunc(fHandler.GetFeaturePhaseByUUID).ServeHTTP(rr, req)
+			req := httptest.NewRequest(http.MethodGet, "/features/"+tt.featureUuid+"/phase/"+tt.phaseUuid, nil)
+			req = req.WithContext(context.WithValue(ctx, auth.ContextKey, tt.pubKeyFromAuth))
+			req = req.WithContext(context.WithValue(req.Context(), chi.RouteCtxKey, rctx))
 
-		var returnedFeaturePhases db.FeaturePhase
-		err = json.Unmarshal(rr.Body.Bytes(), &returnedFeaturePhases)
-		assert.NoError(t, err)
+			rr := httptest.NewRecorder()
+			http.HandlerFunc(dbHandler.GetFeaturePhaseByUUID).ServeHTTP(rr, req)
 
-		updatedFeaturePhase, err := db.TestDB.GetFeaturePhaseByUuid(feature.Uuid, featurePhase.Uuid)
-		if err != nil {
-			t.Fatal(err)
-		}
-
-		updatedFeaturePhase.Created = returnedFeaturePhases.Created
-		updatedFeaturePhase.Updated = returnedFeaturePhases.Updated
-
-		assert.Equal(t, http.StatusOK, rr.Code)
-		assert.Equal(t, updatedFeaturePhase, returnedFeaturePhases)
-	})
-
-	t.Run("Should return feature phase with all new fields", func(t *testing.T) {
-
-		fullFeaturePhase := db.FeaturePhase{
-			Uuid:         "feature_phase_uuid_full_get",
-			FeatureUuid:  feature.Uuid,
-			Name:         "feature_phase_name",
-			Priority:     0,
-			PhasePurpose: "Test phase purpose",
-			PhaseOutcome: "Expected test outcome",
-			PhaseScope:   "Test phase scope",
-		}
-		db.TestDB.CreateOrEditFeaturePhase(fullFeaturePhase)
-
-		rctx := chi.NewRouteContext()
-		rctx.URLParams.Add("phase_uuid", fullFeaturePhase.Uuid)
-		rctx.URLParams.Add("feature_uuid", feature.Uuid)
-		req, err := http.NewRequestWithContext(context.WithValue(ctx, chi.RouteCtxKey, rctx),
-			http.MethodGet,
-			feature.Uuid+"/phase/"+fullFeaturePhase.Uuid,
-			nil)
-		if err != nil {
-			t.Fatal(err)
-		}
-
-		rr := httptest.NewRecorder()
-		http.HandlerFunc(fHandler.GetFeaturePhaseByUUID).ServeHTTP(rr, req)
-
-		var returnedFeaturePhase db.FeaturePhase
-		err = json.Unmarshal(rr.Body.Bytes(), &returnedFeaturePhase)
-		assert.NoError(t, err)
-
-		assert.Equal(t, http.StatusOK, rr.Code)
-		assert.Equal(t, fullFeaturePhase.PhasePurpose, returnedFeaturePhase.PhasePurpose)
-		assert.Equal(t, fullFeaturePhase.PhaseOutcome, returnedFeaturePhase.PhaseOutcome)
-		assert.Equal(t, fullFeaturePhase.PhaseScope, returnedFeaturePhase.PhaseScope)
-	})
-
-	t.Run("Should handle empty optional fields correctly", func(t *testing.T) {
-
-		minimalFeaturePhase := db.FeaturePhase{
-			Uuid:        "feature_phase_uuid_minimal_get",
-			FeatureUuid: feature.Uuid,
-			Name:        "feature_phase_name",
-			Priority:    0,
-		}
-		db.TestDB.CreateOrEditFeaturePhase(minimalFeaturePhase)
-
-		rctx := chi.NewRouteContext()
-		rctx.URLParams.Add("phase_uuid", minimalFeaturePhase.Uuid)
-		rctx.URLParams.Add("feature_uuid", feature.Uuid)
-		req, err := http.NewRequestWithContext(context.WithValue(ctx, chi.RouteCtxKey, rctx),
-			http.MethodGet,
-			feature.Uuid+"/phase/"+minimalFeaturePhase.Uuid,
-			nil)
-		if err != nil {
-			t.Fatal(err)
-		}
-
-		rr := httptest.NewRecorder()
-		http.HandlerFunc(fHandler.GetFeaturePhaseByUUID).ServeHTTP(rr, req)
-
-		var returnedFeaturePhase db.FeaturePhase
-		err = json.Unmarshal(rr.Body.Bytes(), &returnedFeaturePhase)
-		assert.NoError(t, err)
-
-		assert.Equal(t, http.StatusOK, rr.Code)
-		assert.Empty(t, returnedFeaturePhase.PhasePurpose)
-		assert.Empty(t, returnedFeaturePhase.PhaseOutcome)
-		assert.Empty(t, returnedFeaturePhase.PhaseScope)
-	})
+			assert.Equal(t, tt.expectedStatus, rr.Code)
+			if tt.validateFunc != nil {
+				tt.validateFunc(t, rr.Body.Bytes())
+			}
+		})
+	}
+	db.CleanTestData()
 }
 
 func TestDeleteFeaturePhase(t *testing.T) {
@@ -2582,6 +2908,232 @@ func TestGetBountiesByFeatureAndPhaseUuid(t *testing.T) {
 		http.HandlerFunc(fHandler.GetBountiesByFeatureAndPhaseUuid).ServeHTTP(rr, req)
 
 		assert.Equal(t, http.StatusNotFound, rr.Code)
+	})
+	t.Run("Valid Request with Bounties", func(t *testing.T) {
+		rctx := chi.NewRouteContext()
+		rctx.URLParams.Add("feature_uuid", feature.Uuid)
+		rctx.URLParams.Add("phase_uuid", featurePhase.Uuid)
+		req, err := http.NewRequestWithContext(context.WithValue(ctx, chi.RouteCtxKey, rctx),
+			http.MethodGet,
+			fmt.Sprintf("/features/%s/phase/%s/bounty", feature.Uuid, featurePhase.Uuid),
+			nil)
+		assert.NoError(t, err)
+
+		rr := httptest.NewRecorder()
+		http.HandlerFunc(fHandler.GetBountiesByFeatureAndPhaseUuid).ServeHTTP(rr, req)
+
+		var returnedBounties []db.BountyResponse
+		err = json.Unmarshal(rr.Body.Bytes(), &returnedBounties)
+		assert.NoError(t, err)
+		assert.Equal(t, http.StatusOK, rr.Code)
+		assert.NotEmpty(t, returnedBounties)
+	})
+
+	t.Run("Non-Existent Feature UUID", func(t *testing.T) {
+		nonExistentUUID := uuid.New().String()
+		rctx := chi.NewRouteContext()
+		rctx.URLParams.Add("feature_uuid", nonExistentUUID)
+		rctx.URLParams.Add("phase_uuid", featurePhase.Uuid)
+		req, err := http.NewRequestWithContext(context.WithValue(ctx, chi.RouteCtxKey, rctx),
+			http.MethodGet,
+			fmt.Sprintf("/features/%s/phase/%s/bounty", nonExistentUUID, featurePhase.Uuid),
+			nil)
+		assert.NoError(t, err)
+
+		rr := httptest.NewRecorder()
+		http.HandlerFunc(fHandler.GetBountiesByFeatureAndPhaseUuid).ServeHTTP(rr, req)
+
+		assert.Equal(t, http.StatusNotFound, rr.Code)
+	})
+
+	t.Run("Non-Existent Phase UUID", func(t *testing.T) {
+		nonExistentUUID := uuid.New().String()
+		rctx := chi.NewRouteContext()
+		rctx.URLParams.Add("feature_uuid", feature.Uuid)
+		rctx.URLParams.Add("phase_uuid", nonExistentUUID)
+		req, err := http.NewRequestWithContext(context.WithValue(ctx, chi.RouteCtxKey, rctx),
+			http.MethodGet,
+			fmt.Sprintf("/features/%s/phase/%s/bounty", feature.Uuid, nonExistentUUID),
+			nil)
+		assert.NoError(t, err)
+
+		rr := httptest.NewRecorder()
+		http.HandlerFunc(fHandler.GetBountiesByFeatureAndPhaseUuid).ServeHTTP(rr, req)
+
+		assert.Equal(t, http.StatusNotFound, rr.Code)
+	})
+
+	t.Run("Valid UUIDs but Different Case", func(t *testing.T) {
+		upperCaseFeatureUUID := strings.ToUpper(feature.Uuid)
+		upperCasePhaseUUID := strings.ToUpper(featurePhase.Uuid)
+
+		rctx := chi.NewRouteContext()
+		rctx.URLParams.Add("feature_uuid", upperCaseFeatureUUID)
+		rctx.URLParams.Add("phase_uuid", upperCasePhaseUUID)
+		req, err := http.NewRequestWithContext(context.WithValue(ctx, chi.RouteCtxKey, rctx),
+			http.MethodGet,
+			fmt.Sprintf("/features/%s/phase/%s/bounty", upperCaseFeatureUUID, upperCasePhaseUUID),
+			nil)
+		assert.NoError(t, err)
+
+		rr := httptest.NewRecorder()
+		http.HandlerFunc(fHandler.GetBountiesByFeatureAndPhaseUuid).ServeHTTP(rr, req)
+
+		assert.Equal(t, http.StatusNotFound, rr.Code)
+	})
+
+	t.Run("Malformed UUIDs", func(t *testing.T) {
+		malformedUUIDs := []string{
+			"not-a-uuid",
+			"123e4567-e89b-12d3-a456",
+			"123e4567-e89b-12d3-a456-426614174000-extra",
+			"123e4567-e89b-12d3-a456-42661417400g",
+		}
+
+		for _, malformedUUID := range malformedUUIDs {
+			t.Run(fmt.Sprintf("Malformed UUID: %s", malformedUUID), func(t *testing.T) {
+				rctx := chi.NewRouteContext()
+				rctx.URLParams.Add("feature_uuid", malformedUUID)
+				rctx.URLParams.Add("phase_uuid", malformedUUID)
+				req, err := http.NewRequestWithContext(context.WithValue(ctx, chi.RouteCtxKey, rctx),
+					http.MethodGet,
+					fmt.Sprintf("/features/%s/phase/%s/bounty", malformedUUID, malformedUUID),
+					nil)
+				assert.NoError(t, err)
+
+				rr := httptest.NewRecorder()
+				http.HandlerFunc(fHandler.GetBountiesByFeatureAndPhaseUuid).ServeHTTP(rr, req)
+
+				assert.Equal(t, http.StatusNotFound, rr.Code)
+			})
+		}
+	})
+
+	t.Run("Valid Request with No Bounties", func(t *testing.T) {
+
+		emptyFeature := db.WorkspaceFeatures{
+			Uuid:          uuid.New().String(),
+			WorkspaceUuid: workspace.Uuid,
+			Name:          "feature-without-bounties",
+		}
+		db.TestDB.CreateOrEditFeature(emptyFeature)
+
+		emptyPhase := db.FeaturePhase{
+			Uuid:        uuid.New().String(),
+			FeatureUuid: emptyFeature.Uuid,
+			Name:        "phase-without-bounties",
+		}
+		db.TestDB.CreateOrEditFeaturePhase(emptyPhase)
+
+		rctx := chi.NewRouteContext()
+		rctx.URLParams.Add("feature_uuid", emptyFeature.Uuid)
+		rctx.URLParams.Add("phase_uuid", emptyPhase.Uuid)
+		req, err := http.NewRequestWithContext(context.WithValue(ctx, chi.RouteCtxKey, rctx),
+			http.MethodGet,
+			fmt.Sprintf("/features/%s/phase/%s/bounty", emptyFeature.Uuid, emptyPhase.Uuid),
+			nil)
+		assert.NoError(t, err)
+
+		rr := httptest.NewRecorder()
+		http.HandlerFunc(fHandler.GetBountiesByFeatureAndPhaseUuid).ServeHTTP(rr, req)
+
+		assert.Equal(t, http.StatusNotFound, rr.Code)
+	})
+
+	t.Run("Empty Feature UUID", func(t *testing.T) {
+		rctx := chi.NewRouteContext()
+		rctx.URLParams.Add("feature_uuid", "")
+		rctx.URLParams.Add("phase_uuid", featurePhase.Uuid)
+		req, err := http.NewRequestWithContext(context.WithValue(ctx, chi.RouteCtxKey, rctx),
+			http.MethodGet,
+			"/features//phase/"+featurePhase.Uuid+"/bounty",
+			nil)
+		assert.NoError(t, err)
+
+		rr := httptest.NewRecorder()
+		http.HandlerFunc(fHandler.GetBountiesByFeatureAndPhaseUuid).ServeHTTP(rr, req)
+
+		assert.Equal(t, http.StatusNotFound, rr.Code)
+	})
+
+	t.Run("Empty Phase UUID", func(t *testing.T) {
+		rctx := chi.NewRouteContext()
+		rctx.URLParams.Add("feature_uuid", feature.Uuid)
+		rctx.URLParams.Add("phase_uuid", "")
+		req, err := http.NewRequestWithContext(context.WithValue(ctx, chi.RouteCtxKey, rctx),
+			http.MethodGet,
+			"/features/"+feature.Uuid+"/phase//bounty",
+			nil)
+		assert.NoError(t, err)
+
+		rr := httptest.NewRecorder()
+		http.HandlerFunc(fHandler.GetBountiesByFeatureAndPhaseUuid).ServeHTTP(rr, req)
+
+		assert.Equal(t, http.StatusNotFound, rr.Code)
+	})
+
+	t.Run("Unauthorized Access", func(t *testing.T) {
+
+		rctx := chi.NewRouteContext()
+		rctx.URLParams.Add("feature_uuid", feature.Uuid)
+		rctx.URLParams.Add("phase_uuid", featurePhase.Uuid)
+		req, err := http.NewRequestWithContext(context.WithValue(context.Background(), chi.RouteCtxKey, rctx),
+			http.MethodGet,
+			fmt.Sprintf("/features/%s/phase/%s/bounty", feature.Uuid, featurePhase.Uuid),
+			nil)
+		assert.NoError(t, err)
+
+		rr := httptest.NewRecorder()
+		http.HandlerFunc(fHandler.GetBountiesByFeatureAndPhaseUuid).ServeHTTP(rr, req)
+
+		assert.Equal(t, http.StatusUnauthorized, rr.Code)
+	})
+
+	t.Run("Invalid UUID Format", func(t *testing.T) {
+		invalidUUIDs := []struct {
+			name        string
+			featureUUID string
+			phaseUUID   string
+		}{
+			{
+				name:        "Invalid Feature UUID",
+				featureUUID: "invalid-uuid",
+				phaseUUID:   featurePhase.Uuid,
+			},
+			{
+				name:        "Invalid Phase UUID",
+				featureUUID: feature.Uuid,
+				phaseUUID:   "invalid-uuid",
+			},
+			{
+				name:        "Both Invalid UUIDs",
+				featureUUID: "invalid-uuid-1",
+				phaseUUID:   "invalid-uuid-2",
+			},
+			{
+				name:        "UUID with Special Characters",
+				featureUUID: "123e4567-e89b-12d3-a456-426614174000!",
+				phaseUUID:   "123e4567-e89b-12d3-a456-426614174000@",
+			},
+		}
+
+		for _, tc := range invalidUUIDs {
+			t.Run(tc.name, func(t *testing.T) {
+				rctx := chi.NewRouteContext()
+				rctx.URLParams.Add("feature_uuid", tc.featureUUID)
+				rctx.URLParams.Add("phase_uuid", tc.phaseUUID)
+				req, err := http.NewRequestWithContext(context.WithValue(ctx, chi.RouteCtxKey, rctx),
+					http.MethodGet,
+					fmt.Sprintf("/features/%s/phase/%s/bounty", tc.featureUUID, tc.phaseUUID),
+					nil)
+				assert.NoError(t, err)
+
+				rr := httptest.NewRecorder()
+				http.HandlerFunc(fHandler.GetBountiesByFeatureAndPhaseUuid).ServeHTTP(rr, req)
+
+				assert.Equal(t, http.StatusNotFound, rr.Code)
+			})
+		}
 	})
 }
 
@@ -4190,6 +4742,16 @@ func TestBriefSend(t *testing.T) {
 
 	db.CleanTestData()
 
+	person := db.Person{
+		Uuid:        uuid.New().String(),
+		OwnerAlias:  "test-alias",
+		UniqueName:  "test-unique-name",
+		OwnerPubKey: "test-pubkey",
+		PriceToMeet: 0,
+		Description: "test-description",
+	}
+	db.TestDB.CreateOrEditPerson(person)
+
 	fHandler := NewFeatureHandler(db.TestDB)
 
 	tests := []struct {
@@ -4207,7 +4769,7 @@ func TestBriefSend(t *testing.T) {
 		{
 			name:           "Valid Request with All Required Fields",
 			contextKey:     auth.ContextKey,
-			contextValue:   "validPubKey",
+			contextValue:   "test-pubkey",
 			body:           `{"audioLink":"link","featureUUID":"uuid","source":"source","examples":["example1"]}`,
 			envHost:        "http://localhost",
 			envSWWFKEY:     "validKey",
@@ -4217,7 +4779,7 @@ func TestBriefSend(t *testing.T) {
 		{
 			name:           "Empty JSON Body",
 			contextKey:     auth.ContextKey,
-			contextValue:   "validPubKey",
+			contextValue:   "test-pubkey",
 			body:           ``,
 			expectedStatus: http.StatusNotAcceptable,
 			expectedBody:   "Invalid JSON format\n",
@@ -4225,7 +4787,7 @@ func TestBriefSend(t *testing.T) {
 		{
 			name:           "Missing Required JSON Fields",
 			contextKey:     auth.ContextKey,
-			contextValue:   "validPubKey",
+			contextValue:   "test-pubkey",
 			body:           `{"audioLink":"link"}`,
 			envHost:        "http://localhost",
 			envSWWFKEY:     "",
@@ -4242,7 +4804,7 @@ func TestBriefSend(t *testing.T) {
 		{
 			name:           "Invalid JSON Format",
 			contextKey:     auth.ContextKey,
-			contextValue:   "validPubKey",
+			contextValue:   "test-pubkey",
 			body:           `{"audioLink":}`,
 			expectedStatus: http.StatusNotAcceptable,
 			expectedBody:   "Invalid JSON format\n",
@@ -4250,7 +4812,7 @@ func TestBriefSend(t *testing.T) {
 		{
 			name:           "Environment Variable HOST Not Set",
 			contextKey:     auth.ContextKey,
-			contextValue:   "validPubKey",
+			contextValue:   "test-pubkey",
 			body:           `{"audioLink":"link","featureUUID":"uuid","source":"source","examples":["example1"]}`,
 			envHost:        "",
 			envSWWFKEY:     "validKey",
@@ -4259,16 +4821,16 @@ func TestBriefSend(t *testing.T) {
 		{
 			name:           "Environment Variable SWWFKEY Not Set",
 			contextKey:     auth.ContextKey,
-			contextValue:   "validPubKey",
+			contextValue:   "test-pubkey",
 			body:           `{"audioLink":"link","featureUUID":"uuid","source":"source","examples":["example1"]}`,
 			envHost:        "",
 			envSWWFKEY:     "validKey",
 			expectedStatus: http.StatusNotAcceptable,
 		},
 		{
-			name:           "Stakwork API Request Creation Failure",
+			name:           "Stakwork the API Request Creation Failure",
 			contextKey:     auth.ContextKey,
-			contextValue:   "validPubKey",
+			contextValue:   "test-pubkey",
 			body:           `{"audioLink":"link","featureUUID":"uuid","source":"source","examples":["example1"]}`,
 			envHost:        "http://localhost",
 			envSWWFKEY:     "validKey",
@@ -4278,7 +4840,7 @@ func TestBriefSend(t *testing.T) {
 		{
 			name:           "Stakwork API Request Sending Failure",
 			contextKey:     auth.ContextKey,
-			contextValue:   "validPubKey",
+			contextValue:   "test-pubkey",
 			body:           `{"audioLink":"link","featureUUID":"uuid","source":"source","examples":["example1"]}`,
 			envHost:        "http://localhost",
 			envSWWFKEY:     "validKey",
@@ -4288,7 +4850,7 @@ func TestBriefSend(t *testing.T) {
 		{
 			name:           "Stakwork API Response Reading Failure",
 			contextKey:     auth.ContextKey,
-			contextValue:   "validPubKey",
+			contextValue:   "test-pubkey",
 			body:           `{"audioLink":"link","featureUUID":"uuid","source":"source","examples":["example1"]}`,
 			envHost:        "http://localhost",
 			envSWWFKEY:     "validKey",

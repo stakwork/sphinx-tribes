@@ -322,6 +322,14 @@ func (th *ticketHandler) PostTicketDataToStakwork(w http.ResponseWriter, r *http
 		return
 	}
 
+	user := th.db.GetPersonByPubkey(pubKeyFromAuth)
+
+	if user.OwnerPubKey != pubKeyFromAuth {
+		logger.Log.Info("Person not exists")
+		w.WriteHeader(http.StatusBadRequest)
+		return
+	}
+
 	body, err := io.ReadAll(r.Body)
 	if err != nil {
 		w.WriteHeader(http.StatusBadRequest)
@@ -479,6 +487,7 @@ func (th *ticketHandler) PostTicketDataToStakwork(w http.ResponseWriter, r *http
 						"webhook_url":       webhookURL,
 						"phaseSchematic":    schematicURL,
 						"codeGraph":         codeGraphURL,
+						"alias":             user.OwnerAlias,
 					},
 				},
 			},

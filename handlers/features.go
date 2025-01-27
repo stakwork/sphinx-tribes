@@ -27,6 +27,7 @@ type PostData struct {
 	Examples     []string `json:"examples"`
 	WebhookURL   string   `json:"webhook_url"`
 	FeatureUUID  string   `json:"featureUUID"`
+	Alias        string   `json:"alias"`
 }
 
 type FeatureBriefRequest struct {
@@ -343,6 +344,13 @@ func (oh *featureHandler) GetFeaturePhaseByUUID(w http.ResponseWriter, r *http.R
 		return
 	}
 
+	person := oh.db.GetPersonByPubkey(pubKeyFromAuth)
+	if person.OwnerPubKey != pubKeyFromAuth {
+		logger.Log.Info("Invalid pubkey from auth")
+		w.WriteHeader(http.StatusUnauthorized)
+		return
+	}
+
 	featureUuid := chi.URLParam(r, "feature_uuid")
 	phaseUuid := chi.URLParam(r, "phase_uuid")
 
@@ -585,6 +593,22 @@ func (oh *featureHandler) GetFeatureStories(w http.ResponseWriter, r *http.Reque
 
 func (oh *featureHandler) StoriesSend(w http.ResponseWriter, r *http.Request) {
 
+	ctx := r.Context()
+	pubKeyFromAuth, _ := ctx.Value(auth.ContextKey).(string)
+	if pubKeyFromAuth == "" {
+		logger.Log.Info("no pubkey from auth")
+		w.WriteHeader(http.StatusUnauthorized)
+		return
+	}
+
+	user := oh.db.GetPersonByPubkey(pubKeyFromAuth)
+
+	if user.OwnerPubKey != pubKeyFromAuth {
+		logger.Log.Info("Person not exists")
+		w.WriteHeader(http.StatusBadRequest)
+		return
+	}
+
 	body, err := io.ReadAll(r.Body)
 	r.Body.Close()
 	if err != nil {
@@ -605,6 +629,8 @@ func (oh *featureHandler) StoriesSend(w http.ResponseWriter, r *http.Request) {
 		panic("API key not set in environment")
 		return
 	}
+
+	postData.Alias = user.OwnerAlias
 
 	stakworkPayload := map[string]interface{}{
 		"name":        "string",
@@ -659,6 +685,14 @@ func (oh *featureHandler) BriefSend(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	user := oh.db.GetPersonByPubkey(pubKeyFromAuth)
+
+	if user.OwnerPubKey != pubKeyFromAuth {
+		logger.Log.Info("Person not exists")
+		w.WriteHeader(http.StatusBadRequest)
+		return
+	}
+
 	body, err := io.ReadAll(r.Body)
 	r.Body.Close()
 	if err != nil {
@@ -684,9 +718,11 @@ func (oh *featureHandler) BriefSend(w http.ResponseWriter, r *http.Request) {
 	completePostData := struct {
 		AudioBriefPostData
 		WebhookURL string `json:"webhook_url"`
+		Alias      string `json:"alias"`
 	}{
 		AudioBriefPostData: postData,
 		WebhookURL:         fmt.Sprintf("%s/feature/brief", host),
+		Alias:              user.OwnerAlias,
 	}
 
 	apiKey := os.Getenv("SWWFKEY")
