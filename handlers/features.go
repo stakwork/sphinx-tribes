@@ -343,6 +343,13 @@ func (oh *featureHandler) GetFeaturePhaseByUUID(w http.ResponseWriter, r *http.R
 		return
 	}
 
+	person := oh.db.GetPersonByPubkey(pubKeyFromAuth)
+	if person.OwnerPubKey != pubKeyFromAuth {
+		logger.Log.Info("Invalid pubkey from auth")
+		w.WriteHeader(http.StatusUnauthorized)
+		return
+	}
+
 	featureUuid := chi.URLParam(r, "feature_uuid")
 	phaseUuid := chi.URLParam(r, "phase_uuid")
 
