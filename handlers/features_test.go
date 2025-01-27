@@ -4787,7 +4787,7 @@ func TestBriefSend(t *testing.T) {
 			expectedBody:   "{\"success\":false,\"error\":{\"message\":\"Unauthorized\"}}",
 		},
 		{
-			name:           "Stakwork API Request Sending Failure",
+			name:           "Stakwork the API Request Sending Failure",
 			contextKey:     auth.ContextKey,
 			contextValue:   "test-pubkey",
 			body:           `{"audioLink":"link","featureUUID":"uuid","source":"source","examples":["example1"]}`,
