@@ -4777,7 +4777,7 @@ func TestBriefSend(t *testing.T) {
 			expectedStatus: http.StatusNotAcceptable,
 		},
 		{
-			name:           "Stakwork API Request Creation Failure",
+			name:           "Stakwork the API Request Creation Failure",
 			contextKey:     auth.ContextKey,
 			contextValue:   "test-pubkey",
 			body:           `{"audioLink":"link","featureUUID":"uuid","source":"source","examples":["example1"]}`,
