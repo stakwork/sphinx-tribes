@@ -13220,3 +13220,368 @@ func (_c *Database_DeleteSnippet_Call) RunAndReturn(run func(uint) error) *Datab
 	_c.Call.Return(run)
 	return _c
 }
+
+
+// CreateFileAsset provides a mock function with given fields: asset
+func (_m *Database) CreateFileAsset(asset *db.FileAsset) (*db.FileAsset, error) {
+	ret := _m.Called(asset)
+
+	if len(ret) == 0 {
+		panic("no return value specified for CreateFileAsset")
+	}
+
+	var r0 *db.FileAsset
+	var r1 error
+	if rf, ok := ret.Get(0).(func(*db.FileAsset) (*db.FileAsset, error)); ok {
+		return rf(asset)
+	}
+	if rf, ok := ret.Get(0).(func(*db.FileAsset) *db.FileAsset); ok {
+		r0 = rf(asset)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(*db.FileAsset)
+		}
+	}
+
+	if rf, ok := ret.Get(1).(func(*db.FileAsset) error); ok {
+		r1 = rf(asset)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
+type Database_CreateFileAsset_Call struct {
+	*mock.Call
+}
+
+
+func (_e *Database_Expecter) CreateFileAsset(asset interface{}) *Database_CreateFileAsset_Call {
+	return &Database_CreateFileAsset_Call{Call: _e.mock.On("CreateFileAsset", asset)}
+}
+
+func (_c *Database_CreateFileAsset_Call) Run(run func(asset *db.FileAsset)) *Database_CreateFileAsset_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(*db.FileAsset))
+	})
+	return _c
+}
+
+func (_c *Database_CreateFileAsset_Call) Return(_a0 *db.FileAsset, _a1 error) *Database_CreateFileAsset_Call {
+	_c.Call.Return(_a0, _a1)
+	return _c
+}
+
+func (_c *Database_CreateFileAsset_Call) RunAndReturn(run func(*db.FileAsset) (*db.FileAsset, error)) *Database_CreateFileAsset_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
+
+// GetFileAssetByHash provides a mock function with given fields: fileHash
+func (_m *Database) GetFileAssetByHash(fileHash string) (*db.FileAsset, error) {
+	ret := _m.Called(fileHash)
+
+	if len(ret) == 0 {
+		panic("no return value specified for GetFileAssetByHash")
+	}
+
+	var r0 *db.FileAsset
+	var r1 error
+	if rf, ok := ret.Get(0).(func(string) (*db.FileAsset, error)); ok {
+		return rf(fileHash)
+	}
+	if rf, ok := ret.Get(0).(func(string) *db.FileAsset); ok {
+		r0 = rf(fileHash)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(*db.FileAsset)
+		}
+	}
+
+	if rf, ok := ret.Get(1).(func(string) error); ok {
+		r1 = rf(fileHash)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
+type Database_GetFileAssetByHash_Call struct {
+	*mock.Call
+}
+
+func (_e *Database_Expecter) GetFileAssetByHash(fileHash interface{}) *Database_GetFileAssetByHash_Call {
+	return &Database_GetFileAssetByHash_Call{Call: _e.mock.On("GetFileAssetByHash", fileHash)}
+}
+
+func (_c *Database_GetFileAssetByHash_Call) Run(run func(fileHash string)) *Database_GetFileAssetByHash_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(string))
+	})
+	return _c
+}
+
+func (_c *Database_GetFileAssetByHash_Call) Return(_a0 *db.FileAsset, _a1 error) *Database_GetFileAssetByHash_Call {
+	_c.Call.Return(_a0, _a1)
+	return _c
+}
+
+func (_c *Database_GetFileAssetByHash_Call) RunAndReturn(run func(string) (*db.FileAsset, error)) *Database_GetFileAssetByHash_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
+
+// GetFileAssetByID provides a mock function with given fields: id
+func (_m *Database) GetFileAssetByID(id uint) (*db.FileAsset, error) {
+	ret := _m.Called(id)
+
+	if len(ret) == 0 {
+		panic("no return value specified for GetFileAssetByID")
+	}
+
+	var r0 *db.FileAsset
+	var r1 error
+	if rf, ok := ret.Get(0).(func(uint) (*db.FileAsset, error)); ok {
+		return rf(id)
+	}
+	if rf, ok := ret.Get(0).(func(uint) *db.FileAsset); ok {
+		r0 = rf(id)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(*db.FileAsset)
+		}
+	}
+
+	if rf, ok := ret.Get(1).(func(uint) error); ok {
+		r1 = rf(id)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
+type Database_GetFileAssetByID_Call struct {
+	*mock.Call
+}
+
+func (_e *Database_Expecter) GetFileAssetByID(id interface{}) *Database_GetFileAssetByID_Call {
+	return &Database_GetFileAssetByID_Call{Call: _e.mock.On("GetFileAssetByID", id)}
+}
+
+func (_c *Database_GetFileAssetByID_Call) Run(run func(id uint)) *Database_GetFileAssetByID_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(uint))
+	})
+	return _c
+}
+
+func (_c *Database_GetFileAssetByID_Call) Return(_a0 *db.FileAsset, _a1 error) *Database_GetFileAssetByID_Call {
+	_c.Call.Return(_a0, _a1)
+	return _c
+}
+
+func (_c *Database_GetFileAssetByID_Call) RunAndReturn(run func(uint) (*db.FileAsset, error)) *Database_GetFileAssetByID_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
+
+// UpdateFileAssetReference provides a mock function with given fields: id
+func (_m *Database) UpdateFileAssetReference(id uint) error {
+	ret := _m.Called(id)
+
+	if len(ret) == 0 {
+		panic("no return value specified for UpdateFileAssetReference")
+	}
+
+	var r0 error
+	if rf, ok := ret.Get(0).(func(uint) error); ok {
+		r0 = rf(id)
+	} else {
+		r0 = ret.Error(0)
+	}
+
+	return r0
+}
+
+type Database_UpdateFileAssetReference_Call struct {
+	*mock.Call
+}
+
+func (_e *Database_Expecter) UpdateFileAssetReference(id interface{}) *Database_UpdateFileAssetReference_Call {
+	return &Database_UpdateFileAssetReference_Call{Call: _e.mock.On("UpdateFileAssetReference", id)}
+}
+
+func (_c *Database_UpdateFileAssetReference_Call) Run(run func(id uint)) *Database_UpdateFileAssetReference_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(uint))
+	})
+	return _c
+}
+
+func (_c *Database_UpdateFileAssetReference_Call) Return(_a0 error) *Database_UpdateFileAssetReference_Call {
+	_c.Call.Return(_a0)
+	return _c
+}
+
+func (_c *Database_UpdateFileAssetReference_Call) RunAndReturn(run func(uint) error) *Database_UpdateFileAssetReference_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
+
+// ListFileAssets provides a mock function with given fields: params
+func (_m *Database) ListFileAssets(params db.ListFileAssetsParams) ([]db.FileAsset, int64, error) {
+	ret := _m.Called(params)
+
+	if len(ret) == 0 {
+		panic("no return value specified for ListFileAssets")
+	}
+
+	var r0 []db.FileAsset
+	var r1 int64
+	var r2 error
+	if rf, ok := ret.Get(0).(func(db.ListFileAssetsParams) ([]db.FileAsset, int64, error)); ok {
+		return rf(params)
+	}
+	if rf, ok := ret.Get(0).(func(db.ListFileAssetsParams) []db.FileAsset); ok {
+		r0 = rf(params)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).([]db.FileAsset)
+		}
+	}
+
+	if rf, ok := ret.Get(1).(func(db.ListFileAssetsParams) int64); ok {
+		r1 = rf(params)
+	} else {
+		r1 = ret.Get(1).(int64)
+	}
+
+	if rf, ok := ret.Get(2).(func(db.ListFileAssetsParams) error); ok {
+		r2 = rf(params)
+	} else {
+		r2 = ret.Error(2)
+	}
+
+	return r0, r1, r2
+}
+
+type Database_ListFileAssets_Call struct {
+	*mock.Call
+}
+
+func (_e *Database_Expecter) ListFileAssets(params interface{}) *Database_ListFileAssets_Call {
+	return &Database_ListFileAssets_Call{Call: _e.mock.On("ListFileAssets", params)}
+}
+
+func (_c *Database_ListFileAssets_Call) Run(run func(params db.ListFileAssetsParams)) *Database_ListFileAssets_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(db.ListFileAssetsParams))
+	})
+	return _c
+}
+
+func (_c *Database_ListFileAssets_Call) Return(_a0 []db.FileAsset, _a1 int64, _a2 error) *Database_ListFileAssets_Call {
+	_c.Call.Return(_a0, _a1, _a2)
+	return _c
+}
+
+func (_c *Database_ListFileAssets_Call) RunAndReturn(run func(db.ListFileAssetsParams) ([]db.FileAsset, int64, error)) *Database_ListFileAssets_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
+
+// UpdateFileAsset provides a mock function with given fields: asset
+func (_m *Database) UpdateFileAsset(asset *db.FileAsset) error {
+	ret := _m.Called(asset)
+
+	if len(ret) == 0 {
+		panic("no return value specified for UpdateFileAsset")
+	}
+
+	var r0 error
+	if rf, ok := ret.Get(0).(func(*db.FileAsset) error); ok {
+		r0 = rf(asset)
+	} else {
+		r0 = ret.Error(0)
+	}
+
+	return r0
+}
+
+type Database_UpdateFileAsset_Call struct {
+	*mock.Call
+}
+
+func (_e *Database_Expecter) UpdateFileAsset(asset interface{}) *Database_UpdateFileAsset_Call {
+	return &Database_UpdateFileAsset_Call{Call: _e.mock.On("UpdateFileAsset", asset)}
+}
+
+func (_c *Database_UpdateFileAsset_Call) Run(run func(asset *db.FileAsset)) *Database_UpdateFileAsset_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(*db.FileAsset))
+	})
+	return _c
+}
+
+func (_c *Database_UpdateFileAsset_Call) Return(_a0 error) *Database_UpdateFileAsset_Call {
+	_c.Call.Return(_a0)
+	return _c
+}
+
+func (_c *Database_UpdateFileAsset_Call) RunAndReturn(run func(*db.FileAsset) error) *Database_UpdateFileAsset_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
+
+// DeleteFileAsset provides a mock function with given fields: id
+func (_m *Database) DeleteFileAsset(id uint) error {
+	ret := _m.Called(id)
+
+	if len(ret) == 0 {
+		panic("no return value specified for DeleteFileAsset")
+	}
+
+	var r0 error
+	if rf, ok := ret.Get(0).(func(uint) error); ok {
+		r0 = rf(id)
+	} else {
+		r0 = ret.Error(0)
+	}
+
+	return r0
+}
+
+type Database_DeleteFileAsset_Call struct {
+	*mock.Call
+}
+
+func (_e *Database_Expecter) DeleteFileAsset(id interface{}) *Database_DeleteFileAsset_Call {
+	return &Database_DeleteFileAsset_Call{Call: _e.mock.On("DeleteFileAsset", id)}
+}
+
+func (_c *Database_DeleteFileAsset_Call) Run(run func(id uint)) *Database_DeleteFileAsset_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(uint))
+	})
+	return _c
+}
+
+func (_c *Database_DeleteFileAsset_Call) Return(_a0 error) *Database_DeleteFileAsset_Call {
+	_c.Call.Return(_a0)
+	return _c
+}
+
+func (_c *Database_DeleteFileAsset_Call) RunAndReturn(run func(uint) error) *Database_DeleteFileAsset_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
