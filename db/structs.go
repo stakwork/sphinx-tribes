@@ -1215,6 +1215,43 @@ type TextSnippet struct {
 	LastEdited    time.Time `json:"last_edited" gorm:"autoUpdateTime"`
 }
 
+type FileStatus string
+
+const (
+	ActiveFileStatus   FileStatus = "active"
+	ArchivedFileStatus FileStatus = "archived"
+	DeletedFileStatus  FileStatus = "deleted"
+)
+
+type FileAsset struct {
+	ID             uint       `json:"id" gorm:"primaryKey;autoIncrement"`
+	OriginFilename string     `json:"originFilename"`
+	FileHash       string     `json:"fileHash" gorm:"index"`
+	UploadFilename string     `json:"uploadFilename" gorm:"uniqueIndex"`
+	UploadTime     time.Time  `json:"uploadTime"`
+	LastReferenced time.Time  `json:"lastReferenced"`
+	FileSize       int64      `json:"fileSize"`
+	MimeType       string     `json:"mimeType"`
+	Status         FileStatus `json:"status" gorm:"type:varchar(20);default:'active'"`
+	UploadedBy     string     `json:"uploadedBy"`
+	StoragePath    string     `json:"storagePath"`
+	WorkspaceID    string     `json:"workspaceId" gorm:"index"`
+	CreatedAt      time.Time  `json:"createdAt"`
+	UpdatedAt      time.Time  `json:"updatedAt"`
+	DeletedAt      *time.Time `json:"deletedAt,omitempty" gorm:"index"`
+}
+
+type ListFileAssetsParams struct {
+	Status             *FileStatus `form:"status"`
+	MimeType           *string     `form:"mimeType"`
+	BeforeDate         *time.Time  `form:"beforeDate"`
+	AfterDate          *time.Time  `form:"afterDate"`
+	LastAccessedBefore *time.Time  `form:"lastAccessedBefore"`
+	WorkspaceID        *string     `form:"workspaceId"`
+	Page               int         `form:"page,default=1"`
+	PageSize           int         `form:"pageSize,default=50"`
+}
+
 func (Person) TableName() string {
 	return "people"
 }
