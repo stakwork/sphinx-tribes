@@ -121,7 +121,7 @@ func TestCreateOrEditTicket(t *testing.T) {
 	})
 
 	// shpuld create a ticket if all fields are provided
-	t.Run("should create a ticket if the all fields are provided", func(t *testing.T) {
+	t.Run("should create a ticket if all fields are provided", func(t *testing.T) {
 
 		_, err := TestDB.CreateOrEditTicket(&ticket)
 		if err != nil {
