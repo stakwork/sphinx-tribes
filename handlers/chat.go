@@ -17,6 +17,9 @@ import (
 	"strings"
 	"time"
 
+	"github.com/stakwork/sphinx-tribes/auth"
+	"github.com/stakwork/sphinx-tribes/logger"
+
 	"github.com/google/uuid"
 	"github.com/rs/xid"
 	"github.com/stakwork/sphinx-tribes/websocket"
@@ -222,6 +225,22 @@ func (ch *ChatHandler) ArchiveChat(w http.ResponseWriter, r *http.Request) {
 
 func (ch *ChatHandler) SendMessage(w http.ResponseWriter, r *http.Request) {
 
+	ctx := r.Context()
+	pubKeyFromAuth, _ := ctx.Value(auth.ContextKey).(string)
+	if pubKeyFromAuth == "" {
+		logger.Log.Info("no pubkey from auth")
+		w.WriteHeader(http.StatusUnauthorized)
+		return
+	}
+
+	user := ch.db.GetPersonByPubkey(pubKeyFromAuth)
+
+	if user.OwnerPubKey != pubKeyFromAuth {
+		logger.Log.Info("Person not exists")
+		w.WriteHeader(http.StatusBadRequest)
+		return
+	}
+
 	var request struct {
 		ChatID      string `json:"chat_id"`
 		Message     string `json:"message"`
@@ -319,6 +338,7 @@ func (ch *ChatHandler) SendMessage(w http.ResponseWriter, r *http.Request) {
 						"contextTags":       context,
 						"sourceWebsocketId": request.SourceWebsocketID,
 						"webhook_url":       fmt.Sprintf("%s/hivechat/response", os.Getenv("HOST")),
+						"alias":             user.OwnerAlias,
 					},
 				},
 			},
