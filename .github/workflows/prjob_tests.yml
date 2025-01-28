@@ -45,7 +45,8 @@ jobs:
         run: sudo V2_BOT_URL=http://localhost:3005 V2_BOT_TOKEN=xyzxyzxyz go test ./... -race -v -coverprofile=coverage.out && ./cover-check.sh coverage.out 8.4
 
       - name: Show Coverage Summary
-        run: sudo go tool cover -func=coverage.out
+        run: |
+          sudo go tool cover -func=coverage.out
 
       - name: Droping DB with docker compose
         run: docker compose -f ./docker/testdb-docker-compose.yml -p test_db down
