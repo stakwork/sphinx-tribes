@@ -43,8 +43,8 @@ jobs:
 
       - name: Run Tests with Race Detector and Generate Coverage (Excluding Mocks)
         run: |
-          PKGS=$(go list ./... | grep -v '/mocks' | tr '\n' ',')
-          TEST_PKGS=$(go list ./... | grep -v '/mocks')
+          PKGS=$(sudo go list ./... | grep -v '/mocks' | tr '\n' ',')
+          TEST_PKGS=$(sudo go list ./... | grep -v '/mocks')
 
           sudo V2_BOT_URL=http://localhost:3005 V2_BOT_TOKEN=xyzxyzxyz go test -race -coverprofile=coverage.out -coverpkg=$PKGS $TEST_PKGS
 
