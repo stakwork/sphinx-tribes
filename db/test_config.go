@@ -98,16 +98,18 @@ func DeleteAllChats() {
 	TestDB.db.Exec("DELETE FROM chats")
 }
 
+func DeleteAllBounties() {
+	TestDB.db.Exec("DELETE FROM bounty")
+}
+
 func CleanTestData() {
-	TestDB.db.Exec("DELETE FROM bounties")
+	TestDB.db.Exec("DELETE FROM bounty")
 
 	TestDB.db.Exec("DELETE FROM workspaces")
 
 	TestDB.db.Exec("DELETE FROM workspace_features")
 
 	TestDB.db.Exec("DELETE FROM feature_phases")
-
-	TestDB.db.Exec("DELETE FROM feature_stories")
 
 	TestDB.db.Exec("DELETE FROM people")
 
