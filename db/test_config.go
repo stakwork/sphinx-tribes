@@ -79,6 +79,8 @@ func InitTestDB() {
 	db.AutoMigrate(&Bounty{})
 	db.AutoMigrate(&Notification{})
 	db.AutoMigrate(&BountyTiming{})
+	db.AutoMigrate(&FileAsset{})
+	db.AutoMigrate(&TextSnippet{})
 
 	people := TestDB.GetAllPeople()
 	for _, p := range people {
