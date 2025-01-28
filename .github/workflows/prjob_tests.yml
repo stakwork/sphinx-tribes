@@ -46,7 +46,7 @@ jobs:
 
       - name: Run Tests with Race Detector and Generate Coverage
         run: |
-          sudo PKGS=$(go list ./... | grep -v /mocks | tr '\n' ',')
+          PKGS=$(go list ./... | grep -v /mocks | tr '\n' ',')
           sudo V2_BOT_URL=http://localhost:3005 V2_BOT_TOKEN=xyzxyzxyz go test -race -coverprofile=coverage.out -coverpkg=$PKGS ./...
 
       - name: Show Coverage Summary
