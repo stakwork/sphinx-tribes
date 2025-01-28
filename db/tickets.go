@@ -361,3 +361,14 @@ func (db database) DeleteWorkspaceDraftTicket(workspaceUuid string, uuid string)
 
 	return nil
 }
+
+func (db database) DeleteTicketGroup(TicketGroupUUID uuid.UUID) error {
+	result := db.db.Where("ticket_group = ?", TicketGroupUUID).Delete(&Tickets{})
+	if result.Error != nil {
+		return fmt.Errorf("failed to delete ticket group: %w", result.Error)
+	}
+	if result.RowsAffected == 0 {
+		return errors.New("no tickets found in group")
+	}
+	return nil
+}

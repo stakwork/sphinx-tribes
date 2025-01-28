@@ -515,6 +515,47 @@ func TestTicketToBounty(t *testing.T) {
 	createdTicket, err := db.TestDB.UpdateTicket(ticket)
 	require.NoError(t, err)
 
+	groupUUID := uuid.New()
+	tickets := []db.Tickets{
+		{
+			UUID:        uuid.New(),
+			TicketGroup: &groupUUID,
+			FeatureUUID: feature.Uuid,
+			PhaseUUID:   phase.Uuid,
+			Name:        "Test Ticket v1",
+			Description: "Test Description v1",
+			Status:      db.DraftTicket,
+			Version:     1,
+		},
+		{
+			UUID:        uuid.New(),
+			TicketGroup: &groupUUID,
+			FeatureUUID: feature.Uuid,
+			PhaseUUID:   phase.Uuid,
+			Name:        "Test Ticket v2",
+			Description: "Test Description v2",
+			Status:      db.DraftTicket,
+			Version:     2,
+		},
+		{
+			UUID:        uuid.New(),
+			TicketGroup: &groupUUID,
+			FeatureUUID: feature.Uuid,
+			PhaseUUID:   phase.Uuid,
+			Name:        "Test Ticket Final",
+			Description: "Test Description Final",
+			Status:      db.DraftTicket,
+			Version:     3,
+		},
+	}
+
+	var latestTicket db.Tickets
+	for _, ticket := range tickets {
+		var err error
+		latestTicket, err = db.TestDB.UpdateTicket(ticket)
+		require.NoError(t, err)
+	}
+
 	tests := []struct {
 		name     string
 		ticket   string
@@ -541,8 +582,8 @@ func TestTicketToBounty(t *testing.T) {
 			wantCode: http.StatusNotFound,
 		},
 		{
-			name:     "success - creates bounty from ticket and deletes ticket",
-			ticket:   createdTicket.UUID.String(),
+			name:     "success - creates bounty and deletes all ticket versions",
+			ticket:   latestTicket.UUID.String(),
 			auth:     workspace.OwnerPubKey,
 			wantCode: http.StatusCreated,
 			validate: func(t *testing.T, rr *httptest.ResponseRecorder) {
@@ -555,17 +596,24 @@ func TestTicketToBounty(t *testing.T) {
 
 				// Verify bounty was created correctly
 				bounty := db.TestDB.GetBounty(resp.BountyID)
-				assert.Equal(t, createdTicket.Name, bounty.Title)
-				assert.Equal(t, createdTicket.Description, bounty.Description)
-				assert.Equal(t, createdTicket.PhaseUUID, bounty.PhaseUuid)
+				assert.Equal(t, latestTicket.Name, bounty.Title)
+				assert.Equal(t, latestTicket.Description, bounty.Description)
+				assert.Equal(t, latestTicket.PhaseUUID, bounty.PhaseUuid)
 				assert.Equal(t, "freelance_job_request", bounty.Type)
 				assert.Equal(t, uint(21), bounty.Price)
 				assert.True(t, bounty.Show)
 
-				// Verify ticket was deleted
-				_, err := db.TestDB.GetTicket(createdTicket.UUID.String())
-				assert.Error(t, err)
-				assert.Equal(t, "ticket not found", err.Error())
+				// Verify all ticket versions are deleted
+				for _, ticket := range tickets {
+					_, err := db.TestDB.GetTicket(ticket.UUID.String())
+					assert.Error(t, err)
+					assert.Equal(t, "ticket not found", err.Error())
+				}
+
+				// Verify getting tickets by group returns no results
+				groupTickets, err := db.TestDB.GetTicketsByGroup(groupUUID.String())
+				assert.NoError(t, err)
+				assert.Empty(t, groupTickets)
 			},
 		},
 	}
