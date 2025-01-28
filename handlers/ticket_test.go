@@ -694,8 +694,10 @@ func TestTicketToBountyConversionAndEditing(t *testing.T) {
 	require.NoError(t, err)
 
 	ticketUUID := uuid.New()
+	groupUUID := uuid.New()
 	ticket := db.Tickets{
 		UUID:        ticketUUID,
+		TicketGroup: &groupUUID,
 		FeatureUUID: feature.Uuid,
 		PhaseUUID:   phase.Uuid,
 		Name:        "Test Ticket",
