@@ -12,7 +12,7 @@ import (
 )
 
 func TestRolesCheck_UserHasRole(t *testing.T) {
-	// Mock user roles
+	// Mock user
 	userRoles := []WorkspaceUserRoles{
 		{Role: "ADD BOUNTY", OwnerPubKey: "user1", WorkspaceUuid: "org1", Created: &time.Time{}},
 	}
