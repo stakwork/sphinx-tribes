@@ -41,13 +41,12 @@ jobs:
       - name: Install cover
         run: go get golang.org/x/tools/cmd/cover
 
-      # - name: Run Tests and Generate Coverage
-      #   run: sudo V2_BOT_URL=http://localhost:3005 V2_BOT_TOKEN=xyzxyzxyz go test ./... -race -v -coverprofile=coverage.out && ./cover-check.sh coverage.out 8.4
-
-      - name: Run Tests with Race Detector and Generate Coverage
+      - name: Run Tests with Race Detector and Generate Coverage (Excluding Mocks)
         run: |
-          PKGS=$(go list ./... | grep -v /mocks | tr '\n' ',')
-          sudo V2_BOT_URL=http://localhost:3005 V2_BOT_TOKEN=xyzxyzxyz go test -race -coverprofile=coverage.out -coverpkg=$PKGS ./...
+          PKGS=$(go list ./... | grep -v '/mocks' | tr '\n' ',')
+          TEST_PKGS=$(go list ./... | grep -v '/mocks')
+
+          sudo V2_BOT_URL=http://localhost:3005 V2_BOT_TOKEN=xyzxyzxyz go test -race -coverprofile=coverage.out -coverpkg=$PKGS $TEST_PKGS
 
       - name: Show Coverage Summary
         run: |
