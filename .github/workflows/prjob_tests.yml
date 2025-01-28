@@ -42,7 +42,7 @@ jobs:
         run: go get golang.org/x/tools/cmd/cover
 
       - name: Tests
-        run: sudo V2_BOT_URL=http://localhost:3005 V2_BOT_TOKEN=xyzxyzxyz go test -coverprofile=coverage.out $(sudo go list ./... | grep -v /mocks)
+        run: sudo V2_BOT_URL=http://localhost:3005 V2_BOT_TOKEN=xyzxyzxyz go test -coverprofile=coverage.out $(go list ./... | grep -v /mocks)
 
       - name: Show Coverage Summary
         run: |
