@@ -41,8 +41,8 @@ jobs:
       - name: Install cover
         run: go get golang.org/x/tools/cmd/cover
 
-      - name: Tests
-        run: sudo V2_BOT_URL=http://localhost:3005 V2_BOT_TOKEN=xyzxyzxyz go test -coverprofile=coverage.out $(go list ./... | grep -v /mocks)
+      - name: Run Tests and Generate Coverage
+        run: sudo V2_BOT_URL=http://localhost:3005 V2_BOT_TOKEN=xyzxyzxyz go test ./... -race -v -coverprofile=coverage.out && ./cover-check.sh coverage.out 8.4
 
       - name: Show Coverage Summary
         run: |

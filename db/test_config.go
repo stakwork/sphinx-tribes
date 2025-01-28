@@ -13,7 +13,7 @@ var TestDB database
 
 func InitTestDB() {
 	rdsHost := "localhost"
-	rdsPort := fmt.Sprintf("%d", 5532)
+	rdsPort := fmt.Sprintf("%d", 5432)
 	rdsDbName := "test_db"
 	rdsUsername := "test_user"
 	rdsPassword := "test_password"
