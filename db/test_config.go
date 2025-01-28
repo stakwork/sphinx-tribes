@@ -102,6 +102,10 @@ func DeleteAllBounties() {
 	TestDB.db.Exec("DELETE FROM bounty")
 }
 
+func DeleteAllFeatureStories() {
+	TestDB.db.Exec("DELETE FROM feature_stories")
+}
+
 func CleanTestData() {
 	TestDB.db.Exec("DELETE FROM bounty")
 

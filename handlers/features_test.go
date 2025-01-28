@@ -3692,7 +3692,8 @@ func TestGetFeatureStories(t *testing.T) {
 
 	t.Run("Should not add user stories if stories array is empty", func(t *testing.T) {
 
-		db.CleanTestData()
+		db.DeleteAllFeatureStories()
+
 		db.TestDB.CreateOrEditPerson(person)
 		db.TestDB.CreateOrEditWorkspace(workspace)
 		db.TestDB.CreateOrEditFeature(feature)
