@@ -1805,9 +1805,14 @@ func (h *bountyHandler) UpdateProofStatus(w http.ResponseWriter, r *http.Request
 			return
 		}
 
-		if err := h.db.UpdateBountyTimingOnProof(id); err != nil {
-			http.Error(w, "Failed to update timing", http.StatusInternalServerError)
-			return
+		_, err = h.db.GetBountyTiming(id)
+		if err == nil {
+			if err := h.db.UpdateBountyTimingOnProof(id); err != nil {
+				http.Error(w, "Failed to update timing", http.StatusInternalServerError)
+				return
+			}
+		} else {
+			logger.Log.Error(fmt.Sprintf("No bounty timing found for bounty ID %d: %v", id, err))
 		}
 	}
 
