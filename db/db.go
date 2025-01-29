@@ -2086,3 +2086,16 @@ func (db database) UpdateFeaturedBounty(bountyID string, bounty FeaturedBounty) 
 func (db database) DeleteFeaturedBounty(bountyID string) error {
 	return db.db.Where("bounty_id = ?", bountyID).Delete(&FeaturedBounty{}).Error
 }
+
+func (db database) DeleteBountyTiming(bountyID uint) error {
+	result := db.db.Where("bounty_id = ?", bountyID).Delete(&BountyTiming{})
+	if result.Error != nil {
+		return fmt.Errorf("failed to delete bounty timing: %w", result.Error)
+	}
+
+	if result.RowsAffected == 0 {
+		return fmt.Errorf("no timing record found for bounty %d", bountyID)
+	}
+
+	return nil
+}

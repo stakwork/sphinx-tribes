@@ -2095,3 +2095,29 @@ func (h *bountyHandler) DeleteFeaturedBounty(w http.ResponseWriter, r *http.Requ
 
 	w.WriteHeader(http.StatusNoContent)
 }
+
+func (h *bountyHandler) DeleteBountyTiming(w http.ResponseWriter, r *http.Request) {
+	bountyID := chi.URLParam(r, "id")
+	id, err := utils.ConvertStringToUint(bountyID)
+	if err != nil {
+		http.Error(w, "Invalid bounty ID", http.StatusBadRequest)
+		return
+	}
+
+	_, err = h.db.GetBountyTiming(id)
+	if err != nil {
+		logger.Log.Error(fmt.Sprintf("No bounty timing found for bounty ID %d: %v", id, err))
+		w.WriteHeader(http.StatusNotFound)
+		json.NewEncoder(w).Encode(map[string]string{"error": "No timing record found"})
+		return
+	}
+
+	if err := h.db.DeleteBountyTiming(id); err != nil {
+		logger.Log.Error(fmt.Sprintf("Failed to delete bounty timing for bounty ID %d: %v", id, err))
+		w.WriteHeader(http.StatusInternalServerError)
+		json.NewEncoder(w).Encode(map[string]string{"error": "Failed to delete bounty timing"})
+		return
+	}
+
+	w.WriteHeader(http.StatusNoContent)
+}
