@@ -39,14 +39,14 @@ func InitTestDB() {
 	logger.Log.Info("DB CONNECTED")
 
 	db.Exec(`
-		DO $$ BEGIN
-			ALTER TABLE tickets 
-				ALTER COLUMN feature_uuid DROP NOT NULL,
-				ALTER COLUMN phase_uuid DROP NOT NULL;
-		EXCEPTION
-			WHEN others THEN null;
-		END $$;
-	`)
+        DO $$ BEGIN
+            ALTER TABLE tickets 
+                ALTER COLUMN feature_uuid DROP NOT NULL,
+                ALTER COLUMN phase_uuid DROP NOT NULL;
+        EXCEPTION
+            WHEN others THEN null;
+        END $$;
+    `)
 
 	// migrate table changes
 	db.AutoMigrate(&Tribe{})
@@ -79,8 +79,8 @@ func InitTestDB() {
 	db.AutoMigrate(&Bounty{})
 	db.AutoMigrate(&Notification{})
 	db.AutoMigrate(&BountyTiming{})
-	db.AutoMigrate(&TextSnippet{})
 	db.AutoMigrate(&FileAsset{})
+	db.AutoMigrate(&TextSnippet{})
 
 	people := TestDB.GetAllPeople()
 	for _, p := range people {
@@ -98,9 +98,16 @@ func DeleteAllChats() {
 	TestDB.db.Exec("DELETE FROM chats")
 }
 
-func CleanTestData() {
+func DeleteAllBounties() {
+	TestDB.db.Exec("DELETE FROM bounty")
+}
 
-	TestDB.DeleteAllBounties()
+func DeleteAllFeatureStories() {
+	TestDB.db.Exec("DELETE FROM feature_stories")
+}
+
+func CleanTestData() {
+	TestDB.db.Exec("DELETE FROM bounty")
 
 	TestDB.db.Exec("DELETE FROM workspaces")
 
@@ -115,12 +122,6 @@ func CleanTestData() {
 	TestDB.db.Exec("DELETE FROM chats")
 
 	TestDB.db.Exec("DELETE FROM notifications")
-
-	TestDB.db.Exec("DELETE FROM feature_stories")
-
-	TestDB.db.Exec("DELETE FROM text_snippets")
-
-	TestDB.db.Exec("DELETE FROM file_assets")
 }
 
 func DeleteAllChatMessages() {
