@@ -370,21 +370,16 @@ func createValidBounty() map[string]interface{} {
 }
 
 func TestGetWantedsHeader(t *testing.T) {
-
 	db.InitTestDB()
+
+	db.CleanTestData()
+
 	defer func() {
 		db.CleanTestData()
 		db.CloseTestDB()
 	}()
 
-	originalDB := db.DB
-	defer func() {
-		db.DB = originalDB
-	}()
-
 	db.DB = db.TestDB
-
-	db.CleanTestData()
 
 	tests := []struct {
 		name           string
@@ -434,8 +429,10 @@ func TestGetWantedsHeader(t *testing.T) {
 			},
 		},
 		{
-			name:           "No Developers",
-			setupTestData:  func(t *testing.T) {},
+			name: "No Developers",
+			setupTestData: func(t *testing.T) {
+				db.DeleteAllBounties()
+			},
 			expectedStatus: http.StatusOK,
 			validate: func(t *testing.T, response []byte) {
 				var result struct {
@@ -603,6 +600,8 @@ func TestGetWantedsHeader(t *testing.T) {
 				}
 				_, err := db.TestDB.CreateOrEditPerson(person)
 				assert.NoError(t, err)
+
+				db.DeleteAllBounties()
 			},
 			expectedStatus: http.StatusOK,
 			validate: func(t *testing.T, response []byte) {
