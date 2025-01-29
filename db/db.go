@@ -54,10 +54,10 @@ func (db database) CreateOrEditTribe(m Tribe) (Tribe, error) {
 	}
 
 	db.db.Exec(`UPDATE tribes SET tsv =
-  	setweight(to_tsvector(name), 'A') ||
-	setweight(to_tsvector(description), 'B') ||
-	setweight(array_to_tsvector(tags), 'C')
-	WHERE uuid = '` + m.UUID + "'")
+   setweight(to_tsvector(name), 'A') ||
+   setweight(to_tsvector(description), 'B') ||
+   setweight(array_to_tsvector(tags), 'C')
+   WHERE uuid = '` + m.UUID + "'")
 	return m, nil
 }
 
@@ -103,10 +103,10 @@ func (db database) CreateOrEditBot(b Bot) (Bot, error) {
 	}
 
 	db.db.Exec(`UPDATE bots SET tsv =
-  	setweight(to_tsvector(name), 'A') ||
-	setweight(to_tsvector(description), 'B') ||
-	setweight(array_to_tsvector(tags), 'C')
-	WHERE uuid = '` + b.UUID + "'")
+   setweight(to_tsvector(name), 'A') ||
+   setweight(to_tsvector(description), 'B') ||
+   setweight(array_to_tsvector(tags), 'C')
+   WHERE uuid = '` + b.UUID + "'")
 	return b, nil
 }
 
@@ -252,14 +252,14 @@ func (db database) GetOpenGithubIssues(r *http.Request) (int64, error) {
 	// set limit
 	result := db.db.Raw(
 		`SELECT COUNT(value)
-		FROM (
-			SELECT * 
-			FROM people 
-			WHERE github_issues IS NOT NULL 
-			AND github_issues != 'null'
-			) p,
-		jsonb_each(github_issues) t2 
-		WHERE value @> '{"status": "open"}' OR value @> '{"status": ""}'`).Find(&ms)
+      FROM (
+         SELECT *
+         FROM people
+         WHERE github_issues IS NOT NULL
+         AND github_issues != 'null'
+         ) p,
+      jsonb_each(github_issues) t2
+      WHERE value @> '{"status": "open"}' OR value @> '{"status": ""}'`).Find(&ms)
 
 	return result.RowsAffected, result.Error
 }
@@ -438,20 +438,20 @@ type PeopleExtra struct {
 
 func makeExtrasListQuery(columnName string) string {
 	// this is safe because columnName is not provided by the user, its hard-coded in db.go
-	return `SELECT 		
-	json_build_object('owner_pubkey', owner_pub_key, 'owner_alias', owner_alias, 'img', img, 'unique_name', unique_name, 'id', id, '` + columnName + `', extras->'` + columnName + `', 'github_issues', github_issues) #>> '{}' as person,
-	arr.item_object as body
-	FROM people,
-	jsonb_array_elements(extras->'` + columnName + `') with ordinality 
-	arr(item_object, position)
-	WHERE people.deleted != true
-	AND people.unlisted != true 
-	AND LOWER(arr.item_object->>'title') LIKE ?
-	AND CASE
-			WHEN arr.item_object->>'show' = 'false' THEN false
-			ELSE true
-		END
-	`
+	return `SELECT       
+   json_build_object('owner_pubkey', owner_pub_key, 'owner_alias', owner_alias, 'img', img, 'unique_name', unique_name, 'id', id, '` + columnName + `', extras->'` + columnName + `', 'github_issues', github_issues) #>> '{}' as person,
+   arr.item_object as body
+   FROM people,
+   jsonb_array_elements(extras->'` + columnName + `') with ordinality
+   arr(item_object, position)
+   WHERE people.deleted != true
+   AND people.unlisted != true
+   AND LOWER(arr.item_object->>'title') LIKE ?
+   AND CASE
+         WHEN arr.item_object->>'show' = 'false' THEN false
+         ELSE true
+      END
+   `
 }
 
 func addNotMineToExtrasRawQuery(query string, pubkey string) string {
@@ -1487,17 +1487,17 @@ func (db database) GetPersonByUuid(uuid string) Person {
 func (db database) GetPersonByGithubName(github_name string) Person {
 	m := Person{}
 
-	db.db.Raw(`SELECT 		
-	json_build_object('owner_pubkey', owner_pub_key, 'owner_alias', owner_alias, 'img', img, 'unique_name', unique_name, 'id', id, 'wanted', extras->'wanted', 'github_issues', github_issues) #>> '{}' as person,
-	FROM people,
-	jsonb_array_elements(extras->'github') with ordinality 
-	arr(item_object, position)
-	WHERE people.deleted != true
-	AND people.unlisted != true
-	AND CASE
-			WHEN arr.item_object->>'value' = ? THEN true
-			ELSE false
-		END`, github_name).First(&m)
+	db.db.Raw(`SELECT    
+   json_build_object('owner_pubkey', owner_pub_key, 'owner_alias', owner_alias, 'img', img, 'unique_name', unique_name, 'id', id, 'wanted', extras->'wanted', 'github_issues', github_issues) #>> '{}' as person,
+   FROM people,
+   jsonb_array_elements(extras->'github') with ordinality
+   arr(item_object, position)
+   WHERE people.deleted != true
+   AND people.unlisted != true
+   AND CASE
+         WHEN arr.item_object->>'value' = ? THEN true
+         ELSE false
+      END`, github_name).First(&m)
 
 	return m
 }
@@ -1546,10 +1546,10 @@ func (db database) SearchTribes(s string) []Tribe {
 	// set limit
 	db.db.Raw(
 		`SELECT uuid, owner_pub_key, name, img, description, ts_rank(tsv, q) as rank
-		FROM tribes, to_tsquery(?) q
-		WHERE tsv @@ q
-		AND (deleted = 'f' OR deleted is null)
-		ORDER BY rank DESC LIMIT 100;`, s).Find(&ms)
+      FROM tribes, to_tsquery(?) q
+      WHERE tsv @@ q
+      AND (deleted = 'f' OR deleted is null)
+      ORDER BY rank DESC LIMIT 100;`, s).Find(&ms)
 	return ms
 }
 
@@ -1564,11 +1564,11 @@ func (db database) SearchBots(s string, limit, offset int) []BotRes {
 	s = strings.ReplaceAll(s, " ", " & ")
 	db.db.Raw(
 		`SELECT uuid, owner_pub_key, name, unique_name, img, description, tags, price_per_use, ts_rank(tsv, q) as rank
-		FROM bots, to_tsquery(?) q
-		WHERE tsv @@ q
-		AND (deleted = 'f' OR deleted is null)
-		ORDER BY rank DESC 
-		LIMIT ? OFFSET ?;`, s, limitStr, offsetStr).Find(&ms)
+      FROM bots, to_tsquery(?) q
+      WHERE tsv @@ q
+      AND (deleted = 'f' OR deleted is null)
+      ORDER BY rank DESC
+      LIMIT ? OFFSET ?;`, s, limitStr, offsetStr).Find(&ms)
 	return ms
 }
 
@@ -1582,11 +1582,11 @@ func (db database) SearchPeople(s string, limit, offset int) []Person {
 	offsetStr := strconv.Itoa(offset)
 	db.db.Raw(
 		`SELECT id, owner_pub_key, unique_name, img, description, tags, ts_rank(tsv, q) as rank
-		FROM people, to_tsquery(?) q
-		WHERE tsv @@ q
-		AND (deleted = 'f' OR deleted is null)
-		ORDER BY rank DESC 
-		LIMIT ? OFFSET ?;`, s, limitStr, offsetStr).Find(&ms)
+      FROM people, to_tsquery(?) q
+      WHERE tsv @@ q
+      AND (deleted = 'f' OR deleted is null)
+      ORDER BY rank DESC
+      LIMIT ? OFFSET ?;`, s, limitStr, offsetStr).Find(&ms)
 	return ms
 }
 
@@ -1637,11 +1637,11 @@ func (db database) GetPeopleListShort(count uint32) *[]PersonInShort {
 	p := []PersonInShort{}
 	db.db.Raw(
 		`SELECT id, owner_pub_key, unique_name, img, uuid, owner_alias
-		FROM people
-		WHERE
-		(deleted = 'f' OR deleted is null)
-		ORDER BY random() 
-		LIMIT ?;`, count).Find(&p)
+      FROM people
+      WHERE
+      (deleted = 'f' OR deleted is null)
+      ORDER BY random()
+      LIMIT ?;`, count).Find(&p)
 	return &p
 }
 
@@ -1735,13 +1735,13 @@ func (db database) GetBountiesLeaderboard() []LeaderData {
 	var users = []LeaderData{}
 
 	db.db.Raw(`SELECT t1.owner_pubkey, total_bounties_completed, total_sats_earned FROM
-(SELECT assignee as owner_pubkey, 
+(SELECT assignee as owner_pubkey,
 COUNT(assignee) as total_bounties_completed
-From bounty 
-where paid=true and assignee != '' 
+From bounty
+where paid=true and assignee != ''
 GROUP BY assignee) t1
- Right Join
-(SELECT assignee as owner_pubkey,  
+Right Join
+(SELECT assignee as owner_pubkey, 
 SUM(CAST(price as integer)) as total_sats_earned
 From bounty
 where paid=true and assignee != ''
@@ -2034,11 +2034,11 @@ func (db database) GetWorkspaceBountyCardsData(r *http.Request) []NewBounty {
 	timeFilterQuery := ""
 
 	timeFilterQuery = `
-		AND (
-			(NOT paid AND EXTRACT(EPOCH FROM updated::timestamp) > EXTRACT(EPOCH FROM (NOW() - INTERVAL '4 weeks')))
-			OR (paid AND EXTRACT(EPOCH FROM updated::timestamp) > EXTRACT(EPOCH FROM (NOW() - INTERVAL '2 weeks')))
-			OR updated IS NULL  -- Preserve existing records without updated timestamp
-		)`
+      AND (
+         (NOT paid AND EXTRACT(EPOCH FROM updated::timestamp) > EXTRACT(EPOCH FROM (NOW() - INTERVAL '4 weeks')))
+         OR (paid AND EXTRACT(EPOCH FROM updated::timestamp) > EXTRACT(EPOCH FROM (NOW() - INTERVAL '2 weeks')))
+         OR updated IS NULL  -- Preserve existing records without updated timestamp
+      )`
 
 	if sortBy != "" && direction != "" {
 		orderQuery = "ORDER BY " + sortBy + " " + direction
@@ -2085,4 +2085,17 @@ func (db database) UpdateFeaturedBounty(bountyID string, bounty FeaturedBounty) 
 
 func (db database) DeleteFeaturedBounty(bountyID string) error {
 	return db.db.Where("bounty_id = ?", bountyID).Delete(&FeaturedBounty{}).Error
+}
+
+func (db database) DeleteBountyTiming(bountyID uint) error {
+	result := db.db.Where("bounty_id = ?", bountyID).Delete(&BountyTiming{})
+	if result.Error != nil {
+		return fmt.Errorf("failed to delete bounty timing: %w", result.Error)
+	}
+
+	if result.RowsAffected == 0 {
+		return fmt.Errorf("no timing record found for bounty %d", bountyID)
+	}
+
+	return nil
 }

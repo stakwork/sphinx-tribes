@@ -284,6 +284,14 @@ func (h *bountyHandler) CreateOrEditBounty(w http.ResponseWriter, r *http.Reques
 		}
 	}
 
+	if bounty.Assignee == "" {
+		if bounty.ID != 0 {
+			if err := h.db.DeleteBountyTiming(bounty.ID); err != nil {
+				handleTimingError(w, "delete_timing", err)
+			}
+		}
+	}
+
 	if bounty.Tribe == "" {
 		bounty.Tribe = "None"
 	}
@@ -2090,6 +2098,28 @@ func (h *bountyHandler) DeleteFeaturedBounty(w http.ResponseWriter, r *http.Requ
 	if err := h.db.DeleteFeaturedBounty(bountyID); err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
 		json.NewEncoder(w).Encode(map[string]string{"error": err.Error()})
+		return
+	}
+
+	w.WriteHeader(http.StatusNoContent)
+}
+
+func (h *bountyHandler) DeleteBountyTiming(w http.ResponseWriter, r *http.Request) {
+	bountyID := chi.URLParam(r, "id")
+	id, err := utils.ConvertStringToUint(bountyID)
+	if err != nil {
+		http.Error(w, "Invalid bounty ID", http.StatusBadRequest)
+		return
+	}
+
+	_, err = h.db.GetBountyTiming(id)
+	if err != nil {
+		handleTimingError(w, "get_timing", err)
+		return
+	}
+
+	if err := h.db.DeleteBountyTiming(id); err != nil {
+		handleTimingError(w, "delete_timing", err)
 		return
 	}
 

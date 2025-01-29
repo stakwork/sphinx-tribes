@@ -13585,3 +13585,45 @@ func (_c *Database_DeleteFileAsset_Call) RunAndReturn(run func(uint) error) *Dat
 	return _c
 }
 
+// DeleteBountyTiming provides a mock function with given fields: bountyID
+func (_m *Database) DeleteBountyTiming(bountyID uint) error {
+	ret := _m.Called(bountyID)
+
+	if len(ret) == 0 {
+		panic("no return value specified for DeleteBountyTiming")
+	}
+
+	var r0 error
+	if rf, ok := ret.Get(0).(func(uint) error); ok {
+		r0 = rf(bountyID)
+	} else {
+		r0 = ret.Error(0)
+	}
+
+	return r0
+}
+
+type Database_DeleteBountyTiming_Call struct {
+	*mock.Call
+}
+
+func (_e *Database_Expecter) DeleteBountyTiming(bountyID interface{}) *Database_DeleteBountyTiming_Call {
+	return &Database_DeleteBountyTiming_Call{Call: _e.mock.On("DeleteBountyTiming", bountyID)}
+}
+
+func (_c *Database_DeleteBountyTiming_Call) Run(run func(bountyID uint)) *Database_DeleteBountyTiming_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(uint))
+	})
+	return _c
+}
+
+func (_c *Database_DeleteBountyTiming_Call) Return(_a0 error) *Database_DeleteBountyTiming_Call {
+	_c.Call.Return(_a0)
+	return _c
+}
+
+func (_c *Database_DeleteBountyTiming_Call) RunAndReturn(run func(uint) error) *Database_DeleteBountyTiming_Call {
+	_c.Call.Return(run)
+	return _c
+}
