@@ -2097,6 +2097,15 @@ func (h *bountyHandler) DeleteFeaturedBounty(w http.ResponseWriter, r *http.Requ
 }
 
 func (h *bountyHandler) DeleteBountyTiming(w http.ResponseWriter, r *http.Request) {
+
+	ctx := r.Context()
+	pubKeyFromAuth, _ := ctx.Value(auth.ContextKey).(string)
+	if pubKeyFromAuth == "" {
+		logger.Log.Info("no pubkey from auth")
+		w.WriteHeader(http.StatusUnauthorized)
+		return
+	}
+
 	bountyID := chi.URLParam(r, "id")
 	id, err := utils.ConvertStringToUint(bountyID)
 	if err != nil {

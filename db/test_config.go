@@ -102,6 +102,8 @@ func CleanTestData() {
 
 	TestDB.DeleteAllBounties()
 
+	TestDB.db.Exec("DELETE FROM bounty_timings")
+
 	TestDB.db.Exec("DELETE FROM workspaces")
 
 	TestDB.db.Exec("DELETE FROM workspace_features")
