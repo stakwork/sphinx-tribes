@@ -234,7 +234,6 @@ func (db database) CreateBountyFromTicket(ticket Tickets, pubkey string) (*NewBo
 		logger.Log.Error("failed to create bounty", "error", err, "ticket_id", ticket.UUID)
 		return nil, fmt.Errorf("failed to create bounty: %w", err)
 	}
-	//tst
 	return bounty, nil
 }
 
@@ -359,5 +358,16 @@ func (db database) DeleteWorkspaceDraftTicket(workspaceUuid string, uuid string)
 		return errors.New("draft ticket not found")
 	}
 
+	return nil
+}
+
+func (db database) DeleteTicketGroup(TicketGroupUUID uuid.UUID) error {
+	result := db.db.Where("ticket_group = ?", TicketGroupUUID).Delete(&Tickets{})
+	if result.Error != nil {
+		return fmt.Errorf("failed to delete ticket group: %w", result.Error)
+	}
+	if result.RowsAffected == 0 {
+		return errors.New("no tickets found in group")
+	}
 	return nil
 }

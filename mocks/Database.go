@@ -12804,7 +12804,6 @@ func (_c *Database_GetWorkspaceDraftTicket_Call) RunAndReturn(run func(string, s
 	return _c
 }
 
-
 func (_m *Database) CreateWorkspaceDraftTicket(ticket *db.Tickets) (db.Tickets, error) {
 	ret := _m.Called(ticket)
 
@@ -12856,7 +12855,6 @@ func (_c *Database_CreateWorkspaceDraftTicket_Call) RunAndReturn(run func(*db.Ti
 	_c.Call.Return(run)
 	return _c
 }
-
 
 func (_m *Database) UpdateWorkspaceDraftTicket(ticket *db.Tickets) (db.Tickets, error) {
 	ret := _m.Called(ticket)
@@ -12910,7 +12908,6 @@ func (_c *Database_UpdateWorkspaceDraftTicket_Call) RunAndReturn(run func(*db.Ti
 	return _c
 }
 
-
 func (_m *Database) DeleteWorkspaceDraftTicket(workspaceUuid string, _a1 string) error {
 	ret := _m.Called(workspaceUuid, _a1)
 
@@ -12952,7 +12949,6 @@ func (_c *Database_DeleteWorkspaceDraftTicket_Call) RunAndReturn(run func(string
 	_c.Call.Return(run)
 	return _c
 }
-
 
 // CreateSnippet provides a mock function with given fields: snippet
 func (_m *Database) CreateSnippet(snippet *db.TextSnippet) (*db.TextSnippet, error) {
@@ -13009,7 +13005,6 @@ func (_c *Database_CreateSnippet_Call) RunAndReturn(run func(*db.TextSnippet) (*
 	return _c
 }
 
-
 func (_m *Database) GetSnippetsByWorkspace(workspaceUUID string) ([]db.TextSnippet, error) {
 	ret := _m.Called(workspaceUUID)
 
@@ -13063,8 +13058,6 @@ func (_c *Database_GetSnippetsByWorkspace_Call) RunAndReturn(run func(string) ([
 	_c.Call.Return(run)
 	return _c
 }
-
-
 
 // GetSnippetByID provides a mock function with given fields: id
 func (_m *Database) GetSnippetByID(id uint) (*db.TextSnippet, error) {
@@ -13121,7 +13114,6 @@ func (_c *Database_GetSnippetByID_Call) RunAndReturn(run func(uint) (*db.TextSni
 	return _c
 }
 
-
 // UpdateSnippet provides a mock function with given fields: snippet
 func (_m *Database) UpdateSnippet(snippet *db.TextSnippet) (*db.TextSnippet, error) {
 	ret := _m.Called(snippet)
@@ -13177,7 +13169,6 @@ func (_c *Database_UpdateSnippet_Call) RunAndReturn(run func(*db.TextSnippet) (*
 	return _c
 }
 
-
 // DeleteSnippet provides a mock function with given fields: id
 func (_m *Database) DeleteSnippet(id uint) error {
 	ret := _m.Called(id)
@@ -13221,7 +13212,6 @@ func (_c *Database_DeleteSnippet_Call) RunAndReturn(run func(uint) error) *Datab
 	return _c
 }
 
-
 // CreateFileAsset provides a mock function with given fields: asset
 func (_m *Database) CreateFileAsset(asset *db.FileAsset) (*db.FileAsset, error) {
 	ret := _m.Called(asset)
@@ -13256,7 +13246,6 @@ type Database_CreateFileAsset_Call struct {
 	*mock.Call
 }
 
-
 func (_e *Database_Expecter) CreateFileAsset(asset interface{}) *Database_CreateFileAsset_Call {
 	return &Database_CreateFileAsset_Call{Call: _e.mock.On("CreateFileAsset", asset)}
 }
@@ -13277,7 +13266,6 @@ func (_c *Database_CreateFileAsset_Call) RunAndReturn(run func(*db.FileAsset) (*
 	_c.Call.Return(run)
 	return _c
 }
-
 
 // GetFileAssetByHash provides a mock function with given fields: fileHash
 func (_m *Database) GetFileAssetByHash(fileHash string) (*db.FileAsset, error) {
@@ -13334,7 +13322,6 @@ func (_c *Database_GetFileAssetByHash_Call) RunAndReturn(run func(string) (*db.F
 	return _c
 }
 
-
 // GetFileAssetByID provides a mock function with given fields: id
 func (_m *Database) GetFileAssetByID(id uint) (*db.FileAsset, error) {
 	ret := _m.Called(id)
@@ -13390,7 +13377,6 @@ func (_c *Database_GetFileAssetByID_Call) RunAndReturn(run func(uint) (*db.FileA
 	return _c
 }
 
-
 // UpdateFileAssetReference provides a mock function with given fields: id
 func (_m *Database) UpdateFileAssetReference(id uint) error {
 	ret := _m.Called(id)
@@ -13433,7 +13419,6 @@ func (_c *Database_UpdateFileAssetReference_Call) RunAndReturn(run func(uint) er
 	_c.Call.Return(run)
 	return _c
 }
-
 
 // ListFileAssets provides a mock function with given fields: params
 func (_m *Database) ListFileAssets(params db.ListFileAssetsParams) ([]db.FileAsset, int64, error) {
@@ -13497,7 +13482,6 @@ func (_c *Database_ListFileAssets_Call) RunAndReturn(run func(db.ListFileAssetsP
 	return _c
 }
 
-
 // UpdateFileAsset provides a mock function with given fields: asset
 func (_m *Database) UpdateFileAsset(asset *db.FileAsset) error {
 	ret := _m.Called(asset)
@@ -13540,7 +13524,6 @@ func (_c *Database_UpdateFileAsset_Call) RunAndReturn(run func(*db.FileAsset) er
 	_c.Call.Return(run)
 	return _c
 }
-
 
 // DeleteFileAsset provides a mock function with given fields: id
 func (_m *Database) DeleteFileAsset(id uint) error {
@@ -13585,3 +13568,45 @@ func (_c *Database_DeleteFileAsset_Call) RunAndReturn(run func(uint) error) *Dat
 	return _c
 }
 
+// DeleteTicketGroup provides a mock function with given fields: TicketGroupUUID
+func (_m *Database) DeleteTicketGroup(TicketGroupUUID uuid.UUID) error {
+	ret := _m.Called(TicketGroupUUID)
+
+	if len(ret) == 0 {
+		panic("no return value specified for DeleteTicketGroup")
+	}
+
+	var r0 error
+	if rf, ok := ret.Get(0).(func(uuid.UUID) error); ok {
+		r0 = rf(TicketGroupUUID)
+	} else {
+		r0 = ret.Error(0)
+	}
+
+	return r0
+}
+
+type Database_DeleteTicketGroup_Call struct {
+	*mock.Call
+}
+
+func (_e *Database_Expecter) DeleteTicketGroup(TicketGroupUUID interface{}) *Database_DeleteTicketGroup_Call {
+	return &Database_DeleteTicketGroup_Call{Call: _e.mock.On("DeleteTicketGroup", TicketGroupUUID)}
+}
+
+func (_c *Database_DeleteTicketGroup_Call) Run(run func(TicketGroupUUID uuid.UUID)) *Database_DeleteTicketGroup_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(uuid.UUID))
+	})
+	return _c
+}
+
+func (_c *Database_DeleteTicketGroup_Call) Return(_a0 error) *Database_DeleteTicketGroup_Call {
+	_c.Call.Return(_a0)
+	return _c
+}
+
+func (_c *Database_DeleteTicketGroup_Call) RunAndReturn(run func(uuid.UUID) error) *Database_DeleteTicketGroup_Call {
+	_c.Call.Return(run)
+	return _c
+}
