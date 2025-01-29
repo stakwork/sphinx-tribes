@@ -234,7 +234,7 @@ func (db database) CreateBountyFromTicket(ticket Tickets, pubkey string) (*NewBo
 		logger.Log.Error("failed to create bounty", "error", err, "ticket_id", ticket.UUID)
 		return nil, fmt.Errorf("failed to create bounty: %w", err)
 	}
-
+	//tst
 	return bounty, nil
 }
 
