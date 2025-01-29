@@ -3691,8 +3691,8 @@ func TestGetFeatureStories(t *testing.T) {
 	})
 
 	t.Run("Should not add user stories if stories array is empty", func(t *testing.T) {
+		db.DeleteAllFeatureStories()
 
-		db.CleanTestData()
 		db.TestDB.CreateOrEditPerson(person)
 		db.TestDB.CreateOrEditWorkspace(workspace)
 		db.TestDB.CreateOrEditFeature(feature)
@@ -3897,10 +3897,18 @@ func TestGetFeatureStories(t *testing.T) {
 	})
 
 	t.Run("Duplicate Stories", func(t *testing.T) {
-
 		db.CleanTestData()
 		db.TestDB.CreateOrEditPerson(person)
 		db.TestDB.CreateOrEditWorkspace(workspace)
+
+		feature := db.WorkspaceFeatures{
+			Uuid:          uuid.New().String(),
+			WorkspaceUuid: workspace.Uuid,
+			Name:          "test-get-feature-stories-duplicate-content",
+			Url:           "https://github.com/test-get-feature-stories-feature-url",
+			Priority:      0,
+		}
+
 		db.TestDB.CreateOrEditFeature(feature)
 
 		duplicateStory := db.FeatureStories{
