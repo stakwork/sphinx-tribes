@@ -69,6 +69,18 @@ type FileResponse struct {
 	UploadTime time.Time    `json:"uploadTime"`
 }
 
+type SendMessageRequest struct {
+	ChatID      string `json:"chat_id"`
+	Message     string `json:"message"`
+	PDFURL      string `json:"pdf_url,omitempty"`
+	ContextTags []struct {
+		Type string `json:"type"`
+		ID   string `json:"id"`
+	} `json:"contextTags"`
+	SourceWebsocketID string `json:"sourceWebsocketId"`
+	WorkspaceUUID     string `json:"workspaceUUID"`
+}
+
 func NewChatHandler(httpClient *http.Client, database db.Database) *ChatHandler {
 	return &ChatHandler{
 		httpClient: httpClient,
@@ -224,7 +236,6 @@ func (ch *ChatHandler) ArchiveChat(w http.ResponseWriter, r *http.Request) {
 }
 
 func (ch *ChatHandler) SendMessage(w http.ResponseWriter, r *http.Request) {
-
 	ctx := r.Context()
 	pubKeyFromAuth, _ := ctx.Value(auth.ContextKey).(string)
 	if pubKeyFromAuth == "" {
@@ -241,17 +252,7 @@ func (ch *ChatHandler) SendMessage(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	var request struct {
-		ChatID      string `json:"chat_id"`
-		Message     string `json:"message"`
-		ContextTags []struct {
-			Type string `json:"type"`
-			ID   string `json:"id"`
-		} `json:"contextTags"`
-		SourceWebsocketID string `json:"sourceWebsocketId"`
-		WorkspaceUUID     string `json:"workspaceUUID"`
-	}
-
+	var request SendMessageRequest
 	if err := json.NewDecoder(r.Body).Decode(&request); err != nil {
 		w.WriteHeader(http.StatusBadRequest)
 		json.NewEncoder(w).Encode(ChatResponse{
@@ -308,6 +309,7 @@ func (ch *ChatHandler) SendMessage(w http.ResponseWriter, r *http.Request) {
 		ID:        xid.New().String(),
 		ChatID:    request.ChatID,
 		Message:   request.Message,
+		PDFURL:    request.PDFURL,
 		Role:      "user",
 		Timestamp: time.Now(),
 		Status:    "sending",
@@ -339,6 +341,7 @@ func (ch *ChatHandler) SendMessage(w http.ResponseWriter, r *http.Request) {
 						"sourceWebsocketId": request.SourceWebsocketID,
 						"webhook_url":       fmt.Sprintf("%s/hivechat/response", os.Getenv("HOST")),
 						"alias":             user.OwnerAlias,
+						"pdf_url":           request.PDFURL,
 					},
 				},
 			},
