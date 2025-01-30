@@ -293,6 +293,127 @@ func TestSendTicketMessage(t *testing.T) {
 		err := pool.SendTicketMessage(message)
 		assert.Error(t, err)
 	})
+
+	t.Run("Array of Messages", func(t *testing.T) {
+		pool := NewPool()
+		ws, server := setupTestWebsocket(t)
+		defer server.Close()
+		defer ws.Close()
+
+		client := &Client{
+			Host: "test-client",
+			Conn: ws,
+			Pool: pool,
+		}
+
+		pool.Clients = make(map[string]*ClientData)
+		pool.Clients[client.Host] = &ClientData{
+			Client: client,
+			Status: true,
+		}
+
+		messages := []TicketMessage{
+			{
+				BroadcastType:   "direct",
+				SourceSessionID: "test-client",
+				Message:         "Message 1",
+			},
+			{
+				BroadcastType:   "direct",
+				SourceSessionID: "test-client",
+				Message:         "Message 2",
+			},
+		}
+
+		for _, msg := range messages {
+			err := pool.SendTicketMessage(msg)
+			assert.NoError(t, err)
+		}
+	})
+
+	t.Run("Message with Special Characters", func(t *testing.T) {
+		pool := NewPool()
+		ws, server := setupTestWebsocket(t)
+		defer server.Close()
+		defer ws.Close()
+
+		client := &Client{
+			Host: "test-client",
+			Conn: ws,
+			Pool: pool,
+		}
+
+		pool.Clients = make(map[string]*ClientData)
+		pool.Clients[client.Host] = &ClientData{
+			Client: client,
+			Status: true,
+		}
+
+		message := TicketMessage{
+			BroadcastType:   "direct",
+			SourceSessionID: "test-client",
+			Message:         "Test message with special chars: !@#$%^&*()",
+		}
+
+		err := pool.SendTicketMessage(message)
+		assert.NoError(t, err)
+	})
+
+	t.Run("Message with Empty Message Field", func(t *testing.T) {
+		pool := NewPool()
+		ws, server := setupTestWebsocket(t)
+		defer server.Close()
+		defer ws.Close()
+
+		client := &Client{
+			Host: "test-client",
+			Conn: ws,
+			Pool: pool,
+		}
+
+		pool.Clients = make(map[string]*ClientData)
+		pool.Clients[client.Host] = &ClientData{
+			Client: client,
+			Status: true,
+		}
+
+		message := TicketMessage{
+			BroadcastType:   "direct",
+			SourceSessionID: "test-client",
+			Message:         "",
+		}
+
+		err := pool.SendTicketMessage(message)
+		assert.NoError(t, err)
+	})
+
+	t.Run("Message with Unicode Characters", func(t *testing.T) {
+		pool := NewPool()
+		ws, server := setupTestWebsocket(t)
+		defer server.Close()
+		defer ws.Close()
+
+		client := &Client{
+			Host: "test-client",
+			Conn: ws,
+			Pool: pool,
+		}
+
+		pool.Clients = make(map[string]*ClientData)
+		pool.Clients[client.Host] = &ClientData{
+			Client: client,
+			Status: true,
+		}
+
+		message := TicketMessage{
+			BroadcastType:   "direct",
+			SourceSessionID: "test-client",
+			Message:         "Unicode test: 你好世界 🌍 привет мир",
+		}
+
+		err := pool.SendTicketMessage(message)
+		assert.NoError(t, err)
+	})
 }
 
 func setupTestWebsocket(t *testing.T) (*websocket.Conn, *httptest.Server) {
