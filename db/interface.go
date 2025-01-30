@@ -280,4 +280,6 @@ type Database interface {
 	UpdateFileAsset(asset *FileAsset) error
 	DeleteFileAsset(id uint) error
 	DeleteTicketGroup(TicketGroupUUID uuid.UUID) error
+	PauseBountyTiming(bountyID uint) error
+	ResumeBountyTiming(bountyID uint) error
 }

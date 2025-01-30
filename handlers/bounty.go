@@ -24,12 +24,15 @@ import (
 )
 
 type BountyTimingResponse struct {
-	TotalWorkTimeSeconds int        `json:"total_work_time_seconds"`
-	TotalDurationSeconds int        `json:"total_duration_seconds"`
-	TotalAttempts        int        `json:"total_attempts"`
-	FirstAssignedAt      *time.Time `json:"first_assigned_at"`
-	LastPoWAt            *time.Time `json:"last_pow_at"`
-	ClosedAt             *time.Time `json:"closed_at"`
+	TotalWorkTimeSeconds    int        `json:"total_work_time_seconds"`
+	TotalDurationSeconds    int        `json:"total_duration_seconds"`
+	TotalAttempts           int        `json:"total_attempts"`
+	FirstAssignedAt         *time.Time `json:"first_assigned_at"`
+	LastPoWAt               *time.Time `json:"last_pow_at"`
+	ClosedAt                *time.Time `json:"closed_at"`
+	IsPaused                bool       `json:"is_paused"`
+	LastPausedAt            *time.Time `json:"last_paused_at"`
+	AccumulatedPauseSeconds int        `json:"accumulated_pause_seconds"`
 }
 
 type bountyHandler struct {
@@ -1717,6 +1720,10 @@ func (h *bountyHandler) AddProofOfWork(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	if err := h.db.PauseBountyTiming(proof.BountyID); err != nil {
+		handleTimingError(w, "pause_timing", err)
+	}
+
 	if err := h.db.UpdateBountyTimingOnProof(proof.BountyID); err != nil {
 		handleTimingError(w, "update_timing_on_proof", err)
 	}
@@ -1798,21 +1805,16 @@ func (h *bountyHandler) UpdateProofStatus(w http.ResponseWriter, r *http.Request
 		return
 	}
 
-	if statusUpdate.Status == db.AcceptedStatus {
+	if statusUpdate.Status == db.RejectedStatus || statusUpdate.Status == db.ChangeRequestedStatus {
+
 		id, err := utils.ConvertStringToUint(bountyID)
 		if err != nil {
 			http.Error(w, "Invalid bounty ID", http.StatusBadRequest)
 			return
 		}
 
-		_, err = h.db.GetBountyTiming(id)
-		if err == nil {
-			if err := h.db.UpdateBountyTimingOnProof(id); err != nil {
-				http.Error(w, "Failed to update timing", http.StatusInternalServerError)
-				return
-			}
-		} else {
-			logger.Log.Error(fmt.Sprintf("No bounty timing found for bounty ID %d: %v", id, err))
+		if err := h.db.ResumeBountyTiming(id); err != nil {
+			logger.Log.Error(fmt.Sprintf("Failed to resume timing for bounty ID %d: %v", id, err))
 		}
 	}
 
@@ -1900,12 +1902,15 @@ func (h *bountyHandler) GetBountyTimingStats(w http.ResponseWriter, r *http.Requ
 	}
 
 	response := BountyTimingResponse{
-		TotalWorkTimeSeconds: timing.TotalWorkTimeSeconds,
-		TotalDurationSeconds: timing.TotalDurationSeconds,
-		TotalAttempts:        timing.TotalAttempts,
-		FirstAssignedAt:      timing.FirstAssignedAt,
-		LastPoWAt:            timing.LastPoWAt,
-		ClosedAt:             timing.ClosedAt,
+		TotalWorkTimeSeconds:    timing.TotalWorkTimeSeconds,
+		TotalDurationSeconds:    timing.TotalDurationSeconds,
+		TotalAttempts:           timing.TotalAttempts,
+		FirstAssignedAt:         timing.FirstAssignedAt,
+		LastPoWAt:               timing.LastPoWAt,
+		ClosedAt:                timing.ClosedAt,
+		IsPaused:                timing.IsPaused,
+		LastPausedAt:            timing.LastPausedAt,
+		AccumulatedPauseSeconds: timing.AccumulatedPauseSeconds,
 	}
 
 	w.WriteHeader(http.StatusOK)
