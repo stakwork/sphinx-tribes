@@ -814,10 +814,10 @@ func (th *ticketHandler) TicketToBounty(w http.ResponseWriter, r *http.Request) 
 		"owner_id", bounty.OwnerID)
 
 	// Delete the ticket after successful bounty creation
-	if err := th.db.DeleteTicket(ticketUUID); err != nil {
-		logger.Log.Error("failed to delete ticket after bounty creation",
+	if err := th.db.DeleteTicketGroup(*ticket.TicketGroup); err != nil {
+		logger.Log.Error("failed to delete ticket group after bounty creation",
 			"error", err,
-			"ticket_uuid", ticketUUID)
+			"ticket_group", ticket.TicketGroup)
 
 		w.Header().Set("Content-Type", "application/json")
 		w.WriteHeader(http.StatusCreated)
