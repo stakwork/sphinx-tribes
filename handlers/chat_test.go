@@ -6,6 +6,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"io"
 	"mime/multipart"
 	"net/http"
 	"net/http/httptest"
@@ -19,7 +20,9 @@ import (
 
 	"github.com/go-chi/chi"
 	"github.com/google/uuid"
+	"github.com/stakwork/sphinx-tribes/auth"
 	"github.com/stakwork/sphinx-tribes/db"
+	"github.com/stakwork/sphinx-tribes/websocket"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
@@ -2209,4 +2212,272 @@ func TestDeleteFile(t *testing.T) {
 		require.NoError(t, err)
 		assert.Equal(t, db.DeletedFileStatus, deletedAsset.Status)
 	})
+}
+
+func TestSendMessage(t *testing.T) {
+	teardownSuite := SetupSuite(t)
+	defer teardownSuite(t)
+
+	db.CleanTestData()
+	db.DeleteAllChatMessages()
+
+	originalKey := os.Getenv("SWWFKEY")
+	os.Setenv("SWWFKEY", "test-key")
+	defer os.Setenv("SWWFKEY", originalKey)
+
+	stakworkServer := &http.Client{
+		Transport: RoundTripFunc(func(req *http.Request) (*http.Response, error) {
+			return &http.Response{
+				StatusCode: http.StatusOK,
+				Body: io.NopCloser(bytes.NewBufferString(`{
+                    "success": true,
+                    "data": {
+                        "project_id": 12345
+                    }
+                }`)),
+				Header: make(http.Header),
+			}, nil
+		}),
+	}
+
+	websocket.WebsocketPool = &websocket.Pool{
+		Clients: make(map[string]*websocket.ClientData),
+	}
+
+	chatHandler := NewChatHandler(stakworkServer, db.TestDB)
+
+	t.Run("should successfully send message with PDF URL", func(t *testing.T) {
+
+		person := db.Person{
+			Uuid:        uuid.New().String(),
+			OwnerAlias:  "test-alias",
+			UniqueName:  "test-unique-name",
+			OwnerPubKey: "test-pubkey",
+			PriceToMeet: 0,
+			Description: "test-description",
+		}
+		db.TestDB.CreateOrEditPerson(person)
+
+		workspace := db.Workspace{
+			Uuid:        uuid.New().String(),
+			Name:        "test-workspace" + uuid.New().String(),
+			OwnerPubKey: person.OwnerPubKey,
+			Github:      "https://github.com/test",
+			Website:     "https://www.testwebsite.com",
+			Description: "test-description",
+		}
+		db.TestDB.CreateOrEditWorkspace(workspace)
+
+		chatCreateReq := map[string]string{
+			"workspaceId": workspace.Uuid,
+			"title":       "Test Chat",
+		}
+		chatBodyBytes, _ := json.Marshal(chatCreateReq)
+		chatReq := httptest.NewRequest(http.MethodPost, "/hivechat", bytes.NewReader(chatBodyBytes))
+		chatRR := httptest.NewRecorder()
+		chatHandler.CreateChat(chatRR, chatReq)
+
+		var chatResponse ChatResponse
+		err := json.NewDecoder(chatRR.Body).Decode(&chatResponse)
+		require.NoError(t, err)
+		require.True(t, chatResponse.Success)
+
+		chatData := chatResponse.Data.(map[string]interface{})
+		chatID := chatData["id"].(string)
+
+		requestBody := SendMessageRequest{
+			ChatID:  chatID,
+			Message: "Test message with PDF",
+			PDFURL:  "https://example.com/test.pdf",
+			ContextTags: []struct {
+				Type string `json:"type"`
+				ID   string `json:"id"`
+			}{},
+			SourceWebsocketID: "test-websocket-id",
+			WorkspaceUUID:     workspace.Uuid,
+		}
+		bodyBytes, _ := json.Marshal(requestBody)
+
+		req := httptest.NewRequest(http.MethodPost, "/send", bytes.NewReader(bodyBytes))
+		rr := httptest.NewRecorder()
+
+		ctx := context.WithValue(req.Context(), auth.ContextKey, "test-pubkey")
+		req = req.WithContext(ctx)
+
+		chatHandler.SendMessage(rr, req)
+
+		require.Equal(t, http.StatusOK, rr.Code)
+
+		var response ChatResponse
+		err = json.NewDecoder(rr.Body).Decode(&response)
+		require.NoError(t, err)
+		assert.True(t, response.Success)
+		assert.Equal(t, "Message sent successfully", response.Message)
+
+		messages, err := db.TestDB.GetChatMessagesForChatID(chatID)
+		require.NoError(t, err)
+		assert.Equal(t, 1, len(messages))
+		assert.Equal(t, "Test message with PDF", messages[0].Message)
+		assert.Equal(t, db.UserRole, messages[0].Role)
+		assert.Equal(t, db.SendingStatus, messages[0].Status)
+	})
+
+	t.Run("should handle unauthorized request", func(t *testing.T) {
+		requestBody := SendMessageRequest{
+			ChatID:            uuid.New().String(),
+			Message:           "Test message",
+			WorkspaceUUID:     uuid.New().String(),
+			SourceWebsocketID: "test-websocket-id",
+		}
+		bodyBytes, _ := json.Marshal(requestBody)
+
+		req := httptest.NewRequest(http.MethodPost, "/send", bytes.NewReader(bodyBytes))
+		rr := httptest.NewRecorder()
+
+		chatHandler.SendMessage(rr, req)
+
+		require.Equal(t, http.StatusUnauthorized, rr.Code)
+	})
+
+	t.Run("should handle invalid user", func(t *testing.T) {
+		req := httptest.NewRequest(http.MethodPost, "/send", nil)
+		rr := httptest.NewRecorder()
+
+		ctx := context.WithValue(req.Context(), auth.ContextKey, "non-existent-pubkey")
+		req = req.WithContext(ctx)
+
+		chatHandler.SendMessage(rr, req)
+
+		require.Equal(t, http.StatusBadRequest, rr.Code)
+	})
+
+	t.Run("should handle missing workspaceUUID", func(t *testing.T) {
+
+		testUser := &db.Person{
+			OwnerPubKey: "test-pubkey-2",
+			OwnerAlias:  "test-user-2",
+		}
+		db.TestDB.CreateOrEditPerson(*testUser)
+
+		requestBody := SendMessageRequest{
+			ChatID:            uuid.New().String(),
+			Message:           "Test message",
+			SourceWebsocketID: "test-websocket-id",
+		}
+		bodyBytes, _ := json.Marshal(requestBody)
+
+		req := httptest.NewRequest(http.MethodPost, "/send", bytes.NewReader(bodyBytes))
+		rr := httptest.NewRecorder()
+
+		ctx := context.WithValue(req.Context(), auth.ContextKey, "test-pubkey-2")
+		req = req.WithContext(ctx)
+
+		chatHandler.SendMessage(rr, req)
+
+		require.Equal(t, http.StatusBadRequest, rr.Code)
+
+		var response ChatResponse
+		err := json.NewDecoder(rr.Body).Decode(&response)
+		require.NoError(t, err)
+		assert.False(t, response.Success)
+		assert.Equal(t, "workspaceUUID is required", response.Message)
+	})
+
+	t.Run("should handle invalid request body", func(t *testing.T) {
+
+		testUser := &db.Person{
+			OwnerPubKey: "test-pubkey-3",
+			OwnerAlias:  "test-user-3",
+		}
+		db.TestDB.CreateOrEditPerson(*testUser)
+
+		invalidJSON := []byte(`{"chat_id": "123", "message":`)
+		req := httptest.NewRequest(http.MethodPost, "/send", bytes.NewReader(invalidJSON))
+		rr := httptest.NewRecorder()
+
+		ctx := context.WithValue(req.Context(), auth.ContextKey, "test-pubkey-3")
+		req = req.WithContext(ctx)
+
+		chatHandler.SendMessage(rr, req)
+
+		require.Equal(t, http.StatusBadRequest, rr.Code)
+
+		var response ChatResponse
+		err := json.NewDecoder(rr.Body).Decode(&response)
+		require.NoError(t, err)
+		assert.False(t, response.Success)
+		assert.Equal(t, "Invalid request body", response.Message)
+	})
+
+	t.Run("should successfully send message without PDF URL", func(t *testing.T) {
+
+		testUser := &db.Person{
+			Uuid:        uuid.New().String(),
+			OwnerPubKey: "test-pubkey-4",
+			OwnerAlias:  "test-user-4",
+		}
+		_, err := db.TestDB.CreateOrEditPerson(*testUser)
+		require.NoError(t, err)
+
+		workspace := db.Workspace{
+			Uuid:        uuid.New().String(),
+			Name:        "test-workspace" + uuid.New().String(),
+			OwnerPubKey: testUser.OwnerPubKey,
+			Github:      "https://github.com/test",
+			Website:     "https://www.testwebsite.com",
+			Description: "test-description",
+		}
+		_, err = db.TestDB.CreateOrEditWorkspace(workspace)
+		require.NoError(t, err)
+
+		chat := &db.Chat{
+			ID:          uuid.New().String(),
+			WorkspaceID: workspace.Uuid,
+			Title:       "Test Chat",
+			Status:      db.ActiveStatus,
+		}
+		_, err = db.TestDB.AddChat(chat)
+		require.NoError(t, err)
+
+		requestBody := SendMessageRequest{
+			ChatID:  chat.ID,
+			Message: "Test message without PDF",
+			ContextTags: []struct {
+				Type string `json:"type"`
+				ID   string `json:"id"`
+			}{},
+			SourceWebsocketID: "test-websocket-id",
+			WorkspaceUUID:     workspace.Uuid,
+		}
+		bodyBytes, _ := json.Marshal(requestBody)
+
+		req := httptest.NewRequest(http.MethodPost, "/send", bytes.NewReader(bodyBytes))
+		rr := httptest.NewRecorder()
+
+		ctx := context.WithValue(req.Context(), auth.ContextKey, testUser.OwnerPubKey)
+		req = req.WithContext(ctx)
+
+		chatHandler.SendMessage(rr, req)
+
+		require.Equal(t, http.StatusOK, rr.Code)
+
+		var response ChatResponse
+		err = json.NewDecoder(rr.Body).Decode(&response)
+		require.NoError(t, err)
+		assert.True(t, response.Success)
+		assert.Equal(t, "Message sent successfully", response.Message)
+
+		messages, err := db.TestDB.GetChatMessagesForChatID(chat.ID)
+		require.NoError(t, err)
+		assert.Equal(t, 1, len(messages))
+		assert.Equal(t, "Test message without PDF", messages[0].Message)
+		assert.Equal(t, db.UserRole, messages[0].Role)
+		assert.Equal(t, db.SendingStatus, messages[0].Status)
+	})
+}
+
+type RoundTripFunc func(req *http.Request) (*http.Response, error)
+
+func (f RoundTripFunc) RoundTrip(req *http.Request) (*http.Response, error) {
+	return f(req)
 }
