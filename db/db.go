@@ -2126,3 +2126,16 @@ func (db database) ResumeBountyTiming(bountyID uint) error {
 
 	return db.UpdateBountyTiming(timing)
 }
+
+func (db database) DeleteBountyTiming(bountyID uint) error {
+	result := db.db.Where("bounty_id = ?", bountyID).Delete(&BountyTiming{})
+	if result.Error != nil {
+		return fmt.Errorf("failed to delete bounty timing: %w", result.Error)
+	}
+
+	if result.RowsAffected == 0 {
+		return fmt.Errorf("no timing record found for bounty %d", bountyID)
+	}
+
+	return nil
+}

@@ -279,6 +279,7 @@ type Database interface {
 	ListFileAssets(params ListFileAssetsParams) ([]FileAsset, int64, error)
 	UpdateFileAsset(asset *FileAsset) error
 	DeleteFileAsset(id uint) error
+	DeleteBountyTiming(bountyID uint) error
 	DeleteTicketGroup(TicketGroupUUID uuid.UUID) error
 	PauseBountyTiming(bountyID uint) error
 	ResumeBountyTiming(bountyID uint) error

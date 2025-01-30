@@ -109,6 +109,8 @@ func DeleteAllFeatureStories() {
 func CleanTestData() {
 	TestDB.db.Exec("DELETE FROM bounty")
 
+	TestDB.db.Exec("DELETE FROM bounty_timings")
+
 	TestDB.db.Exec("DELETE FROM workspaces")
 
 	TestDB.db.Exec("DELETE FROM workspace_features")
