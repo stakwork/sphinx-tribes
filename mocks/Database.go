@@ -13610,3 +13610,88 @@ func (_c *Database_DeleteTicketGroup_Call) RunAndReturn(run func(uuid.UUID) erro
 	_c.Call.Return(run)
 	return _c
 }
+
+func (_m *Database) PauseBountyTiming(bountyID uint) error {
+	ret := _m.Called(bountyID)
+
+	if len(ret) == 0 {
+		panic("no return value specified for PauseBountyTiming")
+	}
+
+	var r0 error
+	if rf, ok := ret.Get(0).(func(uint) error); ok {
+		r0 = rf(bountyID)
+	} else {
+		r0 = ret.Error(0)
+	}
+
+	return r0
+}
+
+type Database_PauseBountyTiming_Call struct {
+	*mock.Call
+}
+
+func (_e *Database_Expecter) PauseBountyTiming(bountyID interface{}) *Database_PauseBountyTiming_Call {
+	return &Database_PauseBountyTiming_Call{Call: _e.mock.On("PauseBountyTiming", bountyID)}
+}
+
+func (_c *Database_PauseBountyTiming_Call) Run(run func(bountyID uint)) *Database_PauseBountyTiming_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(uint))
+	})
+	return _c
+}
+
+func (_c *Database_PauseBountyTiming_Call) Return(_a0 error) *Database_PauseBountyTiming_Call {
+	_c.Call.Return(_a0)
+	return _c
+}
+
+func (_c *Database_PauseBountyTiming_Call) RunAndReturn(run func(uint) error) *Database_PauseBountyTiming_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
+
+func (_m *Database) ResumeBountyTiming(bountyID uint) error {
+	ret := _m.Called(bountyID)
+
+	if len(ret) == 0 {
+		panic("no return value specified for ResumeBountyTiming")
+	}
+
+	var r0 error
+	if rf, ok := ret.Get(0).(func(uint) error); ok {
+		r0 = rf(bountyID)
+	} else {
+		r0 = ret.Error(0)
+	}
+
+	return r0
+}
+
+type Database_ResumeBountyTiming_Call struct {
+	*mock.Call
+}
+
+func (_e *Database_Expecter) ResumeBountyTiming(bountyID interface{}) *Database_ResumeBountyTiming_Call {
+	return &Database_ResumeBountyTiming_Call{Call: _e.mock.On("ResumeBountyTiming", bountyID)}
+}
+
+func (_c *Database_ResumeBountyTiming_Call) Run(run func(bountyID uint)) *Database_ResumeBountyTiming_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(uint))
+	})
+	return _c
+}
+
+func (_c *Database_ResumeBountyTiming_Call) Return(_a0 error) *Database_ResumeBountyTiming_Call {
+	_c.Call.Return(_a0)
+	return _c
+}
+
+func (_c *Database_ResumeBountyTiming_Call) RunAndReturn(run func(uint) error) *Database_ResumeBountyTiming_Call {
+	_c.Call.Return(run)
+	return _c
+}
