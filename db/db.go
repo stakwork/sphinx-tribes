@@ -2087,6 +2087,46 @@ func (db database) DeleteFeaturedBounty(bountyID string) error {
 	return db.db.Where("bounty_id = ?", bountyID).Delete(&FeaturedBounty{}).Error
 }
 
+func (db database) PauseBountyTiming(bountyID uint) error {
+	timing, err := db.GetBountyTiming(bountyID)
+	if err != nil {
+		return fmt.Errorf("failed to get bounty timing: %w", err)
+	}
+
+	if timing.IsPaused {
+		return nil
+	}
+
+	now := time.Now()
+	timing.IsPaused = true
+	timing.LastPausedAt = &now
+
+	return db.UpdateBountyTiming(timing)
+}
+
+func (db database) ResumeBountyTiming(bountyID uint) error {
+	timing, err := db.GetBountyTiming(bountyID)
+	if err != nil {
+		return fmt.Errorf("failed to get bounty timing: %w", err)
+	}
+
+	if !timing.IsPaused {
+		return nil
+	}
+
+	now := time.Now()
+
+	if timing.LastPausedAt != nil {
+		pauseDuration := int(now.Sub(*timing.LastPausedAt).Seconds())
+		timing.AccumulatedPauseSeconds += pauseDuration
+	}
+
+	timing.IsPaused = false
+	timing.LastPausedAt = nil
+
+	return db.UpdateBountyTiming(timing)
+}
+
 func (db database) DeleteBountyTiming(bountyID uint) error {
 	result := db.db.Where("bounty_id = ?", bountyID).Delete(&BountyTiming{})
 	if result.Error != nil {

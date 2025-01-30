@@ -281,4 +281,6 @@ type Database interface {
 	DeleteFileAsset(id uint) error
 	DeleteBountyTiming(bountyID uint) error
 	DeleteTicketGroup(TicketGroupUUID uuid.UUID) error
+	PauseBountyTiming(bountyID uint) error
+	ResumeBountyTiming(bountyID uint) error
 }
