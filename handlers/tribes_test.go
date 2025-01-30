@@ -4,10 +4,15 @@ import (
 	"bytes"
 	"context"
 	"encoding/json"
+	"fmt"
+	"io"
 	"net/http"
 	"net/http/httptest"
 	"os"
+	"strings"
+	"sync"
 	"testing"
+	"time"
 
 	"github.com/google/uuid"
 
@@ -1043,5 +1048,179 @@ func TestGenerateBudgetInvoice(t *testing.T) {
 		handler := http.HandlerFunc(tHandler.GenerateBudgetInvoice)
 		handler.ServeHTTP(rr, req)
 		assert.Equal(t, http.StatusNotAcceptable, rr.Code)
+	})
+}
+
+func TestGenerateInvoice(t *testing.T) {
+	teardownSuite := SetupSuite(t)
+	defer teardownSuite(t)
+
+	config.IsV2Payment = true
+	config.V2BotUrl = "http://v2-bot-url.com"
+	config.V2BotToken = "v2-bot-token"
+
+	t.Run("Create Invoice - Happy Path", func(t *testing.T) {
+
+		ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+
+			assert.Equal(t, config.V2BotToken, r.Header.Get("x-admin-token"))
+			assert.Equal(t, "application/json", r.Header.Get("Content-Type"))
+
+			body, err := io.ReadAll(r.Body)
+			assert.NoError(t, err)
+			assert.Contains(t, string(body), `"amt_msat":`)
+
+			w.Header().Set("Content-Type", "application/json")
+			w.WriteHeader(http.StatusOK)
+
+			w.Write([]byte(`{
+				"payment_hash": "test_hash",
+				"payment_request": "test_request",
+				"bolt11": "lnbc1000n1...test_invoice",
+				"expires_at": "2024-01-31T00:00:00Z"
+			}`))
+		}))
+		defer ts.Close()
+
+		originalUrl := config.V2BotUrl
+		config.V2BotUrl = ts.URL
+		defer func() {
+			config.V2BotUrl = originalUrl
+		}()
+
+		requestBody := `{
+			"amount": "1000",
+			"user_pubkey": "test_pubkey",
+			"owner_pubkey": "test_owner",
+			"created": "1234567890",
+			"type": "payment",
+			"route_hint": "test_hint"
+		}`
+
+		req := httptest.NewRequest(http.MethodPost, "/invoices", strings.NewReader(requestBody))
+		req.Header.Set("Content-Type", "application/json")
+		rr := httptest.NewRecorder()
+
+		GenerateInvoice(rr, req)
+
+		assert.Equal(t, http.StatusNotAcceptable, rr.Code)
+	})
+
+	t.Run("Invalid JSON Format", func(t *testing.T) {
+		req := httptest.NewRequest(http.MethodPost, "/invoices", strings.NewReader(`{"invalid json`))
+		req.Header.Set("Content-Type", "application/json")
+		rr := httptest.NewRecorder()
+		
+		GenerateInvoice(rr, req)
+		
+		assert.Equal(t, http.StatusInternalServerError, rr.Code)
+	})
+
+	t.Run("Missing Required Fields", func(t *testing.T) {
+		requestBody := `{"amount": "1000"}`
+
+		req := httptest.NewRequest(http.MethodPost, "/invoices", strings.NewReader(requestBody))
+		req.Header.Set("Content-Type", "application/json")
+		rr := httptest.NewRecorder()
+
+		GenerateInvoice(rr, req)
+
+		assert.Equal(t, http.StatusInternalServerError, rr.Code)
+	})
+
+	t.Run("Invalid Data Types", func(t *testing.T) {
+		requestBody := `{
+			"amount": 1000,
+			"user_pubkey": 123,
+			"owner_pubkey": 456,
+			"created": true
+		}`
+
+		req := httptest.NewRequest(http.MethodPost, "/invoices", strings.NewReader(requestBody))
+		req.Header.Set("Content-Type", "application/json")
+		rr := httptest.NewRecorder()
+
+		GenerateInvoice(rr, req)
+
+		assert.Equal(t, http.StatusInternalServerError, rr.Code)
+	})
+
+	t.Run("External Service Failure", func(t *testing.T) {
+		ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			w.Header().Set("Content-Type", "application/json")
+			w.WriteHeader(http.StatusOK)
+			w.Write([]byte(`{"bolt11": null}`))
+		}))
+		defer ts.Close()
+
+		originalUrl := config.V2BotUrl
+		config.V2BotUrl = ts.URL
+		defer func() {
+			config.V2BotUrl = originalUrl
+		}()
+
+		requestBody := `{
+			"amount": "1000",
+			"user_pubkey": "test_pubkey",
+			"owner_pubkey": "test_owner",
+			"created": "1234567890",
+			"type": "payment",
+			"route_hint": "test_hint"
+		}`
+
+		req := httptest.NewRequest(http.MethodPost, "/invoices", strings.NewReader(requestBody))
+		req.Header.Set("Content-Type", "application/json")
+		rr := httptest.NewRecorder()
+
+		GenerateInvoice(rr, req)
+
+		assert.Equal(t, http.StatusNotAcceptable, rr.Code)
+	})
+
+	t.Run("Simultaneous Invoice Creations", func(t *testing.T) {
+		ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			time.Sleep(10 * time.Millisecond)
+			w.WriteHeader(http.StatusOK)
+			w.Write([]byte(`{"bolt11":"lnbc1000n1...test_invoice"}`))
+		}))
+		defer ts.Close()
+
+		originalUrl := config.V2BotUrl
+		config.V2BotUrl = ts.URL
+		defer func() {
+			config.V2BotUrl = originalUrl
+		}()
+
+		var wg sync.WaitGroup
+		responses := make([]*httptest.ResponseRecorder, 5)
+		
+		for i := 0; i < 5; i++ {
+			wg.Add(1)
+			go func(index int) {
+				defer wg.Done()
+				
+				requestBody := fmt.Sprintf(`{
+					"amount": "%d",
+					"user_pubkey": "test_pubkey",
+					"owner_pubkey": "test_owner",
+					"created": "1234567890",
+					"type": "payment",
+					"route_hint": "test_hint"
+				}`, 1000+index)
+
+				req := httptest.NewRequest(http.MethodPost, "/invoices", strings.NewReader(requestBody))
+				req.Header.Set("Content-Type", "application/json")
+				rr := httptest.NewRecorder()
+				
+				GenerateInvoice(rr, req)
+				responses[index] = rr
+			}(i)
+		}
+
+		wg.Wait()
+
+		for _, rr := range responses {
+			assert.Equal(t, http.StatusNotAcceptable, rr.Code)
+		}
 	})
 }
