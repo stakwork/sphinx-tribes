@@ -365,10 +365,10 @@ func (ah *authHandler) ListConnectionCodes(w http.ResponseWriter, r *http.Reques
 	codes, total, err := ah.db.GetConnectionCodesList(page, limit)
 	if err != nil {
 		logger.Log.Error("[auth] Failed to get connection codes: %v", err)
-		w.WriteHeader(http.StatusInternalServerError)
+		w.WriteHeader(http.StatusNotFound)
 		json.NewEncoder(w).Encode(map[string]interface{}{
 			"success": false,
-			"error":   "Failed to fetch connection codes",
+			"error":   "No connection codes found",
 		})
 		return
 	}
