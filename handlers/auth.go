@@ -7,6 +7,7 @@ import (
 	"io"
 	"log"
 	"net/http"
+	"strconv"
 
 	"github.com/form3tech-oss/jwt-go"
 	"github.com/stakwork/sphinx-tribes/auth"
@@ -30,6 +31,14 @@ func NewAuthHandler(db db.Database) *authHandler {
 		decodeJwt:                 auth.DecodeJwt,
 		encodeJwt:                 auth.EncodeJwt,
 	}
+}
+
+type ConnectionCodesListResponse struct {
+    Success bool `json:"success"`
+    Data    struct {
+        Codes []db.ConnectionCodesList `json:"codes"`
+        Total int64                   `json:"total"`
+    } `json:"data"`
 }
 
 func GetAdminPubkeys(w http.ResponseWriter, r *http.Request) {
@@ -334,4 +343,47 @@ func returnUserMap(p db.Person) map[string]interface{} {
 	user["alias"] = p.OwnerAlias
 	user["url"] = config.Host
 	return user
+}
+
+func (ah *authHandler) ListConnectionCodes(w http.ResponseWriter, r *http.Request) {
+
+	page := 1
+	limit := 20
+	
+	if pageStr := r.URL.Query().Get("page"); pageStr != "" {
+		if p, err := strconv.Atoi(pageStr); err == nil && p > 0 {
+			page = p
+		}
+	}
+	
+	if limitStr := r.URL.Query().Get("limit"); limitStr != "" {
+		if l, err := strconv.Atoi(limitStr); err == nil && l > 0 {
+			limit = l
+		}
+	}
+
+	codes, total, err := ah.db.GetConnectionCodesList(page, limit)
+	if err != nil {
+		logger.Log.Error("[auth] Failed to get connection codes: %v", err)
+		w.WriteHeader(http.StatusInternalServerError)
+		json.NewEncoder(w).Encode(map[string]interface{}{
+			"success": false,
+			"error":   "Failed to fetch connection codes",
+		})
+		return
+	}
+
+	response := ConnectionCodesListResponse{
+		Success: true,
+		Data: struct {
+			Codes []db.ConnectionCodesList `json:"codes"`
+			Total int64                   `json:"total"`
+		}{
+			Codes: codes,
+			Total: total,
+		},
+	}
+
+	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode(response)
 }

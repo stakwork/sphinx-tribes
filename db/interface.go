@@ -82,6 +82,7 @@ type Database interface {
 	CountBounties() uint64
 	GetPeopleListShort(count uint32) *[]PersonInShort
 	GetConnectionCode() ConnectionCodesShort
+	GetConnectionCodesList(page, limit int) ([]ConnectionCodesList, int64, error)
 	CreateConnectionCode(c []ConnectionCodes) ([]ConnectionCodes, error)
 	GetLnUser(lnKey string) int64
 	CreateLnUser(lnKey string) (Person, error)

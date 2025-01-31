@@ -1671,6 +1671,30 @@ func (db database) GetConnectionCode() ConnectionCodesShort {
 	return c
 }
 
+func (db database) GetConnectionCodesList(page, limit int) ([]ConnectionCodesList, int64, error) {
+    var codes []ConnectionCodesList
+    var total int64
+    
+    offset := (page - 1) * limit
+
+    if err := db.db.Model(&ConnectionCodes{}).
+        Where("is_used = ?", false).
+        Count(&total).Error; err != nil {
+        return nil, 0, err
+    }
+
+    if err := db.db.Model(&ConnectionCodes{}).
+        Where("is_used = ?", false).
+        Order("date_created DESC").
+        Limit(limit).
+        Offset(offset).
+        Find(&codes).Error; err != nil {
+        return nil, 0, err
+    }
+
+    return codes, total, nil
+}
+
 func (db database) GetLnUser(lnKey string) int64 {
 	var count int64
 
