@@ -13738,3 +13738,65 @@ func (_c *Database_DeleteBountyTiming_Call) RunAndReturn(run func(uint) error) *
 	_c.Call.Return(run)
 	return _c
 }
+
+// GetConnectionCodesList provides a mock function with given fields: page, limit
+func (_m *Database) GetConnectionCodesList(page int, limit int) ([]db.ConnectionCodesList, int64, error) {
+	ret := _m.Called(page, limit)
+
+	if len(ret) == 0 {
+		panic("no return value specified for GetConnectionCodesList")
+	}
+
+	var r0 []db.ConnectionCodesList
+	var r1 int64
+	var r2 error
+	if rf, ok := ret.Get(0).(func(int, int) ([]db.ConnectionCodesList, int64, error)); ok {
+		return rf(page, limit)
+	}
+	if rf, ok := ret.Get(0).(func(int, int) []db.ConnectionCodesList); ok {
+		r0 = rf(page, limit)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).([]db.ConnectionCodesList)
+		}
+	}
+
+	if rf, ok := ret.Get(1).(func(int, int) int64); ok {
+		r1 = rf(page, limit)
+	} else {
+		r1 = ret.Get(1).(int64)
+	}
+
+	if rf, ok := ret.Get(2).(func(int, int) error); ok {
+		r2 = rf(page, limit)
+	} else {
+		r2 = ret.Error(2)
+	}
+
+	return r0, r1, r2
+}
+
+type Database_GetConnectionCodesList_Call struct {
+	*mock.Call
+}
+
+func (_e *Database_Expecter) GetConnectionCodesList(page interface{}, limit interface{}) *Database_GetConnectionCodesList_Call {
+	return &Database_GetConnectionCodesList_Call{Call: _e.mock.On("GetConnectionCodesList", page, limit)}
+}
+
+func (_c *Database_GetConnectionCodesList_Call) Run(run func(page int, limit int)) *Database_GetConnectionCodesList_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(int), args[1].(int))
+	})
+	return _c
+}
+
+func (_c *Database_GetConnectionCodesList_Call) Return(_a0 []db.ConnectionCodesList, _a1 int64, _a2 error) *Database_GetConnectionCodesList_Call {
+	_c.Call.Return(_a0, _a1, _a2)
+	return _c
+}
+
+func (_c *Database_GetConnectionCodesList_Call) RunAndReturn(run func(int, int) ([]db.ConnectionCodesList, int64, error)) *Database_GetConnectionCodesList_Call {
+	_c.Call.Return(run)
+	return _c
+}
