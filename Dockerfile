@@ -1,5 +1,5 @@
 # build stage
-FROM golang:1.20.13 as builder
+FROM golang:1.20.13 AS builder
 
 ENV GO111MODULE=on
 
@@ -10,13 +10,18 @@ COPY go.sum .
 
 # Installing xgo
 RUN go install github.com/xhd2015/xgo/cmd/xgo@latest
-ENV PATH="/usr/local/xgo/bin:${PATH}"
+# ENV PATH="/usr/local/xgo/bin:${PATH}"
+ENV PATH="${GOPATH}/bin:${PATH}"
+
 
 RUN go mod download
 
 COPY . .
 
-RUN CGO_ENABLED=0 xgo build
+# RUN CGO_ENABLED=0 xgo build
+
+RUN CGO_ENABLED=0 xgo build -o sphinx-tribes
+
 
 # final stage
 FROM alpine:latest
