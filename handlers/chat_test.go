@@ -47,7 +47,7 @@ func TestUpdateChat(t *testing.T) {
 
 	t.Run("should successfully update chat when valid data is provided", func(t *testing.T) {
 		rr := httptest.NewRecorder()
-		handler := http.HandlerFunc(chatHandler.UpdateChat)
+		handler := http.HandlerFunc(chatHandler.UpdateChat) // TODO: fix this
 
 		chat := &db.Chat{
 			ID:          uuid.New().String(),
