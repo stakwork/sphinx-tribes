@@ -4258,3 +4258,116 @@ func TestWorkspaceIsolation(t *testing.T) {
 		}
 	})
 }
+
+func TestDeleteBountyTiming(t *testing.T) {
+	teardownSuite := SetupSuite(t)
+	defer teardownSuite(t)
+
+	db.CleanTestData()
+
+	bHandler := NewBountyHandler(http.DefaultClient, db.TestDB)
+
+	testBounty := db.NewBounty{
+		Type:          "coding",
+		Title:         "Test Bounty for Timing Deletion",
+		Description:   "Test bounty description",
+		WorkspaceUuid: "test-workspace",
+		OwnerID:       bountyOwner.OwnerPubKey,
+		Created:       time.Now().Unix(),
+	}
+
+	createdBounty, err := db.TestDB.CreateOrEditBounty(testBounty)
+	assert.NoError(t, err)
+
+	_, err = db.TestDB.CreateBountyTiming(createdBounty.ID)
+	assert.NoError(t, err)
+
+	t.Run("should return 401 if no pubkey in context", func(t *testing.T) {
+		rr := httptest.NewRecorder()
+		handler := http.HandlerFunc(bHandler.DeleteBountyTiming)
+
+		rctx := chi.NewRouteContext()
+		rctx.URLParams.Add("id", strconv.FormatUint(uint64(createdBounty.ID), 10))
+		req, err := http.NewRequestWithContext(
+			context.WithValue(context.Background(), chi.RouteCtxKey, rctx),
+			http.MethodDelete,
+			"/timing",
+			nil,
+		)
+		assert.NoError(t, err)
+
+		handler.ServeHTTP(rr, req)
+		assert.Equal(t, http.StatusUnauthorized, rr.Code)
+	})
+
+	t.Run("should return 400 for invalid bounty ID", func(t *testing.T) {
+		rr := httptest.NewRecorder()
+		handler := http.HandlerFunc(bHandler.DeleteBountyTiming)
+
+		ctx := context.WithValue(context.Background(), auth.ContextKey, bountyOwner.OwnerPubKey)
+
+		rctx := chi.NewRouteContext()
+		rctx.URLParams.Add("id", "invalid")
+		req, err := http.NewRequestWithContext(
+			context.WithValue(ctx, chi.RouteCtxKey, rctx),
+			http.MethodDelete,
+			"/timing",
+			nil,
+		)
+		assert.NoError(t, err)
+
+		handler.ServeHTTP(rr, req)
+		assert.Equal(t, http.StatusBadRequest, rr.Code)
+	})
+
+	t.Run("should return 404 when no timing record exists", func(t *testing.T) {
+
+		db.CleanTestData()
+
+		rr := httptest.NewRecorder()
+		handler := http.HandlerFunc(bHandler.DeleteBountyTiming)
+
+		ctx := context.WithValue(context.Background(), auth.ContextKey, bountyOwner.OwnerPubKey)
+
+		rctx := chi.NewRouteContext()
+		rctx.URLParams.Add("id", strconv.FormatUint(uint64(createdBounty.ID), 10))
+		req, err := http.NewRequestWithContext(
+			context.WithValue(ctx, chi.RouteCtxKey, rctx),
+			http.MethodDelete,
+			"/timing",
+			nil,
+		)
+		assert.NoError(t, err)
+
+		handler.ServeHTTP(rr, req)
+		assert.Equal(t, http.StatusNotFound, rr.Code)
+	})
+
+	t.Run("should successfully delete bounty timing", func(t *testing.T) {
+
+		_, err := db.TestDB.CreateBountyTiming(createdBounty.ID)
+		assert.NoError(t, err)
+
+		rr := httptest.NewRecorder()
+		handler := http.HandlerFunc(bHandler.DeleteBountyTiming)
+
+		ctx := context.WithValue(context.Background(), auth.ContextKey, bountyOwner.OwnerPubKey)
+
+		rctx := chi.NewRouteContext()
+		rctx.URLParams.Add("id", strconv.FormatUint(uint64(createdBounty.ID), 10))
+		req, err := http.NewRequestWithContext(
+			context.WithValue(ctx, chi.RouteCtxKey, rctx),
+			http.MethodDelete,
+			"/timing",
+			nil,
+		)
+		assert.NoError(t, err)
+
+		handler.ServeHTTP(rr, req)
+		assert.Equal(t, http.StatusNoContent, rr.Code)
+
+		timing, err := db.TestDB.GetBountyTiming(createdBounty.ID)
+		assert.Error(t, err)
+		assert.Nil(t, timing)
+	})
+}

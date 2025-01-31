@@ -1104,6 +1104,7 @@ type ChatMessage struct {
 	ID          string            `json:"id" gorm:"primaryKey"`
 	ChatID      string            `json:"chatId" gorm:"index"`
 	Message     string            `json:"message"`
+	PDFURL      string            `json:"pdf_url,omitempty"`
 	Role        ChatRole          `json:"role"`
 	Timestamp   time.Time         `json:"timestamp"`
 	ContextTags []ContextTag      `json:"contextTags" gorm:"type:jsonb"`

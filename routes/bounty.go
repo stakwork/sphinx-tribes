@@ -1,8 +1,9 @@
 package routes
 
 import (
-	"github.com/stakwork/sphinx-tribes/auth"
 	"net/http"
+
+	"github.com/stakwork/sphinx-tribes/auth"
 
 	"github.com/go-chi/chi"
 	"github.com/stakwork/sphinx-tribes/db"
@@ -60,6 +61,7 @@ func BountyRoutes() chi.Router {
 		r.Get("/{id}/timing", bountyHandler.GetBountyTimingStats)
 		r.Put("/{id}/timing/start", bountyHandler.StartBountyTiming)
 		r.Put("/{id}/timing/close", bountyHandler.CloseBountyTiming)
+		r.Delete("/{id}/timing", bountyHandler.DeleteBountyTiming)
 	})
 	return r
 }
