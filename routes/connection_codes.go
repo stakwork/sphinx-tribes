@@ -12,12 +12,12 @@ func ConnectionCodesRoutes() chi.Router {
 	authHandler := handlers.NewAuthHandler(db.DB)
 	r.Group(func(r chi.Router) {
 		r.Get("/", authHandler.GetConnectionCode)
-		r.Get("/list", authHandler.ListConnectionCodes)
 	})
 
 	r.Group(func(r chi.Router) {
 		r.Use(auth.PubKeyContextSuperAdmin)
 		r.Post("/", authHandler.CreateConnectionCode)
+		r.Get("/list", authHandler.ListConnectionCodes)
 	})
 	return r
 }
