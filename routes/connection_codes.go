@@ -17,6 +17,7 @@ func ConnectionCodesRoutes() chi.Router {
 	r.Group(func(r chi.Router) {
 		r.Use(auth.PubKeyContextSuperAdmin)
 		r.Post("/", authHandler.CreateConnectionCode)
+		r.Get("/list", authHandler.ListConnectionCodes)
 	})
 	return r
 }

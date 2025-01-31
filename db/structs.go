@@ -233,6 +233,14 @@ type ConnectionCodesShort struct {
 	DateCreated      *time.Time `json:"date_created"`
 }
 
+type ConnectionCodesList struct {
+    ConnectionString string     `json:"connection_string"`
+    Pubkey          string     `json:"pubkey"`
+    SatsAmount      uint64     `json:"sats_amount"`
+    DateCreated     *time.Time `json:"date_created"`
+    IsUsed          bool       `json:"is_used"`
+}
+
 type InvoiceRequest struct {
 	Amount          string `json:"amount"`
 	Memo            string `json:"memo"`
