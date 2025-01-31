@@ -293,45 +293,10 @@ func TestSendTicketMessage(t *testing.T) {
 		err := pool.SendTicketMessage(message)
 		assert.Error(t, err)
 	})
+}
 
-	t.Run("Array of Messages", func(t *testing.T) {
-		pool := NewPool()
-		ws, server := setupTestWebsocket(t)
-		defer server.Close()
-		defer ws.Close()
-
-		client := &Client{
-			Host: "test-client",
-			Conn: ws,
-			Pool: pool,
-		}
-
-		pool.Clients = make(map[string]*ClientData)
-		pool.Clients[client.Host] = &ClientData{
-			Client: client,
-			Status: true,
-		}
-
-		messages := []TicketMessage{
-			{
-				BroadcastType:   "direct",
-				SourceSessionID: "test-client",
-				Message:         "Message 1",
-			},
-			{
-				BroadcastType:   "direct",
-				SourceSessionID: "test-client",
-				Message:         "Message 2",
-			},
-		}
-
-		for _, msg := range messages {
-			err := pool.SendTicketMessage(msg)
-			assert.NoError(t, err)
-		}
-	})
-
-	t.Run("Message with Special Characters", func(t *testing.T) {
+func TestSendTicketMessageScenarios(t *testing.T) {
+	t.Run("Direct Broadcast with Valid Client", func(t *testing.T) {
 		pool := NewPool()
 		ws, server := setupTestWebsocket(t)
 		defer server.Close()
@@ -352,14 +317,207 @@ func TestSendTicketMessage(t *testing.T) {
 		message := TicketMessage{
 			BroadcastType:   "direct",
 			SourceSessionID: "test-client",
-			Message:         "Test message with special chars: !@#$%^&*()",
+			Message:         "Test message",
 		}
 
 		err := pool.SendTicketMessage(message)
 		assert.NoError(t, err)
 	})
 
-	t.Run("Message with Empty Message Field", func(t *testing.T) {
+	t.Run("Non-Direct Broadcast", func(t *testing.T) {
+		pool := NewPool()
+		ws, server := setupTestWebsocket(t)
+		defer server.Close()
+		defer ws.Close()
+
+		client := &Client{
+			Host: "test-client",
+			Conn: ws,
+			Pool: pool,
+		}
+
+		pool.Clients = make(map[string]*ClientData)
+		pool.Clients[client.Host] = &ClientData{
+			Client: client,
+			Status: true,
+		}
+
+		message := TicketMessage{
+			BroadcastType:   "broadcast",
+			SourceSessionID: "test-client",
+			Message:         "Test broadcast message",
+		}
+
+		err := pool.SendTicketMessage(message)
+		assert.NoError(t, err)
+	})
+
+	t.Run("Empty SourceSessionID with Direct Broadcast", func(t *testing.T) {
+		pool := NewPool()
+		message := TicketMessage{
+			BroadcastType:   "direct",
+			SourceSessionID: "",
+			Message:         "Test message",
+		}
+
+		err := pool.SendTicketMessage(message)
+		assert.Error(t, err)
+		assert.Contains(t, err.Error(), "client not found")
+	})
+
+	t.Run("Empty BroadcastType", func(t *testing.T) {
+		pool := NewPool()
+		ws, server := setupTestWebsocket(t)
+		defer server.Close()
+		defer ws.Close()
+
+		client := &Client{
+			Host: "test-client",
+			Conn: ws,
+			Pool: pool,
+		}
+
+		pool.Clients = make(map[string]*ClientData)
+		pool.Clients[client.Host] = &ClientData{
+			Client: client,
+			Status: true,
+		}
+
+		message := TicketMessage{
+			BroadcastType:   "",
+			SourceSessionID: "test-client",
+			Message:         "Test message",
+		}
+
+		err := pool.SendTicketMessage(message)
+		assert.NoError(t, err)
+	})
+
+	t.Run("Client Not Found", func(t *testing.T) {
+		pool := NewPool()
+		message := TicketMessage{
+			BroadcastType:   "direct",
+			SourceSessionID: "non-existent-client",
+			Message:         "Test message",
+		}
+
+		err := pool.SendTicketMessage(message)
+		assert.Error(t, err)
+		assert.Contains(t, err.Error(), "client not found")
+	})
+
+	t.Run("WriteJSON Error", func(t *testing.T) {
+		pool := NewPool()
+
+		ws, server := setupTestWebsocket(t)
+		server.Close()
+		ws.Close()
+
+		client := &Client{
+			Host: "test-client",
+			Conn: ws,
+			Pool: pool,
+		}
+
+		pool.Clients = make(map[string]*ClientData)
+		pool.Clients[client.Host] = &ClientData{
+			Client: client,
+			Status: true,
+		}
+
+		message := TicketMessage{
+			BroadcastType:   "direct",
+			SourceSessionID: "test-client",
+			Message:         "Test message",
+		}
+
+		err := pool.SendTicketMessage(message)
+		assert.Error(t, err)
+	})
+
+	t.Run("Large Message Payload", func(t *testing.T) {
+		pool := NewPool()
+		ws, server := setupTestWebsocket(t)
+		defer server.Close()
+		defer ws.Close()
+
+		client := &Client{
+			Host: "test-client",
+			Conn: ws,
+			Pool: pool,
+		}
+
+		pool.Clients = make(map[string]*ClientData)
+		pool.Clients[client.Host] = &ClientData{
+			Client: client,
+			Status: true,
+		}
+
+		largeMessage := strings.Repeat("a", 1024*1024)
+		message := TicketMessage{
+			BroadcastType:   "direct",
+			SourceSessionID: "test-client",
+			Message:         largeMessage,
+		}
+
+		err := pool.SendTicketMessage(message)
+		assert.NoError(t, err)
+	})
+
+	t.Run("Multiple Clients with Same SessionID", func(t *testing.T) {
+		pool := NewPool()
+		ws1, server1 := setupTestWebsocket(t)
+		ws2, server2 := setupTestWebsocket(t)
+		defer server1.Close()
+		defer server2.Close()
+		defer ws1.Close()
+		defer ws2.Close()
+
+		client1 := &Client{
+			Host: "same-session-id",
+			Conn: ws1,
+			Pool: pool,
+		}
+
+		client2 := &Client{
+			Host: "same-session-id",
+			Conn: ws2,
+			Pool: pool,
+		}
+
+		pool.Clients = make(map[string]*ClientData)
+		pool.Clients[client1.Host] = &ClientData{
+			Client: client1,
+			Status: true,
+		}
+		pool.Clients[client2.Host] = &ClientData{
+			Client: client2,
+			Status: true,
+		}
+
+		message := TicketMessage{
+			BroadcastType:   "direct",
+			SourceSessionID: "same-session-id",
+			Message:         "Test message",
+		}
+
+		err := pool.SendTicketMessage(message)
+		assert.NoError(t, err)
+	})
+
+	t.Run("Null or Uninitialized Pool", func(t *testing.T) {
+		var pool *Pool
+		message := TicketMessage{
+			BroadcastType:   "direct",
+			SourceSessionID: "test-client",
+			Message:         "Test message",
+		}
+
+		err := pool.SendTicketMessage(message)
+		assert.Error(t, err)
+	})
+
+	t.Run("Direct Broadcast with Null Message", func(t *testing.T) {
 		pool := NewPool()
 		ws, server := setupTestWebsocket(t)
 		defer server.Close()
@@ -387,7 +545,7 @@ func TestSendTicketMessage(t *testing.T) {
 		assert.NoError(t, err)
 	})
 
-	t.Run("Message with Unicode Characters", func(t *testing.T) {
+	t.Run("Direct Broadcast with Special Characters in Message", func(t *testing.T) {
 		pool := NewPool()
 		ws, server := setupTestWebsocket(t)
 		defer server.Close()
@@ -408,7 +566,7 @@ func TestSendTicketMessage(t *testing.T) {
 		message := TicketMessage{
 			BroadcastType:   "direct",
 			SourceSessionID: "test-client",
-			Message:         "Unicode test: 你好世界 🌍 привет мир",
+			Message:         "Test message with special chars: !@#$%^&*()",
 		}
 
 		err := pool.SendTicketMessage(message)
