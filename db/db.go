@@ -2051,6 +2051,7 @@ func (db database) GetWorkspaceBountyCardsData(r *http.Request) []NewBounty {
 	keys := r.URL.Query()
 	_, _, sortBy, direction, search := utils.GetPaginationParams(r)
 	workspaceUuid := keys.Get("workspace_uuid")
+	inverseSearch := keys.Get("inverse_search") == "true"
 
 	orderQuery := ""
 	searchQuery := ""
@@ -2071,7 +2072,11 @@ func (db database) GetWorkspaceBountyCardsData(r *http.Request) []NewBounty {
 	}
 
 	if search != "" {
-		searchQuery = fmt.Sprintf("AND LOWER(title) LIKE %s", "'%"+strings.ToLower(search)+"%'")
+		if inverseSearch {
+			searchQuery = fmt.Sprintf("AND LOWER(title) NOT LIKE %s", "'%"+strings.ToLower(search)+"%'")
+		} else {
+			searchQuery = fmt.Sprintf("AND LOWER(title) LIKE %s", "'%"+strings.ToLower(search)+"%'")
+		}
 	}
 
 	if workspaceUuid != "" {
