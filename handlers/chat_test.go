@@ -2475,7 +2475,7 @@ func TestSendMessage(t *testing.T) {
 		assert.Equal(t, db.SendingStatus, messages[0].Status)
 	})
 
-	t.Run("should successfully send message with the model selection", func(t *testing.T) {
+	t.Run("should successfully send message with model selection", func(t *testing.T) {
 		person := db.Person{
 			Uuid:        uuid.New().String(),
 			OwnerAlias:  "test-alias-model",
