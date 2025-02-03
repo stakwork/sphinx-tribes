@@ -215,6 +215,118 @@ func (h *bountyHandler) GetPersonAssignedBounties(w http.ResponseWriter, r *http
 	}
 }
 
+func ProcessWaitingNotifications() {
+	notifications := db.DB.GetNotificationsByStatus("WAITING_KEY_EXCHANGE")
+
+	for _, n := range notifications {
+		contactKey, err := getContactKey(n.PubKey)
+		if err != nil {
+			logger.Log.Error("Error checking contact key for pubkey %s: %v", n.PubKey, err)
+			db.DB.IncrementNotificationRetry(n.UUID)
+			continue
+		}
+
+		if contactKey == nil {
+			db.DB.IncrementNotificationRetry(n.UUID)
+			continue
+		}
+
+		// Contact key is available, proceed with sending
+		sendRespStatus := sendNotification(n.PubKey, n.Event, n.Content, "")
+
+		// Update the notification with the response status
+		db.DB.UpdateNotificationStatus(n.UUID, sendRespStatus)
+	}
+}
+
+func getContactKey(pubkey string) (*string, error) {
+	url := fmt.Sprintf("%s/contact/%s", config.V2BotUrl, pubkey)
+	req, err := http.NewRequest(http.MethodGet, url, nil)
+	if err != nil {
+		return nil, fmt.Errorf("error creating request: %v", err)
+	}
+	req.Header.Set("x-admin-token", config.V2BotToken)
+
+	resp, err := http.DefaultClient.Do(req)
+	if err != nil {
+		return nil, fmt.Errorf("error fetching contact: %v", err)
+	}
+	defer resp.Body.Close()
+
+	var contactResp struct {
+		ContactKey *string `json:"contact_key"`
+	}
+	if err := json.NewDecoder(resp.Body).Decode(&contactResp); err != nil {
+		return nil, fmt.Errorf("error decoding contact response: %v", err)
+	}
+
+	return contactResp.ContactKey, nil
+}
+
+func sendNotification(pubkey, event, content, alias string) string {
+	contactKey, err := getContactKey(pubkey)
+	if err != nil {
+		logger.Log.Error("Error checking contact key: %v", err)
+		return "FAILED"
+	}
+
+	if contactKey == nil {
+		addContactURL := fmt.Sprintf("%s/add_contact", config.V2BotUrl)
+		body, _ := json.Marshal(map[string]string{"contact_info": pubkey, "alias": alias})
+		req, _ := http.NewRequest(http.MethodPost, addContactURL, bytes.NewBuffer(body))
+		req.Header.Set("Content-Type", "application/json")
+		req.Header.Set("x-admin-token", config.V2BotToken)
+		http.DefaultClient.Do(req)
+
+		contactKey, err = getContactKey(pubkey)
+		if err != nil {
+			logger.Log.Error("Error rechecking contact key: %v", err)
+			return "FAILED"
+		}
+
+		if contactKey == nil {
+			db.DB.SaveNotification(pubkey, event, content, "WAITING_KEY_EXCHANGE")
+			return "FAILED"
+		}
+	}
+
+	sendURL := fmt.Sprintf("%s/send", config.V2BotUrl)
+	msgBody, _ := json.Marshal(map[string]interface{}{
+		"dest":     pubkey,
+		"amt_msat": 0,
+		"content":  content,
+		"is_tribe": false,
+		"wait":     true,
+	})
+
+	req, err := http.NewRequest(http.MethodPost, sendURL, bytes.NewBuffer(msgBody))
+	if err != nil {
+		logger.Log.Error("Error creating send request: %v", err)
+		return "FAILED"
+	}
+	req.Header.Set("Content-Type", "application/json")
+	req.Header.Set("x-admin-token", config.V2BotToken)
+
+	resp, err := http.DefaultClient.Do(req)
+	if err != nil {
+		logger.Log.Error("Error sending notification: %v", err)
+		return "FAILED"
+	}
+	defer resp.Body.Close()
+
+	var sendResp struct {
+		Status string `json:"status"`
+	}
+	if err := json.NewDecoder(resp.Body).Decode(&sendResp); err != nil {
+		logger.Log.Error("Error decoding send response: %v", err)
+		return "FAILED"
+	}
+
+	db.DB.SaveNotification(pubkey, event, content, sendResp.Status)
+
+	return sendResp.Status
+}
+
 func (h *bountyHandler) CreateOrEditBounty(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 	pubKeyFromAuth, _ := ctx.Value(auth.ContextKey).(string)
@@ -285,6 +397,9 @@ func (h *bountyHandler) CreateOrEditBounty(w http.ResponseWriter, r *http.Reques
 				handleTimingError(w, "start_timing", err)
 			}
 		}
+
+		msg := fmt.Sprintf("You have been assigned a new ticket: %s.", bounty.Title)
+		sendNotification(bounty.Assignee, "bounty_assigned", msg, user.OwnerAlias)
 	}
 
 	if bounty.Tribe == "" {

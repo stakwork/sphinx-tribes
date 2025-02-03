@@ -52,6 +52,7 @@ func main() {
 func runCron() {
 	c := cron.New()
 	c.AddFunc("@every 0h30m0s", handlers.InitV2PaymentsCron)
+	c.AddFunc("@every 0h1m0s", handlers.ProcessWaitingNotifications)
 	c.Start()
 }
 

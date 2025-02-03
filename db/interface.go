@@ -284,4 +284,8 @@ type Database interface {
 	DeleteTicketGroup(TicketGroupUUID uuid.UUID) error
 	PauseBountyTiming(bountyID uint) error
 	ResumeBountyTiming(bountyID uint) error
+	SaveNotification(pubkey, event, content, status string) error
+	GetNotificationsByStatus(status string) []Notification
+	IncrementNotificationRetry(notificationUUID string)
+	UpdateNotificationStatus(notificationUUID string, status string)
 }

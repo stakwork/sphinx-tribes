@@ -3,6 +3,8 @@ package db
 import (
 	"errors"
 	"fmt"
+	"github.com/google/uuid"
+	"gorm.io/gorm"
 	"net/http"
 	"strings"
 	"time"
@@ -390,4 +392,37 @@ func (db database) UpdateFeatureStatus(uuid string, status FeatureStatus) (Works
 
 	db.db.Where("uuid = ?", uuid).First(&feature)
 	return feature, nil
+}
+
+func (db database) SaveNotification(pubkey, event, content, status string) error {
+	notification := Notification{
+		UUID:    uuid.New().String(),
+		PubKey:  pubkey,
+		Event:   event,
+		Content: content,
+		Status:  NotificationStatus(status),
+	}
+
+	result := db.db.Create(&notification)
+	if result.Error != nil {
+		return fmt.Errorf("error saving notification: %v", result.Error)
+	}
+
+	return nil
+}
+
+func (db database) GetNotificationsByStatus(status string) []Notification {
+	var notifications []Notification
+	db.db.Where("status = ?", status).Find(&notifications)
+	return notifications
+}
+
+func (db database) IncrementNotificationRetry(notificationUUID string) {
+	db.db.Model(&Notification{}).Where("uuid = ?", notificationUUID).
+		Update("retries", gorm.Expr("retries + 1"))
+}
+
+func (db database) UpdateNotificationStatus(notificationUUID string, status string) {
+	db.db.Model(&Notification{}).Where("uuid = ?", notificationUUID).
+		Updates(map[string]interface{}{"status": status, "updated_at": time.Now()})
 }
