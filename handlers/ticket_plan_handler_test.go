@@ -99,7 +99,7 @@ func TestCreateTicketPlan(t *testing.T) {
 			},
 		},
 		{
-			name: "unauthorized - no auth token",
+			name: "unauthorized no auth token",
 			requestBody: CreateTicketPlanRequest{
 				FeatureID: feature.Uuid,
 				PhaseID:   phase.Uuid,
