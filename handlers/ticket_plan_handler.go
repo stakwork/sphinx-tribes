@@ -66,9 +66,29 @@ func (th *ticketHandler) CreateTicketPlan(w http.ResponseWriter, r *http.Request
         return
     }
 
+    feature := th.db.GetFeatureByUuid(planRequest.FeatureID)
+    if feature.Uuid == "" {
+        w.WriteHeader(http.StatusNotFound)
+        json.NewEncoder(w).Encode(TicketPlanResponse{
+            Success: false,
+            Message: "Feature not found",
+        })
+        return
+    }
+
+    phase, err := th.db.GetPhaseByUuid(planRequest.PhaseID)
+    if err != nil || phase.Uuid == "" {
+        w.WriteHeader(http.StatusNotFound)
+        json.NewEncoder(w).Encode(TicketPlanResponse{
+            Success: false,
+            Message: "Phase not found",
+        })
+        return
+    }
+
     newPlan := &db.TicketPlan{
         UUID:          uuid.New(),
-        WorkspaceUuid: "",
+        WorkspaceUuid: feature.WorkspaceUuid,
         FeatureUUID:   planRequest.FeatureID,
         PhaseUUID:     planRequest.PhaseID,
         Name:          planRequest.Name,
@@ -80,16 +100,6 @@ func (th *ticketHandler) CreateTicketPlan(w http.ResponseWriter, r *http.Request
         UpdatedBy:     pubKeyFromAuth,
     }
 
-    feature := th.db.GetFeatureByUuid(planRequest.FeatureID)
-    if feature.Uuid == "" {
-        w.WriteHeader(http.StatusNotFound)
-        json.NewEncoder(w).Encode(TicketPlanResponse{
-            Success: false,
-            Message: "Feature not found",
-        })
-        return
-    }
-    newPlan.WorkspaceUuid = feature.WorkspaceUuid
 
     createdPlan, err := th.db.CreateOrEditTicketPlan(newPlan)
     if err != nil {
@@ -103,12 +113,16 @@ func (th *ticketHandler) CreateTicketPlan(w http.ResponseWriter, r *http.Request
     }
 
     if planRequest.SourceWebsocket != "" {
-        websocket.WebsocketPool.SendTicketMessage(websocket.TicketMessage{
+        websocketErr := websocket.WebsocketPool.SendTicketMessage(websocket.TicketMessage{
             BroadcastType:   "direct",
             SourceSessionID: planRequest.SourceWebsocket,
-            Message:         fmt.Sprintf("Created ticket plan %s", createdPlan.UUID.String()),
             Action:          "TICKET_PLAN_CREATED",
+            Message:         fmt.Sprintf("Created ticket plan %s", createdPlan.UUID.String()),
         })
+
+        if websocketErr != nil {
+            logger.Log.Error("Failed to send websocket message", "error", websocketErr)
+        }
     }
 
     w.WriteHeader(http.StatusCreated)
