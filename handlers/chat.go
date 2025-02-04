@@ -327,24 +327,44 @@ func (ch *ChatHandler) SendMessage(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	var codeGraph *db.WorkspaceCodeGraph
+	if workspaceID := request.WorkspaceUUID; workspaceID != "" {
+		codeGraphs, err := ch.db.GetCodeGraphsByWorkspaceUuid(workspaceID)
+		if err == nil && len(codeGraphs) > 0 {
+			codeGraph = &codeGraphs[0]
+		}
+	}
+
 	stakworkPayload := StakworkChatPayload{
 		Name:       "Hive Chat Processor",
 		WorkflowID: 38842,
 		WorkflowParams: map[string]interface{}{
 			"set_var": map[string]interface{}{
 				"attributes": map[string]interface{}{
-					"vars": map[string]interface{}{
-						"chatId":            request.ChatID,
-						"messageId":         createdMessage.ID,
-						"message":           request.Message,
-						"history":           messageHistory,
-						"contextTags":       context,
-						"sourceWebsocketId": request.SourceWebsocketID,
-						"webhook_url":       fmt.Sprintf("%s/hivechat/response", os.Getenv("HOST")),
-						"alias":             user.OwnerAlias,
-						"pdf_url":           request.PDFURL,
-						"modelSelection":    request.ModelSelection,
-					},
+					"vars": func() map[string]interface{} {
+						vars := map[string]interface{}{
+							"chatId":            request.ChatID,
+							"messageId":         createdMessage.ID,
+							"message":           request.Message,
+							"history":           messageHistory,
+							"contextTags":       context,
+							"sourceWebsocketId": request.SourceWebsocketID,
+							"webhook_url":       fmt.Sprintf("%s/hivechat/response", os.Getenv("HOST")),
+							"alias":             user.OwnerAlias,
+							"pdf_url":           request.PDFURL,
+							"modelSelection":    request.ModelSelection,
+						}
+
+						if codeGraph != nil && codeGraph.Url != "" {
+							url := strings.TrimSuffix(codeGraph.Url, "/")
+							if !strings.HasPrefix(url, "https://") {
+								url = "https://" + url
+							}
+							vars["codeGraph"] = url
+						}
+
+						return vars
+					}(),
 				},
 			},
 		},
