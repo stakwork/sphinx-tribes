@@ -70,10 +70,11 @@ type FileResponse struct {
 }
 
 type SendMessageRequest struct {
-	ChatID      string `json:"chat_id"`
-	Message     string `json:"message"`
-	PDFURL      string `json:"pdf_url,omitempty"`
-	ContextTags []struct {
+	ChatID            string `json:"chat_id"`
+	Message           string `json:"message"`
+	PDFURL            string `json:"pdf_url,omitempty"`
+	ModelSelection    string `json:"modelSelection,omitempty"`
+	ContextTags       []struct {
 		Type string `json:"type"`
 		ID   string `json:"id"`
 	} `json:"contextTags"`
@@ -342,6 +343,7 @@ func (ch *ChatHandler) SendMessage(w http.ResponseWriter, r *http.Request) {
 						"webhook_url":       fmt.Sprintf("%s/hivechat/response", os.Getenv("HOST")),
 						"alias":             user.OwnerAlias,
 						"pdf_url":           request.PDFURL,
+						"modelSelection":    request.ModelSelection,
 					},
 				},
 			},

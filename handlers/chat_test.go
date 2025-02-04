@@ -2474,6 +2474,141 @@ func TestSendMessage(t *testing.T) {
 		assert.Equal(t, db.UserRole, messages[0].Role)
 		assert.Equal(t, db.SendingStatus, messages[0].Status)
 	})
+
+	t.Run("should successfully send message with the model selection", func(t *testing.T) {
+		person := db.Person{
+			Uuid:        uuid.New().String(),
+			OwnerAlias:  "test-alias-model",
+			UniqueName:  "test-unique-name-model",
+			OwnerPubKey: "test-pubkey-model",
+			PriceToMeet: 0,
+			Description: "test-description",
+		}
+		db.TestDB.CreateOrEditPerson(person)
+
+		workspace := db.Workspace{
+			Uuid:        uuid.New().String(),
+			Name:        "test-workspace" + uuid.New().String(),
+			OwnerPubKey: person.OwnerPubKey,
+			Github:      "https://github.com/test",
+			Website:     "https://www.testwebsite.com",
+			Description: "test-description",
+		}
+		db.TestDB.CreateOrEditWorkspace(workspace)
+
+		chat := &db.Chat{
+			ID:          uuid.New().String(),
+			WorkspaceID: workspace.Uuid,
+			Title:       "Test Chat with Model",
+			Status:      db.ActiveStatus,
+		}
+		_, err := db.TestDB.AddChat(chat)
+		require.NoError(t, err)
+
+		requestBody := SendMessageRequest{
+			ChatID:         chat.ID,
+			Message:        "Test message with model selection",
+			ModelSelection: "claude-3-sonnet",
+			ContextTags: []struct {
+				Type string `json:"type"`
+				ID   string `json:"id"`
+			}{},
+			SourceWebsocketID: "test-websocket-id",
+			WorkspaceUUID:     workspace.Uuid,
+		}
+		bodyBytes, _ := json.Marshal(requestBody)
+
+		req := httptest.NewRequest(http.MethodPost, "/send", bytes.NewReader(bodyBytes))
+		rr := httptest.NewRecorder()
+
+		ctx := context.WithValue(req.Context(), auth.ContextKey, person.OwnerPubKey)
+		req = req.WithContext(ctx)
+
+		chatHandler.SendMessage(rr, req)
+
+		require.Equal(t, http.StatusOK, rr.Code)
+
+		var response ChatResponse
+		err = json.NewDecoder(rr.Body).Decode(&response)
+		require.NoError(t, err)
+		assert.True(t, response.Success)
+		assert.Equal(t, "Message sent successfully", response.Message)
+
+		messages, err := db.TestDB.GetChatMessagesForChatID(chat.ID)
+		require.NoError(t, err)
+		assert.Equal(t, 1, len(messages))
+		assert.Equal(t, "Test message with model selection", messages[0].Message)
+		assert.Equal(t, db.UserRole, messages[0].Role)
+		assert.Equal(t, db.SendingStatus, messages[0].Status)
+	})
+
+	t.Run("should successfully send message with PDF URL and model selection", func(t *testing.T) {
+		person := db.Person{
+			Uuid:        uuid.New().String(),
+			OwnerAlias:  "test-alias-pdf-model",
+			UniqueName:  "test-unique-name-pdf-model",
+			OwnerPubKey: "test-pubkey-pdf-model",
+			PriceToMeet: 0,
+			Description: "test-description",
+		}
+		db.TestDB.CreateOrEditPerson(person)
+
+		workspace := db.Workspace{
+			Uuid:        uuid.New().String(),
+			Name:        "test-workspace" + uuid.New().String(),
+			OwnerPubKey: person.OwnerPubKey,
+			Github:      "https://github.com/test",
+			Website:     "https://www.testwebsite.com",
+			Description: "test-description",
+		}
+		db.TestDB.CreateOrEditWorkspace(workspace)
+
+		chat := &db.Chat{
+			ID:          uuid.New().String(),
+			WorkspaceID: workspace.Uuid,
+			Title:       "Test Chat PDF Model",
+			Status:      db.ActiveStatus,
+		}
+		_, err := db.TestDB.AddChat(chat)
+		require.NoError(t, err)
+
+		requestBody := SendMessageRequest{
+			ChatID:         chat.ID,
+			Message:        "Test message with PDF and model",
+			PDFURL:        "https://example.com/test.pdf",
+			ModelSelection: "claude-3-opus",
+			ContextTags: []struct {
+				Type string `json:"type"`
+				ID   string `json:"id"`
+			}{},
+			SourceWebsocketID: "test-websocket-id",
+			WorkspaceUUID:     workspace.Uuid,
+		}
+		bodyBytes, _ := json.Marshal(requestBody)
+
+		req := httptest.NewRequest(http.MethodPost, "/send", bytes.NewReader(bodyBytes))
+		rr := httptest.NewRecorder()
+
+		ctx := context.WithValue(req.Context(), auth.ContextKey, person.OwnerPubKey)
+		req = req.WithContext(ctx)
+
+		chatHandler.SendMessage(rr, req)
+
+		require.Equal(t, http.StatusOK, rr.Code)
+
+		var response ChatResponse
+		err = json.NewDecoder(rr.Body).Decode(&response)
+		require.NoError(t, err)
+		assert.True(t, response.Success)
+		assert.Equal(t, "Message sent successfully", response.Message)
+
+		messages, err := db.TestDB.GetChatMessagesForChatID(chat.ID)
+		require.NoError(t, err)
+		assert.Equal(t, 1, len(messages))
+		assert.Equal(t, "Test message with PDF and model", messages[0].Message)
+		assert.Equal(t, db.UserRole, messages[0].Role)
+		assert.Equal(t, db.SendingStatus, messages[0].Status)
+	})
 }
 
 type RoundTripFunc func(req *http.Request) (*http.Response, error)
