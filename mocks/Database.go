@@ -13800,3 +13800,329 @@ func (_c *Database_GetConnectionCodesList_Call) RunAndReturn(run func(int, int) 
 	_c.Call.Return(run)
 	return _c
 }
+
+
+// CreateOrEditTicketPlan provides a mock function with given fields: plan
+func (_m *Database) CreateOrEditTicketPlan(plan *db.TicketPlan) (*db.TicketPlan, error) {
+	ret := _m.Called(plan)
+
+	if len(ret) == 0 {
+		panic("no return value specified for CreateOrEditTicketPlan")
+	}
+
+	var r0 *db.TicketPlan
+	var r1 error
+	if rf, ok := ret.Get(0).(func(*db.TicketPlan) (*db.TicketPlan, error)); ok {
+		return rf(plan)
+	}
+	if rf, ok := ret.Get(0).(func(*db.TicketPlan) *db.TicketPlan); ok {
+		r0 = rf(plan)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(*db.TicketPlan)
+		}
+	}
+
+	if rf, ok := ret.Get(1).(func(*db.TicketPlan) error); ok {
+		r1 = rf(plan)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
+type Database_CreateOrEditTicketPlan_Call struct {
+	*mock.Call
+}
+
+func (_e *Database_Expecter) CreateOrEditTicketPlan(plan interface{}) *Database_CreateOrEditTicketPlan_Call {
+	return &Database_CreateOrEditTicketPlan_Call{Call: _e.mock.On("CreateOrEditTicketPlan", plan)}
+}
+
+func (_c *Database_CreateOrEditTicketPlan_Call) Run(run func(plan *db.TicketPlan)) *Database_CreateOrEditTicketPlan_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(*db.TicketPlan))
+	})
+	return _c
+}
+
+func (_c *Database_CreateOrEditTicketPlan_Call) Return(_a0 *db.TicketPlan, _a1 error) *Database_CreateOrEditTicketPlan_Call {
+	_c.Call.Return(_a0, _a1)
+	return _c
+}
+
+func (_c *Database_CreateOrEditTicketPlan_Call) RunAndReturn(run func(*db.TicketPlan) (*db.TicketPlan, error)) *Database_CreateOrEditTicketPlan_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
+
+
+// GetTicketPlan provides a mock function with given fields: _a0
+func (_m *Database) GetTicketPlan(_a0 string) (*db.TicketPlan, error) {
+	ret := _m.Called(_a0)
+
+	if len(ret) == 0 {
+		panic("no return value specified for GetTicketPlan")
+	}
+
+	var r0 *db.TicketPlan
+	var r1 error
+	if rf, ok := ret.Get(0).(func(string) (*db.TicketPlan, error)); ok {
+		return rf(_a0)
+	}
+	if rf, ok := ret.Get(0).(func(string) *db.TicketPlan); ok {
+		r0 = rf(_a0)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(*db.TicketPlan)
+		}
+	}
+
+	if rf, ok := ret.Get(1).(func(string) error); ok {
+		r1 = rf(_a0)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
+type Database_GetTicketPlan_Call struct {
+	*mock.Call
+}
+
+func (_e *Database_Expecter) GetTicketPlan(_a0 interface{}) *Database_GetTicketPlan_Call {
+	return &Database_GetTicketPlan_Call{Call: _e.mock.On("GetTicketPlan", _a0)}
+}
+
+func (_c *Database_GetTicketPlan_Call) Run(run func(_a0 string)) *Database_GetTicketPlan_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(string))
+	})
+	return _c
+}
+
+func (_c *Database_GetTicketPlan_Call) Return(_a0 *db.TicketPlan, _a1 error) *Database_GetTicketPlan_Call {
+	_c.Call.Return(_a0, _a1)
+	return _c
+}
+
+func (_c *Database_GetTicketPlan_Call) RunAndReturn(run func(string) (*db.TicketPlan, error)) *Database_GetTicketPlan_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
+
+
+// DeleteTicketPlan provides a mock function with given fields: _a0
+func (_m *Database) DeleteTicketPlan(_a0 string) error {
+	ret := _m.Called(_a0)
+
+	if len(ret) == 0 {
+		panic("no return value specified for DeleteTicketPlan")
+	}
+
+	var r0 error
+	if rf, ok := ret.Get(0).(func(string) error); ok {
+		r0 = rf(_a0)
+	} else {
+		r0 = ret.Error(0)
+	}
+
+	return r0
+}
+
+type Database_DeleteTicketPlan_Call struct {
+	*mock.Call
+}
+
+func (_e *Database_Expecter) DeleteTicketPlan(_a0 interface{}) *Database_DeleteTicketPlan_Call {
+	return &Database_DeleteTicketPlan_Call{Call: _e.mock.On("DeleteTicketPlan", _a0)}
+}
+
+func (_c *Database_DeleteTicketPlan_Call) Run(run func(_a0 string)) *Database_DeleteTicketPlan_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(string))
+	})
+	return _c
+}
+
+func (_c *Database_DeleteTicketPlan_Call) Return(_a0 error) *Database_DeleteTicketPlan_Call {
+	_c.Call.Return(_a0)
+	return _c
+}
+
+func (_c *Database_DeleteTicketPlan_Call) RunAndReturn(run func(string) error) *Database_DeleteTicketPlan_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
+
+// GetTicketPlansByFeature provides a mock function with given fields: featureUUID
+func (_m *Database) GetTicketPlansByFeature(featureUUID string) ([]db.TicketPlan, error) {
+	ret := _m.Called(featureUUID)
+
+	if len(ret) == 0 {
+		panic("no return value specified for GetTicketPlansByFeature")
+	}
+
+	var r0 []db.TicketPlan
+	var r1 error
+	if rf, ok := ret.Get(0).(func(string) ([]db.TicketPlan, error)); ok {
+		return rf(featureUUID)
+	}
+	if rf, ok := ret.Get(0).(func(string) []db.TicketPlan); ok {
+		r0 = rf(featureUUID)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).([]db.TicketPlan)
+		}
+	}
+
+	if rf, ok := ret.Get(1).(func(string) error); ok {
+		r1 = rf(featureUUID)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
+type Database_GetTicketPlansByFeature_Call struct {
+	*mock.Call
+}
+
+func (_e *Database_Expecter) GetTicketPlansByFeature(featureUUID interface{}) *Database_GetTicketPlansByFeature_Call {
+	return &Database_GetTicketPlansByFeature_Call{Call: _e.mock.On("GetTicketPlansByFeature", featureUUID)}
+}
+
+func (_c *Database_GetTicketPlansByFeature_Call) Run(run func(featureUUID string)) *Database_GetTicketPlansByFeature_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(string))
+	})
+	return _c
+}
+
+func (_c *Database_GetTicketPlansByFeature_Call) Return(_a0 []db.TicketPlan, _a1 error) *Database_GetTicketPlansByFeature_Call {
+	_c.Call.Return(_a0, _a1)
+	return _c
+}
+
+func (_c *Database_GetTicketPlansByFeature_Call) RunAndReturn(run func(string) ([]db.TicketPlan, error)) *Database_GetTicketPlansByFeature_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
+
+// GetTicketPlansByPhase provides a mock function with given fields: phaseUUID
+func (_m *Database) GetTicketPlansByPhase(phaseUUID string) ([]db.TicketPlan, error) {
+	ret := _m.Called(phaseUUID)
+
+	if len(ret) == 0 {
+		panic("no return value specified for GetTicketPlansByPhase")
+	}
+
+	var r0 []db.TicketPlan
+	var r1 error
+	if rf, ok := ret.Get(0).(func(string) ([]db.TicketPlan, error)); ok {
+		return rf(phaseUUID)
+	}
+	if rf, ok := ret.Get(0).(func(string) []db.TicketPlan); ok {
+		r0 = rf(phaseUUID)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).([]db.TicketPlan)
+		}
+	}
+
+	if rf, ok := ret.Get(1).(func(string) error); ok {
+		r1 = rf(phaseUUID)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
+type Database_GetTicketPlansByPhase_Call struct {
+	*mock.Call
+}
+
+func (_e *Database_Expecter) GetTicketPlansByPhase(phaseUUID interface{}) *Database_GetTicketPlansByPhase_Call {
+	return &Database_GetTicketPlansByPhase_Call{Call: _e.mock.On("GetTicketPlansByPhase", phaseUUID)}
+}
+
+func (_c *Database_GetTicketPlansByPhase_Call) Run(run func(phaseUUID string)) *Database_GetTicketPlansByPhase_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(string))
+	})
+	return _c
+}
+
+func (_c *Database_GetTicketPlansByPhase_Call) Return(_a0 []db.TicketPlan, _a1 error) *Database_GetTicketPlansByPhase_Call {
+	_c.Call.Return(_a0, _a1)
+	return _c
+}
+
+func (_c *Database_GetTicketPlansByPhase_Call) RunAndReturn(run func(string) ([]db.TicketPlan, error)) *Database_GetTicketPlansByPhase_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
+
+// GetTicketPlansByWorkspace provides a mock function with given fields: workspaceUUID
+func (_m *Database) GetTicketPlansByWorkspace(workspaceUUID string) ([]db.TicketPlan, error) {
+	ret := _m.Called(workspaceUUID)
+
+	if len(ret) == 0 {
+		panic("no return value specified for GetTicketPlansByWorkspace")
+	}
+
+	var r0 []db.TicketPlan
+	var r1 error
+	if rf, ok := ret.Get(0).(func(string) ([]db.TicketPlan, error)); ok {
+		return rf(workspaceUUID)
+	}
+	if rf, ok := ret.Get(0).(func(string) []db.TicketPlan); ok {
+		r0 = rf(workspaceUUID)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).([]db.TicketPlan)
+		}
+	}
+
+	if rf, ok := ret.Get(1).(func(string) error); ok {
+		r1 = rf(workspaceUUID)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
+type Database_GetTicketPlansByWorkspace_Call struct {
+	*mock.Call
+}
+
+func (_e *Database_Expecter) GetTicketPlansByWorkspace(workspaceUUID interface{}) *Database_GetTicketPlansByWorkspace_Call {
+	return &Database_GetTicketPlansByWorkspace_Call{Call: _e.mock.On("GetTicketPlansByWorkspace", workspaceUUID)}
+}
+
+func (_c *Database_GetTicketPlansByWorkspace_Call) Run(run func(workspaceUUID string)) *Database_GetTicketPlansByWorkspace_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(string))
+	})
+	return _c
+}
+
+func (_c *Database_GetTicketPlansByWorkspace_Call) Return(_a0 []db.TicketPlan, _a1 error) *Database_GetTicketPlansByWorkspace_Call {
+	_c.Call.Return(_a0, _a1)
+	return _c
+}
+
+func (_c *Database_GetTicketPlansByWorkspace_Call) RunAndReturn(run func(string) ([]db.TicketPlan, error)) *Database_GetTicketPlansByWorkspace_Call {
+	_c.Call.Return(run)
+	return _c
+}
