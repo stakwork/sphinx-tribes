@@ -304,3 +304,106 @@ func TestAddAndUpdateBudget(t *testing.T) {
 		assert.Equal(t, workspaceBudget.TotalBudget, uint(totalAmount))
 	})
 }
+
+func TestGetUserCreatedWorkspaces(t *testing.T) {
+	InitTestDB()
+	defer CloseTestDB()
+
+
+	t.Run("Basic Retrieval with Valid Pubkey", func(t *testing.T) {
+
+		person := Person{
+			Uuid:        uuid.New().String(),
+			OwnerPubKey: "test_user_workspaces",
+			OwnerAlias:  "test_user",
+		}
+		TestDB.db.Create(&person)
+
+		workspace1 := Workspace{
+			OwnerPubKey: person.OwnerPubKey,
+			Uuid:        uuid.New().String(),
+			Name:        "Test Workspace 1",
+		}
+		workspace2 := Workspace{
+			OwnerPubKey: person.OwnerPubKey,
+			Uuid:        uuid.New().String(),
+			Name:        "Test Workspace 2",
+		}
+		TestDB.db.Create(&workspace1)
+		TestDB.db.Create(&workspace2)
+
+		workspaces := TestDB.GetUserCreatedWorkspaces(person.OwnerPubKey)
+		assert.Equal(t, 2, len(workspaces))
+		assert.Equal(t, workspace1.Name, workspaces[0].Name)
+		assert.Equal(t, workspace2.Name, workspaces[1].Name)
+	})
+
+	t.Run("No Workspaces Found", func(t *testing.T) {
+		workspaces := TestDB.GetUserCreatedWorkspaces("non_existent_pubkey")
+		assert.Equal(t, 0, len(workspaces))
+	})
+
+	t.Run("Empty Pubkey", func(t *testing.T) {
+		workspaces := TestDB.GetUserCreatedWorkspaces("")
+		assert.Equal(t, 0, len(workspaces))
+	})
+
+	t.Run("Workspaces with a Mixture of Deleted and Non-Deleted", func(t *testing.T) {
+		person := Person{
+			Uuid:        uuid.New().String(),
+			OwnerPubKey: "test_user_deleted_mix",
+			OwnerAlias:  "test_user_deleted",
+		}
+		TestDB.db.Create(&person)
+
+		workspace1 := Workspace{
+			OwnerPubKey: person.OwnerPubKey,
+			Uuid:        uuid.New().String(),
+			Name:        "Active Workspace",
+			Deleted:     false,
+		}
+		workspace2 := Workspace{
+			OwnerPubKey: person.OwnerPubKey,
+			Uuid:        uuid.New().String(),
+			Name:        "Deleted Workspace",
+			Deleted:     true,
+		}
+		TestDB.db.Create(&workspace1)
+		TestDB.db.Create(&workspace2)
+
+		workspaces := TestDB.GetUserCreatedWorkspaces(person.OwnerPubKey)
+		assert.Equal(t, 1, len(workspaces))
+		assert.Equal(t, workspace1.Name, workspaces[0].Name)
+	})
+
+	t.Run("SQL Injection Prevention", func(t *testing.T) {
+		maliciousPubkey := "' OR '1'='1"
+		workspaces := TestDB.GetUserCreatedWorkspaces(maliciousPubkey)
+		assert.Equal(t, 0, len(workspaces))
+	})
+
+	t.Run("Performance Test with Large Result Set", func(t *testing.T) {
+		person := Person{
+			Uuid:        uuid.New().String(),
+			OwnerPubKey: "test_user_performance",
+			OwnerAlias:  "test_user_perf",
+		}
+		TestDB.db.Create(&person)
+
+		for i := 0; i < 100; i++ {
+			workspace := Workspace{
+				OwnerPubKey: person.OwnerPubKey,
+				Uuid:        uuid.New().String(),
+				Name:        fmt.Sprintf("Performance Workspace %d", i),
+			}
+			TestDB.db.Create(&workspace)
+		}
+
+		start := time.Now()
+		workspaces := TestDB.GetUserCreatedWorkspaces(person.OwnerPubKey)
+		duration := time.Since(start)
+
+		assert.Equal(t, 100, len(workspaces))
+		assert.Less(t, duration.Milliseconds(), int64(1000), "Query should complete within 1 second")
+	})
+}
