@@ -18,12 +18,16 @@ func InitV2PaymentsCron() {
 	paymentHistories := db.DB.GetPendingPaymentHistory()
 	for _, payment := range paymentHistories {
 		bounty := db.DB.GetBounty(payment.BountyId)
+		log.Println("Bounty ID =========================", bounty.ID, bounty)
+		log.Println("Payment ID =========================", payment.ID, payment)
 
 		if bounty.ID > 0 {
 			tag := payment.Tag
 			tagResult := GetInvoiceStatusByTag(tag)
+			log.Println("Tag Result =================", tagResult)
 
 			if tagResult.Status == db.PaymentComplete {
+				log.Println("Payment Status From V2 BOT IS Complete =================================", payment)
 				db.DB.SetPaymentAsComplete(tag)
 
 				now := time.Now()
@@ -37,36 +41,41 @@ func InitV2PaymentsCron() {
 				bounty.CompletionDate = &now
 
 				db.DB.UpdateBountyPaymentStatuses(bounty)
+				log.Println("Bounty Payment Statuses Updated =================================", bounty)
 			} else if tagResult.Status == db.PaymentPending {
-				log.Println("Payment Status From V2 BOT IS Pending", payment)
+				log.Println("Payment Status From V2 BOT IS Pending =================================", payment)
 				if payment.PaymentStatus == db.PaymentPending {
-					log.Println("Payment Status From DB IS Pending", payment)
+					log.Println("Payment Status From DB IS Pending =================================	", payment)
 					created := utils.ConvertTimeToTimestamp(payment.Created.String())
 
 					now := time.Now()
 					daysDiff := utils.GetDateDaysDifference(int64(created), &now)
 
-					log.Println("Payment Date Difference Is", daysDiff)
+					log.Println("Payment Date Difference Is ================================================", daysDiff)
 
 					if daysDiff >= 7 {
 
-						log.Println("Payment Date Difference Is Greater Or Equals 7 Days", payment)
+						log.Println("Payment Date Difference Is Greater Or Equals 7 Days ================================================", payment)
 
 						err := db.DB.ProcessReversePayments(payment.ID)
 						if err != nil {
-							log.Printf("Could not reverse bounty payment after 7 days : Bounty ID - %d, Payment ID - %d, Error - %s", bounty.ID, payment.ID, err)
+							log.Printf("Could not reverse bounty payment after 7 days : Bounty ID - %d, Payment ID - %d, Error - %s ================================================", bounty.ID, payment.ID, err)
 						}
+
+						log.Println("Bounty Payment Statuses Updated After 7 Days ================================================", bounty)
 					}
 				}
 			} else if tagResult.Status == db.PaymentFailed {
 				// Handle failed payments
 				err := db.DB.ProcessReversePayments(payment.ID)
 				if err != nil {
-					log.Printf("Could not reverse bounty payment : Bounty ID - %d, Payment ID - %d, Error - %s", bounty.ID, payment.ID, err)
+					log.Printf("Could not reverse bounty payment : Bounty ID - %d, Payment ID - %d, Error - %s ================================================", bounty.ID, payment.ID, err)
 				}
 
+				log.Println("Bounty Payment Statuses Updated After Failed Payment ================================================", bounty)
+
 			} else {
-				log.Println("Payment Status From V2 BOT IS Unknown", payment, tagResult)
+				log.Println("Payment Status From V2 BOT IS Unknown ================================================", payment, tagResult)
 			}
 		}
 	}
