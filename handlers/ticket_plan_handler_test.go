@@ -164,7 +164,7 @@ func TestCreateTicketPlan(t *testing.T) {
 			},
 		},
 		{
-			name: "not found -- invalid feature",
+			name: "not found - invalid feature",
 			requestBody: CreateTicketPlanRequest{
 				FeatureID: uuid.New().String(),
 				PhaseID:   phase.Uuid,
