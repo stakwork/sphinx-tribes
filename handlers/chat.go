@@ -236,6 +236,31 @@ func (ch *ChatHandler) ArchiveChat(w http.ResponseWriter, r *http.Request) {
 	})
 }
 
+func buildVarsPayload(request SendMessageRequest, createdMessage *db.ChatMessage, messageHistory []map[string]string, context interface{}, user *db.Person, codeGraph *db.WorkspaceCodeGraph) map[string]interface{} {
+	vars := map[string]interface{}{
+		"chatId":            request.ChatID,
+		"messageId":         createdMessage.ID,
+		"message":           request.Message,
+		"history":           messageHistory,
+		"contextTags":       context,
+		"sourceWebsocketId": request.SourceWebsocketID,
+		"webhook_url":       fmt.Sprintf("%s/hivechat/response", os.Getenv("HOST")),
+		"alias":             user.OwnerAlias,
+		"pdf_url":           request.PDFURL,
+		"modelSelection":    request.ModelSelection,
+	}
+
+	if codeGraph != nil && codeGraph.Url != "" {
+		url := strings.TrimSuffix(codeGraph.Url, "/")
+		if !strings.HasPrefix(url, "https://") {
+			url = "https://" + url
+		}
+		vars["codeGraph"] = url
+	}
+
+	return vars
+}
+
 func (ch *ChatHandler) SendMessage(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 	pubKeyFromAuth, _ := ctx.Value(auth.ContextKey).(string)
@@ -335,36 +360,15 @@ func (ch *ChatHandler) SendMessage(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
+	vars := buildVarsPayload(request, &createdMessage, messageHistory, context, &user, codeGraph)
+
 	stakworkPayload := StakworkChatPayload{
 		Name:       "Hive Chat Processor",
 		WorkflowID: 38842,
 		WorkflowParams: map[string]interface{}{
 			"set_var": map[string]interface{}{
 				"attributes": map[string]interface{}{
-					"vars": func() map[string]interface{} {
-						vars := map[string]interface{}{
-							"chatId":            request.ChatID,
-							"messageId":         createdMessage.ID,
-							"message":           request.Message,
-							"history":           messageHistory,
-							"contextTags":       context,
-							"sourceWebsocketId": request.SourceWebsocketID,
-							"webhook_url":       fmt.Sprintf("%s/hivechat/response", os.Getenv("HOST")),
-							"alias":             user.OwnerAlias,
-							"pdf_url":           request.PDFURL,
-							"modelSelection":    request.ModelSelection,
-						}
-
-						if codeGraph != nil && codeGraph.Url != "" {
-							url := strings.TrimSuffix(codeGraph.Url, "/")
-							if !strings.HasPrefix(url, "https://") {
-								url = "https://" + url
-							}
-							vars["codeGraph"] = url
-						}
-
-						return vars
-					}(),
+					"vars": vars,
 				},
 			},
 		},
