@@ -1264,6 +1264,31 @@ type ListFileAssetsParams struct {
 	PageSize           int         `form:"pageSize,default=50"`
 }
 
+type PlanStatus string
+
+const (
+    DraftPlan    PlanStatus = "DRAFT"
+    ApprovedPlan PlanStatus = "APPROVED"
+)
+
+type TicketPlan struct {
+    UUID          uuid.UUID         `gorm:"primaryKey;type:uuid"`
+    WorkspaceUuid string            `gorm:"type:varchar(255);index:workspace_index" json:"workspace_uuid"`
+    FeatureUUID   string            `gorm:"type:varchar(255);index:composite_index;default:null" json:"feature_uuid"`
+    Features      WorkspaceFeatures `gorm:"foreignKey:FeatureUUID;references:Uuid;constraint:OnDelete:SET NULL"`
+    PhaseUUID     string            `gorm:"type:varchar(255);index:phase_index;default:null" json:"phase_uuid"`
+    FeaturePhase  FeaturePhase      `gorm:"foreignKey:PhaseUUID;references:Uuid;constraint:OnDelete:SET NULL"`
+    Name          string            `gorm:"type:varchar(255);not null" json:"name"`
+    Description   string            `gorm:"type:text" json:"description"`
+    TicketGroups  pq.StringArray    `gorm:"type:uuid[];not null;default:'{}'" json:"ticket_groups"`
+    Status        PlanStatus        `gorm:"type:varchar(50);default:'DRAFT'" json:"status"`
+    Version       int               `gorm:"type:integer;default:0" json:"version"`
+    CreatedBy     string            `gorm:"type:varchar(255)" json:"created_by"`
+    UpdatedBy     string            `gorm:"type:varchar(255)" json:"updated_by"`
+    CreatedAt     time.Time         `gorm:"type:timestamp;default:current_timestamp" json:"created_at"`
+    UpdatedAt     time.Time         `gorm:"type:timestamp;default:current_timestamp" json:"updated_at"`
+}
+
 func (Person) TableName() string {
 	return "people"
 }

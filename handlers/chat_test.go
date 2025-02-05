@@ -2474,7 +2474,310 @@ func TestSendMessage(t *testing.T) {
 		assert.Equal(t, db.UserRole, messages[0].Role)
 		assert.Equal(t, db.SendingStatus, messages[0].Status)
 	})
+
+	t.Run("should successfully send message with the model selection", func(t *testing.T) {
+		person := db.Person{
+			Uuid:        uuid.New().String(),
+			OwnerAlias:  "test-alias-model",
+			UniqueName:  "test-unique-name-model",
+			OwnerPubKey: "test-pubkey-model",
+			PriceToMeet: 0,
+			Description: "test-description",
+		}
+		db.TestDB.CreateOrEditPerson(person)
+
+		workspace := db.Workspace{
+			Uuid:        uuid.New().String(),
+			Name:        "test-workspace" + uuid.New().String(),
+			OwnerPubKey: person.OwnerPubKey,
+			Github:      "https://github.com/test",
+			Website:     "https://www.testwebsite.com",
+			Description: "test-description",
+		}
+		db.TestDB.CreateOrEditWorkspace(workspace)
+
+		chat := &db.Chat{
+			ID:          uuid.New().String(),
+			WorkspaceID: workspace.Uuid,
+			Title:       "Test Chat with Model",
+			Status:      db.ActiveStatus,
+		}
+		_, err := db.TestDB.AddChat(chat)
+		require.NoError(t, err)
+
+		requestBody := SendMessageRequest{
+			ChatID:         chat.ID,
+			Message:        "Test message with model selection",
+			ModelSelection: "claude-3-sonnet",
+			ContextTags: []struct {
+				Type string `json:"type"`
+				ID   string `json:"id"`
+			}{},
+			SourceWebsocketID: "test-websocket-id",
+			WorkspaceUUID:     workspace.Uuid,
+		}
+		bodyBytes, _ := json.Marshal(requestBody)
+
+		req := httptest.NewRequest(http.MethodPost, "/send", bytes.NewReader(bodyBytes))
+		rr := httptest.NewRecorder()
+
+		ctx := context.WithValue(req.Context(), auth.ContextKey, person.OwnerPubKey)
+		req = req.WithContext(ctx)
+
+		chatHandler.SendMessage(rr, req)
+
+		require.Equal(t, http.StatusOK, rr.Code)
+
+		var response ChatResponse
+		err = json.NewDecoder(rr.Body).Decode(&response)
+		require.NoError(t, err)
+		assert.True(t, response.Success)
+		assert.Equal(t, "Message sent successfully", response.Message)
+
+		messages, err := db.TestDB.GetChatMessagesForChatID(chat.ID)
+		require.NoError(t, err)
+		assert.Equal(t, 1, len(messages))
+		assert.Equal(t, "Test message with model selection", messages[0].Message)
+		assert.Equal(t, db.UserRole, messages[0].Role)
+		assert.Equal(t, db.SendingStatus, messages[0].Status)
+	})
+
+	t.Run("should successfully send message with PDF URL and model selection", func(t *testing.T) {
+		person := db.Person{
+			Uuid:        uuid.New().String(),
+			OwnerAlias:  "test-alias-pdf-model",
+			UniqueName:  "test-unique-name-pdf-model",
+			OwnerPubKey: "test-pubkey-pdf-model",
+			PriceToMeet: 0,
+			Description: "test-description",
+		}
+		db.TestDB.CreateOrEditPerson(person)
+
+		workspace := db.Workspace{
+			Uuid:        uuid.New().String(),
+			Name:        "test-workspace" + uuid.New().String(),
+			OwnerPubKey: person.OwnerPubKey,
+			Github:      "https://github.com/test",
+			Website:     "https://www.testwebsite.com",
+			Description: "test-description",
+		}
+		db.TestDB.CreateOrEditWorkspace(workspace)
+
+		chat := &db.Chat{
+			ID:          uuid.New().String(),
+			WorkspaceID: workspace.Uuid,
+			Title:       "Test Chat PDF Model",
+			Status:      db.ActiveStatus,
+		}
+		_, err := db.TestDB.AddChat(chat)
+		require.NoError(t, err)
+
+		requestBody := SendMessageRequest{
+			ChatID:         chat.ID,
+			Message:        "Test message with PDF and model",
+			PDFURL:        "https://example.com/test.pdf",
+			ModelSelection: "claude-3-opus",
+			ContextTags: []struct {
+				Type string `json:"type"`
+				ID   string `json:"id"`
+			}{},
+			SourceWebsocketID: "test-websocket-id",
+			WorkspaceUUID:     workspace.Uuid,
+		}
+		bodyBytes, _ := json.Marshal(requestBody)
+
+		req := httptest.NewRequest(http.MethodPost, "/send", bytes.NewReader(bodyBytes))
+		rr := httptest.NewRecorder()
+
+		ctx := context.WithValue(req.Context(), auth.ContextKey, person.OwnerPubKey)
+		req = req.WithContext(ctx)
+
+		chatHandler.SendMessage(rr, req)
+
+		require.Equal(t, http.StatusOK, rr.Code)
+
+		var response ChatResponse
+		err = json.NewDecoder(rr.Body).Decode(&response)
+		require.NoError(t, err)
+		assert.True(t, response.Success)
+		assert.Equal(t, "Message sent successfully", response.Message)
+
+		messages, err := db.TestDB.GetChatMessagesForChatID(chat.ID)
+		require.NoError(t, err)
+		assert.Equal(t, 1, len(messages))
+		assert.Equal(t, "Test message with PDF and model", messages[0].Message)
+		assert.Equal(t, db.UserRole, messages[0].Role)
+		assert.Equal(t, db.SendingStatus, messages[0].Status)
+	})
+
+	t.Run("should successfully send message with code graph", func(t *testing.T) {
+        person := db.Person{
+            Uuid:        uuid.New().String(),
+            OwnerAlias:  "test-alias-code-graph",
+            UniqueName:  "test-unique-name-code-graph",
+            OwnerPubKey: "test-pubkey-code-graph",
+            PriceToMeet: 0,
+            Description: "test-description",
+        }
+        db.TestDB.CreateOrEditPerson(person)
+
+        workspace := db.Workspace{
+            Uuid:        uuid.New().String(),
+            Name:        "test-workspace" + uuid.New().String(),
+            OwnerPubKey: person.OwnerPubKey,
+            Github:      "https://github.com/test",
+            Website:     "https://www.testwebsite.com",
+            Description: "test-description",
+        }
+        db.TestDB.CreateOrEditWorkspace(workspace)
+
+        codeGraph := db.WorkspaceCodeGraph{
+            Uuid:           uuid.New().String(),
+            WorkspaceUuid:  workspace.Uuid,
+            Url:            "boltwall.swarm38.sphinx.chat/",
+            CreatedBy:      person.OwnerPubKey,
+            UpdatedBy:      person.OwnerPubKey,
+        }
+        _, err := db.TestDB.CreateOrEditCodeGraph(codeGraph)
+        require.NoError(t, err)
+
+        chat := &db.Chat{
+            ID:          uuid.New().String(),
+            WorkspaceID: workspace.Uuid,
+            Title:       "Test Chat with Code Graph",
+            Status:      db.ActiveStatus,
+        }
+        _, err = db.TestDB.AddChat(chat)
+        require.NoError(t, err)
+
+        requestBody := SendMessageRequest{
+            ChatID:            chat.ID,
+            Message:           "Test message with code graph",
+            ContextTags:       []struct {
+                Type string `json:"type"`
+                ID   string `json:"id"`
+            }{},
+            SourceWebsocketID: "test-websocket-id",
+            WorkspaceUUID:     workspace.Uuid,
+        }
+        bodyBytes, _ := json.Marshal(requestBody)
+
+        req := httptest.NewRequest(http.MethodPost, "/send", bytes.NewReader(bodyBytes))
+        rr := httptest.NewRecorder()
+
+        ctx := context.WithValue(req.Context(), auth.ContextKey, person.OwnerPubKey)
+        req = req.WithContext(ctx)
+
+        var capturedPayload StakworkChatPayload
+        stakworkServer := &http.Client{
+            Transport: RoundTripFunc(func(req *http.Request) (*http.Response, error) {
+                body, _ := io.ReadAll(req.Body)
+                json.Unmarshal(body, &capturedPayload)
+                return &http.Response{
+                    StatusCode: http.StatusOK,
+                    Body: io.NopCloser(bytes.NewBufferString(`{
+                        "success": true,
+                        "data": {
+                            "project_id": 12345
+                        }
+                    }`)),
+                    Header: make(http.Header),
+                }, nil
+            }),
+        }
+
+        chatHandler := NewChatHandler(stakworkServer, db.TestDB)
+        chatHandler.SendMessage(rr, req)
+
+        require.Equal(t, http.StatusOK, rr.Code)
+
+        vars, ok := capturedPayload.WorkflowParams["set_var"].(map[string]interface{})["attributes"].(map[string]interface{})["vars"].(map[string]interface{})
+        require.True(t, ok, "Workflow params should contain vars")
+        
+        codeGraphUrl, exists := vars["codeGraph"].(string)
+        require.True(t, exists, "codeGraph should exist in vars")
+        assert.Equal(t, "https://boltwall.swarm38.sphinx.chat", codeGraphUrl)
+    })
+
+    t.Run("should send message without code graph", func(t *testing.T) {
+        person := db.Person{
+            Uuid:        uuid.New().String(),
+            OwnerAlias:  "test-alias-no-code-graph",
+            UniqueName:  "test-unique-name-no-code-graph",
+            OwnerPubKey: "test-pubkey-no-code-graph",
+            PriceToMeet: 0,
+            Description: "test-description",
+        }
+        db.TestDB.CreateOrEditPerson(person)
+
+        workspace := db.Workspace{
+            Uuid:        uuid.New().String(),
+            Name:        "test-workspace" + uuid.New().String(),
+            OwnerPubKey: person.OwnerPubKey,
+            Github:      "https://github.com/test",
+            Website:     "https://www.testwebsite.com",
+            Description: "test-description",
+        }
+        db.TestDB.CreateOrEditWorkspace(workspace)
+
+        chat := &db.Chat{
+            ID:          uuid.New().String(),
+            WorkspaceID: workspace.Uuid,
+            Title:       "Test Chat without Code Graph",
+            Status:      db.ActiveStatus,
+        }
+        _, err := db.TestDB.AddChat(chat)
+        require.NoError(t, err)
+
+        requestBody := SendMessageRequest{
+            ChatID:            chat.ID,
+            Message:           "Test message without code graph",
+            ContextTags:       []struct {
+                Type string `json:"type"`
+                ID   string `json:"id"`
+            }{},
+            SourceWebsocketID: "test-websocket-id",
+            WorkspaceUUID:     workspace.Uuid,
+        }
+        bodyBytes, _ := json.Marshal(requestBody)
+
+        req := httptest.NewRequest(http.MethodPost, "/send", bytes.NewReader(bodyBytes))
+        rr := httptest.NewRecorder()
+
+        ctx := context.WithValue(req.Context(), auth.ContextKey, person.OwnerPubKey)
+        req = req.WithContext(ctx)
+
+        var capturedPayload StakworkChatPayload
+        stakworkServer := &http.Client{
+            Transport: RoundTripFunc(func(req *http.Request) (*http.Response, error) {
+                body, _ := io.ReadAll(req.Body)
+                json.Unmarshal(body, &capturedPayload)
+                return &http.Response{
+                    StatusCode: http.StatusOK,
+                    Body: io.NopCloser(bytes.NewBufferString(`{
+                        "success": true,
+                        "data": {
+                            "project_id": 12345
+                        }
+                    }`)),
+                    Header: make(http.Header),
+                }, nil
+            }),
+        }
+
+        chatHandler := NewChatHandler(stakworkServer, db.TestDB)
+        chatHandler.SendMessage(rr, req)
+
+        require.Equal(t, http.StatusOK, rr.Code)
+
+        vars, ok := capturedPayload.WorkflowParams["set_var"].(map[string]interface{})["attributes"].(map[string]interface{})["vars"].(map[string]interface{})
+        require.True(t, ok, "Workflow params should contain vars")
+        
+        _, exists := vars["codeGraph"]
+        assert.False(t, exists, "codeGraph should not exist in vars")
+    })
 }
+
 
 type RoundTripFunc func(req *http.Request) (*http.Response, error)
 
