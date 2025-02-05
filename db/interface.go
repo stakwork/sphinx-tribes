@@ -288,4 +288,10 @@ type Database interface {
 	GetNotificationsByStatus(status string) []Notification
 	IncrementNotificationRetry(notificationUUID string)
 	UpdateNotificationStatus(notificationUUID string, status string)
+	CreateOrEditTicketPlan(plan *TicketPlan) (*TicketPlan, error)
+	GetTicketPlan(uuid string) (*TicketPlan, error)
+	DeleteTicketPlan(uuid string) error
+	GetTicketPlansByFeature(featureUUID string) ([]TicketPlan, error)
+	GetTicketPlansByPhase(phaseUUID string) ([]TicketPlan, error)
+	GetTicketPlansByWorkspace(workspaceUUID string) ([]TicketPlan, error)
 }

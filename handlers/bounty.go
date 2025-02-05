@@ -215,30 +215,6 @@ func (h *bountyHandler) GetPersonAssignedBounties(w http.ResponseWriter, r *http
 	}
 }
 
-func ProcessWaitingNotifications() {
-	notifications := db.DB.GetNotificationsByStatus("WAITING_KEY_EXCHANGE")
-
-	for _, n := range notifications {
-		contactKey, err := getContactKey(n.PubKey)
-		if err != nil {
-			logger.Log.Error("Error checking contact key for pubkey %s: %v", n.PubKey, err)
-			db.DB.IncrementNotificationRetry(n.UUID)
-			continue
-		}
-
-		if contactKey == nil {
-			db.DB.IncrementNotificationRetry(n.UUID)
-			continue
-		}
-
-		// Contact key is available, proceed with sending
-		sendRespStatus := sendNotification(n.PubKey, n.Event, n.Content, "")
-
-		// Update the notification with the response status
-		db.DB.UpdateNotificationStatus(n.UUID, sendRespStatus)
-	}
-}
-
 func getContactKey(pubkey string) (*string, error) {
 	url := fmt.Sprintf("%s/contact/%s", config.V2BotUrl, pubkey)
 	req, err := http.NewRequest(http.MethodGet, url, nil)
@@ -263,33 +239,29 @@ func getContactKey(pubkey string) (*string, error) {
 	return contactResp.ContactKey, nil
 }
 
-func sendNotification(pubkey, event, content, alias string) string {
-	contactKey, err := getContactKey(pubkey)
-	if err != nil {
-		logger.Log.Error("Error checking contact key: %v", err)
-		return "FAILED"
-	}
+func ProcessWaitingNotifications() {
+	notifications := db.DB.GetNotificationsByStatus("WAITING_KEY_EXCHANGE")
 
-	if contactKey == nil {
-		addContactURL := fmt.Sprintf("%s/add_contact", config.V2BotUrl)
-		body, _ := json.Marshal(map[string]string{"contact_info": pubkey, "alias": alias})
-		req, _ := http.NewRequest(http.MethodPost, addContactURL, bytes.NewBuffer(body))
-		req.Header.Set("Content-Type", "application/json")
-		req.Header.Set("x-admin-token", config.V2BotToken)
-		http.DefaultClient.Do(req)
-
-		contactKey, err = getContactKey(pubkey)
+	for _, n := range notifications {
+		contactKey, err := getContactKey(n.PubKey)
 		if err != nil {
-			logger.Log.Error("Error rechecking contact key: %v", err)
-			return "FAILED"
+			logger.Log.Error("Error checking contact key for pubkey %s: %v", n.PubKey, err)
+			db.DB.IncrementNotificationRetry(n.UUID)
+			continue
 		}
 
 		if contactKey == nil {
-			db.DB.SaveNotification(pubkey, event, content, "WAITING_KEY_EXCHANGE")
-			return "FAILED"
+			db.DB.IncrementNotificationRetry(n.UUID)
+			continue
 		}
-	}
 
+		// Contact key is available, proceed with sending
+		sendRespStatus := sendNotification(n.PubKey, n.Content)
+		db.DB.UpdateNotificationStatus(n.UUID, sendRespStatus)
+	}
+}
+
+func sendNotification(pubkey, content string) string {
 	sendURL := fmt.Sprintf("%s/send", config.V2BotUrl)
 	msgBody, _ := json.Marshal(map[string]interface{}{
 		"dest":     pubkey,
@@ -322,9 +294,32 @@ func sendNotification(pubkey, event, content, alias string) string {
 		return "FAILED"
 	}
 
-	db.DB.SaveNotification(pubkey, event, content, sendResp.Status)
-
 	return sendResp.Status
+}
+
+func processNotification(pubkey, event, content, alias string) string {
+	contactKey, err := getContactKey(pubkey)
+	if err != nil {
+		logger.Log.Error("Error checking contact key: %v", err)
+		return "FAILED"
+	}
+
+	if contactKey == nil {
+		addContactURL := fmt.Sprintf("%s/add_contact", config.V2BotUrl)
+		body, _ := json.Marshal(map[string]string{"contact_info": pubkey, "alias": alias})
+		req, _ := http.NewRequest(http.MethodPost, addContactURL, bytes.NewBuffer(body))
+		req.Header.Set("Content-Type", "application/json")
+		req.Header.Set("x-admin-token", config.V2BotToken)
+		http.DefaultClient.Do(req)
+
+		contactKey, err = getContactKey(pubkey)
+		if err != nil || contactKey == nil {
+			db.DB.SaveNotification(pubkey, event, content, "WAITING_KEY_EXCHANGE")
+			return "FAILED"
+		}
+	}
+
+	return sendNotification(pubkey, content)
 }
 
 func (h *bountyHandler) CreateOrEditBounty(w http.ResponseWriter, r *http.Request) {
@@ -399,7 +394,7 @@ func (h *bountyHandler) CreateOrEditBounty(w http.ResponseWriter, r *http.Reques
 		}
 
 		msg := fmt.Sprintf("You have been assigned a new ticket: %s.", bounty.Title)
-		sendNotification(bounty.Assignee, "bounty_assigned", msg, user.OwnerAlias)
+		processNotification(bounty.Assignee, "bounty_assigned", msg, user.OwnerAlias)
 	}
 
 	if bounty.Tribe == "" {
