@@ -84,6 +84,7 @@ func InitTestDB() {
 	db.AutoMigrate(&ConnectionCodesList{})
 	db.AutoMigrate(&TicketMessage{})
 	db.AutoMigrate(&TicketPlan{})
+	db.AutoMigrate(&Activity{})
 
 	people := TestDB.GetAllPeople()
 	for _, p := range people {
