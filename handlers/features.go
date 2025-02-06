@@ -591,7 +591,7 @@ func (oh *featureHandler) GetFeatureStories(w http.ResponseWriter, r *http.Reque
 
 	ticketMsg := websocket.TicketMessage{
 		BroadcastType:   "direct",
-		SourceSessionID: featureStories.Output.SourceWebsocket,
+		SourceSessionID: featureStories.Output.SourceWebsocketId,
 		Message:         fmt.Sprintf("Successfully created new user stories"),
 		Action:          "process",
 	}
