@@ -66,10 +66,10 @@ type FeatureStories struct {
 }
 
 type FeatureOutput struct {
-	FeatureContext  string           `json:"featureContext"`
-	FeatureUuid     string           `json:"featureUuid"`
-	Stories         []FeatureStories `json:"stories"`
-	SourceWebsocket string           `json:"sourceWebsocket"`
+	FeatureContext    string           `json:"featureContext"`
+	FeatureUuid       string           `json:"featureUuid"`
+	Stories           []FeatureStories `json:"stories"`
+	SourceWebsocketId string           `json:"sourceWebsocketId"`
 }
 
 type FeatureStoriesReponse struct {

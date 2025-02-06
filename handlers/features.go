@@ -591,7 +591,7 @@ func (oh *featureHandler) GetFeatureStories(w http.ResponseWriter, r *http.Reque
 
 	ticketMsg := websocket.TicketMessage{
 		BroadcastType:   "direct",
-		SourceSessionID: featureStories.Output.SourceWebsocket,
+		SourceSessionID: featureStories.Output.SourceWebsocketId,
 		Message:         fmt.Sprintf("Successfully created new user stories"),
 		Action:          "process",
 	}
@@ -599,6 +599,7 @@ func (oh *featureHandler) GetFeatureStories(w http.ResponseWriter, r *http.Reque
 	if err := websocket.WebsocketPool.SendTicketMessage(ticketMsg); err != nil {
 		log.Printf("Failed to send websocket message: %v", err)
 		w.WriteHeader(http.StatusOK)
+		json.NewEncoder(w).Encode("Failed to send websocket message")
 		return
 	}
 
