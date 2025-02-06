@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
+	"github.com/stakwork/sphinx-tribes/websocket"
 	"io"
 	"log"
 	"net/http"
@@ -21,13 +22,14 @@ import (
 )
 
 type PostData struct {
-	ProductBrief string   `json:"productBrief"`
-	FeatureName  string   `json:"featureName"`
-	Description  string   `json:"description"`
-	Examples     []string `json:"examples"`
-	WebhookURL   string   `json:"webhook_url"`
-	FeatureUUID  string   `json:"featureUUID"`
-	Alias        string   `json:"alias"`
+	ProductBrief    string   `json:"productBrief"`
+	FeatureName     string   `json:"featureName"`
+	Description     string   `json:"description"`
+	Examples        []string `json:"examples"`
+	WebhookURL      string   `json:"webhook_url"`
+	FeatureUUID     string   `json:"featureUUID"`
+	Alias           string   `json:"alias"`
+	SourceWebsocket string   `json:"sourceWebsocket"`
 }
 
 type FeatureBriefRequest struct {
@@ -585,6 +587,19 @@ func (oh *featureHandler) GetFeatureStories(w http.ResponseWriter, r *http.Reque
 
 		oh.db.CreateOrEditFeatureStory(featureStory)
 		log.Println("Created user story for : ", featureStory.FeatureUuid)
+	}
+
+	ticketMsg := websocket.TicketMessage{
+		BroadcastType:   "direct",
+		SourceSessionID: featureStories.Output.SourceWebsocket,
+		Message:         fmt.Sprintf("Successfully created new user stories"),
+		Action:          "process",
+	}
+
+	if err := websocket.WebsocketPool.SendTicketMessage(ticketMsg); err != nil {
+		log.Printf("Failed to send websocket message: %v", err)
+		w.WriteHeader(http.StatusOK)
+		return
 	}
 
 	w.WriteHeader(http.StatusOK)
