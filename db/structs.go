@@ -1289,6 +1289,17 @@ type TicketPlan struct {
     UpdatedAt     time.Time         `gorm:"type:timestamp;default:current_timestamp" json:"updated_at"`
 }
 
+type NodeData struct {
+    BountyID    uint   `json:"bounty_id"`
+    Title       string `json:"title"`
+    Description string `json:"description"`
+}
+
+type NodeResponse struct {
+    NodeType string     `json:"node_type"`
+    NodeData []NodeData `json:"node_data"`
+}
+
 func (Person) TableName() string {
 	return "people"
 }

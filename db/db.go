@@ -2168,3 +2168,23 @@ func (db database) DeleteBountyTiming(bountyID uint) error {
 
 	return nil
 }
+
+func (db database) GetBountiesByWorkspaceAndTimeRange(workspaceId string, startDate time.Time, endDate time.Time) ([]NewBounty, error) {
+    var bounties []NewBounty
+    
+    startTimestamp := startDate.Unix()
+    endTimestamp := endDate.Unix()
+    
+    query := db.db.
+        Where("workspace_uuid = ? AND created >= ? AND show = true", workspaceId, startTimestamp)
+
+    if endTimestamp < time.Now().Unix() {
+        query = query.Where("created <= ?", endTimestamp)
+    }
+    
+    err := query.
+        Order("created DESC").
+        Find(&bounties).Error
+        
+    return bounties, err
+}
