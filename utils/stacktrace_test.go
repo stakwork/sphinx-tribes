@@ -4,6 +4,8 @@ import (
 	"fmt"
 	"strings"
 	"testing"
+	"encoding/json"
+	"reflect"
 
 	"github.com/stretchr/testify/assert"
 )
@@ -203,15 +205,27 @@ func TestPrettyPrintEdgeList(t *testing.T) {
 			input: EdgeList{
 				EdgeList: []Edge{
 					{
-						EdgeType: "CALLS",
+						Edge:EdgeInfo{
+							EdgeType: "CALLS",
+							Weight: 1,
+						},
+						Source: Node{
+							NodeType: "source_type",
+							NodeData: "node-A",
+						},
+						Targets: []Node{
+							{
+							NodeType: "target_type",
+							NodeData: "node-B",
+							},
+						
+						},
 						Properties: map[string]interface{}{
 							"call_start": 100,
-							"call_end":   150,
-							"weight":     1,
+							"call_end": 150,
+							"weight": 1,
+	
 						},
-						RefID:  "edge-001",
-						Source: "node-A",
-						Target: "node-B",
 					},
 				},
 			},
@@ -224,15 +238,27 @@ func TestPrettyPrintEdgeList(t *testing.T) {
 				expected := map[string]interface{}{
 					"edge_list": []interface{}{
 						map[string]interface{}{
-							"edge_type": "CALLS",
+
+							"edge": map[string]interface{}{
+								"edge_type": "CALLS",
+								"weight": float64(1),
+							},
+							"source": map[string]interface{}{
+								"node_type": "source_type",
+								"node_data": "node-A",
+
+							},
+							"targets":[]interface{}{
+								map[string]interface{}{
+									"node_type": "target_type",
+									"node_data":"node-B",
+								},
+							},
 							"properties": map[string]interface{}{
 								"call_start": float64(100),
-								"call_end":   float64(150),
-								"weight":     float64(1),
+								"call_end": float64(150),
+								"weight": float64(1),
 							},
-							"ref_id": "edge-001",
-							"source": "node-A",
-							"target": "node-B",
 						},
 					},
 				}
@@ -266,74 +292,119 @@ func TestPrettyPrintEdgeList(t *testing.T) {
 			input: EdgeList{
 				EdgeList: []Edge{
 					{
-						EdgeType: "CALLS",
-						Properties: map[string]interface{}{
-							"call_start": 200,
-							"call_end":   250,
-							"weight":     1,
+						Edge: EdgeInfo{
+							EdgeType: "CALLS",
+							Weight: 1,
 						},
-						RefID:  "edge-101",
-						Source: "node-1",
-						Target: "node-2",
+						Source: Node{
+							NodeType: "source_type",
+							NodeData: "node-1",
+						},
+						Targets: []Node{
+						{
+							NodeType: "target_type",
+							NodeData: "node-2",
+						},
+
 					},
-					{
+				},
+				{
+					Edge: EdgeInfo{
 						EdgeType: "CONTAINS",
-						Properties: map[string]interface{}{
-							"weight": 2,
+						Weight: 2,
+					},
+					Source: Node{
+						NodeType: "source_type",
+						NodeData: "node-2",
+					},
+					Targets: []Node{
+						{
+							NodeType: "target_type",
+							NodeData: "node-3",
 						},
-						RefID:  "edge-102",
-						Source: "node-2",
-						Target: "node-3",
+					},
+					Properties: map[string]interface{}{
+						"call_start": 200,
+						"call_end": 250,
+						"weight": 1,
+
 					},
 				},
 			},
-			validator: func(t *testing.T, output string) {
-				var result map[string]interface{}
-				err := json.Unmarshal([]byte(output), &result)
-				if err != nil {
-					t.Fatalf("Unexpected error unmarshaling JSON: %v", err)
-				}
-				edges, ok := result["edge_list"].([]interface{})
-				if !ok {
-					t.Fatalf("Expected 'edge_list' to be an array")
-				}
-				if len(edges) != 2 {
-					t.Fatalf("Expected 2 edges, got %d", len(edges))
-				}
-				first, ok := edges[0].(map[string]interface{})
-				if !ok {
-					t.Fatalf("Expected first edge to be a map")
-				}
-				if first["edge_type"] != "CALLS" {
-					t.Errorf("Expected first edge type 'CALLS', got %v", first["edge_type"])
-				}
-				second, ok := edges[1].(map[string]interface{})
-				if !ok {
-					t.Fatalf("Expected second edge to be a map")
-				}
-				if second["edge_type"] != "CONTAINS" {
-					t.Errorf("Expected second edge type 'CONTAINS', got %v", second["edge_type"])
-				}
-			},
 		},
+		validator: func(t *testing.T, output string) {
+			var result map[string]interface{}
+			err := json.Unmarshal([]byte(output), &result)
+			if err != nil {
+				t.Fatalf("Unexpected error unmarshaling JSON: %v", err)
+			}
+		
+			edges, ok := result["edge_list"].([]interface{})
+			if !ok {
+				t.Fatalf("Expected 'edge_list' to be an array")
+			}
+			if len(edges) != 2 {
+				t.Fatalf("Expected 2 edges, got %d", len(edges))
+			}
+		
+			first, ok := edges[0].(map[string]interface{})
+			if !ok {
+				t.Fatalf("Expected first edge to be a map")
+			}
+			edgeData1, ok := first["edge"].(map[string]interface{}) 
+			if !ok {
+				t.Fatalf("Expected 'edge' to be a map, got: %T", first["edge"])
+			}
+			if edgeData1["edge_type"] != "CALLS" {
+				t.Errorf("Expected first edge type 'CALLS', got %v", edgeData1["edge_type"])
+			}
+		
+			second, ok := edges[1].(map[string]interface{})
+			if !ok {
+				t.Fatalf("Expected second edge to be a map")
+			}
+			edgeData2, ok := second["edge"].(map[string]interface{})
+			if !ok {
+				t.Fatalf("Expected 'edge' to be a map, got: %T", second["edge"])
+			}
+			if edgeData2["edge_type"] != "CONTAINS" {
+				t.Errorf("Expected second edge type 'CONTAINS', got %v", edgeData2["edge_type"])
+			}
+		},
+	},
 		{
 			name: "Error Condition: Unserializable Field",
 			input: EdgeList{
 				EdgeList: []Edge{
 					{
-						EdgeType: "CALLS",
-						Properties: map[string]interface{}{
-							"call_start": 300,
-							"call_end":   350,
-							"weight":     1,
-							"fail":       func() {},
+						Edge: EdgeInfo{
+							EdgeType: "CONTAINS",
+							Weight: 2,
 						},
-						RefID:  "edge-invalid",
-						Source: "node-X",
-						Target: "node-Y",
+						
+					
+					Source: Node{
+						NodeType: "source_type",
+						NodeData: "node-X",
+
 					},
+					Targets: []Node{
+						{
+						NodeType: "target_type",
+						NodeData: "Node-Y",
+						},
+					},
+					Properties: map[string]interface{}{
+						"call_start": 300,
+						"call_end": 350,
+						"weight": 1,
+						"invalid": func(){},
+
+					},
+
 				},
 			},
+		},
 			validator: func(t *testing.T, output string) {
 				expectedPrefix := "Error formatting edge list:"
 				if !strings.HasPrefix(output, expectedPrefix) {
@@ -347,15 +418,27 @@ func TestPrettyPrintEdgeList(t *testing.T) {
 				edges := make([]Edge, 5000)
 				for i := 1; i <= 5000; i++ {
 					edges[i-1] = Edge{
-						EdgeType: "CALLS",
+						Edge: EdgeInfo{
+							EdgeType: "CALLS",
+							Weight: 1,
+						},
 						Properties: map[string]interface{}{
 							"call_start": i,
-							"call_end":   i + 50,
-							"weight":     1,
+							"call_end": i+50,
+							"weight": 1,
 						},
-						RefID:  "edge-" + strconv.Itoa(i),
-						Source: "node-large",
-						Target: "node-large-target",
+						Source: Node{
+							NodeType: "large_source",
+							NodeData: "node-large",
+						},
+						Targets: []Node{
+							{
+								NodeType: "large_target",
+								NodeData: "node-large-target",
+							},
+						},
+			
+						
 					}
 				}
 				return EdgeList{EdgeList: edges}
@@ -379,16 +462,30 @@ func TestPrettyPrintEdgeList(t *testing.T) {
 			input: EdgeList{
 				EdgeList: []Edge{
 					{
-						EdgeType: "CALLS",
+						Edge: EdgeInfo{
+							EdgeType: "CALLS",
+							Weight: 1,
+						},
 						Properties: map[string]interface{}{
 							"message": "This is a \"special\" message.\nIt contains newlines, \t tabs, and Unicode — ✓",
+	
 						},
-						RefID:  "edge-special",
-						Source: "node-special",
-						Target: "node-destination",
+
+					Source: Node{
+						NodeType: "special_type",
+						NodeData: "node-special",
+
 					},
+					Targets: []Node{
+						{
+						NodeType: "destination_type",
+						NodeData: "node-destination",
+						},
+					},
+					
 				},
 			},
+		},
 			validator: func(t *testing.T, output string) {
 				var result map[string]interface{}
 				err := json.Unmarshal([]byte(output), &result)
@@ -418,11 +515,25 @@ func TestPrettyPrintEdgeList(t *testing.T) {
 			input: EdgeList{
 				EdgeList: []Edge{
 					{
-						EdgeType:   "NULL_TEST",
-						Properties: nil,
-						RefID:      "edge-NULL",
-						Source:     "node-NULL",
-						Target:     "node-NULL-target",
+						Edge: EdgeInfo{
+							EdgeType: "NULL_TEST",
+							Weight: 1,
+							RefID: "edge-NULL",
+						},
+						Properties: map[string]interface{}(nil),
+						Source: Node{
+							NodeType: "null_source",
+							NodeData: "node-NULL",
+						},
+						Targets: []Node{
+							{
+								NodeType: "null_target",
+								NodeData: "node-NULL-target",
+
+							},
+							
+						},
+						
 					},
 				},
 			},
@@ -450,17 +561,30 @@ func TestPrettyPrintEdgeList(t *testing.T) {
 			input: EdgeList{
 				EdgeList: []Edge{
 					{
-						EdgeType: "NESTED",
-						Properties: map[string]interface{}{
-							"metadata": map[string]interface{}{
-								"version": "1.0",
-								"flags":   []string{"alpha", "beta"},
-							},
-							"status": "active",
+						Edge: EdgeInfo{
+							EdgeType: "NESTED",
+							Weight: 1,
+							RefID: "edge-nested",
+
 						},
-						RefID:  "edge-nested",
-						Source: "node-nested",
-						Target: "node-target",
+						Properties: map[string]interface{}{
+							"metadata" : map[string]interface{}{
+								"version": "1.0",
+								"flags": []string{"alpha", "beta"},
+							},
+							"status":"active",
+						},
+						Source: Node{
+							NodeType: "nested_source",
+							NodeData: "node-nested",
+
+						},
+						Targets: []Node{
+							{
+								NodeType: "nested_target",
+								NodeData: "node-target",
+							},
+						},
 					},
 				},
 			},
