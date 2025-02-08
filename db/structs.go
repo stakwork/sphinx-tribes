@@ -1295,9 +1295,13 @@ type NodeData struct {
     Description string `json:"description"`
 }
 
-type NodeResponse struct {
-    NodeType string     `json:"node_type"`
-    NodeData []NodeData `json:"node_data"`
+type Node struct {
+    NodeType string   `json:"node_type"`
+    NodeData NodeData `json:"node_data"`
+}
+
+type NodeListResponse struct {
+    NodeList []Node `json:"node_list"`
 }
 
 func (Person) TableName() string {

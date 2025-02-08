@@ -2177,18 +2177,20 @@ func (h *bountyHandler) GetBountiesByWorkspaceTime(w http.ResponseWriter, r *htt
 		return
 	}
 
-	nodeData := make([]db.NodeData, len(bounties))
+	nodes := make([]db.Node, len(bounties))
 	for i, bounty := range bounties {
-		nodeData[i] = db.NodeData{
-			BountyID:    bounty.ID,
-			Title:       bounty.Title,
-			Description: bounty.Description,
+		nodes[i] = db.Node{
+			NodeType: "Bounty",
+			NodeData: db.NodeData{
+				BountyID:    bounty.ID,
+				Title:       bounty.Title,
+				Description: bounty.Description,
+			},
 		}
 	}
 
-	response := db.NodeResponse{
-		NodeType: "Bounty",
-		NodeData: nodeData,
+	response := db.NodeListResponse{
+		NodeList: nodes,
 	}
 
 	w.Header().Set("Content-Type", "application/json")
