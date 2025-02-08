@@ -4283,7 +4283,7 @@ func TestDeleteBountyTiming(t *testing.T) {
 	_, err = db.TestDB.CreateBountyTiming(createdBounty.ID)
 	assert.NoError(t, err)
 
-	t.Run("should return 401 if no pubkey in context", func(t *testing.T) {
+	t.Run("should return 401 if no - pubkey in context", func(t *testing.T) {
 		rr := httptest.NewRecorder()
 		handler := http.HandlerFunc(bHandler.DeleteBountyTiming)
 
