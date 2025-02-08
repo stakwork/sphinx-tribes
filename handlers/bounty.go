@@ -2135,3 +2135,64 @@ func (h *bountyHandler) DeleteBountyTiming(w http.ResponseWriter, r *http.Reques
 
 	w.WriteHeader(http.StatusNoContent)
 }
+
+func (h *bountyHandler) GetBountiesByWorkspaceTime(w http.ResponseWriter, r *http.Request) {
+
+	workspaceId := chi.URLParam(r, "workspaceId")
+	daysStartStr := chi.URLParam(r, "daysStart")
+	daysEndStr := chi.URLParam(r, "daysEnd")
+
+	daysStart, err := strconv.Atoi(daysStartStr)
+	if err != nil {
+		http.Error(w, "Invalid daysStart parameter", http.StatusBadRequest)
+		return
+	}
+
+	daysEnd, err := strconv.Atoi(daysEndStr)
+	if err != nil {
+		http.Error(w, "Invalid daysEnd parameter", http.StatusBadRequest)
+		return
+	}
+
+	if workspaceId == "" {
+		http.Error(w, "Workspace ID is required", http.StatusBadRequest)
+		return
+	}
+
+	now := time.Now()
+	var endDate time.Time
+
+	if daysStart == 0 {
+		endDate = now.AddDate(0, 0, 1)
+	} else {
+		endDate = now.AddDate(0, 0, -daysStart)
+	}
+
+	startDate := now.AddDate(0, 0, -daysEnd)
+
+	bounties, err := h.db.GetBountiesByWorkspaceAndTimeRange(workspaceId, startDate, endDate)
+	if err != nil {
+		logger.Log.Error("[bounty] Error retrieving bounties: %v", err)
+		http.Error(w, "Error retrieving bounties", http.StatusInternalServerError)
+		return
+	}
+
+	nodes := make([]db.Node, len(bounties))
+	for i, bounty := range bounties {
+		nodes[i] = db.Node{
+			NodeType: "Bounty",
+			NodeData: db.NodeData{
+				BountyID:    bounty.ID,
+				Title:       bounty.Title,
+				Description: bounty.Description,
+			},
+		}
+	}
+
+	response := db.NodeListResponse{
+		NodeList: nodes,
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	json.NewEncoder(w).Encode(response)
+}

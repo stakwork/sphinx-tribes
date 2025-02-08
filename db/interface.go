@@ -290,4 +290,5 @@ type Database interface {
     GetTicketPlansByFeature(featureUUID string) ([]TicketPlan, error)
     GetTicketPlansByPhase(phaseUUID string) ([]TicketPlan, error)
     GetTicketPlansByWorkspace(workspaceUUID string) ([]TicketPlan, error)
+	GetBountiesByWorkspaceAndTimeRange(workspaceId string, startDate time.Time, endDate time.Time) ([]NewBounty, error)
 }
