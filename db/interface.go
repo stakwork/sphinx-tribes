@@ -285,9 +285,18 @@ type Database interface {
 	PauseBountyTiming(bountyID uint) error
 	ResumeBountyTiming(bountyID uint) error
 	CreateOrEditTicketPlan(plan *TicketPlan) (*TicketPlan, error)
-    GetTicketPlan(uuid string) (*TicketPlan, error)
-    DeleteTicketPlan(uuid string) error
-    GetTicketPlansByFeature(featureUUID string) ([]TicketPlan, error)
-    GetTicketPlansByPhase(phaseUUID string) ([]TicketPlan, error)
-    GetTicketPlansByWorkspace(workspaceUUID string) ([]TicketPlan, error)
+	GetTicketPlan(uuid string) (*TicketPlan, error)
+	DeleteTicketPlan(uuid string) error
+	GetTicketPlansByFeature(featureUUID string) ([]TicketPlan, error)
+	GetTicketPlansByPhase(phaseUUID string) ([]TicketPlan, error)
+	GetTicketPlansByWorkspace(workspaceUUID string) ([]TicketPlan, error)
+	CreateActivity(activity *Activity) (*Activity, error)
+	UpdateActivity(activity *Activity) (*Activity, error)
+	GetActivity(id string) (*Activity, error)
+	GetActivitiesByThread(threadID string) ([]Activity, error)
+	GetActivitiesByFeature(featureUUID string) ([]Activity, error)
+	GetActivitiesByPhase(phaseUUID string) ([]Activity, error)
+	GetActivitiesByWorkspace(workspace string) ([]Activity, error)
+	GetLatestActivityByThread(threadID string) (*Activity, error)
+	CreateActivityThread(sourceID string, activity *Activity) (*Activity, error)
 }
