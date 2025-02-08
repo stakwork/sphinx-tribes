@@ -98,6 +98,7 @@ func InitDB() {
 	db.AutoMigrate(&BountyTiming{})
 	db.AutoMigrate(&FileAsset{})
 	db.AutoMigrate(&TicketPlan{})
+	db.AutoMigrate(&Activity{})
 
 	DB.MigrateTablesWithOrgUuid()
 	DB.MigrateOrganizationToWorkspace()

@@ -1289,6 +1289,41 @@ type TicketPlan struct {
     UpdatedAt     time.Time         `gorm:"type:timestamp;default:current_timestamp" json:"updated_at"`
 }
 
+type AuthorType string
+
+const (
+    HumansAuthor AuthorType = "human"
+    HiveAuthor  AuthorType = "hive"
+)
+
+type ContentType string
+
+const (
+    FeatureCreation    ContentType = "feature_creation"
+    StoryUpdate       ContentType = "story_update"
+    RequirementChange ContentType = "requirement_change"
+    GeneralUpdate     ContentType = "general_update"
+)
+
+type Activity struct {
+    ID          uuid.UUID      `gorm:"primaryKey;type:uuid"`
+    ThreadID    uuid.UUID      `gorm:"type:uuid;index:thread_index" json:"thread_id"`
+    Sequence    int            `gorm:"type:integer;not null" json:"sequence"`
+    ContentType ContentType    `gorm:"type:varchar(50);not null" json:"content_type"`
+    Content     string         `gorm:"type:text;not null;check:content,length(content) <= 10000" json:"content"`
+    Workspace   string         `gorm:"type:varchar(255);index:workspace_index" json:"workspace"`
+    FeatureUUID string         `gorm:"type:varchar(255);index:feature_index" json:"feature_uuid"`
+    PhaseUUID   string         `gorm:"type:varchar(255);index:phase_index" json:"phase_uuid"`
+    Feedback    string         `gorm:"type:text" json:"feedback"`
+    Actions     pq.StringArray `gorm:"type:text[];default:'{}'" json:"actions"`
+    Questions   pq.StringArray `gorm:"type:text[];default:'{}'" json:"questions"`
+    TimeCreated time.Time      `gorm:"type:timestamp;default:current_timestamp" json:"time_created"`
+    TimeUpdated time.Time      `gorm:"type:timestamp;default:current_timestamp" json:"time_updated"`
+    Status      string         `gorm:"type:varchar(20);default:'active'" json:"status"`
+    Author      AuthorType     `gorm:"type:varchar(10);not null" json:"author"`
+    AuthorRef   string         `gorm:"type:varchar(255);not null" json:"author_ref"`
+}
+
 type NodeData struct {
     BountyID    uint   `json:"bounty_id"`
     Title       string `json:"title"`
