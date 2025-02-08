@@ -17,11 +17,13 @@ type Edge struct {
 	Edge    EdgeInfo `json:"edge"`
 	Source  Node     `json:"source"`
 	Targets []Node   `json:"targets,omitempty"`
+	Properties map[string]interface{} `json:"properties"`
 }
 
 type EdgeInfo struct {
 	EdgeType string  `json:"edge_type"`
 	Weight   float64 `json:"weight"`
+	RefID string `json:"ref_id,omitempty"`
 }
 
 type Node struct {
