@@ -593,6 +593,7 @@ type WorkspaceCodeGraph struct {
 	WorkspaceUuid string     `gorm:"not null" json:"workspace_uuid"`
 	Name          string     `gorm:"not null" json:"name"`
 	Url           string     `json:"url"`
+	SecretAlias   string     `json:"secret_alias"`
 	Created       *time.Time `json:"created"`
 	Updated       *time.Time `json:"updated"`
 	CreatedBy     string     `json:"created_by"`
@@ -1256,9 +1257,9 @@ type FileAsset struct {
 type ListFileAssetsParams struct {
 	Status             *FileStatus `form:"status"`
 	MimeType           *string     `form:"mimeType"`
-	BeforeDate         *time.Time  `form:"beforeDate"`
-	AfterDate          *time.Time  `form:"afterDate"`
-	LastAccessedBefore *time.Time  `form:"lastAccessedBefore"`
+	BeforeDate         *time.Time    `form:"beforeDate"`
+	AfterDate          *time.Time    `form:"afterDate"`
+	LastAccessedBefore *time.Time    `form:"lastAccessedBefore"`
 	WorkspaceID        *string     `form:"workspaceId"`
 	Page               int         `form:"page,default=1"`
 	PageSize           int         `form:"pageSize,default=50"`
