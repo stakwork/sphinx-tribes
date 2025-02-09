@@ -1684,6 +1684,7 @@ func (db database) GetConnectionCodesList(page, limit int) ([]ConnectionCodesLis
     }
 
     if err := db.db.Model(&ConnectionCodes{}).
+        Select("id, connection_string, is_used, date_created, pubkey, route_hint, sats_amount").
         Where("is_used = ?", false).
         Order("date_created DESC").
         Limit(limit).

@@ -363,27 +363,32 @@ func (ah *authHandler) ListConnectionCodes(w http.ResponseWriter, r *http.Reques
 	}
 
 	codes, total, err := ah.db.GetConnectionCodesList(page, limit)
-	if err != nil {
-		logger.Log.Error("[auth] Failed to get connection codes: %v", err)
-		w.WriteHeader(http.StatusNotFound)
-		json.NewEncoder(w).Encode(map[string]interface{}{
-			"success": false,
-			"error":   "No connection codes found",
-		})
-		return
-	}
+    if err != nil {
+        w.WriteHeader(http.StatusOK)
+        json.NewEncoder(w).Encode(ConnectionCodesListResponse{
+            Success: false,
+            Data: struct {
+                Codes []db.ConnectionCodesList `json:"codes"`
+                Total int64                   `json:"total"`
+            }{
+                Codes: []db.ConnectionCodesList{},
+                Total: 0,
+            },
+        })
+        return
+    }
 
-	response := ConnectionCodesListResponse{
-		Success: true,
-		Data: struct {
-			Codes []db.ConnectionCodesList `json:"codes"`
-			Total int64                   `json:"total"`
-		}{
-			Codes: codes,
-			Total: total,
-		},
-	}
+    response := ConnectionCodesListResponse{
+        Success: true,
+        Data: struct {
+            Codes []db.ConnectionCodesList `json:"codes"`
+            Total int64                   `json:"total"`
+        }{
+            Codes: codes,
+            Total: total,
+        },
+    }
 
-	w.WriteHeader(http.StatusOK)
-	json.NewEncoder(w).Encode(response)
+    w.WriteHeader(http.StatusOK)
+    json.NewEncoder(w).Encode(response)
 }
