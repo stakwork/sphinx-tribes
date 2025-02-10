@@ -1988,6 +1988,91 @@ func TestCreateOrEditWorkspaceCodeGraph(t *testing.T) {
 		assert.Equal(t, codeGraph.Name, returnedCodeGraph.Name)
 		assert.Equal(t, codeGraph.Url, returnedCodeGraph.Url)
 	})
+
+	t.Run("user should be able to add a workspace code graph with secret alias", func(t *testing.T) {
+		rr := httptest.NewRecorder()
+		handler := http.HandlerFunc(oHandler.CreateOrEditWorkspaceCodeGraph)
+
+		workspace := db.Workspace{
+			Uuid:        uuid.New().String(),
+			Name:        uuid.New().String(),
+			OwnerPubKey: "workspace_owner_pubkey",
+			Github:      "https://github.com/test",
+			Website:     "https://www.test.com",
+			Description: "Test Description",
+		}
+		db.TestDB.CreateOrEditWorkspace(workspace)
+
+		codeGraph := db.WorkspaceCodeGraph{
+			Uuid:          uuid.New().String(),
+			WorkspaceUuid: workspace.Uuid,
+			Name:          "testgraph",
+			Url:           "https://github.com/test/graph",
+			SecretAlias:   "{{test_secret}}",
+		}
+
+		requestBody, _ := json.Marshal(codeGraph)
+		ctx := context.WithValue(context.Background(), auth.ContextKey, "pub-key")
+		req, err := http.NewRequestWithContext(ctx, http.MethodPost, "/codegraph", bytes.NewReader(requestBody))
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		handler.ServeHTTP(rr, req)
+
+		var returnedCodeGraph db.WorkspaceCodeGraph
+		err = json.Unmarshal(rr.Body.Bytes(), &returnedCodeGraph)
+		assert.NoError(t, err)
+
+		assert.Equal(t, http.StatusOK, rr.Code)
+		assert.Equal(t, codeGraph.Name, returnedCodeGraph.Name)
+		assert.Equal(t, codeGraph.Url, returnedCodeGraph.Url)
+		assert.Equal(t, codeGraph.SecretAlias, returnedCodeGraph.SecretAlias)
+	})
+
+	t.Run("should be able to update secret alias of existing code graph", func(t *testing.T) {
+
+		workspace := db.Workspace{
+			Uuid:        uuid.New().String(),
+			Name:        uuid.New().String(),
+			OwnerPubKey: "workspace_owner_pubkey",
+			Github:      "https://github.com/test",
+			Website:     "https://www.test.com",
+			Description: "Test Description",
+		}
+		db.TestDB.CreateOrEditWorkspace(workspace)
+
+		initialCodeGraph := db.WorkspaceCodeGraph{
+			Uuid:          uuid.New().String(),
+			WorkspaceUuid: workspace.Uuid,
+			Name:          "testgraph",
+			Url:           "https://github.com/test/graph",
+			SecretAlias:   "{{initial_secret}}",
+		}
+		db.TestDB.CreateOrEditCodeGraph(initialCodeGraph)
+
+		rr := httptest.NewRecorder()
+		handler := http.HandlerFunc(oHandler.CreateOrEditWorkspaceCodeGraph)
+
+		updatedCodeGraph := initialCodeGraph
+		updatedCodeGraph.SecretAlias = "{{updated_secret}}"
+
+		requestBody, _ := json.Marshal(updatedCodeGraph)
+		ctx := context.WithValue(context.Background(), auth.ContextKey, "pub-key")
+		req, err := http.NewRequestWithContext(ctx, http.MethodPost, "/codegraph", bytes.NewReader(requestBody))
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		handler.ServeHTTP(rr, req)
+
+		var returnedCodeGraph db.WorkspaceCodeGraph
+		err = json.Unmarshal(rr.Body.Bytes(), &returnedCodeGraph)
+		assert.NoError(t, err)
+
+		assert.Equal(t, http.StatusOK, rr.Code)
+		assert.Equal(t, updatedCodeGraph.SecretAlias, returnedCodeGraph.SecretAlias)
+	})
 }
 
 func TestGetWorkspaceCodeGraphByUUID(t *testing.T) {
