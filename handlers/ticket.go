@@ -8,6 +8,7 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"strings"
 	"time"
 
 	"github.com/go-chi/chi"
@@ -382,9 +383,11 @@ func (th *ticketHandler) PostTicketDataToStakwork(w http.ResponseWriter, r *http
 	}
 
 	var (
-		productBrief, featureBrief, codeGraphURL string
+		productBrief, featureBrief string
 		feature                                  db.WorkspaceFeatures
 	)
+
+	var codeGraphData map[string]interface{}
 
 	if ticket.FeatureUUID != "" {
 		feature = th.db.GetFeatureByUuid(ticket.FeatureUUID)
@@ -452,11 +455,15 @@ func (th *ticketHandler) PostTicketDataToStakwork(w http.ResponseWriter, r *http
 
 		codeGraph, err := th.db.GetCodeGraphByUUID(feature.WorkspaceUuid)
 		if err == nil {
-			codeGraphURL = codeGraph.Url
-		} else {
-			codeGraphURL = ""
+			url := strings.TrimSuffix(codeGraph.Url, "/")
+			if !strings.HasPrefix(url, "https://") {
+				url = "https://" + url
+			}
+			codeGraphData = map[string]interface{}{
+				"url":          url,
+				"secret_alias": codeGraph.SecretAlias,
+			}
 		}
-
 	}
 
 	phase, err := th.db.GetPhaseByUuid(ticket.PhaseUUID)
@@ -486,7 +493,7 @@ func (th *ticketHandler) PostTicketDataToStakwork(w http.ResponseWriter, r *http
 						"sourceWebsocket":   ticketRequest.Metadata.ID,
 						"webhook_url":       webhookURL,
 						"phaseSchematic":    schematicURL,
-						"codeGraph":         codeGraphURL,
+						"codeGraph":         codeGraphData,
 						"alias":             user.OwnerAlias,
 					},
 				},

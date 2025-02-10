@@ -255,7 +255,10 @@ func buildVarsPayload(request SendMessageRequest, createdMessage *db.ChatMessage
 		if !strings.HasPrefix(url, "https://") {
 			url = "https://" + url
 		}
-		vars["codeGraph"] = url
+		vars["codeGraph"] = map[string]interface{}{
+			"url":    url,
+			"secret_alias": codeGraph.SecretAlias,
+		}
 	}
 
 	return vars
