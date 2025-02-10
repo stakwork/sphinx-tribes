@@ -234,8 +234,10 @@ type ConnectionCodesShort struct {
 }
 
 type ConnectionCodesList struct {
+    ID               uint       `json:"id"`
     ConnectionString string     `json:"connection_string"`
     Pubkey          string     `json:"pubkey"`
+    RouteHint       string     `json:"route_hint"`
     SatsAmount      uint64     `json:"sats_amount"`
     DateCreated     *time.Time `json:"date_created"`
     IsUsed          bool       `json:"is_used"`
