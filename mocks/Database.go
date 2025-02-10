@@ -14683,3 +14683,167 @@ func (_c *Database_GetBountiesByWorkspaceAndTimeRange_Call) RunAndReturn(run fun
 	_c.Call.Return(run)
 	return _c
 }
+
+// SaveNotification provides a mock function with given fields: pubkey, event, content, status
+func (_m *Database) SaveNotification(pubkey string, event string, content string, status string) error {
+	ret := _m.Called(pubkey, event, content, status)
+
+	if len(ret) == 0 {
+		panic("no return value specified for SaveNotification")
+	}
+
+	var r0 error
+	if rf, ok := ret.Get(0).(func(string, string, string, string) error); ok {
+		r0 = rf(pubkey, event, content, status)
+	} else {
+		r0 = ret.Error(0)
+	}
+
+	return r0
+}
+
+// Database_SaveNotification_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'SaveNotification'
+type Database_SaveNotification_Call struct {
+	*mock.Call
+}
+
+// SaveNotification is a helper method to define mock.On call
+//   - pubkey string
+//   - event string
+//   - content string
+//   - status string
+func (_e *Database_Expecter) SaveNotification(pubkey interface{}, event interface{}, content interface{}, status interface{}) *Database_SaveNotification_Call {
+	return &Database_SaveNotification_Call{Call: _e.mock.On("SaveNotification", pubkey, event, content, status)}
+}
+
+func (_c *Database_SaveNotification_Call) Run(run func(pubkey string, event string, content string, status string)) *Database_SaveNotification_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(string), args[1].(string), args[2].(string), args[3].(string))
+	})
+	return _c
+}
+
+func (_c *Database_SaveNotification_Call) Return(_a0 error) *Database_SaveNotification_Call {
+	_c.Call.Return(_a0)
+	return _c
+}
+
+func (_c *Database_SaveNotification_Call) RunAndReturn(run func(string, string, string, string) error) *Database_SaveNotification_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
+// GetNotificationsByStatus provides a mock function with given fields: status
+func (_m *Database) GetNotificationsByStatus(status string) []db.Notification {
+	ret := _m.Called(status)
+
+	if len(ret) == 0 {
+		panic("no return value specified for GetNotificationsByStatus")
+	}
+
+	var r0 []db.Notification
+	if rf, ok := ret.Get(0).(func(string) []db.Notification); ok {
+		r0 = rf(status)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).([]db.Notification)
+		}
+	}
+
+	return r0
+}
+
+// Database_GetNotificationsByStatus_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'GetNotificationsByStatus'
+type Database_GetNotificationsByStatus_Call struct {
+	*mock.Call
+}
+
+// GetNotificationsByStatus is a helper method to define mock.On call
+//   - status string
+func (_e *Database_Expecter) GetNotificationsByStatus(status interface{}) *Database_GetNotificationsByStatus_Call {
+	return &Database_GetNotificationsByStatus_Call{Call: _e.mock.On("GetNotificationsByStatus", status)}
+}
+
+func (_c *Database_GetNotificationsByStatus_Call) Run(run func(status string)) *Database_GetNotificationsByStatus_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(string))
+	})
+	return _c
+}
+
+func (_c *Database_GetNotificationsByStatus_Call) Return(_a0 []db.Notification) *Database_GetNotificationsByStatus_Call {
+	_c.Call.Return(_a0)
+	return _c
+}
+
+func (_c *Database_GetNotificationsByStatus_Call) RunAndReturn(run func(string) []db.Notification) *Database_GetNotificationsByStatus_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
+// IncrementNotificationRetry provides a mock function with given fields: notificationUUID
+func (_m *Database) IncrementNotificationRetry(notificationUUID string) {
+	_m.Called(notificationUUID)
+}
+
+// Database_IncrementNotificationRetry_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'IncrementNotificationRetry'
+type Database_IncrementNotificationRetry_Call struct {
+	*mock.Call
+}
+
+// IncrementNotificationRetry is a helper method to define mock.On call
+//   - notificationUUID string
+func (_e *Database_Expecter) IncrementNotificationRetry(notificationUUID interface{}) *Database_IncrementNotificationRetry_Call {
+	return &Database_IncrementNotificationRetry_Call{Call: _e.mock.On("IncrementNotificationRetry", notificationUUID)}
+}
+
+func (_c *Database_IncrementNotificationRetry_Call) Run(run func(notificationUUID string)) *Database_IncrementNotificationRetry_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(string))
+	})
+	return _c
+}
+
+func (_c *Database_IncrementNotificationRetry_Call) Return() *Database_IncrementNotificationRetry_Call {
+	_c.Call.Return()
+	return _c
+}
+
+func (_c *Database_IncrementNotificationRetry_Call) RunAndReturn(run func(string)) *Database_IncrementNotificationRetry_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
+// UpdateNotificationStatus provides a mock function with given fields: notificationUUID, status
+func (_m *Database) UpdateNotificationStatus(notificationUUID string, status string) {
+	_m.Called(notificationUUID, status)
+}
+
+// Database_UpdateNotificationStatus_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'UpdateNotificationStatus'
+type Database_UpdateNotificationStatus_Call struct {
+	*mock.Call
+}
+
+// UpdateNotificationStatus is a helper method to define mock.On call
+//   - notificationUUID string
+//   - status string
+func (_e *Database_Expecter) UpdateNotificationStatus(notificationUUID interface{}, status interface{}) *Database_UpdateNotificationStatus_Call {
+	return &Database_UpdateNotificationStatus_Call{Call: _e.mock.On("UpdateNotificationStatus", notificationUUID, status)}
+}
+
+func (_c *Database_UpdateNotificationStatus_Call) Run(run func(notificationUUID string, status string)) *Database_UpdateNotificationStatus_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(string), args[1].(string))
+	})
+	return _c
+}
+
+func (_c *Database_UpdateNotificationStatus_Call) Return() *Database_UpdateNotificationStatus_Call {
+	_c.Call.Return()
+	return _c
+}
+
+func (_c *Database_UpdateNotificationStatus_Call) RunAndReturn(run func(string, string)) *Database_UpdateNotificationStatus_Call {
+	_c.Call.Return(run)
+	return _c
+}
