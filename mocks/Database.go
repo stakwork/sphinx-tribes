@@ -13653,6 +13653,7 @@ func (_c *Database_PauseBountyTiming_Call) RunAndReturn(run func(uint) error) *D
 	return _c
 }
 
+
 func (_m *Database) ResumeBountyTiming(bountyID uint) error {
 	ret := _m.Called(bountyID)
 
@@ -13800,6 +13801,7 @@ func (_c *Database_GetConnectionCodesList_Call) RunAndReturn(run func(int, int) 
 	return _c
 }
 
+
 // CreateOrEditTicketPlan provides a mock function with given fields: plan
 func (_m *Database) CreateOrEditTicketPlan(plan *db.TicketPlan) (*db.TicketPlan, error) {
 	ret := _m.Called(plan)
@@ -13854,6 +13856,8 @@ func (_c *Database_CreateOrEditTicketPlan_Call) RunAndReturn(run func(*db.Ticket
 	_c.Call.Return(run)
 	return _c
 }
+
+
 
 // GetTicketPlan provides a mock function with given fields: _a0
 func (_m *Database) GetTicketPlan(_a0 string) (*db.TicketPlan, error) {
@@ -13910,6 +13914,8 @@ func (_c *Database_GetTicketPlan_Call) RunAndReturn(run func(string) (*db.Ticket
 	return _c
 }
 
+
+
 // DeleteTicketPlan provides a mock function with given fields: _a0
 func (_m *Database) DeleteTicketPlan(_a0 string) error {
 	ret := _m.Called(_a0)
@@ -13952,6 +13958,7 @@ func (_c *Database_DeleteTicketPlan_Call) RunAndReturn(run func(string) error) *
 	_c.Call.Return(run)
 	return _c
 }
+
 
 // GetTicketPlansByFeature provides a mock function with given fields: featureUUID
 func (_m *Database) GetTicketPlansByFeature(featureUUID string) ([]db.TicketPlan, error) {
@@ -14008,6 +14015,7 @@ func (_c *Database_GetTicketPlansByFeature_Call) RunAndReturn(run func(string) (
 	return _c
 }
 
+
 // GetTicketPlansByPhase provides a mock function with given fields: phaseUUID
 func (_m *Database) GetTicketPlansByPhase(phaseUUID string) ([]db.TicketPlan, error) {
 	ret := _m.Called(phaseUUID)
@@ -14063,6 +14071,7 @@ func (_c *Database_GetTicketPlansByPhase_Call) RunAndReturn(run func(string) ([]
 	return _c
 }
 
+
 // GetTicketPlansByWorkspace provides a mock function with given fields: workspaceUUID
 func (_m *Database) GetTicketPlansByWorkspace(workspaceUUID string) ([]db.TicketPlan, error) {
 	ret := _m.Called(workspaceUUID)
@@ -14114,6 +14123,563 @@ func (_c *Database_GetTicketPlansByWorkspace_Call) Return(_a0 []db.TicketPlan, _
 }
 
 func (_c *Database_GetTicketPlansByWorkspace_Call) RunAndReturn(run func(string) ([]db.TicketPlan, error)) *Database_GetTicketPlansByWorkspace_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
+// CreateActivity provides a mock function with given fields: activity
+func (_m *Database) CreateActivity(activity *db.Activity) (*db.Activity, error) {
+	ret := _m.Called(activity)
+
+	if len(ret) == 0 {
+		panic("no return value specified for CreateActivity")
+	}
+
+	var r0 *db.Activity
+	var r1 error
+	if rf, ok := ret.Get(0).(func(*db.Activity) (*db.Activity, error)); ok {
+		return rf(activity)
+	}
+	if rf, ok := ret.Get(0).(func(*db.Activity) *db.Activity); ok {
+		r0 = rf(activity)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(*db.Activity)
+		}
+	}
+
+	if rf, ok := ret.Get(1).(func(*db.Activity) error); ok {
+		r1 = rf(activity)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
+type Database_CreateActivity_Call struct {
+	*mock.Call
+}
+
+func (_e *Database_Expecter) CreateActivity(activity interface{}) *Database_CreateActivity_Call {
+	return &Database_CreateActivity_Call{Call: _e.mock.On("CreateActivity", activity)}
+}
+
+func (_c *Database_CreateActivity_Call) Run(run func(activity *db.Activity)) *Database_CreateActivity_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(*db.Activity))
+	})
+	return _c
+}
+
+func (_c *Database_CreateActivity_Call) Return(_a0 *db.Activity, _a1 error) *Database_CreateActivity_Call {
+	_c.Call.Return(_a0, _a1)
+	return _c
+}
+
+func (_c *Database_CreateActivity_Call) RunAndReturn(run func(*db.Activity) (*db.Activity, error)) *Database_CreateActivity_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
+// CreateActivityThread provides a mock function with given fields: sourceID, activity
+func (_m *Database) CreateActivityThread(sourceID string, activity *db.Activity) (*db.Activity, error) {
+	ret := _m.Called(sourceID, activity)
+
+	if len(ret) == 0 {
+		panic("no return value specified for CreateActivityThread")
+	}
+
+	var r0 *db.Activity
+	var r1 error
+	if rf, ok := ret.Get(0).(func(string, *db.Activity) (*db.Activity, error)); ok {
+		return rf(sourceID, activity)
+	}
+	if rf, ok := ret.Get(0).(func(string, *db.Activity) *db.Activity); ok {
+		r0 = rf(sourceID, activity)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(*db.Activity)
+		}
+	}
+
+	if rf, ok := ret.Get(1).(func(string, *db.Activity) error); ok {
+		r1 = rf(sourceID, activity)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
+type Database_CreateActivityThread_Call struct {
+	*mock.Call
+}
+
+func (_e *Database_Expecter) CreateActivityThread(sourceID interface{}, activity interface{}) *Database_CreateActivityThread_Call {
+	return &Database_CreateActivityThread_Call{Call: _e.mock.On("CreateActivityThread", sourceID, activity)}
+}
+
+func (_c *Database_CreateActivityThread_Call) Run(run func(sourceID string, activity *db.Activity)) *Database_CreateActivityThread_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(string), args[1].(*db.Activity))
+	})
+	return _c
+}
+
+func (_c *Database_CreateActivityThread_Call) Return(_a0 *db.Activity, _a1 error) *Database_CreateActivityThread_Call {
+	_c.Call.Return(_a0, _a1)
+	return _c
+}
+
+func (_c *Database_CreateActivityThread_Call) RunAndReturn(run func(string, *db.Activity) (*db.Activity, error)) *Database_CreateActivityThread_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
+
+// UpdateActivity provides a mock function with given fields: activity
+func (_m *Database) UpdateActivity(activity *db.Activity) (*db.Activity, error) {
+	ret := _m.Called(activity)
+
+	if len(ret) == 0 {
+		panic("no return value specified for UpdateActivity")
+	}
+
+	var r0 *db.Activity
+	var r1 error
+	if rf, ok := ret.Get(0).(func(*db.Activity) (*db.Activity, error)); ok {
+		return rf(activity)
+	}
+	if rf, ok := ret.Get(0).(func(*db.Activity) *db.Activity); ok {
+		r0 = rf(activity)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(*db.Activity)
+		}
+	}
+
+	if rf, ok := ret.Get(1).(func(*db.Activity) error); ok {
+		r1 = rf(activity)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
+type Database_UpdateActivity_Call struct {
+	*mock.Call
+}
+
+func (_e *Database_Expecter) UpdateActivity(activity interface{}) *Database_UpdateActivity_Call {
+	return &Database_UpdateActivity_Call{Call: _e.mock.On("UpdateActivity", activity)}
+}
+
+func (_c *Database_UpdateActivity_Call) Run(run func(activity *db.Activity)) *Database_UpdateActivity_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(*db.Activity))
+	})
+	return _c
+}
+
+func (_c *Database_UpdateActivity_Call) Return(_a0 *db.Activity, _a1 error) *Database_UpdateActivity_Call {
+	_c.Call.Return(_a0, _a1)
+	return _c
+}
+
+func (_c *Database_UpdateActivity_Call) RunAndReturn(run func(*db.Activity) (*db.Activity, error)) *Database_UpdateActivity_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
+
+// GetActivity provides a mock function with given fields: id
+func (_m *Database) GetActivity(id string) (*db.Activity, error) {
+	ret := _m.Called(id)
+
+	if len(ret) == 0 {
+		panic("no return value specified for GetActivity")
+	}
+
+	var r0 *db.Activity
+	var r1 error
+	if rf, ok := ret.Get(0).(func(string) (*db.Activity, error)); ok {
+		return rf(id)
+	}
+	if rf, ok := ret.Get(0).(func(string) *db.Activity); ok {
+		r0 = rf(id)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(*db.Activity)
+		}
+	}
+
+	if rf, ok := ret.Get(1).(func(string) error); ok {
+		r1 = rf(id)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
+type Database_GetActivity_Call struct {
+	*mock.Call
+}
+
+func (_e *Database_Expecter) GetActivity(id interface{}) *Database_GetActivity_Call {
+	return &Database_GetActivity_Call{Call: _e.mock.On("GetActivity", id)}
+}
+
+func (_c *Database_GetActivity_Call) Run(run func(id string)) *Database_GetActivity_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(string))
+	})
+	return _c
+}
+
+func (_c *Database_GetActivity_Call) Return(_a0 *db.Activity, _a1 error) *Database_GetActivity_Call {
+	_c.Call.Return(_a0, _a1)
+	return _c
+}
+
+func (_c *Database_GetActivity_Call) RunAndReturn(run func(string) (*db.Activity, error)) *Database_GetActivity_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
+
+// GetActivitiesByThread provides a mock function with given fields: threadID
+func (_m *Database) GetActivitiesByThread(threadID string) ([]db.Activity, error) {
+	ret := _m.Called(threadID)
+
+	if len(ret) == 0 {
+		panic("no return value specified for GetActivitiesByThread")
+	}
+
+	var r0 []db.Activity
+	var r1 error
+	if rf, ok := ret.Get(0).(func(string) ([]db.Activity, error)); ok {
+		return rf(threadID)
+	}
+	if rf, ok := ret.Get(0).(func(string) []db.Activity); ok {
+		r0 = rf(threadID)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).([]db.Activity)
+		}
+	}
+
+	if rf, ok := ret.Get(1).(func(string) error); ok {
+		r1 = rf(threadID)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
+type Database_GetActivitiesByThread_Call struct {
+	*mock.Call
+}
+
+func (_e *Database_Expecter) GetActivitiesByThread(threadID interface{}) *Database_GetActivitiesByThread_Call {
+	return &Database_GetActivitiesByThread_Call{Call: _e.mock.On("GetActivitiesByThread", threadID)}
+}
+
+func (_c *Database_GetActivitiesByThread_Call) Run(run func(threadID string)) *Database_GetActivitiesByThread_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(string))
+	})
+	return _c
+}
+
+func (_c *Database_GetActivitiesByThread_Call) Return(_a0 []db.Activity, _a1 error) *Database_GetActivitiesByThread_Call {
+	_c.Call.Return(_a0, _a1)
+	return _c
+}
+
+func (_c *Database_GetActivitiesByThread_Call) RunAndReturn(run func(string) ([]db.Activity, error)) *Database_GetActivitiesByThread_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
+
+// GetActivitiesByFeature provides a mock function with given fields: featureUUID
+func (_m *Database) GetActivitiesByFeature(featureUUID string) ([]db.Activity, error) {
+	ret := _m.Called(featureUUID)
+
+	if len(ret) == 0 {
+		panic("no return value specified for GetActivitiesByFeature")
+	}
+
+	var r0 []db.Activity
+	var r1 error
+	if rf, ok := ret.Get(0).(func(string) ([]db.Activity, error)); ok {
+		return rf(featureUUID)
+	}
+	if rf, ok := ret.Get(0).(func(string) []db.Activity); ok {
+		r0 = rf(featureUUID)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).([]db.Activity)
+		}
+	}
+
+	if rf, ok := ret.Get(1).(func(string) error); ok {
+		r1 = rf(featureUUID)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
+type Database_GetActivitiesByFeature_Call struct {
+	*mock.Call
+}
+
+func (_e *Database_Expecter) GetActivitiesByFeature(featureUUID interface{}) *Database_GetActivitiesByFeature_Call {
+	return &Database_GetActivitiesByFeature_Call{Call: _e.mock.On("GetActivitiesByFeature", featureUUID)}
+}
+
+func (_c *Database_GetActivitiesByFeature_Call) Run(run func(featureUUID string)) *Database_GetActivitiesByFeature_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(string))
+	})
+	return _c
+}
+
+func (_c *Database_GetActivitiesByFeature_Call) Return(_a0 []db.Activity, _a1 error) *Database_GetActivitiesByFeature_Call {
+	_c.Call.Return(_a0, _a1)
+	return _c
+}
+
+func (_c *Database_GetActivitiesByFeature_Call) RunAndReturn(run func(string) ([]db.Activity, error)) *Database_GetActivitiesByFeature_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
+
+// GetActivitiesByPhase provides a mock function with given fields: phaseUUID
+func (_m *Database) GetActivitiesByPhase(phaseUUID string) ([]db.Activity, error) {
+	ret := _m.Called(phaseUUID)
+
+	if len(ret) == 0 {
+		panic("no return value specified for GetActivitiesByPhase")
+	}
+
+	var r0 []db.Activity
+	var r1 error
+	if rf, ok := ret.Get(0).(func(string) ([]db.Activity, error)); ok {
+		return rf(phaseUUID)
+	}
+	if rf, ok := ret.Get(0).(func(string) []db.Activity); ok {
+		r0 = rf(phaseUUID)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).([]db.Activity)
+		}
+	}
+
+	if rf, ok := ret.Get(1).(func(string) error); ok {
+		r1 = rf(phaseUUID)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
+type Database_GetActivitiesByPhase_Call struct {
+	*mock.Call
+}
+
+func (_e *Database_Expecter) GetActivitiesByPhase(phaseUUID interface{}) *Database_GetActivitiesByPhase_Call {
+	return &Database_GetActivitiesByPhase_Call{Call: _e.mock.On("GetActivitiesByPhase", phaseUUID)}
+}
+
+func (_c *Database_GetActivitiesByPhase_Call) Run(run func(phaseUUID string)) *Database_GetActivitiesByPhase_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(string))
+	})
+	return _c
+}
+
+func (_c *Database_GetActivitiesByPhase_Call) Return(_a0 []db.Activity, _a1 error) *Database_GetActivitiesByPhase_Call {
+	_c.Call.Return(_a0, _a1)
+	return _c
+}
+
+func (_c *Database_GetActivitiesByPhase_Call) RunAndReturn(run func(string) ([]db.Activity, error)) *Database_GetActivitiesByPhase_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
+
+// GetActivitiesByWorkspace provides a mock function with given fields: workspace
+func (_m *Database) GetActivitiesByWorkspace(workspace string) ([]db.Activity, error) {
+	ret := _m.Called(workspace)
+
+	if len(ret) == 0 {
+		panic("no return value specified for GetActivitiesByWorkspace")
+	}
+
+	var r0 []db.Activity
+	var r1 error
+	if rf, ok := ret.Get(0).(func(string) ([]db.Activity, error)); ok {
+		return rf(workspace)
+	}
+	if rf, ok := ret.Get(0).(func(string) []db.Activity); ok {
+		r0 = rf(workspace)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).([]db.Activity)
+		}
+	}
+
+	if rf, ok := ret.Get(1).(func(string) error); ok {
+		r1 = rf(workspace)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
+type Database_GetActivitiesByWorkspace_Call struct {
+	*mock.Call
+}
+
+func (_e *Database_Expecter) GetActivitiesByWorkspace(workspace interface{}) *Database_GetActivitiesByWorkspace_Call {
+	return &Database_GetActivitiesByWorkspace_Call{Call: _e.mock.On("GetActivitiesByWorkspace", workspace)}
+}
+
+func (_c *Database_GetActivitiesByWorkspace_Call) Run(run func(workspace string)) *Database_GetActivitiesByWorkspace_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(string))
+	})
+	return _c
+}
+
+func (_c *Database_GetActivitiesByWorkspace_Call) Return(_a0 []db.Activity, _a1 error) *Database_GetActivitiesByWorkspace_Call {
+	_c.Call.Return(_a0, _a1)
+	return _c
+}
+
+func (_c *Database_GetActivitiesByWorkspace_Call) RunAndReturn(run func(string) ([]db.Activity, error)) *Database_GetActivitiesByWorkspace_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
+
+// GetLatestActivityByThread provides a mock function with given fields: threadID
+func (_m *Database) GetLatestActivityByThread(threadID string) (*db.Activity, error) {
+	ret := _m.Called(threadID)
+
+	if len(ret) == 0 {
+		panic("no return value specified for GetLatestActivityByThread")
+	}
+
+	var r0 *db.Activity
+	var r1 error
+	if rf, ok := ret.Get(0).(func(string) (*db.Activity, error)); ok {
+		return rf(threadID)
+	}
+	if rf, ok := ret.Get(0).(func(string) *db.Activity); ok {
+		r0 = rf(threadID)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(*db.Activity)
+		}
+	}
+
+	if rf, ok := ret.Get(1).(func(string) error); ok {
+		r1 = rf(threadID)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
+type Database_GetLatestActivityByThread_Call struct {
+	*mock.Call
+}
+
+func (_e *Database_Expecter) GetLatestActivityByThread(threadID interface{}) *Database_GetLatestActivityByThread_Call {
+	return &Database_GetLatestActivityByThread_Call{Call: _e.mock.On("GetLatestActivityByThread", threadID)}
+}
+
+func (_c *Database_GetLatestActivityByThread_Call) Run(run func(threadID string)) *Database_GetLatestActivityByThread_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(string))
+	})
+	return _c
+}
+
+func (_c *Database_GetLatestActivityByThread_Call) Return(_a0 *db.Activity, _a1 error) *Database_GetLatestActivityByThread_Call {
+	_c.Call.Return(_a0, _a1)
+	return _c
+}
+
+func (_c *Database_GetLatestActivityByThread_Call) RunAndReturn(run func(string) (*db.Activity, error)) *Database_GetLatestActivityByThread_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
+// GetBountiesByWorkspaceAndTimeRange provides a mock function with given fields: workspaceId, startDate, endDate
+func (_m *Database) GetBountiesByWorkspaceAndTimeRange(workspaceId string, startDate time.Time, endDate time.Time) ([]db.NewBounty, error) {
+	ret := _m.Called(workspaceId, startDate, endDate)
+
+	if len(ret) == 0 {
+		panic("no return value specified for GetBountiesByWorkspaceAndTimeRange")
+	}
+
+	var r0 []db.NewBounty
+	var r1 error
+	if rf, ok := ret.Get(0).(func(string, time.Time, time.Time) ([]db.NewBounty, error)); ok {
+		return rf(workspaceId, startDate, endDate)
+	}
+	if rf, ok := ret.Get(0).(func(string, time.Time, time.Time) []db.NewBounty); ok {
+		r0 = rf(workspaceId, startDate, endDate)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).([]db.NewBounty)
+		}
+	}
+
+	if rf, ok := ret.Get(1).(func(string, time.Time, time.Time) error); ok {
+		r1 = rf(workspaceId, startDate, endDate)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
+type Database_GetBountiesByWorkspaceAndTimeRange_Call struct {
+	*mock.Call
+}
+
+func (_e *Database_Expecter) GetBountiesByWorkspaceAndTimeRange(workspaceId interface{}, startDate interface{}, endDate interface{}) *Database_GetBountiesByWorkspaceAndTimeRange_Call {
+	return &Database_GetBountiesByWorkspaceAndTimeRange_Call{Call: _e.mock.On("GetBountiesByWorkspaceAndTimeRange", workspaceId, startDate, endDate)}
+}
+
+func (_c *Database_GetBountiesByWorkspaceAndTimeRange_Call) Run(run func(workspaceId string, startDate time.Time, endDate time.Time)) *Database_GetBountiesByWorkspaceAndTimeRange_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(string), args[1].(time.Time), args[2].(time.Time))
+	})
+	return _c
+}
+
+func (_c *Database_GetBountiesByWorkspaceAndTimeRange_Call) Return(_a0 []db.NewBounty, _a1 error) *Database_GetBountiesByWorkspaceAndTimeRange_Call {
+	_c.Call.Return(_a0, _a1)
+	return _c
+}
+
+func (_c *Database_GetBountiesByWorkspaceAndTimeRange_Call) RunAndReturn(run func(string, time.Time, time.Time) ([]db.NewBounty, error)) *Database_GetBountiesByWorkspaceAndTimeRange_Call {
 	_c.Call.Return(run)
 	return _c
 }

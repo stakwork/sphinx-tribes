@@ -1684,6 +1684,7 @@ func (db database) GetConnectionCodesList(page, limit int) ([]ConnectionCodesLis
     }
 
     if err := db.db.Model(&ConnectionCodes{}).
+        Select("id, connection_string, is_used, date_created, pubkey, route_hint, sats_amount").
         Where("is_used = ?", false).
         Order("date_created DESC").
         Limit(limit).
@@ -2167,4 +2168,24 @@ func (db database) DeleteBountyTiming(bountyID uint) error {
 	}
 
 	return nil
+}
+
+func (db database) GetBountiesByWorkspaceAndTimeRange(workspaceId string, startDate time.Time, endDate time.Time) ([]NewBounty, error) {
+    var bounties []NewBounty
+
+    startTimestamp := startDate.Unix()
+    endTimestamp := endDate.Unix()
+
+    query := db.db.
+        Where("workspace_uuid = ? AND created >= ? AND show = true", workspaceId, startTimestamp)
+
+    if endTimestamp < time.Now().Unix() {
+        query = query.Where("created <= ?", endTimestamp)
+    }
+
+    err := query.
+        Order("created DESC").
+        Find(&bounties).Error
+
+    return bounties, err
 }

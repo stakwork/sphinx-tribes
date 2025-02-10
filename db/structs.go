@@ -234,8 +234,10 @@ type ConnectionCodesShort struct {
 }
 
 type ConnectionCodesList struct {
+    ID               uint       `json:"id"`
     ConnectionString string     `json:"connection_string"`
     Pubkey          string     `json:"pubkey"`
+    RouteHint       string     `json:"route_hint"`
     SatsAmount      uint64     `json:"sats_amount"`
     DateCreated     *time.Time `json:"date_created"`
     IsUsed          bool       `json:"is_used"`
@@ -593,6 +595,7 @@ type WorkspaceCodeGraph struct {
 	WorkspaceUuid string     `gorm:"not null" json:"workspace_uuid"`
 	Name          string     `gorm:"not null" json:"name"`
 	Url           string     `json:"url"`
+	SecretAlias   string     `json:"secret_alias"`
 	Created       *time.Time `json:"created"`
 	Updated       *time.Time `json:"updated"`
 	CreatedBy     string     `json:"created_by"`
@@ -1256,9 +1259,9 @@ type FileAsset struct {
 type ListFileAssetsParams struct {
 	Status             *FileStatus `form:"status"`
 	MimeType           *string     `form:"mimeType"`
-	BeforeDate         *time.Time  `form:"beforeDate"`
-	AfterDate          *time.Time  `form:"afterDate"`
-	LastAccessedBefore *time.Time  `form:"lastAccessedBefore"`
+	BeforeDate         *time.Time    `form:"beforeDate"`
+	AfterDate          *time.Time    `form:"afterDate"`
+	LastAccessedBefore *time.Time    `form:"lastAccessedBefore"`
 	WorkspaceID        *string     `form:"workspaceId"`
 	Page               int         `form:"page,default=1"`
 	PageSize           int         `form:"pageSize,default=50"`
@@ -1287,6 +1290,56 @@ type TicketPlan struct {
     UpdatedBy     string            `gorm:"type:varchar(255)" json:"updated_by"`
     CreatedAt     time.Time         `gorm:"type:timestamp;default:current_timestamp" json:"created_at"`
     UpdatedAt     time.Time         `gorm:"type:timestamp;default:current_timestamp" json:"updated_at"`
+}
+
+type AuthorType string
+
+const (
+    HumansAuthor AuthorType = "human"
+    HiveAuthor  AuthorType = "hive"
+)
+
+type ContentType string
+
+const (
+    FeatureCreation    ContentType = "feature_creation"
+    StoryUpdate       ContentType = "story_update"
+    RequirementChange ContentType = "requirement_change"
+    GeneralUpdate     ContentType = "general_update"
+)
+
+type Activity struct {
+    ID          uuid.UUID      `gorm:"primaryKey;type:uuid"`
+    ThreadID    uuid.UUID      `gorm:"type:uuid;index:thread_index" json:"thread_id"`
+    Sequence    int            `gorm:"type:integer;not null" json:"sequence"`
+    ContentType ContentType    `gorm:"type:varchar(50);not null" json:"content_type"`
+    Content     string         `gorm:"type:text;not null;check:content,length(content) <= 10000" json:"content"`
+    Workspace   string         `gorm:"type:varchar(255);index:workspace_index" json:"workspace"`
+    FeatureUUID string         `gorm:"type:varchar(255);index:feature_index" json:"feature_uuid"`
+    PhaseUUID   string         `gorm:"type:varchar(255);index:phase_index" json:"phase_uuid"`
+    Feedback    string         `gorm:"type:text" json:"feedback"`
+    Actions     pq.StringArray `gorm:"type:text[];default:'{}'" json:"actions"`
+    Questions   pq.StringArray `gorm:"type:text[];default:'{}'" json:"questions"`
+    TimeCreated time.Time      `gorm:"type:timestamp;default:current_timestamp" json:"time_created"`
+    TimeUpdated time.Time      `gorm:"type:timestamp;default:current_timestamp" json:"time_updated"`
+    Status      string         `gorm:"type:varchar(20);default:'active'" json:"status"`
+    Author      AuthorType     `gorm:"type:varchar(10);not null" json:"author"`
+    AuthorRef   string         `gorm:"type:varchar(255);not null" json:"author_ref"`
+}
+
+type NodeData struct {
+    BountyID    uint   `json:"bounty_id"`
+    Title       string `json:"title"`
+    Description string `json:"description"`
+}
+
+type Node struct {
+    NodeType string   `json:"node_type"`
+    NodeData NodeData `json:"node_data"`
+}
+
+type NodeListResponse struct {
+    NodeList []Node `json:"node_list"`
 }
 
 func (Person) TableName() string {
