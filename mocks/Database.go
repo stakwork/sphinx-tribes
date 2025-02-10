@@ -14628,3 +14628,58 @@ func (_c *Database_GetLatestActivityByThread_Call) RunAndReturn(run func(string)
 	_c.Call.Return(run)
 	return _c
 }
+
+// GetBountiesByWorkspaceAndTimeRange provides a mock function with given fields: workspaceId, startDate, endDate
+func (_m *Database) GetBountiesByWorkspaceAndTimeRange(workspaceId string, startDate time.Time, endDate time.Time) ([]db.NewBounty, error) {
+	ret := _m.Called(workspaceId, startDate, endDate)
+
+	if len(ret) == 0 {
+		panic("no return value specified for GetBountiesByWorkspaceAndTimeRange")
+	}
+
+	var r0 []db.NewBounty
+	var r1 error
+	if rf, ok := ret.Get(0).(func(string, time.Time, time.Time) ([]db.NewBounty, error)); ok {
+		return rf(workspaceId, startDate, endDate)
+	}
+	if rf, ok := ret.Get(0).(func(string, time.Time, time.Time) []db.NewBounty); ok {
+		r0 = rf(workspaceId, startDate, endDate)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).([]db.NewBounty)
+		}
+	}
+
+	if rf, ok := ret.Get(1).(func(string, time.Time, time.Time) error); ok {
+		r1 = rf(workspaceId, startDate, endDate)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
+type Database_GetBountiesByWorkspaceAndTimeRange_Call struct {
+	*mock.Call
+}
+
+func (_e *Database_Expecter) GetBountiesByWorkspaceAndTimeRange(workspaceId interface{}, startDate interface{}, endDate interface{}) *Database_GetBountiesByWorkspaceAndTimeRange_Call {
+	return &Database_GetBountiesByWorkspaceAndTimeRange_Call{Call: _e.mock.On("GetBountiesByWorkspaceAndTimeRange", workspaceId, startDate, endDate)}
+}
+
+func (_c *Database_GetBountiesByWorkspaceAndTimeRange_Call) Run(run func(workspaceId string, startDate time.Time, endDate time.Time)) *Database_GetBountiesByWorkspaceAndTimeRange_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(string), args[1].(time.Time), args[2].(time.Time))
+	})
+	return _c
+}
+
+func (_c *Database_GetBountiesByWorkspaceAndTimeRange_Call) Return(_a0 []db.NewBounty, _a1 error) *Database_GetBountiesByWorkspaceAndTimeRange_Call {
+	_c.Call.Return(_a0, _a1)
+	return _c
+}
+
+func (_c *Database_GetBountiesByWorkspaceAndTimeRange_Call) RunAndReturn(run func(string, time.Time, time.Time) ([]db.NewBounty, error)) *Database_GetBountiesByWorkspaceAndTimeRange_Call {
+	_c.Call.Return(run)
+	return _c
+}

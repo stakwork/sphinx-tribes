@@ -1324,6 +1324,21 @@ type Activity struct {
     AuthorRef   string         `gorm:"type:varchar(255);not null" json:"author_ref"`
 }
 
+type NodeData struct {
+    BountyID    uint   `json:"bounty_id"`
+    Title       string `json:"title"`
+    Description string `json:"description"`
+}
+
+type Node struct {
+    NodeType string   `json:"node_type"`
+    NodeData NodeData `json:"node_data"`
+}
+
+type NodeListResponse struct {
+    NodeList []Node `json:"node_list"`
+}
+
 func (Person) TableName() string {
 	return "people"
 }
