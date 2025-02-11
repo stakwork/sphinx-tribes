@@ -8,7 +8,6 @@ import (
 	"log"
 	"net/http"
 	"os"
-	"strings"
 	"time"
 
 	"github.com/go-chi/chi"
@@ -315,114 +314,113 @@ func (th *ticketHandler) DeleteTicket(w http.ResponseWriter, r *http.Request) {
 func (th *ticketHandler) PostTicketDataToStakwork(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 	pubKeyFromAuth, _ := ctx.Value(auth.ContextKey).(string)
-
+ 
 	if pubKeyFromAuth == "" {
-		logger.Log.Info("[ticket] no pubkey from auth")
-		w.WriteHeader(http.StatusUnauthorized)
-		json.NewEncoder(w).Encode(map[string]string{"error": "Unauthorized"})
-		return
+	   logger.Log.Info("[ticket] no pubkey from auth")
+	   w.WriteHeader(http.StatusUnauthorized)
+	   json.NewEncoder(w).Encode(map[string]string{"error": "Unauthorized"})
+	   return
 	}
-
+ 
 	user := th.db.GetPersonByPubkey(pubKeyFromAuth)
-
+ 
 	if user.OwnerPubKey != pubKeyFromAuth {
-		logger.Log.Info("Person not exists")
-		w.WriteHeader(http.StatusBadRequest)
-		return
+	   logger.Log.Info("Person not exists")
+	   w.WriteHeader(http.StatusBadRequest)
+	   return
 	}
-
+ 
 	body, err := io.ReadAll(r.Body)
 	if err != nil {
-		w.WriteHeader(http.StatusBadRequest)
-		json.NewEncoder(w).Encode(TicketResponse{
-			Success: false,
-			Message: "Validation failed",
-			Errors:  []string{"Error reading request body"},
-		})
-		return
+	   w.WriteHeader(http.StatusBadRequest)
+	   json.NewEncoder(w).Encode(TicketResponse{
+		  Success: false,
+		  Message: "Validation failed",
+		  Errors:  []string{"Error reading request body"},
+	   })
+	   return
 	}
 	defer r.Body.Close()
-
+ 
 	var ticketRequest UpdateTicketRequest
 	if err := json.Unmarshal(body, &ticketRequest); err != nil {
-		w.WriteHeader(http.StatusBadRequest)
-		json.NewEncoder(w).Encode(TicketResponse{
-			Success: false,
-			Message: "Validation failed",
-			Errors:  []string{"Error parsing request body: " + err.Error()},
-		})
-		return
+	   w.WriteHeader(http.StatusBadRequest)
+	   json.NewEncoder(w).Encode(TicketResponse{
+		  Success: false,
+		  Message: "Validation failed",
+		  Errors:  []string{"Error parsing request body: " + err.Error()},
+	   })
+	   return
 	}
-
+ 
 	if ticketRequest.Ticket == nil {
-		w.WriteHeader(http.StatusBadRequest)
-		json.NewEncoder(w).Encode(TicketResponse{
-			Success: false,
-			Message: "Validation failed",
-			Errors:  []string{"Ticket data is required"},
-		})
-		return
+	   w.WriteHeader(http.StatusBadRequest)
+	   json.NewEncoder(w).Encode(TicketResponse{
+		  Success: false,
+		  Message: "Validation failed",
+		  Errors:  []string{"Ticket data is required"},
+	   })
+	   return
 	}
-
+ 
 	ticket := ticketRequest.Ticket
 	var validationErrors []string
 	if ticket.UUID == uuid.Nil {
-		validationErrors = append(validationErrors, "UUID is required")
+	   validationErrors = append(validationErrors, "UUID is required")
 	} else if _, err := uuid.Parse(ticket.UUID.String()); err != nil {
-		validationErrors = append(validationErrors, "Invalid UUID format")
+	   validationErrors = append(validationErrors, "Invalid UUID format")
 	}
-
+ 
 	if len(validationErrors) > 0 {
-		w.WriteHeader(http.StatusBadRequest)
-		json.NewEncoder(w).Encode(TicketResponse{
-			Success: false,
-			Message: "Validation failed",
-			Errors:  validationErrors,
-		})
-		return
+	   w.WriteHeader(http.StatusBadRequest)
+	   json.NewEncoder(w).Encode(TicketResponse{
+		  Success: false,
+		  Message: "Validation failed",
+		  Errors:  validationErrors,
+	   })
+	   return
 	}
-
+ 
 	var (
-		productBrief, featureBrief, featureArchitecture string
-		feature                                  db.WorkspaceFeatures
+	   productBrief, featureBrief, featureArchitecture, codeGraphURL, codeGraphAlias string
+	   feature                                                  db.WorkspaceFeatures
 	)
-
-	var codeGraphData map[string]interface{}
-
+ 
+ 
 	if ticket.FeatureUUID != "" {
-		feature = th.db.GetFeatureByUuid(ticket.FeatureUUID)
-		if feature.Uuid == "" {
-			w.WriteHeader(http.StatusInternalServerError)
-			json.NewEncoder(w).Encode(TicketResponse{
-				Success: false,
-				Message: "Error retrieving feature details",
-				Errors:  []string{"Feature not found with the provided UUID"},
-			})
-			return
-		}
-
-		var err error
-		productBrief, err = th.db.GetProductBrief(feature.WorkspaceUuid)
-		if err != nil {
-			w.WriteHeader(http.StatusInternalServerError)
-			json.NewEncoder(w).Encode(TicketResponse{
-				Success: false,
-				Message: "Error retrieving product brief",
-				Errors:  []string{err.Error()},
-			})
-			return
-		}
-
-		featureBrief, err = th.db.GetFeatureBrief(ticket.FeatureUUID)
-		if err != nil {
-			w.WriteHeader(http.StatusInternalServerError)
-			json.NewEncoder(w).Encode(TicketResponse{
-				Success: false,
-				Message: "Error retrieving feature brief",
-				Errors:  []string{err.Error()},
-			})
-			return
-		}
+	   feature = th.db.GetFeatureByUuid(ticket.FeatureUUID)
+	   if feature.Uuid == "" {
+		  w.WriteHeader(http.StatusInternalServerError)
+		  json.NewEncoder(w).Encode(TicketResponse{
+			 Success: false,
+			 Message: "Error retrieving feature details",
+			 Errors:  []string{"Feature not found with the provided UUID"},
+		  })
+		  return
+	   }
+ 
+	   var err error
+	   productBrief, err = th.db.GetProductBrief(feature.WorkspaceUuid)
+	   if err != nil {
+		  w.WriteHeader(http.StatusInternalServerError)
+		  json.NewEncoder(w).Encode(TicketResponse{
+			 Success: false,
+			 Message: "Error retrieving product brief",
+			 Errors:  []string{err.Error()},
+		  })
+		  return
+	   }
+ 
+	   featureBrief, err = th.db.GetFeatureBrief(ticket.FeatureUUID)
+	   if err != nil {
+		  w.WriteHeader(http.StatusInternalServerError)
+		  json.NewEncoder(w).Encode(TicketResponse{
+			 Success: false,
+			 Message: "Error retrieving feature brief",
+			 Errors:  []string{err.Error()},
+		  })
+		  return
+	   }
 
 		featureArchitecture, err = th.db.GetFeatureArchitecture(ticket.FeatureUUID)
 		if err != nil {
@@ -435,61 +433,58 @@ func (th *ticketHandler) PostTicketDataToStakwork(w http.ResponseWriter, r *http
 			return
 		}
 	}
-
+ 
 	host := os.Getenv("HOST")
 	if host == "" {
-		w.WriteHeader(http.StatusInternalServerError)
-		json.NewEncoder(w).Encode(TicketResponse{
-			Success: false,
-			Message: "HOST environment variable not set",
-		})
-		return
+	   w.WriteHeader(http.StatusInternalServerError)
+	   json.NewEncoder(w).Encode(TicketResponse{
+		  Success: false,
+		  Message: "HOST environment variable not set",
+	   })
+	   return
 	}
-
+ 
 	webhookURL := fmt.Sprintf("%s/bounties/ticket/review", host)
-
+ 
 	var schematicURL string
 	if feature.WorkspaceUuid != "" {
-
-		workspace := th.db.GetWorkspaceByUuid(feature.WorkspaceUuid)
-
-		if workspace.Uuid == "" {
-			w.WriteHeader(http.StatusNotFound)
-			json.NewEncoder(w).Encode(TicketResponse{
-				Success: false,
-				Message: "Workspace not found",
-			})
-			return
-		}
-
-		schematicURL = workspace.SchematicUrl
-
-		codeGraph, err := th.db.GetCodeGraphByUUID(feature.WorkspaceUuid)
-		if err == nil {
-			url := strings.TrimSuffix(codeGraph.Url, "/")
-			if !strings.HasPrefix(url, "https://") {
-				url = "https://" + url
-			}
-			codeGraphData = map[string]interface{}{
-				"url":          url,
-				"secret_alias": codeGraph.SecretAlias,
-			}
-		}
+ 
+	   workspace := th.db.GetWorkspaceByUuid(feature.WorkspaceUuid)
+ 
+	   if workspace.Uuid == "" {
+		  w.WriteHeader(http.StatusNotFound)
+		  json.NewEncoder(w).Encode(TicketResponse{
+			 Success: false,
+			 Message: "Workspace not found",
+		  })
+		  return
+	   }
+ 
+	   schematicURL = workspace.SchematicUrl
+ 
+	   codeGraph, err := th.db.GetCodeGraphByUUID(feature.WorkspaceUuid)
+	   if err == nil {
+		  codeGraphURL = codeGraph.Url
+		  codeGraphAlias = codeGraph.SecretAlias
+	   } else {
+		  codeGraphURL = ""
+		  codeGraphAlias = ""
+	   }
 	}
-
+ 
 	phase, err := th.db.GetPhaseByUuid(ticket.PhaseUUID)
 	if err != nil {
-		w.WriteHeader(http.StatusNotFound)
-		return
+	   w.WriteHeader(http.StatusNotFound)
+	   return
 	}
-
+ 
 	stakworkPayload := map[string]interface{}{
-		"name":        "Hive Ticket Builder",
-		"workflow_id": 37324,
-		"workflow_params": map[string]interface{}{
-			"set_var": map[string]interface{}{
-				"attributes": map[string]interface{}{
-					"vars": map[string]interface{}{
+	   "name":        "Hive Ticket Builder",
+	   "workflow_id": 37324,
+	   "workflow_params": map[string]interface{}{
+		  "set_var": map[string]interface{}{
+			 "attributes": map[string]interface{}{
+				"vars": map[string]interface{}{
 						"featureUUID":         ticket.FeatureUUID,
 						"phaseUUID":           ticket.PhaseUUID,
 						"ticketUUID":          ticket.UUID.String(),
@@ -505,148 +500,149 @@ func (th *ticketHandler) PostTicketDataToStakwork(w http.ResponseWriter, r *http
 						"sourceWebsocket":     ticketRequest.Metadata.ID,
 						"webhook_url":         webhookURL,
 						"phaseSchematic":      schematicURL,
-						"codeGraph":           codeGraphData,
+				        "codeGraph":           codeGraphURL,
+						"codeGraphAlias":      codeGraphAlias,
 						"alias":               user.OwnerAlias,
-					},
 				},
-			},
-		},
+			 },
+		  },
+	   },
 	}
-
+ 
 	stakworkPayloadJSON, err := json.Marshal(stakworkPayload)
 	if err != nil {
-		w.WriteHeader(http.StatusInternalServerError)
-		json.NewEncoder(w).Encode(TicketResponse{
-			Success: false,
-			Message: "Error encoding payload",
-			Errors:  []string{err.Error()},
-		})
-		return
+	   w.WriteHeader(http.StatusInternalServerError)
+	   json.NewEncoder(w).Encode(TicketResponse{
+		  Success: false,
+		  Message: "Error encoding payload",
+		  Errors:  []string{err.Error()},
+	   })
+	   return
 	}
-
+ 
 	apiKey := os.Getenv("SWWFKEY")
 	if apiKey == "" {
-		w.WriteHeader(http.StatusInternalServerError)
-		json.NewEncoder(w).Encode(TicketResponse{
-			Success: false,
-			Message: "API key not set in environment",
-		})
-		return
+	   w.WriteHeader(http.StatusInternalServerError)
+	   json.NewEncoder(w).Encode(TicketResponse{
+		  Success: false,
+		  Message: "API key not set in environment",
+	   })
+	   return
 	}
-
+ 
 	req, err := http.NewRequest(http.MethodPost, "https://api.stakwork.com/api/v1/projects", bytes.NewBuffer(stakworkPayloadJSON))
 	if err != nil {
-		w.WriteHeader(http.StatusInternalServerError)
-		json.NewEncoder(w).Encode(TicketResponse{
-			Success: false,
-			Message: "Error creating request",
-			Errors:  []string{err.Error()},
-		})
-		return
+	   w.WriteHeader(http.StatusInternalServerError)
+	   json.NewEncoder(w).Encode(TicketResponse{
+		  Success: false,
+		  Message: "Error creating request",
+		  Errors:  []string{err.Error()},
+	   })
+	   return
 	}
-
+ 
 	req.Header.Set("Authorization", "Token token="+apiKey)
 	req.Header.Set("Content-Type", "application/json")
-
+ 
 	resp, err := th.httpClient.Do(req)
 	if err != nil {
-		w.WriteHeader(http.StatusInternalServerError)
-		json.NewEncoder(w).Encode(TicketResponse{
-			Success: false,
-			Message: "Error sending request to Stakwork",
-			Errors:  []string{err.Error()},
-		})
-		return
+	   w.WriteHeader(http.StatusInternalServerError)
+	   json.NewEncoder(w).Encode(TicketResponse{
+		  Success: false,
+		  Message: "Error sending request to Stakwork",
+		  Errors:  []string{err.Error()},
+	   })
+	   return
 	}
 	defer resp.Body.Close()
-
+ 
 	respBody, err := io.ReadAll(resp.Body)
 	if err != nil {
-		w.WriteHeader(http.StatusInternalServerError)
-		json.NewEncoder(w).Encode(TicketResponse{
-			Success: false,
-			Message: "Error reading response from Stakwork",
-			Errors:  []string{err.Error()},
-		})
-		return
+	   w.WriteHeader(http.StatusInternalServerError)
+	   json.NewEncoder(w).Encode(TicketResponse{
+		  Success: false,
+		  Message: "Error reading response from Stakwork",
+		  Errors:  []string{err.Error()},
+	   })
+	   return
 	}
-
+ 
 	var stakworkResp StakworkResponse
 	if err := json.Unmarshal(respBody, &stakworkResp); err != nil {
-		w.WriteHeader(http.StatusInternalServerError)
-		json.NewEncoder(w).Encode(TicketResponse{
-			Success: false,
-			Message: "Error parsing Stakwork response",
-			Errors:  []string{err.Error()},
-		})
-		return
+	   w.WriteHeader(http.StatusInternalServerError)
+	   json.NewEncoder(w).Encode(TicketResponse{
+		  Success: false,
+		  Message: "Error parsing Stakwork response",
+		  Errors:  []string{err.Error()},
+	   })
+	   return
 	}
-
+ 
 	if resp.StatusCode != http.StatusOK || !stakworkResp.Success {
-		w.WriteHeader(resp.StatusCode)
-		json.NewEncoder(w).Encode(TicketResponse{
-			Success: false,
-			Message: string(respBody),
-			Errors:  []string{fmt.Sprintf("Stakwork API returned status code: %d", resp.StatusCode)},
-		})
-		return
+	   w.WriteHeader(resp.StatusCode)
+	   json.NewEncoder(w).Encode(TicketResponse{
+		  Success: false,
+		  Message: string(respBody),
+		  Errors:  []string{fmt.Sprintf("Stakwork API returned status code: %d", resp.StatusCode)},
+	   })
+	   return
 	}
-
+ 
 	if ticketRequest.Metadata.Source == "websocket" && ticketRequest.Metadata.ID != "" {
-		ticketMsg := websocket.TicketMessage{
-			BroadcastType:   "direct",
-			SourceSessionID: ticketRequest.Metadata.ID,
-			Message:         fmt.Sprintf("I have your updates and I'm rewriting ticket %s now", ticketRequest.Ticket.Name),
-			Action:          "message",
-			TicketDetails: websocket.TicketData{
-				FeatureUUID:       ticketRequest.Ticket.FeatureUUID,
-				PhaseUUID:         ticketRequest.Ticket.PhaseUUID,
-				TicketUUID:        ticketRequest.Ticket.UUID.String(),
-				TicketDescription: ticketRequest.Ticket.Description,
-			},
-		}
-
-		if err := websocket.WebsocketPool.SendTicketMessage(ticketMsg); err != nil {
-			log.Printf("Failed to send websocket message: %v", err)
-			w.WriteHeader(http.StatusOK)
-			json.NewEncoder(w).Encode(map[string]interface{}{
-				"ticket":          ticketRequest,
-				"websocket_error": err.Error(),
-			})
-			return
-		}
-
-		projectMsg := websocket.TicketMessage{
-			BroadcastType:   "direct",
-			SourceSessionID: ticketRequest.Metadata.ID,
-			Message:         fmt.Sprintf("https://jobs.stakwork.com/admin/projects/%d", stakworkResp.Data.ProjectID),
-			Action:          "swrun",
-			TicketDetails: websocket.TicketData{
-				FeatureUUID:       ticketRequest.Ticket.FeatureUUID,
-				PhaseUUID:         ticketRequest.Ticket.PhaseUUID,
-				TicketUUID:        ticketRequest.Ticket.UUID.String(),
-				TicketDescription: ticketRequest.Ticket.Description,
-			},
-		}
-
-		if err := websocket.WebsocketPool.SendTicketMessage(projectMsg); err != nil {
-			log.Printf("Failed to send project ID websocket message: %v", err)
-			w.WriteHeader(http.StatusOK)
-			json.NewEncoder(w).Encode(map[string]interface{}{
-				"ticket":          ticketRequest,
-				"websocket_error": err.Error(),
-			})
-			return
-		}
+	   ticketMsg := websocket.TicketMessage{
+		  BroadcastType:   "direct",
+		  SourceSessionID: ticketRequest.Metadata.ID,
+		  Message:         fmt.Sprintf("I have your updates and I'm rewriting ticket %s now", ticketRequest.Ticket.Name),
+		  Action:          "message",
+		  TicketDetails: websocket.TicketData{
+			 FeatureUUID:       ticketRequest.Ticket.FeatureUUID,
+			 PhaseUUID:         ticketRequest.Ticket.PhaseUUID,
+			 TicketUUID:        ticketRequest.Ticket.UUID.String(),
+			 TicketDescription: ticketRequest.Ticket.Description,
+		  },
+	   }
+ 
+	   if err := websocket.WebsocketPool.SendTicketMessage(ticketMsg); err != nil {
+		  log.Printf("Failed to send websocket message: %v", err)
+		  w.WriteHeader(http.StatusOK)
+		  json.NewEncoder(w).Encode(map[string]interface{}{
+			 "ticket":          ticketRequest,
+			 "websocket_error": err.Error(),
+		  })
+		  return
+	   }
+ 
+	   projectMsg := websocket.TicketMessage{
+		  BroadcastType:   "direct",
+		  SourceSessionID: ticketRequest.Metadata.ID,
+		  Message:         fmt.Sprintf("https://jobs.stakwork.com/admin/projects/%d", stakworkResp.Data.ProjectID),
+		  Action:          "swrun",
+		  TicketDetails: websocket.TicketData{
+			 FeatureUUID:       ticketRequest.Ticket.FeatureUUID,
+			 PhaseUUID:         ticketRequest.Ticket.PhaseUUID,
+			 TicketUUID:        ticketRequest.Ticket.UUID.String(),
+			 TicketDescription: ticketRequest.Ticket.Description,
+		  },
+	   }
+ 
+	   if err := websocket.WebsocketPool.SendTicketMessage(projectMsg); err != nil {
+		  log.Printf("Failed to send project ID websocket message: %v", err)
+		  w.WriteHeader(http.StatusOK)
+		  json.NewEncoder(w).Encode(map[string]interface{}{
+			 "ticket":          ticketRequest,
+			 "websocket_error": err.Error(),
+		  })
+		  return
+	   }
 	}
-
+ 
 	w.WriteHeader(http.StatusOK)
 	json.NewEncoder(w).Encode(TicketResponse{
-		Success:  true,
-		Message:  string(respBody),
-		TicketID: ticket.UUID.String(),
+	   Success:  true,
+	   Message:  string(respBody),
+	   TicketID: ticket.UUID.String(),
 	})
-}
+ }
 
 func (th *ticketHandler) ProcessTicketReview(w http.ResponseWriter, r *http.Request) {
 
