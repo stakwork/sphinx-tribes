@@ -2690,19 +2690,18 @@ func TestSendMessage(t *testing.T) {
         chatHandler := NewChatHandler(stakworkServer, db.TestDB)
         chatHandler.SendMessage(rr, req)
 
-        require.Equal(t, http.StatusOK, rr.Code)
+      require.Equal(t, http.StatusOK, rr.Code)
 
-        vars, ok := capturedPayload.WorkflowParams["set_var"].(map[string]interface{})["attributes"].(map[string]interface{})["vars"].(map[string]interface{})
-        require.True(t, ok, "Workflow params should contain vars")
-        
-        codeGraphData, exists := vars["codeGraph"].(map[string]interface{})
-        require.True(t, exists, "codeGraph should exist in vars")
-        url, hasURL := codeGraphData["url"].(string)
-        require.True(t, hasURL, "codeGraph should have url field")
-        assert.Equal(t, "https://boltwall.swarm38.sphinx.chat", url)
-        
-        _, hasSecret := codeGraphData["secret_alias"].(string)
-        require.True(t, hasSecret, "codeGraph should have secret_alias field")
+      vars, ok := capturedPayload.WorkflowParams["set_var"].(map[string]interface{})["attributes"].(map[string]interface{})["vars"].(map[string]interface{})
+      require.True(t, ok, "Workflow params should contain vars")
+
+
+      codeGraphUrl, exist := vars["codeGraph"].(string)
+      codeGraphAlias, exists := vars["codeGraphAlias"].(string)
+      require.True(t, exist, "codeGraph should exist in vars")
+      assert.Equal(t, "https://boltwall.swarm38.sphinx.chat", codeGraphUrl)
+      require.True(t, exists, "codeGraph should exist in vars")
+      assert.Equal(t, "{{test-secret-alias}}", codeGraphAlias)
 		
     })
 
