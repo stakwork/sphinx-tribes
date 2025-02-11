@@ -14887,3 +14887,46 @@ func (_c *Database_GetFeatureArchitecture_Call) RunAndReturn(run func(string) (s
 	_c.Call.Return(run)
 	return _c
 }
+
+// DeleteActivity provides a mock function with given fields: id
+func (_m *Database) DeleteActivity(id string) error {
+	ret := _m.Called(id)
+
+	if len(ret) == 0 {
+		panic("no return value specified for DeleteActivity")
+	}
+
+	var r0 error
+	if rf, ok := ret.Get(0).(func(string) error); ok {
+		r0 = rf(id)
+	} else {
+		r0 = ret.Error(0)
+	}
+
+	return r0
+}
+
+type Database_DeleteActivity_Call struct {
+	*mock.Call
+}
+
+func (_e *Database_Expecter) DeleteActivity(id interface{}) *Database_DeleteActivity_Call {
+	return &Database_DeleteActivity_Call{Call: _e.mock.On("DeleteActivity", id)}
+}
+
+func (_c *Database_DeleteActivity_Call) Run(run func(id string)) *Database_DeleteActivity_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(string))
+	})
+	return _c
+}
+
+func (_c *Database_DeleteActivity_Call) Return(_a0 error) *Database_DeleteActivity_Call {
+	_c.Call.Return(_a0)
+	return _c
+}
+
+func (_c *Database_DeleteActivity_Call) RunAndReturn(run func(string) error) *Database_DeleteActivity_Call {
+	_c.Call.Return(run)
+	return _c
+}

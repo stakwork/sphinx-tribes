@@ -221,4 +221,21 @@ func (db database) CreateActivityThread(sourceID string, activity *Activity) (*A
 	activity.Sequence = len(existingActivities) + 1
 	
 	return db.CreateActivity(activity)
-} 
+}
+
+func (db database) DeleteActivity(id string) error {
+    if _, err := uuid.Parse(id); err != nil {
+        return errors.New("invalid activity ID format")
+    }
+
+    existing := &Activity{}
+    if err := db.db.Where("id = ?", id).First(existing).Error; err != nil {
+        return errors.New("activity not found")
+    }
+
+    if err := db.db.Delete(&Activity{}, "id = ?", id).Error; err != nil {
+        return err
+    }
+
+    return nil
+}
