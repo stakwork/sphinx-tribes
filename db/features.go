@@ -382,6 +382,20 @@ func (db database) GetFeatureBrief(featureUuid string) (string, error) {
 	return featureBrief, nil
 }
 
+func (db database) GetFeatureArchitecture(featureUuid string) (string, error) {
+	feature := WorkspaceFeatures{}
+	result := db.db.Model(&WorkspaceFeatures{}).Where("uuid = ?", featureUuid).First(&feature)
+	if result.Error != nil {
+		return "", fmt.Errorf("error getting feature: %v", result.Error)
+	}
+
+	featureArchitecture := fmt.Sprintf("Feature: %s. Architecture: %s",
+		feature.Name,
+		feature.Architecture)
+
+	return featureArchitecture, nil
+}
+
 func (db database) UpdateFeatureStatus(uuid string, status FeatureStatus) (WorkspaceFeatures, error) {
 	var feature WorkspaceFeatures
 
