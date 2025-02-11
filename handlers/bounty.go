@@ -639,6 +639,7 @@ func (h *bountyHandler) GenerateBountyResponse(bounties []db.NewBounty) []db.Bou
 				PaymentPending:          bounty.PaymentPending,
 				PaymentFailed:           bounty.PaymentFailed,
 				PhaseUuid:               bounty.PhaseUuid,
+				FeatureUuid:             bounty.FeatureUuid,
 				PhasePriority:           bounty.PhasePriority,
 				ProofOfWorkCount:        bounty.ProofOfWorkCount,
 			},
