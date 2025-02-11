@@ -14,7 +14,6 @@ func ActivityRoutes() chi.Router {
 	activityHandler := handlers.NewActivityHandler(http.DefaultClient, db.DB)
 
 	r.Group(func(r chi.Router) {
-		
 		r.Get("/{id}", activityHandler.GetActivity)
 		r.Get("/thread/{thread_id}", activityHandler.GetActivitiesByThread)
 		r.Get("/thread/{thread_id}/latest", activityHandler.GetLatestActivityByThread)
