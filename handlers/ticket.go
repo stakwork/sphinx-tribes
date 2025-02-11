@@ -382,7 +382,7 @@ func (th *ticketHandler) PostTicketDataToStakwork(w http.ResponseWriter, r *http
 	}
 
 	var (
-		productBrief, featureBrief, featureArchitecture, codeGraphURL string
+		productBrief, featureBrief, featureArchitecture, codeGraphURL, codeGraphAlias string
 		feature                                                       db.WorkspaceFeatures
 	)
 
@@ -464,8 +464,10 @@ func (th *ticketHandler) PostTicketDataToStakwork(w http.ResponseWriter, r *http
 		codeGraph, err := th.db.GetCodeGraphByUUID(feature.WorkspaceUuid)
 		if err == nil {
 			codeGraphURL = codeGraph.Url
+			codeGraphAlias = codeGraph.SecretAlias
 		} else {
 			codeGraphURL = ""
+			codeGraphAlias = ""
 		}
 
 	}
@@ -499,6 +501,7 @@ func (th *ticketHandler) PostTicketDataToStakwork(w http.ResponseWriter, r *http
 						"webhook_url":         webhookURL,
 						"phaseSchematic":      schematicURL,
 						"codeGraph":           codeGraphURL,
+						"codeGraphAlias":      codeGraphAlias,
 						"alias":               user.OwnerAlias,
 					},
 				},

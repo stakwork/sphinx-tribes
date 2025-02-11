@@ -2635,6 +2635,7 @@ func TestSendMessage(t *testing.T) {
             Uuid:           uuid.New().String(),
             WorkspaceUuid:  workspace.Uuid,
             Url:            "boltwall.swarm38.sphinx.chat/",
+			SecretAlias:    "{{test-secret-alias}}",
             CreatedBy:      person.OwnerPubKey,
             UpdatedBy:      person.OwnerPubKey,
         }
@@ -2694,9 +2695,14 @@ func TestSendMessage(t *testing.T) {
         vars, ok := capturedPayload.WorkflowParams["set_var"].(map[string]interface{})["attributes"].(map[string]interface{})["vars"].(map[string]interface{})
         require.True(t, ok, "Workflow params should contain vars")
         
-        codeGraphUrl, exists := vars["codeGraph"].(string)
+        codeGraphData, exists := vars["codeGraph"].(map[string]interface{})
         require.True(t, exists, "codeGraph should exist in vars")
-        assert.Equal(t, "https://boltwall.swarm38.sphinx.chat", codeGraphUrl)
+        url, hasURL := codeGraphData["url"].(string)
+        require.True(t, hasURL, "codeGraph should have url field")
+        assert.Equal(t, "https://boltwall.swarm38.sphinx.chat", url)
+        
+        _, hasSecret := codeGraphData["secret_alias"].(string)
+        require.True(t, hasSecret, "codeGraph should have secret_alias field")
     })
 
     t.Run("should send message without code graph", func(t *testing.T) {

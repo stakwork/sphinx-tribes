@@ -256,6 +256,7 @@ func buildVarsPayload(request SendMessageRequest, createdMessage *db.ChatMessage
 			url = "https://" + url
 		}
 		vars["codeGraph"] = url
+		vars["codeGraphAlias"] = codeGraph.SecretAlias
 	}
 
 	return vars
