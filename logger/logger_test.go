@@ -1199,3 +1199,192 @@ func TestRouteBasedUUIDMiddleware(t *testing.T) {
 		})
 	}
 }
+
+func TestLogger_Debug(t *testing.T) {
+	var logLevelMu sync.RWMutex
+	originalLogLevel := config.LogLevel
+	defer func() {
+		logLevelMu.Lock()
+		config.LogLevel = originalLogLevel
+		logLevelMu.Unlock()
+	}()
+
+	tests := []struct {
+		name           string
+		logLevel       string
+		format         string
+		args           []interface{}
+		setupLogger    func() *Logger
+		expectedLogs   bool
+		concurrent     bool
+	}{
+		{
+			name:      "Log Level is DEBUG",
+			logLevel:  "DEBUG",
+			format:    "Debug test message",
+			args:      []interface{}{},
+			setupLogger: func() *Logger {
+				return &Logger{
+					debugLogger: log.New(os.Stdout, "DEBUG: ", log.Ldate|log.Ltime),
+				}
+			},
+			expectedLogs: true,
+		},
+		{
+			name:      "Log Level is MACHINE",
+			logLevel:  "MACHINE",
+			format:    "Machine level debug message",
+			args:      []interface{}{},
+			setupLogger: func() *Logger {
+				return &Logger{
+					debugLogger: log.New(os.Stdout, "DEBUG: ", log.Ldate|log.Ltime),
+				}
+			},
+			expectedLogs: true,
+		},
+		{
+			name:      "Empty Format String",
+			logLevel:  "DEBUG",
+			format:    "",
+			args:      []interface{}{"ignored", "args"},
+			setupLogger: func() *Logger {
+				return &Logger{
+					debugLogger: log.New(os.Stdout, "DEBUG: ", log.Ldate|log.Ltime),
+				}
+			},
+			expectedLogs: true,
+		},
+		{
+			name:      "No Variadic Arguments",
+			logLevel:  "DEBUG",
+			format:    "Simple debug message without args",
+			args:      []interface{}{},
+			setupLogger: func() *Logger {
+				return &Logger{
+					debugLogger: log.New(os.Stdout, "DEBUG: ", log.Ldate|log.Ltime),
+				}
+			},
+			expectedLogs: true,
+		},
+		{
+			name:      "Invalid Log Level",
+			logLevel:  "INVALID",
+			format:    "This should not be logged",
+			args:      []interface{}{},
+			setupLogger: func() *Logger {
+				return &Logger{
+					debugLogger: log.New(os.Stdout, "DEBUG: ", log.Ldate|log.Ltime),
+				}
+			},
+			expectedLogs: false,
+		},
+		{
+			name:      "Large Number of the Variadic Arguments",
+			logLevel:  "DEBUG",
+			format:    strings.Repeat("%v ", 100),
+			args:      make([]interface{}, 100),
+			setupLogger: func() *Logger {
+				return &Logger{
+					debugLogger: log.New(os.Stdout, "DEBUG: ", log.Ldate|log.Ltime),
+				}
+			},
+			expectedLogs: true,
+		},
+		{
+			name:      "Log Level is DEBUG with Special Characters in Format",
+			logLevel:  "DEBUG",
+			format:    "Special chars: %s\n\t\r\b\f%s",
+			args:      []interface{}{"test1", "test2"},
+			setupLogger: func() *Logger {
+				return &Logger{
+					debugLogger: log.New(os.Stdout, "DEBUG: ", log.Ldate|log.Ltime),
+				}
+			},
+			expectedLogs: true,
+		},
+		{
+			name:      "Log Level is MACHINE with Complex Object",
+			logLevel:  "MACHINE",
+			format:    "Complex object: %+v",
+			args:      []interface{}{struct{ Name string }{"test"}},
+			setupLogger: func() *Logger {
+				return &Logger{
+					debugLogger: log.New(os.Stdout, "DEBUG: ", log.Ldate|log.Ltime),
+				}
+			},
+			expectedLogs: true,
+		},
+		{
+			name:      "Log Level Changes During Execution",
+			logLevel:  "DEBUG",
+			format:    "Dynamic log level test",
+			args:      []interface{}{},
+			setupLogger: func() *Logger {
+				logger := &Logger{
+					debugLogger: log.New(os.Stdout, "DEBUG: ", log.Ldate|log.Ltime),
+				}
+				go func() {
+					time.Sleep(10 * time.Millisecond)
+					logLevelMu.Lock()
+					config.LogLevel = "INFO"
+					logLevelMu.Unlock()
+				}()
+				return logger
+			},
+			expectedLogs: true,
+		},
+		{
+			name:      "Concurrent Logging",
+			logLevel:  "DEBUG",
+			format:    "Concurrent message %d",
+			concurrent: true,
+			setupLogger: func() *Logger {
+				return &Logger{
+					debugLogger: log.New(os.Stdout, "DEBUG: ", log.Ldate|log.Ltime),
+					mu:         sync.Mutex{},
+				}
+			},
+			expectedLogs: true,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			logLevelMu.Lock()
+			config.LogLevel = tt.logLevel
+			logLevelMu.Unlock()
+			
+			logger := tt.setupLogger()
+
+			var buf bytes.Buffer
+			logger.debugLogger.SetOutput(&buf)
+
+			if tt.concurrent {
+				var wg sync.WaitGroup
+				for i := 0; i < 10; i++ {
+					wg.Add(1)
+					go func(i int) {
+						defer wg.Done()
+						logLevelMu.RLock()
+						logger.Debug(tt.format, i)
+						logLevelMu.RUnlock()
+					}(i)
+				}
+				wg.Wait()
+			} else {
+				logLevelMu.RLock()
+				logger.Debug(tt.format, tt.args...)
+				logLevelMu.RUnlock()
+			}
+
+			output := buf.String()
+			if tt.expectedLogs {
+				assert.NotEmpty(t, output, "Expected logs but got none")
+				assert.Contains(t, output, "DEBUG: ", "Log should contain DEBUG prefix")
+				assert.Contains(t, output, "[logger_test.go:", "Log should contain file info")
+			} else {
+				assert.Empty(t, output, "Expected no logs but got some")
+			}
+		})
+	}
+}
