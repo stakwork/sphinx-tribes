@@ -2703,6 +2703,7 @@ func TestSendMessage(t *testing.T) {
         
         _, hasSecret := codeGraphData["secret_alias"].(string)
         require.True(t, hasSecret, "codeGraph should have secret_alias field")
+		
     })
 
     t.Run("should send message without code graph", func(t *testing.T) {
