@@ -13653,7 +13653,6 @@ func (_c *Database_PauseBountyTiming_Call) RunAndReturn(run func(uint) error) *D
 	return _c
 }
 
-
 func (_m *Database) ResumeBountyTiming(bountyID uint) error {
 	ret := _m.Called(bountyID)
 
@@ -13801,7 +13800,6 @@ func (_c *Database_GetConnectionCodesList_Call) RunAndReturn(run func(int, int) 
 	return _c
 }
 
-
 // CreateOrEditTicketPlan provides a mock function with given fields: plan
 func (_m *Database) CreateOrEditTicketPlan(plan *db.TicketPlan) (*db.TicketPlan, error) {
 	ret := _m.Called(plan)
@@ -13856,8 +13854,6 @@ func (_c *Database_CreateOrEditTicketPlan_Call) RunAndReturn(run func(*db.Ticket
 	_c.Call.Return(run)
 	return _c
 }
-
-
 
 // GetTicketPlan provides a mock function with given fields: _a0
 func (_m *Database) GetTicketPlan(_a0 string) (*db.TicketPlan, error) {
@@ -13914,8 +13910,6 @@ func (_c *Database_GetTicketPlan_Call) RunAndReturn(run func(string) (*db.Ticket
 	return _c
 }
 
-
-
 // DeleteTicketPlan provides a mock function with given fields: _a0
 func (_m *Database) DeleteTicketPlan(_a0 string) error {
 	ret := _m.Called(_a0)
@@ -13958,7 +13952,6 @@ func (_c *Database_DeleteTicketPlan_Call) RunAndReturn(run func(string) error) *
 	_c.Call.Return(run)
 	return _c
 }
-
 
 // GetTicketPlansByFeature provides a mock function with given fields: featureUUID
 func (_m *Database) GetTicketPlansByFeature(featureUUID string) ([]db.TicketPlan, error) {
@@ -14015,7 +14008,6 @@ func (_c *Database_GetTicketPlansByFeature_Call) RunAndReturn(run func(string) (
 	return _c
 }
 
-
 // GetTicketPlansByPhase provides a mock function with given fields: phaseUUID
 func (_m *Database) GetTicketPlansByPhase(phaseUUID string) ([]db.TicketPlan, error) {
 	ret := _m.Called(phaseUUID)
@@ -14070,7 +14062,6 @@ func (_c *Database_GetTicketPlansByPhase_Call) RunAndReturn(run func(string) ([]
 	_c.Call.Return(run)
 	return _c
 }
-
 
 // GetTicketPlansByWorkspace provides a mock function with given fields: workspaceUUID
 func (_m *Database) GetTicketPlansByWorkspace(workspaceUUID string) ([]db.TicketPlan, error) {
@@ -14237,7 +14228,6 @@ func (_c *Database_CreateActivityThread_Call) RunAndReturn(run func(string, *db.
 	return _c
 }
 
-
 // UpdateActivity provides a mock function with given fields: activity
 func (_m *Database) UpdateActivity(activity *db.Activity) (*db.Activity, error) {
 	ret := _m.Called(activity)
@@ -14292,7 +14282,6 @@ func (_c *Database_UpdateActivity_Call) RunAndReturn(run func(*db.Activity) (*db
 	_c.Call.Return(run)
 	return _c
 }
-
 
 // GetActivity provides a mock function with given fields: id
 func (_m *Database) GetActivity(id string) (*db.Activity, error) {
@@ -14349,7 +14338,6 @@ func (_c *Database_GetActivity_Call) RunAndReturn(run func(string) (*db.Activity
 	return _c
 }
 
-
 // GetActivitiesByThread provides a mock function with given fields: threadID
 func (_m *Database) GetActivitiesByThread(threadID string) ([]db.Activity, error) {
 	ret := _m.Called(threadID)
@@ -14404,7 +14392,6 @@ func (_c *Database_GetActivitiesByThread_Call) RunAndReturn(run func(string) ([]
 	_c.Call.Return(run)
 	return _c
 }
-
 
 // GetActivitiesByFeature provides a mock function with given fields: featureUUID
 func (_m *Database) GetActivitiesByFeature(featureUUID string) ([]db.Activity, error) {
@@ -14461,7 +14448,6 @@ func (_c *Database_GetActivitiesByFeature_Call) RunAndReturn(run func(string) ([
 	return _c
 }
 
-
 // GetActivitiesByPhase provides a mock function with given fields: phaseUUID
 func (_m *Database) GetActivitiesByPhase(phaseUUID string) ([]db.Activity, error) {
 	ret := _m.Called(phaseUUID)
@@ -14517,7 +14503,6 @@ func (_c *Database_GetActivitiesByPhase_Call) RunAndReturn(run func(string) ([]d
 	return _c
 }
 
-
 // GetActivitiesByWorkspace provides a mock function with given fields: workspace
 func (_m *Database) GetActivitiesByWorkspace(workspace string) ([]db.Activity, error) {
 	ret := _m.Called(workspace)
@@ -14572,7 +14557,6 @@ func (_c *Database_GetActivitiesByWorkspace_Call) RunAndReturn(run func(string) 
 	_c.Call.Return(run)
 	return _c
 }
-
 
 // GetLatestActivityByThread provides a mock function with given fields: threadID
 func (_m *Database) GetLatestActivityByThread(threadID string) (*db.Activity, error) {
@@ -14844,6 +14828,62 @@ func (_c *Database_UpdateNotificationStatus_Call) Return() *Database_UpdateNotif
 }
 
 func (_c *Database_UpdateNotificationStatus_Call) RunAndReturn(run func(string, string)) *Database_UpdateNotificationStatus_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
+// GetFeatureArchitecture provides a mock function with given fields: featureUuid
+func (_m *Database) GetFeatureArchitecture(featureUuid string) (string, error) {
+	ret := _m.Called(featureUuid)
+
+	if len(ret) == 0 {
+		panic("no return value specified for GetFeatureArchitecture")
+	}
+
+	var r0 string
+	var r1 error
+	if rf, ok := ret.Get(0).(func(string) (string, error)); ok {
+		return rf(featureUuid)
+	}
+	if rf, ok := ret.Get(0).(func(string) string); ok {
+		r0 = rf(featureUuid)
+	} else {
+		r0 = ret.Get(0).(string)
+	}
+
+	if rf, ok := ret.Get(1).(func(string) error); ok {
+		r1 = rf(featureUuid)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
+// Database_GetFeatureArchitecture_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'GetFeatureArchitecture'
+type Database_GetFeatureArchitecture_Call struct {
+	*mock.Call
+}
+
+// GetFeatureArchitecture is a helper method to define mock.On call
+//   - featureUuid string
+func (_e *Database_Expecter) GetFeatureArchitecture(featureUuid interface{}) *Database_GetFeatureArchitecture_Call {
+	return &Database_GetFeatureArchitecture_Call{Call: _e.mock.On("GetFeatureArchitecture", featureUuid)}
+}
+
+func (_c *Database_GetFeatureArchitecture_Call) Run(run func(featureUuid string)) *Database_GetFeatureArchitecture_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(string))
+	})
+	return _c
+}
+
+func (_c *Database_GetFeatureArchitecture_Call) Return(_a0 string, _a1 error) *Database_GetFeatureArchitecture_Call {
+	_c.Call.Return(_a0, _a1)
+	return _c
+}
+
+func (_c *Database_GetFeatureArchitecture_Call) RunAndReturn(run func(string) (string, error)) *Database_GetFeatureArchitecture_Call {
 	_c.Call.Return(run)
 	return _c
 }

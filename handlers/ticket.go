@@ -383,7 +383,7 @@ func (th *ticketHandler) PostTicketDataToStakwork(w http.ResponseWriter, r *http
 	}
 
 	var (
-		productBrief, featureBrief string
+		productBrief, featureBrief, featureArchitecture string
 		feature                                  db.WorkspaceFeatures
 	)
 
@@ -419,6 +419,17 @@ func (th *ticketHandler) PostTicketDataToStakwork(w http.ResponseWriter, r *http
 			json.NewEncoder(w).Encode(TicketResponse{
 				Success: false,
 				Message: "Error retrieving feature brief",
+				Errors:  []string{err.Error()},
+			})
+			return
+		}
+
+		featureArchitecture, err = th.db.GetFeatureArchitecture(ticket.FeatureUUID)
+		if err != nil {
+			w.WriteHeader(http.StatusInternalServerError)
+			json.NewEncoder(w).Encode(TicketResponse{
+				Success: false,
+				Message: "Error retrieving feature architecture",
 				Errors:  []string{err.Error()},
 			})
 			return
@@ -479,22 +490,23 @@ func (th *ticketHandler) PostTicketDataToStakwork(w http.ResponseWriter, r *http
 			"set_var": map[string]interface{}{
 				"attributes": map[string]interface{}{
 					"vars": map[string]interface{}{
-						"featureUUID":       ticket.FeatureUUID,
-						"phaseUUID":         ticket.PhaseUUID,
-						"ticketUUID":        ticket.UUID.String(),
-						"phaseOutcome":      phase.PhaseOutcome,
-						"phasePurpose":      phase.PhasePurpose,
-						"phaseScope":        phase.PhaseScope,
-						"ticketName":        ticket.Name,
-						"ticketDescription": ticket.Description,
-						"productBrief":      productBrief,
-						"featureBrief":      featureBrief,
-						"examples":          "",
-						"sourceWebsocket":   ticketRequest.Metadata.ID,
-						"webhook_url":       webhookURL,
-						"phaseSchematic":    schematicURL,
-						"codeGraph":         codeGraphData,
-						"alias":             user.OwnerAlias,
+						"featureUUID":         ticket.FeatureUUID,
+						"phaseUUID":           ticket.PhaseUUID,
+						"ticketUUID":          ticket.UUID.String(),
+						"phaseOutcome":        phase.PhaseOutcome,
+						"phasePurpose":        phase.PhasePurpose,
+						"phaseScope":          phase.PhaseScope,
+						"ticketName":          ticket.Name,
+						"ticketDescription":   ticket.Description,
+						"productBrief":        productBrief,
+						"FeatureArchitecture": featureArchitecture,
+						"featureBrief":        featureBrief,
+						"examples":            "",
+						"sourceWebsocket":     ticketRequest.Metadata.ID,
+						"webhook_url":         webhookURL,
+						"phaseSchematic":      schematicURL,
+						"codeGraph":           codeGraphData,
+						"alias":               user.OwnerAlias,
 					},
 				},
 			},
