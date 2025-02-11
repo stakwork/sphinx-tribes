@@ -1201,9 +1201,12 @@ func TestRouteBasedUUIDMiddleware(t *testing.T) {
 }
 
 func TestLogger_Debug(t *testing.T) {
+	var logLevelMu sync.RWMutex
 	originalLogLevel := config.LogLevel
 	defer func() {
+		logLevelMu.Lock()
 		config.LogLevel = originalLogLevel
+		logLevelMu.Unlock()
 	}()
 
 	tests := []struct {
@@ -1322,7 +1325,9 @@ func TestLogger_Debug(t *testing.T) {
 				}
 				go func() {
 					time.Sleep(10 * time.Millisecond)
+					logLevelMu.Lock()
 					config.LogLevel = "INFO"
+					logLevelMu.Unlock()
 				}()
 				return logger
 			},
@@ -1345,7 +1350,10 @@ func TestLogger_Debug(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
+			logLevelMu.Lock()
 			config.LogLevel = tt.logLevel
+			logLevelMu.Unlock()
+			
 			logger := tt.setupLogger()
 
 			var buf bytes.Buffer
@@ -1357,12 +1365,16 @@ func TestLogger_Debug(t *testing.T) {
 					wg.Add(1)
 					go func(i int) {
 						defer wg.Done()
+						logLevelMu.RLock()
 						logger.Debug(tt.format, i)
+						logLevelMu.RUnlock()
 					}(i)
 				}
 				wg.Wait()
 			} else {
+				logLevelMu.RLock()
 				logger.Debug(tt.format, tt.args...)
+				logLevelMu.RUnlock()
 			}
 
 			output := buf.String()
