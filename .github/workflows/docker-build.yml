@@ -8,48 +8,229 @@ on:
       - "*"
 
 jobs:
-  build:
-    runs-on: ubuntu-20.04
-    name: Build and push Tribes image
+  build_amd64:
+    runs-on: ubuntu-24.04
+    name: Build Tribes AMD64 image 
     env:
       ACTIONS_ALLOW_UNSECURE_COMMANDS: true
     steps:
-      - name: Check out from Git
-        uses: actions/checkout@v4
-      - name: Test env
-        run: echo "RELEASE_TAG=${GITHUB_REF#refs/*/}" >> $GITHUB_ENV
-      - name: Test print env
+      - name: Setup env
         run: |
-          echo $RELEASE_TAG
-          echo ${{ env.RELEASE_TAG }}
+          echo "PLATFORM=linux/amd64" | tee -a $GITHUB_ENV
       - name: Login to Docker Hub
-        run: echo "${{ secrets.DOCKER_PASSWORD }}" | docker login -u "${{ secrets.DOCKER_USERNAME }}" --password-stdin
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+      - name: Docker meta
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: |
+            ${{ secrets.DOCKER_HUB_USER }}/sphinx-tribes
       - name: Checkout project
         uses: actions/checkout@v4
       - name: Setup Docker buildx action
-        uses: crazy-max/ghaction-docker-buildx@v1
-        id: buildx
-        with:
-          buildx-version: latest
-          qemu-version: 7.1.0-2
-      - name: Show available buildx platforms
-        run: echo ${{ steps.buildx.outputs.platforms }}
+        uses: docker/setup-buildx-action@v3
       - name: Cache Docker layers
         uses: actions/cache@v4
         id: cache
         with:
-          path: /tmp/.buildx-cache
+          path: ${{ runner.temp }}/.buildx-cache
           key: ${{ runner.os }}-buildx-${{ github.sha }}
           restore-keys: |
             ${{ runner.os }}-buildx-
-      - name: Test print env
-        run: |
-          echo $RELEASE_TAG
-          echo ${{ env.RELEASE_TAG }}
       - name: Run Docker buildx
+        id: build
+        uses: docker/build-push-action@v6
+        with:
+          platforms: ${{ env.PLATFORM }}
+          cache-from: type=local,src=${{ runner.temp }}/.buildx-cache
+          cache-to: type=local,dest=${{ runner.temp }}/.buildx-cache-new,mode=max
+          build-args: |
+            REACT_APP_PUBLIC_POSTHOG_KEY=${{ secrets.REACT_APP_PUBLIC_POSTHOG_KEY }}
+            REACT_APP_PUBLIC_POSTHOG_HOST=${{ secrets.REACT_APP_PUBLIC_POSTHOG_HOST }}
+          labels: ${{ steps.meta.outputs.labels }}
+          outputs: type=image,"name=${{ secrets.DOCKER_HUB_USER }}/sphinx-tribes",push-by-digest=true,push=true,name-canonical=true
+      - name: Export digest
         run: |
-          docker buildx build \
-          --platform linux/amd64,linux/arm64,linux/arm/v7 \
-          --tag "${{ secrets.DOCKER_HUB_USER }}/sphinx-tribes:${{ env.RELEASE_TAG }}" \
-          --tag "${{ secrets.DOCKER_HUB_USER }}/sphinx-tribes:latest" \
-          --output "type=registry" ./
+          mkdir -p ${{ runner.temp }}/digests
+          digest="${{ steps.build.outputs.digest }}"
+          touch "${{ runner.temp }}/digests/${digest#sha256:}"
+      - name: Upload digest artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: digests-amd64
+          path: ${{ runner.temp }}/digests/*
+          if-no-files-found: error
+          retention-days: 1
+      - # Temp fix
+        # https://github.com/docker/build-push-action/issues/252
+        # https://github.com/moby/buildkit/issues/1896
+        name: Move cache
+        run: |
+          rm -rf ${{ runner.temp }}/.buildx-cache
+          mv ${{ runner.temp }}/.buildx-cache-new ${{ runner.temp }}/.buildx-cache
+
+  build_arm7:
+    runs-on: ubuntu-24.04-arm
+    name: Build Tribes ARMv7 image
+    env:
+      ACTIONS_ALLOW_UNSECURE_COMMANDS: true
+    steps:
+      - name: Setup env
+        run: |
+          echo "PLATFORM=linux/arm/v7" | tee -a $GITHUB_ENV
+      - name: Login to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+      - name: Docker meta
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: |
+            ${{ secrets.DOCKER_HUB_USER }}/sphinx-tribes
+      - name: Checkout project
+        uses: actions/checkout@v4
+      - name: Setup Docker buildx action
+        uses: docker/setup-buildx-action@v3
+      - name: Cache Docker layers
+        uses: actions/cache@v4
+        id: cache
+        with:
+          path: ${{ runner.temp }}/.buildx-cache
+          key: ${{ runner.os }}-buildx-${{ github.sha }}
+          restore-keys: |
+            ${{ runner.os }}-buildx-
+      - name: Run Docker buildx
+        id: build
+        uses: docker/build-push-action@v6
+        with:
+          platforms: ${{ env.PLATFORM }}
+          cache-from: type=local,src=${{ runner.temp }}/.buildx-cache
+          cache-to: type=local,dest=${{ runner.temp }}/.buildx-cache-new,mode=max
+          build-args: |
+            REACT_APP_PUBLIC_POSTHOG_KEY=${{ secrets.REACT_APP_PUBLIC_POSTHOG_KEY }}
+            REACT_APP_PUBLIC_POSTHOG_HOST=${{ secrets.REACT_APP_PUBLIC_POSTHOG_HOST }}
+          labels: ${{ steps.meta.outputs.labels }}
+          outputs: type=image,"name=${{ secrets.DOCKER_HUB_USER }}/sphinx-tribes",push-by-digest=true,push=true,name-canonical=true
+      - name: Export digest
+        run: |
+          mkdir -p ${{ runner.temp }}/digests
+          digest="${{ steps.build.outputs.digest }}"
+          touch "${{ runner.temp }}/digests/${digest#sha256:}"
+      - name: Upload digest artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: digests-arm7
+          path: ${{ runner.temp }}/digests/*
+          if-no-files-found: error
+          retention-days: 1
+      - # Temp fix
+        # https://github.com/docker/build-push-action/issues/252
+        # https://github.com/moby/buildkit/issues/1896
+        name: Move cache
+        run: |
+          rm -rf ${{ runner.temp }}/.buildx-cache
+          mv ${{ runner.temp }}/.buildx-cache-new ${{ runner.temp }}/.buildx-cache
+
+  build_arm64:
+    runs-on: ubuntu-24.04-arm
+    name: Build Tribes ARM64 image
+    env:
+      ACTIONS_ALLOW_UNSECURE_COMMANDS: true
+    steps:
+      - name: Setup env
+        run: |
+          echo "PLATFORM=linux/arm64" | tee -a $GITHUB_ENV
+      - name: Login to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+      - name: Docker meta
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: |
+            ${{ secrets.DOCKER_HUB_USER }}/sphinx-tribes
+      - name: Checkout project
+        uses: actions/checkout@v4
+      - name: Setup Docker buildx action
+        uses: docker/setup-buildx-action@v3
+      - name: Cache Docker layers
+        uses: actions/cache@v4
+        id: cache
+        with:
+          path: ${{ runner.temp }}/.buildx-cache
+          key: ${{ runner.os }}-buildx-${{ github.sha }}
+          restore-keys: |
+            ${{ runner.os }}-buildx-
+      - name: Run Docker buildx
+        id: build
+        uses: docker/build-push-action@v6
+        with:
+          platforms: ${{ env.PLATFORM }}
+          cache-from: type=local,src=${{ runner.temp }}/.buildx-cache
+          cache-to: type=local,dest=${{ runner.temp }}/.buildx-cache-new,mode=max
+          build-args: |
+            REACT_APP_PUBLIC_POSTHOG_KEY=${{ secrets.REACT_APP_PUBLIC_POSTHOG_KEY }}
+            REACT_APP_PUBLIC_POSTHOG_HOST=${{ secrets.REACT_APP_PUBLIC_POSTHOG_HOST }}
+          labels: ${{ steps.meta.outputs.labels }}
+          outputs: type=image,"name=${{ secrets.DOCKER_HUB_USER }}/sphinx-tribes",push-by-digest=true,push=true,name-canonical=true
+      - name: Export digest
+        run: |
+          mkdir -p ${{ runner.temp }}/digests
+          digest="${{ steps.build.outputs.digest }}"
+          touch "${{ runner.temp }}/digests/${digest#sha256:}"
+      - name: Upload digest artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: digests-arm64
+          path: ${{ runner.temp }}/digests/*
+          if-no-files-found: error
+          retention-days: 1
+      - # Temp fix
+        # https://github.com/docker/build-push-action/issues/252
+        # https://github.com/moby/buildkit/issues/1896
+        name: Move cache
+        run: |
+          rm -rf ${{ runner.temp }}/.buildx-cache
+          mv ${{ runner.temp }}/.buildx-cache-new ${{ runner.temp }}/.buildx-cache
+
+  create_and_push_manifest:
+    runs-on: ubuntu-24.04
+    needs:
+      - build_amd64
+      - build_arm7
+      - build_arm64
+    steps:
+      - name: Download digest artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: ${{ runner.temp }}/digests
+          pattern: digests-*
+          merge-multiple: true
+      - name: Login to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+      - name: Setup Docker buildx action
+        uses: docker/setup-buildx-action@v3
+      - name: Docker image tags
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: |
+            ${{ secrets.DOCKER_HUB_USER }}/sphinx-tribes
+          tags: |
+            type=raw,value=latest
+            type=semver,pattern={{raw}}
+      - name: Create manifest list and push
+        working-directory: ${{ runner.temp }}/digests
+        run: |
+          docker buildx imagetools create $(jq -cr '.tags | map("-t " + .) | join(" ")' <<< "$DOCKER_METADATA_OUTPUT_JSON") \
+            $(printf '${{ secrets.DOCKER_HUB_USER }}/sphinx-tribes@sha256:%s ' *)
