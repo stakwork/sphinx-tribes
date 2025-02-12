@@ -1916,8 +1916,8 @@ func (h *bountyHandler) UpdateProofStatus(w http.ResponseWriter, r *http.Request
 		return
 	}
 
-	if statusUpdate.Status == db.RejectedStatus || statusUpdate.Status == db.ChangeRequestedStatus {
-
+	switch statusUpdate.Status {
+	case db.RejectedStatus, db.ChangeRequestedStatus:
 		id, err := utils.ConvertStringToUint(bountyID)
 		if err != nil {
 			http.Error(w, "Invalid bounty ID", http.StatusBadRequest)
@@ -1926,6 +1926,17 @@ func (h *bountyHandler) UpdateProofStatus(w http.ResponseWriter, r *http.Request
 
 		if err := h.db.ResumeBountyTiming(id); err != nil {
 			logger.Log.Error(fmt.Sprintf("Failed to resume timing for bounty ID %d: %v", id, err))
+		}
+
+	case db.AcceptedStatus:
+		id, err := utils.ConvertStringToUint(bountyID)
+		if err != nil {
+			http.Error(w, "Invalid bounty ID", http.StatusBadRequest)
+			return
+		}
+
+		if err := h.db.CloseBountyTiming(id); err != nil {
+			logger.Log.Error(fmt.Sprintf("Failed to close timing for bounty ID %d: %v", id, err))
 		}
 	}
 
