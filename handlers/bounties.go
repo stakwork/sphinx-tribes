@@ -7,6 +7,7 @@ import (
 	"github.com/stakwork/sphinx-tribes/logger"
 	"net/http"
 	"reflect"
+	"time"
 )
 
 func GetWantedsHeader(w http.ResponseWriter, r *http.Request) {
@@ -34,159 +35,101 @@ func GetListedOffers(w http.ResponseWriter, r *http.Request) {
 }
 
 func MigrateBounties(w http.ResponseWriter, r *http.Request) {
+	startTime := time.Now()
+	logger.Log.Info("Starting bounty migration at %s", startTime.Format(time.RFC3339))
+
 	peeps := db.DB.GetAllPeople()
 
-	for indexPeep, peep := range peeps {
-		logger.Log.Info("peep: %d", indexPeep)
+	for _, peep := range peeps {
 		bounties, ok := peep.Extras["wanted"].([]interface{})
-
 		if !ok {
-			logger.Log.Info("Wanted not there")
 			continue
 		}
 
-		for index, bounty := range bounties {
-
-			logger.Log.Info("looping bounties: %d", index)
-			migrateBounty := bounty.(map[string]interface{})
-
-			migrateBountyFinal := db.Bounty{}
-			migrateBountyFinal.Title, ok = migrateBounty["title"].(string)
-
-			migrateBountyFinal.OwnerID = peep.OwnerPubKey
-
-			Paid, ok1 := migrateBounty["paid"].(bool)
-			if !ok1 {
-				migrateBountyFinal.Paid = false
-			} else {
-				migrateBountyFinal.Paid = Paid
+		for _, bounty := range bounties {
+			migrateBounty, ok := bounty.(map[string]interface{})
+			if !ok {
+				continue
 			}
 
-			Show, ok2 := migrateBounty["show"].(bool)
-			if !ok2 {
-				migrateBountyFinal.Show = true
-			} else {
-				migrateBountyFinal.Show = Show
+			migrateBountyFinal := db.Bounty{
+				Title:                 getString(migrateBounty, "title"),
+				OwnerID:               peep.OwnerPubKey,
+				Paid:                  getBool(migrateBounty, "paid", false),
+				Show:                  getBool(migrateBounty, "show", true),
+				Type:                  getString(migrateBounty, "type"),
+				Award:                 getString(migrateBounty, "award"),
+				Price:                 getUint(migrateBounty, "price"),
+				Tribe:                 getString(migrateBounty, "tribe"),
+				Created:               getInt64(migrateBounty, "created"),
+				Assignee:              getAssignee(peeps, migrateBounty),
+				TicketUrl:             getString(migrateBounty, "ticketUrl"),
+				Description:           getString(migrateBounty, "description"),
+				WantedType:            getString(migrateBounty, "wanted_type"),
+				Deliverables:          getString(migrateBounty, "deliverables"),
+				CodingLanguages:       getStringArray(migrateBounty, "coding_language"),
+				GithubDescription:     getBool(migrateBounty, "github_description", false),
+				OneSentenceSummary:    getString(migrateBounty, "one_sentence_summary"),
+				EstimatedSessionLength: getString(migrateBounty, "estimated_session_length"),
+				EstimatedCompletionDate: getString(migrateBounty, "estimated_completion_date"),
 			}
 
-			Type, ok3 := migrateBounty["type"].(string)
-			if !ok3 {
-				migrateBountyFinal.Type = ""
-			} else {
-				migrateBountyFinal.Type = Type
-			}
-
-			Award, ok4 := migrateBounty["award"].(string)
-			if !ok4 {
-				migrateBountyFinal.Award = ""
-			} else {
-				migrateBountyFinal.Award = Award
-			}
-
-			Price, ok5 := migrateBounty["price"].(uint)
-			if !ok5 {
-				migrateBountyFinal.Price = 0
-			} else {
-				migrateBountyFinal.Price = Price
-			}
-
-			Tribe, ok6 := migrateBounty["tribe"].(string)
-			if !ok6 {
-				migrateBountyFinal.Tribe = ""
-			} else {
-				migrateBountyFinal.Tribe = Tribe
-			}
-
-			Created, ok7 := migrateBounty["created"].(float64)
-			CreatedInt64 := int64(Created)
-			if !ok7 {
-				migrateBountyFinal.Created = 0
-			} else {
-				logger.Log.Info("Type: %v", reflect.TypeOf(CreatedInt64))
-				logger.Log.Info("Timestamp: %d", CreatedInt64)
-				migrateBountyFinal.Created = CreatedInt64
-			}
-
-			Assignee, ok8 := migrateBounty["assignee"].(map[string]interface{})
-			if !ok8 {
-				migrateBountyFinal.Assignee = ""
-			} else {
-				assigneePubkey := Assignee["owner_pubkey"].(string)
-				assigneeId := ""
-				for _, peep := range peeps {
-					if peep.OwnerPubKey == assigneePubkey {
-						assigneeId = peep.OwnerPubKey
-					}
-				}
-				migrateBountyFinal.Assignee = assigneeId
-			}
-
-			TicketUrl, ok9 := migrateBounty["ticketUrl"].(string)
-			if !ok9 {
-				migrateBountyFinal.TicketUrl = ""
-			} else {
-				migrateBountyFinal.TicketUrl = TicketUrl
-			}
-
-			Description, ok10 := migrateBounty["description"].(string)
-			if !ok10 {
-				migrateBountyFinal.Description = ""
-			} else {
-				migrateBountyFinal.Description = Description
-			}
-
-			WantedType, ok11 := migrateBounty["wanted_type"].(string)
-			if !ok11 {
-				migrateBountyFinal.WantedType = ""
-			} else {
-				migrateBountyFinal.WantedType = WantedType
-			}
-
-			Deliverables, ok12 := migrateBounty["deliverables"].(string)
-			if !ok12 {
-				migrateBountyFinal.Deliverables = ""
-			} else {
-				migrateBountyFinal.Deliverables = Deliverables
-			}
-
-			CodingLanguages, ok13 := migrateBounty["coding_language"].(db.PropertyMap)
-			if !ok13 {
-				migrateBountyFinal.CodingLanguages = pq.StringArray{}
-			} else {
-				migrateBountyFinal.CodingLanguages = CodingLanguages["value"].(pq.StringArray)
-			}
-
-			GithuDescription, ok14 := migrateBounty["github_description"].(bool)
-			if !ok14 {
-				migrateBountyFinal.GithubDescription = false
-			} else {
-				migrateBountyFinal.GithubDescription = GithuDescription
-			}
-
-			OneSentenceSummary, ok15 := migrateBounty["one_sentence_summary"].(string)
-			if !ok15 {
-				migrateBountyFinal.OneSentenceSummary = ""
-			} else {
-				migrateBountyFinal.OneSentenceSummary = OneSentenceSummary
-			}
-
-			EstimatedSessionLength, ok16 := migrateBounty["estimated_session_length"].(string)
-			if !ok16 {
-				migrateBountyFinal.EstimatedSessionLength = ""
-			} else {
-				migrateBountyFinal.EstimatedSessionLength = EstimatedSessionLength
-			}
-
-			EstimatedCompletionDate, ok17 := migrateBounty["estimated_completion_date"].(string)
-			if !ok17 {
-				migrateBountyFinal.EstimatedCompletionDate = ""
-			} else {
-				migrateBountyFinal.EstimatedCompletionDate = EstimatedCompletionDate
-			}
-			logger.Log.Info("Bounty about to be added ")
+			logger.Log.Info("Adding bounty: %s", migrateBountyFinal.Title)
 			db.DB.AddBounty(migrateBountyFinal)
-			//Migrate the bounties here
 		}
 	}
-	return
+
+	endTime := time.Now()
+	duration := endTime.Sub(startTime)
+	logger.Log.Info("Bounty migration completed in %s", duration)
+}
+
+func getString(data map[string]interface{}, key string) string {
+	if value, ok := data[key].(string); ok {
+		return value
+	}
+	return ""
+}
+
+func getBool(data map[string]interface{}, key string, defaultValue bool) bool {
+	if value, ok := data[key].(bool); ok {
+		return value
+	}
+	return defaultValue
+}
+
+func getUint(data map[string]interface{}, key string) uint {
+	if value, ok := data[key].(uint); ok {
+		return value
+	}
+	return 0
+}
+
+func getInt64(data map[string]interface{}, key string) int64 {
+	if value, ok := data[key].(float64); ok {
+		return int64(value)
+	}
+	return 0
+}
+
+func getAssignee(peeps []db.Person, data map[string]interface{}) string {
+	if assignee, ok := data["assignee"].(map[string]interface{}); ok {
+		if pubkey, exists := assignee["owner_pubkey"].(string); exists {
+			for _, peep := range peeps {
+				if peep.OwnerPubKey == pubkey {
+					return peep.OwnerPubKey
+				}
+			}
+		}
+	}
+	return ""
+}
+
+func getStringArray(data map[string]interface{}, key string) pq.StringArray {
+	if value, ok := data[key].(db.PropertyMap); ok {
+		if array, exists := value["value"].(pq.StringArray); exists {
+			return array
+		}
+	}
+	return pq.StringArray{}
 }
