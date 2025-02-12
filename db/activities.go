@@ -69,6 +69,11 @@ func (db database) CreateActivity(activity *Activity) (*Activity, error) {
 	if activity.ID == uuid.Nil {
 		activity.ID = uuid.New()
 	}
+
+	if activity.ThreadID == uuid.Nil {
+		activity.ThreadID = activity.ID
+		activity.Sequence = 1
+	}
 	
 	if activity.Actions == nil {
 		activity.Actions = []string{}
