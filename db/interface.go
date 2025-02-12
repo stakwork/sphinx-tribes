@@ -304,5 +304,6 @@ type Database interface {
 	GetActivitiesByWorkspace(workspace string) ([]Activity, error)
 	GetLatestActivityByThread(threadID string) (*Activity, error)
 	CreateActivityThread(sourceID string, activity *Activity) (*Activity, error)
+	DeleteActivity(id string) error
 	GetBountiesByWorkspaceAndTimeRange(workspaceId string, startDate time.Time, endDate time.Time) ([]NewBounty, error)
 }

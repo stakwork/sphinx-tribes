@@ -58,6 +58,7 @@ func NewRouter() *http.Server {
 	r.Mount("/test", TestRoutes())
 	r.Mount("/feature-flags", FeatureFlagRoutes())
 	r.Mount("/snippet", SnippetRoutes())
+	r.Mount("/activities", ActivityRoutes())
 
 	r.Group(func(r chi.Router) {
 		r.Get("/tribe_by_feed", tribeHandlers.GetFirstTribeByFeed)
