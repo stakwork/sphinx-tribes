@@ -10,6 +10,38 @@ import (
 	"time"
 )
 
+type BountyTimer struct {
+	StartTime   *time.Time `json:"start_time"`
+	PausedTime  *time.Time `json:"paused_time"`
+	TotalPaused time.Duration `json:"total_paused"`
+}
+
+var BountyTimers = make(map[string]*BountyTimer)
+
+func startBountyTimer(bountyID string) {
+	startTime := time.Now()
+	BountyTimers[bountyID] = &BountyTimer{StartTime: &startTime}
+}
+
+func pauseBountyTimer(bountyID string) {
+	if timer, exists := BountyTimers[bountyID]; exists {
+		pausedTime := time.Now()
+		timer.PausedTime = &pausedTime
+	}
+}
+
+func resumeBountyTimer(bountyID string) {
+	if timer, exists := BountyTimers[bountyID]; exists && timer.PausedTime != nil {
+		pausedDuration := time.Since(*timer.PausedTime)
+		timer.TotalPaused += pausedDuration
+		timer.PausedTime = nil
+	}
+}
+
+func closeBountyTimer(bountyID string) {
+	delete(BountyTimers, bountyID)
+}
+
 func GetWantedsHeader(w http.ResponseWriter, r *http.Request) {
 	var ret struct {
 		DeveloperCount int64               `json:"developer_count"`
@@ -35,101 +67,72 @@ func GetListedOffers(w http.ResponseWriter, r *http.Request) {
 }
 
 func MigrateBounties(w http.ResponseWriter, r *http.Request) {
-	startTime := time.Now()
-	logger.Log.Info("Starting bounty migration at %s", startTime.Format(time.RFC3339))
-
 	peeps := db.DB.GetAllPeople()
 
-	for _, peep := range peeps {
+	for indexPeep, peep := range peeps {
+		logger.Log.Info("peep: %d", indexPeep)
 		bounties, ok := peep.Extras["wanted"].([]interface{})
+
 		if !ok {
+			logger.Log.Info("Wanted not there")
 			continue
 		}
 
-		for _, bounty := range bounties {
-			migrateBounty, ok := bounty.(map[string]interface{})
-			if !ok {
-				continue
+		for index, bounty := range bounties {
+			logger.Log.Info("looping bounties: %d", index)
+			migrateBounty := bounty.(map[string]interface{})
+
+			migrateBountyFinal := db.Bounty{}
+			migrateBountyFinal.Title, ok = migrateBounty["title"].(string)
+			migrateBountyFinal.OwnerID = peep.OwnerPubKey
+
+			if Paid, ok := migrateBounty["paid"].(bool); ok {
+				migrateBountyFinal.Paid = Paid
+			} else {
+				migrateBountyFinal.Paid = false
 			}
 
-			migrateBountyFinal := db.Bounty{
-				Title:                 getString(migrateBounty, "title"),
-				OwnerID:               peep.OwnerPubKey,
-				Paid:                  getBool(migrateBounty, "paid", false),
-				Show:                  getBool(migrateBounty, "show", true),
-				Type:                  getString(migrateBounty, "type"),
-				Award:                 getString(migrateBounty, "award"),
-				Price:                 getUint(migrateBounty, "price"),
-				Tribe:                 getString(migrateBounty, "tribe"),
-				Created:               getInt64(migrateBounty, "created"),
-				Assignee:              getAssignee(peeps, migrateBounty),
-				TicketUrl:             getString(migrateBounty, "ticketUrl"),
-				Description:           getString(migrateBounty, "description"),
-				WantedType:            getString(migrateBounty, "wanted_type"),
-				Deliverables:          getString(migrateBounty, "deliverables"),
-				CodingLanguages:       getStringArray(migrateBounty, "coding_language"),
-				GithubDescription:     getBool(migrateBounty, "github_description", false),
-				OneSentenceSummary:    getString(migrateBounty, "one_sentence_summary"),
-				EstimatedSessionLength: getString(migrateBounty, "estimated_session_length"),
-				EstimatedCompletionDate: getString(migrateBounty, "estimated_completion_date"),
+			if Show, ok := migrateBounty["show"].(bool); ok {
+				migrateBountyFinal.Show = Show
+			} else {
+				migrateBountyFinal.Show = true
 			}
 
-			logger.Log.Info("Adding bounty: %s", migrateBountyFinal.Title)
+			if Assignee, ok := migrateBounty["assignee"].(map[string]interface{}); ok {
+				assigneePubkey := Assignee["owner_pubkey"].(string)
+				assigneeId := ""
+				for _, peep := range peeps {
+					if peep.OwnerPubKey == assigneePubkey {
+						assigneeId = peep.OwnerPubKey
+					}
+				}
+				migrateBountyFinal.Assignee = assigneeId
+				if assigneeId != "" {
+					startBountyTimer(migrateBountyFinal.OwnerID)
+				}
+			} else {
+				migrateBountyFinal.Assignee = ""
+			}
+
+			if migrateBountyFinal.Assignee == "" {
+				closeBountyTimer(migrateBountyFinal.OwnerID)
+			}
+
+			if _, ok := migrateBounty["proof_submitted"].(bool); ok {
+				pauseBountyTimer(migrateBountyFinal.OwnerID)
+			}
+
+			if _, ok := migrateBounty["feedback_given"].(bool); ok {
+				resumeBountyTimer(migrateBountyFinal.OwnerID)
+			}
+
+			if _, ok := migrateBounty["completed"].(bool); ok {
+				closeBountyTimer(migrateBountyFinal.OwnerID)
+			}
+
+			logger.Log.Info("Bounty about to be added ")
 			db.DB.AddBounty(migrateBountyFinal)
 		}
 	}
-
-	endTime := time.Now()
-	duration := endTime.Sub(startTime)
-	logger.Log.Info("Bounty migration completed in %s", duration)
-}
-
-func getString(data map[string]interface{}, key string) string {
-	if value, ok := data[key].(string); ok {
-		return value
-	}
-	return ""
-}
-
-func getBool(data map[string]interface{}, key string, defaultValue bool) bool {
-	if value, ok := data[key].(bool); ok {
-		return value
-	}
-	return defaultValue
-}
-
-func getUint(data map[string]interface{}, key string) uint {
-	if value, ok := data[key].(uint); ok {
-		return value
-	}
-	return 0
-}
-
-func getInt64(data map[string]interface{}, key string) int64 {
-	if value, ok := data[key].(float64); ok {
-		return int64(value)
-	}
-	return 0
-}
-
-func getAssignee(peeps []db.Person, data map[string]interface{}) string {
-	if assignee, ok := data["assignee"].(map[string]interface{}); ok {
-		if pubkey, exists := assignee["owner_pubkey"].(string); exists {
-			for _, peep := range peeps {
-				if peep.OwnerPubKey == pubkey {
-					return peep.OwnerPubKey
-				}
-			}
-		}
-	}
-	return ""
-}
-
-func getStringArray(data map[string]interface{}, key string) pq.StringArray {
-	if value, ok := data[key].(db.PropertyMap); ok {
-		if array, exists := value["value"].(pq.StringArray); exists {
-			return array
-		}
-	}
-	return pq.StringArray{}
+	return
 }
