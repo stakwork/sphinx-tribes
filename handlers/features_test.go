@@ -1888,6 +1888,117 @@ func TestGetStoriesByFeatureUuid(t *testing.T) {
 		assert.Equal(t, returnedFeatureStory, updatedFeatureStory)
 		assert.Equal(t, http.StatusOK, rr.Code)
 	})
+
+	t.Run("Valid Request with No Stories", func(t *testing.T) {
+		emptyFeature := db.WorkspaceFeatures{
+			Uuid:          "empty_feature_uuid",
+			WorkspaceUuid: workspace.Uuid,
+			Name:          "empty_feature",
+		}
+		db.TestDB.CreateOrEditFeature(emptyFeature)
+
+		rctx := chi.NewRouteContext()
+		rctx.URLParams.Add("feature_uuid", emptyFeature.Uuid)
+		req, err := http.NewRequestWithContext(context.WithValue(ctx, chi.RouteCtxKey, rctx), http.MethodGet, "/"+emptyFeature.Uuid+"/story", nil)
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		rr := httptest.NewRecorder()
+		http.HandlerFunc(oHandler.GetStoriesByFeatureUuid).ServeHTTP(rr, req)
+
+		var returnedFeatureStory []db.FeatureStory
+		err = json.Unmarshal(rr.Body.Bytes(), &returnedFeatureStory)
+		assert.NoError(t, err)
+		assert.Empty(t, returnedFeatureStory)
+		assert.Equal(t, http.StatusOK, rr.Code)
+	})
+
+	t.Run("Empty Feature UUID", func(t *testing.T) {
+		rctx := chi.NewRouteContext()
+		rctx.URLParams.Add("feature_uuid", "")
+		req, err := http.NewRequestWithContext(context.WithValue(ctx, chi.RouteCtxKey, rctx), http.MethodGet, "/features/''/story", nil)
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		rr := httptest.NewRecorder()
+		http.HandlerFunc(oHandler.GetStoriesByFeatureUuid).ServeHTTP(rr, req)
+
+		assert.Equal(t, http.StatusBadRequest, rr.Code)
+	})
+
+	t.Run("Non-Existent Feature UUID", func(t *testing.T) {
+		rctx := chi.NewRouteContext()
+		rctx.URLParams.Add("feature_uuid", "non_existent_uuid")
+		req, err := http.NewRequestWithContext(context.WithValue(ctx, chi.RouteCtxKey, rctx), http.MethodGet, "/non_existent_uuid/story", nil)
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		rr := httptest.NewRecorder()
+		http.HandlerFunc(oHandler.GetStoriesByFeatureUuid).ServeHTTP(rr, req)
+
+		var returnedFeatureStory []db.FeatureStory
+		err = json.Unmarshal(rr.Body.Bytes(), &returnedFeatureStory)
+		assert.NoError(t, err)
+		assert.Empty(t, returnedFeatureStory)
+		assert.Equal(t, http.StatusOK, rr.Code)
+	})
+
+	t.Run("Large Number of Stories", func(t *testing.T) {
+		largeFeature := db.WorkspaceFeatures{
+			Uuid:          "large_feature_uuid",
+			WorkspaceUuid: workspace.Uuid,
+			Name:          "large_feature",
+		}
+		db.TestDB.CreateOrEditFeature(largeFeature)
+
+		// Create 100 stories
+		for i := 0; i < 100; i++ {
+			story := db.FeatureStory{
+				Uuid:        fmt.Sprintf("story_uuid_%d", i),
+				FeatureUuid: largeFeature.Uuid,
+				Description: fmt.Sprintf("Story %d", i),
+				Priority:    i,
+			}
+			db.TestDB.CreateOrEditFeatureStory(story)
+		}
+
+		rctx := chi.NewRouteContext()
+		rctx.URLParams.Add("feature_uuid", largeFeature.Uuid)
+		req, err := http.NewRequestWithContext(context.WithValue(ctx, chi.RouteCtxKey, rctx), http.MethodGet, "/"+largeFeature.Uuid+"/story", nil)
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		rr := httptest.NewRecorder()
+		http.HandlerFunc(oHandler.GetStoriesByFeatureUuid).ServeHTTP(rr, req)
+
+		var returnedFeatureStory []db.FeatureStory
+		err = json.Unmarshal(rr.Body.Bytes(), &returnedFeatureStory)
+		assert.NoError(t, err)
+		assert.Equal(t, 100, len(returnedFeatureStory))
+		assert.Equal(t, http.StatusOK, rr.Code)
+	})
+
+	t.Run("Malformed Feature UUID", func(t *testing.T) {
+		rctx := chi.NewRouteContext()
+		rctx.URLParams.Add("feature_uuid", "invalid-uuid-format")
+		req, err := http.NewRequestWithContext(context.WithValue(ctx, chi.RouteCtxKey, rctx), http.MethodGet, "/invalid-uuid-format/story", nil)
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		rr := httptest.NewRecorder()
+		http.HandlerFunc(oHandler.GetStoriesByFeatureUuid).ServeHTTP(rr, req)
+
+		var returnedFeatureStory []db.FeatureStory
+		err = json.Unmarshal(rr.Body.Bytes(), &returnedFeatureStory)
+		assert.NoError(t, err)
+		assert.Empty(t, returnedFeatureStory)
+		assert.Equal(t, http.StatusOK, rr.Code)
+	})
 }
 
 func TestGetStoryByUuid(t *testing.T) {
@@ -1919,7 +2030,7 @@ func TestGetStoryByUuid(t *testing.T) {
 
 	feature := db.WorkspaceFeatures{
 		Uuid:          uuid.New().String(),
-		WorkspaceUuid: workspace.Uuid,
+			WorkspaceUuid: workspace.Uuid,
 		Name:          "test-feature",
 		Url:           "https://github.com/test-feature",
 		Priority:      0,
@@ -1977,7 +2088,7 @@ func TestGetStoryByUuid(t *testing.T) {
 	})
 
 	t.Run("Valid Request with Existing Story", func(t *testing.T) {
-        rr := httptest.NewRecorder()
+		rr := httptest.NewRecorder()
         handler := http.HandlerFunc(fHandler.GetStoryByUuid)
 
         rctx := chi.NewRouteContext()
@@ -2002,7 +2113,7 @@ func TestGetStoryByUuid(t *testing.T) {
         handler := http.HandlerFunc(fHandler.GetStoryByUuid)
 
         nonExistentUUID := uuid.New().String()
-        rctx := chi.NewRouteContext()
+		rctx := chi.NewRouteContext()
         rctx.URLParams.Add("feature_uuid", feature.Uuid)
         rctx.URLParams.Add("story_uuid", nonExistentUUID)
         ctx := context.WithValue(context.Background(), auth.ContextKey, person.OwnerPubKey)
@@ -2015,7 +2126,7 @@ func TestGetStoryByUuid(t *testing.T) {
     })
 
     t.Run("Valid Request with Empty UUIDs", func(t *testing.T) {
-        rr := httptest.NewRecorder()
+		rr := httptest.NewRecorder()
         handler := http.HandlerFunc(fHandler.GetStoryByUuid)
 
         rctx := chi.NewRouteContext()
@@ -2024,7 +2135,7 @@ func TestGetStoryByUuid(t *testing.T) {
         ctx := context.WithValue(context.Background(), auth.ContextKey, person.OwnerPubKey)
         req, err := http.NewRequestWithContext(context.WithValue(ctx, chi.RouteCtxKey, rctx),
             http.MethodGet, "/features//story/", nil)
-        assert.NoError(t, err)
+		assert.NoError(t, err)
 
         handler.ServeHTTP(rr, req)
         assert.Equal(t, http.StatusNotFound, rr.Code)
@@ -2049,7 +2160,7 @@ func TestGetStoryByUuid(t *testing.T) {
         rr := httptest.NewRecorder()
         handler := http.HandlerFunc(fHandler.GetStoryByUuid)
 
-        rctx := chi.NewRouteContext()
+		rctx := chi.NewRouteContext()
         rctx.URLParams.Add("feature_uuid", "invalid-uuid")
         rctx.URLParams.Add("story_uuid", "invalid-uuid")
         ctx := context.WithValue(context.Background(), auth.ContextKey, person.OwnerPubKey)
@@ -2062,7 +2173,7 @@ func TestGetStoryByUuid(t *testing.T) {
     })
 	
     t.Run("Story with Special Characters", func(t *testing.T) {
-        rr := httptest.NewRecorder()
+		rr := httptest.NewRecorder()
         handler := http.HandlerFunc(fHandler.GetStoryByUuid)
 
         specialCharsUUID := "!@#$%^&*()"
@@ -2072,7 +2183,7 @@ func TestGetStoryByUuid(t *testing.T) {
         ctx := context.WithValue(context.Background(), auth.ContextKey, person.OwnerPubKey)
         req, err := http.NewRequestWithContext(context.WithValue(ctx, chi.RouteCtxKey, rctx),
             http.MethodGet, "/features/"+feature.Uuid+"/story/"+url.QueryEscape(specialCharsUUID), nil)
-        assert.NoError(t, err)
+		assert.NoError(t, err)
 
         handler.ServeHTTP(rr, req)
         assert.Equal(t, http.StatusNotFound, rr.Code)
@@ -2084,7 +2195,7 @@ func TestGetStoryByUuid(t *testing.T) {
 
         upperFeatureUUID := strings.ToUpper(feature.Uuid)
         upperStoryUUID := strings.ToUpper(featureStory.Uuid)
-        rctx := chi.NewRouteContext()
+		rctx := chi.NewRouteContext()
         rctx.URLParams.Add("feature_uuid", upperFeatureUUID)
         rctx.URLParams.Add("story_uuid", upperStoryUUID)
         ctx := context.WithValue(context.Background(), auth.ContextKey, person.OwnerPubKey)
@@ -2097,7 +2208,7 @@ func TestGetStoryByUuid(t *testing.T) {
     })
 
     t.Run("Request with Long UUIDs", func(t *testing.T) {
-        rr := httptest.NewRecorder()
+		rr := httptest.NewRecorder()
         handler := http.HandlerFunc(fHandler.GetStoryByUuid)
 
         longUUID := feature.Uuid + "extra"
@@ -2107,11 +2218,11 @@ func TestGetStoryByUuid(t *testing.T) {
         ctx := context.WithValue(context.Background(), auth.ContextKey, person.OwnerPubKey)
         req, err := http.NewRequestWithContext(context.WithValue(ctx, chi.RouteCtxKey, rctx),
             http.MethodGet, "/features/"+longUUID+"/story/"+longUUID, nil)
-        assert.NoError(t, err)
+		assert.NoError(t, err)
 
         handler.ServeHTTP(rr, req)
         assert.Equal(t, http.StatusNotFound, rr.Code)
-    })
+	})
 }
 
 func TestDeleteStory(t *testing.T) {

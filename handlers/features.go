@@ -4,11 +4,12 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
-	"github.com/stakwork/sphinx-tribes/websocket"
 	"io"
 	"log"
 	"net/http"
 	"time"
+
+	"github.com/stakwork/sphinx-tribes/websocket"
 
 	"github.com/stakwork/sphinx-tribes/utils"
 
@@ -447,6 +448,12 @@ func (oh *featureHandler) GetStoriesByFeatureUuid(w http.ResponseWriter, r *http
 	}
 
 	featureUuid := chi.URLParam(r, "feature_uuid")
+	if featureUuid == "" {
+		logger.Log.Info("empty feature uuid")
+		w.WriteHeader(http.StatusBadRequest)
+		return
+	}
+
 	stories, err := oh.db.GetFeatureStoriesByFeatureUuid(featureUuid)
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
