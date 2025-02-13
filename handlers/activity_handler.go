@@ -42,6 +42,25 @@ type ActivityResponse struct {
 	Error   string       `json:"error,omitempty"`
 }
 
+type WebhookActivityRequest struct {
+	ContentType  string         `json:"content_type"`
+	Content      string         `json:"content"`
+	Workspace    string         `json:"workspace"`
+	ThreadID     string         `json:"thread_id,omitempty"`
+	FeatureUUID  string         `json:"feature_uuid,omitempty"`
+	PhaseUUID    string         `json:"phase_uuid,omitempty"`
+	Actions      []string       `json:"actions,omitempty"`
+	Questions    []string       `json:"questions,omitempty"`
+	Author       db.AuthorType  `json:"author"`
+	AuthorRef    string         `json:"author_ref"`
+}
+
+type WebhookResponse struct {
+	Success   bool   `json:"success"`
+	ActivityID string `json:"activity_id,omitempty"`
+	Error     string `json:"error,omitempty"`
+}
+
 func (ah *activityHandler) GetActivity(w http.ResponseWriter, r *http.Request) {
 	id := chi.URLParam(r, "id")
 	if id == "" {
@@ -516,5 +535,95 @@ func (ah *activityHandler) RemoveActivityQuestion(w http.ResponseWriter, r *http
 	json.NewEncoder(w).Encode(ActivityResponse{
 		Success: true,
 		Data:    updatedActivity,
+	})
+}
+
+func (ah *activityHandler) ReceiveActivity(w http.ResponseWriter, r *http.Request) {
+	var req WebhookActivityRequest
+	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
+		w.WriteHeader(http.StatusBadRequest)
+		json.NewEncoder(w).Encode(WebhookResponse{
+			Success: false,
+			Error:   "Invalid request payload",
+		})
+		return
+	}
+
+	if req.Author == db.HumansAuthor {
+		if len(req.AuthorRef) < 32 {
+			w.WriteHeader(http.StatusBadRequest)
+			json.NewEncoder(w).Encode(WebhookResponse{
+				Success: false,
+				Error:   "invalid public key format for human author",
+			})
+			return
+		}
+	} else if req.Author == db.HiveAuthor {
+		if _, err := uuid.Parse(req.AuthorRef); err != nil {
+			w.WriteHeader(http.StatusBadRequest)
+			json.NewEncoder(w).Encode(WebhookResponse{
+				Success: false,
+				Error:   "invalid UUID format for hive author",
+			})
+			return
+		}
+	}
+
+	if req.ThreadID != "" {
+		if _, err := uuid.Parse(req.ThreadID); err != nil {
+			w.WriteHeader(http.StatusBadRequest)
+			json.NewEncoder(w).Encode(WebhookResponse{
+				Success: false,
+				Error:   "invalid source ID format",
+			})
+			return
+		}
+	}
+
+	activity := &db.Activity{
+		ID:          uuid.New(),
+		ContentType: db.ContentType(req.ContentType),
+		Content:     req.Content,
+		Workspace:   req.Workspace,
+		FeatureUUID: req.FeatureUUID,
+		PhaseUUID:   req.PhaseUUID,
+		Actions:     req.Actions,
+		Questions:   req.Questions,
+		Author:      req.Author,
+		AuthorRef:   req.AuthorRef,
+		TimeCreated: time.Now(),
+		TimeUpdated: time.Now(),
+		Status:      "active",
+	}
+
+	var createdActivity *db.Activity
+	var err error
+
+	if req.ThreadID != "" {
+		createdActivity, err = ah.db.CreateActivityThread(req.ThreadID, activity)
+	} else {
+		createdActivity, err = ah.db.CreateActivity(activity)
+	}
+
+	if err != nil {
+		status := http.StatusInternalServerError
+		if err == db.ErrInvalidContent || err == db.ErrInvalidAuthorRef || 
+		   err == db.ErrInvalidContentType || err == db.ErrInvalidAuthorType || 
+		   err == db.ErrInvalidWorkspace {
+			status = http.StatusBadRequest
+		}
+		
+		w.WriteHeader(status)
+		json.NewEncoder(w).Encode(WebhookResponse{
+			Success: false,
+			Error:   err.Error(),
+		})
+		return
+	}
+
+	w.WriteHeader(http.StatusCreated)
+	json.NewEncoder(w).Encode(WebhookResponse{
+		Success:    true,
+		ActivityID: createdActivity.ID.String(),
 	})
 } 

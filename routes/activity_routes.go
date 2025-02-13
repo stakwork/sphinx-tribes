@@ -17,6 +17,7 @@ func ActivityRoutes() chi.Router {
 		r.Get("/{id}", activityHandler.GetActivity)
 		r.Get("/thread/{thread_id}", activityHandler.GetActivitiesByThread)
 		r.Get("/thread/{thread_id}/latest", activityHandler.GetLatestActivityByThread)
+		r.Post("/receive", activityHandler.ReceiveActivity)
 	})
 
 	r.Group(func(r chi.Router) {
