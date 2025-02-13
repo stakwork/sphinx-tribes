@@ -383,7 +383,7 @@ func (th *ticketHandler) PostTicketDataToStakwork(w http.ResponseWriter, r *http
 
 	var (
 		productBrief, featureBrief, featureArchitecture, codeGraphURL, codeGraphAlias string
-		feature                                                       db.WorkspaceFeatures
+		feature                                                                       db.WorkspaceFeatures
 	)
 
 	if ticket.FeatureUUID != "" {
@@ -461,7 +461,7 @@ func (th *ticketHandler) PostTicketDataToStakwork(w http.ResponseWriter, r *http
 
 		schematicURL = workspace.SchematicUrl
 
-		codeGraph, err := th.db.GetCodeGraphByUUID(feature.WorkspaceUuid)
+		codeGraph, err := th.db.GetCodeGraphByWorkspaceUuid(feature.WorkspaceUuid)
 		if err == nil {
 			codeGraphURL = codeGraph.Url
 			codeGraphAlias = codeGraph.SecretAlias

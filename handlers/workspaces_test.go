@@ -2185,7 +2185,7 @@ func TestGetCodeGraphsByWorkspaceUuid(t *testing.T) {
 
 	t.Run("should return error if user is not authorized", func(t *testing.T) {
 		rr := httptest.NewRecorder()
-		handler := http.HandlerFunc(oHandler.GetCodeGraphsByWorkspaceUuid)
+		handler := http.HandlerFunc(oHandler.GetCodeGraphByWorkspaceUuid)
 
 		rctx := chi.NewRouteContext()
 		rctx.URLParams.Add("workspace_uuid", workspace.Uuid)
@@ -2201,7 +2201,7 @@ func TestGetCodeGraphsByWorkspaceUuid(t *testing.T) {
 
 	t.Run("should return workspace code graphs if user is authorized", func(t *testing.T) {
 		rr := httptest.NewRecorder()
-		handler := http.HandlerFunc(oHandler.GetCodeGraphsByWorkspaceUuid)
+		handler := http.HandlerFunc(oHandler.GetCodeGraphByWorkspaceUuid)
 
 		rctx := chi.NewRouteContext()
 		rctx.URLParams.Add("workspace_uuid", workspace.Uuid)
@@ -2215,12 +2215,11 @@ func TestGetCodeGraphsByWorkspaceUuid(t *testing.T) {
 		handler.ServeHTTP(rr, req)
 		assert.Equal(t, http.StatusOK, rr.Code)
 
-		var returnedCodeGraphs []db.WorkspaceCodeGraph
+		var returnedCodeGraphs db.WorkspaceCodeGraph
 		err = json.Unmarshal(rr.Body.Bytes(), &returnedCodeGraphs)
 		assert.NoError(t, err)
-		assert.Equal(t, 1, len(returnedCodeGraphs))
-		assert.Equal(t, codeGraph.Name, returnedCodeGraphs[0].Name)
-		assert.Equal(t, codeGraph.Url, returnedCodeGraphs[0].Url)
+		assert.Equal(t, codeGraph.Name, returnedCodeGraphs.Name)
+		assert.Equal(t, codeGraph.Url, returnedCodeGraphs.Url)
 	})
 }
 

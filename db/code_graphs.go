@@ -16,15 +16,15 @@ func (db database) GetCodeGraphByUUID(uuid string) (WorkspaceCodeGraph, error) {
 	return codeGraph, nil
 }
 
-func (db database) GetCodeGraphsByWorkspaceUuid(workspace_uuid string) ([]WorkspaceCodeGraph, error) {
-	var codeGraphs []WorkspaceCodeGraph
-	result := db.db.Where("workspace_uuid = ?", workspace_uuid).Find(&codeGraphs)
+func (db database) GetCodeGraphByWorkspaceUuid(workspace_uuid string) (WorkspaceCodeGraph, error) {
+	var codeGraph WorkspaceCodeGraph
+	result := db.db.Where("workspace_uuid = ?", workspace_uuid).Order("created DESC").First(&codeGraph)
 
 	if result.Error != nil {
-		return nil, result.Error
+		return WorkspaceCodeGraph{}, result.Error
 	}
 
-	return codeGraphs, nil
+	return codeGraph, nil
 }
 
 func (db database) CreateOrEditCodeGraph(m WorkspaceCodeGraph) (WorkspaceCodeGraph, error) {

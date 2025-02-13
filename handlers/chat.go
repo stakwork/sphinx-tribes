@@ -70,11 +70,11 @@ type FileResponse struct {
 }
 
 type SendMessageRequest struct {
-	ChatID            string `json:"chat_id"`
-	Message           string `json:"message"`
-	PDFURL            string `json:"pdf_url,omitempty"`
-	ModelSelection    string `json:"modelSelection,omitempty"`
-	ContextTags       []struct {
+	ChatID         string `json:"chat_id"`
+	Message        string `json:"message"`
+	PDFURL         string `json:"pdf_url,omitempty"`
+	ModelSelection string `json:"modelSelection,omitempty"`
+	ContextTags    []struct {
 		Type string `json:"type"`
 		ID   string `json:"id"`
 	} `json:"contextTags"`
@@ -355,9 +355,9 @@ func (ch *ChatHandler) SendMessage(w http.ResponseWriter, r *http.Request) {
 
 	var codeGraph *db.WorkspaceCodeGraph
 	if workspaceID := request.WorkspaceUUID; workspaceID != "" {
-		codeGraphs, err := ch.db.GetCodeGraphsByWorkspaceUuid(workspaceID)
-		if err == nil && len(codeGraphs) > 0 {
-			codeGraph = &codeGraphs[0]
+		codeGraphResult, err := ch.db.GetCodeGraphByWorkspaceUuid(workspaceID)
+		if err == nil {
+			codeGraph = &codeGraphResult
 		}
 	}
 
