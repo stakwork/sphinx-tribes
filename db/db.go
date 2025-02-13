@@ -1672,28 +1672,28 @@ func (db database) GetConnectionCode() ConnectionCodesShort {
 }
 
 func (db database) GetConnectionCodesList(page, limit int) ([]ConnectionCodesList, int64, error) {
-    var codes []ConnectionCodesList
-    var total int64
-    
-    offset := (page - 1) * limit
+	var codes []ConnectionCodesList
+	var total int64
 
-    if err := db.db.Model(&ConnectionCodes{}).
-        Where("is_used = ?", false).
-        Count(&total).Error; err != nil {
-        return nil, 0, err
-    }
+	offset := (page - 1) * limit
 
-    if err := db.db.Model(&ConnectionCodes{}).
-        Select("id, connection_string, is_used, date_created, pubkey, route_hint, sats_amount").
-        Where("is_used = ?", false).
-        Order("date_created DESC").
-        Limit(limit).
-        Offset(offset).
-        Find(&codes).Error; err != nil {
-        return nil, 0, err
-    }
+	if err := db.db.Model(&ConnectionCodes{}).
+		Where("is_used = ?", false).
+		Count(&total).Error; err != nil {
+		return nil, 0, err
+	}
 
-    return codes, total, nil
+	if err := db.db.Model(&ConnectionCodes{}).
+		Select("id, connection_string, is_used, date_created, pubkey, route_hint, sats_amount").
+		Where("is_used = ?", false).
+		Order("date_created DESC").
+		Limit(limit).
+		Offset(offset).
+		Find(&codes).Error; err != nil {
+		return nil, 0, err
+	}
+
+	return codes, total, nil
 }
 
 func (db database) GetLnUser(lnKey string) int64 {
@@ -2130,6 +2130,7 @@ func (db database) PauseBountyTiming(bountyID uint) error {
 	now := time.Now()
 	timing.IsPaused = true
 	timing.LastPausedAt = &now
+	timing.ClosedAt = nil
 
 	return db.UpdateBountyTiming(timing)
 }
@@ -2153,6 +2154,7 @@ func (db database) ResumeBountyTiming(bountyID uint) error {
 
 	timing.IsPaused = false
 	timing.LastPausedAt = nil
+	timing.ClosedAt = nil
 
 	return db.UpdateBountyTiming(timing)
 }
@@ -2171,21 +2173,21 @@ func (db database) DeleteBountyTiming(bountyID uint) error {
 }
 
 func (db database) GetBountiesByWorkspaceAndTimeRange(workspaceId string, startDate time.Time, endDate time.Time) ([]NewBounty, error) {
-    var bounties []NewBounty
+	var bounties []NewBounty
 
-    startTimestamp := startDate.Unix()
-    endTimestamp := endDate.Unix()
+	startTimestamp := startDate.Unix()
+	endTimestamp := endDate.Unix()
 
-    query := db.db.
-        Where("workspace_uuid = ? AND created >= ? AND show = true", workspaceId, startTimestamp)
+	query := db.db.
+		Where("workspace_uuid = ? AND created >= ? AND show = true", workspaceId, startTimestamp)
 
-    if endTimestamp < time.Now().Unix() {
-        query = query.Where("created <= ?", endTimestamp)
-    }
+	if endTimestamp < time.Now().Unix() {
+		query = query.Where("created <= ?", endTimestamp)
+	}
 
-    err := query.
-        Order("created DESC").
-        Find(&bounties).Error
+	err := query.
+		Order("created DESC").
+		Find(&bounties).Error
 
-    return bounties, err
+	return bounties, err
 }
