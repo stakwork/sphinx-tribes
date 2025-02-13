@@ -2,6 +2,7 @@ package db
 
 import (
 	"errors"
+	"strings"
 	"testing"
 	"time"
 
@@ -998,4 +999,75 @@ func TestCreateActivityThread(t *testing.T) {
 			}
 		})
 	}
+}
+
+func TestValidateActivityTitle(t *testing.T) {
+    teardownSuite := SetupSuite(t)
+    defer teardownSuite(t)
+
+    tests := []struct {
+        name     string
+        input    *Activity
+        expected error
+    }{
+        {
+            name: "Valid title",
+            input: &Activity{
+                Title:       "Test Title",
+                Content:     "Valid content",
+                AuthorRef:   "12345678901234567890123456789012",
+                ContentType: FeatureCreation,
+                Author:      HumansAuthor,
+                Workspace:   "valid_workspace",
+            },
+            expected: nil,
+        },
+        {
+            name: "Empty title",
+            input: &Activity{
+                Title:       "",
+                Content:     "Valid content",
+                AuthorRef:   "12345678901234567890123456789012",
+                ContentType: FeatureCreation,
+                Author:      HumansAuthor,
+                Workspace:   "valid_workspace",
+            },
+            expected: nil,
+        },
+        {
+            name: "Title at max length",
+            input: &Activity{
+                Title:       strings.Repeat("a", 200),
+                Content:     "Valid content",
+                AuthorRef:   "12345678901234567890123456789012",
+                ContentType: FeatureCreation,
+                Author:      HumansAuthor,
+                Workspace:   "valid_workspace",
+            },
+            expected: nil,
+        },
+        {
+            name: "Title exceeds max length",
+            input: &Activity{
+                Title:       strings.Repeat("a", 201),
+                Content:     "Valid content",
+                AuthorRef:   "12345678901234567890123456789012",
+                ContentType: FeatureCreation,
+                Author:      HumansAuthor,
+                Workspace:   "valid_workspace",
+            },
+            expected: ErrInvalidTitle,
+        },
+    }
+
+    for _, test := range tests {
+        t.Run(test.name, func(t *testing.T) {
+            err := validateActivity(test.input)
+            if test.expected == nil {
+                assert.NoError(t, err)
+            } else {
+                assert.EqualError(t, err, test.expected.Error())
+            }
+        })
+    }
 }

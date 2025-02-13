@@ -1311,6 +1311,7 @@ const (
 type Activity struct {
     ID          uuid.UUID      `gorm:"primaryKey;type:uuid"`
     ThreadID    uuid.UUID      `gorm:"type:uuid;index:thread_index" json:"thread_id"`
+	Title       string         `gorm:"type:varchar(200)" json:"title,omitempty"`
     Sequence    int            `gorm:"type:integer;not null" json:"sequence"`
     ContentType ContentType    `gorm:"type:varchar(50);not null" json:"content_type"`
     Content     string         `gorm:"type:text;not null;check:content,length(content) <= 10000" json:"content"`

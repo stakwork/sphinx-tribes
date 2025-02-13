@@ -26,6 +26,7 @@ func NewActivityHandler(httpClient HttpClient, database db.Database) *activityHa
 
 type CreateActivityRequest struct {
 	ContentType string         `json:"content_type"`
+	Title       string         `json:"title,omitempty"`
 	Content     string         `json:"content"`
 	Workspace   string         `json:"workspace"`
 	FeatureUUID string         `json:"feature_uuid"`
@@ -44,6 +45,7 @@ type ActivityResponse struct {
 
 type WebhookActivityRequest struct {
 	ContentType  string         `json:"content_type"`
+	Title        string         `json:"title,omitempty"`
 	Content      string         `json:"content"`
 	Workspace    string         `json:"workspace"`
 	ThreadID     string         `json:"thread_id,omitempty"`
@@ -101,6 +103,7 @@ func (ah *activityHandler) CreateActivity(w http.ResponseWriter, r *http.Request
 
 	activity := &db.Activity{
 		ID:          uuid.New(),
+		Title:       req.Title,
 		ContentType: db.ContentType(req.ContentType),
 		Content:     req.Content,
 		Workspace:   req.Workspace,
@@ -143,14 +146,24 @@ func (ah *activityHandler) UpdateActivity(w http.ResponseWriter, r *http.Request
 		return
 	}
 
-	var activity db.Activity
-	if err := json.NewDecoder(r.Body).Decode(&activity); err != nil {
+	existing, err := ah.db.GetActivity(id)
+	if err != nil {
+		http.Error(w, fmt.Sprintf("Failed to get activity: %v", err), http.StatusInternalServerError)
+		return
+	}
+
+	var updateReq db.Activity
+	if err := json.NewDecoder(r.Body).Decode(&updateReq); err != nil {
 		http.Error(w, "Invalid request body", http.StatusBadRequest)
 		return
 	}
 
-	activity.TimeUpdated = time.Now()
-	updatedActivity, err := ah.db.UpdateActivity(&activity)
+	updateReq.ID = existing.ID
+	updateReq.ThreadID = existing.ThreadID
+	updateReq.Sequence = existing.Sequence
+	updateReq.TimeUpdated = time.Now()
+
+	updatedActivity, err := ah.db.UpdateActivity(&updateReq)
 	if err != nil {
 		http.Error(w, fmt.Sprintf("Failed to update activity: %v", err), http.StatusInternalServerError)
 		return
@@ -582,6 +595,7 @@ func (ah *activityHandler) ReceiveActivity(w http.ResponseWriter, r *http.Reques
 
 	activity := &db.Activity{
 		ID:          uuid.New(),
+		Title:       req.Title,
 		ContentType: db.ContentType(req.ContentType),
 		Content:     req.Content,
 		Workspace:   req.Workspace,

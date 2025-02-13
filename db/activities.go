@@ -15,9 +15,13 @@ var (
 	ErrInvalidAuthorType  = errors.New("invalid author type")
 	ErrInvalidWorkspace   = errors.New("workspace is required")
 	ErrInvalidThreadID    = errors.New("thread ID is required")
+	ErrInvalidTitle       = errors.New("title must be less than 200 characters")
 )
 
 func validateActivity(activity *Activity) error {
+	if activity.Title != "" && len(activity.Title) > 200 {
+		return ErrInvalidTitle
+	}
 
 	if strings.TrimSpace(activity.Content) == "" || len(activity.Content) > 10000 {
 		return ErrInvalidContent
