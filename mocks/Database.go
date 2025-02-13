@@ -5751,25 +5751,23 @@ func (_c *Database_GetCodeGraphByUUID_Call) RunAndReturn(run func(string) (db.Wo
 	return _c
 }
 
-// GetCodeGraphsByWorkspaceUuid provides a mock function with given fields: workspace_uuid
-func (_m *Database) GetCodeGraphsByWorkspaceUuid(workspace_uuid string) ([]db.WorkspaceCodeGraph, error) {
+// GetCodeGraphByWorkspaceUuid provides a mock function with given fields: workspace_uuid
+func (_m *Database) GetCodeGraphByWorkspaceUuid(workspace_uuid string) (db.WorkspaceCodeGraph, error) {
 	ret := _m.Called(workspace_uuid)
 
 	if len(ret) == 0 {
-		panic("no return value specified for GetCodeGraphsByWorkspaceUuid")
+		panic("no return value specified for GetCodeGraphByWorkspaceUuid")
 	}
 
-	var r0 []db.WorkspaceCodeGraph
+	var r0 db.WorkspaceCodeGraph
 	var r1 error
-	if rf, ok := ret.Get(0).(func(string) ([]db.WorkspaceCodeGraph, error)); ok {
+	if rf, ok := ret.Get(0).(func(string) (db.WorkspaceCodeGraph, error)); ok {
 		return rf(workspace_uuid)
 	}
-	if rf, ok := ret.Get(0).(func(string) []db.WorkspaceCodeGraph); ok {
+	if rf, ok := ret.Get(0).(func(string) db.WorkspaceCodeGraph); ok {
 		r0 = rf(workspace_uuid)
 	} else {
-		if ret.Get(0) != nil {
-			r0 = ret.Get(0).([]db.WorkspaceCodeGraph)
-		}
+		r0 = ret.Get(0).(db.WorkspaceCodeGraph)
 	}
 
 	if rf, ok := ret.Get(1).(func(string) error); ok {
@@ -5781,30 +5779,30 @@ func (_m *Database) GetCodeGraphsByWorkspaceUuid(workspace_uuid string) ([]db.Wo
 	return r0, r1
 }
 
-// Database_GetCodeGraphsByWorkspaceUuid_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'GetCodeGraphsByWorkspaceUuid'
-type Database_GetCodeGraphsByWorkspaceUuid_Call struct {
+// Database_GetCodeGraphByWorkspaceUuid_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'GetCodeGraphByWorkspaceUuid'
+type Database_GetCodeGraphByWorkspaceUuid_Call struct {
 	*mock.Call
 }
 
-// GetCodeGraphsByWorkspaceUuid is a helper method to define mock.On call
+// GetCodeGraphByWorkspaceUuid is a helper method to define mock.On call
 //   - workspace_uuid string
-func (_e *Database_Expecter) GetCodeGraphsByWorkspaceUuid(workspace_uuid interface{}) *Database_GetCodeGraphsByWorkspaceUuid_Call {
-	return &Database_GetCodeGraphsByWorkspaceUuid_Call{Call: _e.mock.On("GetCodeGraphsByWorkspaceUuid", workspace_uuid)}
+func (_e *Database_Expecter) GetCodeGraphByWorkspaceUuid(workspace_uuid interface{}) *Database_GetCodeGraphByWorkspaceUuid_Call {
+	return &Database_GetCodeGraphByWorkspaceUuid_Call{Call: _e.mock.On("GetCodeGraphByWorkspaceUuid", workspace_uuid)}
 }
 
-func (_c *Database_GetCodeGraphsByWorkspaceUuid_Call) Run(run func(workspace_uuid string)) *Database_GetCodeGraphsByWorkspaceUuid_Call {
+func (_c *Database_GetCodeGraphByWorkspaceUuid_Call) Run(run func(workspace_uuid string)) *Database_GetCodeGraphByWorkspaceUuid_Call {
 	_c.Call.Run(func(args mock.Arguments) {
 		run(args[0].(string))
 	})
 	return _c
 }
 
-func (_c *Database_GetCodeGraphsByWorkspaceUuid_Call) Return(_a0 []db.WorkspaceCodeGraph, _a1 error) *Database_GetCodeGraphsByWorkspaceUuid_Call {
+func (_c *Database_GetCodeGraphByWorkspaceUuid_Call) Return(_a0 db.WorkspaceCodeGraph, _a1 error) *Database_GetCodeGraphByWorkspaceUuid_Call {
 	_c.Call.Return(_a0, _a1)
 	return _c
 }
 
-func (_c *Database_GetCodeGraphsByWorkspaceUuid_Call) RunAndReturn(run func(string) ([]db.WorkspaceCodeGraph, error)) *Database_GetCodeGraphsByWorkspaceUuid_Call {
+func (_c *Database_GetCodeGraphByWorkspaceUuid_Call) RunAndReturn(run func(string) (db.WorkspaceCodeGraph, error)) *Database_GetCodeGraphByWorkspaceUuid_Call {
 	_c.Call.Return(run)
 	return _c
 }

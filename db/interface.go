@@ -214,7 +214,7 @@ type Database interface {
 	GetChatMessagesForChatID(chatID string) ([]ChatMessage, error)
 	GetChatsForWorkspace(workspaceID string, chatStatus string) ([]Chat, error)
 	GetCodeGraphByUUID(uuid string) (WorkspaceCodeGraph, error)
-	GetCodeGraphsByWorkspaceUuid(workspace_uuid string) ([]WorkspaceCodeGraph, error)
+	GetCodeGraphByWorkspaceUuid(workspace_uuid string) (WorkspaceCodeGraph, error)
 	CreateOrEditCodeGraph(m WorkspaceCodeGraph) (WorkspaceCodeGraph, error)
 	DeleteCodeGraph(workspace_uuid string, uuid string) error
 	GetTicketsWithoutGroup() ([]Tickets, error)

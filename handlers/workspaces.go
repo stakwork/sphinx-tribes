@@ -1230,7 +1230,7 @@ func (oh *workspaceHandler) GetWorkspaceCodeGraphByUUID(w http.ResponseWriter, r
 	json.NewEncoder(w).Encode(codeGraph)
 }
 
-func (oh *workspaceHandler) GetCodeGraphsByWorkspaceUuid(w http.ResponseWriter, r *http.Request) {
+func (oh *workspaceHandler) GetCodeGraphByWorkspaceUuid(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 	pubKeyFromAuth, _ := ctx.Value(auth.ContextKey).(string)
 	if pubKeyFromAuth == "" {
@@ -1240,7 +1240,7 @@ func (oh *workspaceHandler) GetCodeGraphsByWorkspaceUuid(w http.ResponseWriter, 
 	}
 
 	workspace_uuid := chi.URLParam(r, "workspace_uuid")
-	codeGraphs, err := oh.db.GetCodeGraphsByWorkspaceUuid(workspace_uuid)
+	codeGraph, err := oh.db.GetCodeGraphByWorkspaceUuid(workspace_uuid)
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
 		json.NewEncoder(w).Encode(map[string]string{"error": "Failed to get code graphs"})
@@ -1248,7 +1248,7 @@ func (oh *workspaceHandler) GetCodeGraphsByWorkspaceUuid(w http.ResponseWriter, 
 	}
 
 	w.WriteHeader(http.StatusOK)
-	json.NewEncoder(w).Encode(codeGraphs)
+	json.NewEncoder(w).Encode(codeGraph)
 }
 
 func (oh *workspaceHandler) DeleteWorkspaceCodeGraph(w http.ResponseWriter, r *http.Request) {
