@@ -23,14 +23,14 @@ import (
 )
 
 type PostData struct {
-	ProductBrief    string   `json:"productBrief"`
-	FeatureName     string   `json:"featureName"`
-	Description     string   `json:"description"`
-	Examples        []string `json:"examples"`
-	WebhookURL      string   `json:"webhook_url"`
-	FeatureUUID     string   `json:"featureUUID"`
-	Alias           string   `json:"alias"`
-	SourceWebsocket string   `json:"sourceWebsocket"`
+	ProductBrief      string   `json:"productBrief"`
+	FeatureName       string   `json:"featureName"`
+	Description       string   `json:"description"`
+	Examples          []string `json:"examples"`
+	WebhookURL        string   `json:"webhook_url"`
+	FeatureUUID       string   `json:"featureUUID"`
+	Alias             string   `json:"alias"`
+	SourceWebsocketId string   `json:"sourceWebsocketId"`
 }
 
 type FeatureBriefRequest struct {
