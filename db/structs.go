@@ -637,6 +637,7 @@ type FeaturePhase struct {
 	PhasePurpose string     `json:"phase_purpose,omitempty" gorm:"default:null"`
 	PhaseOutcome string     `json:"phase_outcome,omitempty" gorm:"default:null"`
 	PhaseScope   string     `json:"phase_scope,omitempty" gorm:"default:null"`
+	PhaseDesign  string     `json:"phase_design,omitempty" gorm:"default:null"`
 	Created      *time.Time `json:"created"`
 	Updated      *time.Time `json:"updated"`
 	CreatedBy    string     `json:"created_by"`
