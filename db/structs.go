@@ -234,13 +234,13 @@ type ConnectionCodesShort struct {
 }
 
 type ConnectionCodesList struct {
-    ID               uint       `json:"id"`
-    ConnectionString string     `json:"connection_string"`
-    Pubkey          string     `json:"pubkey"`
-    RouteHint       string     `json:"route_hint"`
-    SatsAmount      uint64     `json:"sats_amount"`
-    DateCreated     *time.Time `json:"date_created"`
-    IsUsed          bool       `json:"is_used"`
+	ID               uint       `json:"id"`
+	ConnectionString string     `json:"connection_string"`
+	Pubkey           string     `json:"pubkey"`
+	RouteHint        string     `json:"route_hint"`
+	SatsAmount       uint64     `json:"sats_amount"`
+	DateCreated      *time.Time `json:"date_created"`
+	IsUsed           bool       `json:"is_used"`
 }
 
 type InvoiceRequest struct {
@@ -1259,9 +1259,9 @@ type FileAsset struct {
 type ListFileAssetsParams struct {
 	Status             *FileStatus `form:"status"`
 	MimeType           *string     `form:"mimeType"`
-	BeforeDate         *time.Time    `form:"beforeDate"`
-	AfterDate          *time.Time    `form:"afterDate"`
-	LastAccessedBefore *time.Time    `form:"lastAccessedBefore"`
+	BeforeDate         *time.Time  `form:"beforeDate"`
+	AfterDate          *time.Time  `form:"afterDate"`
+	LastAccessedBefore *time.Time  `form:"lastAccessedBefore"`
 	WorkspaceID        *string     `form:"workspaceId"`
 	Page               int         `form:"page,default=1"`
 	PageSize           int         `form:"pageSize,default=50"`
@@ -1270,77 +1270,77 @@ type ListFileAssetsParams struct {
 type PlanStatus string
 
 const (
-    DraftPlan    PlanStatus = "DRAFT"
-    ApprovedPlan PlanStatus = "APPROVED"
+	DraftPlan    PlanStatus = "DRAFT"
+	ApprovedPlan PlanStatus = "APPROVED"
 )
 
 type TicketPlan struct {
-    UUID          uuid.UUID         `gorm:"primaryKey;type:uuid"`
-    WorkspaceUuid string            `gorm:"type:varchar(255);index:workspace_index" json:"workspace_uuid"`
-    FeatureUUID   string            `gorm:"type:varchar(255);index:composite_index;default:null" json:"feature_uuid"`
-    Features      WorkspaceFeatures `gorm:"foreignKey:FeatureUUID;references:Uuid;constraint:OnDelete:SET NULL"`
-    PhaseUUID     string            `gorm:"type:varchar(255);index:phase_index;default:null" json:"phase_uuid"`
-    FeaturePhase  FeaturePhase      `gorm:"foreignKey:PhaseUUID;references:Uuid;constraint:OnDelete:SET NULL"`
-    Name          string            `gorm:"type:varchar(255);not null" json:"name"`
-    Description   string            `gorm:"type:text" json:"description"`
-    TicketGroups  pq.StringArray    `gorm:"type:uuid[];not null;default:'{}'" json:"ticket_groups"`
-    Status        PlanStatus        `gorm:"type:varchar(50);default:'DRAFT'" json:"status"`
-    Version       int               `gorm:"type:integer;default:0" json:"version"`
-    CreatedBy     string            `gorm:"type:varchar(255)" json:"created_by"`
-    UpdatedBy     string            `gorm:"type:varchar(255)" json:"updated_by"`
-    CreatedAt     time.Time         `gorm:"type:timestamp;default:current_timestamp" json:"created_at"`
-    UpdatedAt     time.Time         `gorm:"type:timestamp;default:current_timestamp" json:"updated_at"`
+	UUID          uuid.UUID         `gorm:"primaryKey;type:uuid"`
+	WorkspaceUuid string            `gorm:"type:varchar(255);index:workspace_index" json:"workspace_uuid"`
+	FeatureUUID   string            `gorm:"type:varchar(255);index:composite_index;default:null" json:"feature_uuid"`
+	Features      WorkspaceFeatures `gorm:"foreignKey:FeatureUUID;references:Uuid;constraint:OnDelete:SET NULL"`
+	PhaseUUID     string            `gorm:"type:varchar(255);index:phase_index;default:null" json:"phase_uuid"`
+	FeaturePhase  FeaturePhase      `gorm:"foreignKey:PhaseUUID;references:Uuid;constraint:OnDelete:SET NULL"`
+	Name          string            `gorm:"type:varchar(255);not null" json:"name"`
+	Description   string            `gorm:"type:text" json:"description"`
+	TicketGroups  pq.StringArray    `gorm:"type:uuid[];not null;default:'{}'" json:"ticket_groups"`
+	Status        PlanStatus        `gorm:"type:varchar(50);default:'DRAFT'" json:"status"`
+	Version       int               `gorm:"type:integer;default:0" json:"version"`
+	CreatedBy     string            `gorm:"type:varchar(255)" json:"created_by"`
+	UpdatedBy     string            `gorm:"type:varchar(255)" json:"updated_by"`
+	CreatedAt     time.Time         `gorm:"type:timestamp;default:current_timestamp" json:"created_at"`
+	UpdatedAt     time.Time         `gorm:"type:timestamp;default:current_timestamp" json:"updated_at"`
 }
 
 type AuthorType string
 
 const (
-    HumansAuthor AuthorType = "human"
-    HiveAuthor  AuthorType = "hive"
+	HumansAuthor AuthorType = "human"
+	HiveAuthor   AuthorType = "hive"
 )
 
 type ContentType string
 
 const (
-    FeatureCreation    ContentType = "feature_creation"
-    StoryUpdate       ContentType = "story_update"
-    RequirementChange ContentType = "requirement_change"
-    GeneralUpdate     ContentType = "general_update"
+	FeatureCreation   ContentType = "feature_creation"
+	StoryUpdate       ContentType = "story_update"
+	RequirementChange ContentType = "requirement_change"
+	GeneralUpdate     ContentType = "general_update"
 )
 
 type Activity struct {
-    ID          uuid.UUID      `gorm:"primaryKey;type:uuid"`
-    ThreadID    uuid.UUID      `gorm:"type:uuid;index:thread_index" json:"thread_id"`
+	ID          uuid.UUID      `gorm:"primaryKey;type:uuid"`
+	ThreadID    uuid.UUID      `gorm:"type:uuid;index:thread_index" json:"thread_id"`
 	Title       string         `gorm:"type:varchar(200)" json:"title,omitempty"`
-    Sequence    int            `gorm:"type:integer;not null" json:"sequence"`
-    ContentType ContentType    `gorm:"type:varchar(50);not null" json:"content_type"`
-    Content     string         `gorm:"type:text;not null;check:content,length(content) <= 10000" json:"content"`
-    Workspace   string         `gorm:"type:varchar(255);index:workspace_index" json:"workspace"`
-    FeatureUUID string         `gorm:"type:varchar(255);index:feature_index" json:"feature_uuid"`
-    PhaseUUID   string         `gorm:"type:varchar(255);index:phase_index" json:"phase_uuid"`
-    Feedback    string         `gorm:"type:text" json:"feedback"`
-    Actions     pq.StringArray `gorm:"type:text[];default:'{}'" json:"actions"`
-    Questions   pq.StringArray `gorm:"type:text[];default:'{}'" json:"questions"`
-    TimeCreated time.Time      `gorm:"type:timestamp;default:current_timestamp" json:"time_created"`
-    TimeUpdated time.Time      `gorm:"type:timestamp;default:current_timestamp" json:"time_updated"`
-    Status      string         `gorm:"type:varchar(20);default:'active'" json:"status"`
-    Author      AuthorType     `gorm:"type:varchar(10);not null" json:"author"`
-    AuthorRef   string         `gorm:"type:varchar(255);not null" json:"author_ref"`
+	Sequence    int            `gorm:"type:integer;not null" json:"sequence"`
+	ContentType ContentType    `gorm:"type:varchar(50);not null" json:"content_type"`
+	Content     string         `gorm:"type:text;not null;check:content,length(content) <= 10000" json:"content"`
+	Workspace   string         `gorm:"type:varchar(255);index:workspace_index" json:"workspace"`
+	FeatureUUID string         `gorm:"type:varchar(255);index:feature_index" json:"feature_uuid"`
+	PhaseUUID   string         `gorm:"type:varchar(255);index:phase_index" json:"phase_uuid"`
+	Feedback    string         `gorm:"type:text" json:"feedback"`
+	Actions     pq.StringArray `gorm:"type:text[];default:'{}'" json:"actions"`
+	Questions   pq.StringArray `gorm:"type:text[];default:'{}'" json:"questions"`
+	TimeCreated time.Time      `gorm:"type:timestamp;default:current_timestamp" json:"time_created"`
+	TimeUpdated time.Time      `gorm:"type:timestamp;default:current_timestamp" json:"time_updated"`
+	Status      string         `gorm:"type:varchar(20);default:'active'" json:"status"`
+	Author      AuthorType     `gorm:"type:varchar(10);not null" json:"author"`
+	AuthorRef   string         `gorm:"type:varchar(255);not null" json:"author_ref"`
 }
 
 type NodeData struct {
-    BountyID    uint   `json:"bounty_id"`
-    Title       string `json:"title"`
-    Description string `json:"description"`
+	BountyID    uint   `json:"bounty_id"`
+	Title       string `json:"title"`
+	Description string `json:"description"`
 }
 
 type Node struct {
-    NodeType string   `json:"node_type"`
-    NodeData NodeData `json:"node_data"`
+	NodeType string   `json:"node_type"`
+	NodeData NodeData `json:"node_data"`
 }
 
 type NodeListResponse struct {
-    NodeList []Node `json:"node_list"`
+	NodeList []Node `json:"node_list"`
 }
 
 func (Person) TableName() string {

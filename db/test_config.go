@@ -82,7 +82,6 @@ func InitTestDB() {
 	db.AutoMigrate(&FileAsset{})
 	db.AutoMigrate(&TextSnippet{})
 	db.AutoMigrate(&ConnectionCodesList{})
-	db.AutoMigrate(&TicketMessage{})
 	db.AutoMigrate(&TicketPlan{})
 	db.AutoMigrate(&Activity{})
 
