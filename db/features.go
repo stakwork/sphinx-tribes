@@ -3,11 +3,12 @@ package db
 import (
 	"errors"
 	"fmt"
-	"github.com/google/uuid"
-	"gorm.io/gorm"
 	"net/http"
 	"strings"
 	"time"
+
+	"github.com/google/uuid"
+	"gorm.io/gorm"
 
 	"github.com/stakwork/sphinx-tribes/utils"
 )
@@ -142,6 +143,10 @@ func (db database) GetFeaturePhaseByUuid(featureUuid, phaseUuid string) (Feature
 	}
 	if phase.PhaseScope != "" {
 		phase.PhaseScope = strings.TrimSpace(phase.PhaseScope)
+	}
+
+	if phase.PhaseDesign != "" {
+		phase.PhaseDesign = strings.TrimSpace(phase.PhaseDesign)
 	}
 
 	return phase, nil
