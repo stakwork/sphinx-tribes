@@ -1139,6 +1139,13 @@ func GetAllUserWorkspaces(pubkey string) []db.Workspace {
 		workspace := db.DB.GetWorkspaceByUuid(uuid)
 		bountyCount := db.DB.GetWorkspaceBountyCount(uuid)
 		hasRole := db.UserHasAccess(pubkey, uuid, db.ViewReport)
+
+		// don't add workspace to the list if user is the owner of the workspace
+		alreadyAdded := false
+		if workspace.OwnerPubKey == pubkey {
+			alreadyAdded = true
+		}
+
 		// don't add deleted workspaces to the list
 		if !workspace.Deleted {
 			if hasRole {
@@ -1149,7 +1156,16 @@ func GetAllUserWorkspaces(pubkey string) []db.Workspace {
 			}
 			workspace.BountyCount = bountyCount
 
-			workspaces = append(workspaces, workspace)
+			// check if workspace has already been added to the list
+			for _, existingWorkspace := range workspaces {
+				if existingWorkspace.Uuid == workspace.Uuid {
+					alreadyAdded = true
+				}
+			}
+
+			if !alreadyAdded {
+				workspaces = append(workspaces, workspace)
+			}
 		}
 	}
 
