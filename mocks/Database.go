@@ -15055,3 +15055,103 @@ func NewDatabase(t interface {
 
 	return mock
 }
+
+// GetPhaseDesign provides a mock function with given fields: phaseUUID
+func (_m *Database) GetPhaseDesign(phaseUUID string) (string, error) {
+	ret := _m.Called(phaseUUID)
+
+	if len(ret) == 0 {
+		panic("no return value specified for GetPhaseDesign")
+	}
+
+	var r0 string
+	var r1 error
+	if rf, ok := ret.Get(0).(func(string) (string, error)); ok {
+		return rf(phaseUUID)
+	}
+	if rf, ok := ret.Get(0).(func(string) string); ok {
+		r0 = rf(phaseUUID)
+	} else {
+		r0 = ret.Get(0).(string)
+	}
+
+	if rf, ok := ret.Get(1).(func(string) error); ok {
+		r1 = rf(phaseUUID)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
+type Database_GetPhaseDesign_Call struct {
+	*mock.Call
+}
+
+func (_e *Database_Expecter) GetPhaseDesign(phaseUUID interface{}) *Database_GetPhaseDesign_Call {
+	return &Database_GetPhaseDesign_Call{Call: _e.mock.On("GetPhaseDesign", phaseUUID)}
+}
+
+func (_c *Database_GetPhaseDesign_Call) Run(run func(phaseUUID string)) *Database_GetPhaseDesign_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(string))
+	})
+	return _c
+}
+
+func (_c *Database_GetPhaseDesign_Call) Return(_a0 string, _a1 error) *Database_GetPhaseDesign_Call {
+	_c.Call.Return(_a0, _a1)
+	return _c
+}
+
+func (_c *Database_GetPhaseDesign_Call) RunAndReturn(run func(string) (string, error)) *Database_GetPhaseDesign_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
+
+
+// BuildTicketArray provides a mock function with given fields: groupIDs
+func (_m *Database) BuildTicketArray(groupIDs []string) []db.TicketArrayItem {
+	ret := _m.Called(groupIDs)
+
+	if len(ret) == 0 {
+		panic("no return value specified for BuildTicketArray")
+	}
+
+	var r0 []db.TicketArrayItem
+	if rf, ok := ret.Get(0).(func([]string) []db.TicketArrayItem); ok {
+		r0 = rf(groupIDs)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).([]db.TicketArrayItem)
+		}
+	}
+
+	return r0
+}
+
+type Database_BuildTicketArray_Call struct {
+	*mock.Call
+}
+
+func (_e *Database_Expecter) BuildTicketArray(groupIDs interface{}) *Database_BuildTicketArray_Call {
+	return &Database_BuildTicketArray_Call{Call: _e.mock.On("BuildTicketArray", groupIDs)}
+}
+
+func (_c *Database_BuildTicketArray_Call) Run(run func(groupIDs []string)) *Database_BuildTicketArray_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].([]string))
+	})
+	return _c
+}
+
+func (_c *Database_BuildTicketArray_Call) Return(_a0 []db.TicketArrayItem) *Database_BuildTicketArray_Call {
+	_c.Call.Return(_a0)
+	return _c
+}
+
+func (_c *Database_BuildTicketArray_Call) RunAndReturn(run func([]string) []db.TicketArrayItem) *Database_BuildTicketArray_Call {
+	_c.Call.Return(run)
+	return _c
+}

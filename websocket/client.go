@@ -44,6 +44,20 @@ type TicketData struct {
 	TicketName        string `json:"ticketName,omitempty"`
 }
 
+type TicketPlanMessage struct {
+    BroadcastType   string             `json:"broadcast_type"`
+    SourceSessionID string             `json:"source_session_id"`
+    Message         string             `json:"message"`
+    Action          string             `json:"action"`
+    PlanDetails     TicketPlanDetails  `json:"plan_details"`
+}
+
+type TicketPlanDetails struct {
+    RequestUUID  string `json:"request_uuid"`
+    FeatureUUID  string `json:"feature_uuid"`
+    PhaseUUID    string `json:"phase_uuid"`
+}
+
 func (c *Client) Read() {
 	defer func() {
 		// ceck to acoid nil pointer

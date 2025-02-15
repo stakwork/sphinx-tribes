@@ -205,6 +205,7 @@ type Database interface {
 	GetProductBrief(workspaceUuid string) (string, error)
 	GetFeatureBrief(featureUuid string) (string, error)
 	GetFeatureArchitecture(featureUuid string) (string, error)
+	GetPhaseDesign(phaseUUID string) (string, error)
 	GetTicketsByPhaseUUID(featureUUID string, phaseUUID string) ([]Tickets, error)
 	AddChat(chat *Chat) (Chat, error)
 	UpdateChat(chat *Chat) (Chat, error)
@@ -305,5 +306,6 @@ type Database interface {
 	GetLatestActivityByThread(threadID string) (*Activity, error)
 	CreateActivityThread(sourceID string, activity *Activity) (*Activity, error)
 	DeleteActivity(id string) error
+	BuildTicketArray(groupIDs []string) []TicketArrayItem
 	GetBountiesByWorkspaceAndTimeRange(workspaceId string, startDate time.Time, endDate time.Time) ([]NewBounty, error)
 }

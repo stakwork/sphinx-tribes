@@ -98,3 +98,35 @@ func (db database) GetTicketPlansByWorkspace(workspaceUUID string) ([]TicketPlan
 	}
 	return plans, nil
 } 
+
+func (db database) BuildTicketArray(groupIDs []string) []TicketArrayItem {
+    var ticketArray []TicketArrayItem
+    
+    for _, groupID := range groupIDs {
+        var tickets []Tickets
+        result := db.db.Where("ticket_group = ?", groupID).Find(&tickets)
+        if result.Error != nil {
+            continue
+        }
+        
+        var latestVersion int
+        var latestName, latestDescription string
+        
+        for _, ticket := range tickets {
+            if ticket.Version > latestVersion {
+                latestVersion = ticket.Version
+                latestName = ticket.Name
+                latestDescription = ticket.Description
+            }
+        }
+
+        if latestVersion > 0 {
+            ticketArray = append(ticketArray, TicketArrayItem{
+                TicketName:        latestName,
+                TicketDescription: latestDescription,
+            })
+        }
+    }
+    
+    return ticketArray
+}

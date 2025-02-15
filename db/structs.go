@@ -1293,6 +1293,11 @@ type TicketPlan struct {
 	UpdatedAt     time.Time         `gorm:"type:timestamp;default:current_timestamp" json:"updated_at"`
 }
 
+type TicketArrayItem struct {
+    TicketName        string `json:"ticket_name"`
+    TicketDescription string `json:"ticket_description"`
+}
+
 type AuthorType string
 
 const (
