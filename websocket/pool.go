@@ -88,3 +88,23 @@ func (pool *Pool) SendTicketMessage(message TicketMessage) error {
 
 	return nil
 }
+
+
+func (pool *Pool) SendTicketPlanMessage(message TicketPlanMessage) error {
+    if pool == nil {
+        return fmt.Errorf("pool is nil")
+    }
+
+    if message.BroadcastType == "direct" {
+        if message.SourceSessionID == "" {
+            return fmt.Errorf("client not found")
+        }
+
+		if client, ok := pool.Clients[message.SourceSessionID]; ok {
+            return client.Client.Conn.WriteJSON(message)
+        }
+        return fmt.Errorf("client not found: %s", message.SourceSessionID)
+    }
+
+    return nil
+}

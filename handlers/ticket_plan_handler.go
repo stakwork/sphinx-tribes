@@ -1,9 +1,13 @@
 package handlers
 
 import (
+	"bytes"
 	"encoding/json"
 	"fmt"
+	"io"
+	"log"
 	"net/http"
+	"os"
 
 	"github.com/go-chi/chi"
 	"github.com/google/uuid"
@@ -32,6 +36,21 @@ type TicketPlanResponse struct {
 type TicketArrayItem struct {
     TicketName        string `json:"ticket_name"`
     TicketDescription string `json:"ticket_description"`
+}
+
+type SendTicketPlanRequest struct {
+    FeatureID       string   `json:"feature_id"`
+    PhaseID         string   `json:"phase_id"`
+    TicketGroupIDs  []string `json:"ticket_group_ids"`
+    SourceWebsocket string   `json:"source_websocket"`
+    RequestUUID     string   `json:"request_uuid"`
+}
+
+type SendTicketPlanResponse struct {
+    Success     bool     `json:"success"`
+    Message     string   `json:"message"`
+    RequestUUID string   `json:"request_uuid"`
+    Errors      []string `json:"errors,omitempty"`
 }
 
 func (th *ticketHandler) CreateTicketPlan(w http.ResponseWriter, r *http.Request) {
@@ -284,4 +303,311 @@ func (th *ticketHandler) GetTicketPlansByWorkspace(w http.ResponseWriter, r *htt
 
     w.WriteHeader(http.StatusOK)
     json.NewEncoder(w).Encode(plans)
-} 
+}
+
+func (th *ticketHandler) SendTicketPlanToStakwork(w http.ResponseWriter, r *http.Request) {
+    ctx := r.Context()
+    pubKeyFromAuth, _ := ctx.Value(auth.ContextKey).(string)
+
+    if pubKeyFromAuth == "" {
+        logger.Log.Info("[ticket plan] no pubkey from auth")
+        w.WriteHeader(http.StatusUnauthorized)
+        json.NewEncoder(w).Encode(map[string]string{"error": "Unauthorized"})
+        return
+    }
+
+    user := th.db.GetPersonByPubkey(pubKeyFromAuth)
+    if user.OwnerPubKey != pubKeyFromAuth {
+        logger.Log.Info("Person not exists")
+        w.WriteHeader(http.StatusBadRequest)
+        return
+    }
+
+    body, err := io.ReadAll(r.Body)
+    if err != nil {
+        w.WriteHeader(http.StatusBadRequest)
+        json.NewEncoder(w).Encode(TicketPlanResponse{
+            Success: false,
+            Message: "Validation failed",
+            Errors:  []string{"Error reading request body"},
+        })
+        return
+    }
+    defer r.Body.Close()
+
+    var planRequest SendTicketPlanRequest
+    if err := json.Unmarshal(body, &planRequest); err != nil {
+        w.WriteHeader(http.StatusBadRequest)
+        json.NewEncoder(w).Encode(TicketPlanResponse{
+            Success: false,
+            Message: "Validation failed",
+            Errors:  []string{"Error parsing request body: " + err.Error()},
+        })
+        return
+    }
+
+    if planRequest.FeatureID == "" || planRequest.PhaseID == "" || len(planRequest.TicketGroupIDs) == 0 {
+        w.WriteHeader(http.StatusBadRequest)
+        json.NewEncoder(w).Encode(TicketPlanResponse{
+            Success: false,
+            Message: "Validation failed",
+            Errors:  []string{"feature_id, phase_id, and ticket_group_ids are required"},
+        })
+        return
+    }
+
+    var (
+        productBrief, featureBrief, phaseDesign, codeGraphURL, codeGraphAlias string
+        feature                                                                db.WorkspaceFeatures
+    )
+
+    feature = th.db.GetFeatureByUuid(planRequest.FeatureID)
+    if feature.Uuid == "" {
+        w.WriteHeader(http.StatusInternalServerError)
+        json.NewEncoder(w).Encode(TicketPlanResponse{
+            Success: false,
+            Message: "Error retrieving feature details",
+            Errors:  []string{"Feature not found with the provided UUID"},
+        })
+        return
+    }
+
+    productBrief, err = th.db.GetProductBrief(feature.WorkspaceUuid)
+    if err != nil {
+        w.WriteHeader(http.StatusInternalServerError)
+        json.NewEncoder(w).Encode(TicketPlanResponse{
+            Success: false,
+            Message: "Error retrieving product brief",
+            Errors:  []string{err.Error()},
+        })
+        return
+    }
+
+    featureBrief, err = th.db.GetFeatureBrief(planRequest.FeatureID)
+    if err != nil {
+        w.WriteHeader(http.StatusInternalServerError)
+        json.NewEncoder(w).Encode(TicketPlanResponse{
+            Success: false,
+            Message: "Error retrieving feature brief",
+            Errors:  []string{err.Error()},
+        })
+        return
+    }
+
+    phaseDesign, err = th.db.GetPhaseDesign(planRequest.PhaseID)
+    if err != nil {
+        w.WriteHeader(http.StatusInternalServerError)
+        json.NewEncoder(w).Encode(TicketPlanResponse{
+            Success: false,
+            Message: "Error retrieving phase design",
+            Errors:  []string{err.Error()},
+        })
+        return
+    }
+
+    host := os.Getenv("HOST")
+    if host == "" {
+        w.WriteHeader(http.StatusInternalServerError)
+        json.NewEncoder(w).Encode(TicketPlanResponse{
+            Success: false,
+            Message: "HOST environment variable not set",
+        })
+        return
+    }
+
+    webhookURL := fmt.Sprintf("%s/bounties/ticket-plan/review", host)
+
+    var schematicURL string
+    if feature.WorkspaceUuid != "" {
+        workspace := th.db.GetWorkspaceByUuid(feature.WorkspaceUuid)
+        if workspace.Uuid == "" {
+            w.WriteHeader(http.StatusNotFound)
+            json.NewEncoder(w).Encode(TicketPlanResponse{
+                Success: false,
+                Message: "Workspace not found",
+            })
+            return
+        }
+
+        schematicURL = workspace.SchematicUrl
+
+        codeGraph, err := th.db.GetCodeGraphByWorkspaceUuid(feature.WorkspaceUuid)
+        if err == nil {
+            codeGraphURL = codeGraph.Url
+            codeGraphAlias = codeGraph.SecretAlias
+        } else {
+            codeGraphURL = ""
+            codeGraphAlias = ""
+        }
+    }
+
+    phase, err := th.db.GetPhaseByUuid(planRequest.PhaseID)
+    if err != nil {
+        w.WriteHeader(http.StatusNotFound)
+        return
+    }
+
+    ticketArray := th.db.BuildTicketArray(planRequest.TicketGroupIDs)
+
+    stakworkPayload := map[string]interface{}{
+        "name":        "Ticket Plan Builder",
+        "workflow_id": 42472,
+        "workflow_params": map[string]interface{}{
+            "set_var": map[string]interface{}{
+                "attributes": map[string]interface{}{
+                    "vars": map[string]interface{}{
+                        "featureUUID":     planRequest.FeatureID,
+                        "phaseUUID":       planRequest.PhaseID,
+                        "ticketPlanUUID":  uuid.New().String(),
+                        "phaseOutcome":    phase.PhaseOutcome,
+                        "phasePurpose":    phase.PhasePurpose,
+                        "phaseScope":      phase.PhaseScope,
+                        "phaseDesign":     phaseDesign,
+                        "ticketArray":     ticketArray,
+                        "productBrief":    productBrief,
+                        "featureBrief":    featureBrief,
+                        "sourceWebsocket": planRequest.SourceWebsocket,
+                        "webhook_url":     webhookURL,
+                        "phaseSchematic":  schematicURL,
+                        "codeGraph":       codeGraphURL,
+                        "alias":           user.OwnerAlias,
+                        "requestUUID":     planRequest.RequestUUID,
+                        "codeGraphAlias":  codeGraphAlias,
+                    },
+                },
+            },
+        },
+    }
+
+    stakworkPayloadJSON, err := json.Marshal(stakworkPayload)
+    if err != nil {
+        w.WriteHeader(http.StatusInternalServerError)
+        json.NewEncoder(w).Encode(TicketPlanResponse{
+            Success: false,
+            Message: "Error encoding payload",
+            Errors:  []string{err.Error()},
+        })
+        return
+    }
+
+    apiKey := os.Getenv("SWWFKEY")
+    if apiKey == "" {
+        w.WriteHeader(http.StatusInternalServerError)
+        json.NewEncoder(w).Encode(TicketPlanResponse{
+            Success: false,
+            Message: "API key not set in environment",
+        })
+        return
+    }
+
+    req, err := http.NewRequest(http.MethodPost, "https://api.stakwork.com/api/v1/projects", bytes.NewBuffer(stakworkPayloadJSON))
+    if err != nil {
+        w.WriteHeader(http.StatusInternalServerError)
+        json.NewEncoder(w).Encode(TicketPlanResponse{
+            Success: false,
+            Message: "Error creating request",
+            Errors:  []string{err.Error()},
+        })
+        return
+    }
+
+    req.Header.Set("Authorization", "Token token="+apiKey)
+    req.Header.Set("Content-Type", "application/json")
+
+    resp, err := th.httpClient.Do(req)
+    if err != nil {
+        w.WriteHeader(http.StatusInternalServerError)
+        json.NewEncoder(w).Encode(TicketPlanResponse{
+            Success: false,
+            Message: "Error sending request to Stakwork",
+            Errors:  []string{err.Error()},
+        })
+        return
+    }
+    defer resp.Body.Close()
+
+    respBody, err := io.ReadAll(resp.Body)
+    if err != nil {
+        w.WriteHeader(http.StatusInternalServerError)
+        json.NewEncoder(w).Encode(TicketPlanResponse{
+            Success: false,
+            Message: "Error reading response from Stakwork",
+            Errors:  []string{err.Error()},
+        })
+        return
+    }
+
+    var stakworkResp StakworkResponse
+    if err := json.Unmarshal(respBody, &stakworkResp); err != nil {
+        w.WriteHeader(http.StatusInternalServerError)
+        json.NewEncoder(w).Encode(TicketPlanResponse{
+            Success: false,
+            Message: "Error parsing Stakwork response",
+            Errors:  []string{err.Error()},
+        })
+        return
+    }
+
+    if resp.StatusCode != http.StatusOK || !stakworkResp.Success {
+        w.WriteHeader(resp.StatusCode)
+        json.NewEncoder(w).Encode(TicketPlanResponse{
+            Success: false,
+            Message: string(respBody),
+            Errors:  []string{fmt.Sprintf("Stakwork API returned status code: %d", resp.StatusCode)},
+        })
+        return
+    }
+
+    if planRequest.SourceWebsocket != "" {
+        ticketMsg := websocket.TicketPlanMessage{
+            BroadcastType:   "direct",
+            SourceSessionID: planRequest.SourceWebsocket,
+            Message:         "Processing ticket plan generation",
+            Action:          "TICKET_PLAN_PROCESSING",
+            PlanDetails: websocket.TicketPlanDetails{
+                RequestUUID:  planRequest.RequestUUID,
+                FeatureUUID: planRequest.FeatureID,
+                PhaseUUID:   planRequest.PhaseID,
+            },
+        }
+
+        if err := websocket.WebsocketPool.SendTicketPlanMessage(ticketMsg); err != nil {
+            log.Printf("Failed to send websocket message: %v", err)
+            w.WriteHeader(http.StatusOK)
+            json.NewEncoder(w).Encode(map[string]interface{}{
+                "plan":            planRequest,
+                "websocket_error": err.Error(),
+            })
+            return
+        }
+
+        projectMsg := websocket.TicketPlanMessage{
+            BroadcastType:   "direct",
+            SourceSessionID: planRequest.SourceWebsocket,
+            Message:         fmt.Sprintf("https://jobs.stakwork.com/admin/projects/%d", stakworkResp.Data.ProjectID),
+            Action:          "swrun",
+            PlanDetails: websocket.TicketPlanDetails{
+                RequestUUID:  planRequest.RequestUUID,
+                FeatureUUID: planRequest.FeatureID,
+                PhaseUUID:   planRequest.PhaseID,
+            },
+        }
+
+        if err := websocket.WebsocketPool.SendTicketPlanMessage(projectMsg); err != nil {
+            log.Printf("Failed to send project ID websocket message: %v", err)
+            w.WriteHeader(http.StatusOK)
+            json.NewEncoder(w).Encode(map[string]interface{}{
+                "plan":            planRequest,
+                "websocket_error": err.Error(),
+            })
+            return
+        }
+    }
+
+    w.WriteHeader(http.StatusOK)
+    json.NewEncoder(w).Encode(SendTicketPlanResponse{
+        Success:     true,
+        Message:     string(respBody),
+        RequestUUID: planRequest.RequestUUID,
+    })
+}

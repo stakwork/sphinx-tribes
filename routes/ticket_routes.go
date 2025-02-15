@@ -35,6 +35,7 @@ func TicketRoutes() chi.Router {
 		r.Delete("/workspace/{workspace_uuid}/draft/{uuid}", ticketHandler.DeleteWorkspaceDraftTicket)
 
 		r.Post("/plan", ticketHandler.CreateTicketPlan)
+		r.Post("/plan/send", ticketHandler.SendTicketPlanToStakwork)
 		r.Get("/plan/{uuid}", ticketHandler.GetTicketPlan)
 		r.Delete("/plan/{uuid}", ticketHandler.DeleteTicketPlan)
 		r.Get("/plan/feature/{feature_uuid}", ticketHandler.GetTicketPlansByFeature)
