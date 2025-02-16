@@ -401,6 +401,20 @@ func (db database) GetFeatureArchitecture(featureUuid string) (string, error) {
 	return featureArchitecture, nil
 }
 
+func (db database) GetPhaseDesign(phaseUUID string) (string, error) {
+    phase := FeaturePhase{}
+    result := db.db.Model(&FeaturePhase{}).Where("uuid = ?", phaseUUID).First(&phase)
+    if result.Error != nil {
+        return "", fmt.Errorf("error getting phase: %v", result.Error)
+    }
+
+    phaseDesign := fmt.Sprintf("Phase: %s. Design: %s",
+        phase.Name,
+        phase.PhaseDesign)
+
+    return phaseDesign, nil
+}
+
 func (db database) UpdateFeatureStatus(uuid string, status FeatureStatus) (WorkspaceFeatures, error) {
 	var feature WorkspaceFeatures
 
