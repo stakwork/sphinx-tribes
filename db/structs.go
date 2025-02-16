@@ -1340,6 +1340,34 @@ type NodeData struct {
 	Description string `json:"description"`
 }
 
+type QuickBountyItem struct {
+    BountyID      uint          `json:"bountyID"`
+    BountyTitle   string        `json:"bountyTitle"`
+    Status        BountyStatus  `json:"status"`
+    AssignedAlias *string       `json:"assignedAlias"`
+    PhaseID       *string       `json:"phaseID"`
+}
+
+type QuickBountiesResponse struct {
+    FeatureID string                       `json:"featureID"`
+    Phases    map[string][]QuickBountyItem `json:"phases"`    
+    Unphased  []QuickBountyItem            `json:"unphased"`
+}
+
+type QuickTicketItem struct {
+    TicketUUID    uuid.UUID    `json:"ticketUUID"`
+    TicketTitle   string       `json:"ticketTitle"`
+    Status        BountyStatus   `json:"status"`
+    AssignedAlias *string      `json:"assignedAlias"`
+    PhaseID       *string      `json:"phaseID"`
+}
+
+type QuickTicketsResponse struct {
+    FeatureID string                       `json:"featureID"`
+    Phases    map[string][]QuickTicketItem `json:"phases"`    
+    Unphased  []QuickTicketItem            `json:"unphased"`
+}
+
 type Node struct {
 	NodeType string   `json:"node_type"`
 	NodeData NodeData `json:"node_data"`
