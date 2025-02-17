@@ -742,7 +742,7 @@ func TestCreateConnectionCode(t *testing.T) {
 
 	aHandler := NewAuthHandler(db.TestDB)
 
-	aHandler.makeConnectionCodeRequest = func(inviter_pubkey string, inviter_route_hint string, msats_amount uint64) string {
+	aHandler.makeConnectionCodeRequest = func(inviter_pubkey string, inviter_route_hint string, msats_amount uint64, sessionId string) string {
 		return "22222222222222222"
 	}
 
