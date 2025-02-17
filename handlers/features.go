@@ -911,12 +911,19 @@ func (oh *featureHandler) GetQuickBounties(w http.ResponseWriter, r *http.Reques
 		}
 
 		status := calculateBountyStatus(bounty)
+		
+		var phaseID *string
+		if bounty.PhaseUuid != "" {
+			phaseUUID := bounty.PhaseUuid
+			phaseID = &phaseUUID
+		}
+
 		item := db.QuickBountyItem{
 			BountyID:      bounty.ID,
 			BountyTitle:   bounty.Title,
 			Status:        status,
 			AssignedAlias: assignedAlias,
-			PhaseID:       &bounty.PhaseUuid,
+			PhaseID:       phaseID, 
 		}
 
 		if status == db.StatusTodo {
@@ -971,12 +978,18 @@ func (oh *featureHandler) GetQuickTickets(w http.ResponseWriter, r *http.Request
 	}
 
 	for _, ticket := range tickets {
+		var phaseID *string
+		if ticket.PhaseUUID != "" {
+			phaseUUID := ticket.PhaseUUID
+			phaseID = &phaseUUID
+		}
+
 		item := db.QuickTicketItem{
 			TicketUUID:    ticket.UUID,
 			TicketTitle:   ticket.Name,
 			Status:        db.StatusDraft,
 			AssignedAlias: nil,
-			PhaseID:       &ticket.PhaseUUID,
+			PhaseID:       phaseID,
 		}
 
 		if ticket.PhaseUUID != "" {
