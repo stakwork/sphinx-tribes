@@ -491,6 +491,7 @@ func (th *ticketHandler) PostTicketDataToStakwork(w http.ResponseWriter, r *http
 						"phaseOutcome":        phase.PhaseOutcome,
 						"phasePurpose":        phase.PhasePurpose,
 						"phaseScope":          phase.PhaseScope,
+						"phaseDesign":         phase.PhaseDesign,
 						"ticketName":          ticket.Name,
 						"ticketDescription":   ticket.Description,
 						"productBrief":        productBrief,
