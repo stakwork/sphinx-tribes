@@ -571,15 +571,6 @@ func (ah *activityHandler) ReceiveActivity(w http.ResponseWriter, r *http.Reques
 			})
 			return
 		}
-	} else if req.Author == db.HiveAuthor {
-		if _, err := uuid.Parse(req.AuthorRef); err != nil {
-			w.WriteHeader(http.StatusBadRequest)
-			json.NewEncoder(w).Encode(WebhookResponse{
-				Success: false,
-				Error:   "invalid UUID format for hive author",
-			})
-			return
-		}
 	}
 
 	if req.ThreadID != "" {

@@ -105,16 +105,24 @@ func TestReceiveActivity(t *testing.T) {
 			expectedError:  "invalid public key format for human author",
 		},
 		{
-			name: "invalid hive author ref",
+			name: "successful hive activity with URL",
 			payload: WebhookActivityRequest{
 				ContentType: "general_update",
 				Content:     "Test content",
 				Workspace:   "test-workspace",
 				Author:      db.HiveAuthor,
-				AuthorRef:   "not-a-uuid",
+				AuthorRef:   "https://example.com/hive",
 			},
-			expectedStatus: http.StatusBadRequest,
-			expectedError:  "invalid UUID format for hive author",
+			expectedStatus: http.StatusCreated,
+			validateFunc: func(t *testing.T, resp WebhookResponse) {
+				assert.True(t, resp.Success)
+				assert.NotEmpty(t, resp.ActivityID)
+
+				activity, err := db.TestDB.GetActivity(resp.ActivityID)
+				assert.NoError(t, err)
+				assert.Equal(t, "Test content", activity.Content)
+				assert.Equal(t, "https://example.com/hive", activity.AuthorRef)
+			},
 		},
 		{
 			name: "invalid thread ID format",

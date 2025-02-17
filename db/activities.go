@@ -55,12 +55,6 @@ func validateActivity(activity *Activity) error {
 		}
 	}
 
-	if activity.Author == HiveAuthor {
-		if _, err := uuid.Parse(activity.AuthorRef); err != nil {
-			return errors.New("invalid UUID format for hive author")
-		}
-	}
-
 	return nil
 }
 
