@@ -864,3 +864,141 @@ func (oh *featureHandler) UpdateFeatureStatus(w http.ResponseWriter, r *http.Req
 	w.WriteHeader(http.StatusOK)
 	json.NewEncoder(w).Encode(updatedFeature)
 }
+
+func (oh *featureHandler) GetQuickBounties(w http.ResponseWriter, r *http.Request) {
+	ctx := r.Context()
+	pubKeyFromAuth, _ := ctx.Value(auth.ContextKey).(string)
+	if pubKeyFromAuth == "" {
+		logger.Log.Info("no pubkey from auth")
+		w.WriteHeader(http.StatusUnauthorized)
+		return
+	}
+
+	featureUUID := chi.URLParam(r, "feature_uuid")
+	if featureUUID == "" {
+		w.WriteHeader(http.StatusBadRequest)
+		json.NewEncoder(w).Encode(map[string]string{"error": "feature_uuid is required"})
+		return
+	}
+
+	feature := oh.db.GetFeatureByUuid(featureUUID)
+	if feature.ID == 0 {
+		w.WriteHeader(http.StatusNotFound)
+		json.NewEncoder(w).Encode(map[string]string{"error": "feature not found"})
+		return
+	}
+
+	bounties, err := oh.db.GetBountiesByFeatureUuid(featureUUID)
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		json.NewEncoder(w).Encode(map[string]string{"error": err.Error()})
+		return
+	}
+
+	response := db.QuickBountiesResponse{
+		FeatureID: featureUUID,
+		Phases:    make(map[string][]db.QuickBountyItem),
+		Unphased:  make([]db.QuickBountyItem, 0),
+	}
+
+	for _, bounty := range bounties {
+		var assignedAlias *string
+		if bounty.Assignee != "" {
+			assignee := oh.db.GetPersonByPubkey(bounty.Assignee)
+			if assignee.OwnerAlias != "" {
+				assignedAlias = &assignee.OwnerAlias
+			}
+		}
+
+		status := calculateBountyStatus(bounty)
+		
+		var phaseID *string
+		if bounty.PhaseUuid != "" {
+			phaseUUID := bounty.PhaseUuid
+			phaseID = &phaseUUID
+		}
+
+		item := db.QuickBountyItem{
+			BountyID:      bounty.ID,
+			BountyTitle:   bounty.Title,
+			Status:        status,
+			AssignedAlias: assignedAlias,
+			PhaseID:       phaseID, 
+		}
+
+		if status == db.StatusTodo {
+			item.AssignedAlias = nil
+		}
+
+		if bounty.PhaseUuid != "" {
+			response.Phases[bounty.PhaseUuid] = append(response.Phases[bounty.PhaseUuid], item)
+		} else {
+			response.Unphased = append(response.Unphased, item)
+		}
+	}
+
+	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode(response)
+}
+
+func (oh *featureHandler) GetQuickTickets(w http.ResponseWriter, r *http.Request) {
+	ctx := r.Context()
+	pubKeyFromAuth, _ := ctx.Value(auth.ContextKey).(string)
+	if pubKeyFromAuth == "" {
+		logger.Log.Info("no pubkey from auth")
+		w.WriteHeader(http.StatusUnauthorized)
+		return
+	}
+
+	featureUUID := chi.URLParam(r, "feature_uuid")
+	if featureUUID == "" {
+		w.WriteHeader(http.StatusBadRequest)
+		json.NewEncoder(w).Encode(map[string]string{"error": "feature_uuid is required"})
+		return
+	}
+
+	feature := oh.db.GetFeatureByUuid(featureUUID)
+	if feature.ID == 0 {
+		w.WriteHeader(http.StatusNotFound)
+		json.NewEncoder(w).Encode(map[string]string{"error": "feature not found"})
+		return
+	}
+
+	tickets, err := oh.db.GetTicketsByFeatureUUID(featureUUID)
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		json.NewEncoder(w).Encode(map[string]string{"error": err.Error()})
+		return
+	}
+
+	response := db.QuickTicketsResponse{
+		FeatureID: featureUUID,
+		Phases:    make(map[string][]db.QuickTicketItem),
+		Unphased:  make([]db.QuickTicketItem, 0),
+	}
+
+	for _, ticket := range tickets {
+		var phaseID *string
+		if ticket.PhaseUUID != "" {
+			phaseUUID := ticket.PhaseUUID
+			phaseID = &phaseUUID
+		}
+
+		item := db.QuickTicketItem{
+			TicketUUID:    ticket.UUID,
+			TicketTitle:   ticket.Name,
+			Status:        db.StatusDraft,
+			AssignedAlias: nil,
+			PhaseID:       phaseID,
+		}
+
+		if ticket.PhaseUUID != "" {
+			response.Phases[ticket.PhaseUUID] = append(response.Phases[ticket.PhaseUUID], item)
+		} else {
+			response.Unphased = append(response.Unphased, item)
+		}
+	}
+
+	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode(response)
+}

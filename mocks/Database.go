@@ -15156,3 +15156,115 @@ func (_c *Database_BuildTicketArray_Call) RunAndReturn(run func([]string) []db.T
 	_c.Call.Return(run)
 	return _c
 }
+
+// GetBountiesByFeatureUuid provides a mock function with given fields: featureUuid
+func (_m *Database) GetBountiesByFeatureUuid(featureUuid string) ([]db.NewBounty, error) {
+	ret := _m.Called(featureUuid)
+
+	if len(ret) == 0 {
+		panic("no return value specified for GetBountiesByFeatureUuid")
+	}
+
+	var r0 []db.NewBounty
+	var r1 error
+	if rf, ok := ret.Get(0).(func(string) ([]db.NewBounty, error)); ok {
+		return rf(featureUuid)
+	}
+	if rf, ok := ret.Get(0).(func(string) []db.NewBounty); ok {
+		r0 = rf(featureUuid)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).([]db.NewBounty)
+		}
+	}
+
+	if rf, ok := ret.Get(1).(func(string) error); ok {
+		r1 = rf(featureUuid)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
+type Database_GetBountiesByFeatureUuid_Call struct {
+	*mock.Call
+}
+
+func (_e *Database_Expecter) GetBountiesByFeatureUuid(featureUuid interface{}) *Database_GetBountiesByFeatureUuid_Call {
+	return &Database_GetBountiesByFeatureUuid_Call{Call: _e.mock.On("GetBountiesByFeatureUuid", featureUuid)}
+}
+
+func (_c *Database_GetBountiesByFeatureUuid_Call) Run(run func(featureUuid string)) *Database_GetBountiesByFeatureUuid_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(string))
+	})
+	return _c
+}
+
+func (_c *Database_GetBountiesByFeatureUuid_Call) Return(_a0 []db.NewBounty, _a1 error) *Database_GetBountiesByFeatureUuid_Call {
+	_c.Call.Return(_a0, _a1)
+	return _c
+}
+
+func (_c *Database_GetBountiesByFeatureUuid_Call) RunAndReturn(run func(string) ([]db.NewBounty, error)) *Database_GetBountiesByFeatureUuid_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
+
+// GetTicketsByFeatureUUID provides a mock function with given fields: featureUuid
+func (_m *Database) GetTicketsByFeatureUUID(featureUuid string) ([]db.Tickets, error) {
+	ret := _m.Called(featureUuid)
+
+	if len(ret) == 0 {
+		panic("no return value specified for GetTicketsByFeatureUUID")
+	}
+
+	var r0 []db.Tickets
+	var r1 error
+	if rf, ok := ret.Get(0).(func(string) ([]db.Tickets, error)); ok {
+		return rf(featureUuid)
+	}
+	if rf, ok := ret.Get(0).(func(string) []db.Tickets); ok {
+		r0 = rf(featureUuid)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).([]db.Tickets)
+		}
+	}
+
+	if rf, ok := ret.Get(1).(func(string) error); ok {
+		r1 = rf(featureUuid)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
+type Database_GetTicketsByFeatureUUID_Call struct {
+	*mock.Call
+}
+
+func (_e *Database_Expecter) GetTicketsByFeatureUUID(featureUuid interface{}) *Database_GetTicketsByFeatureUUID_Call {
+	return &Database_GetTicketsByFeatureUUID_Call{Call: _e.mock.On("GetTicketsByFeatureUUID", featureUuid)}
+}
+
+func (_c *Database_GetTicketsByFeatureUUID_Call) Run(run func(featureUuid string)) *Database_GetTicketsByFeatureUUID_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(string))
+	})
+	return _c
+}
+
+func (_c *Database_GetTicketsByFeatureUUID_Call) Return(_a0 []db.Tickets, _a1 error) *Database_GetTicketsByFeatureUUID_Call {
+	_c.Call.Return(_a0, _a1)
+	return _c
+}
+
+func (_c *Database_GetTicketsByFeatureUUID_Call) RunAndReturn(run func(string) ([]db.Tickets, error)) *Database_GetTicketsByFeatureUUID_Call {
+	_c.Call.Return(run)
+	return _c
+}
+

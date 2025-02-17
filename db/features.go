@@ -459,3 +459,36 @@ func (db database) UpdateNotificationStatus(notificationUUID string, status stri
 	db.db.Model(&Notification{}).Where("uuid = ?", notificationUUID).
 		Updates(map[string]interface{}{"status": status, "updated_at": time.Now()})
 }
+
+func (db database) GetBountiesByFeatureUuid(featureUuid string) ([]NewBounty, error) {
+	var bounties []NewBounty
+	
+	phases := db.GetPhasesByFeatureUuid(featureUuid)
+
+	for _, phase := range phases {
+		var phaseBounties []NewBounty
+		result := db.db.Where("phase_uuid = ? AND show = true", phase.Uuid).Find(&phaseBounties)
+		if result.Error != nil {
+			return nil, fmt.Errorf("error getting bounties for phase %s: %v", phase.Uuid, result.Error)
+		}
+		bounties = append(bounties, phaseBounties...)
+	}
+
+	var unphasedBounties []NewBounty
+	result := db.db.Where("phase_uuid = '' AND feature_uuid = ? AND show = true", featureUuid).Find(&unphasedBounties)
+	if result.Error != nil {
+		return nil, fmt.Errorf("error getting unphased bounties: %v", result.Error)
+	}
+	bounties = append(bounties, unphasedBounties...)
+
+	return bounties, nil
+}
+
+func (db database) GetTicketsByFeatureUUID(featureUuid string) ([]Tickets, error) {
+	var tickets []Tickets
+	result := db.db.Where("feature_uuid = ?", featureUuid).Find(&tickets)
+	if result.Error != nil {
+		return nil, fmt.Errorf("error getting tickets: %v", result.Error)
+	}
+	return tickets, nil
+}
