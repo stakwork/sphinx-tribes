@@ -295,7 +295,7 @@ func (th *ticketHandler) DeleteTicket(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	err := th.db.DeleteTicket(uuid)
+	ticket, err := th.db.GetTicket(uuid)
 	if err != nil {
 		if err.Error() == "ticket not found" {
 			w.WriteHeader(http.StatusNotFound)
@@ -303,12 +303,24 @@ func (th *ticketHandler) DeleteTicket(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 		w.WriteHeader(http.StatusInternalServerError)
-		json.NewEncoder(w).Encode(map[string]string{"error": fmt.Sprintf("Failed to delete ticket: %v", err)})
+		json.NewEncoder(w).Encode(map[string]string{"error": fmt.Sprintf("Failed to fetch ticket: %v", err)})
 		return
 	}
 
+	if err := th.db.DeleteTicketGroup(*ticket.TicketGroup); err != nil {
+		logger.Log.Error("failed to delete ticket group",
+			"error", err,
+			"ticket_group", ticket.TicketGroup)
+		w.WriteHeader(http.StatusInternalServerError)
+		json.NewEncoder(w).Encode(map[string]string{"error": fmt.Sprintf("Failed to delete ticket group: %v", err)})
+		return
+	}
+
+	logger.Log.Info("ticket group deleted successfully",
+		"ticket_group", ticket.TicketGroup)
+
 	w.WriteHeader(http.StatusOK)
-	json.NewEncoder(w).Encode(map[string]string{"message": "Ticket deleted successfully"})
+	json.NewEncoder(w).Encode(map[string]string{"message": "Ticket group deleted successfully"})
 }
 
 func (th *ticketHandler) PostTicketDataToStakwork(w http.ResponseWriter, r *http.Request) {

@@ -388,10 +388,13 @@ func TestDeleteTicket(t *testing.T) {
 	}
 	db.TestDB.CreateOrEditFeaturePhase(featurePhase)
 
+	groupID := uuid.New()
+	
 	ticket := db.Tickets{
 		UUID:        uuid.New(),
 		FeatureUUID: feature.Uuid,
 		PhaseUUID:   featurePhase.Uuid,
+		TicketGroup: &groupID,
 		Name:        "Test Ticket",
 		Sequence:    1,
 		Description: "Test Description",
