@@ -2030,7 +2030,7 @@ func TestGetStoryByUuid(t *testing.T) {
 
 	feature := db.WorkspaceFeatures{
 		Uuid:          uuid.New().String(),
-		WorkspaceUuid: workspace.Uuid,
+			WorkspaceUuid: workspace.Uuid,
 		Name:          "test-feature",
 		Url:           "https://github.com/test-feature",
 		Priority:      0,
@@ -2089,139 +2089,139 @@ func TestGetStoryByUuid(t *testing.T) {
 
 	t.Run("Valid Request with Existing Story", func(t *testing.T) {
 		rr := httptest.NewRecorder()
-		handler := http.HandlerFunc(fHandler.GetStoryByUuid)
+        handler := http.HandlerFunc(fHandler.GetStoryByUuid)
 
+        rctx := chi.NewRouteContext()
+        rctx.URLParams.Add("feature_uuid", feature.Uuid)
+        rctx.URLParams.Add("story_uuid", featureStory.Uuid)
+        ctx := context.WithValue(context.Background(), auth.ContextKey, person.OwnerPubKey)
+        req, err := http.NewRequestWithContext(context.WithValue(ctx, chi.RouteCtxKey, rctx), 
+            http.MethodGet, "/features/"+feature.Uuid+"/story/"+featureStory.Uuid, nil)
+        assert.NoError(t, err)
+
+        handler.ServeHTTP(rr, req)
+
+        assert.Equal(t, http.StatusOK, rr.Code)
+        var returnedStory db.FeatureStory
+        err = json.Unmarshal(rr.Body.Bytes(), &returnedStory)
+        assert.NoError(t, err)
+        assert.Equal(t, featureStory.Description, returnedStory.Description)
+    })
+
+    t.Run("Valid Request with Non-Existing Story", func(t *testing.T) {
+        rr := httptest.NewRecorder()
+        handler := http.HandlerFunc(fHandler.GetStoryByUuid)
+
+        nonExistentUUID := uuid.New().String()
 		rctx := chi.NewRouteContext()
-		rctx.URLParams.Add("feature_uuid", feature.Uuid)
-		rctx.URLParams.Add("story_uuid", featureStory.Uuid)
-		ctx := context.WithValue(context.Background(), auth.ContextKey, person.OwnerPubKey)
-		req, err := http.NewRequestWithContext(context.WithValue(ctx, chi.RouteCtxKey, rctx),
-			http.MethodGet, "/features/"+feature.Uuid+"/story/"+featureStory.Uuid, nil)
-		assert.NoError(t, err)
+        rctx.URLParams.Add("feature_uuid", feature.Uuid)
+        rctx.URLParams.Add("story_uuid", nonExistentUUID)
+        ctx := context.WithValue(context.Background(), auth.ContextKey, person.OwnerPubKey)
+        req, err := http.NewRequestWithContext(context.WithValue(ctx, chi.RouteCtxKey, rctx),
+            http.MethodGet, "/features/"+feature.Uuid+"/story/"+nonExistentUUID, nil)
+        assert.NoError(t, err)
 
-		handler.ServeHTTP(rr, req)
+        handler.ServeHTTP(rr, req)
+        assert.Equal(t, http.StatusNotFound, rr.Code)
+    })
 
-		assert.Equal(t, http.StatusOK, rr.Code)
-		var returnedStory db.FeatureStory
-		err = json.Unmarshal(rr.Body.Bytes(), &returnedStory)
-		assert.NoError(t, err)
-		assert.Equal(t, featureStory.Description, returnedStory.Description)
-	})
-
-	t.Run("Valid Request with Non-Existing Story", func(t *testing.T) {
+    t.Run("Valid Request with Empty UUIDs", func(t *testing.T) {
 		rr := httptest.NewRecorder()
-		handler := http.HandlerFunc(fHandler.GetStoryByUuid)
+        handler := http.HandlerFunc(fHandler.GetStoryByUuid)
 
-		nonExistentUUID := uuid.New().String()
-		rctx := chi.NewRouteContext()
-		rctx.URLParams.Add("feature_uuid", feature.Uuid)
-		rctx.URLParams.Add("story_uuid", nonExistentUUID)
-		ctx := context.WithValue(context.Background(), auth.ContextKey, person.OwnerPubKey)
-		req, err := http.NewRequestWithContext(context.WithValue(ctx, chi.RouteCtxKey, rctx),
-			http.MethodGet, "/features/"+feature.Uuid+"/story/"+nonExistentUUID, nil)
+        rctx := chi.NewRouteContext()
+        rctx.URLParams.Add("feature_uuid", "")
+        rctx.URLParams.Add("story_uuid", "")
+        ctx := context.WithValue(context.Background(), auth.ContextKey, person.OwnerPubKey)
+        req, err := http.NewRequestWithContext(context.WithValue(ctx, chi.RouteCtxKey, rctx),
+            http.MethodGet, "/features//story/", nil)
 		assert.NoError(t, err)
 
-		handler.ServeHTTP(rr, req)
-		assert.Equal(t, http.StatusNotFound, rr.Code)
-	})
+        handler.ServeHTTP(rr, req)
+        assert.Equal(t, http.StatusNotFound, rr.Code)
+    })
 
-	t.Run("Valid Request with Empty UUIDs", func(t *testing.T) {
+    t.Run("Unauthorized Request", func(t *testing.T) {
+        rr := httptest.NewRecorder()
+        handler := http.HandlerFunc(fHandler.GetStoryByUuid)
+
+        rctx := chi.NewRouteContext()
+        rctx.URLParams.Add("feature_uuid", feature.Uuid)
+        rctx.URLParams.Add("story_uuid", featureStory.Uuid)
+        req, err := http.NewRequestWithContext(context.WithValue(context.Background(), chi.RouteCtxKey, rctx),
+            http.MethodGet, "/features/"+feature.Uuid+"/story/"+featureStory.Uuid, nil)
+        assert.NoError(t, err)
+
+        handler.ServeHTTP(rr, req)
+        assert.Equal(t, http.StatusUnauthorized, rr.Code)
+    })
+
+    t.Run("Invalid UUID Format", func(t *testing.T) {
+        rr := httptest.NewRecorder()
+        handler := http.HandlerFunc(fHandler.GetStoryByUuid)
+
+		rctx := chi.NewRouteContext()
+        rctx.URLParams.Add("feature_uuid", "invalid-uuid")
+        rctx.URLParams.Add("story_uuid", "invalid-uuid")
+        ctx := context.WithValue(context.Background(), auth.ContextKey, person.OwnerPubKey)
+        req, err := http.NewRequestWithContext(context.WithValue(ctx, chi.RouteCtxKey, rctx),
+            http.MethodGet, "/features/invalid-uuid/story/invalid-uuid", nil)
+        assert.NoError(t, err)
+
+        handler.ServeHTTP(rr, req)
+        assert.Equal(t, http.StatusNotFound, rr.Code)
+    })
+	
+    t.Run("Story with Special Characters", func(t *testing.T) {
 		rr := httptest.NewRecorder()
-		handler := http.HandlerFunc(fHandler.GetStoryByUuid)
+        handler := http.HandlerFunc(fHandler.GetStoryByUuid)
 
-		rctx := chi.NewRouteContext()
-		rctx.URLParams.Add("feature_uuid", "")
-		rctx.URLParams.Add("story_uuid", "")
-		ctx := context.WithValue(context.Background(), auth.ContextKey, person.OwnerPubKey)
-		req, err := http.NewRequestWithContext(context.WithValue(ctx, chi.RouteCtxKey, rctx),
-			http.MethodGet, "/features//story/", nil)
+        specialCharsUUID := "!@#$%^&*()"
+        rctx := chi.NewRouteContext()
+        rctx.URLParams.Add("feature_uuid", feature.Uuid)
+        rctx.URLParams.Add("story_uuid", specialCharsUUID)
+        ctx := context.WithValue(context.Background(), auth.ContextKey, person.OwnerPubKey)
+        req, err := http.NewRequestWithContext(context.WithValue(ctx, chi.RouteCtxKey, rctx),
+            http.MethodGet, "/features/"+feature.Uuid+"/story/"+url.QueryEscape(specialCharsUUID), nil)
 		assert.NoError(t, err)
 
-		handler.ServeHTTP(rr, req)
-		assert.Equal(t, http.StatusNotFound, rr.Code)
-	})
+        handler.ServeHTTP(rr, req)
+        assert.Equal(t, http.StatusNotFound, rr.Code)
+    })
 
-	t.Run("Unauthorized Request", func(t *testing.T) {
+    t.Run("Valid Request with Mixed Case UUIDs", func(t *testing.T) {
+        rr := httptest.NewRecorder()
+        handler := http.HandlerFunc(fHandler.GetStoryByUuid)
+
+        upperFeatureUUID := strings.ToUpper(feature.Uuid)
+        upperStoryUUID := strings.ToUpper(featureStory.Uuid)
+		rctx := chi.NewRouteContext()
+        rctx.URLParams.Add("feature_uuid", upperFeatureUUID)
+        rctx.URLParams.Add("story_uuid", upperStoryUUID)
+        ctx := context.WithValue(context.Background(), auth.ContextKey, person.OwnerPubKey)
+        req, err := http.NewRequestWithContext(context.WithValue(ctx, chi.RouteCtxKey, rctx),
+            http.MethodGet, "/features/"+upperFeatureUUID+"/story/"+upperStoryUUID, nil)
+        assert.NoError(t, err)
+
+        handler.ServeHTTP(rr, req)
+        assert.Equal(t, http.StatusNotFound, rr.Code)
+    })
+
+    t.Run("Request with Long UUIDs", func(t *testing.T) {
 		rr := httptest.NewRecorder()
-		handler := http.HandlerFunc(fHandler.GetStoryByUuid)
+        handler := http.HandlerFunc(fHandler.GetStoryByUuid)
 
-		rctx := chi.NewRouteContext()
-		rctx.URLParams.Add("feature_uuid", feature.Uuid)
-		rctx.URLParams.Add("story_uuid", featureStory.Uuid)
-		req, err := http.NewRequestWithContext(context.WithValue(context.Background(), chi.RouteCtxKey, rctx),
-			http.MethodGet, "/features/"+feature.Uuid+"/story/"+featureStory.Uuid, nil)
+        longUUID := feature.Uuid + "extra"
+        rctx := chi.NewRouteContext()
+        rctx.URLParams.Add("feature_uuid", longUUID)
+        rctx.URLParams.Add("story_uuid", longUUID)
+        ctx := context.WithValue(context.Background(), auth.ContextKey, person.OwnerPubKey)
+        req, err := http.NewRequestWithContext(context.WithValue(ctx, chi.RouteCtxKey, rctx),
+            http.MethodGet, "/features/"+longUUID+"/story/"+longUUID, nil)
 		assert.NoError(t, err)
 
-		handler.ServeHTTP(rr, req)
-		assert.Equal(t, http.StatusUnauthorized, rr.Code)
-	})
-
-	t.Run("Invalid UUID Format", func(t *testing.T) {
-		rr := httptest.NewRecorder()
-		handler := http.HandlerFunc(fHandler.GetStoryByUuid)
-
-		rctx := chi.NewRouteContext()
-		rctx.URLParams.Add("feature_uuid", "invalid-uuid")
-		rctx.URLParams.Add("story_uuid", "invalid-uuid")
-		ctx := context.WithValue(context.Background(), auth.ContextKey, person.OwnerPubKey)
-		req, err := http.NewRequestWithContext(context.WithValue(ctx, chi.RouteCtxKey, rctx),
-			http.MethodGet, "/features/invalid-uuid/story/invalid-uuid", nil)
-		assert.NoError(t, err)
-
-		handler.ServeHTTP(rr, req)
-		assert.Equal(t, http.StatusNotFound, rr.Code)
-	})
-
-	t.Run("Story with Special Characters", func(t *testing.T) {
-		rr := httptest.NewRecorder()
-		handler := http.HandlerFunc(fHandler.GetStoryByUuid)
-
-		specialCharsUUID := "!@#$%^&*()"
-		rctx := chi.NewRouteContext()
-		rctx.URLParams.Add("feature_uuid", feature.Uuid)
-		rctx.URLParams.Add("story_uuid", specialCharsUUID)
-		ctx := context.WithValue(context.Background(), auth.ContextKey, person.OwnerPubKey)
-		req, err := http.NewRequestWithContext(context.WithValue(ctx, chi.RouteCtxKey, rctx),
-			http.MethodGet, "/features/"+feature.Uuid+"/story/"+url.QueryEscape(specialCharsUUID), nil)
-		assert.NoError(t, err)
-
-		handler.ServeHTTP(rr, req)
-		assert.Equal(t, http.StatusNotFound, rr.Code)
-	})
-
-	t.Run("Valid Request with Mixed Case UUIDs", func(t *testing.T) {
-		rr := httptest.NewRecorder()
-		handler := http.HandlerFunc(fHandler.GetStoryByUuid)
-
-		upperFeatureUUID := strings.ToUpper(feature.Uuid)
-		upperStoryUUID := strings.ToUpper(featureStory.Uuid)
-		rctx := chi.NewRouteContext()
-		rctx.URLParams.Add("feature_uuid", upperFeatureUUID)
-		rctx.URLParams.Add("story_uuid", upperStoryUUID)
-		ctx := context.WithValue(context.Background(), auth.ContextKey, person.OwnerPubKey)
-		req, err := http.NewRequestWithContext(context.WithValue(ctx, chi.RouteCtxKey, rctx),
-			http.MethodGet, "/features/"+upperFeatureUUID+"/story/"+upperStoryUUID, nil)
-		assert.NoError(t, err)
-
-		handler.ServeHTTP(rr, req)
-		assert.Equal(t, http.StatusNotFound, rr.Code)
-	})
-
-	t.Run("Request with Long UUIDs", func(t *testing.T) {
-		rr := httptest.NewRecorder()
-		handler := http.HandlerFunc(fHandler.GetStoryByUuid)
-
-		longUUID := feature.Uuid + "extra"
-		rctx := chi.NewRouteContext()
-		rctx.URLParams.Add("feature_uuid", longUUID)
-		rctx.URLParams.Add("story_uuid", longUUID)
-		ctx := context.WithValue(context.Background(), auth.ContextKey, person.OwnerPubKey)
-		req, err := http.NewRequestWithContext(context.WithValue(ctx, chi.RouteCtxKey, rctx),
-			http.MethodGet, "/features/"+longUUID+"/story/"+longUUID, nil)
-		assert.NoError(t, err)
-
-		handler.ServeHTTP(rr, req)
-		assert.Equal(t, http.StatusNotFound, rr.Code)
+        handler.ServeHTTP(rr, req)
+        assert.Equal(t, http.StatusNotFound, rr.Code)
 	})
 }
 
