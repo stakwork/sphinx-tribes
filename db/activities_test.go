@@ -26,7 +26,6 @@ func TestValidateActivity(t *testing.T) {
 		{"Invalid ContentType", &Activity{Content: "Valid", AuthorRef: "valid_author", ContentType: "invalid_type", Author: HumansAuthor, Workspace: "valid_workspace"}, ErrInvalidContentType},
 		{"Invalid AuthorType", &Activity{Content: "Valid", AuthorRef: "valid_author", ContentType: FeatureCreation, Author: "invalid_author", Workspace: "valid_workspace"}, ErrInvalidAuthorType},
 		{"Invalid Human Author Public Key", &Activity{Content: "Valid", AuthorRef: "short_key", ContentType: FeatureCreation, Author: HumansAuthor, Workspace: "valid_workspace"}, errors.New("invalid public key format for human author")},
-		{"Invalid Hive Author UUID", &Activity{Content: "Valid", AuthorRef: "not-a-uuid", ContentType: FeatureCreation, Author: HiveAuthor, Workspace: "valid_workspace"}, errors.New("invalid UUID format for hive author")},
 		{"Valid Human Author", &Activity{Content: "Valid", AuthorRef: "abcdefghijklmnopqrstuvwxyz123456", ContentType: FeatureCreation, Author: HumansAuthor, Workspace: "valid_workspace"}, nil},
 		{"Valid Hive Author", &Activity{Content: "Valid", AuthorRef: uuid.NewString(), ContentType: FeatureCreation, Author: HiveAuthor, Workspace: "valid_workspace"}, nil},
 	}
@@ -108,18 +107,17 @@ func TestCreateActivity(t *testing.T) {
 			errorMsg:    "invalid public key format for human author",
 		},
 		{
-			name: "Invalid activity: invalid UUID for hive author",
+			name: "Valid activity: hive author with URL",
 			setup: func() *Activity {
 				return &Activity{
 					Content:     "Valid content",
 					ContentType: FeatureCreation,
 					Author:      HiveAuthor,
-					AuthorRef:   "invalid-uuid",
+					AuthorRef:   "https://example.com/hive",
 					Workspace:   "workspace-1",
 				}
 			},
-			expectError: true,
-			errorMsg:    "invalid UUID format for hive author",
+			expectError: false,
 		},
 	}
 
