@@ -8,6 +8,7 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"time"
 
 	"github.com/go-chi/chi"
 	"github.com/google/uuid"
@@ -415,7 +416,7 @@ func (th *ticketHandler) SendTicketPlanToStakwork(w http.ResponseWriter, r *http
         return
     }
 
-    webhookURL := fmt.Sprintf("%s/bounties/ticket-plan/review", host)
+    webhookURL := fmt.Sprintf("%s/bounties/ticket/plan/review", host)
 
     var schematicURL string
     if feature.WorkspaceUuid != "" {
@@ -609,5 +610,141 @@ func (th *ticketHandler) SendTicketPlanToStakwork(w http.ResponseWriter, r *http
         Success:     true,
         Message:     string(respBody),
         RequestUUID: planRequest.RequestUUID,
+    })
+}
+
+func (th *ticketHandler) ProcessTicketPlanReview(w http.ResponseWriter, r *http.Request) {
+
+    body, err := io.ReadAll(r.Body)
+    if err != nil {
+        log.Printf("Error reading request body: %v", err)
+        w.WriteHeader(http.StatusBadRequest)
+        json.NewEncoder(w).Encode(db.TicketPlanReviewResponse{
+            Success: false,
+            Message: "Error reading request body",
+            Errors:  []string{err.Error()},
+        })
+        return
+    }
+    defer r.Body.Close()
+
+    var planReview db.TicketPlanReviewRequest
+    if err := json.Unmarshal(body, &planReview); err != nil {
+        log.Printf("Error parsing request JSON: %v", err)
+        w.WriteHeader(http.StatusBadRequest)
+        json.NewEncoder(w).Encode(db.TicketPlanReviewResponse{
+            Success: false,
+            Message: "Error parsing request body",
+            Errors:  []string{err.Error()},
+        })
+        return
+    }
+
+    if len(planReview.Value.PhasePlan.StubTickets) == 0 {
+        w.WriteHeader(http.StatusBadRequest)
+        json.NewEncoder(w).Encode(db.TicketPlanReviewResponse{
+            Success: false,
+            Message: "No tickets provided in the plan",
+        })
+        return
+    }
+
+    feature := th.db.GetFeatureByUuid(planReview.Value.FeatureUUID)
+    if feature.Uuid == "" {
+        w.WriteHeader(http.StatusNotFound)
+        json.NewEncoder(w).Encode(db.TicketPlanReviewResponse{
+            Success: false,
+            Message: "Feature not found",
+        })
+        return
+    }
+
+    phase, err := th.db.GetPhaseByUuid(planReview.Value.PhaseUUID)
+    if err != nil {
+        w.WriteHeader(http.StatusNotFound)
+        json.NewEncoder(w).Encode(db.TicketPlanReviewResponse{
+            Success: false,
+            Message: "Phase not found",
+        })
+        return
+    }
+
+    var createdTickets []db.Tickets
+    for i, stub := range planReview.Value.PhasePlan.StubTickets {
+        ticketGroup := uuid.New()
+        description := fmt.Sprintf("%s\n\nReasoning: %s", stub.TicketDescription, stub.Reasoning)
+
+        ticket := db.Tickets{
+            UUID:          uuid.New(),
+            TicketGroup:   &ticketGroup,
+            WorkspaceUuid: feature.WorkspaceUuid,
+            FeatureUUID:   planReview.Value.FeatureUUID,
+            PhaseUUID:     planReview.Value.PhaseUUID,
+            Name:          stub.TicketName,
+            Sequence:      i,
+            Description:   description,
+            Status:        db.DraftTicket,
+            Version:       1,
+            Author:        (*db.Author)(nil),
+            CreatedAt:     time.Now(),
+            UpdatedAt:     time.Now(),
+        }
+
+        createdTicket, err := th.db.CreateOrEditTicket(&ticket)
+        if err != nil {
+            log.Printf("Error creating ticket: %v", err)
+            w.WriteHeader(http.StatusInternalServerError)
+            json.NewEncoder(w).Encode(db.TicketPlanReviewResponse{
+                Success: false,
+                Message: "Error creating ticket",
+                Errors:  []string{err.Error()},
+            })
+            return
+        }
+        createdTickets = append(createdTickets, createdTicket)
+
+        if planReview.SourceWebsocket != "" {
+            ticketMsg := websocket.TicketMessage{
+                BroadcastType:   "direct",
+                SourceSessionID: planReview.SourceWebsocket,
+                Message:         fmt.Sprintf("Created ticket: %s", stub.TicketName),
+                Action:          "process",
+                TicketDetails: websocket.TicketData{
+                    FeatureUUID:       planReview.Value.FeatureUUID,
+                    PhaseUUID:         planReview.Value.PhaseUUID,
+                    TicketUUID:        createdTicket.UUID.String(),
+                    TicketDescription: description,
+                    TicketName:        stub.TicketName,
+                },
+            }
+
+            if err := websocket.WebsocketPool.SendTicketMessage(ticketMsg); err != nil {
+                log.Printf("Failed to send ticket websocket message: %v", err)
+            }
+        }
+    }
+
+    if planReview.SourceWebsocket != "" {
+        completionMsg := websocket.TicketPlanMessage{
+            BroadcastType:   "direct",
+            SourceSessionID: planReview.SourceWebsocket,
+            Message:         fmt.Sprintf("Successfully created %d tickets for phase %s", len(createdTickets), phase.Name),
+            Action:          "TICKET_PLAN_COMPLETED",
+            PlanDetails: websocket.TicketPlanDetails{
+                RequestUUID:  planReview.RequestUUID,
+                FeatureUUID: planReview.Value.FeatureUUID,
+                PhaseUUID:   planReview.Value.PhaseUUID,
+            },
+        }
+
+        if err := websocket.WebsocketPool.SendTicketPlanMessage(completionMsg); err != nil {
+            log.Printf("Failed to send completion websocket message: %v", err)
+        }
+    }
+
+    w.WriteHeader(http.StatusOK)
+    json.NewEncoder(w).Encode(db.TicketPlanReviewResponse{
+        Success: true,
+        Message: fmt.Sprintf("Successfully created %d tickets", len(createdTickets)),
     })
 }

@@ -1298,6 +1298,33 @@ type TicketPlan struct {
 	UpdatedAt     time.Time         `gorm:"type:timestamp;default:current_timestamp" json:"updated_at"`
 }
 
+type StubTicket struct {
+    TicketName        string `json:"ticketName"`
+    TicketDescription string `json:"ticketDescription"`
+    Reasoning         string `json:"reasoning"`
+}
+
+type PhasePlan struct {
+    PhaseApproach string       `json:"phaseApproach"`
+    StubTickets   []StubTicket `json:"stubTickets"`
+}
+
+type TicketPlanReviewRequest struct {
+    Value struct {
+        FeatureUUID string    `json:"featureUUID"`
+        PhaseUUID   string    `json:"phaseUUID"`
+        PhasePlan   PhasePlan `json:"phasePlan"`
+    } `json:"value"`
+    RequestUUID     string `json:"requestUUID"`
+    SourceWebsocket string `json:"sourceWebsocket"`
+}
+
+type TicketPlanReviewResponse struct {
+    Success bool     `json:"success"`
+    Message string   `json:"message"`
+    Errors  []string `json:"errors,omitempty"`
+}
+
 type AuthorType string
 
 const (
