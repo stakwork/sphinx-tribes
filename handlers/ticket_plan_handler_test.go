@@ -1056,3 +1056,268 @@ func TestGetTicketPlansByWorkspace(t *testing.T) {
 		})
 	}
 }
+
+func TestProcessTicketPlanReview(t *testing.T) {
+	teardownSuite := SetupSuite(t)
+	defer teardownSuite(t)
+
+	tHandler := NewTicketHandler(&http.Client{}, db.TestDB)
+
+	person := db.Person{
+		Uuid:        uuid.New().String(),
+		OwnerAlias:  "test-alias",
+		UniqueName:  "test-unique-name",
+		OwnerPubKey: "test-pubkey",
+		PriceToMeet: 0,
+		Description: "test-description",
+	}
+	_, err := db.TestDB.CreateOrEditPerson(person)
+	require.NoError(t, err)
+
+	workspace := db.Workspace{
+		Uuid:        uuid.New().String(),
+		Name:        "test-workspace" + uuid.New().String(),
+		OwnerPubKey: person.OwnerPubKey,
+		Github:      "https://github.com/test",
+		Website:     "https://www.testwebsite.com",
+		Description: "test-description",
+	}
+	_, err = db.TestDB.CreateOrEditWorkspace(workspace)
+	require.NoError(t, err)
+
+	feature := db.WorkspaceFeatures{
+		Uuid:          uuid.New().String(),
+		WorkspaceUuid: workspace.Uuid,
+		Name:          "test-feature",
+		Url:           "https://github.com/test-feature",
+		Priority:      0,
+	}
+	createdFeature, err := db.TestDB.CreateOrEditFeature(feature)
+	require.NoError(t, err)
+
+	featurePhase := db.FeaturePhase{
+		Uuid:        uuid.New().String(),
+		FeatureUuid: feature.Uuid,
+		Name:        "test-phase",
+		Priority:    0,
+	}
+	createdPhase, err := db.TestDB.CreateOrEditFeaturePhase(featurePhase)
+	require.NoError(t, err)
+
+	tests := []struct {
+		name           string
+		requestBody    interface{}
+		expectedStatus int
+		expectedBody   func(*testing.T, *httptest.ResponseRecorder)
+	}{
+		{
+			name: "successful ticket plan review",
+			requestBody: db.TicketPlanReviewRequest{
+				Value: struct {
+					FeatureUUID string       `json:"featureUUID"`
+					PhaseUUID   string       `json:"phaseUUID"`
+					PhasePlan   db.PhasePlan `json:"phasePlan"`
+				}{
+					FeatureUUID: createdFeature.Uuid,
+					PhaseUUID:   createdPhase.Uuid,
+					PhasePlan: db.PhasePlan{
+						StubTickets: []db.StubTicket{
+							{
+								TicketName:        "Test Ticket 1",
+								TicketDescription: "Test Description 1",
+								Reasoning:         "Test Reasoning 1",
+							},
+							{
+								TicketName:        "Test Ticket 2",
+								TicketDescription: "Test Description 2",
+								Reasoning:         "Test Reasoning 2",
+							},
+						},
+					},
+				},
+				SourceWebsocket: "test-websocket",
+				RequestUUID:     uuid.New().String(),
+			},
+			expectedStatus: http.StatusOK,
+			expectedBody: func(t *testing.T, rr *httptest.ResponseRecorder) {
+				var response db.TicketPlanReviewResponse
+				err := json.Unmarshal(rr.Body.Bytes(), &response)
+				require.NoError(t, err)
+
+				assert.True(t, response.Success)
+				assert.Contains(t, response.Message, "Successfully created 2 tickets")
+
+				tickets, err := db.TestDB.GetTicketsByFeatureUUID(createdFeature.Uuid)
+				require.NoError(t, err)
+				assert.Equal(t, 2, len(tickets))
+
+				ticketNames := map[string]bool{
+					"Test Ticket 1": false,
+					"Test Ticket 2": false,
+				}
+				for _, ticket := range tickets {
+					ticketNames[ticket.Name] = true
+					assert.Contains(t, ticket.Description, "Reasoning:")
+					assert.Equal(t, db.DraftTicket, ticket.Status)
+					assert.NotNil(t, ticket.TicketGroup)
+				}
+				assert.True(t, ticketNames["Test Ticket 1"])
+				assert.True(t, ticketNames["Test Ticket 2"])
+			},
+		},
+		{
+            name: "Empty stub tickets",
+            requestBody: db.TicketPlanReviewRequest{
+                Value: struct {
+                    FeatureUUID string    `json:"featureUUID"`
+                    PhaseUUID   string    `json:"phaseUUID"`
+                    PhasePlan   db.PhasePlan `json:"phasePlan"`
+                }{
+                    FeatureUUID: createdFeature.Uuid,
+                    PhaseUUID:   createdPhase.Uuid,
+                    PhasePlan: db.PhasePlan{
+                        StubTickets: []db.StubTicket{},
+                    },
+                },
+            },
+            expectedStatus: http.StatusBadRequest,
+            expectedBody: func(t *testing.T, rr *httptest.ResponseRecorder) {
+                var response db.TicketPlanReviewResponse
+                err := json.Unmarshal(rr.Body.Bytes(), &response)
+                require.NoError(t, err)
+                assert.False(t, response.Success)
+                assert.Contains(t, response.Message, "No tickets provided in the plan")
+            },
+        },
+		{
+			name:           "Malformed JSON",
+			requestBody:    "{invalid-json}",
+			expectedStatus: http.StatusBadRequest,
+			expectedBody: func(t *testing.T, rr *httptest.ResponseRecorder) {
+				var response db.TicketPlanReviewResponse
+				err := json.Unmarshal(rr.Body.Bytes(), &response)
+				require.NoError(t, err)
+				assert.False(t, response.Success)
+				assert.Contains(t, response.Message, "Error parsing request body")
+			},
+		},
+		{
+			name: "Invalid Feature UUID",
+			requestBody: db.TicketPlanReviewRequest{
+				Value: struct {
+					FeatureUUID string       `json:"featureUUID"`
+					PhaseUUID   string       `json:"phaseUUID"`
+					PhasePlan   db.PhasePlan `json:"phasePlan"`
+				}{
+					FeatureUUID: uuid.New().String(),
+					PhaseUUID:   createdPhase.Uuid,
+					PhasePlan: db.PhasePlan{
+						StubTickets: []db.StubTicket{
+							{
+								TicketName:        "Test Ticket",
+								TicketDescription: "Test Description",
+								Reasoning:         "Test Reasoning",
+							},
+						},
+					},
+				},
+			},
+			expectedStatus: http.StatusNotFound,
+			expectedBody: func(t *testing.T, rr *httptest.ResponseRecorder) {
+				var response db.TicketPlanReviewResponse
+				err := json.Unmarshal(rr.Body.Bytes(), &response)
+				require.NoError(t, err)
+				assert.False(t, response.Success)
+				assert.Equal(t, "Feature not found", response.Message)
+			},
+		},
+		{
+			name: "Invalid Phase UUID",
+			requestBody: db.TicketPlanReviewRequest{
+				Value: struct {
+					FeatureUUID string       `json:"featureUUID"`
+					PhaseUUID   string       `json:"phaseUUID"`
+					PhasePlan   db.PhasePlan `json:"phasePlan"`
+				}{
+					FeatureUUID: createdFeature.Uuid,
+					PhaseUUID:   uuid.New().String(),
+					PhasePlan: db.PhasePlan{
+						StubTickets: []db.StubTicket{
+							{
+								TicketName:        "Test Ticket",
+								TicketDescription: "Test Description",
+								Reasoning:         "Test Reasoning",
+							},
+						},
+					},
+				},
+			},
+			expectedStatus: http.StatusNotFound,
+			expectedBody: func(t *testing.T, rr *httptest.ResponseRecorder) {
+				var response db.TicketPlanReviewResponse
+				err := json.Unmarshal(rr.Body.Bytes(), &response)
+				require.NoError(t, err)
+				assert.False(t, response.Success)
+				assert.Equal(t, "Phase not found", response.Message)
+			},
+		},
+		{
+			name: "Websocket Notification Test",
+			requestBody: db.TicketPlanReviewRequest{
+				Value: struct {
+					FeatureUUID string       `json:"featureUUID"`
+					PhaseUUID   string       `json:"phaseUUID"`
+					PhasePlan   db.PhasePlan `json:"phasePlan"`
+				}{
+					FeatureUUID: createdFeature.Uuid,
+					PhaseUUID:   createdPhase.Uuid,
+					PhasePlan: db.PhasePlan{
+						StubTickets: []db.StubTicket{
+							{
+								TicketName:        "Test Ticket",
+								TicketDescription: "Test Description",
+								Reasoning:         "Test Reasoning",
+							},
+						},
+					},
+				},
+				SourceWebsocket: "non-existent-socket",
+				RequestUUID:     uuid.New().String(),
+			},
+			expectedStatus: http.StatusOK,
+			expectedBody: func(t *testing.T, rr *httptest.ResponseRecorder) {
+				var response db.TicketPlanReviewResponse
+				err := json.Unmarshal(rr.Body.Bytes(), &response)
+				require.NoError(t, err)
+				assert.True(t, response.Success)
+				assert.Contains(t, response.Message, "Successfully created 1 ticket")
+			},
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			rr := httptest.NewRecorder()
+
+			r := chi.NewRouter()
+			r.Mount("/bounties/ticket", func() http.Handler {
+				r := chi.NewRouter()
+				r.Post("/plan/review", tHandler.ProcessTicketPlanReview)
+				return r
+			}())
+
+			var req *http.Request
+			if tt.requestBody != nil {
+				requestBody, _ := json.Marshal(tt.requestBody)
+				req = httptest.NewRequest(http.MethodPost, "/bounties/ticket/plan/review", bytes.NewBuffer(requestBody))
+				req.Header.Set("Content-Type", "application/json")
+			} else {
+				req = httptest.NewRequest(http.MethodPost, "/bounties/ticket/plan/review", nil)
+			}
+
+			r.ServeHTTP(rr, req)
+			assert.Equal(t, tt.expectedStatus, rr.Code)
+			tt.expectedBody(t, rr)
+		})
+	}
+}

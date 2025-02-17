@@ -640,6 +640,15 @@ func (th *ticketHandler) ProcessTicketPlanReview(w http.ResponseWriter, r *http.
         return
     }
 
+    if len(planReview.Value.PhasePlan.StubTickets) == 0 {
+        w.WriteHeader(http.StatusBadRequest)
+        json.NewEncoder(w).Encode(db.TicketPlanReviewResponse{
+            Success: false,
+            Message: "No tickets provided in the plan",
+        })
+        return
+    }
+
     feature := th.db.GetFeatureByUuid(planReview.Value.FeatureUUID)
     if feature.Uuid == "" {
         w.WriteHeader(http.StatusNotFound)
