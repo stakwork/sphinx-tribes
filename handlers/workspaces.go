@@ -505,16 +505,34 @@ func (oh *workspaceHandler) GetUserDropdownWorkspaces(w http.ResponseWriter, r *
 		hasRole := oh.configUserHasAccess(user.OwnerPubKey, uuid, db.ViewReport)
 		hasBountyRoles := oh.configUserHasManageBountyRoles(user.OwnerPubKey, uuid)
 
+		alreadyAdded := false
+
+		if workspace.OwnerPubKey == user.OwnerPubKey {
+			alreadyAdded = true
+		}
+
 		// don't add deleted workspaces to the list
 		if !workspace.Deleted && hasBountyRoles {
-			if hasRole {
+
+			// check if workspace has already been added to the list
+			for _, existingWorkspace := range workspaces {
+				if existingWorkspace.Uuid == workspace.Uuid {
+					alreadyAdded = true
+				}
+			}
+
+			if hasRole && !alreadyAdded {
 				budget := oh.db.GetWorkspaceBudget(uuid)
 				workspace.Budget = budget.TotalBudget
 			} else {
 				workspace.Budget = 0
 			}
+
 			workspace.BountyCount = bountyCount
-			workspaces = append(workspaces, workspace)
+
+			if !alreadyAdded {
+				workspaces = append(workspaces, workspace)
+			}
 		}
 	}
 
