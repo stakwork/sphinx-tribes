@@ -16,6 +16,7 @@ func TicketRoutes() chi.Router {
 	r.Group(func(r chi.Router) {
 		r.Get("/{uuid}", ticketHandler.GetTicket)
 		r.Post("/review", ticketHandler.ProcessTicketReview)
+		r.Post("/plan/review", ticketHandler.ProcessTicketPlanReview)
 	})
 
 	r.Group(func(r chi.Router) {
