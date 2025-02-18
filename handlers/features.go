@@ -977,6 +977,8 @@ func (oh *featureHandler) GetQuickTickets(w http.ResponseWriter, r *http.Request
 		Unphased:  make([]db.QuickTicketItem, 0),
 	}
 
+	latestTickets := make(map[string]db.QuickTicketItem)
+
 	for _, ticket := range tickets {
 		var phaseID *string
 		if ticket.PhaseUUID != "" {
@@ -992,8 +994,14 @@ func (oh *featureHandler) GetQuickTickets(w http.ResponseWriter, r *http.Request
 			PhaseID:       phaseID,
 		}
 
-		if ticket.PhaseUUID != "" {
-			response.Phases[ticket.PhaseUUID] = append(response.Phases[ticket.PhaseUUID], item)
+		if existingItem, exists := latestTickets[ticket.TicketGroup.String()]; !exists || ticket.UUID.String() > existingItem.TicketUUID.String() {
+			latestTickets[ticket.TicketGroup.String()] = item
+		}
+	}
+
+	for _, item := range latestTickets {
+		if item.PhaseID != nil {
+			response.Phases[*item.PhaseID] = append(response.Phases[*item.PhaseID], item)
 		} else {
 			response.Unphased = append(response.Unphased, item)
 		}
