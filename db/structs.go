@@ -1031,6 +1031,15 @@ const (
 	AgentAuthor Author = "AGENT"
 )
 
+type Category string
+
+const (
+	WebDevelopment     Category = "Web development"
+	BackendDevelopment Category = "Backend development"
+	Design             Category = "Design"
+	Other              Category = "Other"
+)
+
 type Tickets struct {
 	UUID          uuid.UUID         `gorm:"primaryKey;type:uuid"`
 	TicketGroup   *uuid.UUID        `gorm:"type:uuid;index:group_index" json:"ticket_group,omitempty"`
@@ -1047,13 +1056,15 @@ type Tickets struct {
 	Version       int               `gorm:"type:integer;default:0" json:"version"`
 	Author        *Author           `gorm:"type:varchar(50)" json:"author,omitempty"`
 	AuthorID      *string           `gorm:"type:varchar(255)" json:"author_id,omitempty"`
+	Amount        *int64            `gorm:"type:bigint;default:null" json:"amount,omitempty"`
+	Category      *Category         `gorm:"type:varchar(50);default:null" json:"category,omitempty"`
 	CreatedAt     time.Time         `gorm:"type:timestamp;default:current_timestamp" json:"created_at"`
 	UpdatedAt     time.Time         `gorm:"type:timestamp;default:current_timestamp" json:"updated_at"`
 }
 
 type TicketArrayItem struct {
-    TicketName        string `json:"ticket_name"`
-    TicketDescription string `json:"ticket_description"`
+	TicketName        string `json:"ticket_name"`
+	TicketDescription string `json:"ticket_description"`
 }
 
 type BroadcastType string
@@ -1299,30 +1310,30 @@ type TicketPlan struct {
 }
 
 type StubTicket struct {
-    TicketName        string `json:"ticketName"`
-    TicketDescription string `json:"ticketDescription"`
-    Reasoning         string `json:"reasoning"`
+	TicketName        string `json:"ticketName"`
+	TicketDescription string `json:"ticketDescription"`
+	Reasoning         string `json:"reasoning"`
 }
 
 type PhasePlan struct {
-    PhaseApproach string       `json:"phaseApproach"`
-    StubTickets   []StubTicket `json:"stubTickets"`
+	PhaseApproach string       `json:"phaseApproach"`
+	StubTickets   []StubTicket `json:"stubTickets"`
 }
 
 type TicketPlanReviewRequest struct {
-    Value struct {
-        FeatureUUID string    `json:"featureUUID"`
-        PhaseUUID   string    `json:"phaseUUID"`
-        PhasePlan   PhasePlan `json:"phasePlan"`
-    } `json:"value"`
-    RequestUUID     string `json:"requestUUID"`
-    SourceWebsocket string `json:"sourceWebsocket"`
+	Value struct {
+		FeatureUUID string    `json:"featureUUID"`
+		PhaseUUID   string    `json:"phaseUUID"`
+		PhasePlan   PhasePlan `json:"phasePlan"`
+	} `json:"value"`
+	RequestUUID     string `json:"requestUUID"`
+	SourceWebsocket string `json:"sourceWebsocket"`
 }
 
 type TicketPlanReviewResponse struct {
-    Success bool     `json:"success"`
-    Message string   `json:"message"`
-    Errors  []string `json:"errors,omitempty"`
+	Success bool     `json:"success"`
+	Message string   `json:"message"`
+	Errors  []string `json:"errors,omitempty"`
 }
 
 type AuthorType string
@@ -1368,31 +1379,31 @@ type NodeData struct {
 }
 
 type QuickBountyItem struct {
-    BountyID      uint          `json:"bountyID"`
-    BountyTitle   string        `json:"bountyTitle"`
-    Status        BountyStatus  `json:"status"`
-    AssignedAlias *string       `json:"assignedAlias"`
-    PhaseID       *string       `json:"phaseID"`
+	BountyID      uint         `json:"bountyID"`
+	BountyTitle   string       `json:"bountyTitle"`
+	Status        BountyStatus `json:"status"`
+	AssignedAlias *string      `json:"assignedAlias"`
+	PhaseID       *string      `json:"phaseID"`
 }
 
 type QuickBountiesResponse struct {
-    FeatureID string                       `json:"featureID"`
-    Phases    map[string][]QuickBountyItem `json:"phases"`    
-    Unphased  []QuickBountyItem            `json:"unphased"`
+	FeatureID string                       `json:"featureID"`
+	Phases    map[string][]QuickBountyItem `json:"phases"`
+	Unphased  []QuickBountyItem            `json:"unphased"`
 }
 
 type QuickTicketItem struct {
-    TicketUUID    uuid.UUID    `json:"ticketUUID"`
-    TicketTitle   string       `json:"ticketTitle"`
-    Status        BountyStatus   `json:"status"`
-    AssignedAlias *string      `json:"assignedAlias"`
-    PhaseID       *string      `json:"phaseID"`
+	TicketUUID    uuid.UUID    `json:"ticketUUID"`
+	TicketTitle   string       `json:"ticketTitle"`
+	Status        BountyStatus `json:"status"`
+	AssignedAlias *string      `json:"assignedAlias"`
+	PhaseID       *string      `json:"phaseID"`
 }
 
 type QuickTicketsResponse struct {
-    FeatureID string                       `json:"featureID"`
-    Phases    map[string][]QuickTicketItem `json:"phases"`    
-    Unphased  []QuickTicketItem            `json:"unphased"`
+	FeatureID string                       `json:"featureID"`
+	Phases    map[string][]QuickTicketItem `json:"phases"`
+	Unphased  []QuickTicketItem            `json:"unphased"`
 }
 
 type Node struct {
