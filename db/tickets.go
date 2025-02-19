@@ -214,6 +214,16 @@ func (db database) CreateBountyFromTicket(ticket Tickets, pubkey string) (*NewBo
 
 	feature := db.GetFeatureByUuid(ticket.FeatureUUID)
 
+	price := uint(21)
+	if ticket.Amount != nil {
+		price = uint(*ticket.Amount)
+	}
+
+	wantedType := "Other"
+	if ticket.Category != nil {
+		wantedType = string(*ticket.Category)
+	}
+
 	bounty := &NewBounty{
 		Title:           ticket.Name,
 		Description:     ticket.Description,
@@ -222,8 +232,8 @@ func (db database) CreateBountyFromTicket(ticket Tickets, pubkey string) (*NewBo
 		WorkspaceUuid:   feature.WorkspaceUuid,
 		OwnerID:         pubkey,
 		Type:            "freelance_job_request",
-		WantedType:      "Other",
-		Price:           21,
+		WantedType:      wantedType,
+		Price:           price,
 		Created:         now.Unix(),
 		Updated:         &now,
 		Show:            true,
