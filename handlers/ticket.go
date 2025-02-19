@@ -63,6 +63,26 @@ type CreateBountyResponse struct {
 	Message  string `json:"message"`
 }
 
+type BulkTicketToBountyRequest struct {
+	TicketsToBounties []TicketToBountyItem `json:"tickets_to_bounties"`
+}
+
+type TicketToBountyItem struct {
+	TicketUUID string `json:"ticketUUID"`
+}
+
+type BulkConversionResult struct {
+	BountyID uint   `json:"bounty_id,omitempty"`
+	Success  bool   `json:"success"`
+	Message  string `json:"message"`
+}
+
+type BulkConversionResponse struct {
+	Results []BulkConversionResult `json:"results"`
+	Success bool                   `json:"success"`
+	Message string                 `json:"message"`
+}
+
 func (th *ticketHandler) GetTicket(w http.ResponseWriter, r *http.Request) {
 	uuid := chi.URLParam(r, "uuid")
 	if uuid == "" {
@@ -1141,4 +1161,87 @@ func (th *ticketHandler) DeleteWorkspaceDraftTicket(w http.ResponseWriter, r *ht
 	}
 
 	w.WriteHeader(http.StatusNoContent)
+}
+
+func (th *ticketHandler) TicketsToBounties(w http.ResponseWriter, r *http.Request) {
+
+	ctx := r.Context()
+	pubKeyFromAuth, _ := ctx.Value(auth.ContextKey).(string)
+	if pubKeyFromAuth == "" {
+		w.WriteHeader(http.StatusUnauthorized)
+		json.NewEncoder(w).Encode(BulkConversionResponse{
+			Success: false,
+			Message: "Unauthorized",
+		})
+		return
+	}
+
+	var req BulkTicketToBountyRequest
+	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
+		w.WriteHeader(http.StatusBadRequest)
+		json.NewEncoder(w).Encode(BulkConversionResponse{
+			Success: false,
+			Message: "Invalid request body",
+		})
+		return
+	}
+
+	if len(req.TicketsToBounties) == 0 {
+		w.WriteHeader(http.StatusBadRequest)
+		json.NewEncoder(w).Encode(BulkConversionResponse{
+			Success: false,
+			Message: "No tickets provided for conversion",
+		})
+		return
+	}
+
+	results := make([]BulkConversionResult, 0, len(req.TicketsToBounties))
+	for _, item := range req.TicketsToBounties {
+		result := BulkConversionResult{Success: false}
+
+		ticket, err := th.db.GetTicket(item.TicketUUID)
+		if err != nil {
+			result.Message = fmt.Sprintf("Failed to fetch ticket: %v", err)
+			results = append(results, result)
+			continue
+		}
+
+		bounty, err := th.db.CreateBountyFromTicket(ticket, pubKeyFromAuth)
+		if err != nil {
+			result.Message = fmt.Sprintf("Failed to create bounty: %v", err)
+			results = append(results, result)
+			continue
+		}
+
+		if ticket.TicketGroup != nil {
+			if err := th.db.DeleteTicketGroup(*ticket.TicketGroup); err != nil {
+				result.Success = true
+				result.BountyID = bounty.ID
+				result.Message = "Bounty created successfully, but failed to delete original ticket"
+				results = append(results, result)
+				continue
+			}
+		}
+
+		result.Success = true
+		result.BountyID = bounty.ID
+		result.Message = "Bounty created successfully and ticket deleted"
+		results = append(results, result)
+	}
+
+	allSuccessful := true
+	for _, result := range results {
+		if !result.Success {
+			allSuccessful = false
+			break
+		}
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode(BulkConversionResponse{
+		Results: results,
+		Success: allSuccessful,
+		Message: "Bulk conversion completed",
+	})
 }
