@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"net/http"
 	"net/http/httptest"
+	"strings"
 	"testing"
 	"time"
 
@@ -1594,6 +1595,238 @@ func TestDeleteWorkspaceDraftTicket(t *testing.T) {
 			}
 
 			tHandler.DeleteWorkspaceDraftTicket(rr, req)
+
+			assert.Equal(t, tt.expectedCode, rr.Code)
+			if tt.validateResp != nil {
+				tt.validateResp(t, rr)
+			}
+		})
+	}
+}
+
+func TestTicketsToBounties(t *testing.T) {
+	teardownSuite := SetupSuite(t)
+	defer teardownSuite(t)
+
+	tHandler := NewTicketHandler(&http.Client{}, db.TestDB)
+
+	person := db.Person{
+		Uuid:        uuid.New().String(),
+		OwnerAlias:  "test-alias",
+		UniqueName:  "test-unique-name",
+		OwnerPubKey: "test-pubkey",
+	}
+	_, err := db.TestDB.CreateOrEditPerson(person)
+	require.NoError(t, err)
+
+	workspace := db.Workspace{
+		Uuid:        uuid.New().String(),
+		Name:        "test-workspace" + uuid.New().String(),
+		OwnerPubKey: person.OwnerPubKey,
+	}
+	_, err = db.TestDB.CreateOrEditWorkspace(workspace)
+	require.NoError(t, err)
+
+	feature := db.WorkspaceFeatures{
+		Uuid:          uuid.New().String(),
+		WorkspaceUuid: workspace.Uuid,
+		Name:          "test-feature",
+	}
+	_, err = db.TestDB.CreateOrEditFeature(feature)
+	require.NoError(t, err)
+
+	phase := db.FeaturePhase{
+		Uuid:        uuid.New().String(),
+		FeatureUuid: feature.Uuid,
+		Name:        "test-phase",
+	}
+	_, err = db.TestDB.CreateOrEditFeaturePhase(phase)
+	require.NoError(t, err)
+
+	groupID := uuid.New()
+	ticket1 := db.Tickets{
+		UUID:        uuid.New(),
+		FeatureUUID: feature.Uuid,
+		PhaseUUID:   phase.Uuid,
+		TicketGroup: &groupID,
+		Name:        "Test Ticket 1",
+		Description: "Test Description 1",
+		Status:      db.DraftTicket,
+	}
+	createdTicket1, err := db.TestDB.UpdateTicket(ticket1)
+	require.NoError(t, err)
+	
+	groupID2 := uuid.New()
+	ticket2 := db.Tickets{
+		UUID:        uuid.New(),
+		FeatureUUID: feature.Uuid,
+		PhaseUUID:   phase.Uuid,
+		TicketGroup: &groupID2,
+		Name:        "Test Ticket 2",
+		Description: "Test Description 2",
+		Status:      db.DraftTicket,
+	}
+	createdTicket2, err := db.TestDB.UpdateTicket(ticket2)
+	require.NoError(t, err)
+	
+	groupID3 := uuid.New()
+	ticket3 := db.Tickets{
+		UUID:        uuid.New(),
+		FeatureUUID: feature.Uuid,
+		PhaseUUID:   phase.Uuid,
+		TicketGroup: &groupID3,
+		Name:        "Test Ticket 3",
+		Description: "Test Description 3",
+		Status:      db.DraftTicket,
+	}
+	createdTicket3, err := db.TestDB.UpdateTicket(ticket3)
+	require.NoError(t, err)	
+
+	tests := []struct {
+		name           string
+		auth          string
+		requestBody   interface{}
+		expectedCode  int
+		validateResp  func(*testing.T, *httptest.ResponseRecorder)
+	}{
+		{
+			name: "unauthorized",
+			auth: "",
+			requestBody: BulkTicketToBountyRequest{
+				TicketsToBounties: []TicketToBountyItem{
+					{TicketUUID: createdTicket1.UUID.String()},
+				},
+			},
+			expectedCode: http.StatusUnauthorized,
+			validateResp: func(t *testing.T, rr *httptest.ResponseRecorder) {
+				var response BulkConversionResponse
+				err := json.NewDecoder(rr.Body).Decode(&response)
+				require.NoError(t, err)
+				assert.False(t, response.Success)
+				assert.Equal(t, "Unauthorized", response.Message)
+			},
+		},
+		{
+			name: "invalid request body",
+			auth: person.OwnerPubKey,
+			requestBody: "invalid json",
+			expectedCode: http.StatusBadRequest,
+			validateResp: func(t *testing.T, rr *httptest.ResponseRecorder) {
+				var response BulkConversionResponse
+				err := json.NewDecoder(rr.Body).Decode(&response)
+				require.NoError(t, err)
+				assert.False(t, response.Success)
+				assert.Equal(t, "Invalid request body", response.Message)
+			},
+		},
+		{
+			name: "empty tickets list",
+			auth: person.OwnerPubKey,
+			requestBody: BulkTicketToBountyRequest{
+				TicketsToBounties: []TicketToBountyItem{},
+			},
+			expectedCode: http.StatusBadRequest,
+			validateResp: func(t *testing.T, rr *httptest.ResponseRecorder) {
+				var response BulkConversionResponse
+				err := json.NewDecoder(rr.Body).Decode(&response)
+				require.NoError(t, err)
+				assert.False(t, response.Success)
+				assert.Equal(t, "No tickets provided for conversion", response.Message)
+			},
+		},
+		{
+			name: "non-existent ticket",
+			auth: person.OwnerPubKey,
+			requestBody: BulkTicketToBountyRequest{
+				TicketsToBounties: []TicketToBountyItem{
+					{TicketUUID: uuid.New().String()},
+				},
+			},
+			expectedCode: http.StatusOK,
+			validateResp: func(t *testing.T, rr *httptest.ResponseRecorder) {
+				var response BulkConversionResponse
+				err := json.NewDecoder(rr.Body).Decode(&response)
+				require.NoError(t, err)
+				assert.False(t, response.Success)
+				assert.Len(t, response.Results, 1)
+				assert.False(t, response.Results[0].Success)
+				assert.Contains(t, response.Results[0].Message, "Failed to fetch ticket")
+			},
+		},
+		{
+			name: "successful conversion - single ticket",
+			auth: person.OwnerPubKey,
+			requestBody: BulkTicketToBountyRequest{
+				TicketsToBounties: []TicketToBountyItem{
+					{TicketUUID: createdTicket1.UUID.String()},
+				},
+			},
+			expectedCode: http.StatusOK,
+			validateResp: func(t *testing.T, rr *httptest.ResponseRecorder) {
+				var response BulkConversionResponse
+				err := json.NewDecoder(rr.Body).Decode(&response)
+				require.NoError(t, err)
+				assert.True(t, response.Success)
+				assert.Len(t, response.Results, 1)
+				assert.True(t, response.Results[0].Success)
+				assert.NotZero(t, response.Results[0].BountyID)
+				assert.Equal(t, "Bounty created successfully and ticket deleted", response.Results[0].Message)
+
+				_, err = db.TestDB.GetTicket(createdTicket1.UUID.String())
+				assert.Error(t, err)
+			},
+		},
+		{
+			name: "successful conversion - multiple tickets",
+			auth: person.OwnerPubKey,
+			requestBody: BulkTicketToBountyRequest{
+				TicketsToBounties: []TicketToBountyItem{
+					{TicketUUID: createdTicket2.UUID.String()},
+					{TicketUUID: createdTicket3.UUID.String()},
+				},
+			},
+			expectedCode: http.StatusOK,
+			validateResp: func(t *testing.T, rr *httptest.ResponseRecorder) {
+				var response BulkConversionResponse
+				err := json.NewDecoder(rr.Body).Decode(&response)
+				require.NoError(t, err)
+				assert.True(t, response.Success)
+				assert.Len(t, response.Results, 2)
+				
+				assert.True(t, response.Results[0].Success)
+				assert.NotZero(t, response.Results[0].BountyID)
+				assert.Equal(t, "Bounty created successfully and ticket deleted", response.Results[0].Message)
+				
+				assert.True(t, response.Results[1].Success)
+				assert.NotZero(t, response.Results[1].BountyID)
+				assert.Equal(t, "Bounty created successfully and ticket deleted", response.Results[1].Message)
+		
+				_, err = db.TestDB.GetTicket(createdTicket2.UUID.String())
+				assert.Error(t, err)
+				_, err = db.TestDB.GetTicket(createdTicket3.UUID.String())
+				assert.Error(t, err)
+			},
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			rr := httptest.NewRecorder()
+
+			var req *http.Request
+			if requestBody, ok := tt.requestBody.(string); ok {
+				req = httptest.NewRequest(http.MethodPost, "/bounty/bulk", strings.NewReader(requestBody))
+			} else {
+				requestBodyBytes, err := json.Marshal(tt.requestBody)
+				require.NoError(t, err)
+				req = httptest.NewRequest(http.MethodPost, "/bounty/bulk", bytes.NewReader(requestBodyBytes))
+			}
+
+			if tt.auth != "" {
+				req = req.WithContext(context.WithValue(req.Context(), auth.ContextKey, tt.auth))
+			}
+
+			tHandler.TicketsToBounties(rr, req)
 
 			assert.Equal(t, tt.expectedCode, rr.Code)
 			if tt.validateResp != nil {
