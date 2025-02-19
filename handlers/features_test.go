@@ -5592,13 +5592,17 @@ func TestGetQuickTickets(t *testing.T) {
 	t.Run("should return correct response for feature with phased ticket", func(t *testing.T) {
 
 		ticketUUID := uuid.New()
+		ticketGroupUUID := uuid.New()
+
 		ticket := db.Tickets{
-			UUID:        ticketUUID,
-			FeatureUUID: feature.Uuid,
-			PhaseUUID:   phase.Uuid,
-			Name:        "test phased ticket",
-			CreatedAt:   now,
-			UpdatedAt:   now,
+			UUID:          ticketUUID,
+			TicketGroup:   &ticketGroupUUID,
+			FeatureUUID:   feature.Uuid,
+			PhaseUUID:     phase.Uuid,
+			Name:          "test phased ticket",
+			CreatedAt:     now,
+			UpdatedAt:     now,
+			Version:       1,
 		}
 		_, err := db.TestDB.CreateOrEditTicket(&ticket)
 		assert.NoError(t, err)
@@ -5606,6 +5610,7 @@ func TestGetQuickTickets(t *testing.T) {
 		savedTicket, err := db.TestDB.GetTicket(ticketUUID.String())
 		assert.NoError(t, err)
 		assert.Equal(t, ticket.Name, savedTicket.Name)
+		assert.Equal(t, ticketGroupUUID, *savedTicket.TicketGroup)
 
 		rr := httptest.NewRecorder()
 		req := httptest.NewRequest(http.MethodGet, "/features/"+feature.Uuid+"/quick-tickets", nil)
@@ -5626,6 +5631,7 @@ func TestGetQuickTickets(t *testing.T) {
 		assert.NoError(t, err)
 
 		t.Logf("Ticket UUID: %s", ticketUUID.String())
+		t.Logf("Ticket Group UUID: %s", ticketGroupUUID.String())
 		t.Logf("Response: %+v", response)
 
 		assert.Equal(t, feature.Uuid, response.FeatureID)
