@@ -845,7 +845,7 @@ func TestProcessTicketReview(t *testing.T) {
 	require.NoError(t, err)
 
 	amount := int64(30)
-	category := utils.BackendDevelopment
+	category := db.BackendDevelopment
 
 	ticket := db.Tickets{
 		UUID:        uuid.New(),
@@ -874,13 +874,11 @@ func TestProcessTicketReview(t *testing.T) {
 			name: "Valid Request",
 			requestBody: utils.TicketReviewRequest{
 				Value: struct {
-					FeatureUUID       string          `json:"featureUUID"`
-					PhaseUUID         string          `json:"phaseUUID"`
-					TicketUUID        string          `json:"ticketUUID" validate:"required"`
-					TicketDescription string          `json:"ticketDescription" validate:"required"`
-					TicketName        string          `json:"ticketName,omitempty"`
-					TicketAmount      *int64          `json:"ticketAmount,omitempty"`
-					TicketCategory    *utils.Category `json:"ticketCategory,omitempty"`
+					FeatureUUID       string `json:"featureUUID"`
+					PhaseUUID         string `json:"phaseUUID"`
+					TicketUUID        string `json:"ticketUUID" validate:"required"`
+					TicketDescription string `json:"ticketDescription" validate:"required"`
+					TicketName        string `json:"ticketName,omitempty"`
 				}{
 					FeatureUUID:       createdFeature.Uuid,
 					PhaseUUID:         createdPhase.Uuid,
@@ -924,13 +922,11 @@ func TestProcessTicketReview(t *testing.T) {
 			name: "Missing Required Fields",
 			requestBody: utils.TicketReviewRequest{
 				Value: struct {
-					FeatureUUID       string          `json:"featureUUID"`
-					PhaseUUID         string          `json:"phaseUUID"`
-					TicketUUID        string          `json:"ticketUUID" validate:"required"`
-					TicketDescription string          `json:"ticketDescription" validate:"required"`
-					TicketName        string          `json:"ticketName,omitempty"`
-					TicketAmount      *int64          `json:"ticketAmount,omitempty"`
-					TicketCategory    *utils.Category `json:"ticketCategory,omitempty"`
+					FeatureUUID       string `json:"featureUUID"`
+					PhaseUUID         string `json:"phaseUUID"`
+					TicketUUID        string `json:"ticketUUID" validate:"required"`
+					TicketDescription string `json:"ticketDescription" validate:"required"`
+					TicketName        string `json:"ticketName,omitempty"`
 				}{
 					FeatureUUID:       createdFeature.Uuid,
 					PhaseUUID:         createdPhase.Uuid,
@@ -947,13 +943,11 @@ func TestProcessTicketReview(t *testing.T) {
 			name: "Non-existent TicketUUID",
 			requestBody: utils.TicketReviewRequest{
 				Value: struct {
-					FeatureUUID       string          `json:"featureUUID"`
-					PhaseUUID         string          `json:"phaseUUID"`
-					TicketUUID        string          `json:"ticketUUID" validate:"required"`
-					TicketDescription string          `json:"ticketDescription" validate:"required"`
-					TicketName        string          `json:"ticketName,omitempty"`
-					TicketAmount      *int64          `json:"ticketAmount,omitempty"`
-					TicketCategory    *utils.Category `json:"ticketCategory,omitempty"`
+					FeatureUUID       string `json:"featureUUID"`
+					PhaseUUID         string `json:"phaseUUID"`
+					TicketUUID        string `json:"ticketUUID" validate:"required"`
+					TicketDescription string `json:"ticketDescription" validate:"required"`
+					TicketName        string `json:"ticketName,omitempty"`
 				}{
 					TicketUUID:        "non-existent-uuid",
 					TicketDescription: "New description",
@@ -972,13 +966,11 @@ func TestProcessTicketReview(t *testing.T) {
 			name: "Websocket Error",
 			requestBody: utils.TicketReviewRequest{
 				Value: struct {
-					FeatureUUID       string          `json:"featureUUID"`
-					PhaseUUID         string          `json:"phaseUUID"`
-					TicketUUID        string          `json:"ticketUUID" validate:"required"`
-					TicketDescription string          `json:"ticketDescription" validate:"required"`
-					TicketName        string          `json:"ticketName,omitempty"`
-					TicketAmount      *int64          `json:"ticketAmount,omitempty"`
-					TicketCategory    *utils.Category `json:"ticketCategory,omitempty"`
+					FeatureUUID       string `json:"featureUUID"`
+					PhaseUUID         string `json:"phaseUUID"`
+					TicketUUID        string `json:"ticketUUID" validate:"required"`
+					TicketDescription string `json:"ticketDescription" validate:"required"`
+					TicketName        string `json:"ticketName,omitempty"`
 				}{
 					TicketUUID:        createdTicket.UUID.String(),
 					TicketDescription: "New description",
