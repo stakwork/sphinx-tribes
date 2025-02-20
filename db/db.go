@@ -1759,37 +1759,46 @@ func (db database) GetBountiesLeaderboard() []LeaderData {
 	ms := []BountyLeaderboard{}
 	var users = []LeaderData{}
 
-	db.db.Raw(`SELECT t1.owner_pubkey, total_bounties_completed, total_sats_earned FROM
-(SELECT assignee as owner_pubkey, 
-COUNT(assignee) as total_bounties_completed
-From bounty 
-where paid=true and assignee != '' 
-GROUP BY assignee) t1
- Right Join
-(SELECT assignee as owner_pubkey,  
-SUM(CAST(price as integer)) as total_sats_earned
-From bounty
-where paid=true and assignee != ''
-GROUP BY assignee) t2
-ON t1.owner_pubkey = t2.owner_pubkey
-ORDER by total_sats_earned DESC`).Find(&ms)
+	db.db.Raw(`SELECT 
+            t2.owner_pubkey,
+            t1.total_bounties_completed,
+            t2.total_sats_earned,
+            IFNULL(t3.today_bounties_completed, 0) as today_bounties_completed
+        FROM 
+            (SELECT assignee as owner_pubkey, COUNT(assignee) as total_bounties_completed 
+             FROM bounty 
+             WHERE paid = true AND assignee != '' 
+             GROUP BY assignee) t1
+        RIGHT JOIN 
+            (SELECT assignee as owner_pubkey, SUM(CAST(price as integer)) as total_sats_earned 
+             FROM bounty 
+             WHERE paid = true AND assignee != '' 
+             GROUP BY assignee) t2 
+             ON t1.owner_pubkey = t2.owner_pubkey
+        LEFT JOIN 
+            (SELECT assignee as owner_pubkey, COUNT(assignee) as today_bounties_completed 
+             FROM bounty 
+             WHERE paid = true AND assignee != '' AND DATE(created_at) = CURRENT_DATE 
+             GROUP BY assignee) t3 
+             ON t2.owner_pubkey = t3.owner_pubkey
+        ORDER BY t2.total_sats_earned DESC`).Find(&ms)
 
 	for _, val := range ms {
 		var newLeader = make(map[string]interface{})
 		found, index := GetLeaderData(users, val.Owner_pubkey)
-
 		if found == -1 {
 			newLeader["owner_pubkey"] = val.Owner_pubkey
 			newLeader["total_bounties_completed"] = val.Total_bounties_completed
 			newLeader["total_sats_earned"] = val.Total_sats_earned
-
+			newLeader["today_bounties_completed"] = val.Today_bounties_completed // NEW FIELD
 			users = append(users, newLeader)
 		} else {
 			total_bounties := users[index]["total_bounties_completed"].(uint)
 			total_sats := users[index]["total_sats_earned"].(uint)
-
+			today := users[index]["today_bounties_completed"].(uint)
 			users[index]["total_bounties_completed"] = total_bounties + val.Total_bounties_completed
 			users[index]["total_sats_earned"] = total_sats + val.Total_sats_earned
+			users[index]["today_bounties_completed"] = today + val.Today_bounties_completed
 		}
 	}
 	return users

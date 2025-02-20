@@ -357,6 +357,7 @@ type BountyLeaderboard struct {
 	Owner_pubkey             string `json:"owner_pubkey"`
 	Total_bounties_completed uint   `json:"total_bounties_completed"`
 	Total_sats_earned        uint   `json:"total_sats_earned"`
+	Today_bounties_completed uint   `json:"today_bounties_completed"` // NEW FIELD
 }
 
 type YoutubeDownload struct {
