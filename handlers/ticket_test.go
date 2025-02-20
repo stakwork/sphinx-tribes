@@ -390,7 +390,7 @@ func TestDeleteTicket(t *testing.T) {
 	db.TestDB.CreateOrEditFeaturePhase(featurePhase)
 
 	groupID := uuid.New()
-	
+
 	ticket := db.Tickets{
 		UUID:        uuid.New(),
 		FeatureUUID: feature.Uuid,
@@ -844,6 +844,9 @@ func TestProcessTicketReview(t *testing.T) {
 	createdPhase, err := db.TestDB.CreateOrEditFeaturePhase(featurePhase)
 	require.NoError(t, err)
 
+	amount := int64(30)
+	category := utils.BackendDevelopment
+
 	ticket := db.Tickets{
 		UUID:        uuid.New(),
 		FeatureUUID: createdFeature.Uuid,
@@ -853,6 +856,8 @@ func TestProcessTicketReview(t *testing.T) {
 		Description: "Test Description",
 		Status:      db.DraftTicket,
 		Version:     0,
+		Amount:      &amount,
+		Category:    &category,
 		CreatedAt:   time.Now(),
 		UpdatedAt:   time.Now(),
 	}
@@ -869,11 +874,13 @@ func TestProcessTicketReview(t *testing.T) {
 			name: "Valid Request",
 			requestBody: utils.TicketReviewRequest{
 				Value: struct {
-					FeatureUUID       string `json:"featureUUID"`
-					PhaseUUID         string `json:"phaseUUID"`
-					TicketUUID        string `json:"ticketUUID" validate:"required"`
-					TicketDescription string `json:"ticketDescription" validate:"required"`
-					TicketName        string `json:"ticketName,omitempty"`
+					FeatureUUID       string          `json:"featureUUID"`
+					PhaseUUID         string          `json:"phaseUUID"`
+					TicketUUID        string          `json:"ticketUUID" validate:"required"`
+					TicketDescription string          `json:"ticketDescription" validate:"required"`
+					TicketName        string          `json:"ticketName,omitempty"`
+					TicketAmount      *int64          `json:"ticketAmount,omitempty"`
+					TicketCategory    *utils.Category `json:"ticketCategory,omitempty"`
 				}{
 					FeatureUUID:       createdFeature.Uuid,
 					PhaseUUID:         createdPhase.Uuid,
@@ -917,11 +924,13 @@ func TestProcessTicketReview(t *testing.T) {
 			name: "Missing Required Fields",
 			requestBody: utils.TicketReviewRequest{
 				Value: struct {
-					FeatureUUID       string `json:"featureUUID"`
-					PhaseUUID         string `json:"phaseUUID"`
-					TicketUUID        string `json:"ticketUUID" validate:"required"`
-					TicketDescription string `json:"ticketDescription" validate:"required"`
-					TicketName        string `json:"ticketName,omitempty"`
+					FeatureUUID       string          `json:"featureUUID"`
+					PhaseUUID         string          `json:"phaseUUID"`
+					TicketUUID        string          `json:"ticketUUID" validate:"required"`
+					TicketDescription string          `json:"ticketDescription" validate:"required"`
+					TicketName        string          `json:"ticketName,omitempty"`
+					TicketAmount      *int64          `json:"ticketAmount,omitempty"`
+					TicketCategory    *utils.Category `json:"ticketCategory,omitempty"`
 				}{
 					FeatureUUID:       createdFeature.Uuid,
 					PhaseUUID:         createdPhase.Uuid,
@@ -938,11 +947,13 @@ func TestProcessTicketReview(t *testing.T) {
 			name: "Non-existent TicketUUID",
 			requestBody: utils.TicketReviewRequest{
 				Value: struct {
-					FeatureUUID       string `json:"featureUUID"`
-					PhaseUUID         string `json:"phaseUUID"`
-					TicketUUID        string `json:"ticketUUID" validate:"required"`
-					TicketDescription string `json:"ticketDescription" validate:"required"`
-					TicketName        string `json:"ticketName,omitempty"`
+					FeatureUUID       string          `json:"featureUUID"`
+					PhaseUUID         string          `json:"phaseUUID"`
+					TicketUUID        string          `json:"ticketUUID" validate:"required"`
+					TicketDescription string          `json:"ticketDescription" validate:"required"`
+					TicketName        string          `json:"ticketName,omitempty"`
+					TicketAmount      *int64          `json:"ticketAmount,omitempty"`
+					TicketCategory    *utils.Category `json:"ticketCategory,omitempty"`
 				}{
 					TicketUUID:        "non-existent-uuid",
 					TicketDescription: "New description",
@@ -961,11 +972,13 @@ func TestProcessTicketReview(t *testing.T) {
 			name: "Websocket Error",
 			requestBody: utils.TicketReviewRequest{
 				Value: struct {
-					FeatureUUID       string `json:"featureUUID"`
-					PhaseUUID         string `json:"phaseUUID"`
-					TicketUUID        string `json:"ticketUUID" validate:"required"`
-					TicketDescription string `json:"ticketDescription" validate:"required"`
-					TicketName        string `json:"ticketName,omitempty"`
+					FeatureUUID       string          `json:"featureUUID"`
+					PhaseUUID         string          `json:"phaseUUID"`
+					TicketUUID        string          `json:"ticketUUID" validate:"required"`
+					TicketDescription string          `json:"ticketDescription" validate:"required"`
+					TicketName        string          `json:"ticketName,omitempty"`
+					TicketAmount      *int64          `json:"ticketAmount,omitempty"`
+					TicketCategory    *utils.Category `json:"ticketCategory,omitempty"`
 				}{
 					TicketUUID:        createdTicket.UUID.String(),
 					TicketDescription: "New description",
@@ -1655,7 +1668,7 @@ func TestTicketsToBounties(t *testing.T) {
 	}
 	createdTicket1, err := db.TestDB.UpdateTicket(ticket1)
 	require.NoError(t, err)
-	
+
 	groupID2 := uuid.New()
 	ticket2 := db.Tickets{
 		UUID:        uuid.New(),
@@ -1668,7 +1681,7 @@ func TestTicketsToBounties(t *testing.T) {
 	}
 	createdTicket2, err := db.TestDB.UpdateTicket(ticket2)
 	require.NoError(t, err)
-	
+
 	groupID3 := uuid.New()
 	ticket3 := db.Tickets{
 		UUID:        uuid.New(),
@@ -1680,14 +1693,14 @@ func TestTicketsToBounties(t *testing.T) {
 		Status:      db.DraftTicket,
 	}
 	createdTicket3, err := db.TestDB.UpdateTicket(ticket3)
-	require.NoError(t, err)	
+	require.NoError(t, err)
 
 	tests := []struct {
-		name           string
-		auth          string
-		requestBody   interface{}
-		expectedCode  int
-		validateResp  func(*testing.T, *httptest.ResponseRecorder)
+		name         string
+		auth         string
+		requestBody  interface{}
+		expectedCode int
+		validateResp func(*testing.T, *httptest.ResponseRecorder)
 	}{
 		{
 			name: "unauthorized",
@@ -1707,9 +1720,9 @@ func TestTicketsToBounties(t *testing.T) {
 			},
 		},
 		{
-			name: "invalid request body",
-			auth: person.OwnerPubKey,
-			requestBody: "invalid json",
+			name:         "invalid request body",
+			auth:         person.OwnerPubKey,
+			requestBody:  "invalid json",
 			expectedCode: http.StatusBadRequest,
 			validateResp: func(t *testing.T, rr *httptest.ResponseRecorder) {
 				var response BulkConversionResponse
@@ -1792,15 +1805,15 @@ func TestTicketsToBounties(t *testing.T) {
 				require.NoError(t, err)
 				assert.True(t, response.Success)
 				assert.Len(t, response.Results, 2)
-				
+
 				assert.True(t, response.Results[0].Success)
 				assert.NotZero(t, response.Results[0].BountyID)
 				assert.Equal(t, "Bounty created successfully and ticket deleted", response.Results[0].Message)
-				
+
 				assert.True(t, response.Results[1].Success)
 				assert.NotZero(t, response.Results[1].BountyID)
 				assert.Equal(t, "Bounty created successfully and ticket deleted", response.Results[1].Message)
-		
+
 				_, err = db.TestDB.GetTicket(createdTicket2.UUID.String())
 				assert.Error(t, err)
 				_, err = db.TestDB.GetTicket(createdTicket3.UUID.String())

@@ -530,6 +530,8 @@ func (th *ticketHandler) PostTicketDataToStakwork(w http.ResponseWriter, r *http
 						"phaseDesign":         phase.PhaseDesign,
 						"ticketName":          ticket.Name,
 						"ticketDescription":   ticket.Description,
+						"ticketAmount":        ticket.Amount,
+						"ticketCategory":      ticket.Category,
 						"productBrief":        productBrief,
 						"FeatureArchitecture": featureArchitecture,
 						"featureBrief":        featureBrief,
@@ -726,6 +728,8 @@ func (th *ticketHandler) ProcessTicketReview(w http.ResponseWriter, r *http.Requ
 		Description: reviewReq.Value.TicketDescription,
 		Status:      existingTicket.Status,
 		Version:     existingTicket.Version + 1,
+		Amount:      reviewReq.Value.TicketAmount,
+		Category:    reviewReq.Value.TicketCategory,
 		CreatedAt:   time.Now(),
 		UpdatedAt:   time.Now(),
 	}

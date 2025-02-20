@@ -5,6 +5,7 @@ import (
 	"database/sql/driver"
 	"encoding/json"
 	"errors"
+	"github.com/stakwork/sphinx-tribes/utils"
 	"time"
 
 	"github.com/google/uuid"
@@ -1057,7 +1058,7 @@ type Tickets struct {
 	Author        *Author           `gorm:"type:varchar(50)" json:"author,omitempty"`
 	AuthorID      *string           `gorm:"type:varchar(255)" json:"author_id,omitempty"`
 	Amount        *int64            `gorm:"type:bigint;default:null" json:"amount,omitempty"`
-	Category      *Category         `gorm:"type:varchar(50);default:null" json:"category,omitempty"`
+	Category      *utils.Category   `gorm:"type:varchar(50);default:null" json:"category,omitempty"`
 	CreatedAt     time.Time         `gorm:"type:timestamp;default:current_timestamp" json:"created_at"`
 	UpdatedAt     time.Time         `gorm:"type:timestamp;default:current_timestamp" json:"updated_at"`
 }
