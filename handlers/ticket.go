@@ -726,6 +726,8 @@ func (th *ticketHandler) ProcessTicketReview(w http.ResponseWriter, r *http.Requ
 		Description: reviewReq.Value.TicketDescription,
 		Status:      existingTicket.Status,
 		Version:     existingTicket.Version + 1,
+		Amount:      existingTicket.Amount,
+		Category:    existingTicket.Category,
 		CreatedAt:   time.Now(),
 		UpdatedAt:   time.Now(),
 	}
