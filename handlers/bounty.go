@@ -2079,6 +2079,12 @@ func (h *bountyHandler) GetBountiesLeaderboard(w http.ResponseWriter, _ *http.Re
 	json.NewEncoder(w).Encode(leaderBoard)
 }
 
+func (h *bountyHandler) GetDailyBountyLeaderboard(w http.ResponseWriter, _ *http.Request) {
+	dailyData := h.db.GetDailyBountyLeaderboard()
+	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode(dailyData)
+}
+
 func (h *bountyHandler) GetAllFeaturedBounties(w http.ResponseWriter, r *http.Request) {
 	bounties, err := h.db.GetAllFeaturedBounties()
 	if err != nil {

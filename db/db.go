@@ -1808,6 +1808,23 @@ func GetLeaderData(arr []LeaderData, key string) (int, int) {
 	return found, index
 }
 
+func (db database) GetDailyBountyLeaderboard() map[string]uint {
+	var dailyBounties uint
+	var dailySats uint
+
+	// Adjust the SQL query to filter bounty records for the current day using CURRENT_DATE.
+	db.db.Raw(`SELECT COUNT(*) as daily_bounties_completed, COALESCE(SUM(CAST(price as integer)), 0) as daily_sats_earned
+FROM bounty
+WHERE paid = true AND created_at >= CURRENT_DATE AND assignee != ''`).Row().Scan(&dailyBounties, &dailySats)
+
+	result := map[string]uint{
+		"daily_bounties_completed": dailyBounties,
+		"daily_sats_earned":        dailySats,
+	}
+
+	return result
+}
+
 func (db database) GetInvoice(payment_request string) NewInvoiceList {
 	ms := NewInvoiceList{}
 	db.db.Where("payment_request = ?", payment_request).Find(&ms)
