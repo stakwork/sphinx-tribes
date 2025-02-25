@@ -82,6 +82,10 @@ type SendMessageRequest struct {
 	WorkspaceUUID     string `json:"workspaceUUID"`
 }
 
+type BuildMessageRequest struct {
+	Question string `json:"question"`
+}
+
 func NewChatHandler(httpClient *http.Client, database db.Database) *ChatHandler {
 	return &ChatHandler{
 		httpClient: httpClient,
@@ -830,6 +834,74 @@ func (ch *ChatHandler) DeleteFile(w http.ResponseWriter, r *http.Request) {
 		Success: true,
 		Message: "File deleted successfully",
 	})
+}
+
+func (ch *ChatHandler) SendBuildMessage(w http.ResponseWriter, r *http.Request) {
+
+	body, err := io.ReadAll(r.Body)
+	if err != nil {
+		http.Error(w, "Error reading request body", http.StatusBadRequest)
+		return
+	}
+	defer r.Body.Close()
+
+	var req BuildMessageRequest
+	if err := json.Unmarshal(body, &req); err != nil {
+		http.Error(w, "Invalid request format", http.StatusBadRequest)
+		return
+	}
+
+	apiKey := os.Getenv("SWWFKEY")
+	if apiKey == "" {
+		http.Error(w, "API key not set in environment", http.StatusInternalServerError)
+		return
+	}
+
+	stakworkPayload := map[string]interface{}{
+		"name":        "hive_autogen",
+		"workflow_id": 43198,
+		"workflow_params": map[string]interface{}{
+			"set_var": map[string]interface{}{
+				"attributes": map[string]interface{}{
+					"vars": map[string]interface{}{
+						"query": req.Question,
+					},
+				},
+			},
+		},
+	}
+
+	payloadBytes, err := json.Marshal(stakworkPayload)
+	if err != nil {
+		http.Error(w, "Error encoding payload", http.StatusInternalServerError)
+		return
+	}
+
+	stakworkURL := "https://api.stakwork.com/api/v1/projects"
+	reqStakwork, err := http.NewRequest("POST", stakworkURL, bytes.NewBuffer(payloadBytes))
+	if err != nil {
+		http.Error(w, "Error creating Stakwork request", http.StatusInternalServerError)
+		return
+	}
+
+	reqStakwork.Header.Set("Authorization", "Token token="+apiKey)
+	reqStakwork.Header.Set("Content-Type", "application/json")
+
+	resp, err := ch.httpClient.Do(reqStakwork)
+	if err != nil {
+		http.Error(w, "Error sending request to Stakwork", http.StatusInternalServerError)
+		return
+	}
+	defer resp.Body.Close()
+
+	respBody, err := io.ReadAll(resp.Body)
+	if err != nil {
+		http.Error(w, "Error reading Stakwork response", http.StatusInternalServerError)
+		return
+	}
+
+	w.WriteHeader(resp.StatusCode)
+	w.Write(respBody)
 }
 
 func isAllowedFileType(mimeType string) bool {
