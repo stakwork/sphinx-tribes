@@ -16,6 +16,7 @@ import (
 
 	"github.com/go-chi/chi"
 	"github.com/go-chi/chi/middleware"
+	"github.com/posthog/posthog-go"
 	"github.com/rs/cors"
 	"github.com/urfave/negroni"
 	"github.com/xhd2015/xgo/runtime/core"
@@ -28,8 +29,6 @@ import (
 	"github.com/stakwork/sphinx-tribes/logger"
 	customMiddleware "github.com/stakwork/sphinx-tribes/middlewares"
 	"github.com/stakwork/sphinx-tribes/utils"
-
-	"github.com/posthog/posthog-go"
 )
 
 // NewRouter creates a chi router
@@ -134,7 +133,6 @@ type extractResponse struct {
 }
 
 func getFromAuth(path string) (*extractResponse, error) {
-
 	authURL := "http://auth:9090"
 	resp, err := http.Get(authURL + path)
 	if err != nil {
@@ -336,7 +334,7 @@ func initChi() *chi.Mux {
 	r.Use(customMiddleware.FeatureFlag(db.DB))
 	cors := cors.New(cors.Options{
 		AllowedOrigins:   []string{"*"},
-		AllowedMethods:   []string{"GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"},
+		AllowedMethods:   []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"},
 		AllowedHeaders:   []string{"Accept", "Authorization", "Content-Type", "X-CSRF-Token", "X-User", "authorization", "x-jwt", "Referer", "User-Agent", "x-session-id"},
 		AllowCredentials: true,
 		MaxAge:           300,

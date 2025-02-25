@@ -650,7 +650,6 @@ func (oh *featureHandler) StoriesSend(w http.ResponseWriter, r *http.Request) {
 	apiKey := os.Getenv("SWWFKEY")
 	if apiKey == "" {
 		panic("API key not set in environment")
-		return
 	}
 
 	postData.Alias = user.OwnerAlias
@@ -670,13 +669,11 @@ func (oh *featureHandler) StoriesSend(w http.ResponseWriter, r *http.Request) {
 	stakworkPayloadJSON, err := json.Marshal(stakworkPayload)
 	if err != nil {
 		panic("Failed to encode payload")
-		return
 	}
 
 	req, err := http.NewRequest("POST", "https://api.stakwork.com/api/v1/projects", bytes.NewBuffer(stakworkPayloadJSON))
 	if err != nil {
 		panic("Failed to create request to Stakwork API")
-		return
 	}
 	req.Header.Set("Authorization", "Token token="+apiKey)
 	req.Header.Set("Content-Type", "application/json")
@@ -685,14 +682,12 @@ func (oh *featureHandler) StoriesSend(w http.ResponseWriter, r *http.Request) {
 	resp, err := client.Do(req)
 	if err != nil {
 		panic("Failed to send request to Stakwork API")
-		return
 	}
 	defer resp.Body.Close()
 
 	respBody, err := io.ReadAll(resp.Body)
 	if err != nil {
 		panic("Failed to read response from Stakwork API")
-		return
 	}
 
 	w.WriteHeader(resp.StatusCode)
@@ -911,7 +906,7 @@ func (oh *featureHandler) GetQuickBounties(w http.ResponseWriter, r *http.Reques
 		}
 
 		status := calculateBountyStatus(bounty)
-		
+
 		var phaseID *string
 		if bounty.PhaseUuid != "" {
 			phaseUUID := bounty.PhaseUuid
@@ -923,7 +918,7 @@ func (oh *featureHandler) GetQuickBounties(w http.ResponseWriter, r *http.Reques
 			BountyTitle:   bounty.Title,
 			Status:        status,
 			AssignedAlias: assignedAlias,
-			PhaseID:       phaseID, 
+			PhaseID:       phaseID,
 		}
 
 		if status == db.StatusTodo {

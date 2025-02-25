@@ -851,7 +851,7 @@ func (ch *ChatHandler) SendBuildMessage(w http.ResponseWriter, r *http.Request) 
 		return
 	}
 
-	apiKey := os.Getenv("SWWFKEY")
+	apiKey := os.Getenv("SWWFSWKEY")
 	if apiKey == "" {
 		http.Error(w, "API key not set in environment", http.StatusInternalServerError)
 		return
