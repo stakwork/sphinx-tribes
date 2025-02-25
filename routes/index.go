@@ -2,9 +2,7 @@ package routes
 
 import (
 	"bytes"
-	"compress/gzip"
 	"context"
-	"encoding/hex"
 	"encoding/json"
 	"fmt"
 	"io"
@@ -28,8 +26,6 @@ import (
 	"github.com/stakwork/sphinx-tribes/logger"
 	customMiddleware "github.com/stakwork/sphinx-tribes/middlewares"
 	"github.com/stakwork/sphinx-tribes/utils"
-
-	"github.com/posthog/posthog-go"
 )
 
 // NewRouter creates a chi router
@@ -57,8 +53,6 @@ func NewRouter() *http.Server {
 	r.Mount("/hivechat", ChatRoutes())
 	r.Mount("/test", TestRoutes())
 	r.Mount("/feature-flags", FeatureFlagRoutes())
-	r.Mount("/snippet", SnippetRoutes())
-	r.Mount("/activities", ActivityRoutes())
 
 	r.Group(func(r chi.Router) {
 		r.Get("/tribe_by_feed", tribeHandlers.GetFirstTribeByFeed)
@@ -134,7 +128,6 @@ type extractResponse struct {
 }
 
 func getFromAuth(path string) (*extractResponse, error) {
-
 	authURL := "http://auth:9090"
 	resp, err := http.Get(authURL + path)
 	if err != nil {
@@ -202,37 +195,11 @@ func sendEdgeListToJarvis(edgeList utils.EdgeList) error {
 	return fmt.Errorf("jarvis returned non-success status: %d, body: %s", resp.StatusCode, string(body))
 }
 
-func compressToHex(input string) (string, error) {
-	// Create a buffer to hold the compressed data
-	var compressedBuffer bytes.Buffer
-
-	// Create a gzip writer
-	gzipWriter := gzip.NewWriter(&compressedBuffer)
-
-	// Write the input string to the gzip writer
-	_, err := gzipWriter.Write([]byte(input))
-	if err != nil {
-		return "", fmt.Errorf("failed to write to gzip writer: %w", err)
-	}
-
-	// Close the gzip writer to flush the data
-	err = gzipWriter.Close()
-	if err != nil {
-		return "", fmt.Errorf("failed to close gzip writer: %w", err)
-	}
-
-	// Encode the compressed data to hex
-	hexEncoded := hex.EncodeToString(compressedBuffer.Bytes())
-	return hexEncoded, nil
-}
-
 // Middleware to handle InternalServerError
 func internalServerErrorHandler(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		rr := negroni.NewResponseWriter(w)
 
-		var elements_chain strings.Builder
-		isExceedingLimit := false
 		trap.AddInterceptor(&trap.Interceptor{
 			Pre: func(ctx context.Context, f *core.FuncInfo, args core.Object, results core.Object) (interface{}, error) {
 				index := strings.Index(f.File, "sphinx-tribes")
@@ -240,60 +207,11 @@ func internalServerErrorHandler(next http.Handler) http.Handler {
 				if index != -1 {
 					trimmed = f.File[index:]
 				}
-
-				newContent := fmt.Sprintf("%s:%d %s,\n", trimmed, f.Line, f.Name)
-				maxByteSize := 177000
-				if elements_chain.Len()+len(newContent) <= maxByteSize && isExceedingLimit == false {
-					elements_chain.WriteString(newContent)
-					if args != nil && args.NumField() != 0 {
-						for i := 0; i < args.NumField(); i++ {
-							thingWeWantToPrint := args.GetFieldIndex(i)
-							argNameAndValue := fmt.Sprintf("Name: %s Value: %#v\n", thingWeWantToPrint.Name(), thingWeWantToPrint.Value())
-							if elements_chain.Len()+len(argNameAndValue) <= maxByteSize {
-								elements_chain.WriteString(argNameAndValue)
-							} else {
-								fmt.Printf("elements_chain length exceeded 500KB, skipping further additions.\n")
-								isExceedingLimit = true
-							}
-						}
-					}
-				} else if isExceedingLimit == false {
-					fmt.Printf("elements_chain length exceeded 500KB, skipping further additions.\n")
-					isExceedingLimit = true
-				}
+				logger.Log.Machine("%s:%d %s\n", trimmed, f.Line, f.Name)
 
 				return nil, nil
 			},
 		})
-
-		defer func() {
-			posthog_key := os.Getenv("POSTHOG_KEY")
-			posthog_url := os.Getenv("POSTHOG_URL")
-			session_id := r.Header.Get("x-session-id")
-			if posthog_key != "" && posthog_url != "" && session_id != "" {
-				logger.Log.Info("Sending to Posthog")
-				client, _ := posthog.NewWithConfig(
-					posthog_key,
-					posthog.Config{
-						Endpoint: posthog_url,
-					},
-				)
-				defer client.Close()
-				elements_chain_string := elements_chain.String()
-				hexCompressed, _ := compressToHex(elements_chain_string)
-				_ = client.Enqueue(posthog.Capture{
-					DistinctId: session_id,         // Unique ID for the user
-					Event:      "backend_api_call", // The event name
-					Properties: map[string]interface{}{
-						"$session_id":     session_id,
-						"$event_type":     "backend_api_call",
-						"$elements_chain": hexCompressed,
-						"$current_url":    r.URL.Path,
-					},
-				})
-			}
-		}()
-
 		defer func() {
 			if err := recover(); err != nil {
 				// Get stack trace
@@ -336,7 +254,7 @@ func initChi() *chi.Mux {
 	r.Use(customMiddleware.FeatureFlag(db.DB))
 	cors := cors.New(cors.Options{
 		AllowedOrigins:   []string{"*"},
-		AllowedMethods:   []string{"GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"},
+		AllowedMethods:   []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"},
 		AllowedHeaders:   []string{"Accept", "Authorization", "Content-Type", "X-CSRF-Token", "X-User", "authorization", "x-jwt", "Referer", "User-Agent", "x-session-id"},
 		AllowCredentials: true,
 		MaxAge:           300,
