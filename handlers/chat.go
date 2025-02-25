@@ -439,9 +439,9 @@ func (ch *ChatHandler) sendToStakwork(payload StakworkChatPayload) (int64, error
 		return 0, fmt.Errorf("error creating request: %v", err)
 	}
 
-	apiKey := os.Getenv("SWWFSWKEY")
+	apiKey := os.Getenv("SWWFKEY")
 	if apiKey == "" {
-		return 0, fmt.Errorf("SWWFSWKEY environment variable not set")
+		return 0, fmt.Errorf("SWWFKEY environment variable not set")
 	}
 
 	req.Header.Set("Authorization", "Token token="+apiKey)
@@ -851,7 +851,7 @@ func (ch *ChatHandler) SendBuildMessage(w http.ResponseWriter, r *http.Request) 
 		return
 	}
 
-	apiKey := os.Getenv("SWWFKEY")
+	apiKey := os.Getenv("SWWFSWKEY")
 	if apiKey == "" {
 		http.Error(w, "API key not set in environment", http.StatusInternalServerError)
 		return
