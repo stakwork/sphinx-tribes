@@ -2,13 +2,14 @@ version: "3.8"
 services:
   app:
     image: mcr.microsoft.com/devcontainers/go:1-ubuntu
+    working_dir: /workspaces/sphinx-tribes
     volumes:
       - ..:/workspaces/sphinx-tribes:cached
     ports:
       - "8080:8080"
     depends_on:
       - postgres
-    command: "go run main.go"
+    command: [ "bash", "-c", "go version && go run main.go" ]
   postgres:
     image: postgres:latest
     container_name: sphinx_postgres
