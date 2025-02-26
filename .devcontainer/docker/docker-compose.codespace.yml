@@ -3,7 +3,7 @@ services:
   app:
     image: mcr.microsoft.com/devcontainers/go:1-ubuntu
     volumes:
-      - ..:/workspace:cached
+      - ..:/workspaces/sphinx-tribes:cached
     ports:
       - "8080:8080"
     depends_on:
