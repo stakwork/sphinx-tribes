@@ -1,5 +1,15 @@
 version: "3.8"
 services:
+  app:
+    build:
+      context: ..
+      dockerfile: Dockerfile
+    volumes:
+      - ..:/workspace:cached
+    ports:
+      - "8080:8080"
+    depends_on:
+      - postgres
   postgres:
     image: postgres:latest
     container_name: sphinx_postgres
