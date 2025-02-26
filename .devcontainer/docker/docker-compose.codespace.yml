@@ -9,7 +9,7 @@ services:
       - "8080:8080"
     depends_on:
       - postgres
-    command: [ "bash", "-c", "go version && go run main.go" ]
+    command: [ "bash", "-l", "-c", "go version && go run main.go" ]
   postgres:
     image: postgres:latest
     container_name: sphinx_postgres
