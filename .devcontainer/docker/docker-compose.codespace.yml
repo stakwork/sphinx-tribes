@@ -1,11 +1,7 @@
 version: "3.8"
 services:
   app:
-    build:
-      # This context goes from the compose file location to the repo root.
-      context: ../..
-      # Path to the Dockerfile from the repo root.
-      dockerfile: .devcontainer/Dockerfile.app
+    image: mcr.microsoft.com/devcontainers/go:1-ubuntu
     volumes:
       - ..:/workspace:cached
     ports:
