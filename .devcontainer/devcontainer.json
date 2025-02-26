@@ -2,7 +2,7 @@
   "name": "Sphinx Tribes Dev",
   "dockerComposeFile": ["docker/docker-compose.codespace.yml"],
   "service": "app",
-  "workspaceFolder": "/workspace",
+  "workspaceFolder": "/workspaces/sphinx-tribes",
   "forwardPorts": [8080, 5432],
   "postCreateCommand": "bash .devcontainer/setup.sh",
   "containerEnv": {
