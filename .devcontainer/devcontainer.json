@@ -1,16 +1,14 @@
 {
   "name": "Sphinx Tribes Dev",
-  "image": "mcr.microsoft.com/devcontainers/go:1-ubuntu",
-  "features": {},
+  "dockerComposeFile": ["docker/docker-compose.codespace.yml"],
+  "service": "app",
   "forwardPorts": [5432, 8080],
   "postCreateCommand": "bash .devcontainer/setup.sh",
   "containerEnv": {
-    "DB_HOST": "127.0.0.1",
+    "DB_HOST": "postgres",
     "DB_PORT": "5432",
     "DB_USER": "sphinx_user",
     "DB_PASSWORD": "sphinx_password",
     "DB_NAME": "sphinx_tribes"
-  },
-  "dockerComposeFile": ["docker/docker-compose.codespace.yml"],
-  "service": "app"
+  }
 }
