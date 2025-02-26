@@ -5,7 +5,14 @@ FROM golang:1.20-bullseye
 WORKDIR /workspace
 
 # Copy go.mod and go.sum to leverage Docker caching (adjust paths if necessary)
-COPY go.mod go.sum ./
+COPY go.mod .
+COPY go.sum .
+
+# Installing xgo
+RUN go install github.com/xhd2015/xgo/cmd/xgo@latest
+# ENV PATH="/usr/local/xgo/bin:${PATH}"
+ENV PATH="${GOPATH}/bin:${PATH}"
+
 RUN go mod download
 
 # Copy the rest of the source code into the container
