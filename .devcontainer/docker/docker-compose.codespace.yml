@@ -2,14 +2,17 @@ version: "3.8"
 services:
   app:
     build:
-      context: ..
-      dockerfile: Dockerfile
+      # This context goes from the compose file location to the repo root.
+      context: ../..
+      # Path to the Dockerfile from the repo root.
+      dockerfile: .devcontainer/Dockerfile.app
     volumes:
       - ..:/workspace:cached
     ports:
       - "8080:8080"
     depends_on:
       - postgres
+    command: "go run main.go"
   postgres:
     image: postgres:latest
     container_name: sphinx_postgres
@@ -25,3 +28,5 @@ services:
 
 volumes:
   pgdata:
+
+
