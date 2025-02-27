@@ -1,0 +1,2372 @@
+basePath: /
+definitions:
+  db.Activity:
+    properties:
+      actions:
+        items:
+          type: string
+        type: array
+      author:
+        $ref: '#/definitions/db.AuthorType'
+      author_ref:
+        type: string
+      content:
+        type: string
+      content_type:
+        $ref: '#/definitions/db.ContentType'
+      feature_uuid:
+        type: string
+      feedback:
+        type: string
+      id:
+        type: string
+      phase_uuid:
+        type: string
+      questions:
+        items:
+          type: string
+        type: array
+      sequence:
+        type: integer
+      status:
+        type: string
+      thread_id:
+        type: string
+      time_created:
+        type: string
+      time_updated:
+        type: string
+      title:
+        type: string
+      workspace:
+        type: string
+    type: object
+  db.AuthorType:
+    enum:
+    - human
+    - hive
+    type: string
+    x-enum-varnames:
+    - HumansAuthor
+    - HiveAuthor
+  db.Bot:
+    properties:
+      created:
+        type: string
+      deleted:
+        type: boolean
+      description:
+        type: string
+      img:
+        type: string
+      member_count:
+        type: integer
+      name:
+        type: string
+      owner_alias:
+        type: string
+      owner_pubkey:
+        type: string
+      owner_route_hint:
+        type: string
+      price_per_use:
+        type: integer
+      tags:
+        items:
+          type: string
+        type: array
+      tsv:
+        type: string
+      unique_name:
+        type: string
+      unlisted:
+        type: boolean
+      updated:
+        type: string
+      uuid:
+        type: string
+    type: object
+  db.Bounty:
+    properties:
+      assigned_date:
+        type: string
+      assigned_hours:
+        type: integer
+      assignee:
+        type: string
+      award:
+        type: string
+      bounty_expires:
+        type: string
+      coding_languages:
+        items:
+          type: string
+        type: array
+      commitment_fee:
+        type: integer
+      completed:
+        type: boolean
+      completion_date:
+        type: string
+      created:
+        type: integer
+      deliverables:
+        type: string
+      description:
+        type: string
+      estimated_completion_date:
+        type: string
+      estimated_session_length:
+        type: string
+      github_description:
+        type: boolean
+      id:
+        type: integer
+      mark_as_paid_date:
+        type: string
+      one_sentence_summary:
+        type: string
+      org_uuid:
+        type: string
+      owner_id:
+        type: string
+      paid:
+        type: boolean
+      paid_date:
+        type: string
+      payment_failed:
+        type: boolean
+      payment_pending:
+        type: boolean
+      phase_priority:
+        type: integer
+      phase_uuid:
+        type: string
+      price:
+        type: integer
+      show:
+        type: boolean
+      ticket_url:
+        type: string
+      title:
+        type: string
+      tribe:
+        type: string
+      type:
+        type: string
+      updated:
+        type: string
+      wanted_type:
+        type: string
+    type: object
+  db.BountyCard:
+    properties:
+      assignee:
+        type: string
+      assignee_img:
+        type: string
+      assignee_name:
+        type: string
+      features:
+        $ref: '#/definitions/db.WorkspaceFeatures'
+      id:
+        type: integer
+      phase:
+        $ref: '#/definitions/db.FeaturePhase'
+      status:
+        $ref: '#/definitions/db.BountyStatus'
+      ticket_group:
+        type: string
+      ticket_uuid:
+        type: string
+      title:
+        type: string
+      workspace:
+        $ref: '#/definitions/db.Workspace'
+    type: object
+  db.BountyStatus:
+    enum:
+    - TODO
+    - IN_PROGRESS
+    - IN_REVIEW
+    - COMPLETED
+    - PAID
+    - DRAFT
+    type: string
+    x-enum-varnames:
+    - StatusTodo
+    - StatusInProgress
+    - StatusInReview
+    - StatusComplete
+    - StatusPaid
+    - StatusDraft
+  db.BudgetInvoiceRequest:
+    properties:
+      amount:
+        type: integer
+      org_uuid:
+        type: string
+      payment_type:
+        $ref: '#/definitions/db.PaymentType'
+      sender_pubkey:
+        type: string
+      websocket_token:
+        type: string
+      workspace_uuid:
+        type: string
+    type: object
+  db.ContentType:
+    enum:
+    - feature_creation
+    - story_update
+    - requirement_change
+    - general_update
+    type: string
+    x-enum-varnames:
+    - FeatureCreation
+    - StoryUpdate
+    - RequirementChange
+    - GeneralUpdate
+  db.FeaturePhase:
+    properties:
+      created:
+        type: string
+      created_by:
+        type: string
+      feature_uuid:
+        type: string
+      name:
+        type: string
+      phase_design:
+        type: string
+      phase_outcome:
+        type: string
+      phase_purpose:
+        type: string
+      phase_scope:
+        type: string
+      priority:
+        type: integer
+      updated:
+        type: string
+      updated_by:
+        type: string
+      uuid:
+        type: string
+    type: object
+  db.FeatureStatus:
+    enum:
+    - active
+    - archived
+    type: string
+    x-enum-varnames:
+    - ActiveFeature
+    - ArchivedFeature
+  db.FeaturedBounty:
+    properties:
+      addedAt:
+        type: integer
+      bountyId:
+        type: string
+      created_at:
+        type: string
+      title:
+        type: string
+      updated_at:
+        type: string
+      url:
+        type: string
+    type: object
+  db.FilterStatusCount:
+    properties:
+      assigned:
+        type: integer
+      completed:
+        type: integer
+      failed:
+        type: integer
+      open:
+        type: integer
+      paid:
+        type: integer
+      pending:
+        type: integer
+    type: object
+  db.Invoice:
+    properties:
+      invoice:
+        type: string
+    type: object
+  db.InvoiceCheckResponse:
+    properties:
+      amount:
+        type: string
+      payment_hash:
+        type: string
+      payment_request:
+        type: string
+      preimage:
+        type: string
+      settled:
+        type: boolean
+    type: object
+  db.InvoicePaySuccess:
+    properties:
+      response:
+        $ref: '#/definitions/db.InvoiceCheckResponse'
+      success:
+        type: boolean
+    type: object
+  db.InvoiceRequest:
+    properties:
+      amount:
+        type: string
+      assigned_hours:
+        type: integer
+      bounty_expires:
+        type: string
+      commitment_fee:
+        type: integer
+      created:
+        type: string
+      memo:
+        type: string
+      owner_pubkey:
+        type: string
+      route_hint:
+        type: string
+      type:
+        type: string
+      user_pubkey:
+        type: string
+      websocket_token:
+        type: string
+    type: object
+  db.InvoiceResponse:
+    properties:
+      response:
+        $ref: '#/definitions/db.Invoice'
+      success:
+        type: boolean
+    type: object
+  db.InvoiceResult:
+    properties:
+      response:
+        $ref: '#/definitions/db.InvoiceCheckResponse'
+      success:
+        type: boolean
+    type: object
+  db.LeaderBoard:
+    properties:
+      alias:
+        type: string
+      earned:
+        type: integer
+      reputation:
+        type: integer
+      spent:
+        type: integer
+      tribe_uuid:
+        type: string
+    type: object
+  db.LeaderData:
+    additionalProperties: true
+    type: object
+  db.NewBounty:
+    properties:
+      assigned_date:
+        type: string
+      assigned_hours:
+        type: integer
+      assignee:
+        type: string
+      award:
+        type: string
+      bounty_expires:
+        type: string
+      coding_languages:
+        items:
+          type: string
+        type: array
+      commitment_fee:
+        type: integer
+      completed:
+        type: boolean
+      completion_date:
+        type: string
+      created:
+        type: integer
+      deliverables:
+        type: string
+      description:
+        type: string
+      estimated_completion_date:
+        type: string
+      estimated_session_length:
+        type: string
+      feature_uuid:
+        type: string
+      github_description:
+        type: boolean
+      id:
+        type: integer
+      mark_as_paid_date:
+        type: string
+      one_sentence_summary:
+        type: string
+      org_uuid:
+        type: string
+      owner_id:
+        type: string
+      paid:
+        type: boolean
+      paid_date:
+        type: string
+      payment_failed:
+        type: boolean
+      payment_pending:
+        type: boolean
+      phase_priority:
+        type: integer
+      phase_uuid:
+        type: string
+      pow:
+        type: integer
+      price:
+        type: integer
+      show:
+        type: boolean
+      ticket_url:
+        type: string
+      title:
+        type: string
+      tribe:
+        type: string
+      type:
+        type: string
+      updated:
+        type: string
+      wanted_type:
+        type: string
+      workspace_uuid:
+        type: string
+    type: object
+  db.NewPaymentHistory:
+    properties:
+      amount:
+        type: integer
+      bounty_id:
+        type: integer
+      created:
+        type: string
+      error:
+        type: string
+      id:
+        type: integer
+      org_uuid:
+        type: string
+      payment_status:
+        type: string
+      payment_type:
+        $ref: '#/definitions/db.PaymentType'
+      receiver_pubkey:
+        type: string
+      sender_pubkey:
+        type: string
+      status:
+        type: boolean
+      tag:
+        type: string
+      updated:
+        type: string
+      workspace_uuid:
+        type: string
+    type: object
+  db.NewWithdrawBudgetRequest:
+    properties:
+      payment_request:
+        type: string
+      websocket_token:
+        type: string
+      workspace_uuid:
+        type: string
+    type: object
+  db.Node:
+    properties:
+      node_data:
+        $ref: '#/definitions/db.NodeData'
+      node_type:
+        type: string
+    type: object
+  db.NodeData:
+    properties:
+      bounty_id:
+        type: integer
+      description:
+        type: string
+      title:
+        type: string
+    type: object
+  db.NodeListResponse:
+    properties:
+      node_list:
+        items:
+          $ref: '#/definitions/db.Node'
+        type: array
+    type: object
+  db.PaymentType:
+    enum:
+    - deposit
+    - withdraw
+    - payment
+    - reversal
+    type: string
+    x-enum-varnames:
+    - Deposit
+    - Withdraw
+    - Payment
+    - Reversal
+  db.Person:
+    properties:
+      created:
+        type: string
+      deleted:
+        type: boolean
+      description:
+        type: string
+      extras:
+        $ref: '#/definitions/db.PropertyMap'
+      github_issues:
+        $ref: '#/definitions/db.PropertyMap'
+      id:
+        type: integer
+      img:
+        type: string
+      last_login:
+        type: integer
+      new_ticket_time:
+        type: integer
+      owner_alias:
+        type: string
+      owner_contact_key:
+        type: string
+      owner_pubkey:
+        type: string
+      owner_route_hint:
+        type: string
+      price_to_meet:
+        type: integer
+      referred_by:
+        type: integer
+      tags:
+        items:
+          type: string
+        type: array
+      twitter_confirmed:
+        type: boolean
+      unique_name:
+        type: string
+      unlisted:
+        type: boolean
+      updated:
+        type: string
+      uuid:
+        type: string
+    type: object
+  db.PersonInShort:
+    properties:
+      id:
+        type: integer
+      img:
+        type: string
+      owner_alias:
+        type: string
+      owner_pubkey:
+        type: string
+      unique_name:
+        type: string
+      uuid:
+        type: string
+    type: object
+  db.ProofOfWork:
+    properties:
+      bounty_id:
+        type: integer
+      created_at:
+        type: string
+      description:
+        type: string
+      id:
+        type: string
+      status:
+        $ref: '#/definitions/db.ProofOfWorkStatus'
+      submitted_at:
+        type: string
+    type: object
+  db.ProofOfWorkStatus:
+    enum:
+    - New
+    - Accepted
+    - Rejected
+    - Change Requested
+    type: string
+    x-enum-varnames:
+    - NewStatus
+    - AcceptedStatus
+    - RejectedStatus
+    - ChangeRequestedStatus
+  db.PropertyMap:
+    additionalProperties: true
+    type: object
+  db.Tribe:
+    properties:
+      app_url:
+        type: string
+      badges:
+        items:
+          type: string
+        type: array
+      bots:
+        type: string
+      created:
+        type: string
+      deleted:
+        type: boolean
+      description:
+        type: string
+      escrow_amount:
+        type: integer
+      escrow_millis:
+        type: integer
+      feed_type:
+        type: integer
+      feed_url:
+        type: string
+      group_key:
+        type: string
+      img:
+        type: string
+      last_active:
+        type: integer
+      member_count:
+        type: integer
+      name:
+        type: string
+      owner_alias:
+        type: string
+      owner_pubkey:
+        type: string
+      owner_route_hint:
+        type: string
+      pin:
+        type: string
+      preview:
+        type: string
+      price_per_message:
+        type: integer
+      price_to_join:
+        type: integer
+      private:
+        type: boolean
+      profile_filters:
+        description: '"twitter,github"'
+        type: string
+      second_brain_url:
+        type: string
+      tags:
+        items:
+          type: string
+        type: array
+      unique_name:
+        type: string
+      unlisted:
+        type: boolean
+      updated:
+        type: string
+      uuid:
+        type: string
+    type: object
+  db.Workspace:
+    properties:
+      bounty_count:
+        type: integer
+      budget:
+        type: integer
+      created:
+        type: string
+      deleted:
+        type: boolean
+      description:
+        maxLength: 120
+        type: string
+      github:
+        type: string
+      id:
+        type: integer
+      img:
+        type: string
+      mission:
+        type: string
+      name:
+        type: string
+      owner_pubkey:
+        type: string
+      schematic_img:
+        type: string
+      schematic_url:
+        type: string
+      show:
+        type: boolean
+      tactics:
+        type: string
+      updated:
+        type: string
+      uuid:
+        type: string
+      website:
+        type: string
+    type: object
+  db.WorkspaceFeatures:
+    properties:
+      architecture:
+        type: string
+      bounties_count_assigned:
+        type: integer
+      bounties_count_completed:
+        type: integer
+      bounties_count_open:
+        type: integer
+      brief:
+        type: string
+      created:
+        type: string
+      created_by:
+        type: string
+      feat_status:
+        $ref: '#/definitions/db.FeatureStatus'
+      id:
+        type: integer
+      name:
+        type: string
+      priority:
+        type: integer
+      requirements:
+        type: string
+      updated:
+        type: string
+      updated_by:
+        type: string
+      url:
+        type: string
+      uuid:
+        type: string
+      workspace_uuid:
+        type: string
+    type: object
+  handlers.ActivityContentRequest:
+    properties:
+      content:
+        type: string
+    type: object
+  handlers.ActivityResponse:
+    properties:
+      data:
+        $ref: '#/definitions/db.Activity'
+      error:
+        type: string
+      success:
+        type: boolean
+    type: object
+  handlers.BountyTimingResponse:
+    properties:
+      accumulated_pause_seconds:
+        type: integer
+      closed_at:
+        type: string
+      first_assigned_at:
+        type: string
+      is_paused:
+        type: boolean
+      last_paused_at:
+        type: string
+      last_pow_at:
+        type: string
+      total_attempts:
+        type: integer
+      total_duration_seconds:
+        type: integer
+      total_work_time_seconds:
+        type: integer
+    type: object
+  handlers.CreateActivityRequest:
+    properties:
+      actions:
+        items:
+          type: string
+        type: array
+      author:
+        $ref: '#/definitions/db.AuthorType'
+      author_ref:
+        type: string
+      content:
+        type: string
+      content_type:
+        type: string
+      feature_uuid:
+        type: string
+      phase_uuid:
+        type: string
+      questions:
+        items:
+          type: string
+        type: array
+      title:
+        type: string
+      workspace:
+        type: string
+    type: object
+  handlers.WantedsHeaderResponse:
+    properties:
+      bounties_count:
+        type: integer
+      developer_count:
+        type: integer
+      people:
+        items:
+          $ref: '#/definitions/db.PersonInShort'
+        type: array
+    type: object
+host: localhost:5002
+info:
+  contact: {}
+  description: This is the API documentation for Sphinx Tribes.
+  title: Sphinx Tribes API
+  version: "1.0"
+paths:
+  /activities:
+    post:
+      description: Create a new activity
+      parameters:
+      - description: Activity object
+        in: body
+        name: activity
+        required: true
+        schema:
+          $ref: '#/definitions/handlers.CreateActivityRequest'
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/handlers.ActivityResponse'
+      summary: Create an activity
+      tags:
+      - Activities
+  /activities/{id}:
+    delete:
+      description: Delete an activity by ID
+      parameters:
+      - description: Activity ID
+        in: path
+        name: id
+        required: true
+        type: string
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+      summary: Delete an activity
+      tags:
+      - Activities
+    get:
+      description: Get an activity by ID
+      parameters:
+      - description: Activity ID
+        in: path
+        name: id
+        required: true
+        type: string
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/handlers.ActivityResponse'
+      summary: Get an activity
+      tags:
+      - Activities
+    put:
+      description: Update an existing activity
+      parameters:
+      - description: Activity ID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Activity object
+        in: body
+        name: activity
+        required: true
+        schema:
+          $ref: '#/definitions/db.Activity'
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/handlers.ActivityResponse'
+      summary: Update an activity
+      tags:
+      - Activities
+  /activities/{id}/actions:
+    post:
+      description: Add actions to an activity by ID
+      parameters:
+      - description: Activity ID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Action content
+        in: body
+        name: action
+        required: true
+        schema:
+          $ref: '#/definitions/handlers.ActivityContentRequest'
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/handlers.ActivityResponse'
+      summary: Add actions to an activity
+      tags:
+      - Activities
+  /activities/{id}/actions/{action_id}:
+    delete:
+      description: Remove an action from an activity by ID
+      parameters:
+      - description: Activity ID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Action ID
+        in: path
+        name: action_id
+        required: true
+        type: string
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/handlers.ActivityResponse'
+      summary: Remove an action from an activity
+      tags:
+      - Activities
+  /activities/{id}/questions:
+    post:
+      description: Add questions to an activity by ID
+      parameters:
+      - description: Activity ID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Question content
+        in: body
+        name: question
+        required: true
+        schema:
+          $ref: '#/definitions/handlers.ActivityContentRequest'
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/handlers.ActivityResponse'
+      summary: Add questions to an activity
+      tags:
+      - Activities
+  /activities/{id}/questions/{question_id}:
+    delete:
+      description: Remove a question from an activity by ID
+      parameters:
+      - description: Activity ID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Question ID
+        in: path
+        name: question_id
+        required: true
+        type: string
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/handlers.ActivityResponse'
+      summary: Remove a question from an activity
+      tags:
+      - Activities
+  /activities/feature/{feature_uuid}:
+    get:
+      description: Get activities by feature UUID
+      parameters:
+      - description: Feature UUID
+        in: path
+        name: feature_uuid
+        required: true
+        type: string
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+      summary: Get activities by feature
+      tags:
+      - Activities
+  /activities/phase/{phase_uuid}:
+    get:
+      description: Get activities by phase UUID
+      parameters:
+      - description: Phase UUID
+        in: path
+        name: phase_uuid
+        required: true
+        type: string
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+      summary: Get activities by phase
+      tags:
+      - Activities
+  /activities/thread:
+    post:
+      description: Create a new activity thread
+      parameters:
+      - description: Activity object
+        in: body
+        name: activity
+        required: true
+        schema:
+          $ref: '#/definitions/handlers.CreateActivityRequest'
+      - description: Source ID
+        in: query
+        name: source_id
+        required: true
+        type: string
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/handlers.ActivityResponse'
+      summary: Create an activity thread
+      tags:
+      - Activities
+  /activities/thread/{thread_id}:
+    get:
+      description: Get activities by thread ID
+      parameters:
+      - description: Thread ID
+        in: path
+        name: thread_id
+        required: true
+        type: string
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+      summary: Get activities by thread
+      tags:
+      - Activities
+  /activities/thread/{thread_id}/latest:
+    get:
+      description: Get the latest activity by thread ID
+      parameters:
+      - description: Thread ID
+        in: path
+        name: thread_id
+        required: true
+        type: string
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/handlers.ActivityResponse'
+      summary: Get the latest activity by thread
+      tags:
+      - Activities
+  /activities/workspace/{workspace}:
+    get:
+      description: Get activities by workspace
+      parameters:
+      - description: Workspace
+        in: path
+        name: workspace
+        required: true
+        type: string
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+      summary: Get activities by workspace
+      tags:
+      - Activities
+  /admin/auth:
+    get:
+      description: Check if the user is an admin
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties:
+              type: boolean
+            type: object
+      summary: Check if user is admin
+      tags:
+      - Auth
+  /admin_pubkeys:
+    get:
+      description: Get a list of admin pubkeys
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              type: string
+            type: array
+      summary: Get admin pubkeys
+      tags:
+      - Auth
+  /bots:
+    put:
+      description: Create or edit a bot
+      parameters:
+      - description: Bot object
+        in: body
+        name: bot
+        required: true
+        schema:
+          $ref: '#/definitions/db.Bot'
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/db.Bot'
+      summary: Create or edit a bot
+      tags:
+      - Bots
+  /bots/{uuid}:
+    delete:
+      description: Delete a bot by UUID
+      parameters:
+      - description: Bot UUID
+        in: path
+        name: uuid
+        required: true
+        type: string
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: boolean
+      summary: Delete a bot
+      tags:
+      - Bots
+    get:
+      description: Get a bot by UUID
+      parameters:
+      - description: Bot UUID
+        in: path
+        name: uuid
+        required: true
+        type: string
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/db.Bot'
+      summary: Get a bot
+      tags:
+      - Bots
+  /bots/listed:
+    get:
+      description: Get a list of listed bots
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/db.Bot'
+            type: array
+      summary: Get listed bots
+      tags:
+      - Bots
+  /bots/owner/{pubkey}:
+    get:
+      description: Get a list of bots by owner public key
+      parameters:
+      - description: Owner public key
+        in: path
+        name: pubkey
+        required: true
+        type: string
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/db.Bot'
+            type: array
+      summary: Get bots by owner
+      tags:
+      - Bots
+  /bots/search:
+    get:
+      description: Search for bots
+      parameters:
+      - description: Search query
+        in: query
+        name: query
+        required: true
+        type: string
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/db.Bot'
+            type: array
+      summary: Search bots
+      tags:
+      - Bots
+  /bots/unique/{unique_name}:
+    get:
+      description: Get a bot by unique name
+      parameters:
+      - description: Unique name
+        in: path
+        name: unique_name
+        required: true
+        type: string
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/db.Bot'
+      summary: Get a bot by unique name
+      tags:
+      - Bots
+  /bots/unique_name:
+    get:
+      description: Get unique name from bot name
+      parameters:
+      - description: Bot name
+        in: query
+        name: name
+        required: true
+        type: string
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: string
+      summary: Get unique name from bot name
+      tags:
+      - Bots
+  /gobounties:
+    post:
+      description: Create or edit a bounty
+      parameters:
+      - description: Bounty object
+        in: body
+        name: bounty
+        required: true
+        schema:
+          $ref: '#/definitions/db.NewBounty'
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/db.NewBounty'
+      summary: Create or edit a bounty
+      tags:
+      - Go-Bounties
+  /gobounties/{id}/proof:
+    post:
+      description: Add proof of work to a bounty
+      parameters:
+      - description: Bounty ID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Proof of Work object
+        in: body
+        name: proof
+        required: true
+        schema:
+          $ref: '#/definitions/db.ProofOfWork'
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/db.ProofOfWork'
+      summary: Add proof of work
+      tags:
+      - Go-Bounties
+  /gobounties/{id}/proofs:
+    get:
+      description: Get proofs by bounty ID
+      parameters:
+      - description: Bounty ID
+        in: path
+        name: id
+        required: true
+        type: string
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/db.ProofOfWork'
+            type: array
+      summary: Get proofs by bounty
+      tags:
+      - Go-Bounties
+  /gobounties/{id}/proofs/{proofId}:
+    delete:
+      description: Delete proof by ID
+      parameters:
+      - description: Bounty ID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Proof ID
+        in: path
+        name: proofId
+        required: true
+        type: string
+      responses:
+        "204":
+          description: No Content
+      summary: Delete proof
+      tags:
+      - Go-Bounties
+  /gobounties/{id}/timing:
+    delete:
+      description: Delete bounty timing by ID
+      parameters:
+      - description: Bounty ID
+        in: path
+        name: id
+        required: true
+        type: string
+      responses:
+        "204":
+          description: No Content
+      summary: Delete bounty timing
+      tags:
+      - Go-Bounties
+    get:
+      description: Get bounty timing stats by ID
+      parameters:
+      - description: Bounty ID
+        in: path
+        name: id
+        required: true
+        type: string
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/handlers.BountyTimingResponse'
+      summary: Get bounty timing stats
+      tags:
+      - Go-Bounties
+  /gobounties/{id}/timing/close:
+    post:
+      description: Close bounty timing by ID
+      parameters:
+      - description: Bounty ID
+        in: path
+        name: id
+        required: true
+        type: string
+      responses:
+        "200":
+          description: OK
+      summary: Close bounty timing
+      tags:
+      - Go-Bounties
+  /gobounties/{id}/timing/start:
+    post:
+      description: Start bounty timing by ID
+      parameters:
+      - description: Bounty ID
+        in: path
+        name: id
+        required: true
+        type: string
+      responses:
+        "200":
+          description: OK
+      summary: Start bounty timing
+      tags:
+      - Go-Bounties
+  /gobounties/{pubkey}/{created}:
+    delete:
+      description: Delete a bounty by ID
+      parameters:
+      - description: PubKey
+        in: path
+        name: pubkey
+        required: true
+        type: string
+      - description: Created
+        in: path
+        name: created
+        required: true
+        type: string
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: boolean
+      summary: Delete a bounty
+      tags:
+      - Go-Bounties
+  /gobounties/all:
+    get:
+      description: Get a list of all bounties
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/db.Bounty'
+            type: array
+      summary: Get all bounties
+      tags:
+      - Go-Bounties
+  /gobounties/bounty-cards:
+    get:
+      description: Get bounty cards
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/db.BountyCard'
+            type: array
+      summary: Get bounty cards
+      tags:
+      - Go-Bounties
+  /gobounties/budget/withdraw:
+    post:
+      description: Withdraw bounty budget
+      parameters:
+      - description: Withdraw Budget Request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/db.NewWithdrawBudgetRequest'
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/db.InvoicePaySuccess'
+      summary: Withdraw bounty budget
+      tags:
+      - Go-Bounties
+  /gobounties/completedstatus/{created}:
+    post:
+      description: Update completed status by created date
+      parameters:
+      - description: Created
+        in: path
+        name: created
+        required: true
+        type: string
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/db.NewBounty'
+      summary: Update completed status
+      tags:
+      - Go-Bounties
+  /gobounties/count:
+    get:
+      description: Get bounty count
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: integer
+      summary: Get bounty count
+      tags:
+      - Go-Bounties
+  /gobounties/count/{personKey}/{tabType}:
+    get:
+      description: Get user bounty count by person key and tab type
+      parameters:
+      - description: Person Key
+        in: path
+        name: personKey
+        required: true
+        type: string
+      - description: Tab Type
+        in: path
+        name: tabType
+        required: true
+        type: string
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: integer
+      summary: Get user bounty count
+      tags:
+      - Go-Bounties
+  /gobounties/created/{created}:
+    get:
+      description: Get bounty by created date
+      parameters:
+      - description: Created date
+        in: path
+        name: created
+        required: true
+        type: string
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/db.Bounty'
+      summary: Get bounty by created date
+      tags:
+      - Go-Bounties
+  /gobounties/featured/all:
+    get:
+      description: Get all featured bounties
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/db.FeaturedBounty'
+            type: array
+      summary: Get all featured bounties
+      tags:
+      - Go-Bounties
+  /gobounties/featured/create:
+    post:
+      description: Create a featured bounty
+      parameters:
+      - description: Featured Bounty object
+        in: body
+        name: bounty
+        required: true
+        schema:
+          $ref: '#/definitions/db.FeaturedBounty'
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/db.FeaturedBounty'
+      summary: Create a featured bounty
+      tags:
+      - Go-Bounties
+  /gobounties/featured/delete/{bountyId}:
+    delete:
+      description: Delete a featured bounty by ID
+      parameters:
+      - description: Bounty ID
+        in: path
+        name: bountyId
+        required: true
+        type: string
+      responses:
+        "204":
+          description: No Content
+      summary: Delete a featured bounty
+      tags:
+      - Go-Bounties
+  /gobounties/featured/update:
+    put:
+      description: Update a featured bounty
+      parameters:
+      - description: Featured Bounty object
+        in: body
+        name: bounty
+        required: true
+        schema:
+          $ref: '#/definitions/db.FeaturedBounty'
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/db.FeaturedBounty'
+      summary: Update a featured bounty
+      tags:
+      - Go-Bounties
+  /gobounties/filter/count:
+    get:
+      description: Get filter count
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/db.FilterStatusCount'
+      summary: Get filter count
+      tags:
+      - Go-Bounties
+  /gobounties/id/{bountyId}:
+    get:
+      description: Get a bounty by ID
+      parameters:
+      - description: Bounty ID
+        in: path
+        name: id
+        required: true
+        type: string
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/db.Bounty'
+      summary: Get a bounty
+      tags:
+      - Go-Bounties
+  /gobounties/index/{bountyId}:
+    get:
+      description: Get bounty index by ID
+      parameters:
+      - description: Bounty ID
+        in: path
+        name: id
+        required: true
+        type: string
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: integer
+      summary: Get bounty index
+      tags:
+      - Go-Bounties
+  /gobounties/invoice/{paymentRequest}:
+    get:
+      description: Get invoice data by payment request
+      parameters:
+      - description: Payment Request
+        in: path
+        name: paymentRequest
+        required: true
+        type: string
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/db.InvoiceResult'
+      summary: Get invoice data
+      tags:
+      - Go-Bounties
+  /gobounties/invoice/poll/{paymentRequest}:
+    get:
+      description: Poll invoice by payment request
+      parameters:
+      - description: Payment Request
+        in: path
+        name: paymentRequest
+        required: true
+        type: string
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/db.InvoiceResult'
+      summary: Poll invoice
+      tags:
+      - Go-Bounties
+  /gobounties/leaderboard:
+    get:
+      description: Get bounties leaderboard
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              items:
+                $ref: '#/definitions/db.LeaderData'
+              type: array
+            type: array
+      summary: Get bounties leaderboard
+      tags:
+      - Go-Bounties
+  /gobounties/next/{created}:
+    get:
+      description: Get next bounty by created date
+      parameters:
+      - description: Created date
+        in: path
+        name: created
+        required: true
+        type: string
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/db.Bounty'
+      summary: Get next bounty
+      tags:
+      - Go-Bounties
+  /gobounties/pay/{id}:
+    post:
+      description: Make a bounty payment
+      parameters:
+      - description: Bounty ID
+        in: path
+        name: id
+        required: true
+        type: string
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/db.NewBounty'
+      summary: Make a bounty payment
+      tags:
+      - Go-Bounties
+  /gobounties/payment/{bountyId}:
+    get:
+      description: Get payment by bounty ID
+      parameters:
+      - description: Bounty ID
+        in: path
+        name: bountyId
+        required: true
+        type: string
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/db.NewPaymentHistory'
+      summary: Get payment by bounty ID
+      tags:
+      - Go-Bounties
+  /gobounties/payment/status/{id}:
+    get:
+      description: Get bounty payment status by ID
+      parameters:
+      - description: Bounty ID
+        in: path
+        name: id
+        required: true
+        type: string
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/db.NewPaymentHistory'
+      summary: Get bounty payment status
+      tags:
+      - Go-Bounties
+    put:
+      description: Update bounty payment status by ID
+      parameters:
+      - description: Bounty ID
+        in: path
+        name: id
+        required: true
+        type: string
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/db.NewPaymentHistory'
+      summary: Update bounty payment status
+      tags:
+      - Go-Bounties
+  /gobounties/paymentstatus/{created}:
+    post:
+      description: Update payment status by created date
+      parameters:
+      - description: Created
+        in: path
+        name: created
+        required: true
+        type: string
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/db.NewBounty'
+      summary: Update payment status
+      tags:
+      - Go-Bounties
+  /gobounties/previous/{created}:
+    get:
+      description: Get previous bounty by created date
+      parameters:
+      - description: Created date
+        in: path
+        name: created
+        required: true
+        type: string
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/db.Bounty'
+      summary: Get previous bounty
+      tags:
+      - Go-Bounties
+  /gobounties/workspace/next/{uuid}/{created}:
+    get:
+      description: Get next workspace bounty by created date
+      parameters:
+      - description: Workspace UUID
+        in: path
+        name: uuid
+        required: true
+        type: string
+      - description: Created date
+        in: path
+        name: created
+        required: true
+        type: string
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/db.Bounty'
+      summary: Get next workspace bounty
+      tags:
+      - Go-Bounties
+  /gobounties/workspace/previous/{uuid}/{created}:
+    get:
+      description: Get previous workspace bounty by created date
+      parameters:
+      - description: Workspace UUID
+        in: path
+        name: uuid
+        required: true
+        type: string
+      - description: Created date
+        in: path
+        name: created
+        required: true
+        type: string
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/db.Bounty'
+      summary: Get previous workspace bounty
+      tags:
+      - Go-Bounties
+  /gobounties/workspace/timerange/{workspaceId}/{daysStart}/{daysEnd}:
+    get:
+      description: Get bounties by workspace time range
+      parameters:
+      - description: Workspace ID
+        in: path
+        name: workspaceId
+        required: true
+        type: string
+      - description: Days Start
+        in: path
+        name: daysStart
+        required: true
+        type: string
+      - description: Days End
+        in: path
+        name: daysEnd
+        required: true
+        type: string
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/db.NodeListResponse'
+      summary: Get bounties by workspace time
+      tags:
+      - Go-Bounties
+  /invoice:
+    post:
+      description: Generate an invoice for a tribe
+      parameters:
+      - description: Invoice request
+        in: body
+        name: invoice
+        required: true
+        schema:
+          $ref: '#/definitions/db.InvoiceRequest'
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/db.InvoiceResponse'
+      summary: Generate an invoice
+      tags:
+      - Tribes
+  /lnauth:
+    get:
+      description: Get LNURL auth details
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Get LNURL auth
+      tags:
+      - Auth
+  /lnauth_login:
+    get:
+      description: Receive LNURL auth data
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Receive LNURL auth data
+      tags:
+      - Auth
+  /migrate_bounties:
+    post:
+      description: Migrate bounties from extras to the new structure
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Returns status of migration
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal server error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - ApiKeyAuth: []
+      summary: Migrate bounties
+      tags:
+      - Others
+  /people/offers:
+    get:
+      description: Get a list of listed offers
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/db.Person'
+            type: array
+      summary: Get listed offers
+      tags:
+      - People
+  /people/wanteds/header:
+    get:
+      description: Get the header information for wanteds
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/handlers.WantedsHeaderResponse'
+      summary: Get wanteds header
+      tags:
+      - People
+  /refresh_jwt:
+    get:
+      description: Refresh the JWT token
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Refresh JWT token
+      tags:
+      - Auth
+  /tribes:
+    get:
+      description: Get a list of all tribes
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/db.Tribe'
+            type: array
+      summary: Get all tribes
+      tags:
+      - Tribes
+    put:
+      description: Create or edit a tribe
+      parameters:
+      - description: Tribe object
+        in: body
+        name: tribe
+        required: true
+        schema:
+          $ref: '#/definitions/db.Tribe'
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/db.Tribe'
+      summary: Create or edit a tribe
+      tags:
+      - Tribes
+  /tribes/{uuid}:
+    delete:
+      description: Delete a tribe by UUID
+      parameters:
+      - description: Tribe UUID
+        in: path
+        name: uuid
+        required: true
+        type: string
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: boolean
+      summary: Delete a tribe
+      tags:
+      - Tribes
+    get:
+      description: Get a tribe by UUID
+      parameters:
+      - description: Tribe UUID
+        in: path
+        name: uuid
+        required: true
+        type: string
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+      summary: Get a tribe
+      tags:
+      - Tribes
+  /tribes/activity/{uuid}:
+    put:
+      description: Update the activity of a tribe
+      parameters:
+      - description: Tribe UUID
+        in: path
+        name: uuid
+        required: true
+        type: string
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: boolean
+      summary: Update tribe activity
+      tags:
+      - Tribes
+  /tribes/app/{app_url}:
+    get:
+      description: Get a list of tribes by app URL
+      parameters:
+      - description: App URL
+        in: path
+        name: app_url
+        required: true
+        type: string
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/db.Tribe'
+            type: array
+      summary: Get tribes by app URL
+      tags:
+      - Tribes
+  /tribes/apps/{app_urls}:
+    get:
+      description: Get a list of tribes by multiple app URLs
+      parameters:
+      - description: Comma-separated list of app URLs
+        in: path
+        name: app_urls
+        required: true
+        type: string
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties:
+              items:
+                $ref: '#/definitions/db.Tribe'
+              type: array
+            type: object
+      summary: Get tribes by multiple app URLs
+      tags:
+      - Tribes
+  /tribes/budget_invoice:
+    post:
+      description: Generate a budget invoice for a tribe
+      parameters:
+      - description: Budget invoice request
+        in: body
+        name: invoice
+        required: true
+        schema:
+          $ref: '#/definitions/db.BudgetInvoiceRequest'
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/db.InvoiceResponse'
+      summary: Generate a budget invoice
+      tags:
+      - Tribes
+  /tribes/feed:
+    get:
+      description: Get the first tribe by feed URL
+      parameters:
+      - description: Feed URL
+        in: query
+        name: url
+        required: true
+        type: string
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+      summary: Get the first tribe by feed URL
+      tags:
+      - Tribes
+  /tribes/invoice:
+    post:
+      description: Generate an invoice for a tribe
+      parameters:
+      - description: Invoice request
+        in: body
+        name: invoice
+        required: true
+        schema:
+          $ref: '#/definitions/db.InvoiceRequest'
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/db.InvoiceResponse'
+      summary: Generate an invoice
+      tags:
+      - Tribes
+  /tribes/leaderboard/{tribe_uuid}:
+    get:
+      description: Get a leaderboard for a tribe
+      parameters:
+      - description: Tribe UUID
+        in: path
+        name: tribe_uuid
+        required: true
+        type: string
+      - description: Alias
+        in: query
+        name: alias
+        type: string
+      responses:
+        "200":
+          description: OK
+          schema: {}
+      summary: Get a leaderboard
+      tags:
+      - Tribes
+    post:
+      description: Create a leaderboard for a tribe
+      parameters:
+      - description: Tribe UUID
+        in: path
+        name: tribe_uuid
+        required: true
+        type: string
+      - description: Leaderboard object
+        in: body
+        name: leaderboard
+        required: true
+        schema:
+          items:
+            $ref: '#/definitions/db.LeaderBoard'
+          type: array
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: boolean
+      summary: Create a leaderboard
+      tags:
+      - Tribes
+    put:
+      description: Update a leaderboard for a tribe
+      parameters:
+      - description: Tribe UUID
+        in: path
+        name: tribe_uuid
+        required: true
+        type: string
+      - description: Leaderboard object
+        in: body
+        name: leaderboard
+        required: true
+        schema:
+          $ref: '#/definitions/db.LeaderBoard'
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: boolean
+      summary: Update a leaderboard
+      tags:
+      - Tribes
+  /tribes/listed:
+    get:
+      description: Get a list of listed tribes
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/db.Tribe'
+            type: array
+      summary: Get listed tribes
+      tags:
+      - Tribes
+  /tribes/owner/{pubkey}:
+    get:
+      description: Get a list of tribes by owner public key
+      parameters:
+      - description: Owner public key
+        in: path
+        name: pubkey
+        required: true
+        type: string
+      - description: Include all tribes
+        in: query
+        name: all
+        type: string
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/db.Tribe'
+            type: array
+      summary: Get tribes by owner
+      tags:
+      - Tribes
+  /tribes/preview/{uuid}:
+    put:
+      description: Set the preview of a tribe
+      parameters:
+      - description: Tribe UUID
+        in: path
+        name: uuid
+        required: true
+        type: string
+      - description: Preview URL
+        in: query
+        name: preview
+        required: true
+        type: string
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: boolean
+      summary: Set tribe preview
+      tags:
+      - Tribes
+  /tribes/stats:
+    put:
+      description: Update the stats of a tribe
+      parameters:
+      - description: Tribe object
+        in: body
+        name: tribe
+        required: true
+        schema:
+          $ref: '#/definitions/db.Tribe'
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: boolean
+      summary: Update tribe stats
+      tags:
+      - Tribes
+  /tribes/total:
+    get:
+      description: Get the total number of tribes
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: integer
+      summary: Get total number of tribes
+      tags:
+      - Tribes
+  /tribes/unique/{un}:
+    get:
+      description: Get a tribe by unique name
+      parameters:
+      - description: Unique name
+        in: path
+        name: un
+        required: true
+        type: string
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+      summary: Get a tribe by unique name
+      tags:
+      - Tribes
+  /tribes/unique_name:
+    get:
+      description: Get unique name from tribe name
+      parameters:
+      - description: Tribe name
+        in: query
+        name: name
+        required: true
+        type: string
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: string
+      summary: Get unique name from tribe name
+      tags:
+      - Tribes
+swagger: "2.0"

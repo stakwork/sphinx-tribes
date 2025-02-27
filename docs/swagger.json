@@ -1,0 +1,3593 @@
+{
+    "swagger": "2.0",
+    "info": {
+        "description": "This is the API documentation for Sphinx Tribes.",
+        "title": "Sphinx Tribes API",
+        "contact": {},
+        "version": "1.0"
+    },
+    "host": "localhost:5002",
+    "basePath": "/",
+    "paths": {
+        "/activities": {
+            "post": {
+                "description": "Create a new activity",
+                "tags": [
+                    "Activities"
+                ],
+                "summary": "Create an activity",
+                "parameters": [
+                    {
+                        "description": "Activity object",
+                        "name": "activity",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/handlers.CreateActivityRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "schema": {
+                            "$ref": "#/definitions/handlers.ActivityResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/activities/feature/{feature_uuid}": {
+            "get": {
+                "description": "Get activities by feature UUID",
+                "tags": [
+                    "Activities"
+                ],
+                "summary": "Get activities by feature",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Feature UUID",
+                        "name": "feature_uuid",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    }
+                }
+            }
+        },
+        "/activities/phase/{phase_uuid}": {
+            "get": {
+                "description": "Get activities by phase UUID",
+                "tags": [
+                    "Activities"
+                ],
+                "summary": "Get activities by phase",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Phase UUID",
+                        "name": "phase_uuid",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    }
+                }
+            }
+        },
+        "/activities/thread": {
+            "post": {
+                "description": "Create a new activity thread",
+                "tags": [
+                    "Activities"
+                ],
+                "summary": "Create an activity thread",
+                "parameters": [
+                    {
+                        "description": "Activity object",
+                        "name": "activity",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/handlers.CreateActivityRequest"
+                        }
+                    },
+                    {
+                        "type": "string",
+                        "description": "Source ID",
+                        "name": "source_id",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "schema": {
+                            "$ref": "#/definitions/handlers.ActivityResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/activities/thread/{thread_id}": {
+            "get": {
+                "description": "Get activities by thread ID",
+                "tags": [
+                    "Activities"
+                ],
+                "summary": "Get activities by thread",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Thread ID",
+                        "name": "thread_id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    }
+                }
+            }
+        },
+        "/activities/thread/{thread_id}/latest": {
+            "get": {
+                "description": "Get the latest activity by thread ID",
+                "tags": [
+                    "Activities"
+                ],
+                "summary": "Get the latest activity by thread",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Thread ID",
+                        "name": "thread_id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/handlers.ActivityResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/activities/workspace/{workspace}": {
+            "get": {
+                "description": "Get activities by workspace",
+                "tags": [
+                    "Activities"
+                ],
+                "summary": "Get activities by workspace",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Workspace",
+                        "name": "workspace",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    }
+                }
+            }
+        },
+        "/activities/{id}": {
+            "get": {
+                "description": "Get an activity by ID",
+                "tags": [
+                    "Activities"
+                ],
+                "summary": "Get an activity",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Activity ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/handlers.ActivityResponse"
+                        }
+                    }
+                }
+            },
+            "put": {
+                "description": "Update an existing activity",
+                "tags": [
+                    "Activities"
+                ],
+                "summary": "Update an activity",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Activity ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "Activity object",
+                        "name": "activity",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/db.Activity"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/handlers.ActivityResponse"
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "description": "Delete an activity by ID",
+                "tags": [
+                    "Activities"
+                ],
+                "summary": "Delete an activity",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Activity ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    }
+                }
+            }
+        },
+        "/activities/{id}/actions": {
+            "post": {
+                "description": "Add actions to an activity by ID",
+                "tags": [
+                    "Activities"
+                ],
+                "summary": "Add actions to an activity",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Activity ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "Action content",
+                        "name": "action",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/handlers.ActivityContentRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/handlers.ActivityResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/activities/{id}/actions/{action_id}": {
+            "delete": {
+                "description": "Remove an action from an activity by ID",
+                "tags": [
+                    "Activities"
+                ],
+                "summary": "Remove an action from an activity",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Activity ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Action ID",
+                        "name": "action_id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/handlers.ActivityResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/activities/{id}/questions": {
+            "post": {
+                "description": "Add questions to an activity by ID",
+                "tags": [
+                    "Activities"
+                ],
+                "summary": "Add questions to an activity",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Activity ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "Question content",
+                        "name": "question",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/handlers.ActivityContentRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/handlers.ActivityResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/activities/{id}/questions/{question_id}": {
+            "delete": {
+                "description": "Remove a question from an activity by ID",
+                "tags": [
+                    "Activities"
+                ],
+                "summary": "Remove a question from an activity",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Activity ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Question ID",
+                        "name": "question_id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/handlers.ActivityResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/admin/auth": {
+            "get": {
+                "description": "Check if the user is an admin",
+                "tags": [
+                    "Auth"
+                ],
+                "summary": "Check if user is admin",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "boolean"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/admin_pubkeys": {
+            "get": {
+                "description": "Get a list of admin pubkeys",
+                "tags": [
+                    "Auth"
+                ],
+                "summary": "Get admin pubkeys",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/bots": {
+            "put": {
+                "description": "Create or edit a bot",
+                "tags": [
+                    "Bots"
+                ],
+                "summary": "Create or edit a bot",
+                "parameters": [
+                    {
+                        "description": "Bot object",
+                        "name": "bot",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/db.Bot"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/db.Bot"
+                        }
+                    }
+                }
+            }
+        },
+        "/bots/listed": {
+            "get": {
+                "description": "Get a list of listed bots",
+                "tags": [
+                    "Bots"
+                ],
+                "summary": "Get listed bots",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/db.Bot"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/bots/owner/{pubkey}": {
+            "get": {
+                "description": "Get a list of bots by owner public key",
+                "tags": [
+                    "Bots"
+                ],
+                "summary": "Get bots by owner",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Owner public key",
+                        "name": "pubkey",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/db.Bot"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/bots/search": {
+            "get": {
+                "description": "Search for bots",
+                "tags": [
+                    "Bots"
+                ],
+                "summary": "Search bots",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Search query",
+                        "name": "query",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/db.Bot"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/bots/unique/{unique_name}": {
+            "get": {
+                "description": "Get a bot by unique name",
+                "tags": [
+                    "Bots"
+                ],
+                "summary": "Get a bot by unique name",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Unique name",
+                        "name": "unique_name",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/db.Bot"
+                        }
+                    }
+                }
+            }
+        },
+        "/bots/unique_name": {
+            "get": {
+                "description": "Get unique name from bot name",
+                "tags": [
+                    "Bots"
+                ],
+                "summary": "Get unique name from bot name",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Bot name",
+                        "name": "name",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
+        "/bots/{uuid}": {
+            "get": {
+                "description": "Get a bot by UUID",
+                "tags": [
+                    "Bots"
+                ],
+                "summary": "Get a bot",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Bot UUID",
+                        "name": "uuid",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/db.Bot"
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "description": "Delete a bot by UUID",
+                "tags": [
+                    "Bots"
+                ],
+                "summary": "Delete a bot",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Bot UUID",
+                        "name": "uuid",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "boolean"
+                        }
+                    }
+                }
+            }
+        },
+        "/gobounties": {
+            "post": {
+                "description": "Create or edit a bounty",
+                "tags": [
+                    "Go-Bounties"
+                ],
+                "summary": "Create or edit a bounty",
+                "parameters": [
+                    {
+                        "description": "Bounty object",
+                        "name": "bounty",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/db.NewBounty"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/db.NewBounty"
+                        }
+                    }
+                }
+            }
+        },
+        "/gobounties/all": {
+            "get": {
+                "description": "Get a list of all bounties",
+                "tags": [
+                    "Go-Bounties"
+                ],
+                "summary": "Get all bounties",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/db.Bounty"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/gobounties/bounty-cards": {
+            "get": {
+                "description": "Get bounty cards",
+                "tags": [
+                    "Go-Bounties"
+                ],
+                "summary": "Get bounty cards",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/db.BountyCard"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/gobounties/budget/withdraw": {
+            "post": {
+                "description": "Withdraw bounty budget",
+                "tags": [
+                    "Go-Bounties"
+                ],
+                "summary": "Withdraw bounty budget",
+                "parameters": [
+                    {
+                        "description": "Withdraw Budget Request",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/db.NewWithdrawBudgetRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/db.InvoicePaySuccess"
+                        }
+                    }
+                }
+            }
+        },
+        "/gobounties/completedstatus/{created}": {
+            "post": {
+                "description": "Update completed status by created date",
+                "tags": [
+                    "Go-Bounties"
+                ],
+                "summary": "Update completed status",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Created",
+                        "name": "created",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/db.NewBounty"
+                        }
+                    }
+                }
+            }
+        },
+        "/gobounties/count": {
+            "get": {
+                "description": "Get bounty count",
+                "tags": [
+                    "Go-Bounties"
+                ],
+                "summary": "Get bounty count",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                }
+            }
+        },
+        "/gobounties/count/{personKey}/{tabType}": {
+            "get": {
+                "description": "Get user bounty count by person key and tab type",
+                "tags": [
+                    "Go-Bounties"
+                ],
+                "summary": "Get user bounty count",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Person Key",
+                        "name": "personKey",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Tab Type",
+                        "name": "tabType",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                }
+            }
+        },
+        "/gobounties/created/{created}": {
+            "get": {
+                "description": "Get bounty by created date",
+                "tags": [
+                    "Go-Bounties"
+                ],
+                "summary": "Get bounty by created date",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Created date",
+                        "name": "created",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/db.Bounty"
+                        }
+                    }
+                }
+            }
+        },
+        "/gobounties/featured/all": {
+            "get": {
+                "description": "Get all featured bounties",
+                "tags": [
+                    "Go-Bounties"
+                ],
+                "summary": "Get all featured bounties",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/db.FeaturedBounty"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/gobounties/featured/create": {
+            "post": {
+                "description": "Create a featured bounty",
+                "tags": [
+                    "Go-Bounties"
+                ],
+                "summary": "Create a featured bounty",
+                "parameters": [
+                    {
+                        "description": "Featured Bounty object",
+                        "name": "bounty",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/db.FeaturedBounty"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "schema": {
+                            "$ref": "#/definitions/db.FeaturedBounty"
+                        }
+                    }
+                }
+            }
+        },
+        "/gobounties/featured/delete/{bountyId}": {
+            "delete": {
+                "description": "Delete a featured bounty by ID",
+                "tags": [
+                    "Go-Bounties"
+                ],
+                "summary": "Delete a featured bounty",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Bounty ID",
+                        "name": "bountyId",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "No Content"
+                    }
+                }
+            }
+        },
+        "/gobounties/featured/update": {
+            "put": {
+                "description": "Update a featured bounty",
+                "tags": [
+                    "Go-Bounties"
+                ],
+                "summary": "Update a featured bounty",
+                "parameters": [
+                    {
+                        "description": "Featured Bounty object",
+                        "name": "bounty",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/db.FeaturedBounty"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/db.FeaturedBounty"
+                        }
+                    }
+                }
+            }
+        },
+        "/gobounties/filter/count": {
+            "get": {
+                "description": "Get filter count",
+                "tags": [
+                    "Go-Bounties"
+                ],
+                "summary": "Get filter count",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/db.FilterStatusCount"
+                        }
+                    }
+                }
+            }
+        },
+        "/gobounties/id/{bountyId}": {
+            "get": {
+                "description": "Get a bounty by ID",
+                "tags": [
+                    "Go-Bounties"
+                ],
+                "summary": "Get a bounty",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Bounty ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/db.Bounty"
+                        }
+                    }
+                }
+            }
+        },
+        "/gobounties/index/{bountyId}": {
+            "get": {
+                "description": "Get bounty index by ID",
+                "tags": [
+                    "Go-Bounties"
+                ],
+                "summary": "Get bounty index",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Bounty ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                }
+            }
+        },
+        "/gobounties/invoice/poll/{paymentRequest}": {
+            "get": {
+                "description": "Poll invoice by payment request",
+                "tags": [
+                    "Go-Bounties"
+                ],
+                "summary": "Poll invoice",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Payment Request",
+                        "name": "paymentRequest",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/db.InvoiceResult"
+                        }
+                    }
+                }
+            }
+        },
+        "/gobounties/invoice/{paymentRequest}": {
+            "get": {
+                "description": "Get invoice data by payment request",
+                "tags": [
+                    "Go-Bounties"
+                ],
+                "summary": "Get invoice data",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Payment Request",
+                        "name": "paymentRequest",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/db.InvoiceResult"
+                        }
+                    }
+                }
+            }
+        },
+        "/gobounties/leaderboard": {
+            "get": {
+                "description": "Get bounties leaderboard",
+                "tags": [
+                    "Go-Bounties"
+                ],
+                "summary": "Get bounties leaderboard",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "type": "array",
+                                "items": {
+                                    "$ref": "#/definitions/db.LeaderData"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/gobounties/next/{created}": {
+            "get": {
+                "description": "Get next bounty by created date",
+                "tags": [
+                    "Go-Bounties"
+                ],
+                "summary": "Get next bounty",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Created date",
+                        "name": "created",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/db.Bounty"
+                        }
+                    }
+                }
+            }
+        },
+        "/gobounties/pay/{id}": {
+            "post": {
+                "description": "Make a bounty payment",
+                "tags": [
+                    "Go-Bounties"
+                ],
+                "summary": "Make a bounty payment",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Bounty ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/db.NewBounty"
+                        }
+                    }
+                }
+            }
+        },
+        "/gobounties/payment/status/{id}": {
+            "get": {
+                "description": "Get bounty payment status by ID",
+                "tags": [
+                    "Go-Bounties"
+                ],
+                "summary": "Get bounty payment status",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Bounty ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/db.NewPaymentHistory"
+                        }
+                    }
+                }
+            },
+            "put": {
+                "description": "Update bounty payment status by ID",
+                "tags": [
+                    "Go-Bounties"
+                ],
+                "summary": "Update bounty payment status",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Bounty ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/db.NewPaymentHistory"
+                        }
+                    }
+                }
+            }
+        },
+        "/gobounties/payment/{bountyId}": {
+            "get": {
+                "description": "Get payment by bounty ID",
+                "tags": [
+                    "Go-Bounties"
+                ],
+                "summary": "Get payment by bounty ID",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Bounty ID",
+                        "name": "bountyId",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/db.NewPaymentHistory"
+                        }
+                    }
+                }
+            }
+        },
+        "/gobounties/paymentstatus/{created}": {
+            "post": {
+                "description": "Update payment status by created date",
+                "tags": [
+                    "Go-Bounties"
+                ],
+                "summary": "Update payment status",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Created",
+                        "name": "created",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/db.NewBounty"
+                        }
+                    }
+                }
+            }
+        },
+        "/gobounties/previous/{created}": {
+            "get": {
+                "description": "Get previous bounty by created date",
+                "tags": [
+                    "Go-Bounties"
+                ],
+                "summary": "Get previous bounty",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Created date",
+                        "name": "created",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/db.Bounty"
+                        }
+                    }
+                }
+            }
+        },
+        "/gobounties/workspace/next/{uuid}/{created}": {
+            "get": {
+                "description": "Get next workspace bounty by created date",
+                "tags": [
+                    "Go-Bounties"
+                ],
+                "summary": "Get next workspace bounty",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Workspace UUID",
+                        "name": "uuid",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Created date",
+                        "name": "created",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/db.Bounty"
+                        }
+                    }
+                }
+            }
+        },
+        "/gobounties/workspace/previous/{uuid}/{created}": {
+            "get": {
+                "description": "Get previous workspace bounty by created date",
+                "tags": [
+                    "Go-Bounties"
+                ],
+                "summary": "Get previous workspace bounty",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Workspace UUID",
+                        "name": "uuid",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Created date",
+                        "name": "created",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/db.Bounty"
+                        }
+                    }
+                }
+            }
+        },
+        "/gobounties/workspace/timerange/{workspaceId}/{daysStart}/{daysEnd}": {
+            "get": {
+                "description": "Get bounties by workspace time range",
+                "tags": [
+                    "Go-Bounties"
+                ],
+                "summary": "Get bounties by workspace time",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Workspace ID",
+                        "name": "workspaceId",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Days Start",
+                        "name": "daysStart",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Days End",
+                        "name": "daysEnd",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/db.NodeListResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/gobounties/{id}/proof": {
+            "post": {
+                "description": "Add proof of work to a bounty",
+                "tags": [
+                    "Go-Bounties"
+                ],
+                "summary": "Add proof of work",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Bounty ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "Proof of Work object",
+                        "name": "proof",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/db.ProofOfWork"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "schema": {
+                            "$ref": "#/definitions/db.ProofOfWork"
+                        }
+                    }
+                }
+            }
+        },
+        "/gobounties/{id}/proofs": {
+            "get": {
+                "description": "Get proofs by bounty ID",
+                "tags": [
+                    "Go-Bounties"
+                ],
+                "summary": "Get proofs by bounty",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Bounty ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/db.ProofOfWork"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/gobounties/{id}/proofs/{proofId}": {
+            "delete": {
+                "description": "Delete proof by ID",
+                "tags": [
+                    "Go-Bounties"
+                ],
+                "summary": "Delete proof",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Bounty ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Proof ID",
+                        "name": "proofId",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "No Content"
+                    }
+                }
+            }
+        },
+        "/gobounties/{id}/timing": {
+            "get": {
+                "description": "Get bounty timing stats by ID",
+                "tags": [
+                    "Go-Bounties"
+                ],
+                "summary": "Get bounty timing stats",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Bounty ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/handlers.BountyTimingResponse"
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "description": "Delete bounty timing by ID",
+                "tags": [
+                    "Go-Bounties"
+                ],
+                "summary": "Delete bounty timing",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Bounty ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "No Content"
+                    }
+                }
+            }
+        },
+        "/gobounties/{id}/timing/close": {
+            "post": {
+                "description": "Close bounty timing by ID",
+                "tags": [
+                    "Go-Bounties"
+                ],
+                "summary": "Close bounty timing",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Bounty ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    }
+                }
+            }
+        },
+        "/gobounties/{id}/timing/start": {
+            "post": {
+                "description": "Start bounty timing by ID",
+                "tags": [
+                    "Go-Bounties"
+                ],
+                "summary": "Start bounty timing",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Bounty ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    }
+                }
+            }
+        },
+        "/gobounties/{pubkey}/{created}": {
+            "delete": {
+                "description": "Delete a bounty by ID",
+                "tags": [
+                    "Go-Bounties"
+                ],
+                "summary": "Delete a bounty",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "PubKey",
+                        "name": "pubkey",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Created",
+                        "name": "created",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "boolean"
+                        }
+                    }
+                }
+            }
+        },
+        "/invoice": {
+            "post": {
+                "description": "Generate an invoice for a tribe",
+                "tags": [
+                    "Tribes"
+                ],
+                "summary": "Generate an invoice",
+                "parameters": [
+                    {
+                        "description": "Invoice request",
+                        "name": "invoice",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/db.InvoiceRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/db.InvoiceResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/lnauth": {
+            "get": {
+                "description": "Get LNURL auth details",
+                "tags": [
+                    "Auth"
+                ],
+                "summary": "Get LNURL auth",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/lnauth_login": {
+            "get": {
+                "description": "Receive LNURL auth data",
+                "tags": [
+                    "Auth"
+                ],
+                "summary": "Receive LNURL auth data",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/migrate_bounties": {
+            "post": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "Migrate bounties from extras to the new structure",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Others"
+                ],
+                "summary": "Migrate bounties",
+                "responses": {
+                    "200": {
+                        "description": "Returns status of migration",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/people/offers": {
+            "get": {
+                "description": "Get a list of listed offers",
+                "tags": [
+                    "People"
+                ],
+                "summary": "Get listed offers",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/db.Person"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/people/wanteds/header": {
+            "get": {
+                "description": "Get the header information for wanteds",
+                "tags": [
+                    "People"
+                ],
+                "summary": "Get wanteds header",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/handlers.WantedsHeaderResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/refresh_jwt": {
+            "get": {
+                "description": "Refresh the JWT token",
+                "tags": [
+                    "Auth"
+                ],
+                "summary": "Refresh JWT token",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/tribes": {
+            "get": {
+                "description": "Get a list of all tribes",
+                "tags": [
+                    "Tribes"
+                ],
+                "summary": "Get all tribes",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/db.Tribe"
+                            }
+                        }
+                    }
+                }
+            },
+            "put": {
+                "description": "Create or edit a tribe",
+                "tags": [
+                    "Tribes"
+                ],
+                "summary": "Create or edit a tribe",
+                "parameters": [
+                    {
+                        "description": "Tribe object",
+                        "name": "tribe",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/db.Tribe"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/db.Tribe"
+                        }
+                    }
+                }
+            }
+        },
+        "/tribes/activity/{uuid}": {
+            "put": {
+                "description": "Update the activity of a tribe",
+                "tags": [
+                    "Tribes"
+                ],
+                "summary": "Update tribe activity",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Tribe UUID",
+                        "name": "uuid",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "boolean"
+                        }
+                    }
+                }
+            }
+        },
+        "/tribes/app/{app_url}": {
+            "get": {
+                "description": "Get a list of tribes by app URL",
+                "tags": [
+                    "Tribes"
+                ],
+                "summary": "Get tribes by app URL",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "App URL",
+                        "name": "app_url",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/db.Tribe"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/tribes/apps/{app_urls}": {
+            "get": {
+                "description": "Get a list of tribes by multiple app URLs",
+                "tags": [
+                    "Tribes"
+                ],
+                "summary": "Get tribes by multiple app URLs",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Comma-separated list of app URLs",
+                        "name": "app_urls",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "array",
+                                "items": {
+                                    "$ref": "#/definitions/db.Tribe"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/tribes/budget_invoice": {
+            "post": {
+                "description": "Generate a budget invoice for a tribe",
+                "tags": [
+                    "Tribes"
+                ],
+                "summary": "Generate a budget invoice",
+                "parameters": [
+                    {
+                        "description": "Budget invoice request",
+                        "name": "invoice",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/db.BudgetInvoiceRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/db.InvoiceResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/tribes/feed": {
+            "get": {
+                "description": "Get the first tribe by feed URL",
+                "tags": [
+                    "Tribes"
+                ],
+                "summary": "Get the first tribe by feed URL",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Feed URL",
+                        "name": "url",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    }
+                }
+            }
+        },
+        "/tribes/invoice": {
+            "post": {
+                "description": "Generate an invoice for a tribe",
+                "tags": [
+                    "Tribes"
+                ],
+                "summary": "Generate an invoice",
+                "parameters": [
+                    {
+                        "description": "Invoice request",
+                        "name": "invoice",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/db.InvoiceRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/db.InvoiceResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/tribes/leaderboard/{tribe_uuid}": {
+            "get": {
+                "description": "Get a leaderboard for a tribe",
+                "tags": [
+                    "Tribes"
+                ],
+                "summary": "Get a leaderboard",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Tribe UUID",
+                        "name": "tribe_uuid",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Alias",
+                        "name": "alias",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {}
+                    }
+                }
+            },
+            "put": {
+                "description": "Update a leaderboard for a tribe",
+                "tags": [
+                    "Tribes"
+                ],
+                "summary": "Update a leaderboard",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Tribe UUID",
+                        "name": "tribe_uuid",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "Leaderboard object",
+                        "name": "leaderboard",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/db.LeaderBoard"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "boolean"
+                        }
+                    }
+                }
+            },
+            "post": {
+                "description": "Create a leaderboard for a tribe",
+                "tags": [
+                    "Tribes"
+                ],
+                "summary": "Create a leaderboard",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Tribe UUID",
+                        "name": "tribe_uuid",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "Leaderboard object",
+                        "name": "leaderboard",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/db.LeaderBoard"
+                            }
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "boolean"
+                        }
+                    }
+                }
+            }
+        },
+        "/tribes/listed": {
+            "get": {
+                "description": "Get a list of listed tribes",
+                "tags": [
+                    "Tribes"
+                ],
+                "summary": "Get listed tribes",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/db.Tribe"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/tribes/owner/{pubkey}": {
+            "get": {
+                "description": "Get a list of tribes by owner public key",
+                "tags": [
+                    "Tribes"
+                ],
+                "summary": "Get tribes by owner",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Owner public key",
+                        "name": "pubkey",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Include all tribes",
+                        "name": "all",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/db.Tribe"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/tribes/preview/{uuid}": {
+            "put": {
+                "description": "Set the preview of a tribe",
+                "tags": [
+                    "Tribes"
+                ],
+                "summary": "Set tribe preview",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Tribe UUID",
+                        "name": "uuid",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Preview URL",
+                        "name": "preview",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "boolean"
+                        }
+                    }
+                }
+            }
+        },
+        "/tribes/stats": {
+            "put": {
+                "description": "Update the stats of a tribe",
+                "tags": [
+                    "Tribes"
+                ],
+                "summary": "Update tribe stats",
+                "parameters": [
+                    {
+                        "description": "Tribe object",
+                        "name": "tribe",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/db.Tribe"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "boolean"
+                        }
+                    }
+                }
+            }
+        },
+        "/tribes/total": {
+            "get": {
+                "description": "Get the total number of tribes",
+                "tags": [
+                    "Tribes"
+                ],
+                "summary": "Get total number of tribes",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                }
+            }
+        },
+        "/tribes/unique/{un}": {
+            "get": {
+                "description": "Get a tribe by unique name",
+                "tags": [
+                    "Tribes"
+                ],
+                "summary": "Get a tribe by unique name",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Unique name",
+                        "name": "un",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    }
+                }
+            }
+        },
+        "/tribes/unique_name": {
+            "get": {
+                "description": "Get unique name from tribe name",
+                "tags": [
+                    "Tribes"
+                ],
+                "summary": "Get unique name from tribe name",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Tribe name",
+                        "name": "name",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
+        "/tribes/{uuid}": {
+            "get": {
+                "description": "Get a tribe by UUID",
+                "tags": [
+                    "Tribes"
+                ],
+                "summary": "Get a tribe",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Tribe UUID",
+                        "name": "uuid",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "description": "Delete a tribe by UUID",
+                "tags": [
+                    "Tribes"
+                ],
+                "summary": "Delete a tribe",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Tribe UUID",
+                        "name": "uuid",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "boolean"
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "definitions": {
+        "db.Activity": {
+            "type": "object",
+            "properties": {
+                "actions": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "author": {
+                    "$ref": "#/definitions/db.AuthorType"
+                },
+                "author_ref": {
+                    "type": "string"
+                },
+                "content": {
+                    "type": "string"
+                },
+                "content_type": {
+                    "$ref": "#/definitions/db.ContentType"
+                },
+                "feature_uuid": {
+                    "type": "string"
+                },
+                "feedback": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "phase_uuid": {
+                    "type": "string"
+                },
+                "questions": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "sequence": {
+                    "type": "integer"
+                },
+                "status": {
+                    "type": "string"
+                },
+                "thread_id": {
+                    "type": "string"
+                },
+                "time_created": {
+                    "type": "string"
+                },
+                "time_updated": {
+                    "type": "string"
+                },
+                "title": {
+                    "type": "string"
+                },
+                "workspace": {
+                    "type": "string"
+                }
+            }
+        },
+        "db.AuthorType": {
+            "type": "string",
+            "enum": [
+                "human",
+                "hive"
+            ],
+            "x-enum-varnames": [
+                "HumansAuthor",
+                "HiveAuthor"
+            ]
+        },
+        "db.Bot": {
+            "type": "object",
+            "properties": {
+                "created": {
+                    "type": "string"
+                },
+                "deleted": {
+                    "type": "boolean"
+                },
+                "description": {
+                    "type": "string"
+                },
+                "img": {
+                    "type": "string"
+                },
+                "member_count": {
+                    "type": "integer"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "owner_alias": {
+                    "type": "string"
+                },
+                "owner_pubkey": {
+                    "type": "string"
+                },
+                "owner_route_hint": {
+                    "type": "string"
+                },
+                "price_per_use": {
+                    "type": "integer"
+                },
+                "tags": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "tsv": {
+                    "type": "string"
+                },
+                "unique_name": {
+                    "type": "string"
+                },
+                "unlisted": {
+                    "type": "boolean"
+                },
+                "updated": {
+                    "type": "string"
+                },
+                "uuid": {
+                    "type": "string"
+                }
+            }
+        },
+        "db.Bounty": {
+            "type": "object",
+            "properties": {
+                "assigned_date": {
+                    "type": "string"
+                },
+                "assigned_hours": {
+                    "type": "integer"
+                },
+                "assignee": {
+                    "type": "string"
+                },
+                "award": {
+                    "type": "string"
+                },
+                "bounty_expires": {
+                    "type": "string"
+                },
+                "coding_languages": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "commitment_fee": {
+                    "type": "integer"
+                },
+                "completed": {
+                    "type": "boolean"
+                },
+                "completion_date": {
+                    "type": "string"
+                },
+                "created": {
+                    "type": "integer"
+                },
+                "deliverables": {
+                    "type": "string"
+                },
+                "description": {
+                    "type": "string"
+                },
+                "estimated_completion_date": {
+                    "type": "string"
+                },
+                "estimated_session_length": {
+                    "type": "string"
+                },
+                "github_description": {
+                    "type": "boolean"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "mark_as_paid_date": {
+                    "type": "string"
+                },
+                "one_sentence_summary": {
+                    "type": "string"
+                },
+                "org_uuid": {
+                    "type": "string"
+                },
+                "owner_id": {
+                    "type": "string"
+                },
+                "paid": {
+                    "type": "boolean"
+                },
+                "paid_date": {
+                    "type": "string"
+                },
+                "payment_failed": {
+                    "type": "boolean"
+                },
+                "payment_pending": {
+                    "type": "boolean"
+                },
+                "phase_priority": {
+                    "type": "integer"
+                },
+                "phase_uuid": {
+                    "type": "string"
+                },
+                "price": {
+                    "type": "integer"
+                },
+                "show": {
+                    "type": "boolean"
+                },
+                "ticket_url": {
+                    "type": "string"
+                },
+                "title": {
+                    "type": "string"
+                },
+                "tribe": {
+                    "type": "string"
+                },
+                "type": {
+                    "type": "string"
+                },
+                "updated": {
+                    "type": "string"
+                },
+                "wanted_type": {
+                    "type": "string"
+                }
+            }
+        },
+        "db.BountyCard": {
+            "type": "object",
+            "properties": {
+                "assignee": {
+                    "type": "string"
+                },
+                "assignee_img": {
+                    "type": "string"
+                },
+                "assignee_name": {
+                    "type": "string"
+                },
+                "features": {
+                    "$ref": "#/definitions/db.WorkspaceFeatures"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "phase": {
+                    "$ref": "#/definitions/db.FeaturePhase"
+                },
+                "status": {
+                    "$ref": "#/definitions/db.BountyStatus"
+                },
+                "ticket_group": {
+                    "type": "string"
+                },
+                "ticket_uuid": {
+                    "type": "string"
+                },
+                "title": {
+                    "type": "string"
+                },
+                "workspace": {
+                    "$ref": "#/definitions/db.Workspace"
+                }
+            }
+        },
+        "db.BountyStatus": {
+            "type": "string",
+            "enum": [
+                "TODO",
+                "IN_PROGRESS",
+                "IN_REVIEW",
+                "COMPLETED",
+                "PAID",
+                "DRAFT"
+            ],
+            "x-enum-varnames": [
+                "StatusTodo",
+                "StatusInProgress",
+                "StatusInReview",
+                "StatusComplete",
+                "StatusPaid",
+                "StatusDraft"
+            ]
+        },
+        "db.BudgetInvoiceRequest": {
+            "type": "object",
+            "properties": {
+                "amount": {
+                    "type": "integer"
+                },
+                "org_uuid": {
+                    "type": "string"
+                },
+                "payment_type": {
+                    "$ref": "#/definitions/db.PaymentType"
+                },
+                "sender_pubkey": {
+                    "type": "string"
+                },
+                "websocket_token": {
+                    "type": "string"
+                },
+                "workspace_uuid": {
+                    "type": "string"
+                }
+            }
+        },
+        "db.ContentType": {
+            "type": "string",
+            "enum": [
+                "feature_creation",
+                "story_update",
+                "requirement_change",
+                "general_update"
+            ],
+            "x-enum-varnames": [
+                "FeatureCreation",
+                "StoryUpdate",
+                "RequirementChange",
+                "GeneralUpdate"
+            ]
+        },
+        "db.FeaturePhase": {
+            "type": "object",
+            "properties": {
+                "created": {
+                    "type": "string"
+                },
+                "created_by": {
+                    "type": "string"
+                },
+                "feature_uuid": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "phase_design": {
+                    "type": "string"
+                },
+                "phase_outcome": {
+                    "type": "string"
+                },
+                "phase_purpose": {
+                    "type": "string"
+                },
+                "phase_scope": {
+                    "type": "string"
+                },
+                "priority": {
+                    "type": "integer"
+                },
+                "updated": {
+                    "type": "string"
+                },
+                "updated_by": {
+                    "type": "string"
+                },
+                "uuid": {
+                    "type": "string"
+                }
+            }
+        },
+        "db.FeatureStatus": {
+            "type": "string",
+            "enum": [
+                "active",
+                "archived"
+            ],
+            "x-enum-varnames": [
+                "ActiveFeature",
+                "ArchivedFeature"
+            ]
+        },
+        "db.FeaturedBounty": {
+            "type": "object",
+            "properties": {
+                "addedAt": {
+                    "type": "integer"
+                },
+                "bountyId": {
+                    "type": "string"
+                },
+                "created_at": {
+                    "type": "string"
+                },
+                "title": {
+                    "type": "string"
+                },
+                "updated_at": {
+                    "type": "string"
+                },
+                "url": {
+                    "type": "string"
+                }
+            }
+        },
+        "db.FilterStatusCount": {
+            "type": "object",
+            "properties": {
+                "assigned": {
+                    "type": "integer"
+                },
+                "completed": {
+                    "type": "integer"
+                },
+                "failed": {
+                    "type": "integer"
+                },
+                "open": {
+                    "type": "integer"
+                },
+                "paid": {
+                    "type": "integer"
+                },
+                "pending": {
+                    "type": "integer"
+                }
+            }
+        },
+        "db.Invoice": {
+            "type": "object",
+            "properties": {
+                "invoice": {
+                    "type": "string"
+                }
+            }
+        },
+        "db.InvoiceCheckResponse": {
+            "type": "object",
+            "properties": {
+                "amount": {
+                    "type": "string"
+                },
+                "payment_hash": {
+                    "type": "string"
+                },
+                "payment_request": {
+                    "type": "string"
+                },
+                "preimage": {
+                    "type": "string"
+                },
+                "settled": {
+                    "type": "boolean"
+                }
+            }
+        },
+        "db.InvoicePaySuccess": {
+            "type": "object",
+            "properties": {
+                "response": {
+                    "$ref": "#/definitions/db.InvoiceCheckResponse"
+                },
+                "success": {
+                    "type": "boolean"
+                }
+            }
+        },
+        "db.InvoiceRequest": {
+            "type": "object",
+            "properties": {
+                "amount": {
+                    "type": "string"
+                },
+                "assigned_hours": {
+                    "type": "integer"
+                },
+                "bounty_expires": {
+                    "type": "string"
+                },
+                "commitment_fee": {
+                    "type": "integer"
+                },
+                "created": {
+                    "type": "string"
+                },
+                "memo": {
+                    "type": "string"
+                },
+                "owner_pubkey": {
+                    "type": "string"
+                },
+                "route_hint": {
+                    "type": "string"
+                },
+                "type": {
+                    "type": "string"
+                },
+                "user_pubkey": {
+                    "type": "string"
+                },
+                "websocket_token": {
+                    "type": "string"
+                }
+            }
+        },
+        "db.InvoiceResponse": {
+            "type": "object",
+            "properties": {
+                "response": {
+                    "$ref": "#/definitions/db.Invoice"
+                },
+                "success": {
+                    "type": "boolean"
+                }
+            }
+        },
+        "db.InvoiceResult": {
+            "type": "object",
+            "properties": {
+                "response": {
+                    "$ref": "#/definitions/db.InvoiceCheckResponse"
+                },
+                "success": {
+                    "type": "boolean"
+                }
+            }
+        },
+        "db.LeaderBoard": {
+            "type": "object",
+            "properties": {
+                "alias": {
+                    "type": "string"
+                },
+                "earned": {
+                    "type": "integer"
+                },
+                "reputation": {
+                    "type": "integer"
+                },
+                "spent": {
+                    "type": "integer"
+                },
+                "tribe_uuid": {
+                    "type": "string"
+                }
+            }
+        },
+        "db.LeaderData": {
+            "type": "object",
+            "additionalProperties": true
+        },
+        "db.NewBounty": {
+            "type": "object",
+            "properties": {
+                "assigned_date": {
+                    "type": "string"
+                },
+                "assigned_hours": {
+                    "type": "integer"
+                },
+                "assignee": {
+                    "type": "string"
+                },
+                "award": {
+                    "type": "string"
+                },
+                "bounty_expires": {
+                    "type": "string"
+                },
+                "coding_languages": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "commitment_fee": {
+                    "type": "integer"
+                },
+                "completed": {
+                    "type": "boolean"
+                },
+                "completion_date": {
+                    "type": "string"
+                },
+                "created": {
+                    "type": "integer"
+                },
+                "deliverables": {
+                    "type": "string"
+                },
+                "description": {
+                    "type": "string"
+                },
+                "estimated_completion_date": {
+                    "type": "string"
+                },
+                "estimated_session_length": {
+                    "type": "string"
+                },
+                "feature_uuid": {
+                    "type": "string"
+                },
+                "github_description": {
+                    "type": "boolean"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "mark_as_paid_date": {
+                    "type": "string"
+                },
+                "one_sentence_summary": {
+                    "type": "string"
+                },
+                "org_uuid": {
+                    "type": "string"
+                },
+                "owner_id": {
+                    "type": "string"
+                },
+                "paid": {
+                    "type": "boolean"
+                },
+                "paid_date": {
+                    "type": "string"
+                },
+                "payment_failed": {
+                    "type": "boolean"
+                },
+                "payment_pending": {
+                    "type": "boolean"
+                },
+                "phase_priority": {
+                    "type": "integer"
+                },
+                "phase_uuid": {
+                    "type": "string"
+                },
+                "pow": {
+                    "type": "integer"
+                },
+                "price": {
+                    "type": "integer"
+                },
+                "show": {
+                    "type": "boolean"
+                },
+                "ticket_url": {
+                    "type": "string"
+                },
+                "title": {
+                    "type": "string"
+                },
+                "tribe": {
+                    "type": "string"
+                },
+                "type": {
+                    "type": "string"
+                },
+                "updated": {
+                    "type": "string"
+                },
+                "wanted_type": {
+                    "type": "string"
+                },
+                "workspace_uuid": {
+                    "type": "string"
+                }
+            }
+        },
+        "db.NewPaymentHistory": {
+            "type": "object",
+            "properties": {
+                "amount": {
+                    "type": "integer"
+                },
+                "bounty_id": {
+                    "type": "integer"
+                },
+                "created": {
+                    "type": "string"
+                },
+                "error": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "org_uuid": {
+                    "type": "string"
+                },
+                "payment_status": {
+                    "type": "string"
+                },
+                "payment_type": {
+                    "$ref": "#/definitions/db.PaymentType"
+                },
+                "receiver_pubkey": {
+                    "type": "string"
+                },
+                "sender_pubkey": {
+                    "type": "string"
+                },
+                "status": {
+                    "type": "boolean"
+                },
+                "tag": {
+                    "type": "string"
+                },
+                "updated": {
+                    "type": "string"
+                },
+                "workspace_uuid": {
+                    "type": "string"
+                }
+            }
+        },
+        "db.NewWithdrawBudgetRequest": {
+            "type": "object",
+            "properties": {
+                "payment_request": {
+                    "type": "string"
+                },
+                "websocket_token": {
+                    "type": "string"
+                },
+                "workspace_uuid": {
+                    "type": "string"
+                }
+            }
+        },
+        "db.Node": {
+            "type": "object",
+            "properties": {
+                "node_data": {
+                    "$ref": "#/definitions/db.NodeData"
+                },
+                "node_type": {
+                    "type": "string"
+                }
+            }
+        },
+        "db.NodeData": {
+            "type": "object",
+            "properties": {
+                "bounty_id": {
+                    "type": "integer"
+                },
+                "description": {
+                    "type": "string"
+                },
+                "title": {
+                    "type": "string"
+                }
+            }
+        },
+        "db.NodeListResponse": {
+            "type": "object",
+            "properties": {
+                "node_list": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/db.Node"
+                    }
+                }
+            }
+        },
+        "db.PaymentType": {
+            "type": "string",
+            "enum": [
+                "deposit",
+                "withdraw",
+                "payment",
+                "reversal"
+            ],
+            "x-enum-varnames": [
+                "Deposit",
+                "Withdraw",
+                "Payment",
+                "Reversal"
+            ]
+        },
+        "db.Person": {
+            "type": "object",
+            "properties": {
+                "created": {
+                    "type": "string"
+                },
+                "deleted": {
+                    "type": "boolean"
+                },
+                "description": {
+                    "type": "string"
+                },
+                "extras": {
+                    "$ref": "#/definitions/db.PropertyMap"
+                },
+                "github_issues": {
+                    "$ref": "#/definitions/db.PropertyMap"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "img": {
+                    "type": "string"
+                },
+                "last_login": {
+                    "type": "integer"
+                },
+                "new_ticket_time": {
+                    "type": "integer"
+                },
+                "owner_alias": {
+                    "type": "string"
+                },
+                "owner_contact_key": {
+                    "type": "string"
+                },
+                "owner_pubkey": {
+                    "type": "string"
+                },
+                "owner_route_hint": {
+                    "type": "string"
+                },
+                "price_to_meet": {
+                    "type": "integer"
+                },
+                "referred_by": {
+                    "type": "integer"
+                },
+                "tags": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "twitter_confirmed": {
+                    "type": "boolean"
+                },
+                "unique_name": {
+                    "type": "string"
+                },
+                "unlisted": {
+                    "type": "boolean"
+                },
+                "updated": {
+                    "type": "string"
+                },
+                "uuid": {
+                    "type": "string"
+                }
+            }
+        },
+        "db.PersonInShort": {
+            "type": "object",
+            "properties": {
+                "id": {
+                    "type": "integer"
+                },
+                "img": {
+                    "type": "string"
+                },
+                "owner_alias": {
+                    "type": "string"
+                },
+                "owner_pubkey": {
+                    "type": "string"
+                },
+                "unique_name": {
+                    "type": "string"
+                },
+                "uuid": {
+                    "type": "string"
+                }
+            }
+        },
+        "db.ProofOfWork": {
+            "type": "object",
+            "properties": {
+                "bounty_id": {
+                    "type": "integer"
+                },
+                "created_at": {
+                    "type": "string"
+                },
+                "description": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "status": {
+                    "$ref": "#/definitions/db.ProofOfWorkStatus"
+                },
+                "submitted_at": {
+                    "type": "string"
+                }
+            }
+        },
+        "db.ProofOfWorkStatus": {
+            "type": "string",
+            "enum": [
+                "New",
+                "Accepted",
+                "Rejected",
+                "Change Requested"
+            ],
+            "x-enum-varnames": [
+                "NewStatus",
+                "AcceptedStatus",
+                "RejectedStatus",
+                "ChangeRequestedStatus"
+            ]
+        },
+        "db.PropertyMap": {
+            "type": "object",
+            "additionalProperties": true
+        },
+        "db.Tribe": {
+            "type": "object",
+            "properties": {
+                "app_url": {
+                    "type": "string"
+                },
+                "badges": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "bots": {
+                    "type": "string"
+                },
+                "created": {
+                    "type": "string"
+                },
+                "deleted": {
+                    "type": "boolean"
+                },
+                "description": {
+                    "type": "string"
+                },
+                "escrow_amount": {
+                    "type": "integer"
+                },
+                "escrow_millis": {
+                    "type": "integer"
+                },
+                "feed_type": {
+                    "type": "integer"
+                },
+                "feed_url": {
+                    "type": "string"
+                },
+                "group_key": {
+                    "type": "string"
+                },
+                "img": {
+                    "type": "string"
+                },
+                "last_active": {
+                    "type": "integer"
+                },
+                "member_count": {
+                    "type": "integer"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "owner_alias": {
+                    "type": "string"
+                },
+                "owner_pubkey": {
+                    "type": "string"
+                },
+                "owner_route_hint": {
+                    "type": "string"
+                },
+                "pin": {
+                    "type": "string"
+                },
+                "preview": {
+                    "type": "string"
+                },
+                "price_per_message": {
+                    "type": "integer"
+                },
+                "price_to_join": {
+                    "type": "integer"
+                },
+                "private": {
+                    "type": "boolean"
+                },
+                "profile_filters": {
+                    "description": "\"twitter,github\"",
+                    "type": "string"
+                },
+                "second_brain_url": {
+                    "type": "string"
+                },
+                "tags": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "unique_name": {
+                    "type": "string"
+                },
+                "unlisted": {
+                    "type": "boolean"
+                },
+                "updated": {
+                    "type": "string"
+                },
+                "uuid": {
+                    "type": "string"
+                }
+            }
+        },
+        "db.Workspace": {
+            "type": "object",
+            "properties": {
+                "bounty_count": {
+                    "type": "integer"
+                },
+                "budget": {
+                    "type": "integer"
+                },
+                "created": {
+                    "type": "string"
+                },
+                "deleted": {
+                    "type": "boolean"
+                },
+                "description": {
+                    "type": "string",
+                    "maxLength": 120
+                },
+                "github": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "img": {
+                    "type": "string"
+                },
+                "mission": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "owner_pubkey": {
+                    "type": "string"
+                },
+                "schematic_img": {
+                    "type": "string"
+                },
+                "schematic_url": {
+                    "type": "string"
+                },
+                "show": {
+                    "type": "boolean"
+                },
+                "tactics": {
+                    "type": "string"
+                },
+                "updated": {
+                    "type": "string"
+                },
+                "uuid": {
+                    "type": "string"
+                },
+                "website": {
+                    "type": "string"
+                }
+            }
+        },
+        "db.WorkspaceFeatures": {
+            "type": "object",
+            "properties": {
+                "architecture": {
+                    "type": "string"
+                },
+                "bounties_count_assigned": {
+                    "type": "integer"
+                },
+                "bounties_count_completed": {
+                    "type": "integer"
+                },
+                "bounties_count_open": {
+                    "type": "integer"
+                },
+                "brief": {
+                    "type": "string"
+                },
+                "created": {
+                    "type": "string"
+                },
+                "created_by": {
+                    "type": "string"
+                },
+                "feat_status": {
+                    "$ref": "#/definitions/db.FeatureStatus"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "priority": {
+                    "type": "integer"
+                },
+                "requirements": {
+                    "type": "string"
+                },
+                "updated": {
+                    "type": "string"
+                },
+                "updated_by": {
+                    "type": "string"
+                },
+                "url": {
+                    "type": "string"
+                },
+                "uuid": {
+                    "type": "string"
+                },
+                "workspace_uuid": {
+                    "type": "string"
+                }
+            }
+        },
+        "handlers.ActivityContentRequest": {
+            "type": "object",
+            "properties": {
+                "content": {
+                    "type": "string"
+                }
+            }
+        },
+        "handlers.ActivityResponse": {
+            "type": "object",
+            "properties": {
+                "data": {
+                    "$ref": "#/definitions/db.Activity"
+                },
+                "error": {
+                    "type": "string"
+                },
+                "success": {
+                    "type": "boolean"
+                }
+            }
+        },
+        "handlers.BountyTimingResponse": {
+            "type": "object",
+            "properties": {
+                "accumulated_pause_seconds": {
+                    "type": "integer"
+                },
+                "closed_at": {
+                    "type": "string"
+                },
+                "first_assigned_at": {
+                    "type": "string"
+                },
+                "is_paused": {
+                    "type": "boolean"
+                },
+                "last_paused_at": {
+                    "type": "string"
+                },
+                "last_pow_at": {
+                    "type": "string"
+                },
+                "total_attempts": {
+                    "type": "integer"
+                },
+                "total_duration_seconds": {
+                    "type": "integer"
+                },
+                "total_work_time_seconds": {
+                    "type": "integer"
+                }
+            }
+        },
+        "handlers.CreateActivityRequest": {
+            "type": "object",
+            "properties": {
+                "actions": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "author": {
+                    "$ref": "#/definitions/db.AuthorType"
+                },
+                "author_ref": {
+                    "type": "string"
+                },
+                "content": {
+                    "type": "string"
+                },
+                "content_type": {
+                    "type": "string"
+                },
+                "feature_uuid": {
+                    "type": "string"
+                },
+                "phase_uuid": {
+                    "type": "string"
+                },
+                "questions": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "title": {
+                    "type": "string"
+                },
+                "workspace": {
+                    "type": "string"
+                }
+            }
+        },
+        "handlers.WantedsHeaderResponse": {
+            "type": "object",
+            "properties": {
+                "bounties_count": {
+                    "type": "integer"
+                },
+                "developer_count": {
+                    "type": "integer"
+                },
+                "people": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/db.PersonInShort"
+                    }
+                }
+            }
+        }
+    }
+}

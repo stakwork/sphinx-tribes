@@ -13,11 +13,18 @@ import (
 	"github.com/stakwork/sphinx-tribes/auth"
 	"github.com/stakwork/sphinx-tribes/config"
 	"github.com/stakwork/sphinx-tribes/db"
+	_ "github.com/stakwork/sphinx-tribes/docs"
 	"github.com/stakwork/sphinx-tribes/handlers"
 	"github.com/stakwork/sphinx-tribes/routes"
 	"github.com/stakwork/sphinx-tribes/websocket"
 	"gopkg.in/go-playground/validator.v9"
 )
+
+//	@title			Sphinx Tribes API
+//	@version		1.0
+//	@description	This is the API documentation for Sphinx Tribes.
+//	@host			localhost:5002
+//	@BasePath		/
 
 func main() {
 	if err := godotenv.Load(); err != nil {
