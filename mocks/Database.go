@@ -15268,3 +15268,365 @@ func (_c *Database_GetTicketsByFeatureUUID_Call) RunAndReturn(run func(string) (
 	return _c
 }
 
+
+func (_m *Database) CreateArtifact(artifact *db.Artifact) (*db.Artifact, error) {
+	ret := _m.Called(artifact)
+
+	if len(ret) == 0 {
+		panic("no return value specified for CreateArtifact")
+	}
+
+	var r0 *db.Artifact
+	var r1 error
+	if rf, ok := ret.Get(0).(func(*db.Artifact) (*db.Artifact, error)); ok {
+		return rf(artifact)
+	}
+	if rf, ok := ret.Get(0).(func(*db.Artifact) *db.Artifact); ok {
+		r0 = rf(artifact)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(*db.Artifact)
+		}
+	}
+
+	if rf, ok := ret.Get(1).(func(*db.Artifact) error); ok {
+		r1 = rf(artifact)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
+type Database_CreateArtifact_Call struct {
+	*mock.Call
+}
+
+func (_e *Database_Expecter) CreateArtifact(artifact interface{}) *Database_CreateArtifact_Call {
+	return &Database_CreateArtifact_Call{Call: _e.mock.On("CreateArtifact", artifact)}
+}
+
+func (_c *Database_CreateArtifact_Call) Run(run func(artifact *db.Artifact)) *Database_CreateArtifact_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(*db.Artifact))
+	})
+	return _c
+}
+
+func (_c *Database_CreateArtifact_Call) Return(_a0 *db.Artifact, _a1 error) *Database_CreateArtifact_Call {
+	_c.Call.Return(_a0, _a1)
+	return _c
+}
+
+func (_c *Database_CreateArtifact_Call) RunAndReturn(run func(*db.Artifact) (*db.Artifact, error)) *Database_CreateArtifact_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
+
+func (_m *Database) GetArtifactByID(id uuid.UUID) (*db.Artifact, error) {
+	ret := _m.Called(id)
+
+	if len(ret) == 0 {
+		panic("no return value specified for GetArtifactByID")
+	}
+
+	var r0 *db.Artifact
+	var r1 error
+	if rf, ok := ret.Get(0).(func(uuid.UUID) (*db.Artifact, error)); ok {
+		return rf(id)
+	}
+	if rf, ok := ret.Get(0).(func(uuid.UUID) *db.Artifact); ok {
+		r0 = rf(id)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(*db.Artifact)
+		}
+	}
+
+	if rf, ok := ret.Get(1).(func(uuid.UUID) error); ok {
+		r1 = rf(id)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
+type Database_GetArtifactByID_Call struct {
+	*mock.Call
+}
+
+
+func (_e *Database_Expecter) GetArtifactByID(id interface{}) *Database_GetArtifactByID_Call {
+	return &Database_GetArtifactByID_Call{Call: _e.mock.On("GetArtifactByID", id)}
+}
+
+func (_c *Database_GetArtifactByID_Call) Run(run func(id uuid.UUID)) *Database_GetArtifactByID_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(uuid.UUID))
+	})
+	return _c
+}
+
+func (_c *Database_GetArtifactByID_Call) Return(_a0 *db.Artifact, _a1 error) *Database_GetArtifactByID_Call {
+	_c.Call.Return(_a0, _a1)
+	return _c
+}
+
+func (_c *Database_GetArtifactByID_Call) RunAndReturn(run func(uuid.UUID) (*db.Artifact, error)) *Database_GetArtifactByID_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
+
+func (_m *Database) GetArtifactsByMessageID(messageID string) ([]db.Artifact, error) {
+	ret := _m.Called(messageID)
+
+	if len(ret) == 0 {
+		panic("no return value specified for GetArtifactsByMessageID")
+	}
+
+	var r0 []db.Artifact
+	var r1 error
+	if rf, ok := ret.Get(0).(func(string) ([]db.Artifact, error)); ok {
+		return rf(messageID)
+	}
+	if rf, ok := ret.Get(0).(func(string) []db.Artifact); ok {
+		r0 = rf(messageID)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).([]db.Artifact)
+		}
+	}
+
+	if rf, ok := ret.Get(1).(func(string) error); ok {
+		r1 = rf(messageID)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
+type Database_GetArtifactsByMessageID_Call struct {
+	*mock.Call
+}
+
+func (_e *Database_Expecter) GetArtifactsByMessageID(messageID interface{}) *Database_GetArtifactsByMessageID_Call {
+	return &Database_GetArtifactsByMessageID_Call{Call: _e.mock.On("GetArtifactsByMessageID", messageID)}
+}
+
+func (_c *Database_GetArtifactsByMessageID_Call) Run(run func(messageID string)) *Database_GetArtifactsByMessageID_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(string))
+	})
+	return _c
+}
+
+func (_c *Database_GetArtifactsByMessageID_Call) Return(_a0 []db.Artifact, _a1 error) *Database_GetArtifactsByMessageID_Call {
+	_c.Call.Return(_a0, _a1)
+	return _c
+}
+
+func (_c *Database_GetArtifactsByMessageID_Call) RunAndReturn(run func(string) ([]db.Artifact, error)) *Database_GetArtifactsByMessageID_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
+
+func (_m *Database) GetAllArtifactsByChatID(chatID string) ([]db.Artifact, error) {
+	ret := _m.Called(chatID)
+
+	if len(ret) == 0 {
+		panic("no return value specified for GetAllArtifactsByChatID")
+	}
+
+	var r0 []db.Artifact
+	var r1 error
+	if rf, ok := ret.Get(0).(func(string) ([]db.Artifact, error)); ok {
+		return rf(chatID)
+	}
+	if rf, ok := ret.Get(0).(func(string) []db.Artifact); ok {
+		r0 = rf(chatID)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).([]db.Artifact)
+		}
+	}
+
+	if rf, ok := ret.Get(1).(func(string) error); ok {
+		r1 = rf(chatID)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
+type Database_GetAllArtifactsByChatID_Call struct {
+	*mock.Call
+}
+
+func (_e *Database_Expecter) GetAllArtifactsByChatID(chatID interface{}) *Database_GetAllArtifactsByChatID_Call {
+	return &Database_GetAllArtifactsByChatID_Call{Call: _e.mock.On("GetAllArtifactsByChatID", chatID)}
+}
+
+func (_c *Database_GetAllArtifactsByChatID_Call) Run(run func(chatID string)) *Database_GetAllArtifactsByChatID_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(string))
+	})
+	return _c
+}
+
+func (_c *Database_GetAllArtifactsByChatID_Call) Return(_a0 []db.Artifact, _a1 error) *Database_GetAllArtifactsByChatID_Call {
+	_c.Call.Return(_a0, _a1)
+	return _c
+}
+
+func (_c *Database_GetAllArtifactsByChatID_Call) RunAndReturn(run func(string) ([]db.Artifact, error)) *Database_GetAllArtifactsByChatID_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
+
+func (_m *Database) UpdateArtifact(artifact *db.Artifact) (*db.Artifact, error) {
+	ret := _m.Called(artifact)
+
+	if len(ret) == 0 {
+		panic("no return value specified for UpdateArtifact")
+	}
+
+	var r0 *db.Artifact
+	var r1 error
+	if rf, ok := ret.Get(0).(func(*db.Artifact) (*db.Artifact, error)); ok {
+		return rf(artifact)
+	}
+	if rf, ok := ret.Get(0).(func(*db.Artifact) *db.Artifact); ok {
+		r0 = rf(artifact)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(*db.Artifact)
+		}
+	}
+
+	if rf, ok := ret.Get(1).(func(*db.Artifact) error); ok {
+		r1 = rf(artifact)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
+type Database_UpdateArtifact_Call struct {
+	*mock.Call
+}
+
+
+func (_e *Database_Expecter) UpdateArtifact(artifact interface{}) *Database_UpdateArtifact_Call {
+	return &Database_UpdateArtifact_Call{Call: _e.mock.On("UpdateArtifact", artifact)}
+}
+
+func (_c *Database_UpdateArtifact_Call) Run(run func(artifact *db.Artifact)) *Database_UpdateArtifact_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(*db.Artifact))
+	})
+	return _c
+}
+
+func (_c *Database_UpdateArtifact_Call) Return(_a0 *db.Artifact, _a1 error) *Database_UpdateArtifact_Call {
+	_c.Call.Return(_a0, _a1)
+	return _c
+}
+
+func (_c *Database_UpdateArtifact_Call) RunAndReturn(run func(*db.Artifact) (*db.Artifact, error)) *Database_UpdateArtifact_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
+
+func (_m *Database) DeleteArtifactByID(id uuid.UUID) error {
+	ret := _m.Called(id)
+
+	if len(ret) == 0 {
+		panic("no return value specified for DeleteArtifactByID")
+	}
+
+	var r0 error
+	if rf, ok := ret.Get(0).(func(uuid.UUID) error); ok {
+		r0 = rf(id)
+	} else {
+		r0 = ret.Error(0)
+	}
+
+	return r0
+}
+
+type Database_DeleteArtifactByID_Call struct {
+	*mock.Call
+}
+
+
+func (_e *Database_Expecter) DeleteArtifactByID(id interface{}) *Database_DeleteArtifactByID_Call {
+	return &Database_DeleteArtifactByID_Call{Call: _e.mock.On("DeleteArtifactByID", id)}
+}
+
+func (_c *Database_DeleteArtifactByID_Call) Run(run func(id uuid.UUID)) *Database_DeleteArtifactByID_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(uuid.UUID))
+	})
+	return _c
+}
+
+func (_c *Database_DeleteArtifactByID_Call) Return(_a0 error) *Database_DeleteArtifactByID_Call {
+	_c.Call.Return(_a0)
+	return _c
+}
+
+func (_c *Database_DeleteArtifactByID_Call) RunAndReturn(run func(uuid.UUID) error) *Database_DeleteArtifactByID_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
+func (_m *Database) DeleteAllArtifactsByChatID(chatID string) error {
+	ret := _m.Called(chatID)
+
+	if len(ret) == 0 {
+		panic("no return value specified for DeleteAllArtifactsByChatID")
+	}
+
+	var r0 error
+	if rf, ok := ret.Get(0).(func(string) error); ok {
+		r0 = rf(chatID)
+	} else {
+		r0 = ret.Error(0)
+	}
+
+	return r0
+}
+
+type Database_DeleteAllArtifactsByChatID_Call struct {
+	*mock.Call
+}
+
+func (_e *Database_Expecter) DeleteAllArtifactsByChatID(chatID interface{}) *Database_DeleteAllArtifactsByChatID_Call {
+	return &Database_DeleteAllArtifactsByChatID_Call{Call: _e.mock.On("DeleteAllArtifactsByChatID", chatID)}
+}
+
+func (_c *Database_DeleteAllArtifactsByChatID_Call) Run(run func(chatID string)) *Database_DeleteAllArtifactsByChatID_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(string))
+	})
+	return _c
+}
+
+func (_c *Database_DeleteAllArtifactsByChatID_Call) Return(_a0 error) *Database_DeleteAllArtifactsByChatID_Call {
+	_c.Call.Return(_a0)
+	return _c
+}
+
+func (_c *Database_DeleteAllArtifactsByChatID_Call) RunAndReturn(run func(string) error) *Database_DeleteAllArtifactsByChatID_Call {
+	_c.Call.Return(run)
+	return _c
+}
