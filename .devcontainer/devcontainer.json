@@ -1,15 +1,21 @@
 {
   "name": "Sphinx Tribes Dev",
-  "dockerComposeFile": ["docker/docker-compose.codespace.yml"],
-  "service": "app",
+  "service": "workspace",
+  "runServices": ["workspace", "postgres"],
+  "dockerComposeFile": "docker-compose.yml",
   "workspaceFolder": "/workspaces/sphinx-tribes",
-  "forwardPorts": [8080, 5432],
+  "forwardPorts": [8080, 5432, 3000],
   "postCreateCommand": "bash .devcontainer/setup.sh",
-  "containerEnv": {
-    "DB_HOST": "postgres",
-    "DB_PORT": "5432",
-    "DB_USER": "sphinx_user",
-    "DB_PASSWORD": "sphinx_password",
-    "DB_NAME": "sphinx_tribes"
+  "customizations": {
+    "codespaces": {
+      "repositories": {
+        "stakwork/sphinx-tribes-frontend": {
+          "permissions": {
+            "content": "write",
+            "pull_requests": "write"
+          }
+        }
+      }
+    }
   }
 }
