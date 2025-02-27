@@ -2,12 +2,10 @@ version: "3.8"
 services:
   app:
     build:
-      # Set context to the repository root (one level up from the docker folder)
-      context: ..
-      dockerfile: Dockerfile.app
+      context: /workspaces/sphinx-tribes
+      dockerfile: .devcontainer/Dockerfile.app
     working_dir: /workspaces/sphinx-tribes
     volumes:
-      # Mount the repository root into /workspaces/sphinx-tribes in the container
       - ..:/workspaces/sphinx-tribes:cached
     ports:
       - "8080:8080"
