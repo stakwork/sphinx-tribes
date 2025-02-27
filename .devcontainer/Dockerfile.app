@@ -9,6 +9,6 @@ COPY . .
 
 EXPOSE 8080
 
-CMD ["bash", "-c", "echo 'Container started'; go version; ls -l; tail -f /dev/null"]
+CMD ["go", "run", "main.go"]
 
 
