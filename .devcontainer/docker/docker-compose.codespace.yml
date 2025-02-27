@@ -3,7 +3,7 @@ services:
   app:
     build:
       context: /workspaces/sphinx-tribes
-      dockerfile: .devcontainer/Dockerfile.app
+      dockerfile: Dockerfile.app
     working_dir: /workspaces/sphinx-tribes
     volumes:
       - ..:/workspaces/sphinx-tribes:cached
