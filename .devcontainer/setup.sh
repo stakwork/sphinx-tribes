@@ -1,13 +1,9 @@
-#!/bin/bash
+cd /workspaces
 
-echo "Starting PostgreSQL..."
-sudo service postgresql start
+git clone https://github.com/stakwork/sphinx-tribes-frontend 
 
-echo "Creating database and user..."
-sudo -u postgres psql <<EOF
-CREATE DATABASE sphinx_tribes;
-CREATE USER sphinx_user WITH ENCRYPTED PASSWORD 'yourpassword';
-GRANT ALL PRIVILEGES ON DATABASE sphinx_tribes TO sphinx_user;
-EOF
+cd sphinx-tribes
 
-echo "Setup complete!"
+go build
+
+./sphinx-tribes
