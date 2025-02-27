@@ -2,7 +2,7 @@
   "name": "Sphinx Tribes Dev",
   "service": "workspace",
   "runServices": ["workspace", "postgres"],
-  "dockerComposeFile": "docker-compose.yml",
+  "dockerComposeFile": ".devcontainer/docker-compose.yml",
   "workspaceFolder": "/workspaces/sphinx-tribes",
   "forwardPorts": [8080, 5432, 3000],
   "postCreateCommand": "bash .devcontainer/setup.sh",
