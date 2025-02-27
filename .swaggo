@@ -1,0 +1,3 @@
+// StringArray is a custom type for pq.StringArray to be recognized by Swaggo
+// swagger:model StringArray
+replace pq.StringArray []string
