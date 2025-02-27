@@ -12,7 +12,7 @@ services:
     depends_on:
       - postgres
   postgres:
-    image: postgres:latest
+    image: postgres:14
     container_name: sphinx_postgres
     restart: always
     environment:
