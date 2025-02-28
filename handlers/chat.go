@@ -30,11 +30,13 @@ import (
 	"github.com/stakwork/sphinx-tribes/db"
 )
 
+// ChatHandler handles chat-related requests
 type ChatHandler struct {
 	httpClient *http.Client
 	db         db.Database
 }
 
+// ChatResponse is the response format for chat requests
 type ChatResponse struct {
 	Success   bool          `json:"success"`
 	Message   string        `json:"message"`
@@ -108,21 +110,26 @@ type ChatMessageArtifact struct {
 
 type ActionMessageRequest struct {
 	ActionWebhook     string `json:"action_webhook"`
-	ChatID           string `json:"chatId"`
-	MessageID        string `json:"messageId"`
-	Message          string `json:"message"`
+	ChatID            string `json:"chatId"`
+	MessageID         string `json:"messageId"`
+	Message           string `json:"message"`
 	SourceWebsocketID string `json:"sourceWebsocketId"`
 }
 
 type ActionPayload struct {
-	ChatID            string              `json:"chatId"`
-	MessageID         string              `json:"messageId"`
-	Message           string              `json:"message"`
-	History           []db.ChatMessage    `json:"history"`
-	CodeGraph         string              `json:"codeGraph,omitempty"`
-	CodeGraphAlias    string              `json:"codeGraphAlias,omitempty"`
-	SourceWebsocketID string              `json:"sourceWebsocketId"`
-	WebhookURL        string              `json:"webhook_url"`
+	ChatID            string           `json:"chatId"`
+	MessageID         string           `json:"messageId"`
+	Message           string           `json:"message"`
+	History           []db.ChatMessage `json:"history"`
+	CodeGraph         string           `json:"codeGraph,omitempty"`
+	CodeGraphAlias    string           `json:"codeGraphAlias,omitempty"`
+	SourceWebsocketID string           `json:"sourceWebsocketId"`
+	WebhookURL        string           `json:"webhook_url"`
+}
+
+type CreateOrEditChatRequest struct {
+	WorkspaceID string `json:"workspaceId"`
+	Title       string `json:"title"`
 }
 
 func NewChatHandler(httpClient *http.Client, database db.Database) *ChatHandler {
@@ -132,11 +139,20 @@ func NewChatHandler(httpClient *http.Client, database db.Database) *ChatHandler 
 	}
 }
 
+// CreateChat creates a new chat
+//
+//	@Summary		Create a new chat
+//	@Description	Create a new chat with the given workspace ID and title
+//	@Tags			Hive Chat
+//	@Accept			json
+//	@Produce		json
+//	@Param			request	body		CreateOrEditChatRequest	true	"Chat creation request"
+//	@Success		200		{object}	ChatResponse
+//	@Failure		400		{object}	ChatResponse
+//	@Failure		500		{object}	ChatResponse
+//	@Router			/hivechat [post]
 func (ch *ChatHandler) CreateChat(w http.ResponseWriter, r *http.Request) {
-	var request struct {
-		WorkspaceID string `json:"workspaceId"`
-		Title       string `json:"title"`
-	}
+	var request CreateOrEditChatRequest
 
 	if err := json.NewDecoder(r.Body).Decode(&request); err != nil {
 		w.WriteHeader(http.StatusBadRequest)
@@ -181,6 +197,20 @@ func (ch *ChatHandler) CreateChat(w http.ResponseWriter, r *http.Request) {
 	})
 }
 
+// UpdateChat updates an existing chat
+//
+//	@Summary		Update an existing chat
+//	@Description	Update the title of an existing chat
+//	@Tags			Hive Chat
+//	@Accept			json
+//	@Produce		json
+//	@Param			chat_id	path		string					true	"Chat ID"
+//	@Param			request	body		CreateOrEditChatRequest	true	"Chat update request"
+//	@Success		200		{object}	ChatResponse
+//	@Failure		400		{object}	ChatResponse
+//	@Failure		404		{object}	ChatResponse
+//	@Failure		500		{object}	ChatResponse
+//	@Router			/hivechat/{chat_id} [put]
 func (ch *ChatHandler) UpdateChat(w http.ResponseWriter, r *http.Request) {
 	chatID := chi.URLParam(r, "chat_id")
 	if chatID == "" {
@@ -192,10 +222,7 @@ func (ch *ChatHandler) UpdateChat(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	var request struct {
-		WorkspaceID string `json:"workspaceId"`
-		Title       string `json:"title"`
-	}
+	var request CreateOrEditChatRequest
 
 	if err := json.NewDecoder(r.Body).Decode(&request); err != nil {
 		w.WriteHeader(http.StatusBadRequest)
@@ -237,6 +264,19 @@ func (ch *ChatHandler) UpdateChat(w http.ResponseWriter, r *http.Request) {
 	})
 }
 
+// ArchiveChat archives an existing chat
+//
+//	@Summary		Archive an existing chat
+//	@Description	Archive a chat by changing its status to archived
+//	@Tags			Hive Chat
+//	@Accept			json
+//	@Produce		json
+//	@Param			chat_id	path		string	true	"Chat ID"
+//	@Success		200		{object}	ChatResponse
+//	@Failure		400		{object}	ChatResponse
+//	@Failure		404		{object}	ChatResponse
+//	@Failure		500		{object}	ChatResponse
+//	@Router			/hivechat/{chat_id}/archive [put]
 func (ch *ChatHandler) ArchiveChat(w http.ResponseWriter, r *http.Request) {
 	chatID := chi.URLParam(r, "chat_id")
 	if chatID == "" {
@@ -314,6 +354,19 @@ func buildVarsPayload(request SendMessageRequest, createdMessage *db.ChatMessage
 	return vars
 }
 
+// SendMessage sends a message in a chat
+//
+//	@Summary		Send a message in a chat
+//	@Description	Send a message in a chat with the given details
+//	@Tags			Hive Chat
+//	@Accept			json
+//	@Produce		json
+//	@Param			request	body		SendMessageRequest	true	"Send message request"
+//	@Success		200		{object}	ChatResponse
+//	@Failure		400		{object}	ChatResponse
+//	@Failure		401		{object}	ChatResponse
+//	@Failure		500		{object}	ChatResponse
+//	@Router			/hivechat/send [post]
 func (ch *ChatHandler) SendMessage(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 	pubKeyFromAuth, _ := ctx.Value(auth.ContextKey).(string)
@@ -534,6 +587,18 @@ func (ch *ChatHandler) sendToStakwork(payload StakworkChatPayload, apiKey string
 	return stakworkResp.Data.ProjectID, nil
 }
 
+// GetChat retrieves chats for a workspace
+//
+//	@Summary		Retrieve chats for a workspace
+//	@Description	Retrieve chats for a workspace with the given ID and status
+//	@Tags			Hive Chat
+//	@Produce		json
+//	@Param			workspace_id	query		string	true	"Workspace ID"
+//	@Param			status			query		string	false	"Chat status"
+//	@Success		200				{object}	ChatResponse
+//	@Failure		400				{object}	ChatResponse
+//	@Failure		500				{object}	ChatResponse
+//	@Router			/hivechat [get]
 func (ch *ChatHandler) GetChat(w http.ResponseWriter, r *http.Request) {
 	workspaceID := r.URL.Query().Get("workspace_id")
 	chatStatus := r.URL.Query().Get("status")
@@ -564,6 +629,17 @@ func (ch *ChatHandler) GetChat(w http.ResponseWriter, r *http.Request) {
 	})
 }
 
+// GetChatHistory retrieves the history of a chat
+//
+//	@Summary		Retrieve chat history
+//	@Description	Retrieve the history of a chat with the given ID
+//	@Tags			Hive Chat
+//	@Produce		json
+//	@Param			uuid	path		string	true	"Chat ID"
+//	@Success		200		{object}	HistoryChatResponse
+//	@Failure		400		{object}	ChatResponse
+//	@Failure		500		{object}	ChatResponse
+//	@Router			/hivechat/history/{uuid} [get]
 func (ch *ChatHandler) GetChatHistory(w http.ResponseWriter, r *http.Request) {
 	chatID := chi.URLParam(r, "uuid")
 	if chatID == "" {
@@ -592,6 +668,18 @@ func (ch *ChatHandler) GetChatHistory(w http.ResponseWriter, r *http.Request) {
 	})
 }
 
+// ProcessChatResponse processes a chat response
+//
+//	@Summary		Process a chat response
+//	@Description	Process a chat response with the given details
+//	@Tags			Hive Chat
+//	@Accept			json
+//	@Produce		json
+//	@Param			request	body		ChatResponseRequest	true	"Chat response request"
+//	@Success		200		{object}	ChatResponse
+//	@Failure		400		{object}	ChatResponse
+//	@Failure		500		{object}	ChatResponse
+//	@Router			/hivechat/response [post]
 func (ch *ChatHandler) ProcessChatResponse(w http.ResponseWriter, r *http.Request) {
 	var request ChatResponseRequest
 
@@ -681,6 +769,18 @@ func (ch *ChatHandler) ProcessChatResponse(w http.ResponseWriter, r *http.Reques
 	})
 }
 
+// UploadFile uploads a file to a chat
+//
+//	@Summary		Upload a file to a chat
+//	@Description	Upload a file to a chat with the given details
+//	@Tags			Hive Chat
+//	@Accept			multipart/form-data
+//	@Produce		json
+//	@Param			file	formData	file	true	"File to upload"
+//	@Success		200		{object}	FileResponse
+//	@Failure		400		{object}	ChatResponse
+//	@Failure		500		{object}	ChatResponse
+//	@Router			/hivechat/upload [post]
 func (ch *ChatHandler) UploadFile(w http.ResponseWriter, r *http.Request) {
 	file, header, err := r.FormFile("file")
 	if err != nil {
@@ -780,6 +880,17 @@ func (ch *ChatHandler) UploadFile(w http.ResponseWriter, r *http.Request) {
 	})
 }
 
+// GetFile retrieves a file from a chat
+//
+//	@Summary		Retrieve a file from a chat
+//	@Description	Retrieve a file from a chat with the given ID
+//	@Tags			Hive Chat
+//	@Produce		json
+//	@Param			id	path		string	true	"File ID"
+//	@Success		200	{object}	FileResponse
+//	@Failure		400	{object}	ChatResponse
+//	@Failure		404	{object}	ChatResponse
+//	@Router			/hivechat/file/{id} [get]
 func (ch *ChatHandler) GetFile(w http.ResponseWriter, r *http.Request) {
 	id := chi.URLParam(r, "id")
 	if id == "" {
@@ -821,6 +932,21 @@ func (ch *ChatHandler) GetFile(w http.ResponseWriter, r *http.Request) {
 	})
 }
 
+// ListFiles lists all files in a chat
+//
+//	@Summary		List all files in a chat
+//	@Description	List all files in a chat with the given parameters
+//	@Tags			Hive Chat
+//	@Produce		json
+//	@Param			status		query		string	false	"File status"
+//	@Param			mimeType	query		string	false	"File MIME type"
+//	@Param			workspaceId	query		string	false	"Workspace ID"
+//	@Param			page		query		int		false	"Page number"
+//	@Param			pageSize	query		int		false	"Page size"
+//	@Success		200			{object}	map[string]interface{}
+//	@Failure		400			{object}	ChatResponse
+//	@Failure		500			{object}	ChatResponse
+//	@Router			/hivechat/file/all [get]
 func (ch *ChatHandler) ListFiles(w http.ResponseWriter, r *http.Request) {
 	var params db.ListFileAssetsParams
 	if err := r.ParseForm(); err != nil {
@@ -875,6 +1001,18 @@ func (ch *ChatHandler) ListFiles(w http.ResponseWriter, r *http.Request) {
 	})
 }
 
+// DeleteFile deletes a file from a chat
+//
+//	@Summary		Delete a file from a chat
+//	@Description	Delete a file from a chat with the given ID
+//	@Tags			Hive Chat
+//	@Produce		json
+//	@Param			id	path		string	true	"File ID"
+//	@Success		200	{object}	ChatResponse
+//	@Failure		400	{object}	ChatResponse
+//	@Failure		404	{object}	ChatResponse
+//	@Failure		500	{object}	ChatResponse
+//	@Router			/hivechat/file/{id} [delete]
 func (ch *ChatHandler) DeleteFile(w http.ResponseWriter, r *http.Request) {
 	id := chi.URLParam(r, "id")
 	if id == "" {
@@ -921,6 +1059,18 @@ func (ch *ChatHandler) DeleteFile(w http.ResponseWriter, r *http.Request) {
 	})
 }
 
+// SendBuildMessage sends a build message in a chat
+//
+//	@Summary		Send a build message in a chat
+//	@Description	Send a build message in a chat with the given details
+//	@Tags			Hive Chat
+//	@Accept			json
+//	@Produce		json
+//	@Param			request	body		BuildMessageRequest	true	"Build message request"
+//	@Success		200		{object}	ChatResponse
+//	@Failure		400		{object}	ChatResponse
+//	@Failure		500		{object}	ChatResponse
+//	@Router			/hivechat/send/build [post]
 func (ch *ChatHandler) SendBuildMessage(w http.ResponseWriter, r *http.Request) {
 
 	body, err := io.ReadAll(r.Body)

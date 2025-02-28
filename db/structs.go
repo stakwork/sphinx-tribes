@@ -956,7 +956,7 @@ type MetricsBountyCsv struct {
 	DateAssigned *time.Time `json:"date_assigned"`
 }
 
-type FilterStattuCount struct {
+type FilterStatusCount struct {
 	Open      int64 `json:"open"`
 	Assigned  int64 `json:"assigned"`
 	Completed int64 `json:"completed"`

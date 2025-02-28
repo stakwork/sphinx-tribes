@@ -678,6 +678,54 @@ func (_c *Database_BountiesPaidPercentage_Call) RunAndReturn(run func(db.Payment
 	return _c
 }
 
+// BuildTicketArray provides a mock function with given fields: groupIDs
+func (_m *Database) BuildTicketArray(groupIDs []string) []db.TicketArrayItem {
+	ret := _m.Called(groupIDs)
+
+	if len(ret) == 0 {
+		panic("no return value specified for BuildTicketArray")
+	}
+
+	var r0 []db.TicketArrayItem
+	if rf, ok := ret.Get(0).(func([]string) []db.TicketArrayItem); ok {
+		r0 = rf(groupIDs)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).([]db.TicketArrayItem)
+		}
+	}
+
+	return r0
+}
+
+// Database_BuildTicketArray_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'BuildTicketArray'
+type Database_BuildTicketArray_Call struct {
+	*mock.Call
+}
+
+// BuildTicketArray is a helper method to define mock.On call
+//   - groupIDs []string
+func (_e *Database_Expecter) BuildTicketArray(groupIDs interface{}) *Database_BuildTicketArray_Call {
+	return &Database_BuildTicketArray_Call{Call: _e.mock.On("BuildTicketArray", groupIDs)}
+}
+
+func (_c *Database_BuildTicketArray_Call) Run(run func(groupIDs []string)) *Database_BuildTicketArray_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].([]string))
+	})
+	return _c
+}
+
+func (_c *Database_BuildTicketArray_Call) Return(_a0 []db.TicketArrayItem) *Database_BuildTicketArray_Call {
+	_c.Call.Return(_a0)
+	return _c
+}
+
+func (_c *Database_BuildTicketArray_Call) RunAndReturn(run func([]string) []db.TicketArrayItem) *Database_BuildTicketArray_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
 // ChangeWorkspaceDeleteStatus provides a mock function with given fields: workspace_uuid, status
 func (_m *Database) ChangeWorkspaceDeleteStatus(workspace_uuid string, status bool) db.Workspace {
 	ret := _m.Called(workspace_uuid, status)
@@ -974,6 +1022,64 @@ func (_c *Database_CreateActivityThread_Call) Return(_a0 *db.Activity, _a1 error
 }
 
 func (_c *Database_CreateActivityThread_Call) RunAndReturn(run func(string, *db.Activity) (*db.Activity, error)) *Database_CreateActivityThread_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
+// CreateArtifact provides a mock function with given fields: artifact
+func (_m *Database) CreateArtifact(artifact *db.Artifact) (*db.Artifact, error) {
+	ret := _m.Called(artifact)
+
+	if len(ret) == 0 {
+		panic("no return value specified for CreateArtifact")
+	}
+
+	var r0 *db.Artifact
+	var r1 error
+	if rf, ok := ret.Get(0).(func(*db.Artifact) (*db.Artifact, error)); ok {
+		return rf(artifact)
+	}
+	if rf, ok := ret.Get(0).(func(*db.Artifact) *db.Artifact); ok {
+		r0 = rf(artifact)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(*db.Artifact)
+		}
+	}
+
+	if rf, ok := ret.Get(1).(func(*db.Artifact) error); ok {
+		r1 = rf(artifact)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
+// Database_CreateArtifact_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'CreateArtifact'
+type Database_CreateArtifact_Call struct {
+	*mock.Call
+}
+
+// CreateArtifact is a helper method to define mock.On call
+//   - artifact *db.Artifact
+func (_e *Database_Expecter) CreateArtifact(artifact interface{}) *Database_CreateArtifact_Call {
+	return &Database_CreateArtifact_Call{Call: _e.mock.On("CreateArtifact", artifact)}
+}
+
+func (_c *Database_CreateArtifact_Call) Run(run func(artifact *db.Artifact)) *Database_CreateArtifact_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(*db.Artifact))
+	})
+	return _c
+}
+
+func (_c *Database_CreateArtifact_Call) Return(_a0 *db.Artifact, _a1 error) *Database_CreateArtifact_Call {
+	_c.Call.Return(_a0, _a1)
+	return _c
+}
+
+func (_c *Database_CreateArtifact_Call) RunAndReturn(run func(*db.Artifact) (*db.Artifact, error)) *Database_CreateArtifact_Call {
 	_c.Call.Return(run)
 	return _c
 }
@@ -2148,6 +2254,65 @@ func (_c *Database_CreateOrEditWorkspaceRepository_Call) RunAndReturn(run func(d
 	return _c
 }
 
+// CreateOrUpdateFeatureCall provides a mock function with given fields: workspaceID, url
+func (_m *Database) CreateOrUpdateFeatureCall(workspaceID string, url string) (*db.FeatureCall, error) {
+	ret := _m.Called(workspaceID, url)
+
+	if len(ret) == 0 {
+		panic("no return value specified for CreateOrUpdateFeatureCall")
+	}
+
+	var r0 *db.FeatureCall
+	var r1 error
+	if rf, ok := ret.Get(0).(func(string, string) (*db.FeatureCall, error)); ok {
+		return rf(workspaceID, url)
+	}
+	if rf, ok := ret.Get(0).(func(string, string) *db.FeatureCall); ok {
+		r0 = rf(workspaceID, url)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(*db.FeatureCall)
+		}
+	}
+
+	if rf, ok := ret.Get(1).(func(string, string) error); ok {
+		r1 = rf(workspaceID, url)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
+// Database_CreateOrUpdateFeatureCall_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'CreateOrUpdateFeatureCall'
+type Database_CreateOrUpdateFeatureCall_Call struct {
+	*mock.Call
+}
+
+// CreateOrUpdateFeatureCall is a helper method to define mock.On call
+//   - workspaceID string
+//   - url string
+func (_e *Database_Expecter) CreateOrUpdateFeatureCall(workspaceID interface{}, url interface{}) *Database_CreateOrUpdateFeatureCall_Call {
+	return &Database_CreateOrUpdateFeatureCall_Call{Call: _e.mock.On("CreateOrUpdateFeatureCall", workspaceID, url)}
+}
+
+func (_c *Database_CreateOrUpdateFeatureCall_Call) Run(run func(workspaceID string, url string)) *Database_CreateOrUpdateFeatureCall_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(string), args[1].(string))
+	})
+	return _c
+}
+
+func (_c *Database_CreateOrUpdateFeatureCall_Call) Return(_a0 *db.FeatureCall, _a1 error) *Database_CreateOrUpdateFeatureCall_Call {
+	_c.Call.Return(_a0, _a1)
+	return _c
+}
+
+func (_c *Database_CreateOrUpdateFeatureCall_Call) RunAndReturn(run func(string, string) (*db.FeatureCall, error)) *Database_CreateOrUpdateFeatureCall_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
 // CreateProcessingMap provides a mock function with given fields: pm
 func (_m *Database) CreateProcessingMap(pm *db.WfProcessingMap) error {
 	ret := _m.Called(pm)
@@ -2634,6 +2799,52 @@ func (_c *Database_DeleteActivity_Call) RunAndReturn(run func(string) error) *Da
 	return _c
 }
 
+// DeleteAllArtifactsByChatID provides a mock function with given fields: chatID
+func (_m *Database) DeleteAllArtifactsByChatID(chatID string) error {
+	ret := _m.Called(chatID)
+
+	if len(ret) == 0 {
+		panic("no return value specified for DeleteAllArtifactsByChatID")
+	}
+
+	var r0 error
+	if rf, ok := ret.Get(0).(func(string) error); ok {
+		r0 = rf(chatID)
+	} else {
+		r0 = ret.Error(0)
+	}
+
+	return r0
+}
+
+// Database_DeleteAllArtifactsByChatID_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'DeleteAllArtifactsByChatID'
+type Database_DeleteAllArtifactsByChatID_Call struct {
+	*mock.Call
+}
+
+// DeleteAllArtifactsByChatID is a helper method to define mock.On call
+//   - chatID string
+func (_e *Database_Expecter) DeleteAllArtifactsByChatID(chatID interface{}) *Database_DeleteAllArtifactsByChatID_Call {
+	return &Database_DeleteAllArtifactsByChatID_Call{Call: _e.mock.On("DeleteAllArtifactsByChatID", chatID)}
+}
+
+func (_c *Database_DeleteAllArtifactsByChatID_Call) Run(run func(chatID string)) *Database_DeleteAllArtifactsByChatID_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(string))
+	})
+	return _c
+}
+
+func (_c *Database_DeleteAllArtifactsByChatID_Call) Return(_a0 error) *Database_DeleteAllArtifactsByChatID_Call {
+	_c.Call.Return(_a0)
+	return _c
+}
+
+func (_c *Database_DeleteAllArtifactsByChatID_Call) RunAndReturn(run func(string) error) *Database_DeleteAllArtifactsByChatID_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
 // DeleteAllUsersFromWorkspace provides a mock function with given fields: _a0
 func (_m *Database) DeleteAllUsersFromWorkspace(_a0 string) error {
 	ret := _m.Called(_a0)
@@ -2676,6 +2887,52 @@ func (_c *Database_DeleteAllUsersFromWorkspace_Call) Return(_a0 error) *Database
 }
 
 func (_c *Database_DeleteAllUsersFromWorkspace_Call) RunAndReturn(run func(string) error) *Database_DeleteAllUsersFromWorkspace_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
+// DeleteArtifactByID provides a mock function with given fields: id
+func (_m *Database) DeleteArtifactByID(id uuid.UUID) error {
+	ret := _m.Called(id)
+
+	if len(ret) == 0 {
+		panic("no return value specified for DeleteArtifactByID")
+	}
+
+	var r0 error
+	if rf, ok := ret.Get(0).(func(uuid.UUID) error); ok {
+		r0 = rf(id)
+	} else {
+		r0 = ret.Error(0)
+	}
+
+	return r0
+}
+
+// Database_DeleteArtifactByID_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'DeleteArtifactByID'
+type Database_DeleteArtifactByID_Call struct {
+	*mock.Call
+}
+
+// DeleteArtifactByID is a helper method to define mock.On call
+//   - id uuid.UUID
+func (_e *Database_Expecter) DeleteArtifactByID(id interface{}) *Database_DeleteArtifactByID_Call {
+	return &Database_DeleteArtifactByID_Call{Call: _e.mock.On("DeleteArtifactByID", id)}
+}
+
+func (_c *Database_DeleteArtifactByID_Call) Run(run func(id uuid.UUID)) *Database_DeleteArtifactByID_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(uuid.UUID))
+	})
+	return _c
+}
+
+func (_c *Database_DeleteArtifactByID_Call) Return(_a0 error) *Database_DeleteArtifactByID_Call {
+	_c.Call.Return(_a0)
+	return _c
+}
+
+func (_c *Database_DeleteArtifactByID_Call) RunAndReturn(run func(uuid.UUID) error) *Database_DeleteArtifactByID_Call {
 	_c.Call.Return(run)
 	return _c
 }
@@ -2918,6 +3175,52 @@ func (_c *Database_DeleteFeatureByUuid_Call) Return(_a0 error) *Database_DeleteF
 }
 
 func (_c *Database_DeleteFeatureByUuid_Call) RunAndReturn(run func(string) error) *Database_DeleteFeatureByUuid_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
+// DeleteFeatureCall provides a mock function with given fields: workspaceID
+func (_m *Database) DeleteFeatureCall(workspaceID string) error {
+	ret := _m.Called(workspaceID)
+
+	if len(ret) == 0 {
+		panic("no return value specified for DeleteFeatureCall")
+	}
+
+	var r0 error
+	if rf, ok := ret.Get(0).(func(string) error); ok {
+		r0 = rf(workspaceID)
+	} else {
+		r0 = ret.Error(0)
+	}
+
+	return r0
+}
+
+// Database_DeleteFeatureCall_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'DeleteFeatureCall'
+type Database_DeleteFeatureCall_Call struct {
+	*mock.Call
+}
+
+// DeleteFeatureCall is a helper method to define mock.On call
+//   - workspaceID string
+func (_e *Database_Expecter) DeleteFeatureCall(workspaceID interface{}) *Database_DeleteFeatureCall_Call {
+	return &Database_DeleteFeatureCall_Call{Call: _e.mock.On("DeleteFeatureCall", workspaceID)}
+}
+
+func (_c *Database_DeleteFeatureCall_Call) Run(run func(workspaceID string)) *Database_DeleteFeatureCall_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(string))
+	})
+	return _c
+}
+
+func (_c *Database_DeleteFeatureCall_Call) Return(_a0 error) *Database_DeleteFeatureCall_Call {
+	_c.Call.Return(_a0)
+	return _c
+}
+
+func (_c *Database_DeleteFeatureCall_Call) RunAndReturn(run func(string) error) *Database_DeleteFeatureCall_Call {
 	_c.Call.Return(run)
 	return _c
 }
@@ -4092,6 +4395,64 @@ func (_c *Database_GetActivity_Call) RunAndReturn(run func(string) (*db.Activity
 	return _c
 }
 
+// GetAllArtifactsByChatID provides a mock function with given fields: chatID
+func (_m *Database) GetAllArtifactsByChatID(chatID string) ([]db.Artifact, error) {
+	ret := _m.Called(chatID)
+
+	if len(ret) == 0 {
+		panic("no return value specified for GetAllArtifactsByChatID")
+	}
+
+	var r0 []db.Artifact
+	var r1 error
+	if rf, ok := ret.Get(0).(func(string) ([]db.Artifact, error)); ok {
+		return rf(chatID)
+	}
+	if rf, ok := ret.Get(0).(func(string) []db.Artifact); ok {
+		r0 = rf(chatID)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).([]db.Artifact)
+		}
+	}
+
+	if rf, ok := ret.Get(1).(func(string) error); ok {
+		r1 = rf(chatID)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
+// Database_GetAllArtifactsByChatID_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'GetAllArtifactsByChatID'
+type Database_GetAllArtifactsByChatID_Call struct {
+	*mock.Call
+}
+
+// GetAllArtifactsByChatID is a helper method to define mock.On call
+//   - chatID string
+func (_e *Database_Expecter) GetAllArtifactsByChatID(chatID interface{}) *Database_GetAllArtifactsByChatID_Call {
+	return &Database_GetAllArtifactsByChatID_Call{Call: _e.mock.On("GetAllArtifactsByChatID", chatID)}
+}
+
+func (_c *Database_GetAllArtifactsByChatID_Call) Run(run func(chatID string)) *Database_GetAllArtifactsByChatID_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(string))
+	})
+	return _c
+}
+
+func (_c *Database_GetAllArtifactsByChatID_Call) Return(_a0 []db.Artifact, _a1 error) *Database_GetAllArtifactsByChatID_Call {
+	_c.Call.Return(_a0, _a1)
+	return _c
+}
+
+func (_c *Database_GetAllArtifactsByChatID_Call) RunAndReturn(run func(string) ([]db.Artifact, error)) *Database_GetAllArtifactsByChatID_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
 // GetAllBounties provides a mock function with given fields: r
 func (_m *Database) GetAllBounties(r *http.Request) []db.NewBounty {
 	ret := _m.Called(r)
@@ -4403,6 +4764,122 @@ func (_c *Database_GetAllTribesByOwner_Call) Return(_a0 []db.Tribe) *Database_Ge
 }
 
 func (_c *Database_GetAllTribesByOwner_Call) RunAndReturn(run func(string) []db.Tribe) *Database_GetAllTribesByOwner_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
+// GetArtifactByID provides a mock function with given fields: id
+func (_m *Database) GetArtifactByID(id uuid.UUID) (*db.Artifact, error) {
+	ret := _m.Called(id)
+
+	if len(ret) == 0 {
+		panic("no return value specified for GetArtifactByID")
+	}
+
+	var r0 *db.Artifact
+	var r1 error
+	if rf, ok := ret.Get(0).(func(uuid.UUID) (*db.Artifact, error)); ok {
+		return rf(id)
+	}
+	if rf, ok := ret.Get(0).(func(uuid.UUID) *db.Artifact); ok {
+		r0 = rf(id)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(*db.Artifact)
+		}
+	}
+
+	if rf, ok := ret.Get(1).(func(uuid.UUID) error); ok {
+		r1 = rf(id)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
+// Database_GetArtifactByID_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'GetArtifactByID'
+type Database_GetArtifactByID_Call struct {
+	*mock.Call
+}
+
+// GetArtifactByID is a helper method to define mock.On call
+//   - id uuid.UUID
+func (_e *Database_Expecter) GetArtifactByID(id interface{}) *Database_GetArtifactByID_Call {
+	return &Database_GetArtifactByID_Call{Call: _e.mock.On("GetArtifactByID", id)}
+}
+
+func (_c *Database_GetArtifactByID_Call) Run(run func(id uuid.UUID)) *Database_GetArtifactByID_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(uuid.UUID))
+	})
+	return _c
+}
+
+func (_c *Database_GetArtifactByID_Call) Return(_a0 *db.Artifact, _a1 error) *Database_GetArtifactByID_Call {
+	_c.Call.Return(_a0, _a1)
+	return _c
+}
+
+func (_c *Database_GetArtifactByID_Call) RunAndReturn(run func(uuid.UUID) (*db.Artifact, error)) *Database_GetArtifactByID_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
+// GetArtifactsByMessageID provides a mock function with given fields: messageID
+func (_m *Database) GetArtifactsByMessageID(messageID string) ([]db.Artifact, error) {
+	ret := _m.Called(messageID)
+
+	if len(ret) == 0 {
+		panic("no return value specified for GetArtifactsByMessageID")
+	}
+
+	var r0 []db.Artifact
+	var r1 error
+	if rf, ok := ret.Get(0).(func(string) ([]db.Artifact, error)); ok {
+		return rf(messageID)
+	}
+	if rf, ok := ret.Get(0).(func(string) []db.Artifact); ok {
+		r0 = rf(messageID)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).([]db.Artifact)
+		}
+	}
+
+	if rf, ok := ret.Get(1).(func(string) error); ok {
+		r1 = rf(messageID)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
+// Database_GetArtifactsByMessageID_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'GetArtifactsByMessageID'
+type Database_GetArtifactsByMessageID_Call struct {
+	*mock.Call
+}
+
+// GetArtifactsByMessageID is a helper method to define mock.On call
+//   - messageID string
+func (_e *Database_Expecter) GetArtifactsByMessageID(messageID interface{}) *Database_GetArtifactsByMessageID_Call {
+	return &Database_GetArtifactsByMessageID_Call{Call: _e.mock.On("GetArtifactsByMessageID", messageID)}
+}
+
+func (_c *Database_GetArtifactsByMessageID_Call) Run(run func(messageID string)) *Database_GetArtifactsByMessageID_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(string))
+	})
+	return _c
+}
+
+func (_c *Database_GetArtifactsByMessageID_Call) Return(_a0 []db.Artifact, _a1 error) *Database_GetArtifactsByMessageID_Call {
+	_c.Call.Return(_a0, _a1)
+	return _c
+}
+
+func (_c *Database_GetArtifactsByMessageID_Call) RunAndReturn(run func(string) ([]db.Artifact, error)) *Database_GetArtifactsByMessageID_Call {
 	_c.Call.Return(run)
 	return _c
 }
@@ -4757,6 +5234,64 @@ func (_c *Database_GetBountiesByFeatureAndPhaseUuid_Call) Return(_a0 []db.NewBou
 }
 
 func (_c *Database_GetBountiesByFeatureAndPhaseUuid_Call) RunAndReturn(run func(string, string, *http.Request) ([]db.NewBounty, error)) *Database_GetBountiesByFeatureAndPhaseUuid_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
+// GetBountiesByFeatureUuid provides a mock function with given fields: featureUuid
+func (_m *Database) GetBountiesByFeatureUuid(featureUuid string) ([]db.NewBounty, error) {
+	ret := _m.Called(featureUuid)
+
+	if len(ret) == 0 {
+		panic("no return value specified for GetBountiesByFeatureUuid")
+	}
+
+	var r0 []db.NewBounty
+	var r1 error
+	if rf, ok := ret.Get(0).(func(string) ([]db.NewBounty, error)); ok {
+		return rf(featureUuid)
+	}
+	if rf, ok := ret.Get(0).(func(string) []db.NewBounty); ok {
+		r0 = rf(featureUuid)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).([]db.NewBounty)
+		}
+	}
+
+	if rf, ok := ret.Get(1).(func(string) error); ok {
+		r1 = rf(featureUuid)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
+// Database_GetBountiesByFeatureUuid_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'GetBountiesByFeatureUuid'
+type Database_GetBountiesByFeatureUuid_Call struct {
+	*mock.Call
+}
+
+// GetBountiesByFeatureUuid is a helper method to define mock.On call
+//   - featureUuid string
+func (_e *Database_Expecter) GetBountiesByFeatureUuid(featureUuid interface{}) *Database_GetBountiesByFeatureUuid_Call {
+	return &Database_GetBountiesByFeatureUuid_Call{Call: _e.mock.On("GetBountiesByFeatureUuid", featureUuid)}
+}
+
+func (_c *Database_GetBountiesByFeatureUuid_Call) Run(run func(featureUuid string)) *Database_GetBountiesByFeatureUuid_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(string))
+	})
+	return _c
+}
+
+func (_c *Database_GetBountiesByFeatureUuid_Call) Return(_a0 []db.NewBounty, _a1 error) *Database_GetBountiesByFeatureUuid_Call {
+	_c.Call.Return(_a0, _a1)
+	return _c
+}
+
+func (_c *Database_GetBountiesByFeatureUuid_Call) RunAndReturn(run func(string) ([]db.NewBounty, error)) *Database_GetBountiesByFeatureUuid_Call {
 	_c.Call.Return(run)
 	return _c
 }
@@ -6362,6 +6897,64 @@ func (_c *Database_GetFeatureByUuid_Call) RunAndReturn(run func(string) db.Works
 	return _c
 }
 
+// GetFeatureCallByWorkspaceID provides a mock function with given fields: workspaceID
+func (_m *Database) GetFeatureCallByWorkspaceID(workspaceID string) (*db.FeatureCall, error) {
+	ret := _m.Called(workspaceID)
+
+	if len(ret) == 0 {
+		panic("no return value specified for GetFeatureCallByWorkspaceID")
+	}
+
+	var r0 *db.FeatureCall
+	var r1 error
+	if rf, ok := ret.Get(0).(func(string) (*db.FeatureCall, error)); ok {
+		return rf(workspaceID)
+	}
+	if rf, ok := ret.Get(0).(func(string) *db.FeatureCall); ok {
+		r0 = rf(workspaceID)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(*db.FeatureCall)
+		}
+	}
+
+	if rf, ok := ret.Get(1).(func(string) error); ok {
+		r1 = rf(workspaceID)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
+// Database_GetFeatureCallByWorkspaceID_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'GetFeatureCallByWorkspaceID'
+type Database_GetFeatureCallByWorkspaceID_Call struct {
+	*mock.Call
+}
+
+// GetFeatureCallByWorkspaceID is a helper method to define mock.On call
+//   - workspaceID string
+func (_e *Database_Expecter) GetFeatureCallByWorkspaceID(workspaceID interface{}) *Database_GetFeatureCallByWorkspaceID_Call {
+	return &Database_GetFeatureCallByWorkspaceID_Call{Call: _e.mock.On("GetFeatureCallByWorkspaceID", workspaceID)}
+}
+
+func (_c *Database_GetFeatureCallByWorkspaceID_Call) Run(run func(workspaceID string)) *Database_GetFeatureCallByWorkspaceID_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(string))
+	})
+	return _c
+}
+
+func (_c *Database_GetFeatureCallByWorkspaceID_Call) Return(_a0 *db.FeatureCall, _a1 error) *Database_GetFeatureCallByWorkspaceID_Call {
+	_c.Call.Return(_a0, _a1)
+	return _c
+}
+
+func (_c *Database_GetFeatureCallByWorkspaceID_Call) RunAndReturn(run func(string) (*db.FeatureCall, error)) *Database_GetFeatureCallByWorkspaceID_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
 // GetFeatureFlagByUUID provides a mock function with given fields: flagUUID
 func (_m *Database) GetFeatureFlagByUUID(flagUUID uuid.UUID) (db.FeatureFlag, error) {
 	ret := _m.Called(flagUUID)
@@ -6916,18 +7509,18 @@ func (_c *Database_GetFileAssetByID_Call) RunAndReturn(run func(uint) (*db.FileA
 }
 
 // GetFilterStatusCount provides a mock function with no fields
-func (_m *Database) GetFilterStatusCount() db.FilterStattuCount {
+func (_m *Database) GetFilterStatusCount() db.FilterStatusCount {
 	ret := _m.Called()
 
 	if len(ret) == 0 {
 		panic("no return value specified for GetFilterStatusCount")
 	}
 
-	var r0 db.FilterStattuCount
-	if rf, ok := ret.Get(0).(func() db.FilterStattuCount); ok {
+	var r0 db.FilterStatusCount
+	if rf, ok := ret.Get(0).(func() db.FilterStatusCount); ok {
 		r0 = rf()
 	} else {
-		r0 = ret.Get(0).(db.FilterStattuCount)
+		r0 = ret.Get(0).(db.FilterStatusCount)
 	}
 
 	return r0
@@ -6950,12 +7543,12 @@ func (_c *Database_GetFilterStatusCount_Call) Run(run func()) *Database_GetFilte
 	return _c
 }
 
-func (_c *Database_GetFilterStatusCount_Call) Return(_a0 db.FilterStattuCount) *Database_GetFilterStatusCount_Call {
+func (_c *Database_GetFilterStatusCount_Call) Return(_a0 db.FilterStatusCount) *Database_GetFilterStatusCount_Call {
 	_c.Call.Return(_a0)
 	return _c
 }
 
-func (_c *Database_GetFilterStatusCount_Call) RunAndReturn(run func() db.FilterStattuCount) *Database_GetFilterStatusCount_Call {
+func (_c *Database_GetFilterStatusCount_Call) RunAndReturn(run func() db.FilterStatusCount) *Database_GetFilterStatusCount_Call {
 	_c.Call.Return(run)
 	return _c
 }
@@ -8735,6 +9328,62 @@ func (_c *Database_GetPhaseByUuid_Call) RunAndReturn(run func(string) (db.Featur
 	return _c
 }
 
+// GetPhaseDesign provides a mock function with given fields: phaseUUID
+func (_m *Database) GetPhaseDesign(phaseUUID string) (string, error) {
+	ret := _m.Called(phaseUUID)
+
+	if len(ret) == 0 {
+		panic("no return value specified for GetPhaseDesign")
+	}
+
+	var r0 string
+	var r1 error
+	if rf, ok := ret.Get(0).(func(string) (string, error)); ok {
+		return rf(phaseUUID)
+	}
+	if rf, ok := ret.Get(0).(func(string) string); ok {
+		r0 = rf(phaseUUID)
+	} else {
+		r0 = ret.Get(0).(string)
+	}
+
+	if rf, ok := ret.Get(1).(func(string) error); ok {
+		r1 = rf(phaseUUID)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
+// Database_GetPhaseDesign_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'GetPhaseDesign'
+type Database_GetPhaseDesign_Call struct {
+	*mock.Call
+}
+
+// GetPhaseDesign is a helper method to define mock.On call
+//   - phaseUUID string
+func (_e *Database_Expecter) GetPhaseDesign(phaseUUID interface{}) *Database_GetPhaseDesign_Call {
+	return &Database_GetPhaseDesign_Call{Call: _e.mock.On("GetPhaseDesign", phaseUUID)}
+}
+
+func (_c *Database_GetPhaseDesign_Call) Run(run func(phaseUUID string)) *Database_GetPhaseDesign_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(string))
+	})
+	return _c
+}
+
+func (_c *Database_GetPhaseDesign_Call) Return(_a0 string, _a1 error) *Database_GetPhaseDesign_Call {
+	_c.Call.Return(_a0, _a1)
+	return _c
+}
+
+func (_c *Database_GetPhaseDesign_Call) RunAndReturn(run func(string) (string, error)) *Database_GetPhaseDesign_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
 // GetPhasesByFeatureUuid provides a mock function with given fields: featureUuid
 func (_m *Database) GetPhasesByFeatureUuid(featureUuid string) []db.FeaturePhase {
 	ret := _m.Called(featureUuid)
@@ -9608,6 +10257,64 @@ func (_c *Database_GetTicketPlansByWorkspace_Call) Return(_a0 []db.TicketPlan, _
 }
 
 func (_c *Database_GetTicketPlansByWorkspace_Call) RunAndReturn(run func(string) ([]db.TicketPlan, error)) *Database_GetTicketPlansByWorkspace_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
+// GetTicketsByFeatureUUID provides a mock function with given fields: featureUuid
+func (_m *Database) GetTicketsByFeatureUUID(featureUuid string) ([]db.Tickets, error) {
+	ret := _m.Called(featureUuid)
+
+	if len(ret) == 0 {
+		panic("no return value specified for GetTicketsByFeatureUUID")
+	}
+
+	var r0 []db.Tickets
+	var r1 error
+	if rf, ok := ret.Get(0).(func(string) ([]db.Tickets, error)); ok {
+		return rf(featureUuid)
+	}
+	if rf, ok := ret.Get(0).(func(string) []db.Tickets); ok {
+		r0 = rf(featureUuid)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).([]db.Tickets)
+		}
+	}
+
+	if rf, ok := ret.Get(1).(func(string) error); ok {
+		r1 = rf(featureUuid)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
+// Database_GetTicketsByFeatureUUID_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'GetTicketsByFeatureUUID'
+type Database_GetTicketsByFeatureUUID_Call struct {
+	*mock.Call
+}
+
+// GetTicketsByFeatureUUID is a helper method to define mock.On call
+//   - featureUuid string
+func (_e *Database_Expecter) GetTicketsByFeatureUUID(featureUuid interface{}) *Database_GetTicketsByFeatureUUID_Call {
+	return &Database_GetTicketsByFeatureUUID_Call{Call: _e.mock.On("GetTicketsByFeatureUUID", featureUuid)}
+}
+
+func (_c *Database_GetTicketsByFeatureUUID_Call) Run(run func(featureUuid string)) *Database_GetTicketsByFeatureUUID_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(string))
+	})
+	return _c
+}
+
+func (_c *Database_GetTicketsByFeatureUUID_Call) Return(_a0 []db.Tickets, _a1 error) *Database_GetTicketsByFeatureUUID_Call {
+	_c.Call.Return(_a0, _a1)
+	return _c
+}
+
+func (_c *Database_GetTicketsByFeatureUUID_Call) RunAndReturn(run func(string) ([]db.Tickets, error)) *Database_GetTicketsByFeatureUUID_Call {
 	_c.Call.Return(run)
 	return _c
 }
@@ -13144,6 +13851,64 @@ func (_c *Database_UpdateActivity_Call) RunAndReturn(run func(*db.Activity) (*db
 	return _c
 }
 
+// UpdateArtifact provides a mock function with given fields: artifact
+func (_m *Database) UpdateArtifact(artifact *db.Artifact) (*db.Artifact, error) {
+	ret := _m.Called(artifact)
+
+	if len(ret) == 0 {
+		panic("no return value specified for UpdateArtifact")
+	}
+
+	var r0 *db.Artifact
+	var r1 error
+	if rf, ok := ret.Get(0).(func(*db.Artifact) (*db.Artifact, error)); ok {
+		return rf(artifact)
+	}
+	if rf, ok := ret.Get(0).(func(*db.Artifact) *db.Artifact); ok {
+		r0 = rf(artifact)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(*db.Artifact)
+		}
+	}
+
+	if rf, ok := ret.Get(1).(func(*db.Artifact) error); ok {
+		r1 = rf(artifact)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
+// Database_UpdateArtifact_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'UpdateArtifact'
+type Database_UpdateArtifact_Call struct {
+	*mock.Call
+}
+
+// UpdateArtifact is a helper method to define mock.On call
+//   - artifact *db.Artifact
+func (_e *Database_Expecter) UpdateArtifact(artifact interface{}) *Database_UpdateArtifact_Call {
+	return &Database_UpdateArtifact_Call{Call: _e.mock.On("UpdateArtifact", artifact)}
+}
+
+func (_c *Database_UpdateArtifact_Call) Run(run func(artifact *db.Artifact)) *Database_UpdateArtifact_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(*db.Artifact))
+	})
+	return _c
+}
+
+func (_c *Database_UpdateArtifact_Call) Return(_a0 *db.Artifact, _a1 error) *Database_UpdateArtifact_Call {
+	_c.Call.Return(_a0, _a1)
+	return _c
+}
+
+func (_c *Database_UpdateArtifact_Call) RunAndReturn(run func(*db.Artifact) (*db.Artifact, error)) *Database_UpdateArtifact_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
 // UpdateBot provides a mock function with given fields: _a0, u
 func (_m *Database) UpdateBot(_a0 string, u map[string]interface{}) bool {
 	ret := _m.Called(_a0, u)
@@ -15054,732 +15819,4 @@ func NewDatabase(t interface {
 	t.Cleanup(func() { mock.AssertExpectations(t) })
 
 	return mock
-}
-
-
-// GetPhaseDesign provides a mock function with given fields: phaseUUID
-func (_m *Database) GetPhaseDesign(phaseUUID string) (string, error) {
-	ret := _m.Called(phaseUUID)
-
-	if len(ret) == 0 {
-		panic("no return value specified for GetPhaseDesign")
-	}
-
-	var r0 string
-	var r1 error
-	if rf, ok := ret.Get(0).(func(string) (string, error)); ok {
-		return rf(phaseUUID)
-	}
-	if rf, ok := ret.Get(0).(func(string) string); ok {
-		r0 = rf(phaseUUID)
-	} else {
-		r0 = ret.Get(0).(string)
-	}
-
-	if rf, ok := ret.Get(1).(func(string) error); ok {
-		r1 = rf(phaseUUID)
-	} else {
-		r1 = ret.Error(1)
-	}
-
-	return r0, r1
-}
-
-type Database_GetPhaseDesign_Call struct {
-	*mock.Call
-}
-
-func (_e *Database_Expecter) GetPhaseDesign(phaseUUID interface{}) *Database_GetPhaseDesign_Call {
-	return &Database_GetPhaseDesign_Call{Call: _e.mock.On("GetPhaseDesign", phaseUUID)}
-}
-
-func (_c *Database_GetPhaseDesign_Call) Run(run func(phaseUUID string)) *Database_GetPhaseDesign_Call {
-	_c.Call.Run(func(args mock.Arguments) {
-		run(args[0].(string))
-	})
-	return _c
-}
-
-func (_c *Database_GetPhaseDesign_Call) Return(_a0 string, _a1 error) *Database_GetPhaseDesign_Call {
-	_c.Call.Return(_a0, _a1)
-	return _c
-}
-
-func (_c *Database_GetPhaseDesign_Call) RunAndReturn(run func(string) (string, error)) *Database_GetPhaseDesign_Call {
-	_c.Call.Return(run)
-	return _c
-}
-
-
-
-// BuildTicketArray provides a mock function with given fields: groupIDs
-func (_m *Database) BuildTicketArray(groupIDs []string) []db.TicketArrayItem {
-	ret := _m.Called(groupIDs)
-
-	if len(ret) == 0 {
-		panic("no return value specified for BuildTicketArray")
-	}
-
-	var r0 []db.TicketArrayItem
-	if rf, ok := ret.Get(0).(func([]string) []db.TicketArrayItem); ok {
-		r0 = rf(groupIDs)
-	} else {
-		if ret.Get(0) != nil {
-			r0 = ret.Get(0).([]db.TicketArrayItem)
-		}
-	}
-
-	return r0
-}
-
-type Database_BuildTicketArray_Call struct {
-	*mock.Call
-}
-
-func (_e *Database_Expecter) BuildTicketArray(groupIDs interface{}) *Database_BuildTicketArray_Call {
-	return &Database_BuildTicketArray_Call{Call: _e.mock.On("BuildTicketArray", groupIDs)}
-}
-
-func (_c *Database_BuildTicketArray_Call) Run(run func(groupIDs []string)) *Database_BuildTicketArray_Call {
-	_c.Call.Run(func(args mock.Arguments) {
-		run(args[0].([]string))
-	})
-	return _c
-}
-
-func (_c *Database_BuildTicketArray_Call) Return(_a0 []db.TicketArrayItem) *Database_BuildTicketArray_Call {
-	_c.Call.Return(_a0)
-	return _c
-}
-
-func (_c *Database_BuildTicketArray_Call) RunAndReturn(run func([]string) []db.TicketArrayItem) *Database_BuildTicketArray_Call {
-	_c.Call.Return(run)
-	return _c
-}
-
-// GetBountiesByFeatureUuid provides a mock function with given fields: featureUuid
-func (_m *Database) GetBountiesByFeatureUuid(featureUuid string) ([]db.NewBounty, error) {
-	ret := _m.Called(featureUuid)
-
-	if len(ret) == 0 {
-		panic("no return value specified for GetBountiesByFeatureUuid")
-	}
-
-	var r0 []db.NewBounty
-	var r1 error
-	if rf, ok := ret.Get(0).(func(string) ([]db.NewBounty, error)); ok {
-		return rf(featureUuid)
-	}
-	if rf, ok := ret.Get(0).(func(string) []db.NewBounty); ok {
-		r0 = rf(featureUuid)
-	} else {
-		if ret.Get(0) != nil {
-			r0 = ret.Get(0).([]db.NewBounty)
-		}
-	}
-
-	if rf, ok := ret.Get(1).(func(string) error); ok {
-		r1 = rf(featureUuid)
-	} else {
-		r1 = ret.Error(1)
-	}
-
-	return r0, r1
-}
-
-type Database_GetBountiesByFeatureUuid_Call struct {
-	*mock.Call
-}
-
-func (_e *Database_Expecter) GetBountiesByFeatureUuid(featureUuid interface{}) *Database_GetBountiesByFeatureUuid_Call {
-	return &Database_GetBountiesByFeatureUuid_Call{Call: _e.mock.On("GetBountiesByFeatureUuid", featureUuid)}
-}
-
-func (_c *Database_GetBountiesByFeatureUuid_Call) Run(run func(featureUuid string)) *Database_GetBountiesByFeatureUuid_Call {
-	_c.Call.Run(func(args mock.Arguments) {
-		run(args[0].(string))
-	})
-	return _c
-}
-
-func (_c *Database_GetBountiesByFeatureUuid_Call) Return(_a0 []db.NewBounty, _a1 error) *Database_GetBountiesByFeatureUuid_Call {
-	_c.Call.Return(_a0, _a1)
-	return _c
-}
-
-func (_c *Database_GetBountiesByFeatureUuid_Call) RunAndReturn(run func(string) ([]db.NewBounty, error)) *Database_GetBountiesByFeatureUuid_Call {
-	_c.Call.Return(run)
-	return _c
-}
-
-
-// GetTicketsByFeatureUUID provides a mock function with given fields: featureUuid
-func (_m *Database) GetTicketsByFeatureUUID(featureUuid string) ([]db.Tickets, error) {
-	ret := _m.Called(featureUuid)
-
-	if len(ret) == 0 {
-		panic("no return value specified for GetTicketsByFeatureUUID")
-	}
-
-	var r0 []db.Tickets
-	var r1 error
-	if rf, ok := ret.Get(0).(func(string) ([]db.Tickets, error)); ok {
-		return rf(featureUuid)
-	}
-	if rf, ok := ret.Get(0).(func(string) []db.Tickets); ok {
-		r0 = rf(featureUuid)
-	} else {
-		if ret.Get(0) != nil {
-			r0 = ret.Get(0).([]db.Tickets)
-		}
-	}
-
-	if rf, ok := ret.Get(1).(func(string) error); ok {
-		r1 = rf(featureUuid)
-	} else {
-		r1 = ret.Error(1)
-	}
-
-	return r0, r1
-}
-
-type Database_GetTicketsByFeatureUUID_Call struct {
-	*mock.Call
-}
-
-func (_e *Database_Expecter) GetTicketsByFeatureUUID(featureUuid interface{}) *Database_GetTicketsByFeatureUUID_Call {
-	return &Database_GetTicketsByFeatureUUID_Call{Call: _e.mock.On("GetTicketsByFeatureUUID", featureUuid)}
-}
-
-func (_c *Database_GetTicketsByFeatureUUID_Call) Run(run func(featureUuid string)) *Database_GetTicketsByFeatureUUID_Call {
-	_c.Call.Run(func(args mock.Arguments) {
-		run(args[0].(string))
-	})
-	return _c
-}
-
-func (_c *Database_GetTicketsByFeatureUUID_Call) Return(_a0 []db.Tickets, _a1 error) *Database_GetTicketsByFeatureUUID_Call {
-	_c.Call.Return(_a0, _a1)
-	return _c
-}
-
-func (_c *Database_GetTicketsByFeatureUUID_Call) RunAndReturn(run func(string) ([]db.Tickets, error)) *Database_GetTicketsByFeatureUUID_Call {
-	_c.Call.Return(run)
-	return _c
-}
-
-
-func (_m *Database) CreateArtifact(artifact *db.Artifact) (*db.Artifact, error) {
-	ret := _m.Called(artifact)
-
-	if len(ret) == 0 {
-		panic("no return value specified for CreateArtifact")
-	}
-
-	var r0 *db.Artifact
-	var r1 error
-	if rf, ok := ret.Get(0).(func(*db.Artifact) (*db.Artifact, error)); ok {
-		return rf(artifact)
-	}
-	if rf, ok := ret.Get(0).(func(*db.Artifact) *db.Artifact); ok {
-		r0 = rf(artifact)
-	} else {
-		if ret.Get(0) != nil {
-			r0 = ret.Get(0).(*db.Artifact)
-		}
-	}
-
-	if rf, ok := ret.Get(1).(func(*db.Artifact) error); ok {
-		r1 = rf(artifact)
-	} else {
-		r1 = ret.Error(1)
-	}
-
-	return r0, r1
-}
-
-type Database_CreateArtifact_Call struct {
-	*mock.Call
-}
-
-func (_e *Database_Expecter) CreateArtifact(artifact interface{}) *Database_CreateArtifact_Call {
-	return &Database_CreateArtifact_Call{Call: _e.mock.On("CreateArtifact", artifact)}
-}
-
-func (_c *Database_CreateArtifact_Call) Run(run func(artifact *db.Artifact)) *Database_CreateArtifact_Call {
-	_c.Call.Run(func(args mock.Arguments) {
-		run(args[0].(*db.Artifact))
-	})
-	return _c
-}
-
-func (_c *Database_CreateArtifact_Call) Return(_a0 *db.Artifact, _a1 error) *Database_CreateArtifact_Call {
-	_c.Call.Return(_a0, _a1)
-	return _c
-}
-
-func (_c *Database_CreateArtifact_Call) RunAndReturn(run func(*db.Artifact) (*db.Artifact, error)) *Database_CreateArtifact_Call {
-	_c.Call.Return(run)
-	return _c
-}
-
-
-func (_m *Database) GetArtifactByID(id uuid.UUID) (*db.Artifact, error) {
-	ret := _m.Called(id)
-
-	if len(ret) == 0 {
-		panic("no return value specified for GetArtifactByID")
-	}
-
-	var r0 *db.Artifact
-	var r1 error
-	if rf, ok := ret.Get(0).(func(uuid.UUID) (*db.Artifact, error)); ok {
-		return rf(id)
-	}
-	if rf, ok := ret.Get(0).(func(uuid.UUID) *db.Artifact); ok {
-		r0 = rf(id)
-	} else {
-		if ret.Get(0) != nil {
-			r0 = ret.Get(0).(*db.Artifact)
-		}
-	}
-
-	if rf, ok := ret.Get(1).(func(uuid.UUID) error); ok {
-		r1 = rf(id)
-	} else {
-		r1 = ret.Error(1)
-	}
-
-	return r0, r1
-}
-
-type Database_GetArtifactByID_Call struct {
-	*mock.Call
-}
-
-
-func (_e *Database_Expecter) GetArtifactByID(id interface{}) *Database_GetArtifactByID_Call {
-	return &Database_GetArtifactByID_Call{Call: _e.mock.On("GetArtifactByID", id)}
-}
-
-func (_c *Database_GetArtifactByID_Call) Run(run func(id uuid.UUID)) *Database_GetArtifactByID_Call {
-	_c.Call.Run(func(args mock.Arguments) {
-		run(args[0].(uuid.UUID))
-	})
-	return _c
-}
-
-func (_c *Database_GetArtifactByID_Call) Return(_a0 *db.Artifact, _a1 error) *Database_GetArtifactByID_Call {
-	_c.Call.Return(_a0, _a1)
-	return _c
-}
-
-func (_c *Database_GetArtifactByID_Call) RunAndReturn(run func(uuid.UUID) (*db.Artifact, error)) *Database_GetArtifactByID_Call {
-	_c.Call.Return(run)
-	return _c
-}
-
-
-func (_m *Database) GetArtifactsByMessageID(messageID string) ([]db.Artifact, error) {
-	ret := _m.Called(messageID)
-
-	if len(ret) == 0 {
-		panic("no return value specified for GetArtifactsByMessageID")
-	}
-
-	var r0 []db.Artifact
-	var r1 error
-	if rf, ok := ret.Get(0).(func(string) ([]db.Artifact, error)); ok {
-		return rf(messageID)
-	}
-	if rf, ok := ret.Get(0).(func(string) []db.Artifact); ok {
-		r0 = rf(messageID)
-	} else {
-		if ret.Get(0) != nil {
-			r0 = ret.Get(0).([]db.Artifact)
-		}
-	}
-
-	if rf, ok := ret.Get(1).(func(string) error); ok {
-		r1 = rf(messageID)
-	} else {
-		r1 = ret.Error(1)
-	}
-
-	return r0, r1
-}
-
-type Database_GetArtifactsByMessageID_Call struct {
-	*mock.Call
-}
-
-func (_e *Database_Expecter) GetArtifactsByMessageID(messageID interface{}) *Database_GetArtifactsByMessageID_Call {
-	return &Database_GetArtifactsByMessageID_Call{Call: _e.mock.On("GetArtifactsByMessageID", messageID)}
-}
-
-func (_c *Database_GetArtifactsByMessageID_Call) Run(run func(messageID string)) *Database_GetArtifactsByMessageID_Call {
-	_c.Call.Run(func(args mock.Arguments) {
-		run(args[0].(string))
-	})
-	return _c
-}
-
-func (_c *Database_GetArtifactsByMessageID_Call) Return(_a0 []db.Artifact, _a1 error) *Database_GetArtifactsByMessageID_Call {
-	_c.Call.Return(_a0, _a1)
-	return _c
-}
-
-func (_c *Database_GetArtifactsByMessageID_Call) RunAndReturn(run func(string) ([]db.Artifact, error)) *Database_GetArtifactsByMessageID_Call {
-	_c.Call.Return(run)
-	return _c
-}
-
-
-func (_m *Database) GetAllArtifactsByChatID(chatID string) ([]db.Artifact, error) {
-	ret := _m.Called(chatID)
-
-	if len(ret) == 0 {
-		panic("no return value specified for GetAllArtifactsByChatID")
-	}
-
-	var r0 []db.Artifact
-	var r1 error
-	if rf, ok := ret.Get(0).(func(string) ([]db.Artifact, error)); ok {
-		return rf(chatID)
-	}
-	if rf, ok := ret.Get(0).(func(string) []db.Artifact); ok {
-		r0 = rf(chatID)
-	} else {
-		if ret.Get(0) != nil {
-			r0 = ret.Get(0).([]db.Artifact)
-		}
-	}
-
-	if rf, ok := ret.Get(1).(func(string) error); ok {
-		r1 = rf(chatID)
-	} else {
-		r1 = ret.Error(1)
-	}
-
-	return r0, r1
-}
-
-type Database_GetAllArtifactsByChatID_Call struct {
-	*mock.Call
-}
-
-func (_e *Database_Expecter) GetAllArtifactsByChatID(chatID interface{}) *Database_GetAllArtifactsByChatID_Call {
-	return &Database_GetAllArtifactsByChatID_Call{Call: _e.mock.On("GetAllArtifactsByChatID", chatID)}
-}
-
-func (_c *Database_GetAllArtifactsByChatID_Call) Run(run func(chatID string)) *Database_GetAllArtifactsByChatID_Call {
-	_c.Call.Run(func(args mock.Arguments) {
-		run(args[0].(string))
-	})
-	return _c
-}
-
-func (_c *Database_GetAllArtifactsByChatID_Call) Return(_a0 []db.Artifact, _a1 error) *Database_GetAllArtifactsByChatID_Call {
-	_c.Call.Return(_a0, _a1)
-	return _c
-}
-
-func (_c *Database_GetAllArtifactsByChatID_Call) RunAndReturn(run func(string) ([]db.Artifact, error)) *Database_GetAllArtifactsByChatID_Call {
-	_c.Call.Return(run)
-	return _c
-}
-
-
-func (_m *Database) UpdateArtifact(artifact *db.Artifact) (*db.Artifact, error) {
-	ret := _m.Called(artifact)
-
-	if len(ret) == 0 {
-		panic("no return value specified for UpdateArtifact")
-	}
-
-	var r0 *db.Artifact
-	var r1 error
-	if rf, ok := ret.Get(0).(func(*db.Artifact) (*db.Artifact, error)); ok {
-		return rf(artifact)
-	}
-	if rf, ok := ret.Get(0).(func(*db.Artifact) *db.Artifact); ok {
-		r0 = rf(artifact)
-	} else {
-		if ret.Get(0) != nil {
-			r0 = ret.Get(0).(*db.Artifact)
-		}
-	}
-
-	if rf, ok := ret.Get(1).(func(*db.Artifact) error); ok {
-		r1 = rf(artifact)
-	} else {
-		r1 = ret.Error(1)
-	}
-
-	return r0, r1
-}
-
-type Database_UpdateArtifact_Call struct {
-	*mock.Call
-}
-
-
-func (_e *Database_Expecter) UpdateArtifact(artifact interface{}) *Database_UpdateArtifact_Call {
-	return &Database_UpdateArtifact_Call{Call: _e.mock.On("UpdateArtifact", artifact)}
-}
-
-func (_c *Database_UpdateArtifact_Call) Run(run func(artifact *db.Artifact)) *Database_UpdateArtifact_Call {
-	_c.Call.Run(func(args mock.Arguments) {
-		run(args[0].(*db.Artifact))
-	})
-	return _c
-}
-
-func (_c *Database_UpdateArtifact_Call) Return(_a0 *db.Artifact, _a1 error) *Database_UpdateArtifact_Call {
-	_c.Call.Return(_a0, _a1)
-	return _c
-}
-
-func (_c *Database_UpdateArtifact_Call) RunAndReturn(run func(*db.Artifact) (*db.Artifact, error)) *Database_UpdateArtifact_Call {
-	_c.Call.Return(run)
-	return _c
-}
-
-
-func (_m *Database) DeleteArtifactByID(id uuid.UUID) error {
-	ret := _m.Called(id)
-
-	if len(ret) == 0 {
-		panic("no return value specified for DeleteArtifactByID")
-	}
-
-	var r0 error
-	if rf, ok := ret.Get(0).(func(uuid.UUID) error); ok {
-		r0 = rf(id)
-	} else {
-		r0 = ret.Error(0)
-	}
-
-	return r0
-}
-
-type Database_DeleteArtifactByID_Call struct {
-	*mock.Call
-}
-
-
-func (_e *Database_Expecter) DeleteArtifactByID(id interface{}) *Database_DeleteArtifactByID_Call {
-	return &Database_DeleteArtifactByID_Call{Call: _e.mock.On("DeleteArtifactByID", id)}
-}
-
-func (_c *Database_DeleteArtifactByID_Call) Run(run func(id uuid.UUID)) *Database_DeleteArtifactByID_Call {
-	_c.Call.Run(func(args mock.Arguments) {
-		run(args[0].(uuid.UUID))
-	})
-	return _c
-}
-
-func (_c *Database_DeleteArtifactByID_Call) Return(_a0 error) *Database_DeleteArtifactByID_Call {
-	_c.Call.Return(_a0)
-	return _c
-}
-
-func (_c *Database_DeleteArtifactByID_Call) RunAndReturn(run func(uuid.UUID) error) *Database_DeleteArtifactByID_Call {
-	_c.Call.Return(run)
-	return _c
-}
-
-func (_m *Database) DeleteAllArtifactsByChatID(chatID string) error {
-	ret := _m.Called(chatID)
-
-	if len(ret) == 0 {
-		panic("no return value specified for DeleteAllArtifactsByChatID")
-	}
-
-	var r0 error
-	if rf, ok := ret.Get(0).(func(string) error); ok {
-		r0 = rf(chatID)
-	} else {
-		r0 = ret.Error(0)
-	}
-
-	return r0
-}
-
-type Database_DeleteAllArtifactsByChatID_Call struct {
-	*mock.Call
-}
-
-func (_e *Database_Expecter) DeleteAllArtifactsByChatID(chatID interface{}) *Database_DeleteAllArtifactsByChatID_Call {
-	return &Database_DeleteAllArtifactsByChatID_Call{Call: _e.mock.On("DeleteAllArtifactsByChatID", chatID)}
-}
-
-func (_c *Database_DeleteAllArtifactsByChatID_Call) Run(run func(chatID string)) *Database_DeleteAllArtifactsByChatID_Call {
-	_c.Call.Run(func(args mock.Arguments) {
-		run(args[0].(string))
-	})
-	return _c
-}
-
-func (_c *Database_DeleteAllArtifactsByChatID_Call) Return(_a0 error) *Database_DeleteAllArtifactsByChatID_Call {
-	_c.Call.Return(_a0)
-	return _c
-}
-
-func (_c *Database_DeleteAllArtifactsByChatID_Call) RunAndReturn(run func(string) error) *Database_DeleteAllArtifactsByChatID_Call {
-	_c.Call.Return(run)
-	return _c
-}
-
-
-func (_m *Database) CreateOrUpdateFeatureCall(workspaceID string, url string) (*db.FeatureCall, error) {
-	ret := _m.Called(workspaceID, url)
-
-	if len(ret) == 0 {
-		panic("no return value specified for CreateOrUpdateFeatureCall")
-	}
-
-	var r0 *db.FeatureCall
-	var r1 error
-	if rf, ok := ret.Get(0).(func(string, string) (*db.FeatureCall, error)); ok {
-		return rf(workspaceID, url)
-	}
-	if rf, ok := ret.Get(0).(func(string, string) *db.FeatureCall); ok {
-		r0 = rf(workspaceID, url)
-	} else {
-		if ret.Get(0) != nil {
-			r0 = ret.Get(0).(*db.FeatureCall)
-		}
-	}
-
-	if rf, ok := ret.Get(1).(func(string, string) error); ok {
-		r1 = rf(workspaceID, url)
-	} else {
-		r1 = ret.Error(1)
-	}
-
-	return r0, r1
-}
-
-type Database_CreateOrUpdateFeatureCall_Call struct {
-	*mock.Call
-}
-
-func (_e *Database_Expecter) CreateOrUpdateFeatureCall(workspaceID interface{}, url interface{}) *Database_CreateOrUpdateFeatureCall_Call {
-	return &Database_CreateOrUpdateFeatureCall_Call{Call: _e.mock.On("CreateOrUpdateFeatureCall", workspaceID, url)}
-}
-
-func (_c *Database_CreateOrUpdateFeatureCall_Call) Run(run func(workspaceID string, url string)) *Database_CreateOrUpdateFeatureCall_Call {
-	_c.Call.Run(func(args mock.Arguments) {
-		run(args[0].(string), args[1].(string))
-	})
-	return _c
-}
-
-func (_c *Database_CreateOrUpdateFeatureCall_Call) Return(_a0 *db.FeatureCall, _a1 error) *Database_CreateOrUpdateFeatureCall_Call {
-	_c.Call.Return(_a0, _a1)
-	return _c
-}
-
-func (_c *Database_CreateOrUpdateFeatureCall_Call) RunAndReturn(run func(string, string) (*db.FeatureCall, error)) *Database_CreateOrUpdateFeatureCall_Call {
-	_c.Call.Return(run)
-	return _c
-}
-
-
-func (_m *Database) GetFeatureCallByWorkspaceID(workspaceID string) (*db.FeatureCall, error) {
-	ret := _m.Called(workspaceID)
-
-	if len(ret) == 0 {
-		panic("no return value specified for GetFeatureCallByWorkspaceID")
-	}
-
-	var r0 *db.FeatureCall
-	var r1 error
-	if rf, ok := ret.Get(0).(func(string) (*db.FeatureCall, error)); ok {
-		return rf(workspaceID)
-	}
-	if rf, ok := ret.Get(0).(func(string) *db.FeatureCall); ok {
-		r0 = rf(workspaceID)
-	} else {
-		if ret.Get(0) != nil {
-			r0 = ret.Get(0).(*db.FeatureCall)
-		}
-	}
-
-	if rf, ok := ret.Get(1).(func(string) error); ok {
-		r1 = rf(workspaceID)
-	} else {
-		r1 = ret.Error(1)
-	}
-
-	return r0, r1
-}
-
-type Database_GetFeatureCallByWorkspaceID_Call struct {
-	*mock.Call
-}
-
-func (_e *Database_Expecter) GetFeatureCallByWorkspaceID(workspaceID interface{}) *Database_GetFeatureCallByWorkspaceID_Call {
-	return &Database_GetFeatureCallByWorkspaceID_Call{Call: _e.mock.On("GetFeatureCallByWorkspaceID", workspaceID)}
-}
-
-func (_c *Database_GetFeatureCallByWorkspaceID_Call) Run(run func(workspaceID string)) *Database_GetFeatureCallByWorkspaceID_Call {
-	_c.Call.Run(func(args mock.Arguments) {
-		run(args[0].(string))
-	})
-	return _c
-}
-
-func (_c *Database_GetFeatureCallByWorkspaceID_Call) Return(_a0 *db.FeatureCall, _a1 error) *Database_GetFeatureCallByWorkspaceID_Call {
-	_c.Call.Return(_a0, _a1)
-	return _c
-}
-
-func (_c *Database_GetFeatureCallByWorkspaceID_Call) RunAndReturn(run func(string) (*db.FeatureCall, error)) *Database_GetFeatureCallByWorkspaceID_Call {
-	_c.Call.Return(run)
-	return _c
-}
-
-
-func (_m *Database) DeleteFeatureCall(workspaceID string) error {
-	ret := _m.Called(workspaceID)
-
-	if len(ret) == 0 {
-		panic("no return value specified for DeleteFeatureCall")
-	}
-
-	var r0 error
-	if rf, ok := ret.Get(0).(func(string) error); ok {
-		r0 = rf(workspaceID)
-	} else {
-		r0 = ret.Error(0)
-	}
-
-	return r0
-}
-
-type Database_DeleteFeatureCall_Call struct {
-	*mock.Call
-}
-
-func (_e *Database_Expecter) DeleteFeatureCall(workspaceID interface{}) *Database_DeleteFeatureCall_Call {
-	return &Database_DeleteFeatureCall_Call{Call: _e.mock.On("DeleteFeatureCall", workspaceID)}
-}
-
-func (_c *Database_DeleteFeatureCall_Call) Run(run func(workspaceID string)) *Database_DeleteFeatureCall_Call {
-	_c.Call.Run(func(args mock.Arguments) {
-		run(args[0].(string))
-	})
-	return _c
-}
-
-func (_c *Database_DeleteFeatureCall_Call) Return(_a0 error) *Database_DeleteFeatureCall_Call {
-	_c.Call.Return(_a0)
-	return _c
-}
-
-func (_c *Database_DeleteFeatureCall_Call) RunAndReturn(run func(string) error) *Database_DeleteFeatureCall_Call {
-	_c.Call.Return(run)
-	return _c
 }

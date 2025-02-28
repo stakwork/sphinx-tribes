@@ -74,6 +74,13 @@ func handleTimingError(w http.ResponseWriter, operation string, err error) {
 	})
 }
 
+// GetAllBounties godoc
+//
+//	@Summary		Get all bounties
+//	@Description	Get a list of all bounties
+//	@Tags			Go Bounties
+//	@Success		200	{array}	db.Bounty
+//	@Router			/gobounties/all [get]
 func (h *bountyHandler) GetAllBounties(w http.ResponseWriter, r *http.Request) {
 	bounties := h.db.GetAllBounties(r)
 	var bountyResponse []db.BountyResponse = h.GenerateBountyResponse(bounties)
@@ -82,6 +89,14 @@ func (h *bountyHandler) GetAllBounties(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(bountyResponse)
 }
 
+// GetBountyById godoc
+//
+//	@Summary		Get a bounty
+//	@Description	Get a bounty by ID
+//	@Tags			Go Bounties
+//	@Param			id	path		string	true	"Bounty ID"
+//	@Success		200	{object}	db.Bounty
+//	@Router			/gobounties/id/{bountyId} [get]
 func (h *bountyHandler) GetBountyById(w http.ResponseWriter, r *http.Request) {
 	bountyId := chi.URLParam(r, "bountyId")
 	if bountyId == "" {
@@ -98,6 +113,14 @@ func (h *bountyHandler) GetBountyById(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+// GetNextBountyByCreated godoc
+//
+//	@Summary		Get next bounty
+//	@Description	Get next bounty by created date
+//	@Tags			Go Bounties
+//	@Param			created	path		string	true	"Created date"
+//	@Success		200		{object}	db.Bounty
+//	@Router			/gobounties/next/{created} [get]
 func (h *bountyHandler) GetNextBountyByCreated(w http.ResponseWriter, r *http.Request) {
 	bounties, err := h.db.GetNextBountyByCreated(r)
 	if err != nil {
@@ -109,6 +132,14 @@ func (h *bountyHandler) GetNextBountyByCreated(w http.ResponseWriter, r *http.Re
 	}
 }
 
+// GetPreviousBountyByCreated godoc
+//
+//	@Summary		Get previous bounty
+//	@Description	Get previous bounty by created date
+//	@Tags			Go Bounties
+//	@Param			created	path		string	true	"Created date"
+//	@Success		200		{object}	db.Bounty
+//	@Router			/gobounties/previous/{created} [get]
 func (h *bountyHandler) GetPreviousBountyByCreated(w http.ResponseWriter, r *http.Request) {
 	bounties, err := h.db.GetPreviousBountyByCreated(r)
 	if err != nil {
@@ -120,6 +151,15 @@ func (h *bountyHandler) GetPreviousBountyByCreated(w http.ResponseWriter, r *htt
 	}
 }
 
+// GetWorkspaceNextBountyByCreated godoc
+//
+//	@Summary		Get next workspace bounty
+//	@Description	Get next workspace bounty by created date
+//	@Tags			Go Bounties
+//	@Param			uuid	path		string	true	"Workspace UUID"
+//	@Param			created	path		string	true	"Created date"
+//	@Success		200		{object}	db.Bounty
+//	@Router			/gobounties/workspace/next/{uuid}/{created} [get]
 func (h *bountyHandler) GetWorkspaceNextBountyByCreated(w http.ResponseWriter, r *http.Request) {
 	bounties, err := h.db.GetNextWorkspaceBountyByCreated(r)
 	if err != nil {
@@ -131,6 +171,15 @@ func (h *bountyHandler) GetWorkspaceNextBountyByCreated(w http.ResponseWriter, r
 	}
 }
 
+// GetWorkspacePreviousBountyByCreated godoc
+//
+//	@Summary		Get previous workspace bounty
+//	@Description	Get previous workspace bounty by created date
+//	@Tags			Go Bounties
+//	@Param			uuid	path		string	true	"Workspace UUID"
+//	@Param			created	path		string	true	"Created date"
+//	@Success		200		{object}	db.Bounty
+//	@Router			/gobounties/workspace/previous/{uuid}/{created} [get]
 func (h *bountyHandler) GetWorkspacePreviousBountyByCreated(w http.ResponseWriter, r *http.Request) {
 	bounties, err := h.db.GetPreviousWorkspaceBountyByCreated(r)
 	if err != nil {
@@ -142,6 +191,14 @@ func (h *bountyHandler) GetWorkspacePreviousBountyByCreated(w http.ResponseWrite
 	}
 }
 
+// GetBountyIndexById godoc
+//
+//	@Summary		Get bounty index
+//	@Description	Get bounty index by ID
+//	@Tags			Go Bounties
+//	@Param			id	path		string	true	"Bounty ID"
+//	@Success		200	{object}	int
+//	@Router			/gobounties/index/{bountyId} [get]
 func (h *bountyHandler) GetBountyIndexById(w http.ResponseWriter, r *http.Request) {
 	bountyId := chi.URLParam(r, "bountyId")
 	if bountyId == "" {
@@ -153,6 +210,14 @@ func (h *bountyHandler) GetBountyIndexById(w http.ResponseWriter, r *http.Reques
 	json.NewEncoder(w).Encode(bountyIndex)
 }
 
+// GetBountyByCreated godoc
+//
+//	@Summary		Get bounty by created date
+//	@Description	Get bounty by created date
+//	@Tags			Go Bounties
+//	@Param			created	path		string	true	"Created date"
+//	@Success		200		{object}	db.Bounty
+//	@Router			/gobounties/created/{created} [get]
 func (h *bountyHandler) GetBountyByCreated(w http.ResponseWriter, r *http.Request) {
 	created := chi.URLParam(r, "created")
 	if created == "" {
@@ -170,6 +235,15 @@ func (h *bountyHandler) GetBountyByCreated(w http.ResponseWriter, r *http.Reques
 	}
 }
 
+// GetUserBountyCount godoc
+//
+//	@Summary		Get user bounty count
+//	@Description	Get user bounty count by person key and tab type
+//	@Tags			Go Bounties
+//	@Param			personKey	path		string	true	"Person Key"
+//	@Param			tabType		path		string	true	"Tab Type"
+//	@Success		200			{object}	int
+//	@Router			/gobounties/count/{personKey}/{tabType} [get]
 func GetUserBountyCount(w http.ResponseWriter, r *http.Request) {
 	personKey := chi.URLParam(r, "personKey")
 	tabType := chi.URLParam(r, "tabType")
@@ -183,6 +257,13 @@ func GetUserBountyCount(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(bountyCount)
 }
 
+// GetBountyCount godoc
+//
+//	@Summary		Get bounty count
+//	@Description	Get bounty count
+//	@Tags			Go Bounties
+//	@Success		200	{object}	int
+//	@Router			/gobounties/count [get]
 func GetBountyCount(w http.ResponseWriter, r *http.Request) {
 	bountyCount := db.DB.GetBountiesCount(r)
 	w.WriteHeader(http.StatusOK)
@@ -322,6 +403,14 @@ func processNotification(pubkey, event, content, alias string) string {
 	return sendNotification(pubkey, content)
 }
 
+// CreateOrEditBounty godoc
+//
+//	@Summary		Create or edit a bounty
+//	@Description	Create or edit a bounty
+//	@Tags			Go Bounties
+//	@Param			bounty	body		db.NewBounty	true	"Bounty object"
+//	@Success		200		{object}	db.NewBounty
+//	@Router			/gobounties [post]
 func (h *bountyHandler) CreateOrEditBounty(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 	pubKeyFromAuth, _ := ctx.Value(auth.ContextKey).(string)
@@ -479,6 +568,15 @@ func (h *bountyHandler) CreateOrEditBounty(w http.ResponseWriter, r *http.Reques
 	json.NewEncoder(w).Encode(b)
 }
 
+// DeleteBounty godoc
+//
+//	@Summary		Delete a bounty
+//	@Description	Delete a bounty by ID
+//	@Tags			Go Bounties
+//	@Param			pubkey	path		string	true	"PubKey"
+//	@Param			created	path		string	true	"Created"
+//	@Success		200		{object}	bool
+//	@Router			/gobounties/{pubkey}/{created} [delete]
 func (h *bountyHandler) DeleteBounty(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 	pubKeyFromAuth, _ := ctx.Value(auth.ContextKey).(string)
@@ -531,6 +629,14 @@ func (h *bountyHandler) DeleteBounty(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(b)
 }
 
+// UpdatePaymentStatus godoc
+//
+//	@Summary		Update payment status
+//	@Description	Update payment status by created date
+//	@Tags			Go Bounties
+//	@Param			created	path		string	true	"Created"
+//	@Success		200		{object}	db.NewBounty
+//	@Router			/gobounties/paymentstatus/{created} [post]
 func UpdatePaymentStatus(w http.ResponseWriter, r *http.Request) {
 	createdParam := chi.URLParam(r, "created")
 	created, _ := strconv.ParseUint(createdParam, 10, 32)
@@ -562,6 +668,14 @@ func UpdatePaymentStatus(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(bounty)
 }
 
+// UpdateCompletedStatus godoc
+//
+//	@Summary		Update completed status
+//	@Description	Update completed status by created date
+//	@Tags			Go Bounties
+//	@Param			created	path		string	true	"Created"
+//	@Success		200		{object}	db.NewBounty
+//	@Router			/gobounties/completedstatus/{created} [post]
 func UpdateCompletedStatus(w http.ResponseWriter, r *http.Request) {
 	createdParam := chi.URLParam(r, "created")
 	created, _ := strconv.ParseUint(createdParam, 10, 32)
@@ -586,6 +700,14 @@ func UpdateCompletedStatus(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(bounty)
 }
 
+// GetPaymentByBountyId godoc
+//
+//	@Summary		Get payment by bounty ID
+//	@Description	Get payment by bounty ID
+//	@Tags			Go Bounties
+//	@Param			bountyId	path		string	true	"Bounty ID"
+//	@Success		200			{object}	db.NewPaymentHistory
+//	@Router			/gobounties/payment/{bountyId} [get]
 func GetPaymentByBountyId(w http.ResponseWriter, r *http.Request) {
 	bountyIdParam := chi.URLParam(r, "bountyId")
 	bountyId, _ := strconv.ParseUint(bountyIdParam, 10, 32)
@@ -701,6 +823,14 @@ func (h *bountyHandler) GenerateBountyResponse(bounties []db.NewBounty) []db.Bou
 	return bountyResponse
 }
 
+// MakeBountyPayment godoc
+//
+//	@Summary		Make a bounty payment
+//	@Description	Make a bounty payment
+//	@Tags			Go Bounties
+//	@Param			id	path		string	true	"Bounty ID"
+//	@Success		200	{object}	db.NewBounty
+//	@Router			/gobounties/pay/{id} [post]
 func (h *bountyHandler) MakeBountyPayment(w http.ResponseWriter, r *http.Request) {
 	h.m.Lock()
 
@@ -1070,6 +1200,14 @@ func (h *bountyHandler) MakeBountyPayment(w http.ResponseWriter, r *http.Request
 	}
 }
 
+// GetBountyPaymentStatus godoc
+//
+//	@Summary		Get bounty payment status
+//	@Description	Get bounty payment status by ID
+//	@Tags			Go Bounties
+//	@Param			id	path		string	true	"Bounty ID"
+//	@Success		200	{object}	db.NewPaymentHistory
+//	@Router			/gobounties/payment/status/{id} [get]
 func (h *bountyHandler) GetBountyPaymentStatus(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 	pubKeyFromAuth, _ := ctx.Value(auth.ContextKey).(string)
@@ -1113,6 +1251,14 @@ func (h *bountyHandler) GetBountyPaymentStatus(w http.ResponseWriter, r *http.Re
 	json.NewEncoder(w).Encode(payment)
 }
 
+// UpdateBountyPaymentStatus godoc
+//
+//	@Summary		Update bounty payment status
+//	@Description	Update bounty payment status by ID
+//	@Tags			Go Bounties
+//	@Param			id	path		string	true	"Bounty ID"
+//	@Success		200	{object}	db.NewPaymentHistory
+//	@Router			/gobounties/payment/status/{id} [put]
 func (h *bountyHandler) UpdateBountyPaymentStatus(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 	pubKeyFromAuth, _ := ctx.Value(auth.ContextKey).(string)
@@ -1225,6 +1371,14 @@ func (h *bountyHandler) UpdateBountyPaymentStatus(w http.ResponseWriter, r *http
 }
 
 // Todo: change back to BountyBudgetWithdraw
+// BountyBudgetWithdraw godoc
+//
+//	@Summary		Withdraw bounty budget
+//	@Description	Withdraw bounty budget
+//	@Tags			Go Bounties
+//	@Param			request	body		db.NewWithdrawBudgetRequest	true	"Withdraw Budget Request"
+//	@Success		200		{object}	db.InvoicePaySuccess
+//	@Router			/gobounties/budget/withdraw [post]
 func (h *bountyHandler) BountyBudgetWithdraw(w http.ResponseWriter, r *http.Request) {
 	h.m.Lock()
 
@@ -1604,6 +1758,14 @@ func (h *bountyHandler) PayV2LightningInvoice(payment_request string) (db.Invoic
 	}
 }
 
+// GetInvoiceData godoc
+//
+//	@Summary		Get invoice data
+//	@Description	Get invoice data by payment request
+//	@Tags			Go Bounties
+//	@Param			paymentRequest	path		string	true	"Payment Request"
+//	@Success		200				{object}	db.InvoiceResult
+//	@Router			/gobounties/invoice/{paymentRequest} [get]
 func (h *bountyHandler) GetInvoiceData(w http.ResponseWriter, r *http.Request) {
 	paymentRequest := chi.URLParam(r, "paymentRequest")
 	invoiceData, invoiceErr := h.GetLightningInvoice(paymentRequest)
@@ -1618,6 +1780,14 @@ func (h *bountyHandler) GetInvoiceData(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(invoiceData)
 }
 
+// PollInvoice godoc
+//
+//	@Summary		Poll invoice
+//	@Description	Poll invoice by payment request
+//	@Tags			Go Bounties
+//	@Param			paymentRequest	path		string	true	"Payment Request"
+//	@Success		200				{object}	db.InvoiceResult
+//	@Router			/gobounties/invoice/poll/{paymentRequest} [get]
 func (h *bountyHandler) PollInvoice(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 	pubKeyFromAuth, _ := ctx.Value(auth.ContextKey).(string)
@@ -1663,12 +1833,26 @@ func (h *bountyHandler) PollInvoice(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(invoiceRes)
 }
 
+// GetFilterCount godoc
+//
+//	@Summary		Get filter count
+//	@Description	Get filter count
+//	@Tags			Go Bounties
+//	@Success		200	{object}	db.FilterStatusCount
+//	@Router			/gobounties/filter/count [get]
 func (h *bountyHandler) GetFilterCount(w http.ResponseWriter, r *http.Request) {
 	filterCount := h.db.GetFilterStatusCount()
 	w.WriteHeader(http.StatusOK)
 	json.NewEncoder(w).Encode(filterCount)
 }
 
+// GetBountyCards godoc
+//
+//	@Summary		Get bounty cards
+//	@Description	Get bounty cards
+//	@Tags			Go Bounties
+//	@Success		200	{array}	db.BountyCard
+//	@Router			/gobounties/bounty-cards [get]
 func (h *bountyHandler) GetBountyCards(w http.ResponseWriter, r *http.Request) {
 	workspaceUuid := r.URL.Query().Get("workspace_uuid")
 	var bounties []db.NewBounty
@@ -1805,6 +1989,15 @@ func calculateBountyStatus(bounty db.NewBounty) db.BountyStatus {
 	return db.StatusTodo
 }
 
+// AddProofOfWork godoc
+//
+//	@Summary		Add proof of work
+//	@Description	Add proof of work to a bounty
+//	@Tags			Go Bounties
+//	@Param			id		path		string			true	"Bounty ID"
+//	@Param			proof	body		db.ProofOfWork	true	"Proof of Work object"
+//	@Success		201		{object}	db.ProofOfWork
+//	@Router			/gobounties/{id}/proof [post]
 func (h *bountyHandler) AddProofOfWork(w http.ResponseWriter, r *http.Request) {
 	bountyID := chi.URLParam(r, "id")
 	var proof db.ProofOfWork
@@ -1849,6 +2042,14 @@ func (h *bountyHandler) AddProofOfWork(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(proof)
 }
 
+// GetProofsByBounty godoc
+//
+//	@Summary		Get proofs by bounty
+//	@Description	Get proofs by bounty ID
+//	@Tags			Go Bounties
+//	@Param			id	path	string	true	"Bounty ID"
+//	@Success		200	{array}	db.ProofOfWork
+//	@Router			/gobounties/{id}/proofs [get]
 func (h *bountyHandler) GetProofsByBounty(w http.ResponseWriter, r *http.Request) {
 	bountyID := chi.URLParam(r, "id")
 
@@ -1864,6 +2065,15 @@ func (h *bountyHandler) GetProofsByBounty(w http.ResponseWriter, r *http.Request
 	json.NewEncoder(w).Encode(proofs)
 }
 
+// DeleteProof godoc
+//
+//	@Summary		Delete proof
+//	@Description	Delete proof by ID
+//	@Tags			Go Bounties
+//	@Param			id		path	string	true	"Bounty ID"
+//	@Param			proofId	path	string	true	"Proof ID"
+//	@Success		204
+//	@Router			/gobounties/{id}/proofs/{proofId} [delete]
 func (h *bountyHandler) DeleteProof(w http.ResponseWriter, r *http.Request) {
 	bountyID := chi.URLParam(r, "id")
 	proofID := chi.URLParam(r, "proofId")
@@ -1892,13 +2102,26 @@ func (h *bountyHandler) DeleteProof(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusNoContent)
 }
 
+// UpdateProofStatus godoc
+//
+//	@Summary		Update proof status
+//	@Description	Update proof status by ID
+//	@Tags			Go Bounties
+//	@Param			id		path	string						true	"Bounty ID"
+//	@Param			proofId	path	string						true	"Proof ID"
+//	@Param			status	body	UpdateProofStatusResponse	true	"Status object"
+//	@Success		200
+//	@Router			/gobounties/{id}/proofs/{proofId}/status [put]
+
+type UpdateProofStatusResponse struct {
+	Status db.ProofOfWorkStatus `json:"status"`
+}
+
 func (h *bountyHandler) UpdateProofStatus(w http.ResponseWriter, r *http.Request) {
 	proofID := chi.URLParam(r, "proofId")
 	bountyID := chi.URLParam(r, "id")
 
-	var statusUpdate struct {
-		Status db.ProofOfWorkStatus `json:"status"`
-	}
+	var statusUpdate UpdateProofStatusResponse
 
 	if _, err := uuid.Parse(proofID); err != nil {
 		http.Error(w, "Invalid proof ID", http.StatusBadRequest)
@@ -2010,6 +2233,14 @@ func (h *bountyHandler) DeleteBountyAssignee(w http.ResponseWriter, r *http.Requ
 
 }
 
+// GetBountyTimingStats godoc
+//
+//	@Summary		Get bounty timing stats
+//	@Description	Get bounty timing stats by ID
+//	@Tags			Go Bounties
+//	@Param			id	path		string	true	"Bounty ID"
+//	@Success		200	{object}	BountyTimingResponse
+//	@Router			/gobounties/{id}/timing [get]
 func (h *bountyHandler) GetBountyTimingStats(w http.ResponseWriter, r *http.Request) {
 	bountyID := chi.URLParam(r, "id")
 	id, err := utils.ConvertStringToUint(bountyID)
@@ -2040,6 +2271,14 @@ func (h *bountyHandler) GetBountyTimingStats(w http.ResponseWriter, r *http.Requ
 	json.NewEncoder(w).Encode(response)
 }
 
+// StartBountyTiming godoc
+//
+//	@Summary		Start bounty timing
+//	@Description	Start bounty timing by ID
+//	@Tags			Go Bounties
+//	@Param			id	path	string	true	"Bounty ID"
+//	@Success		200
+//	@Router			/gobounties/{id}/timing/start [post]
 func (h *bountyHandler) StartBountyTiming(w http.ResponseWriter, r *http.Request) {
 	bountyID := chi.URLParam(r, "id")
 
@@ -2057,6 +2296,14 @@ func (h *bountyHandler) StartBountyTiming(w http.ResponseWriter, r *http.Request
 	w.WriteHeader(http.StatusOK)
 }
 
+// CloseBountyTiming godoc
+//
+//	@Summary		Close bounty timing
+//	@Description	Close bounty timing by ID
+//	@Tags			Go Bounties
+//	@Param			id	path	string	true	"Bounty ID"
+//	@Success		200
+//	@Router			/gobounties/{id}/timing/close [post]
 func (h *bountyHandler) CloseBountyTiming(w http.ResponseWriter, r *http.Request) {
 	bountyID := chi.URLParam(r, "id")
 	id, err := utils.ConvertStringToUint(bountyID)
@@ -2073,6 +2320,13 @@ func (h *bountyHandler) CloseBountyTiming(w http.ResponseWriter, r *http.Request
 	w.WriteHeader(http.StatusOK)
 }
 
+// GetBountiesLeaderboard godoc
+//
+//	@Summary		Get bounties leaderboard
+//	@Description	Get bounties leaderboard
+//	@Tags			Go Bounties
+//	@Success		200	{array}	[]db.LeaderData
+//	@Router			/bounty/leaderboard [get]
 func (h *bountyHandler) GetBountiesLeaderboard(w http.ResponseWriter, _ *http.Request) {
 	leaderBoard := h.db.GetBountiesLeaderboard()
 
@@ -2080,6 +2334,13 @@ func (h *bountyHandler) GetBountiesLeaderboard(w http.ResponseWriter, _ *http.Re
 	json.NewEncoder(w).Encode(leaderBoard)
 }
 
+// GetAllFeaturedBounties godoc
+//
+//	@Summary		Get all featured bounties
+//	@Description	Get all featured bounties
+//	@Tags			Go Bounties
+//	@Success		200	{array}	db.FeaturedBounty
+//	@Router			/gobounties/featured/all [get]
 func (h *bountyHandler) GetAllFeaturedBounties(w http.ResponseWriter, r *http.Request) {
 	bounties, err := h.db.GetAllFeaturedBounties()
 	if err != nil {
@@ -2091,6 +2352,14 @@ func (h *bountyHandler) GetAllFeaturedBounties(w http.ResponseWriter, r *http.Re
 	json.NewEncoder(w).Encode(bounties)
 }
 
+// CreateFeaturedBounty godoc
+//
+//	@Summary		Create a featured bounty
+//	@Description	Create a featured bounty
+//	@Tags			Go Bounties
+//	@Param			bounty	body		db.FeaturedBounty	true	"Featured Bounty object"
+//	@Success		201		{object}	db.FeaturedBounty
+//	@Router			/gobounties/featured/create [post]
 func (h *bountyHandler) CreateFeaturedBounty(w http.ResponseWriter, r *http.Request) {
 	var bounty db.FeaturedBounty
 	if err := json.NewDecoder(r.Body).Decode(&bounty); err != nil {
@@ -2145,6 +2414,14 @@ func (h *bountyHandler) CreateFeaturedBounty(w http.ResponseWriter, r *http.Requ
 	})
 }
 
+// UpdateFeaturedBounty godoc
+//
+//	@Summary		Update a featured bounty
+//	@Description	Update a featured bounty
+//	@Tags			Go Bounties
+//	@Param			bounty	body		db.FeaturedBounty	true	"Featured Bounty object"
+//	@Success		200		{object}	db.FeaturedBounty
+//	@Router			/gobounties/featured/update [put]
 func (h *bountyHandler) UpdateFeaturedBounty(w http.ResponseWriter, r *http.Request) {
 
 	var bounty db.FeaturedBounty
@@ -2199,6 +2476,14 @@ func (h *bountyHandler) UpdateFeaturedBounty(w http.ResponseWriter, r *http.Requ
 	})
 }
 
+// DeleteFeaturedBounty godoc
+//
+//	@Summary		Delete a featured bounty
+//	@Description	Delete a featured bounty by ID
+//	@Tags			Go Bounties
+//	@Param			bountyId	path	string	true	"Bounty ID"
+//	@Success		204
+//	@Router			/gobounties/featured/delete/{bountyId} [delete]
 func (h *bountyHandler) DeleteFeaturedBounty(w http.ResponseWriter, r *http.Request) {
 	bountyID := chi.URLParam(r, "bountyId")
 
@@ -2224,6 +2509,14 @@ func (h *bountyHandler) DeleteFeaturedBounty(w http.ResponseWriter, r *http.Requ
 	w.WriteHeader(http.StatusNoContent)
 }
 
+// DeleteBountyTiming godoc
+//
+//	@Summary		Delete bounty timing
+//	@Description	Delete bounty timing by ID
+//	@Tags			Go Bounties
+//	@Param			id	path	string	true	"Bounty ID"
+//	@Success		204
+//	@Router			/gobounties/{id}/timing [delete]
 func (h *bountyHandler) DeleteBountyTiming(w http.ResponseWriter, r *http.Request) {
 
 	ctx := r.Context()
@@ -2259,6 +2552,16 @@ func (h *bountyHandler) DeleteBountyTiming(w http.ResponseWriter, r *http.Reques
 	w.WriteHeader(http.StatusNoContent)
 }
 
+// GetBountiesByWorkspaceTime godoc
+//
+//	@Summary		Get bounties by workspace time
+//	@Description	Get bounties by workspace time range
+//	@Tags			Go Bounties
+//	@Param			workspaceId	path		string	true	"Workspace ID"
+//	@Param			daysStart	path		string	true	"Days Start"
+//	@Param			daysEnd		path		string	true	"Days End"
+//	@Success		200			{object}	db.NodeListResponse
+//	@Router			/gobounties/workspace/timerange/{workspaceId}/{daysStart}/{daysEnd} [get]
 func (h *bountyHandler) GetBountiesByWorkspaceTime(w http.ResponseWriter, r *http.Request) {
 
 	workspaceId := chi.URLParam(r, "workspaceId")

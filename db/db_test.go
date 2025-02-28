@@ -19,12 +19,12 @@ func TestGetFilterStatusCount(t *testing.T) {
 	tests := []struct {
 		name     string
 		setup    []NewBounty
-		expected FilterStattuCount
+		expected FilterStatusCount
 	}{
 		{
 			name:  "Empty Database",
 			setup: []NewBounty{},
-			expected: FilterStattuCount{
+			expected: FilterStatusCount{
 				Open: 0, Assigned: 0, Completed: 0,
 				Paid: 0, Pending: 0, Failed: 0,
 			},
@@ -35,7 +35,7 @@ func TestGetFilterStatusCount(t *testing.T) {
 				{Show: false, Assignee: "", Paid: false},
 				{Show: false, Assignee: "user1", Completed: true},
 			},
-			expected: FilterStattuCount{
+			expected: FilterStatusCount{
 				Open: 0, Assigned: 0, Completed: 0,
 				Paid: 0, Pending: 0, Failed: 0,
 			},
@@ -46,7 +46,7 @@ func TestGetFilterStatusCount(t *testing.T) {
 				{Show: true, Assignee: "", Paid: false},
 				{Show: true, Assignee: "", Paid: false},
 			},
-			expected: FilterStattuCount{
+			expected: FilterStatusCount{
 				Open: 2, Assigned: 0, Completed: 0,
 				Paid: 0, Pending: 0, Failed: 0,
 			},
@@ -57,7 +57,7 @@ func TestGetFilterStatusCount(t *testing.T) {
 				{Show: true, Assignee: "user1", Paid: false},
 				{Show: true, Assignee: "user2", Paid: false},
 			},
-			expected: FilterStattuCount{
+			expected: FilterStatusCount{
 				Open: 0, Assigned: 2, Completed: 0,
 				Paid: 0, Pending: 0, Failed: 0,
 			},
@@ -68,7 +68,7 @@ func TestGetFilterStatusCount(t *testing.T) {
 				{Show: true, Assignee: "user1", Completed: true, Paid: false},
 				{Show: true, Assignee: "user2", Completed: true, Paid: false},
 			},
-			expected: FilterStattuCount{
+			expected: FilterStatusCount{
 				Open: 0, Assigned: 2, Completed: 2,
 				Paid: 0, Pending: 0, Failed: 0,
 			},
@@ -79,7 +79,7 @@ func TestGetFilterStatusCount(t *testing.T) {
 				{Show: true, Assignee: "user1", Paid: true},
 				{Show: true, Assignee: "user2", Paid: true},
 			},
-			expected: FilterStattuCount{
+			expected: FilterStatusCount{
 				Open: 0, Assigned: 0, Completed: 0,
 				Paid: 2, Pending: 0, Failed: 0,
 			},
@@ -90,7 +90,7 @@ func TestGetFilterStatusCount(t *testing.T) {
 				{Show: true, Assignee: "user1", PaymentPending: true},
 				{Show: true, Assignee: "user2", PaymentPending: true},
 			},
-			expected: FilterStattuCount{
+			expected: FilterStatusCount{
 				Open: 0, Assigned: 2, Completed: 0,
 				Paid: 0, Pending: 2, Failed: 0,
 			},
@@ -101,7 +101,7 @@ func TestGetFilterStatusCount(t *testing.T) {
 				{Show: true, Assignee: "user1", PaymentFailed: true},
 				{Show: true, Assignee: "user2", PaymentFailed: true},
 			},
-			expected: FilterStattuCount{
+			expected: FilterStatusCount{
 				Open: 0, Assigned: 2, Completed: 0,
 				Paid: 0, Pending: 0, Failed: 2,
 			},
@@ -117,7 +117,7 @@ func TestGetFilterStatusCount(t *testing.T) {
 				{Show: true, Assignee: "user5", PaymentFailed: true},
 				{Show: false, Assignee: "user6", Paid: true},
 			},
-			expected: FilterStattuCount{
+			expected: FilterStatusCount{
 				Open: 1, Assigned: 4, Completed: 1,
 				Paid: 1, Pending: 1, Failed: 1,
 			},

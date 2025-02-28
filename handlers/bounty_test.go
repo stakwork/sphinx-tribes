@@ -2604,12 +2604,12 @@ func TestBountyGetFilterCount(t *testing.T) {
 	tests := []struct {
 		name          string
 		setupBounties []db.NewBounty
-		expected      db.FilterStattuCount
+		expected      db.FilterStatusCount
 	}{
 		{
 			name:          "Empty Database",
 			setupBounties: []db.NewBounty{},
-			expected: db.FilterStattuCount{
+			expected: db.FilterStatusCount{
 				Open: 0, Assigned: 0, Completed: 0,
 				Paid: 0, Pending: 0, Failed: 0,
 			},
@@ -2634,7 +2634,7 @@ func TestBountyGetFilterCount(t *testing.T) {
 					Title:    "Test Bounty 2",
 				},
 			},
-			expected: db.FilterStattuCount{
+			expected: db.FilterStatusCount{
 				Open:      2,
 				Assigned:  0,
 				Completed: 0,
@@ -2667,7 +2667,7 @@ func TestBountyGetFilterCount(t *testing.T) {
 					Created:   time.Now().Unix(),
 				},
 			},
-			expected: db.FilterStattuCount{
+			expected: db.FilterStatusCount{
 				Open:      0,
 				Assigned:  2,
 				Completed: 0,
@@ -2700,7 +2700,7 @@ func TestBountyGetFilterCount(t *testing.T) {
 					Created:   time.Now().Unix(),
 				},
 			},
-			expected: db.FilterStattuCount{
+			expected: db.FilterStatusCount{
 				Open:      0,
 				Assigned:  2,
 				Completed: 2,
@@ -2731,7 +2731,7 @@ func TestBountyGetFilterCount(t *testing.T) {
 					Created:  time.Now().Unix(),
 				},
 			},
-			expected: db.FilterStattuCount{
+			expected: db.FilterStatusCount{
 				Open: 0, Assigned: 0, Completed: 0,
 				Paid: 2, Pending: 0, Failed: 0,
 			},
@@ -2758,7 +2758,7 @@ func TestBountyGetFilterCount(t *testing.T) {
 					Created:        time.Now().Unix(),
 				},
 			},
-			expected: db.FilterStattuCount{
+			expected: db.FilterStatusCount{
 				Open: 0, Assigned: 2, Completed: 0,
 				Paid: 0, Pending: 2, Failed: 0,
 			},
@@ -2785,7 +2785,7 @@ func TestBountyGetFilterCount(t *testing.T) {
 					Created:       time.Now().Unix(),
 				},
 			},
-			expected: db.FilterStattuCount{
+			expected: db.FilterStatusCount{
 				Open: 0, Assigned: 2, Completed: 0,
 				Paid: 0, Pending: 0, Failed: 2,
 			},
@@ -2812,7 +2812,7 @@ func TestBountyGetFilterCount(t *testing.T) {
 					Created:   time.Now().Unix(),
 				},
 			},
-			expected: db.FilterStattuCount{
+			expected: db.FilterStatusCount{
 				Open: 0, Assigned: 0, Completed: 0,
 				Paid: 0, Pending: 0, Failed: 0,
 			},
@@ -2856,7 +2856,7 @@ func TestBountyGetFilterCount(t *testing.T) {
 					Created: time.Now().Unix(),
 				},
 			},
-			expected: db.FilterStattuCount{
+			expected: db.FilterStatusCount{
 				Open: 1, Assigned: 4, Completed: 1,
 				Paid: 1, Pending: 1, Failed: 1,
 			},
@@ -2885,7 +2885,7 @@ func TestBountyGetFilterCount(t *testing.T) {
 
 			assert.Equal(t, http.StatusOK, rr.Code)
 
-			var result db.FilterStattuCount
+			var result db.FilterStatusCount
 			err = json.NewDecoder(rr.Body).Decode(&result)
 			if err != nil {
 				t.Fatalf("Failed to decode response: %v", err)
@@ -4373,160 +4373,159 @@ func TestDeleteBountyTiming(t *testing.T) {
 	})
 }
 
-
 func TestInverseSearchBountyCards(t *testing.T) {
-    teardownSuite := SetupSuite(t)
-    defer teardownSuite(t)
+	teardownSuite := SetupSuite(t)
+	defer teardownSuite(t)
 
-    mockHttpClient := mocks.NewHttpClient(t)
-    bHandler := NewBountyHandler(mockHttpClient, db.TestDB)
+	mockHttpClient := mocks.NewHttpClient(t)
+	bHandler := NewBountyHandler(mockHttpClient, db.TestDB)
 
-    db.CleanTestData()
+	db.CleanTestData()
 
-    workspace := db.Workspace{
-        ID:          1,
-        Uuid:        "test-workspace-uuid",
-        Name:        "Test Workspace",
-        Description: "Test Workspace Description",
-        OwnerPubKey: "test-owner",
-    }
-    _, err := db.TestDB.CreateOrEditWorkspace(workspace)
-    assert.NoError(t, err)
+	workspace := db.Workspace{
+		ID:          1,
+		Uuid:        "test-workspace-uuid",
+		Name:        "Test Workspace",
+		Description: "Test Workspace Description",
+		OwnerPubKey: "test-owner",
+	}
+	_, err := db.TestDB.CreateOrEditWorkspace(workspace)
+	assert.NoError(t, err)
 
-    phase := db.FeaturePhase{
-        Uuid:        "test-phase-uuid",
-        Name:        "Test Phase",
-        FeatureUuid: "test-feature-uuid",
-    }
-    db.TestDB.CreateOrEditFeaturePhase(phase)
+	phase := db.FeaturePhase{
+		Uuid:        "test-phase-uuid",
+		Name:        "Test Phase",
+		FeatureUuid: "test-feature-uuid",
+	}
+	db.TestDB.CreateOrEditFeaturePhase(phase)
 
-    feature := db.WorkspaceFeatures{
-        Uuid:          "test-feature-uuid",
-        Name:          "Test Feature",
-        WorkspaceUuid: workspace.Uuid,
-    }
-    db.TestDB.CreateOrEditFeature(feature)
+	feature := db.WorkspaceFeatures{
+		Uuid:          "test-feature-uuid",
+		Name:          "Test Feature",
+		WorkspaceUuid: workspace.Uuid,
+	}
+	db.TestDB.CreateOrEditFeature(feature)
 
-    now := time.Now()
+	now := time.Now()
 
-    bounties := []db.NewBounty{
-        {
-            ID:            1,
-            Type:          "coding",
-            Title:         "Backend Task",
-            Description:   "Backend development task",
-            WorkspaceUuid: workspace.Uuid,
-            PhaseUuid:     phase.Uuid,
-            Show:          true,
-            Created:       now.Unix(),
-            Updated:       &now,
-            OwnerID:       "test-owner",
-        },
-        {
-            ID:            2,
-            Type:          "coding",
-            Title:         "Frontend Task",
-            Description:   "Frontend development task",
-            WorkspaceUuid: workspace.Uuid,
-            PhaseUuid:     phase.Uuid,
-            Show:          true,
-            Created:       now.Unix(),
-            Updated:       &now,
-            OwnerID:       "test-owner",
-        },
-        {
-            ID:            3,
-            Type:          "coding",
-            Title:         "Documentation Task",
-            Description:   "Documentation writing task",
-            WorkspaceUuid: workspace.Uuid,
-            PhaseUuid:     phase.Uuid,
-            Show:          true,
-            Created:       now.Unix(),
-            Updated:       &now,
-            OwnerID:       "test-owner",
-        },
-    }
+	bounties := []db.NewBounty{
+		{
+			ID:            1,
+			Type:          "coding",
+			Title:         "Backend Task",
+			Description:   "Backend development task",
+			WorkspaceUuid: workspace.Uuid,
+			PhaseUuid:     phase.Uuid,
+			Show:          true,
+			Created:       now.Unix(),
+			Updated:       &now,
+			OwnerID:       "test-owner",
+		},
+		{
+			ID:            2,
+			Type:          "coding",
+			Title:         "Frontend Task",
+			Description:   "Frontend development task",
+			WorkspaceUuid: workspace.Uuid,
+			PhaseUuid:     phase.Uuid,
+			Show:          true,
+			Created:       now.Unix(),
+			Updated:       &now,
+			OwnerID:       "test-owner",
+		},
+		{
+			ID:            3,
+			Type:          "coding",
+			Title:         "Documentation Task",
+			Description:   "Documentation writing task",
+			WorkspaceUuid: workspace.Uuid,
+			PhaseUuid:     phase.Uuid,
+			Show:          true,
+			Created:       now.Unix(),
+			Updated:       &now,
+			OwnerID:       "test-owner",
+		},
+	}
 
-    for _, b := range bounties {
-        _, err := db.TestDB.CreateOrEditBounty(b)
-        assert.NoError(t, err)
-    }
+	for _, b := range bounties {
+		_, err := db.TestDB.CreateOrEditBounty(b)
+		assert.NoError(t, err)
+	}
 
-    testCases := []struct {
-        name           string
-        searchTerm     string
-        inverseSearch  string
-        expectedCount  int
-        expectedTitles []string
-    }{
-        {
-            name:           "inverse search excludes matching bounties",
-            searchTerm:     "Frontend",
-            inverseSearch:  "true",
-            expectedCount:  2,
-            expectedTitles: []string{"Backend Task", "Documentation Task"},
-        },
-        {
-            name:           "regular search includes matching bounties",
-            searchTerm:     "Frontend",
-            inverseSearch:  "false",
-            expectedCount:  1,
-            expectedTitles: []string{"Frontend Task"},
-        },
-        {
-            name:           "inverse search with common term",
-            searchTerm:     "Task",
-            inverseSearch:  "true",
-            expectedCount:  0,
-            expectedTitles: []string{},
-        },
-        {
-            name:           "case insensitive inverse search",
-            searchTerm:     "BACKEND",
-            inverseSearch:  "true",
-            expectedCount:  2,
-            expectedTitles: []string{"Frontend Task", "Documentation Task"},
-        },
-        {
-            name:           "empty search term returns all bounties",
-            searchTerm:     "",
-            inverseSearch:  "true",
-            expectedCount:  3,
-            expectedTitles: []string{"Backend Task", "Frontend Task", "Documentation Task"},
-        },
-    }
+	testCases := []struct {
+		name           string
+		searchTerm     string
+		inverseSearch  string
+		expectedCount  int
+		expectedTitles []string
+	}{
+		{
+			name:           "inverse search excludes matching bounties",
+			searchTerm:     "Frontend",
+			inverseSearch:  "true",
+			expectedCount:  2,
+			expectedTitles: []string{"Backend Task", "Documentation Task"},
+		},
+		{
+			name:           "regular search includes matching bounties",
+			searchTerm:     "Frontend",
+			inverseSearch:  "false",
+			expectedCount:  1,
+			expectedTitles: []string{"Frontend Task"},
+		},
+		{
+			name:           "inverse search with common term",
+			searchTerm:     "Task",
+			inverseSearch:  "true",
+			expectedCount:  0,
+			expectedTitles: []string{},
+		},
+		{
+			name:           "case insensitive inverse search",
+			searchTerm:     "BACKEND",
+			inverseSearch:  "true",
+			expectedCount:  2,
+			expectedTitles: []string{"Frontend Task", "Documentation Task"},
+		},
+		{
+			name:           "empty search term returns all bounties",
+			searchTerm:     "",
+			inverseSearch:  "true",
+			expectedCount:  3,
+			expectedTitles: []string{"Backend Task", "Frontend Task", "Documentation Task"},
+		},
+	}
 
-    for _, tc := range testCases {
-        t.Run(tc.name, func(t *testing.T) {
-            rr := httptest.NewRecorder()
-            handler := http.HandlerFunc(bHandler.GetBountyCards)
+	for _, tc := range testCases {
+		t.Run(tc.name, func(t *testing.T) {
+			rr := httptest.NewRecorder()
+			handler := http.HandlerFunc(bHandler.GetBountyCards)
 
-            url := fmt.Sprintf("/gobounties/bounty-cards?workspace_uuid=%s&search=%s&inverse_search=%s",
-                workspace.Uuid, url.QueryEscape(tc.searchTerm), tc.inverseSearch)
-            req, err := http.NewRequest(http.MethodGet, url, nil)
-            assert.NoError(t, err)
+			url := fmt.Sprintf("/gobounties/bounty-cards?workspace_uuid=%s&search=%s&inverse_search=%s",
+				workspace.Uuid, url.QueryEscape(tc.searchTerm), tc.inverseSearch)
+			req, err := http.NewRequest(http.MethodGet, url, nil)
+			assert.NoError(t, err)
 
-            handler.ServeHTTP(rr, req)
+			handler.ServeHTTP(rr, req)
 
-            assert.Equal(t, http.StatusOK, rr.Code)
+			assert.Equal(t, http.StatusOK, rr.Code)
 
-            var response []db.BountyCard
-            err = json.Unmarshal(rr.Body.Bytes(), &response)
-            assert.NoError(t, err)
+			var response []db.BountyCard
+			err = json.Unmarshal(rr.Body.Bytes(), &response)
+			assert.NoError(t, err)
 
-            assert.Equal(t, tc.expectedCount, len(response), 
-                "Expected %d bounties but got %d", tc.expectedCount, len(response))
+			assert.Equal(t, tc.expectedCount, len(response),
+				"Expected %d bounties but got %d", tc.expectedCount, len(response))
 
-            responseTitles := make([]string, len(response))
-            for i, card := range response {
-                responseTitles[i] = card.Title
-            }
-            sort.Strings(responseTitles)
-            sort.Strings(tc.expectedTitles)
+			responseTitles := make([]string, len(response))
+			for i, card := range response {
+				responseTitles[i] = card.Title
+			}
+			sort.Strings(responseTitles)
+			sort.Strings(tc.expectedTitles)
 
-            assert.Equal(t, tc.expectedTitles, responseTitles,
-                "Expected titles do not match response titles")
-        })
-    }
+			assert.Equal(t, tc.expectedTitles, responseTitles,
+				"Expected titles do not match response titles")
+		})
+	}
 }

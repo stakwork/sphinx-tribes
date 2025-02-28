@@ -30,6 +30,17 @@ func NewPeopleHandler(db db.Database) *peopleHandler {
 	return &peopleHandler{db: db}
 }
 
+// CreatePerson godoc
+//
+// @Summary		Create Person
+// @Description	Create a new person
+// @Tags			People
+// @Accept			json
+// @Produce		json
+// @Param			referred_by	query		string		false	"Referred By"
+// @Param			person		body		db.Person	true	"Person"
+// @Success		200			{object}	db.Person
+// @Router			/people [post]
 func (ph *peopleHandler) CreatePerson(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 	pubKeyFromAuth, _ := ctx.Value(auth.ContextKey).(string)
@@ -112,6 +123,16 @@ func (ph *peopleHandler) CreatePerson(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(p)
 }
 
+// UpdatePerson godoc
+//
+// @Summary		Update Person
+// @Description	Update an existing person
+// @Tags			People
+// @Accept			json
+// @Produce		json
+// @Param			person	body		db.Person	true	"Person"
+// @Success		200		{object}	db.Person
+// @Router			/people [put]
 func (ph *peopleHandler) UpdatePerson(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 	pubKeyFromAuth, _ := ctx.Value(auth.ContextKey).(string)
@@ -188,6 +209,16 @@ func (ph *peopleHandler) UpdatePerson(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(p)
 }
 
+// UpsertLogin godoc
+//
+// @Summary		Upsert Login
+// @Description	Upsert login for a person
+// @Tags			People
+// @Accept			json
+// @Produce		json
+// @Param			person	body		db.Person	true	"Person"
+// @Success		200		{string}	string		"JWT Token"
+// @Router			/people/login [post]
 func (ph *peopleHandler) UpsertLogin(w http.ResponseWriter, r *http.Request) {
 	person := db.Person{}
 	body, err := io.ReadAll(r.Body)
@@ -279,6 +310,17 @@ func PersonIsAdmin(pk string) bool {
 	return false
 }
 
+// DeleteTicketByAdmin godoc
+//
+// @Summary		Delete Ticket by Admin
+// @Description	Delete a ticket by admin
+// @Tags			People
+// @Accept			json
+// @Produce		json
+// @Param			pubKey	path		string	true	"Public Key"
+// @Param			created	path		int64	true	"Created Timestamp"
+// @Success		200		{string}	string	"Ticket deleted successfully"
+// @Router			/people/ticket/{pubKey}/{created} [delete]
 func DeleteTicketByAdmin(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 	pubKeyFromAuth, _ := ctx.Value(auth.ContextKey).(string)
@@ -489,6 +531,16 @@ func processGithubConfirmationsLoop() {
 	processGithubConfirmationsLoop()
 }
 
+// GetPersonByPubkey godoc
+//
+// @Summary		Get Person by Pubkey
+// @Description	Get a person by their public key
+// @Tags			People
+// @Accept			json
+// @Produce		json
+// @Param			pubkey	path		string	true	"Public Key"
+// @Success		200		{object}	db.Person
+// @Router			/people/{pubkey} [get]
 func (ph *peopleHandler) GetPersonByPubkey(w http.ResponseWriter, r *http.Request) {
 	pubkey := chi.URLParam(r, "pubkey")
 
@@ -497,6 +549,16 @@ func (ph *peopleHandler) GetPersonByPubkey(w http.ResponseWriter, r *http.Reques
 	json.NewEncoder(w).Encode(person)
 }
 
+// GetPersonById godoc
+//
+// @Summary		Get Person by ID
+// @Description	Get a person by their ID
+// @Tags			People
+// @Accept			json
+// @Produce		json
+// @Param			id	path		uint	true	"ID"
+// @Success		200	{object}	db.Person
+// @Router			/people/id/{id} [get]
 func (ph *peopleHandler) GetPersonById(w http.ResponseWriter, r *http.Request) {
 	idParam := chi.URLParam(r, "id")
 	id, _ := strconv.ParseUint(idParam, 10, 32)
@@ -506,6 +568,16 @@ func (ph *peopleHandler) GetPersonById(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(person)
 }
 
+// GetPersonByUuid godoc
+//
+// @Summary		Get Person by UUID
+// @Description	Get a person by their UUID
+// @Tags			People
+// @Accept			json
+// @Produce		json
+// @Param			uuid	path		string	true	"UUID"
+// @Success		200		{object}	map[string]interface{}
+// @Router			/people/uuid/{uuid} [get]
 func (ph *peopleHandler) GetPersonByUuid(w http.ResponseWriter, r *http.Request) {
 	uuid := chi.URLParam(r, "uuid")
 	person := ph.db.GetPersonByUuid(uuid)
@@ -534,7 +606,7 @@ func (ph *peopleHandler) GetPersonByUuid(w http.ResponseWriter, r *http.Request)
 		}
 		personResponse["badges"] = badgeSlice
 	}
-	logger.Log.Info("") 
+	logger.Log.Info("")
 	// FIXME use http to hit sphinx-element server for badges
 	// Todo: response should include no pubKey
 	// FIXME also filter by the tribe "profile_filters"
@@ -542,6 +614,16 @@ func (ph *peopleHandler) GetPersonByUuid(w http.ResponseWriter, r *http.Request)
 	json.NewEncoder(w).Encode(personResponse)
 }
 
+// GetPersonAssetsByUuid godoc
+//
+// @Summary		Get Person Assets by UUID
+// @Description	Get assets of a person by their UUID
+// @Tags			People
+// @Accept			json
+// @Produce		json
+// @Param			uuid	path	string	true	"UUID"
+// @Success		200		{array}	db.AssetListData
+// @Router			/people/assets/{uuid} [get]
 func GetPersonAssetsByUuid(w http.ResponseWriter, r *http.Request) {
 	uuid := chi.URLParam(r, "uuid")
 	person := db.DB.GetPersonByUuid(uuid)
@@ -551,11 +633,21 @@ func GetPersonAssetsByUuid(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusServiceUnavailable)
 		return
 	}
-	logger.Log.Info("") 
+	logger.Log.Info("")
 	w.WriteHeader(http.StatusOK)
 	json.NewEncoder(w).Encode(assetList)
 }
 
+// GetPersonByGithubName godoc
+//
+// @Summary		Get Person by Github Name
+// @Description	Get a person by their Github name
+// @Tags			People
+// @Accept			json
+// @Produce		json
+// @Param			github	path		string	true	"Github Name"
+// @Success		200		{object}	db.Person
+// @Router			/people/github/{github} [get]
 func GetPersonByGithubName(w http.ResponseWriter, r *http.Request) {
 	github := chi.URLParam(r, "github")
 	person := db.DB.GetPersonByGithubName(github)
@@ -563,6 +655,16 @@ func GetPersonByGithubName(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(person)
 }
 
+// DeletePerson godoc
+//
+// @Summary		Delete Person
+// @Description	Delete a person by their ID
+// @Tags			People
+// @Accept			json
+// @Produce		json
+// @Param			id	path		int		true	"ID"
+// @Success		200	{string}	string	"Person deleted successfully"
+// @Router			/people/{id} [delete]
 func (ph *peopleHandler) DeletePerson(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 	pubKeyFromAuth, _ := ctx.Value(auth.ContextKey).(string)
@@ -670,6 +772,16 @@ func GetAssetList(pubkey string) ([]db.AssetListData, error) {
 	return r, nil
 }
 
+// AddOrRemoveBadge godoc
+//
+// @Summary		Add or Remove Badge
+// @Description	Add or remove a badge for a person
+// @Tags			People
+// @Accept			json
+// @Produce		json
+// @Param			badgeCreationData	body		db.BadgeCreationData	true	"Badge Creation Data"
+// @Success		200					{object}	db.Tribe
+// @Router			/people/badge [post]
 func AddOrRemoveBadge(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 	pubKeyFromAuth, _ := ctx.Value(auth.ContextKey).(string)
@@ -703,9 +815,9 @@ func AddOrRemoveBadge(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if badgeCreationData.TribeUUID == "" {
-			logger.Log.Info("tribeId cannot be Empty")
-			w.WriteHeader(http.StatusBadRequest)
-			return
+		logger.Log.Info("tribeId cannot be Empty")
+		w.WriteHeader(http.StatusBadRequest)
+		return
 	}
 
 	extractedPubkey, err := auth.VerifyTribeUUID(badgeCreationData.TribeUUID, false)
@@ -764,6 +876,15 @@ func AddOrRemoveBadge(w http.ResponseWriter, r *http.Request) {
 	return
 }
 
+// GetPeopleShortList godoc
+
+// @Summary		Get People Short List
+// @Description	Get a short list of people
+// @Tags			People
+// @Accept			json
+// @Produce		json
+// @Success		200	{array}	db.Person
+// @Router			/people/short [get]
 func GetPeopleShortList(w http.ResponseWriter, r *http.Request) {
 	var maxCount uint32 = 10000
 	people := db.DB.GetPeopleListShort(maxCount)
@@ -771,18 +892,45 @@ func GetPeopleShortList(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(people)
 }
 
+// GetPeopleBySearch godoc
+//
+// @Summary		Get People by Search
+// @Description	Get people by search query
+// @Tags			People
+// @Accept			json
+// @Produce		json
+// @Success		200	{array}	db.Person
+// @Router			/people/search [get]
 func (ph *peopleHandler) GetPeopleBySearch(w http.ResponseWriter, r *http.Request) {
 	people := ph.db.GetPeopleBySearch(r)
 	w.WriteHeader(http.StatusOK)
 	json.NewEncoder(w).Encode(people)
 }
 
+// GetListedPeople godoc
+//
+//	@Summary		Get Listed People
+//	@Description	Get listed people
+//	@Tags			People
+//	@Accept			json
+//	@Produce		json
+//	@Success		200	{array}	db.Person
+//	@Router			/people [get]
 func (ph *peopleHandler) GetListedPeople(w http.ResponseWriter, r *http.Request) {
 	people := ph.db.GetListedPeople(r)
 	w.WriteHeader(http.StatusOK)
 	json.NewEncoder(w).Encode(people)
 }
 
+// GetListedPosts godoc
+//
+// @Summary		Get Listed Posts
+// @Description	Get listed posts
+// @Tags			People
+// @Accept			json
+// @Produce		json
+// @Success		200	{array}	[]db.PeopleExtra
+// @Router			/people/posts [get]
 func GetListedPosts(w http.ResponseWriter, r *http.Request) {
 	people, err := db.DB.GetListedPosts(r)
 	if err != nil {

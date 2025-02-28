@@ -14,7 +14,7 @@ func TribeRoutes() chi.Router {
 		r.Get("/app_url/{app_url}", tribeHandlers.GetTribesByAppUrl)
 		r.Get("/app_urls/{app_urls}", handlers.GetTribesByAppUrls)
 		r.Get("/{uuid}", tribeHandlers.GetTribe)
-		r.Get("/total", tribeHandlers.GetTotalribes)
+		r.Get("/total", tribeHandlers.GetTotalTribes)
 		r.Post("/", tribeHandlers.CreateOrEditTribe)
 	})
 	return r

@@ -25,16 +25,16 @@ func NewActivityHandler(httpClient HttpClient, database db.Database) *activityHa
 }
 
 type CreateActivityRequest struct {
-	ContentType string         `json:"content_type"`
-	Title       string         `json:"title,omitempty"`
-	Content     string         `json:"content"`
-	Workspace   string         `json:"workspace"`
-	FeatureUUID string         `json:"feature_uuid"`
-	PhaseUUID   string         `json:"phase_uuid"`
-	Actions     []string       `json:"actions,omitempty"`
-	Questions   []string       `json:"questions,omitempty"`
-	Author      db.AuthorType  `json:"author"`
-	AuthorRef   string         `json:"author_ref"`
+	ContentType string        `json:"content_type"`
+	Title       string        `json:"title,omitempty"`
+	Content     string        `json:"content"`
+	Workspace   string        `json:"workspace"`
+	FeatureUUID string        `json:"feature_uuid"`
+	PhaseUUID   string        `json:"phase_uuid"`
+	Actions     []string      `json:"actions,omitempty"`
+	Questions   []string      `json:"questions,omitempty"`
+	Author      db.AuthorType `json:"author"`
+	AuthorRef   string        `json:"author_ref"`
 }
 
 type ActivityResponse struct {
@@ -44,25 +44,33 @@ type ActivityResponse struct {
 }
 
 type WebhookActivityRequest struct {
-	ContentType  string         `json:"content_type"`
-	Title        string         `json:"title,omitempty"`
-	Content      string         `json:"content"`
-	Workspace    string         `json:"workspace"`
-	ThreadID     string         `json:"thread_id,omitempty"`
-	FeatureUUID  string         `json:"feature_uuid,omitempty"`
-	PhaseUUID    string         `json:"phase_uuid,omitempty"`
-	Actions      []string       `json:"actions,omitempty"`
-	Questions    []string       `json:"questions,omitempty"`
-	Author       db.AuthorType  `json:"author"`
-	AuthorRef    string         `json:"author_ref"`
+	ContentType string        `json:"content_type"`
+	Title       string        `json:"title,omitempty"`
+	Content     string        `json:"content"`
+	Workspace   string        `json:"workspace"`
+	ThreadID    string        `json:"thread_id,omitempty"`
+	FeatureUUID string        `json:"feature_uuid,omitempty"`
+	PhaseUUID   string        `json:"phase_uuid,omitempty"`
+	Actions     []string      `json:"actions,omitempty"`
+	Questions   []string      `json:"questions,omitempty"`
+	Author      db.AuthorType `json:"author"`
+	AuthorRef   string        `json:"author_ref"`
 }
 
 type WebhookResponse struct {
-	Success   bool   `json:"success"`
+	Success    bool   `json:"success"`
 	ActivityID string `json:"activity_id,omitempty"`
-	Error     string `json:"error,omitempty"`
+	Error      string `json:"error,omitempty"`
 }
 
+// GetActivity godoc
+//
+//	@Summary		Get an activity
+//	@Description	Get an activity by ID
+//	@Tags			Activities
+//	@Param			id	path		string	true	"Activity ID"
+//	@Success		200	{object}	ActivityResponse
+//	@Router			/activities/{id} [get]
 func (ah *activityHandler) GetActivity(w http.ResponseWriter, r *http.Request) {
 	id := chi.URLParam(r, "id")
 	if id == "" {
@@ -86,10 +94,18 @@ func (ah *activityHandler) GetActivity(w http.ResponseWriter, r *http.Request) {
 	})
 }
 
+// CreateActivity godoc
+//
+//	@Summary		Create an activity
+//	@Description	Create a new activity
+//	@Tags			Activities
+//	@Param			activity	body		CreateActivityRequest	true	"Activity object"
+//	@Success		201			{object}	ActivityResponse
+//	@Router			/activities [post]
 func (ah *activityHandler) CreateActivity(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 	pubKeyFromAuth, _ := ctx.Value(auth.ContextKey).(string)
-	
+
 	if pubKeyFromAuth == "" {
 		http.Error(w, "Unauthorized", http.StatusUnauthorized)
 		return
@@ -131,10 +147,19 @@ func (ah *activityHandler) CreateActivity(w http.ResponseWriter, r *http.Request
 	})
 }
 
+// UpdateActivity godoc
+//
+//	@Summary		Update an activity
+//	@Description	Update an existing activity
+//	@Tags			Activities
+//	@Param			id			path		string		true	"Activity ID"
+//	@Param			activity	body		db.Activity	true	"Activity object"
+//	@Success		200			{object}	ActivityResponse
+//	@Router			/activities/{id} [put]
 func (ah *activityHandler) UpdateActivity(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 	pubKeyFromAuth, _ := ctx.Value(auth.ContextKey).(string)
-	
+
 	if pubKeyFromAuth == "" {
 		http.Error(w, "Unauthorized", http.StatusUnauthorized)
 		return
@@ -175,10 +200,19 @@ func (ah *activityHandler) UpdateActivity(w http.ResponseWriter, r *http.Request
 	})
 }
 
+// CreateActivityThread godoc
+//
+//	@Summary		Create an activity thread
+//	@Description	Create a new activity thread
+//	@Tags			Activities
+//	@Param			activity	body		CreateActivityRequest	true	"Activity object"
+//	@Param			source_id	query		string					true	"Source ID"
+//	@Success		201			{object}	ActivityResponse
+//	@Router			/activities/thread [post]
 func (ah *activityHandler) CreateActivityThread(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 	pubKeyFromAuth, _ := ctx.Value(auth.ContextKey).(string)
-	
+
 	if pubKeyFromAuth == "" {
 		http.Error(w, "Unauthorized", http.StatusUnauthorized)
 		return
@@ -221,6 +255,14 @@ func (ah *activityHandler) CreateActivityThread(w http.ResponseWriter, r *http.R
 	})
 }
 
+// GetActivitiesByThread godoc
+//
+//	@Summary		Get activities by thread
+//	@Description	Get activities by thread ID
+//	@Tags			Activities
+//	@Param			thread_id	path		string	true	"Thread ID"
+//	@Success		200			{object}	map[string]interface{}
+//	@Router			/activities/thread/{thread_id} [get]
 func (ah *activityHandler) GetActivitiesByThread(w http.ResponseWriter, r *http.Request) {
 	threadID := chi.URLParam(r, "thread_id")
 	if threadID == "" {
@@ -240,6 +282,14 @@ func (ah *activityHandler) GetActivitiesByThread(w http.ResponseWriter, r *http.
 	})
 }
 
+// GetLatestActivityByThread godoc
+//
+//	@Summary		Get the latest activity by thread
+//	@Description	Get the latest activity by thread ID
+//	@Tags			Activities
+//	@Param			thread_id	path		string	true	"Thread ID"
+//	@Success		200			{object}	ActivityResponse
+//	@Router			/activities/thread/{thread_id}/latest [get]
 func (ah *activityHandler) GetLatestActivityByThread(w http.ResponseWriter, r *http.Request) {
 	threadID := chi.URLParam(r, "thread_id")
 	if threadID == "" {
@@ -259,6 +309,14 @@ func (ah *activityHandler) GetLatestActivityByThread(w http.ResponseWriter, r *h
 	})
 }
 
+// GetActivitiesByFeature godoc
+//
+//	@Summary		Get activities by feature
+//	@Description	Get activities by feature UUID
+//	@Tags			Activities
+//	@Param			feature_uuid	path		string	true	"Feature UUID"
+//	@Success		200				{object}	map[string]interface{}
+//	@Router			/activities/feature/{feature_uuid} [get]
 func (ah *activityHandler) GetActivitiesByFeature(w http.ResponseWriter, r *http.Request) {
 	featureUUID := chi.URLParam(r, "feature_uuid")
 	if featureUUID == "" {
@@ -278,6 +336,14 @@ func (ah *activityHandler) GetActivitiesByFeature(w http.ResponseWriter, r *http
 	})
 }
 
+// GetActivitiesByPhase godoc
+//
+//	@Summary		Get activities by phase
+//	@Description	Get activities by phase UUID
+//	@Tags			Activities
+//	@Param			phase_uuid	path		string	true	"Phase UUID"
+//	@Success		200			{object}	map[string]interface{}
+//	@Router			/activities/phase/{phase_uuid} [get]
 func (ah *activityHandler) GetActivitiesByPhase(w http.ResponseWriter, r *http.Request) {
 	phaseUUID := chi.URLParam(r, "phase_uuid")
 	if phaseUUID == "" {
@@ -297,6 +363,14 @@ func (ah *activityHandler) GetActivitiesByPhase(w http.ResponseWriter, r *http.R
 	})
 }
 
+// GetActivitiesByWorkspace godoc
+//
+//	@Summary		Get activities by workspace
+//	@Description	Get activities by workspace
+//	@Tags			Activities
+//	@Param			workspace	path		string	true	"Workspace"
+//	@Success		200			{object}	map[string]interface{}
+//	@Router			/activities/workspace/{workspace} [get]
 func (ah *activityHandler) GetActivitiesByWorkspace(w http.ResponseWriter, r *http.Request) {
 	workspace := chi.URLParam(r, "workspace")
 	if workspace == "" {
@@ -316,45 +390,62 @@ func (ah *activityHandler) GetActivitiesByWorkspace(w http.ResponseWriter, r *ht
 	})
 }
 
+// DeleteActivity godoc
+//
+//	@Summary		Delete an activity
+//	@Description	Delete an activity by ID
+//	@Tags			Activities
+//	@Param			id	path		string	true	"Activity ID"
+//	@Success		200	{object}	map[string]interface{}
+//	@Router			/activities/{id} [delete]
 func (ah *activityHandler) DeleteActivity(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 	pubKeyFromAuth, _ := ctx.Value(auth.ContextKey).(string)
-	
+
 	if pubKeyFromAuth == "" {
 		http.Error(w, "Unauthorized", http.StatusUnauthorized)
 		return
 	}
 
 	id := chi.URLParam(r, "id")
-    if id == "" {
-        http.Error(w, "ID is required", http.StatusBadRequest)
-        return
-    }
+	if id == "" {
+		http.Error(w, "ID is required", http.StatusBadRequest)
+		return
+	}
 
-    err := ah.db.DeleteActivity(id)
-    if err != nil {
-        if err.Error() == "activity not found" {
-            http.Error(w, "Activity not found", http.StatusNotFound)
-            return
-        }
-        http.Error(w, fmt.Sprintf("Failed to delete activity: %v", err), http.StatusInternalServerError)
-        return
-    }
+	err := ah.db.DeleteActivity(id)
+	if err != nil {
+		if err.Error() == "activity not found" {
+			http.Error(w, "Activity not found", http.StatusNotFound)
+			return
+		}
+		http.Error(w, fmt.Sprintf("Failed to delete activity: %v", err), http.StatusInternalServerError)
+		return
+	}
 
-    json.NewEncoder(w).Encode(map[string]interface{}{
-        "success": true,
-        "message": "Activity deleted successfully",
-    })
+	json.NewEncoder(w).Encode(map[string]interface{}{
+		"success": true,
+		"message": "Activity deleted successfully",
+	})
 }
 
 type ActivityContentRequest struct {
 	Content string `json:"content"`
 }
 
+// AddActivityActions godoc
+//
+//	@Summary		Add actions to an activity
+//	@Description	Add actions to an activity by ID
+//	@Tags			Activities
+//	@Param			id		path		string					true	"Activity ID"
+//	@Param			action	body		ActivityContentRequest	true	"Action content"
+//	@Success		200		{object}	ActivityResponse
+//	@Router			/activities/{id}/actions [post]
 func (ah *activityHandler) AddActivityActions(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 	pubKeyFromAuth, _ := ctx.Value(auth.ContextKey).(string)
-	
+
 	if pubKeyFromAuth == "" {
 		http.Error(w, "Unauthorized", http.StatusUnauthorized)
 		return
@@ -397,10 +488,19 @@ func (ah *activityHandler) AddActivityActions(w http.ResponseWriter, r *http.Req
 	})
 }
 
+// AddActivityQuestions godoc
+//
+//	@Summary		Add questions to an activity
+//	@Description	Add questions to an activity by ID
+//	@Tags			Activities
+//	@Param			id			path		string					true	"Activity ID"
+//	@Param			question	body		ActivityContentRequest	true	"Question content"
+//	@Success		200			{object}	ActivityResponse
+//	@Router			/activities/{id}/questions [post]
 func (ah *activityHandler) AddActivityQuestions(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 	pubKeyFromAuth, _ := ctx.Value(auth.ContextKey).(string)
-	
+
 	if pubKeyFromAuth == "" {
 		http.Error(w, "Unauthorized", http.StatusUnauthorized)
 		return
@@ -443,10 +543,19 @@ func (ah *activityHandler) AddActivityQuestions(w http.ResponseWriter, r *http.R
 	})
 }
 
+// RemoveActivityAction godoc
+//
+//	@Summary		Remove an action from an activity
+//	@Description	Remove an action from an activity by ID
+//	@Tags			Activities
+//	@Param			id			path		string	true	"Activity ID"
+//	@Param			action_id	path		string	true	"Action ID"
+//	@Success		200			{object}	ActivityResponse
+//	@Router			/activities/{id}/actions/{action_id} [delete]
 func (ah *activityHandler) RemoveActivityAction(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 	pubKeyFromAuth, _ := ctx.Value(auth.ContextKey).(string)
-	
+
 	if pubKeyFromAuth == "" {
 		http.Error(w, "Unauthorized", http.StatusUnauthorized)
 		return
@@ -497,10 +606,19 @@ func (ah *activityHandler) RemoveActivityAction(w http.ResponseWriter, r *http.R
 	})
 }
 
+// RemoveActivityQuestion godoc
+//
+//	@Summary		Remove a question from an activity
+//	@Description	Remove a question from an activity by ID
+//	@Tags			Activities
+//	@Param			id			path		string	true	"Activity ID"
+//	@Param			question_id	path		string	true	"Question ID"
+//	@Success		200			{object}	ActivityResponse
+//	@Router			/activities/{id}/questions/{question_id} [delete]
 func (ah *activityHandler) RemoveActivityQuestion(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 	pubKeyFromAuth, _ := ctx.Value(auth.ContextKey).(string)
-	
+
 	if pubKeyFromAuth == "" {
 		http.Error(w, "Unauthorized", http.StatusUnauthorized)
 		return
@@ -612,12 +730,12 @@ func (ah *activityHandler) ReceiveActivity(w http.ResponseWriter, r *http.Reques
 
 	if err != nil {
 		status := http.StatusInternalServerError
-		if err == db.ErrInvalidContent || err == db.ErrInvalidAuthorRef || 
-		   err == db.ErrInvalidContentType || err == db.ErrInvalidAuthorType || 
-		   err == db.ErrInvalidWorkspace {
+		if err == db.ErrInvalidContent || err == db.ErrInvalidAuthorRef ||
+			err == db.ErrInvalidContentType || err == db.ErrInvalidAuthorType ||
+			err == db.ErrInvalidWorkspace {
 			status = http.StatusBadRequest
 		}
-		
+
 		w.WriteHeader(status)
 		json.NewEncoder(w).Encode(WebhookResponse{
 			Success: false,
@@ -631,4 +749,4 @@ func (ah *activityHandler) ReceiveActivity(w http.ResponseWriter, r *http.Reques
 		Success:    true,
 		ActivityID: createdActivity.ID.String(),
 	})
-} 
+}

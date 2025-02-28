@@ -2,19 +2,30 @@ package handlers
 
 import (
 	"encoding/json"
+	"net/http"
+	"reflect"
+
 	"github.com/lib/pq"
 	"github.com/stakwork/sphinx-tribes/db"
 	"github.com/stakwork/sphinx-tribes/logger"
-	"net/http"
-	"reflect"
 )
 
+// WantedsHeaderResponse represents the response structure for the wanteds header
+type WantedsHeaderResponse struct {
+	DeveloperCount int64               `json:"developer_count"`
+	BountiesCount  uint64              `json:"bounties_count"`
+	People         *[]db.PersonInShort `json:"people"`
+}
+
+// GetWantedsHeader godoc
+//
+//	@Summary		Get wanteds header
+//	@Description	Get the header information for wanteds
+//	@Tags			People
+//	@Success		200	{object}	WantedsHeaderResponse
+//	@Router			/people/wanteds/header [get]
 func GetWantedsHeader(w http.ResponseWriter, r *http.Request) {
-	var ret struct {
-		DeveloperCount int64               `json:"developer_count"`
-		BountiesCount  uint64              `json:"bounties_count"`
-		People         *[]db.PersonInShort `json:"people"`
-	}
+	var ret WantedsHeaderResponse
 	ret.DeveloperCount = db.DB.CountDevelopers()
 	ret.BountiesCount = db.DB.CountBounties()
 	ret.People = db.DB.GetPeopleListShort(3)
@@ -23,6 +34,13 @@ func GetWantedsHeader(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(ret)
 }
 
+// GetListedOffers godoc
+//
+//	@Summary		Get listed offers
+//	@Description	Get a list of listed offers
+//	@Tags			People
+//	@Success		200	{array}	db.Person
+//	@Router			/people/offers [get]
 func GetListedOffers(w http.ResponseWriter, r *http.Request) {
 	people, err := db.DB.GetListedOffers(r)
 	if err != nil {
@@ -33,6 +51,16 @@ func GetListedOffers(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+// MigrateBounties godoc
+//
+//	@Summary		Migrate bounties
+//	@Description	Migrate bounties from extras to the new structure
+//	@Tags			Others
+//	@Produce		json
+//	@Success		200	{object}	map[string]string	"Returns status of migration"
+//	@Failure		500	{object}	map[string]string	"Internal server error"
+//	@Security		ApiKeyAuth
+//	@Router			/migrate_bounties [post]
 func MigrateBounties(w http.ResponseWriter, r *http.Request) {
 	peeps := db.DB.GetAllPeople()
 
@@ -188,5 +216,6 @@ func MigrateBounties(w http.ResponseWriter, r *http.Request) {
 			//Migrate the bounties here
 		}
 	}
-	return
+	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode(map[string]string{"status": "Migration completed"})
 }
