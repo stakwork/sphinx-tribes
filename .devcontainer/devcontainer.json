@@ -15,8 +15,19 @@
           }
         }
       }
+    },
+    "vscode": {
+      "settings": {
+        "git.autofetch": true,
+        "editor.formatOnSave": true
+      },
+      "extensions": [
+        "golang.go",
+        "esbenp.prettier-vscode"
+      ]
     }
   },
+  "hostRequirements": {"cpus": 4, "memory": "8gb"},
   "remoteUser": "root",
   "shutdownAction": "stopCompose"
 }
