@@ -114,6 +114,11 @@ func DeleteAllFeatureStories() {
 	TestDB.db.Exec("DELETE FROM feature_stories")
 }
 
+func DeleteAllArtifacts() {
+	TestDB.db.Exec("DELETE FROM chat_messages")
+	TestDB.db.Exec("DELETE FROM artifacts")
+}
+
 func CleanTestData() {
 	TestDB.db.Exec("DELETE FROM bounty")
 

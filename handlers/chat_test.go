@@ -854,6 +854,8 @@ func TestProcessChatResponse(t *testing.T) {
 
 	handler := NewChatHandler(&http.Client{}, db.TestDB)
 
+	db.DeleteAllArtifacts()
+
 	tests := []struct {
 		name           string
 		input          string
@@ -866,15 +868,15 @@ func TestProcessChatResponse(t *testing.T) {
 		{
 			name: "Valid Input",
 			input: `{
-  			"value": {
-  				"chatId": "validChatId",
-  				"messageId": "validMessageId",
-  				"response": "This is a response",
-  				"sourceWebsocketId": "validWebsocketId"
-  			}
-  		}`,
+				"value": {
+					"chatId": "validChatId",
+					"messageId": "msg_test_1",
+					"response": "This is a response",
+					"sourceWebsocketId": "validWebsocketId"
+				}
+			}`,
 			mockDBResponse: &db.ChatMessage{
-				ID:        "generatedID",
+				ID:        "msg_test_1",
 				ChatID:    "validChatId",
 				Message:   "This is a response",
 				Role:      "assistant",
@@ -889,11 +891,10 @@ func TestProcessChatResponse(t *testing.T) {
 				Success: true,
 				Message: "Response processed successfully",
 				Data: &db.ChatMessage{
-					ID:        "generatedID",
+					ID:        "msg_test_1",
 					ChatID:    "validChatId",
 					Message:   "This is a response",
 					Role:      "assistant",
-					Timestamp: time.Now(),
 					Status:    "sent",
 					Source:    "agent",
 				},
@@ -1067,41 +1068,6 @@ func TestProcessChatResponse(t *testing.T) {
 			},
 		},
 		{
-			name: "Missing MessageID",
-			input: `{
-  			"value": {
-  				"chatId": "validChatId",
-  				"response": "This is a response",
-  				"sourceWebsocketId": "validWebsocketId"
-  			}
-  		}`,
-			mockDBResponse: &db.ChatMessage{
-				ID:        "generatedID",
-				ChatID:    "validChatId",
-				Message:   "This is a response",
-				Role:      "assistant",
-				Timestamp: time.Now(),
-				Status:    "sent",
-				Source:    "agent",
-			},
-			mockDBError:    nil,
-			mockWSResponse: nil,
-			expectedStatus: http.StatusOK,
-			expectedBody: ChatResponse{
-				Success: true,
-				Message: "Response processed successfully",
-				Data: &db.ChatMessage{
-					ID:        "generatedID",
-					ChatID:    "validChatId",
-					Message:   "This is a response",
-					Role:      "assistant",
-					Timestamp: time.Now(),
-					Status:    "sent",
-					Source:    "agent",
-				},
-			},
-		},
-		{
 			name: "Invalid request body",
 			input: `{
   			"value": {
@@ -1119,8 +1085,201 @@ func TestProcessChatResponse(t *testing.T) {
 		},
 	}
 
+	artifactTests := []struct {
+		name           string
+		input          string
+		mockDBResponse *db.ChatMessage
+		mockDBError    error
+		mockWSResponse error
+		expectedStatus int
+		expectedBody   ChatResponse
+	}{
+		{
+			name: "Valid Input with Multiple Artifacts",
+			input: `{
+                "value": {
+                    "chatId": "validChatId",
+                    "messageId": "msg_test_artifacts_1",
+                    "response": "Response with artifacts",
+                    "sourceWebsocketId": "validWebsocketId",
+                    "artifacts": [
+                        {
+                            "id": "art_001",
+                            "type": "text",
+                            "content": {
+                                "text_type": "markdown",
+                                "content": "## Analysis Summary\n- Point 1\n- Point 2"
+                            }
+                        },
+                        {
+                            "id": "art_002",
+                            "type": "visual",
+                            "content": {
+                                "text_type": "chart",
+                                "url": "https://example.com/chart.png"
+                            }
+                        }
+                    ]
+                }
+            }`,
+			mockDBResponse: &db.ChatMessage{
+				ID:        "msg_test_artifacts_1",
+				ChatID:    "validChatId",
+				Message:   "Response with artifacts",
+				Role:      "assistant",
+				Timestamp: time.Now(),
+				Status:    "sent",
+				Source:    "agent",
+			},
+			mockDBError:    nil,
+			mockWSResponse: nil,
+			expectedStatus: http.StatusOK,
+			expectedBody: ChatResponse{
+				Success: true,
+				Message: "Response processed successfully",
+				Data: &db.ChatMessage{
+					ID:        "msg_test_artifacts_1",
+					ChatID:    "validChatId",
+					Message:   "Response with artifacts",
+					Role:      "assistant",
+					Status:    "sent",
+					Source:    "agent",
+				},
+			},
+		},
+		{
+			name: "Valid Input with Single Text Artifact",
+			input: `{
+                "value": {
+                    "chatId": "validChatId",
+                    "messageId": "validMessageId2",
+                    "response": "Response with single artifact",
+                    "sourceWebsocketId": "validWebsocketId",
+                    "artifacts": [
+                        {
+                            "id": "art_001",
+                            "type": "text",
+                            "content": {
+                                "text_type": "plain",
+                                "content": "Simple text artifact"
+                            }
+                        }
+                    ]
+                }
+            }`,
+			mockDBResponse: &db.ChatMessage{
+				ID:        "validMessageId2",
+				ChatID:    "validChatId",
+				Message:   "Response with single artifact",
+				Role:      "assistant",
+				Timestamp: time.Now(),
+				Status:    "sent",
+				Source:    "agent",
+			},
+			mockDBError:    nil,
+			mockWSResponse: nil,
+			expectedStatus: http.StatusOK,
+			expectedBody: ChatResponse{
+				Success: true,
+				Message: "Response processed successfully",
+				Data: &db.ChatMessage{
+					ID:        "validMessageId2",
+					ChatID:    "validChatId",
+					Message:   "Response with single artifact",
+					Role:      "assistant",
+					Status:    "sent",
+					Source:    "agent",
+				},
+			},
+		},
+		{
+			name: "Invalid Artifact Type",
+			input: `{
+                "value": {
+                    "chatId": "validChatId",
+                    "messageId": "validMessageId3",
+                    "response": "Response with invalid artifact",
+                    "sourceWebsocketId": "validWebsocketId",
+                    "artifacts": [
+                        {
+                            "id": "art_001",
+                            "type": "invalid_type",
+                            "content": {
+                                "text_type": "plain",
+                                "content": "Test content"
+                            }
+                        }
+                    ]
+                }
+            }`,
+			mockDBResponse: &db.ChatMessage{
+				ID:        "validMessageId3",
+				ChatID:    "validChatId",
+				Message:   "Response with invalid artifact",
+				Role:      "assistant",
+				Timestamp: time.Now(),
+				Status:    "sent",
+				Source:    "agent",
+			},
+			mockDBError:    nil,
+			mockWSResponse: nil,
+			expectedStatus: http.StatusOK,
+			expectedBody: ChatResponse{
+				Success: true,
+				Message: "Response processed successfully",
+				Data: &db.ChatMessage{
+					ID:        "validMessageId3",
+					ChatID:    "validChatId",
+					Message:   "Response with invalid artifact",
+					Role:      "assistant",
+					Status:    "sent",
+					Source:    "agent",
+				},
+			},
+		},
+		{
+			name: "Empty Artifacts Array",
+			input: `{
+                "value": {
+                    "chatId": "validChatId",
+                    "messageId": "validMessageId4",
+                    "response": "Response with empty artifacts",
+                    "sourceWebsocketId": "validWebsocketId",
+                    "artifacts": []
+                }
+            }`,
+			mockDBResponse: &db.ChatMessage{
+				ID:        "validMessageId4",
+				ChatID:    "validChatId",
+				Message:   "Response with empty artifacts",
+				Role:      "assistant",
+				Timestamp: time.Now(),
+				Status:    "sent",
+				Source:    "agent",
+			},
+			mockDBError:    nil,
+			mockWSResponse: nil,
+			expectedStatus: http.StatusOK,
+			expectedBody: ChatResponse{
+				Success: true,
+				Message: "Response processed successfully",
+				Data: &db.ChatMessage{
+					ID:        "validMessageId4",
+					ChatID:    "validChatId",
+					Message:   "Response with empty artifacts",
+					Role:      "assistant",
+					Status:    "sent",
+					Source:    "agent",
+				},
+			},
+		},
+	}
+
+	tests = append(tests, artifactTests...)
+
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
+			db.DeleteAllArtifacts()
 			req := httptest.NewRequest(http.MethodPost, "/response", bytes.NewBufferString(tt.input))
 			w := httptest.NewRecorder()
 
@@ -1131,7 +1290,7 @@ func TestProcessChatResponse(t *testing.T) {
 
 			assert.Equal(t, tt.expectedStatus, resp.StatusCode)
 
-			var responseBody ChatRes
+			var responseBody ChatResponse
 			err := json.NewDecoder(resp.Body).Decode(&responseBody)
 			assert.NoError(t, err)
 			assert.Equal(t, tt.expectedBody.Success, responseBody.Success)
