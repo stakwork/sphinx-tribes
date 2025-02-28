@@ -690,7 +690,7 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "Tickets"
+                    "Bounty Tickets"
                 ],
                 "summary": "Convert Tickets to Bounties",
                 "parameters": [
@@ -724,7 +724,7 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "Tickets"
+                    "Bounty Tickets"
                 ],
                 "summary": "Get Tickets by Phase UUID",
                 "parameters": [
@@ -766,7 +766,7 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "Tickets"
+                    "Bounty Tickets"
                 ],
                 "summary": "Get Tickets by Group",
                 "parameters": [
@@ -1070,7 +1070,7 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "Tickets"
+                    "Bounty Tickets"
                 ],
                 "summary": "Process Ticket Review",
                 "parameters": [
@@ -1104,7 +1104,7 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "Tickets"
+                    "Bounty Tickets"
                 ],
                 "summary": "Post Ticket Data to Stakwork",
                 "parameters": [
@@ -1138,7 +1138,7 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "Tickets"
+                    "Bounty Tickets"
                 ],
                 "summary": "Create Workspace Draft Ticket",
                 "parameters": [
@@ -1179,7 +1179,7 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "Tickets"
+                    "Bounty Tickets"
                 ],
                 "summary": "Get Workspace Draft Ticket",
                 "parameters": [
@@ -1216,7 +1216,7 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "Tickets"
+                    "Bounty Tickets"
                 ],
                 "summary": "Update Workspace Draft Ticket",
                 "parameters": [
@@ -1262,7 +1262,7 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "Tickets"
+                    "Bounty Tickets"
                 ],
                 "summary": "Delete Workspace Draft Ticket",
                 "parameters": [
@@ -1301,7 +1301,7 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "Tickets"
+                    "Bounty Tickets"
                 ],
                 "summary": "Update Ticket Sequence",
                 "parameters": [
@@ -1342,7 +1342,7 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "Tickets"
+                    "Bounty Tickets"
                 ],
                 "summary": "Convert Ticket to Bounty",
                 "parameters": [
@@ -1374,7 +1374,7 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "Tickets"
+                    "Bounty Tickets"
                 ],
                 "summary": "Get Ticket",
                 "parameters": [
@@ -1404,7 +1404,7 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "Tickets"
+                    "Bounty Tickets"
                 ],
                 "summary": "Update Ticket",
                 "parameters": [
@@ -1443,7 +1443,7 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "Tickets"
+                    "Bounty Tickets"
                 ],
                 "summary": "Delete Ticket",
                 "parameters": [
@@ -1469,7 +1469,7 @@ const docTemplate = `{
             "get": {
                 "description": "Get bounties leaderboard",
                 "tags": [
-                    "Go Bounties"
+                    "Bounties"
                 ],
                 "summary": "Get bounties leaderboard",
                 "responses": {
@@ -1777,7 +1777,7 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "Features"
+                    "Feature - Workspaces"
                 ],
                 "summary": "Get Features by Workspace UUID",
                 "responses": {
@@ -1803,7 +1803,7 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "Features"
+                    "Feature - Phases"
                 ],
                 "summary": "Create or Edit Feature Phase",
                 "responses": {
@@ -1826,7 +1826,7 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "Features"
+                    "Feature - Stories"
                 ],
                 "summary": "Get Feature Stories",
                 "responses": {
@@ -1849,7 +1849,7 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "Features"
+                    "Feature - Stories"
                 ],
                 "summary": "Send Stories",
                 "responses": {
@@ -1872,7 +1872,7 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "Features"
+                    "Feature - Stories"
                 ],
                 "summary": "Create or Edit Story",
                 "responses": {
@@ -1895,7 +1895,7 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "Features"
+                    "Feature - Workspaces"
                 ],
                 "summary": "Get Workspace Features Count",
                 "responses": {
@@ -1918,7 +1918,7 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "Features"
+                    "Feature - Phases"
                 ],
                 "summary": "Get Feature Phases",
                 "responses": {
@@ -1944,7 +1944,7 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "Features"
+                    "Feature - Phases"
                 ],
                 "summary": "Get Feature Phase by UUID",
                 "responses": {
@@ -1965,7 +1965,7 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "Features"
+                    "Feature - Phases"
                 ],
                 "summary": "Delete Feature Phase",
                 "responses": {
@@ -1988,7 +1988,7 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "Features"
+                    "Feature - Phases"
                 ],
                 "summary": "Get Bounties by Feature and Phase UUID",
                 "responses": {
@@ -2014,7 +2014,7 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "Features"
+                    "Feature - Phases"
                 ],
                 "summary": "Get Bounties Count by Feature and Phase UUID",
                 "responses": {
@@ -2083,7 +2083,7 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "Features"
+                    "Feature - Stories"
                 ],
                 "summary": "Get Stories by Feature UUID",
                 "responses": {
@@ -2109,7 +2109,7 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "Features"
+                    "Feature - Stories"
                 ],
                 "summary": "Get Story by UUID",
                 "responses": {
@@ -2130,7 +2130,7 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "Features"
+                    "Feature - Stories"
                 ],
                 "summary": "Delete Story",
                 "responses": {
@@ -2355,7 +2355,7 @@ const docTemplate = `{
             "post": {
                 "description": "Create or edit a bounty",
                 "tags": [
-                    "Go Bounties"
+                    "Bounties"
                 ],
                 "summary": "Create or edit a bounty",
                 "parameters": [
@@ -2383,7 +2383,7 @@ const docTemplate = `{
             "get": {
                 "description": "Get a list of all bounties",
                 "tags": [
-                    "Go Bounties"
+                    "Bounties"
                 ],
                 "summary": "Get all bounties",
                 "responses": {
@@ -2403,7 +2403,7 @@ const docTemplate = `{
             "get": {
                 "description": "Get bounty cards",
                 "tags": [
-                    "Go Bounties"
+                    "Bounties"
                 ],
                 "summary": "Get bounty cards",
                 "responses": {
@@ -2423,7 +2423,7 @@ const docTemplate = `{
             "post": {
                 "description": "Withdraw bounty budget",
                 "tags": [
-                    "Go Bounties"
+                    "Bounties - Payment"
                 ],
                 "summary": "Withdraw bounty budget",
                 "parameters": [
@@ -2451,7 +2451,7 @@ const docTemplate = `{
             "post": {
                 "description": "Update completed status by created date",
                 "tags": [
-                    "Go Bounties"
+                    "Bounties"
                 ],
                 "summary": "Update completed status",
                 "parameters": [
@@ -2477,7 +2477,7 @@ const docTemplate = `{
             "get": {
                 "description": "Get bounty count",
                 "tags": [
-                    "Go Bounties"
+                    "Bounties"
                 ],
                 "summary": "Get bounty count",
                 "responses": {
@@ -2494,7 +2494,7 @@ const docTemplate = `{
             "get": {
                 "description": "Get user bounty count by person key and tab type",
                 "tags": [
-                    "Go Bounties"
+                    "Bounties"
                 ],
                 "summary": "Get user bounty count",
                 "parameters": [
@@ -2527,7 +2527,7 @@ const docTemplate = `{
             "get": {
                 "description": "Get bounty by created date",
                 "tags": [
-                    "Go Bounties"
+                    "Bounties"
                 ],
                 "summary": "Get bounty by created date",
                 "parameters": [
@@ -2553,7 +2553,7 @@ const docTemplate = `{
             "get": {
                 "description": "Get all featured bounties",
                 "tags": [
-                    "Go Bounties"
+                    "Featured Bounties"
                 ],
                 "summary": "Get all featured bounties",
                 "responses": {
@@ -2573,7 +2573,7 @@ const docTemplate = `{
             "post": {
                 "description": "Create a featured bounty",
                 "tags": [
-                    "Go Bounties"
+                    "Featured Bounties"
                 ],
                 "summary": "Create a featured bounty",
                 "parameters": [
@@ -2601,7 +2601,7 @@ const docTemplate = `{
             "delete": {
                 "description": "Delete a featured bounty by ID",
                 "tags": [
-                    "Go Bounties"
+                    "Featured Bounties"
                 ],
                 "summary": "Delete a featured bounty",
                 "parameters": [
@@ -2624,7 +2624,7 @@ const docTemplate = `{
             "put": {
                 "description": "Update a featured bounty",
                 "tags": [
-                    "Go Bounties"
+                    "Featured Bounties"
                 ],
                 "summary": "Update a featured bounty",
                 "parameters": [
@@ -2652,7 +2652,7 @@ const docTemplate = `{
             "get": {
                 "description": "Get filter count",
                 "tags": [
-                    "Go Bounties"
+                    "Bounties"
                 ],
                 "summary": "Get filter count",
                 "responses": {
@@ -2669,7 +2669,7 @@ const docTemplate = `{
             "get": {
                 "description": "Get a bounty by ID",
                 "tags": [
-                    "Go Bounties"
+                    "Bounties"
                 ],
                 "summary": "Get a bounty",
                 "parameters": [
@@ -2695,7 +2695,7 @@ const docTemplate = `{
             "get": {
                 "description": "Get bounty index by ID",
                 "tags": [
-                    "Go Bounties"
+                    "Bounties"
                 ],
                 "summary": "Get bounty index",
                 "parameters": [
@@ -2721,7 +2721,7 @@ const docTemplate = `{
             "get": {
                 "description": "Poll invoice by payment request",
                 "tags": [
-                    "Go Bounties"
+                    "Bounties - Payment"
                 ],
                 "summary": "Poll invoice",
                 "parameters": [
@@ -2747,7 +2747,7 @@ const docTemplate = `{
             "get": {
                 "description": "Get invoice data by payment request",
                 "tags": [
-                    "Go Bounties"
+                    "Bounties - Payment"
                 ],
                 "summary": "Get invoice data",
                 "parameters": [
@@ -2773,7 +2773,7 @@ const docTemplate = `{
             "get": {
                 "description": "Get next bounty by created date",
                 "tags": [
-                    "Go Bounties"
+                    "Bounties"
                 ],
                 "summary": "Get next bounty",
                 "parameters": [
@@ -2799,7 +2799,7 @@ const docTemplate = `{
             "post": {
                 "description": "Make a bounty payment",
                 "tags": [
-                    "Go Bounties"
+                    "Bounties - Payment"
                 ],
                 "summary": "Make a bounty payment",
                 "parameters": [
@@ -2825,7 +2825,7 @@ const docTemplate = `{
             "get": {
                 "description": "Get bounty payment status by ID",
                 "tags": [
-                    "Go Bounties"
+                    "Bounties - Payment"
                 ],
                 "summary": "Get bounty payment status",
                 "parameters": [
@@ -2849,7 +2849,7 @@ const docTemplate = `{
             "put": {
                 "description": "Update bounty payment status by ID",
                 "tags": [
-                    "Go Bounties"
+                    "Bounties - Payment"
                 ],
                 "summary": "Update bounty payment status",
                 "parameters": [
@@ -2875,7 +2875,7 @@ const docTemplate = `{
             "get": {
                 "description": "Get payment by bounty ID",
                 "tags": [
-                    "Go Bounties"
+                    "Bounties - Payment"
                 ],
                 "summary": "Get payment by bounty ID",
                 "parameters": [
@@ -2901,7 +2901,7 @@ const docTemplate = `{
             "post": {
                 "description": "Update payment status by created date",
                 "tags": [
-                    "Go Bounties"
+                    "Bounties - Payment"
                 ],
                 "summary": "Update payment status",
                 "parameters": [
@@ -2927,7 +2927,7 @@ const docTemplate = `{
             "get": {
                 "description": "Get previous bounty by created date",
                 "tags": [
-                    "Go Bounties"
+                    "Bounties"
                 ],
                 "summary": "Get previous bounty",
                 "parameters": [
@@ -2953,7 +2953,7 @@ const docTemplate = `{
             "get": {
                 "description": "Get next workspace bounty by created date",
                 "tags": [
-                    "Go Bounties"
+                    "Bounties"
                 ],
                 "summary": "Get next workspace bounty",
                 "parameters": [
@@ -2986,7 +2986,7 @@ const docTemplate = `{
             "get": {
                 "description": "Get previous workspace bounty by created date",
                 "tags": [
-                    "Go Bounties"
+                    "Bounties"
                 ],
                 "summary": "Get previous workspace bounty",
                 "parameters": [
@@ -3019,7 +3019,7 @@ const docTemplate = `{
             "get": {
                 "description": "Get bounties by workspace time range",
                 "tags": [
-                    "Go Bounties"
+                    "Bounties"
                 ],
                 "summary": "Get bounties by workspace time",
                 "parameters": [
@@ -3059,7 +3059,7 @@ const docTemplate = `{
             "post": {
                 "description": "Add proof of work to a bounty",
                 "tags": [
-                    "Go Bounties"
+                    "Bounties - Proof of Work"
                 ],
                 "summary": "Add proof of work",
                 "parameters": [
@@ -3094,7 +3094,7 @@ const docTemplate = `{
             "get": {
                 "description": "Get proofs by bounty ID",
                 "tags": [
-                    "Go Bounties"
+                    "Bounties - Proof of Work"
                 ],
                 "summary": "Get proofs by bounty",
                 "parameters": [
@@ -3123,7 +3123,7 @@ const docTemplate = `{
             "delete": {
                 "description": "Delete proof by ID",
                 "tags": [
-                    "Go Bounties"
+                    "Bounties - Proof of Work"
                 ],
                 "summary": "Delete proof",
                 "parameters": [
@@ -3153,7 +3153,7 @@ const docTemplate = `{
             "get": {
                 "description": "Get bounty timing stats by ID",
                 "tags": [
-                    "Go Bounties"
+                    "Bounties - Timing"
                 ],
                 "summary": "Get bounty timing stats",
                 "parameters": [
@@ -3177,7 +3177,7 @@ const docTemplate = `{
             "delete": {
                 "description": "Delete bounty timing by ID",
                 "tags": [
-                    "Go Bounties"
+                    "Bounties - Timing"
                 ],
                 "summary": "Delete bounty timing",
                 "parameters": [
@@ -3200,7 +3200,7 @@ const docTemplate = `{
             "post": {
                 "description": "Close bounty timing by ID",
                 "tags": [
-                    "Go Bounties"
+                    "Bounties - Timing"
                 ],
                 "summary": "Close bounty timing",
                 "parameters": [
@@ -3223,7 +3223,7 @@ const docTemplate = `{
             "post": {
                 "description": "Start bounty timing by ID",
                 "tags": [
-                    "Go Bounties"
+                    "Bounties - Timing"
                 ],
                 "summary": "Start bounty timing",
                 "parameters": [
@@ -3246,7 +3246,7 @@ const docTemplate = `{
             "delete": {
                 "description": "Delete a bounty by ID",
                 "tags": [
-                    "Go Bounties"
+                    "Bounties"
                 ],
                 "summary": "Delete a bounty",
                 "parameters": [
@@ -5909,7 +5909,7 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "Workspaces"
+                    "Workspace -  Bounties"
                 ],
                 "summary": "Get Workspace Bounties",
                 "parameters": [
@@ -5944,7 +5944,7 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "Workspaces"
+                    "Workspace -  Bounties"
                 ],
                 "summary": "Get Workspace Bounties Count",
                 "parameters": [
@@ -5976,7 +5976,7 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "Workspaces"
+                    "Workspace -  Bounties"
                 ],
                 "summary": "Get Bounty Roles",
                 "responses": {
@@ -6005,7 +6005,7 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "Workspaces"
+                    "Workspace -  Payments"
                 ],
                 "summary": "Get Workspace Budget History",
                 "parameters": [
@@ -6043,7 +6043,7 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "Workspaces"
+                    "Workspace -  Payments"
                 ],
                 "summary": "Get Workspace Budget",
                 "parameters": [
@@ -6075,7 +6075,7 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "Workspaces"
+                    "Workspace -  Code Graph"
                 ],
                 "summary": "Create or Edit Workspace Code Graph",
                 "parameters": [
@@ -6109,7 +6109,7 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "Workspaces"
+                    "Workspace -  Code Graph"
                 ],
                 "summary": "Get Workspace Code Graph by UUID",
                 "parameters": [
@@ -6139,7 +6139,7 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "Workspaces"
+                    "Workspace -  Code Graph"
                 ],
                 "summary": "Delete Workspace Code Graph",
                 "parameters": [
@@ -6233,7 +6233,7 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "Workspaces"
+                    "Workspace -  Users"
                 ],
                 "summary": "Get Workspace User",
                 "parameters": [
@@ -6265,7 +6265,7 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "Workspaces"
+                    "Workspace -  Payments"
                 ],
                 "summary": "Get Invoices Count",
                 "parameters": [
@@ -6331,7 +6331,7 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "Workspaces"
+                    "Workspace -  Payments"
                 ],
                 "summary": "Get Payment History",
                 "parameters": [
@@ -6366,7 +6366,7 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "Workspaces"
+                    "Workspace -  Payments"
                 ],
                 "summary": "Poll Budget Invoices",
                 "parameters": [
@@ -6398,7 +6398,7 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "Workspaces"
+                    "Workspace -  Payments"
                 ],
                 "summary": "Poll User Workspaces Budget",
                 "responses": {
@@ -6421,7 +6421,7 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "Workspaces"
+                    "Workspace -  Repositories"
                 ],
                 "summary": "Create or Edit Workspace Repository",
                 "parameters": [
@@ -6455,7 +6455,7 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "Workspaces"
+                    "Workspace -  Repositories"
                 ],
                 "summary": "Get Workspace Repositories",
                 "parameters": [
@@ -6490,7 +6490,7 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "Workspaces"
+                    "Workspace -  Repositories"
                 ],
                 "summary": "Get Workspace Repository by UUID",
                 "parameters": [
@@ -6527,7 +6527,7 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "Workspaces"
+                    "Workspace -  Repositories"
                 ],
                 "summary": "Delete Workspace Repository",
                 "parameters": [
@@ -6634,7 +6634,7 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "Workspaces"
+                    "Workspace -  Users"
                 ],
                 "summary": "Get User Dropdown Workspaces",
                 "parameters": [
@@ -6669,7 +6669,7 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "Workspaces"
+                    "Workspace -  Payments"
                 ],
                 "summary": "Get All User Invoices Count",
                 "responses": {
@@ -6692,7 +6692,7 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "Workspaces"
+                    "Workspace -  Users"
                 ],
                 "summary": "Get User Workspaces",
                 "parameters": [
@@ -6727,7 +6727,7 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "Workspaces"
+                    "Workspace -  Users"
                 ],
                 "summary": "Get User Roles",
                 "parameters": [
@@ -6767,7 +6767,7 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "Workspaces"
+                    "Workspace -  Users"
                 ],
                 "summary": "Add User Roles",
                 "parameters": [
@@ -6821,7 +6821,7 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "Workspaces"
+                    "Workspace -  Users"
                 ],
                 "summary": "Get Workspace Users",
                 "parameters": [
@@ -6854,7 +6854,7 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "Workspaces"
+                    "Workspace -  Users"
                 ],
                 "summary": "Create Workspace User",
                 "parameters": [
@@ -6886,7 +6886,7 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "Workspaces"
+                    "Workspace -  Users"
                 ],
                 "summary": "Delete Workspace User",
                 "parameters": [
@@ -6920,7 +6920,7 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "Workspaces"
+                    "Workspace -  Users"
                 ],
                 "summary": "Get Workspace Users Count",
                 "parameters": [
@@ -6984,7 +6984,7 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "Workspaces"
+                    "Workspace -  Code Graph"
                 ],
                 "summary": "Get Code Graph by Workspace UUID",
                 "parameters": [
@@ -7054,7 +7054,7 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "Workspaces"
+                    "Workspace -  Payments"
                 ],
                 "summary": "Get Last Withdrawal",
                 "parameters": [
@@ -7086,7 +7086,7 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "Workspaces"
+                    "Workspace -  Payments"
                 ],
                 "summary": "Update Workspace Pending Payments",
                 "parameters": [

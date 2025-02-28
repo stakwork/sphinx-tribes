@@ -78,7 +78,7 @@ func handleTimingError(w http.ResponseWriter, operation string, err error) {
 //
 //	@Summary		Get all bounties
 //	@Description	Get a list of all bounties
-//	@Tags			Go Bounties
+//	@Tags			Bounties
 //	@Success		200	{array}	db.Bounty
 //	@Router			/gobounties/all [get]
 func (h *bountyHandler) GetAllBounties(w http.ResponseWriter, r *http.Request) {
@@ -93,7 +93,7 @@ func (h *bountyHandler) GetAllBounties(w http.ResponseWriter, r *http.Request) {
 //
 //	@Summary		Get a bounty
 //	@Description	Get a bounty by ID
-//	@Tags			Go Bounties
+//	@Tags			Bounties
 //	@Param			id	path		string	true	"Bounty ID"
 //	@Success		200	{object}	db.Bounty
 //	@Router			/gobounties/id/{bountyId} [get]
@@ -117,7 +117,7 @@ func (h *bountyHandler) GetBountyById(w http.ResponseWriter, r *http.Request) {
 //
 //	@Summary		Get next bounty
 //	@Description	Get next bounty by created date
-//	@Tags			Go Bounties
+//	@Tags			Bounties
 //	@Param			created	path		string	true	"Created date"
 //	@Success		200		{object}	db.Bounty
 //	@Router			/gobounties/next/{created} [get]
@@ -136,7 +136,7 @@ func (h *bountyHandler) GetNextBountyByCreated(w http.ResponseWriter, r *http.Re
 //
 //	@Summary		Get previous bounty
 //	@Description	Get previous bounty by created date
-//	@Tags			Go Bounties
+//	@Tags			Bounties
 //	@Param			created	path		string	true	"Created date"
 //	@Success		200		{object}	db.Bounty
 //	@Router			/gobounties/previous/{created} [get]
@@ -155,7 +155,7 @@ func (h *bountyHandler) GetPreviousBountyByCreated(w http.ResponseWriter, r *htt
 //
 //	@Summary		Get next workspace bounty
 //	@Description	Get next workspace bounty by created date
-//	@Tags			Go Bounties
+//	@Tags			Bounties
 //	@Param			uuid	path		string	true	"Workspace UUID"
 //	@Param			created	path		string	true	"Created date"
 //	@Success		200		{object}	db.Bounty
@@ -175,7 +175,7 @@ func (h *bountyHandler) GetWorkspaceNextBountyByCreated(w http.ResponseWriter, r
 //
 //	@Summary		Get previous workspace bounty
 //	@Description	Get previous workspace bounty by created date
-//	@Tags			Go Bounties
+//	@Tags			Bounties
 //	@Param			uuid	path		string	true	"Workspace UUID"
 //	@Param			created	path		string	true	"Created date"
 //	@Success		200		{object}	db.Bounty
@@ -195,7 +195,7 @@ func (h *bountyHandler) GetWorkspacePreviousBountyByCreated(w http.ResponseWrite
 //
 //	@Summary		Get bounty index
 //	@Description	Get bounty index by ID
-//	@Tags			Go Bounties
+//	@Tags			Bounties
 //	@Param			id	path		string	true	"Bounty ID"
 //	@Success		200	{object}	int
 //	@Router			/gobounties/index/{bountyId} [get]
@@ -214,7 +214,7 @@ func (h *bountyHandler) GetBountyIndexById(w http.ResponseWriter, r *http.Reques
 //
 //	@Summary		Get bounty by created date
 //	@Description	Get bounty by created date
-//	@Tags			Go Bounties
+//	@Tags			Bounties
 //	@Param			created	path		string	true	"Created date"
 //	@Success		200		{object}	db.Bounty
 //	@Router			/gobounties/created/{created} [get]
@@ -239,7 +239,7 @@ func (h *bountyHandler) GetBountyByCreated(w http.ResponseWriter, r *http.Reques
 //
 //	@Summary		Get user bounty count
 //	@Description	Get user bounty count by person key and tab type
-//	@Tags			Go Bounties
+//	@Tags			Bounties
 //	@Param			personKey	path		string	true	"Person Key"
 //	@Param			tabType		path		string	true	"Tab Type"
 //	@Success		200			{object}	int
@@ -261,7 +261,7 @@ func GetUserBountyCount(w http.ResponseWriter, r *http.Request) {
 //
 //	@Summary		Get bounty count
 //	@Description	Get bounty count
-//	@Tags			Go Bounties
+//	@Tags			Bounties
 //	@Success		200	{object}	int
 //	@Router			/gobounties/count [get]
 func GetBountyCount(w http.ResponseWriter, r *http.Request) {
@@ -407,7 +407,7 @@ func processNotification(pubkey, event, content, alias string) string {
 //
 //	@Summary		Create or edit a bounty
 //	@Description	Create or edit a bounty
-//	@Tags			Go Bounties
+//	@Tags			Bounties
 //	@Param			bounty	body		db.NewBounty	true	"Bounty object"
 //	@Success		200		{object}	db.NewBounty
 //	@Router			/gobounties [post]
@@ -572,7 +572,7 @@ func (h *bountyHandler) CreateOrEditBounty(w http.ResponseWriter, r *http.Reques
 //
 //	@Summary		Delete a bounty
 //	@Description	Delete a bounty by ID
-//	@Tags			Go Bounties
+//	@Tags			Bounties
 //	@Param			pubkey	path		string	true	"PubKey"
 //	@Param			created	path		string	true	"Created"
 //	@Success		200		{object}	bool
@@ -633,7 +633,7 @@ func (h *bountyHandler) DeleteBounty(w http.ResponseWriter, r *http.Request) {
 //
 //	@Summary		Update payment status
 //	@Description	Update payment status by created date
-//	@Tags			Go Bounties
+//	@Tags			Bounties - Payment
 //	@Param			created	path		string	true	"Created"
 //	@Success		200		{object}	db.NewBounty
 //	@Router			/gobounties/paymentstatus/{created} [post]
@@ -672,7 +672,7 @@ func UpdatePaymentStatus(w http.ResponseWriter, r *http.Request) {
 //
 //	@Summary		Update completed status
 //	@Description	Update completed status by created date
-//	@Tags			Go Bounties
+//	@Tags			Bounties
 //	@Param			created	path		string	true	"Created"
 //	@Success		200		{object}	db.NewBounty
 //	@Router			/gobounties/completedstatus/{created} [post]
@@ -704,7 +704,7 @@ func UpdateCompletedStatus(w http.ResponseWriter, r *http.Request) {
 //
 //	@Summary		Get payment by bounty ID
 //	@Description	Get payment by bounty ID
-//	@Tags			Go Bounties
+//	@Tags			Bounties - Payment
 //	@Param			bountyId	path		string	true	"Bounty ID"
 //	@Success		200			{object}	db.NewPaymentHistory
 //	@Router			/gobounties/payment/{bountyId} [get]
@@ -826,7 +826,7 @@ func (h *bountyHandler) GenerateBountyResponse(bounties []db.NewBounty) []db.Bou
 //
 //	@Summary		Make a bounty payment
 //	@Description	Make a bounty payment
-//	@Tags			Go Bounties
+//	@Tags			Bounties - Payment
 //	@Param			id	path		string	true	"Bounty ID"
 //	@Success		200	{object}	db.NewBounty
 //	@Router			/gobounties/pay/{id} [post]
@@ -1203,7 +1203,7 @@ func (h *bountyHandler) MakeBountyPayment(w http.ResponseWriter, r *http.Request
 //
 //	@Summary		Get bounty payment status
 //	@Description	Get bounty payment status by ID
-//	@Tags			Go Bounties
+//	@Tags			Bounties - Payment
 //	@Param			id	path		string	true	"Bounty ID"
 //	@Success		200	{object}	db.NewPaymentHistory
 //	@Router			/gobounties/payment/status/{id} [get]
@@ -1254,7 +1254,7 @@ func (h *bountyHandler) GetBountyPaymentStatus(w http.ResponseWriter, r *http.Re
 //
 //	@Summary		Update bounty payment status
 //	@Description	Update bounty payment status by ID
-//	@Tags			Go Bounties
+//	@Tags			Bounties - Payment
 //	@Param			id	path		string	true	"Bounty ID"
 //	@Success		200	{object}	db.NewPaymentHistory
 //	@Router			/gobounties/payment/status/{id} [put]
@@ -1374,7 +1374,7 @@ func (h *bountyHandler) UpdateBountyPaymentStatus(w http.ResponseWriter, r *http
 //
 //	@Summary		Withdraw bounty budget
 //	@Description	Withdraw bounty budget
-//	@Tags			Go Bounties
+//	@Tags			Bounties - Payment
 //	@Param			request	body		db.NewWithdrawBudgetRequest	true	"Withdraw Budget Request"
 //	@Success		200		{object}	db.InvoicePaySuccess
 //	@Router			/gobounties/budget/withdraw [post]
@@ -1761,7 +1761,7 @@ func (h *bountyHandler) PayV2LightningInvoice(payment_request string) (db.Invoic
 //
 //	@Summary		Get invoice data
 //	@Description	Get invoice data by payment request
-//	@Tags			Go Bounties
+//	@Tags			Bounties - Payment
 //	@Param			paymentRequest	path		string	true	"Payment Request"
 //	@Success		200				{object}	db.InvoiceResult
 //	@Router			/gobounties/invoice/{paymentRequest} [get]
@@ -1783,7 +1783,7 @@ func (h *bountyHandler) GetInvoiceData(w http.ResponseWriter, r *http.Request) {
 //
 //	@Summary		Poll invoice
 //	@Description	Poll invoice by payment request
-//	@Tags			Go Bounties
+//	@Tags			Bounties - Payment
 //	@Param			paymentRequest	path		string	true	"Payment Request"
 //	@Success		200				{object}	db.InvoiceResult
 //	@Router			/gobounties/invoice/poll/{paymentRequest} [get]
@@ -1836,7 +1836,7 @@ func (h *bountyHandler) PollInvoice(w http.ResponseWriter, r *http.Request) {
 //
 //	@Summary		Get filter count
 //	@Description	Get filter count
-//	@Tags			Go Bounties
+//	@Tags			Bounties
 //	@Success		200	{object}	db.FilterStatusCount
 //	@Router			/gobounties/filter/count [get]
 func (h *bountyHandler) GetFilterCount(w http.ResponseWriter, r *http.Request) {
@@ -1849,7 +1849,7 @@ func (h *bountyHandler) GetFilterCount(w http.ResponseWriter, r *http.Request) {
 //
 //	@Summary		Get bounty cards
 //	@Description	Get bounty cards
-//	@Tags			Go Bounties
+//	@Tags			Bounties
 //	@Success		200	{array}	db.BountyCard
 //	@Router			/gobounties/bounty-cards [get]
 func (h *bountyHandler) GetBountyCards(w http.ResponseWriter, r *http.Request) {
@@ -1992,7 +1992,7 @@ func calculateBountyStatus(bounty db.NewBounty) db.BountyStatus {
 //
 //	@Summary		Add proof of work
 //	@Description	Add proof of work to a bounty
-//	@Tags			Go Bounties
+//	@Tags			Bounties - Proof of Work
 //	@Param			id		path		string			true	"Bounty ID"
 //	@Param			proof	body		db.ProofOfWork	true	"Proof of Work object"
 //	@Success		201		{object}	db.ProofOfWork
@@ -2045,7 +2045,7 @@ func (h *bountyHandler) AddProofOfWork(w http.ResponseWriter, r *http.Request) {
 //
 //	@Summary		Get proofs by bounty
 //	@Description	Get proofs by bounty ID
-//	@Tags			Go Bounties
+//	@Tags			Bounties - Proof of Work
 //	@Param			id	path	string	true	"Bounty ID"
 //	@Success		200	{array}	db.ProofOfWork
 //	@Router			/gobounties/{id}/proofs [get]
@@ -2068,7 +2068,7 @@ func (h *bountyHandler) GetProofsByBounty(w http.ResponseWriter, r *http.Request
 //
 //	@Summary		Delete proof
 //	@Description	Delete proof by ID
-//	@Tags			Go Bounties
+//	@Tags			Bounties - Proof of Work
 //	@Param			id		path	string	true	"Bounty ID"
 //	@Param			proofId	path	string	true	"Proof ID"
 //	@Success		204
@@ -2105,7 +2105,7 @@ func (h *bountyHandler) DeleteProof(w http.ResponseWriter, r *http.Request) {
 //
 //	@Summary		Update proof status
 //	@Description	Update proof status by ID
-//	@Tags			Go Bounties
+//	@Tags			Bounties - Proof of Work
 //	@Param			id		path	string						true	"Bounty ID"
 //	@Param			proofId	path	string						true	"Proof ID"
 //	@Param			status	body	UpdateProofStatusResponse	true	"Status object"
@@ -2236,7 +2236,7 @@ func (h *bountyHandler) DeleteBountyAssignee(w http.ResponseWriter, r *http.Requ
 //
 //	@Summary		Get bounty timing stats
 //	@Description	Get bounty timing stats by ID
-//	@Tags			Go Bounties
+//	@Tags			Bounties - Timing
 //	@Param			id	path		string	true	"Bounty ID"
 //	@Success		200	{object}	BountyTimingResponse
 //	@Router			/gobounties/{id}/timing [get]
@@ -2274,7 +2274,7 @@ func (h *bountyHandler) GetBountyTimingStats(w http.ResponseWriter, r *http.Requ
 //
 //	@Summary		Start bounty timing
 //	@Description	Start bounty timing by ID
-//	@Tags			Go Bounties
+//	@Tags			Bounties - Timing
 //	@Param			id	path	string	true	"Bounty ID"
 //	@Success		200
 //	@Router			/gobounties/{id}/timing/start [post]
@@ -2299,7 +2299,7 @@ func (h *bountyHandler) StartBountyTiming(w http.ResponseWriter, r *http.Request
 //
 //	@Summary		Close bounty timing
 //	@Description	Close bounty timing by ID
-//	@Tags			Go Bounties
+//	@Tags			Bounties - Timing
 //	@Param			id	path	string	true	"Bounty ID"
 //	@Success		200
 //	@Router			/gobounties/{id}/timing/close [post]
@@ -2323,7 +2323,7 @@ func (h *bountyHandler) CloseBountyTiming(w http.ResponseWriter, r *http.Request
 //
 //	@Summary		Get bounties leaderboard
 //	@Description	Get bounties leaderboard
-//	@Tags			Go Bounties
+//	@Tags			Bounties
 //	@Success		200	{array}	[]db.LeaderData
 //	@Router			/bounty/leaderboard [get]
 func (h *bountyHandler) GetBountiesLeaderboard(w http.ResponseWriter, _ *http.Request) {
@@ -2337,7 +2337,7 @@ func (h *bountyHandler) GetBountiesLeaderboard(w http.ResponseWriter, _ *http.Re
 //
 //	@Summary		Get all featured bounties
 //	@Description	Get all featured bounties
-//	@Tags			Go Bounties
+//	@Tags			Featured Bounties
 //	@Success		200	{array}	db.FeaturedBounty
 //	@Router			/gobounties/featured/all [get]
 func (h *bountyHandler) GetAllFeaturedBounties(w http.ResponseWriter, r *http.Request) {
@@ -2355,7 +2355,7 @@ func (h *bountyHandler) GetAllFeaturedBounties(w http.ResponseWriter, r *http.Re
 //
 //	@Summary		Create a featured bounty
 //	@Description	Create a featured bounty
-//	@Tags			Go Bounties
+//	@Tags			Featured Bounties
 //	@Param			bounty	body		db.FeaturedBounty	true	"Featured Bounty object"
 //	@Success		201		{object}	db.FeaturedBounty
 //	@Router			/gobounties/featured/create [post]
@@ -2417,7 +2417,7 @@ func (h *bountyHandler) CreateFeaturedBounty(w http.ResponseWriter, r *http.Requ
 //
 //	@Summary		Update a featured bounty
 //	@Description	Update a featured bounty
-//	@Tags			Go Bounties
+//	@Tags			Featured Bounties
 //	@Param			bounty	body		db.FeaturedBounty	true	"Featured Bounty object"
 //	@Success		200		{object}	db.FeaturedBounty
 //	@Router			/gobounties/featured/update [put]
@@ -2479,7 +2479,7 @@ func (h *bountyHandler) UpdateFeaturedBounty(w http.ResponseWriter, r *http.Requ
 //
 //	@Summary		Delete a featured bounty
 //	@Description	Delete a featured bounty by ID
-//	@Tags			Go Bounties
+//	@Tags			Featured Bounties
 //	@Param			bountyId	path	string	true	"Bounty ID"
 //	@Success		204
 //	@Router			/gobounties/featured/delete/{bountyId} [delete]
@@ -2512,7 +2512,7 @@ func (h *bountyHandler) DeleteFeaturedBounty(w http.ResponseWriter, r *http.Requ
 //
 //	@Summary		Delete bounty timing
 //	@Description	Delete bounty timing by ID
-//	@Tags			Go Bounties
+//	@Tags			Bounties - Timing
 //	@Param			id	path	string	true	"Bounty ID"
 //	@Success		204
 //	@Router			/gobounties/{id}/timing [delete]
@@ -2555,7 +2555,7 @@ func (h *bountyHandler) DeleteBountyTiming(w http.ResponseWriter, r *http.Reques
 //
 //	@Summary		Get bounties by workspace time
 //	@Description	Get bounties by workspace time range
-//	@Tags			Go Bounties
+//	@Tags			Bounties
 //	@Param			workspaceId	path		string	true	"Workspace ID"
 //	@Param			daysStart	path		string	true	"Days Start"
 //	@Param			daysEnd		path		string	true	"Days End"

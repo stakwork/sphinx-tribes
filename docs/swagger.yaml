@@ -2639,7 +2639,7 @@ paths:
             type: string
       summary: Update Ticket Sequence
       tags:
-      - Tickets
+      - Bounty Tickets
   /bounties/ticket/{ticket_uuid}/bounty:
     post:
       consumes:
@@ -2660,7 +2660,7 @@ paths:
             $ref: '#/definitions/handlers.CreateBountyResponse'
       summary: Convert Ticket to Bounty
       tags:
-      - Tickets
+      - Bounty Tickets
   /bounties/ticket/{uuid}:
     delete:
       consumes:
@@ -2681,7 +2681,7 @@ paths:
             type: string
       summary: Delete Ticket
       tags:
-      - Tickets
+      - Bounty Tickets
     get:
       consumes:
       - application/json
@@ -2701,7 +2701,7 @@ paths:
             $ref: '#/definitions/db.Tickets'
       summary: Get Ticket
       tags:
-      - Tickets
+      - Bounty Tickets
     post:
       consumes:
       - application/json
@@ -2727,7 +2727,7 @@ paths:
             $ref: '#/definitions/db.Tickets'
       summary: Update Ticket
       tags:
-      - Tickets
+      - Bounty Tickets
   /bounties/ticket/bounty/bulk:
     post:
       consumes:
@@ -2749,7 +2749,7 @@ paths:
             $ref: '#/definitions/handlers.BulkConversionResponse'
       summary: Convert Tickets to Bounties
       tags:
-      - Tickets
+      - Bounty Tickets
   /bounties/ticket/feature/{feature_uuid}/phase/{phase_uuid}:
     get:
       consumes:
@@ -2777,7 +2777,7 @@ paths:
             type: array
       summary: Get Tickets by Phase UUID
       tags:
-      - Tickets
+      - Bounty Tickets
   /bounties/ticket/group/{group_uuid}:
     get:
       consumes:
@@ -2800,7 +2800,7 @@ paths:
             type: array
       summary: Get Tickets by Group
       tags:
-      - Tickets
+      - Bounty Tickets
   /bounties/ticket/plan:
     post:
       consumes:
@@ -2998,7 +2998,7 @@ paths:
             $ref: '#/definitions/db.Tickets'
       summary: Process Ticket Review
       tags:
-      - Tickets
+      - Bounty Tickets
   /bounties/ticket/review/send:
     post:
       consumes:
@@ -3020,7 +3020,7 @@ paths:
             $ref: '#/definitions/handlers.TicketResponse'
       summary: Post Ticket Data to Stakwork
       tags:
-      - Tickets
+      - Bounty Tickets
   /bounties/ticket/workspace/{workspace_uuid}/draft:
     post:
       consumes:
@@ -3047,7 +3047,7 @@ paths:
             $ref: '#/definitions/db.Tickets'
       summary: Create Workspace Draft Ticket
       tags:
-      - Tickets
+      - Bounty Tickets
   /bounties/ticket/workspace/{workspace_uuid}/draft/{uuid}:
     delete:
       consumes:
@@ -3073,7 +3073,7 @@ paths:
             type: string
       summary: Delete Workspace Draft Ticket
       tags:
-      - Tickets
+      - Bounty Tickets
     get:
       consumes:
       - application/json
@@ -3098,7 +3098,7 @@ paths:
             $ref: '#/definitions/db.Tickets'
       summary: Get Workspace Draft Ticket
       tags:
-      - Tickets
+      - Bounty Tickets
     post:
       consumes:
       - application/json
@@ -3129,7 +3129,7 @@ paths:
             $ref: '#/definitions/db.Tickets'
       summary: Update Workspace Draft Ticket
       tags:
-      - Tickets
+      - Bounty Tickets
   /bounty/leaderboard:
     get:
       description: Get bounties leaderboard
@@ -3144,7 +3144,7 @@ paths:
             type: array
       summary: Get bounties leaderboard
       tags:
-      - Go Bounties
+      - Bounties
   /feature_flags:
     get:
       description: Get a list of all feature flags
@@ -3315,7 +3315,7 @@ paths:
             type: array
       summary: Get Feature Phases
       tags:
-      - Features
+      - Feature - Phases
   /features/{feature_uuid}/phase/{phase_uuid}:
     delete:
       consumes:
@@ -3330,7 +3330,7 @@ paths:
             type: string
       summary: Delete Feature Phase
       tags:
-      - Features
+      - Feature - Phases
     get:
       consumes:
       - application/json
@@ -3344,7 +3344,7 @@ paths:
             $ref: '#/definitions/db.FeaturePhase'
       summary: Get Feature Phase by UUID
       tags:
-      - Features
+      - Feature - Phases
   /features/{feature_uuid}/phase/{phase_uuid}/bounty:
     get:
       consumes:
@@ -3361,7 +3361,7 @@ paths:
             type: array
       summary: Get Bounties by Feature and Phase UUID
       tags:
-      - Features
+      - Feature - Phases
   /features/{feature_uuid}/phase/{phase_uuid}/bounty/count:
     get:
       consumes:
@@ -3376,7 +3376,7 @@ paths:
             type: int
       summary: Get Bounties Count by Feature and Phase UUID
       tags:
-      - Features
+      - Feature - Phases
   /features/{feature_uuid}/quick-bounties:
     get:
       consumes:
@@ -3423,7 +3423,7 @@ paths:
             type: array
       summary: Get Stories by Feature UUID
       tags:
-      - Features
+      - Feature - Stories
   /features/{feature_uuid}/story/{story_uuid}:
     delete:
       consumes:
@@ -3438,7 +3438,7 @@ paths:
             type: string
       summary: Delete Story
       tags:
-      - Features
+      - Feature - Stories
     get:
       consumes:
       - application/json
@@ -3452,7 +3452,7 @@ paths:
             $ref: '#/definitions/db.FeatureStory'
       summary: Get Story by UUID
       tags:
-      - Features
+      - Feature - Stories
   /features/{uuid}:
     delete:
       consumes:
@@ -3543,7 +3543,7 @@ paths:
             type: array
       summary: Get Features by Workspace UUID
       tags:
-      - Features
+      - Feature - Workspaces
   /features/phase:
     post:
       consumes:
@@ -3558,7 +3558,7 @@ paths:
             $ref: '#/definitions/db.FeaturePhase'
       summary: Create or Edit Feature Phase
       tags:
-      - Features
+      - Feature - Phases
   /features/stories:
     post:
       consumes:
@@ -3573,7 +3573,7 @@ paths:
             $ref: '#/definitions/db.FeatureStoriesReponse'
       summary: Get Feature Stories
       tags:
-      - Features
+      - Feature - Stories
   /features/stories/send:
     post:
       consumes:
@@ -3588,7 +3588,7 @@ paths:
             type: string
       summary: Send Stories
       tags:
-      - Features
+      - Feature - Stories
   /features/story:
     post:
       consumes:
@@ -3603,7 +3603,7 @@ paths:
             $ref: '#/definitions/db.FeatureStory'
       summary: Create or Edit Story
       tags:
-      - Features
+      - Feature - Stories
   /features/workspace/count/{uuid}:
     get:
       consumes:
@@ -3618,7 +3618,7 @@ paths:
             type: int
       summary: Get Workspace Features Count
       tags:
-      - Features
+      - Feature - Workspaces
   /feed:
     get:
       consumes:
@@ -3729,7 +3729,7 @@ paths:
             $ref: '#/definitions/db.NewBounty'
       summary: Create or edit a bounty
       tags:
-      - Go Bounties
+      - Bounties
   /gobounties/{id}/proof:
     post:
       description: Add proof of work to a bounty
@@ -3752,7 +3752,7 @@ paths:
             $ref: '#/definitions/db.ProofOfWork'
       summary: Add proof of work
       tags:
-      - Go Bounties
+      - Bounties - Proof of Work
   /gobounties/{id}/proofs:
     get:
       description: Get proofs by bounty ID
@@ -3771,7 +3771,7 @@ paths:
             type: array
       summary: Get proofs by bounty
       tags:
-      - Go Bounties
+      - Bounties - Proof of Work
   /gobounties/{id}/proofs/{proofId}:
     delete:
       description: Delete proof by ID
@@ -3791,7 +3791,7 @@ paths:
           description: No Content
       summary: Delete proof
       tags:
-      - Go Bounties
+      - Bounties - Proof of Work
   /gobounties/{id}/timing:
     delete:
       description: Delete bounty timing by ID
@@ -3806,7 +3806,7 @@ paths:
           description: No Content
       summary: Delete bounty timing
       tags:
-      - Go Bounties
+      - Bounties - Timing
     get:
       description: Get bounty timing stats by ID
       parameters:
@@ -3822,7 +3822,7 @@ paths:
             $ref: '#/definitions/handlers.BountyTimingResponse'
       summary: Get bounty timing stats
       tags:
-      - Go Bounties
+      - Bounties - Timing
   /gobounties/{id}/timing/close:
     post:
       description: Close bounty timing by ID
@@ -3837,7 +3837,7 @@ paths:
           description: OK
       summary: Close bounty timing
       tags:
-      - Go Bounties
+      - Bounties - Timing
   /gobounties/{id}/timing/start:
     post:
       description: Start bounty timing by ID
@@ -3852,7 +3852,7 @@ paths:
           description: OK
       summary: Start bounty timing
       tags:
-      - Go Bounties
+      - Bounties - Timing
   /gobounties/{pubkey}/{created}:
     delete:
       description: Delete a bounty by ID
@@ -3874,7 +3874,7 @@ paths:
             type: boolean
       summary: Delete a bounty
       tags:
-      - Go Bounties
+      - Bounties
   /gobounties/all:
     get:
       description: Get a list of all bounties
@@ -3887,7 +3887,7 @@ paths:
             type: array
       summary: Get all bounties
       tags:
-      - Go Bounties
+      - Bounties
   /gobounties/bounty-cards:
     get:
       description: Get bounty cards
@@ -3900,7 +3900,7 @@ paths:
             type: array
       summary: Get bounty cards
       tags:
-      - Go Bounties
+      - Bounties
   /gobounties/budget/withdraw:
     post:
       description: Withdraw bounty budget
@@ -3918,7 +3918,7 @@ paths:
             $ref: '#/definitions/db.InvoicePaySuccess'
       summary: Withdraw bounty budget
       tags:
-      - Go Bounties
+      - Bounties - Payment
   /gobounties/completedstatus/{created}:
     post:
       description: Update completed status by created date
@@ -3935,7 +3935,7 @@ paths:
             $ref: '#/definitions/db.NewBounty'
       summary: Update completed status
       tags:
-      - Go Bounties
+      - Bounties
   /gobounties/count:
     get:
       description: Get bounty count
@@ -3946,7 +3946,7 @@ paths:
             type: integer
       summary: Get bounty count
       tags:
-      - Go Bounties
+      - Bounties
   /gobounties/count/{personKey}/{tabType}:
     get:
       description: Get user bounty count by person key and tab type
@@ -3968,7 +3968,7 @@ paths:
             type: integer
       summary: Get user bounty count
       tags:
-      - Go Bounties
+      - Bounties
   /gobounties/created/{created}:
     get:
       description: Get bounty by created date
@@ -3985,7 +3985,7 @@ paths:
             $ref: '#/definitions/db.Bounty'
       summary: Get bounty by created date
       tags:
-      - Go Bounties
+      - Bounties
   /gobounties/featured/all:
     get:
       description: Get all featured bounties
@@ -3998,7 +3998,7 @@ paths:
             type: array
       summary: Get all featured bounties
       tags:
-      - Go Bounties
+      - Featured Bounties
   /gobounties/featured/create:
     post:
       description: Create a featured bounty
@@ -4016,7 +4016,7 @@ paths:
             $ref: '#/definitions/db.FeaturedBounty'
       summary: Create a featured bounty
       tags:
-      - Go Bounties
+      - Featured Bounties
   /gobounties/featured/delete/{bountyId}:
     delete:
       description: Delete a featured bounty by ID
@@ -4031,7 +4031,7 @@ paths:
           description: No Content
       summary: Delete a featured bounty
       tags:
-      - Go Bounties
+      - Featured Bounties
   /gobounties/featured/update:
     put:
       description: Update a featured bounty
@@ -4049,7 +4049,7 @@ paths:
             $ref: '#/definitions/db.FeaturedBounty'
       summary: Update a featured bounty
       tags:
-      - Go Bounties
+      - Featured Bounties
   /gobounties/filter/count:
     get:
       description: Get filter count
@@ -4060,7 +4060,7 @@ paths:
             $ref: '#/definitions/db.FilterStatusCount'
       summary: Get filter count
       tags:
-      - Go Bounties
+      - Bounties
   /gobounties/id/{bountyId}:
     get:
       description: Get a bounty by ID
@@ -4077,7 +4077,7 @@ paths:
             $ref: '#/definitions/db.Bounty'
       summary: Get a bounty
       tags:
-      - Go Bounties
+      - Bounties
   /gobounties/index/{bountyId}:
     get:
       description: Get bounty index by ID
@@ -4094,7 +4094,7 @@ paths:
             type: integer
       summary: Get bounty index
       tags:
-      - Go Bounties
+      - Bounties
   /gobounties/invoice/{paymentRequest}:
     get:
       description: Get invoice data by payment request
@@ -4111,7 +4111,7 @@ paths:
             $ref: '#/definitions/db.InvoiceResult'
       summary: Get invoice data
       tags:
-      - Go Bounties
+      - Bounties - Payment
   /gobounties/invoice/poll/{paymentRequest}:
     get:
       description: Poll invoice by payment request
@@ -4128,7 +4128,7 @@ paths:
             $ref: '#/definitions/db.InvoiceResult'
       summary: Poll invoice
       tags:
-      - Go Bounties
+      - Bounties - Payment
   /gobounties/next/{created}:
     get:
       description: Get next bounty by created date
@@ -4145,7 +4145,7 @@ paths:
             $ref: '#/definitions/db.Bounty'
       summary: Get next bounty
       tags:
-      - Go Bounties
+      - Bounties
   /gobounties/pay/{id}:
     post:
       description: Make a bounty payment
@@ -4162,7 +4162,7 @@ paths:
             $ref: '#/definitions/db.NewBounty'
       summary: Make a bounty payment
       tags:
-      - Go Bounties
+      - Bounties - Payment
   /gobounties/payment/{bountyId}:
     get:
       description: Get payment by bounty ID
@@ -4179,7 +4179,7 @@ paths:
             $ref: '#/definitions/db.NewPaymentHistory'
       summary: Get payment by bounty ID
       tags:
-      - Go Bounties
+      - Bounties - Payment
   /gobounties/payment/status/{id}:
     get:
       description: Get bounty payment status by ID
@@ -4196,7 +4196,7 @@ paths:
             $ref: '#/definitions/db.NewPaymentHistory'
       summary: Get bounty payment status
       tags:
-      - Go Bounties
+      - Bounties - Payment
     put:
       description: Update bounty payment status by ID
       parameters:
@@ -4212,7 +4212,7 @@ paths:
             $ref: '#/definitions/db.NewPaymentHistory'
       summary: Update bounty payment status
       tags:
-      - Go Bounties
+      - Bounties - Payment
   /gobounties/paymentstatus/{created}:
     post:
       description: Update payment status by created date
@@ -4229,7 +4229,7 @@ paths:
             $ref: '#/definitions/db.NewBounty'
       summary: Update payment status
       tags:
-      - Go Bounties
+      - Bounties - Payment
   /gobounties/previous/{created}:
     get:
       description: Get previous bounty by created date
@@ -4246,7 +4246,7 @@ paths:
             $ref: '#/definitions/db.Bounty'
       summary: Get previous bounty
       tags:
-      - Go Bounties
+      - Bounties
   /gobounties/workspace/next/{uuid}/{created}:
     get:
       description: Get next workspace bounty by created date
@@ -4268,7 +4268,7 @@ paths:
             $ref: '#/definitions/db.Bounty'
       summary: Get next workspace bounty
       tags:
-      - Go Bounties
+      - Bounties
   /gobounties/workspace/previous/{uuid}/{created}:
     get:
       description: Get previous workspace bounty by created date
@@ -4290,7 +4290,7 @@ paths:
             $ref: '#/definitions/db.Bounty'
       summary: Get previous workspace bounty
       tags:
-      - Go Bounties
+      - Bounties
   /gobounties/workspace/timerange/{workspaceId}/{daysStart}/{daysEnd}:
     get:
       description: Get bounties by workspace time range
@@ -4317,7 +4317,7 @@ paths:
             $ref: '#/definitions/db.NodeListResponse'
       summary: Get bounties by workspace time
       tags:
-      - Go Bounties
+      - Bounties
   /hivechat:
     get:
       description: Retrieve chats for a workspace with the given ID and status
@@ -6081,7 +6081,7 @@ paths:
             type: array
       summary: Get Code Graph by Workspace UUID
       tags:
-      - Workspaces
+      - Workspace -  Code Graph
   /workspace/{workspace_uuid}/features:
     get:
       consumes:
@@ -6125,7 +6125,7 @@ paths:
             type: int
       summary: Get Last Withdrawal
       tags:
-      - Workspaces
+      - Workspace -  Payments
   /workspace/{workspace_uuid}/payments:
     put:
       consumes:
@@ -6146,7 +6146,7 @@ paths:
             type: string
       summary: Update Workspace Pending Payments
       tags:
-      - Workspaces
+      - Workspace -  Payments
   /workspace/bounties/{uuid}:
     get:
       consumes:
@@ -6169,7 +6169,7 @@ paths:
             type: array
       summary: Get Workspace Bounties
       tags:
-      - Workspaces
+      - Workspace -  Bounties
   /workspace/bounties/{uuid}/count:
     get:
       consumes:
@@ -6190,7 +6190,7 @@ paths:
             type: int
       summary: Get Workspace Bounties Count
       tags:
-      - Workspaces
+      - Workspace -  Bounties
   /workspace/bounty/roles:
     get:
       consumes:
@@ -6209,7 +6209,7 @@ paths:
             type: array
       summary: Get Bounty Roles
       tags:
-      - Workspaces
+      - Workspace -  Bounties
   /workspace/budget/{uuid}:
     get:
       consumes:
@@ -6230,7 +6230,7 @@ paths:
             $ref: '#/definitions/db.StatusBudget'
       summary: Get Workspace Budget
       tags:
-      - Workspaces
+      - Workspace -  Payments
   /workspace/budget/history/{uuid}:
     get:
       consumes:
@@ -6255,7 +6255,7 @@ paths:
             type: array
       summary: Get Workspace Budget History
       tags:
-      - Workspaces
+      - Workspace -  Payments
   /workspace/codegraph:
     post:
       consumes:
@@ -6277,7 +6277,7 @@ paths:
             $ref: '#/definitions/db.WorkspaceCodeGraph'
       summary: Create or Edit Workspace Code Graph
       tags:
-      - Workspaces
+      - Workspace -  Code Graph
   /workspace/codegraph/{uuid}:
     delete:
       consumes:
@@ -6303,7 +6303,7 @@ paths:
             type: string
       summary: Delete Workspace Code Graph
       tags:
-      - Workspaces
+      - Workspace -  Code Graph
     get:
       consumes:
       - application/json
@@ -6323,7 +6323,7 @@ paths:
             $ref: '#/definitions/db.WorkspaceCodeGraph'
       summary: Get Workspace Code Graph by UUID
       tags:
-      - Workspaces
+      - Workspace -  Code Graph
   /workspace/count:
     get:
       consumes:
@@ -6380,7 +6380,7 @@ paths:
             $ref: '#/definitions/db.WorkspaceUsers'
       summary: Get Workspace User
       tags:
-      - Workspaces
+      - Workspace -  Users
   /workspace/invoices/count/{uuid}:
     get:
       consumes:
@@ -6401,7 +6401,7 @@ paths:
             type: int
       summary: Get Invoices Count
       tags:
-      - Workspaces
+      - Workspace -  Payments
   /workspace/mission:
     post:
       consumes:
@@ -6446,7 +6446,7 @@ paths:
             type: array
       summary: Get Payment History
       tags:
-      - Workspaces
+      - Workspace -  Payments
   /workspace/poll/invoices/{uuid}:
     get:
       consumes:
@@ -6467,7 +6467,7 @@ paths:
             type: string
       summary: Poll Budget Invoices
       tags:
-      - Workspaces
+      - Workspace -  Payments
   /workspace/poll/user/invoices:
     get:
       consumes:
@@ -6482,7 +6482,7 @@ paths:
             type: string
       summary: Poll User Workspaces Budget
       tags:
-      - Workspaces
+      - Workspace -  Payments
   /workspace/repositories:
     post:
       consumes:
@@ -6504,7 +6504,7 @@ paths:
             $ref: '#/definitions/db.WorkspaceRepositories'
       summary: Create or Edit Workspace Repository
       tags:
-      - Workspaces
+      - Workspace -  Repositories
   /workspace/repositories/{uuid}:
     get:
       consumes:
@@ -6527,7 +6527,7 @@ paths:
             type: array
       summary: Get Workspace Repositories
       tags:
-      - Workspaces
+      - Workspace -  Repositories
   /workspace/repository/{uuid}:
     delete:
       consumes:
@@ -6553,7 +6553,7 @@ paths:
             type: string
       summary: Delete Workspace Repository
       tags:
-      - Workspaces
+      - Workspace -  Repositories
     get:
       consumes:
       - application/json
@@ -6578,7 +6578,7 @@ paths:
             $ref: '#/definitions/db.WorkspaceRepositories'
       summary: Get Workspace Repository by UUID
       tags:
-      - Workspaces
+      - Workspace -  Repositories
   /workspace/schematicurl:
     post:
       consumes:
@@ -6645,7 +6645,7 @@ paths:
             type: array
       summary: Get User Workspaces
       tags:
-      - Workspaces
+      - Workspace -  Users
   /workspace/user/dropdown/{userId}:
     get:
       consumes:
@@ -6668,7 +6668,7 @@ paths:
             type: array
       summary: Get User Dropdown Workspaces
       tags:
-      - Workspaces
+      - Workspace -  Users
   /workspace/user/invoices/count:
     get:
       consumes:
@@ -6683,7 +6683,7 @@ paths:
             type: int
       summary: Get All User Invoices Count
       tags:
-      - Workspaces
+      - Workspace -  Payments
   /workspace/users/{uuid}:
     delete:
       consumes:
@@ -6705,7 +6705,7 @@ paths:
             $ref: '#/definitions/db.WorkspaceUsersData'
       summary: Delete Workspace User
       tags:
-      - Workspaces
+      - Workspace -  Users
     get:
       consumes:
       - application/json
@@ -6727,7 +6727,7 @@ paths:
             type: array
       summary: Get Workspace Users
       tags:
-      - Workspaces
+      - Workspace -  Users
     post:
       consumes:
       - application/json
@@ -6748,7 +6748,7 @@ paths:
             $ref: '#/definitions/db.WorkspaceUsers'
       summary: Create Workspace User
       tags:
-      - Workspaces
+      - Workspace -  Users
   /workspace/users/{uuid}/count:
     get:
       consumes:
@@ -6769,7 +6769,7 @@ paths:
             type: int
       summary: Get Workspace Users Count
       tags:
-      - Workspaces
+      - Workspace -  Users
   /workspace/users/role/{uuid}/{user}:
     get:
       consumes:
@@ -6797,7 +6797,7 @@ paths:
             type: array
       summary: Get User Roles
       tags:
-      - Workspaces
+      - Workspace -  Users
     post:
       consumes:
       - application/json
@@ -6832,7 +6832,7 @@ paths:
             type: array
       summary: Add User Roles
       tags:
-      - Workspaces
+      - Workspace -  Users
   /youtube_videos:
     get:
       consumes:
