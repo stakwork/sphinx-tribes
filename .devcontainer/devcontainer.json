@@ -3,7 +3,7 @@
 	"dockerComposeFile": "docker-compose.yml",
 	"service": "app",
 	"workspaceFolder": "/workspaces/sphinx-tribes",
-  "forwardPorts": [3000, 5432, 5002],
+  "forwardPorts": [13007, 5432, 5002],
   "postCreateCommand": "bash .devcontainer/setup.sh",
   "customizations": {
     "codespaces": {
