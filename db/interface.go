@@ -310,4 +310,11 @@ type Database interface {
 	GetBountiesByWorkspaceAndTimeRange(workspaceId string, startDate time.Time, endDate time.Time) ([]NewBounty, error)
 	GetBountiesByFeatureUuid(featureUuid string) ([]NewBounty, error)
 	GetTicketsByFeatureUUID(featureUuid string) ([]Tickets, error)
+	CreateArtifact(artifact *Artifact) (*Artifact, error)
+	GetArtifactByID(id uuid.UUID) (*Artifact, error)
+	GetArtifactsByMessageID(messageID string) ([]Artifact, error)
+	GetAllArtifactsByChatID(chatID string) ([]Artifact, error)
+	UpdateArtifact(artifact *Artifact) (*Artifact, error)
+	DeleteArtifactByID(id uuid.UUID) error
+	DeleteAllArtifactsByChatID(chatID string) error
 }

@@ -1415,6 +1415,52 @@ type NodeListResponse struct {
 	NodeList []Node `json:"node_list"`
 }
 
+
+type ArtifactType string
+
+const (
+	TextArtifact   ArtifactType = "text"
+	VisualArtifact ArtifactType = "visual"
+	ActionArtifact ArtifactType = "action"
+)
+
+type Artifact struct {
+	ID        uuid.UUID    `json:"id" gorm:"type:uuid;primaryKey"`
+	MessageID string       `json:"message_id" gorm:"index"`
+	Type      ArtifactType `json:"type" gorm:"type:varchar(20);not null"`
+	Content   PropertyMap  `json:"content" gorm:"type:jsonb;not null;default:'{}'::jsonb"`
+	CreatedAt time.Time    `json:"created_at" gorm:"type:timestamp;default:current_timestamp"`
+	UpdatedAt time.Time    `json:"updated_at" gorm:"type:timestamp;default:current_timestamp"`
+}
+
+type TextContent struct {
+	TextType string `json:"text_type"`
+	Content  string `json:"content"`
+}
+
+type VisualContent struct {
+	TextType string    `json:"text_type,omitempty"`
+	URL      string    `json:"url,omitempty"`
+	Examples []Example `json:"examples,omitempty"`
+}
+
+type Example struct {
+	Type string `json:"type"`
+	URL  string `json:"url"`
+}
+
+type ActionContent struct {
+	ActionText string   `json:"action_text"`
+	Options    []Option `json:"options"`
+}
+
+type Option struct {
+	ActionType     string `json:"action_type"`
+	OptionLabel    string `json:"option_label"`
+	OptionResponse string `json:"option_response"`
+	Webhook        string `json:"webhook"`
+}
+
 func (Person) TableName() string {
 	return "people"
 }
