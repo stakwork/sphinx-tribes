@@ -17,6 +17,16 @@ import (
 	"golang.org/x/oauth2"
 )
 
+//	@Summary		Get Github Issue
+//	@Description	Get a Github issue by owner, repo, and issue number
+//	@Tags			Github
+//	@Accept			json
+//	@Produce		json
+//	@Param			owner	path		string	true	"Owner"
+//	@Param			repo	path		string	true	"Repository"
+//	@Param			issue	path		int		true	"Issue Number"
+//	@Success		200		{object}	db.GithubIssue
+//	@Router			/github_issues/{owner}/{repo}/{issue} [get]
 func GetGithubIssue(w http.ResponseWriter, r *http.Request) {
 	owner := chi.URLParam(r, "owner")
 	repo := chi.URLParam(r, "repo")
@@ -35,6 +45,13 @@ func GetGithubIssue(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(issue)
 }
 
+//	@Summary		Get Open Github Issues
+//	@Description	Get the count of open Github issues
+//	@Tags			Github
+//	@Accept			json
+//	@Produce		json
+//	@Success		200	{int}	int
+//	@Router			/github_issues/status/open [get]
 func GetOpenGithubIssues(w http.ResponseWriter, r *http.Request) {
 	issue_count, err := db.DB.GetOpenGithubIssues(r)
 	if err != nil {

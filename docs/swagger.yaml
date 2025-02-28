@@ -41,6 +41,33 @@ definitions:
       workspace:
         type: string
     type: object
+  db.AssetListData:
+    properties:
+      amount:
+        type: integer
+      asset:
+        type: string
+      balance:
+        type: integer
+      creator:
+        type: string
+      icon:
+        type: string
+      id:
+        type: integer
+      name:
+        type: string
+      token:
+        type: string
+    type: object
+  db.Author:
+    enum:
+    - HUMAN
+    - AGENT
+    type: string
+    x-enum-varnames:
+    - HumanAuthor
+    - AgentAuthor
   db.AuthorType:
     enum:
     - human
@@ -49,6 +76,15 @@ definitions:
     x-enum-varnames:
     - HumansAuthor
     - HiveAuthor
+  db.BadgeCreationData:
+    properties:
+      action:
+        type: string
+      badge:
+        type: string
+      tribeId:
+        type: string
+    type: object
   db.Bot:
     properties:
       created:
@@ -184,6 +220,234 @@ definitions:
       workspace:
         $ref: '#/definitions/db.Workspace'
     type: object
+  db.BountyData:
+    properties:
+      assigned_date:
+        type: string
+      assigned_hours:
+        type: integer
+      assignee:
+        type: string
+      assignee_alias:
+        type: string
+      assignee_created:
+        type: string
+      assignee_description:
+        type: string
+      assignee_id:
+        type: integer
+      assignee_img:
+        type: string
+      assignee_route_hint:
+        type: string
+      assignee_updated:
+        type: string
+      award:
+        type: string
+      bounty_created:
+        type: integer
+      bounty_description:
+        type: string
+      bounty_expires:
+        type: string
+      bounty_id:
+        type: integer
+      bounty_owner_id:
+        type: integer
+      bounty_updated:
+        type: string
+      coding_languages:
+        items:
+          type: string
+        type: array
+      commitment_fee:
+        type: integer
+      completed:
+        type: boolean
+      completion_date:
+        type: string
+      created:
+        type: string
+      deleted:
+        type: boolean
+      deliverables:
+        type: string
+      description:
+        type: string
+      estimated_completion_date:
+        type: string
+      estimated_session_length:
+        type: string
+      extras:
+        $ref: '#/definitions/db.PropertyMap'
+      feature_uuid:
+        type: string
+      github_description:
+        type: boolean
+      github_issues:
+        $ref: '#/definitions/db.PropertyMap'
+      id:
+        type: integer
+      img:
+        type: string
+      last_login:
+        type: integer
+      mark_as_paid_date:
+        type: string
+      new_ticket_time:
+        type: integer
+      one_sentence_summary:
+        type: string
+      org_uuid:
+        type: string
+      organization_img:
+        type: string
+      organization_name:
+        type: string
+      organization_uuid:
+        type: string
+      owner_alias:
+        type: string
+      owner_contact_key:
+        type: string
+      owner_created:
+        type: string
+      owner_description:
+        type: string
+      owner_id:
+        type: string
+      owner_img:
+        type: string
+      owner_key:
+        type: string
+      owner_last_login:
+        type: integer
+      owner_price_to_meet:
+        type: integer
+      owner_pubkey:
+        type: string
+      owner_route_hint:
+        type: string
+      owner_tags:
+        items:
+          type: string
+        type: array
+      owner_twitter_confirmed:
+        type: boolean
+      owner_unique_name:
+        type: string
+      owner_updated:
+        type: string
+      owner_uuid:
+        type: string
+      paid:
+        type: boolean
+      paid_date:
+        type: string
+      payment_failed:
+        type: boolean
+      payment_pending:
+        type: boolean
+      phase_priority:
+        type: integer
+      phase_uuid:
+        type: string
+      pow:
+        type: integer
+      price:
+        type: integer
+      price_to_meet:
+        type: integer
+      referred_by:
+        type: integer
+      show:
+        type: boolean
+      tags:
+        items:
+          type: string
+        type: array
+      ticket_url:
+        type: string
+      title:
+        type: string
+      tribe:
+        type: string
+      twitter_confirmed:
+        type: boolean
+      type:
+        type: string
+      unique_name:
+        type: string
+      unlisted:
+        type: boolean
+      updated:
+        type: string
+      uuid:
+        type: string
+      wanted_type:
+        type: string
+      workspace_description:
+        type: string
+      workspace_img:
+        type: string
+      workspace_name:
+        type: string
+      workspace_uuid:
+        type: string
+    type: object
+  db.BountyMetrics:
+    properties:
+      average_completed:
+        type: integer
+      average_paid:
+        type: integer
+      bounties_assigned:
+        type: integer
+      bounties_paid:
+        type: integer
+      bounties_paid_average:
+        type: integer
+      bounties_posted:
+        type: integer
+      new_hunters:
+        type: integer
+      new_hunters_by_period:
+        type: integer
+      new_hunters_paid:
+        type: integer
+      sats_paid:
+        type: integer
+      sats_paid_percentage:
+        type: integer
+      sats_posted:
+        type: integer
+      unique_hunters_paid:
+        type: integer
+    type: object
+  db.BountyResponse:
+    properties:
+      assignee:
+        $ref: '#/definitions/db.Person'
+      bounty:
+        $ref: '#/definitions/db.NewBounty'
+      organization:
+        $ref: '#/definitions/db.WorkspaceShort'
+      owner:
+        $ref: '#/definitions/db.Person'
+      pow:
+        type: integer
+      proofs:
+        items:
+          $ref: '#/definitions/db.ProofOfWork'
+        type: array
+      workspace:
+        $ref: '#/definitions/db.WorkspaceShort'
+    type: object
+  db.BountyRoles:
+    properties:
+      name:
+        type: string
+    type: object
   db.BountyStatus:
     enum:
     - TODO
@@ -200,6 +464,27 @@ definitions:
     - StatusComplete
     - StatusPaid
     - StatusDraft
+  db.BudgetHistoryData:
+    properties:
+      amount:
+        type: integer
+      created:
+        type: string
+      id:
+        type: integer
+      org_uuid:
+        type: string
+      payment_type:
+        $ref: '#/definitions/db.PaymentType'
+      sender_name:
+        type: string
+      sender_pubkey:
+        type: string
+      status:
+        type: boolean
+      updated:
+        type: string
+    type: object
   db.BudgetInvoiceRequest:
     properties:
       amount:
@@ -215,6 +500,18 @@ definitions:
       workspace_uuid:
         type: string
     type: object
+  db.Category:
+    enum:
+    - Web development
+    - Backend development
+    - Design
+    - Other
+    type: string
+    x-enum-varnames:
+    - WebDevelopment
+    - BackendDevelopment
+    - Design
+    - Other
   db.ContentType:
     enum:
     - feature_creation
@@ -227,6 +524,19 @@ definitions:
     - StoryUpdate
     - RequirementChange
     - GeneralUpdate
+  db.FeatureOutput:
+    properties:
+      featureContext:
+        type: string
+      featureUuid:
+        type: string
+      sourceWebsocketId:
+        type: string
+      stories:
+        items:
+          $ref: '#/definitions/db.FeatureStories'
+        type: array
+    type: object
   db.FeaturePhase:
     properties:
       created:
@@ -262,6 +572,41 @@ definitions:
     x-enum-varnames:
     - ActiveFeature
     - ArchivedFeature
+  db.FeatureStories:
+    properties:
+      order:
+        type: integer
+      rationale:
+        type: string
+      userStory:
+        type: string
+    type: object
+  db.FeatureStoriesReponse:
+    properties:
+      output:
+        $ref: '#/definitions/db.FeatureOutput'
+    type: object
+  db.FeatureStory:
+    properties:
+      created:
+        type: string
+      created_by:
+        type: string
+      description:
+        type: string
+      feature_uuid:
+        type: string
+      id:
+        type: integer
+      priority:
+        type: integer
+      updated:
+        type: string
+      updated_by:
+        type: string
+      uuid:
+        type: string
+    type: object
   db.FeaturedBounty:
     properties:
       addedAt:
@@ -277,6 +622,49 @@ definitions:
       url:
         type: string
     type: object
+  db.FileAsset:
+    properties:
+      createdAt:
+        type: string
+      deletedAt:
+        type: string
+      fileHash:
+        type: string
+      fileSize:
+        type: integer
+      id:
+        type: integer
+      lastReferenced:
+        type: string
+      mimeType:
+        type: string
+      originFilename:
+        type: string
+      status:
+        $ref: '#/definitions/db.FileStatus'
+      storagePath:
+        type: string
+      updatedAt:
+        type: string
+      uploadFilename:
+        type: string
+      uploadTime:
+        type: string
+      uploadedBy:
+        type: string
+      workspaceId:
+        type: string
+    type: object
+  db.FileStatus:
+    enum:
+    - active
+    - archived
+    - deleted
+    type: string
+    x-enum-varnames:
+    - ActiveFileStatus
+    - ArchivedFileStatus
+    - DeletedFileStatus
   db.FilterStatusCount:
     properties:
       assigned:
@@ -291,6 +679,17 @@ definitions:
         type: integer
       pending:
         type: integer
+    type: object
+  db.GithubIssue:
+    properties:
+      assignee:
+        type: string
+      description:
+        type: string
+      status:
+        type: string
+      title:
+        type: string
     type: object
   db.Invoice:
     properties:
@@ -514,6 +913,54 @@ definitions:
           $ref: '#/definitions/db.Node'
         type: array
     type: object
+  db.PaymentDateRange:
+    properties:
+      end_date:
+        type: string
+      payment_type:
+        $ref: '#/definitions/db.PaymentType'
+      start_date:
+        type: string
+    type: object
+  db.PaymentHistoryData:
+    properties:
+      amount:
+        type: integer
+      bounty_id:
+        type: integer
+      created:
+        type: string
+      error:
+        type: string
+      id:
+        type: integer
+      org_uuid:
+        type: string
+      payment_status:
+        type: string
+      payment_type:
+        $ref: '#/definitions/db.PaymentType'
+      receiver_img:
+        type: string
+      receiver_name:
+        type: string
+      receiver_pubkey:
+        type: string
+      sender_img:
+        type: string
+      sender_name:
+        type: string
+      sender_pubkey:
+        type: string
+      status:
+        type: boolean
+      tag:
+        type: string
+      updated:
+        type: string
+      workspace_uuid:
+        type: string
+    type: object
   db.PaymentType:
     enum:
     - deposit
@@ -526,6 +973,13 @@ definitions:
     - Withdraw
     - Payment
     - Reversal
+  db.PeopleExtra:
+    properties:
+      body:
+        type: string
+      person:
+        type: string
+    type: object
   db.Person:
     properties:
       created:
@@ -588,6 +1042,23 @@ definitions:
       uuid:
         type: string
     type: object
+  db.PhasePlan:
+    properties:
+      phaseApproach:
+        type: string
+      stubTickets:
+        items:
+          $ref: '#/definitions/db.StubTicket'
+        type: array
+    type: object
+  db.PlanStatus:
+    enum:
+    - DRAFT
+    - APPROVED
+    type: string
+    x-enum-varnames:
+    - DraftPlan
+    - ApprovedPlan
   db.ProofOfWork:
     properties:
       bounty_id:
@@ -617,6 +1088,236 @@ definitions:
     - ChangeRequestedStatus
   db.PropertyMap:
     additionalProperties: true
+    type: object
+  db.QuickBountiesResponse:
+    properties:
+      featureID:
+        type: string
+      phases:
+        additionalProperties:
+          items:
+            $ref: '#/definitions/db.QuickBountyItem'
+          type: array
+        type: object
+      unphased:
+        items:
+          $ref: '#/definitions/db.QuickBountyItem'
+        type: array
+    type: object
+  db.QuickBountyItem:
+    properties:
+      assignedAlias:
+        type: string
+      bountyID:
+        type: integer
+      bountyTitle:
+        type: string
+      phaseID:
+        type: string
+      status:
+        $ref: '#/definitions/db.BountyStatus'
+    type: object
+  db.QuickTicketItem:
+    properties:
+      assignedAlias:
+        type: string
+      phaseID:
+        type: string
+      status:
+        $ref: '#/definitions/db.BountyStatus'
+      ticketTitle:
+        type: string
+      ticketUUID:
+        type: string
+    type: object
+  db.QuickTicketsResponse:
+    properties:
+      featureID:
+        type: string
+      phases:
+        additionalProperties:
+          items:
+            $ref: '#/definitions/db.QuickTicketItem'
+          type: array
+        type: object
+      unphased:
+        items:
+          $ref: '#/definitions/db.QuickTicketItem'
+        type: array
+    type: object
+  db.StatusBudget:
+    properties:
+      assigned_budget:
+        type: integer
+      assigned_count:
+        type: integer
+      assigned_difference:
+        type: integer
+      completed_budget:
+        type: integer
+      completed_count:
+        type: integer
+      completed_difference:
+        type: integer
+      current_budget:
+        type: integer
+      open_budget:
+        type: integer
+      open_count:
+        type: integer
+      open_difference:
+        type: integer
+      org_uuid:
+        type: string
+      workspace_uuid:
+        type: string
+    type: object
+  db.StubTicket:
+    properties:
+      reasoning:
+        type: string
+      ticketDescription:
+        type: string
+      ticketName:
+        type: string
+    type: object
+  db.TextSnippet:
+    properties:
+      date_created:
+        type: string
+      id:
+        type: integer
+      last_edited:
+        type: string
+      snippet:
+        type: string
+      title:
+        type: string
+      workspace_uuid:
+        type: string
+    type: object
+  db.TicketPlan:
+    properties:
+      created_at:
+        type: string
+      created_by:
+        type: string
+      description:
+        type: string
+      feature_uuid:
+        type: string
+      featurePhase:
+        $ref: '#/definitions/db.FeaturePhase'
+      features:
+        $ref: '#/definitions/db.WorkspaceFeatures'
+      name:
+        type: string
+      phase_uuid:
+        type: string
+      status:
+        $ref: '#/definitions/db.PlanStatus'
+      ticket_groups:
+        items:
+          type: string
+        type: array
+      updated_at:
+        type: string
+      updated_by:
+        type: string
+      uuid:
+        type: string
+      version:
+        type: integer
+      workspace_uuid:
+        type: string
+    type: object
+  db.TicketPlanReviewRequest:
+    properties:
+      requestUUID:
+        type: string
+      sourceWebsocket:
+        type: string
+      value:
+        properties:
+          featureUUID:
+            type: string
+          phasePlan:
+            $ref: '#/definitions/db.PhasePlan'
+          phaseUUID:
+            type: string
+        type: object
+    type: object
+  db.TicketPlanReviewResponse:
+    properties:
+      errors:
+        items:
+          type: string
+        type: array
+      message:
+        type: string
+      success:
+        type: boolean
+    type: object
+  db.TicketStatus:
+    enum:
+    - DRAFT
+    - READY
+    - IN_PROGRESS
+    - TEST
+    - DEPLOY
+    - PAY
+    - COMPLETED
+    type: string
+    x-enum-varnames:
+    - DraftTicket
+    - ReadyTicket
+    - InProgressTicket
+    - TestTicket
+    - DeployTicket
+    - PayTicket
+    - CompletedTicket
+  db.Tickets:
+    properties:
+      amount:
+        type: integer
+      author:
+        $ref: '#/definitions/db.Author'
+      author_id:
+        type: string
+      category:
+        $ref: '#/definitions/db.Category'
+      created_at:
+        type: string
+      dependency:
+        items:
+          type: integer
+        type: array
+      description:
+        type: string
+      feature_uuid:
+        type: string
+      featurePhase:
+        $ref: '#/definitions/db.FeaturePhase'
+      features:
+        $ref: '#/definitions/db.WorkspaceFeatures'
+      name:
+        type: string
+      phase_uuid:
+        type: string
+      sequence:
+        type: integer
+      status:
+        $ref: '#/definitions/db.TicketStatus'
+      ticket_group:
+        type: string
+      updated_at:
+        type: string
+      uuid:
+        type: string
+      version:
+        type: integer
+      workspace_uuid:
+        type: string
     type: object
   db.Tribe:
     properties:
@@ -686,6 +1387,43 @@ definitions:
       uuid:
         type: string
     type: object
+  db.WfRequest:
+    properties:
+      action:
+        type: string
+      created_at:
+        type: string
+      id:
+        type: integer
+      project_id:
+        type: string
+      request_data:
+        $ref: '#/definitions/db.PropertyMap'
+      request_id:
+        type: string
+      response_data:
+        $ref: '#/definitions/db.PropertyMap'
+      source:
+        type: string
+      status:
+        $ref: '#/definitions/db.WfRequestStatus'
+      updated_at:
+        type: string
+      workflow_id:
+        type: string
+    type: object
+  db.WfRequestStatus:
+    enum:
+    - NEW
+    - PENDING
+    - COMPLETED
+    - FAILED
+    type: string
+    x-enum-varnames:
+    - StatusNew
+    - StatusPending
+    - StatusCompleted
+    - StatusFailed
   db.Workspace:
     properties:
       bounty_count:
@@ -726,6 +1464,29 @@ definitions:
       website:
         type: string
     type: object
+  db.WorkspaceCodeGraph:
+    properties:
+      created:
+        type: string
+      created_by:
+        type: string
+      id:
+        type: integer
+      name:
+        type: string
+      secret_alias:
+        type: string
+      updated:
+        type: string
+      updated_by:
+        type: string
+      url:
+        type: string
+      uuid:
+        type: string
+      workspace_uuid:
+        type: string
+    type: object
   db.WorkspaceFeatures:
     properties:
       architecture:
@@ -763,6 +1524,283 @@ definitions:
       workspace_uuid:
         type: string
     type: object
+  db.WorkspaceRepositories:
+    properties:
+      created:
+        type: string
+      created_by:
+        type: string
+      id:
+        type: integer
+      name:
+        type: string
+      updated:
+        type: string
+      updated_by:
+        type: string
+      url:
+        type: string
+      uuid:
+        type: string
+      workspace_uuid:
+        type: string
+    type: object
+  db.WorkspaceShort:
+    properties:
+      img:
+        type: string
+      name:
+        type: string
+      uuid:
+        type: string
+    type: object
+  db.WorkspaceUserRoles:
+    properties:
+      created:
+        type: string
+      org_uuid:
+        type: string
+      owner_pubkey:
+        type: string
+      role:
+        type: string
+      workspace_uuid:
+        type: string
+    type: object
+  db.WorkspaceUsers:
+    properties:
+      created:
+        type: string
+      id:
+        type: integer
+      org_uuid:
+        type: string
+      owner_pubkey:
+        type: string
+      updated:
+        type: string
+      workspace_uuid:
+        type: string
+    type: object
+  db.WorkspaceUsersData:
+    properties:
+      created:
+        type: string
+      deleted:
+        type: boolean
+      description:
+        type: string
+      extras:
+        $ref: '#/definitions/db.PropertyMap'
+      github_issues:
+        $ref: '#/definitions/db.PropertyMap'
+      id:
+        type: integer
+      img:
+        type: string
+      last_login:
+        type: integer
+      new_ticket_time:
+        type: integer
+      org_uuid:
+        type: string
+      owner_alias:
+        type: string
+      owner_contact_key:
+        type: string
+      owner_pubkey:
+        type: string
+      owner_route_hint:
+        type: string
+      price_to_meet:
+        type: integer
+      referred_by:
+        type: integer
+      tags:
+        items:
+          type: string
+        type: array
+      twitter_confirmed:
+        type: boolean
+      unique_name:
+        type: string
+      unlisted:
+        type: boolean
+      updated:
+        type: string
+      user_created:
+        type: string
+      uuid:
+        type: string
+      workspace_uuid:
+        type: string
+    type: object
+  db.YoutubeDownload:
+    properties:
+      youtube_urls:
+        items:
+          type: string
+        type: array
+    type: object
+  feeds.Destination:
+    properties:
+      address:
+        type: string
+      customKey:
+        type: string
+      customValue:
+        type: string
+      split: {}
+      type:
+        type: string
+    type: object
+  feeds.Episode:
+    properties:
+      datePublished:
+        type: integer
+      description:
+        type: string
+      enclosureLength:
+        type: integer
+      enclosureType:
+        type: string
+      enclosureUrl:
+        type: string
+      feedId:
+        type: integer
+      feedUrl:
+        description: for search
+        type: string
+      id:
+        type: integer
+      image:
+        type: string
+      link:
+        type: string
+      title:
+        type: string
+    type: object
+  feeds.Feed:
+    properties:
+      author:
+        type: string
+      contentType:
+        type: string
+      datePublished:
+        type: integer
+      dateUpdated:
+        type: integer
+      description:
+        type: string
+      feedType:
+        description: podcast, video, blog
+        type: integer
+      generator:
+        type: string
+      id:
+        type: string
+      imageUrl:
+        type: string
+      itemId:
+        type: string
+      items:
+        items:
+          $ref: '#/definitions/feeds.Item'
+        type: array
+      language:
+        type: string
+      link:
+        type: string
+      ownerUrl:
+        type: string
+      title:
+        type: string
+      url:
+        type: string
+      value:
+        $ref: '#/definitions/feeds.Value'
+    type: object
+  feeds.Item:
+    properties:
+      author:
+        type: string
+      datePublished:
+        type: integer
+      dateUpdated:
+        type: integer
+      description:
+        type: string
+      duration:
+        type: integer
+      enclosureType:
+        type: string
+      enclosureUrl:
+        type: string
+      feedId:
+        description: for search
+        type: string
+      feedType:
+        type: integer
+      id:
+        type: string
+      imageUrl:
+        type: string
+      link:
+        type: string
+      thumbnailUrl:
+        type: string
+      title:
+        type: string
+      url:
+        type: string
+    type: object
+  feeds.Model:
+    properties:
+      suggested:
+        type: string
+      type:
+        type: string
+    type: object
+  feeds.Podcast:
+    properties:
+      author:
+        type: string
+      contentType:
+        type: string
+      description:
+        type: string
+      episodes:
+        items:
+          $ref: '#/definitions/feeds.Episode'
+        type: array
+      generator:
+        type: string
+      id:
+        type: integer
+      image:
+        type: string
+      language:
+        type: string
+      lastUpdateTime:
+        type: integer
+      link:
+        type: string
+      title:
+        type: string
+      url:
+        type: string
+      value:
+        $ref: '#/definitions/feeds.Value'
+    type: object
+  feeds.Value:
+    properties:
+      destinations:
+        items:
+          $ref: '#/definitions/feeds.Destination'
+        type: array
+      model:
+        $ref: '#/definitions/feeds.Model'
+    type: object
   handlers.ActivityContentRequest:
     properties:
       content:
@@ -776,6 +1814,13 @@ definitions:
         type: string
       success:
         type: boolean
+    type: object
+  handlers.AddFeatureFlagEndpointRequest:
+    properties:
+      endpoints:
+        items:
+          type: string
+        type: array
     type: object
   handlers.BountyTimingResponse:
     properties:
@@ -797,6 +1842,46 @@ definitions:
         type: integer
       total_work_time_seconds:
         type: integer
+    type: object
+  handlers.BuildMessageRequest:
+    properties:
+      question:
+        type: string
+    type: object
+  handlers.BulkConversionResponse:
+    properties:
+      message:
+        type: string
+      results:
+        items:
+          $ref: '#/definitions/handlers.BulkConversionResult'
+        type: array
+      success:
+        type: boolean
+    type: object
+  handlers.BulkConversionResult:
+    properties:
+      bounty_id:
+        type: integer
+      message:
+        type: string
+      success:
+        type: boolean
+    type: object
+  handlers.BulkTicketToBountyRequest:
+    properties:
+      tickets_to_bounties:
+        items:
+          $ref: '#/definitions/handlers.TicketToBountyItem'
+        type: array
+    type: object
+  handlers.ChatResponse:
+    properties:
+      data: {}
+      message:
+        type: string
+      success:
+        type: boolean
     type: object
   handlers.CreateActivityRequest:
     properties:
@@ -825,6 +1910,230 @@ definitions:
       workspace:
         type: string
     type: object
+  handlers.CreateBountyResponse:
+    properties:
+      bounty_id:
+        type: integer
+      message:
+        type: string
+      success:
+        type: boolean
+    type: object
+  handlers.CreateFeatureFlagRequest:
+    properties:
+      description:
+        type: string
+      enabled:
+        type: boolean
+      endpoints:
+        items:
+          type: string
+        type: array
+      name:
+        type: string
+    type: object
+  handlers.CreateOrEditChatRequest:
+    properties:
+      title:
+        type: string
+      workspaceId:
+        type: string
+    type: object
+  handlers.CreateOrEditTicket:
+    properties:
+      description:
+        type: string
+      name:
+        type: string
+      status:
+        $ref: '#/definitions/db.TicketStatus'
+    type: object
+  handlers.CreateTicketPlanRequest:
+    properties:
+      description:
+        type: string
+      feature_id:
+        type: string
+      name:
+        type: string
+      phase_id:
+        type: string
+      source_websocket:
+        type: string
+      ticket_group_ids:
+        items:
+          type: string
+        type: array
+    type: object
+  handlers.CreateWorkflowRequestRequest:
+    properties:
+      request_id:
+        type: string
+      response_data:
+        $ref: '#/definitions/db.PropertyMap'
+    type: object
+  handlers.FeatureFlagResponse:
+    properties:
+      data: {}
+      message:
+        type: string
+      success:
+        type: boolean
+    type: object
+  handlers.FileResponse:
+    properties:
+      asset:
+        $ref: '#/definitions/db.FileAsset'
+      isExisting:
+        type: boolean
+      success:
+        type: boolean
+      uploadTime:
+        type: string
+      url:
+        type: string
+    type: object
+  handlers.HistoryChatResponse:
+    properties:
+      data: {}
+      success:
+        type: boolean
+    type: object
+  handlers.ProcessChatRequest:
+    properties:
+      value:
+        properties:
+          chatId:
+            type: string
+          messageId:
+            type: string
+          response:
+            type: string
+          sourceWebsocketId:
+            type: string
+        type: object
+    type: object
+  handlers.SendMessageRequest:
+    properties:
+      chat_id:
+        type: string
+      contextTags:
+        items:
+          properties:
+            id:
+              type: string
+            type:
+              type: string
+          type: object
+        type: array
+      message:
+        type: string
+      modelSelection:
+        type: string
+      pdf_url:
+        type: string
+      sourceWebsocketId:
+        type: string
+      workspaceUUID:
+        type: string
+    type: object
+  handlers.SendTicketPlanRequest:
+    properties:
+      feature_id:
+        type: string
+      phase_id:
+        type: string
+      request_uuid:
+        type: string
+      source_websocket:
+        type: string
+      ticket_group_ids:
+        items:
+          type: string
+        type: array
+    type: object
+  handlers.SendTicketPlanResponse:
+    properties:
+      errors:
+        items:
+          type: string
+        type: array
+      message:
+        type: string
+      request_uuid:
+        type: string
+      success:
+        type: boolean
+    type: object
+  handlers.SnippetRequest:
+    properties:
+      snippet:
+        type: string
+      title:
+        type: string
+    type: object
+  handlers.TicketPlanResponse:
+    properties:
+      errors:
+        items:
+          type: string
+        type: array
+      message:
+        type: string
+      plan_id:
+        type: string
+      success:
+        type: boolean
+    type: object
+  handlers.TicketResponse:
+    properties:
+      errors:
+        items:
+          type: string
+        type: array
+      message:
+        type: string
+      success:
+        type: boolean
+      ticket_id:
+        type: string
+    type: object
+  handlers.TicketToBountyItem:
+    properties:
+      ticketUUID:
+        type: string
+    type: object
+  handlers.UpdateFeatureFlagEndpointRequest:
+    properties:
+      new_endpoint_path:
+        type: string
+    type: object
+  handlers.UpdateFeatureFlagRequest:
+    properties:
+      description:
+        type: string
+      enabled:
+        type: boolean
+      name:
+        type: string
+    type: object
+  handlers.UpdateTicketRequest:
+    properties:
+      metadata:
+        properties:
+          id:
+            type: string
+          source:
+            type: string
+        type: object
+      ticket:
+        $ref: '#/definitions/db.Tickets'
+    type: object
+  handlers.UpdateTicketSequenceRequest:
+    properties:
+      ticket:
+        $ref: '#/definitions/db.Tickets'
+    type: object
   handlers.WantedsHeaderResponse:
     properties:
       bounties_count:
@@ -835,6 +2144,29 @@ definitions:
         items:
           $ref: '#/definitions/db.PersonInShort'
         type: array
+    type: object
+  utils.TicketReviewRequest:
+    properties:
+      requestUUID:
+        type: string
+      sourceWebsocket:
+        type: string
+      value:
+        properties:
+          featureUUID:
+            type: string
+          phaseUUID:
+            type: string
+          ticketDescription:
+            type: string
+          ticketName:
+            type: string
+          ticketUUID:
+            type: string
+        required:
+        - ticketDescription
+        - ticketUUID
+        type: object
     type: object
 host: localhost:5002
 info:
@@ -1145,7 +2477,53 @@ paths:
       summary: Get admin pubkeys
       tags:
       - Auth
+  /bot/{name}:
+    get:
+      description: Get a bot by unique name
+      parameters:
+      - description: Unique name
+        in: path
+        name: unique_name
+        required: true
+        type: string
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/db.Bot'
+      summary: Get a bot by unique name
+      tags:
+      - Bots
+  /bot/{uuid}:
+    delete:
+      description: Delete a bot by UUID
+      parameters:
+      - description: Bot UUID
+        in: path
+        name: uuid
+        required: true
+        type: string
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: boolean
+      summary: Delete a bot
+      tags:
+      - Bots
   /bots:
+    get:
+      description: Get a list of listed bots
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/db.Bot'
+            type: array
+      summary: Get listed bots
+      tags:
+      - Bots
     put:
       description: Create or edit a bot
       parameters:
@@ -1164,22 +2542,6 @@ paths:
       tags:
       - Bots
   /bots/{uuid}:
-    delete:
-      description: Delete a bot by UUID
-      parameters:
-      - description: Bot UUID
-        in: path
-        name: uuid
-        required: true
-        type: string
-      responses:
-        "200":
-          description: OK
-          schema:
-            type: boolean
-      summary: Delete a bot
-      tags:
-      - Bots
     get:
       description: Get a bot by UUID
       parameters:
@@ -1194,19 +2556,6 @@ paths:
           schema:
             $ref: '#/definitions/db.Bot'
       summary: Get a bot
-      tags:
-      - Bots
-  /bots/listed:
-    get:
-      description: Get a list of listed bots
-      responses:
-        "200":
-          description: OK
-          schema:
-            items:
-              $ref: '#/definitions/db.Bot'
-            type: array
-      summary: Get listed bots
       tags:
       - Bots
   /bots/owner/{pubkey}:
@@ -1247,23 +2596,6 @@ paths:
       summary: Search bots
       tags:
       - Bots
-  /bots/unique/{unique_name}:
-    get:
-      description: Get a bot by unique name
-      parameters:
-      - description: Unique name
-        in: path
-        name: unique_name
-        required: true
-        type: string
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/db.Bot'
-      summary: Get a bot by unique name
-      tags:
-      - Bots
   /bots/unique_name:
     get:
       description: Get unique name from bot name
@@ -1281,6 +2613,1105 @@ paths:
       summary: Get unique name from bot name
       tags:
       - Bots
+  /bounties/ticket/{ticket_group}/sequence:
+    post:
+      consumes:
+      - application/json
+      description: Update the sequence of tickets in a group
+      parameters:
+      - description: Ticket Group UUID
+        in: path
+        name: ticket_group
+        required: true
+        type: string
+      - description: Update Ticket Sequence Request
+        in: body
+        name: ticket
+        required: true
+        schema:
+          $ref: '#/definitions/handlers.UpdateTicketSequenceRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Ticket sequences updated successfully
+          schema:
+            type: string
+      summary: Update Ticket Sequence
+      tags:
+      - Tickets
+  /bounties/ticket/{ticket_uuid}/bounty:
+    post:
+      consumes:
+      - application/json
+      description: Convert a ticket to a bounty
+      parameters:
+      - description: Ticket UUID
+        in: path
+        name: ticket_uuid
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/handlers.CreateBountyResponse'
+      summary: Convert Ticket to Bounty
+      tags:
+      - Tickets
+  /bounties/ticket/{uuid}:
+    delete:
+      consumes:
+      - application/json
+      description: Delete a ticket by its UUID
+      parameters:
+      - description: Ticket UUID
+        in: path
+        name: uuid
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Ticket group deleted successfully
+          schema:
+            type: string
+      summary: Delete Ticket
+      tags:
+      - Tickets
+    get:
+      consumes:
+      - application/json
+      description: Get a ticket by its UUID
+      parameters:
+      - description: Ticket UUID
+        in: path
+        name: uuid
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/db.Tickets'
+      summary: Get Ticket
+      tags:
+      - Tickets
+    post:
+      consumes:
+      - application/json
+      description: Update an existing ticket
+      parameters:
+      - description: Ticket UUID
+        in: path
+        name: uuid
+        required: true
+        type: string
+      - description: Update Ticket Request
+        in: body
+        name: ticket
+        required: true
+        schema:
+          $ref: '#/definitions/handlers.UpdateTicketRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/db.Tickets'
+      summary: Update Ticket
+      tags:
+      - Tickets
+  /bounties/ticket/bounty/bulk:
+    post:
+      consumes:
+      - application/json
+      description: Convert multiple tickets to bounties
+      parameters:
+      - description: Bulk Ticket to Bounty Request
+        in: body
+        name: req
+        required: true
+        schema:
+          $ref: '#/definitions/handlers.BulkTicketToBountyRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/handlers.BulkConversionResponse'
+      summary: Convert Tickets to Bounties
+      tags:
+      - Tickets
+  /bounties/ticket/feature/{feature_uuid}/phase/{phase_uuid}:
+    get:
+      consumes:
+      - application/json
+      description: Get tickets by phase UUID
+      parameters:
+      - description: Feature UUID
+        in: path
+        name: feature_uuid
+        required: true
+        type: string
+      - description: Phase UUID
+        in: path
+        name: phase_uuid
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/db.Tickets'
+            type: array
+      summary: Get Tickets by Phase UUID
+      tags:
+      - Tickets
+  /bounties/ticket/group/{group_uuid}:
+    get:
+      consumes:
+      - application/json
+      description: Get tickets by group UUID
+      parameters:
+      - description: Group UUID
+        in: path
+        name: group_uuid
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/db.Tickets'
+            type: array
+      summary: Get Tickets by Group
+      tags:
+      - Tickets
+  /bounties/ticket/plan:
+    post:
+      consumes:
+      - application/json
+      description: Create a new ticket plan
+      parameters:
+      - description: Create Ticket Plan Request
+        in: body
+        name: planRequest
+        required: true
+        schema:
+          $ref: '#/definitions/handlers.CreateTicketPlanRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/handlers.TicketPlanResponse'
+      summary: Create Ticket Plan
+      tags:
+      - Ticket Plans
+  /bounties/ticket/plan/{uuid}:
+    delete:
+      consumes:
+      - application/json
+      description: Delete a ticket plan by its UUID
+      parameters:
+      - description: Ticket Plan UUID
+        in: path
+        name: uuid
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Ticket plan deleted successfully
+          schema:
+            type: string
+      summary: Delete Ticket Plan
+      tags:
+      - Ticket Plans
+    get:
+      consumes:
+      - application/json
+      description: Get a ticket plan by its UUID
+      parameters:
+      - description: Ticket Plan UUID
+        in: path
+        name: uuid
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/db.TicketPlan'
+      summary: Get Ticket Plan
+      tags:
+      - Ticket Plans
+  /bounties/ticket/plan/feature/{feature_uuid}:
+    get:
+      consumes:
+      - application/json
+      description: Get ticket plans by feature UUID
+      parameters:
+      - description: Feature UUID
+        in: path
+        name: feature_uuid
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/db.TicketPlan'
+            type: array
+      summary: Get Ticket Plans by Feature
+      tags:
+      - Ticket Plans
+  /bounties/ticket/plan/phase/{phase_uuid}:
+    get:
+      consumes:
+      - application/json
+      description: Get ticket plans by phase UUID
+      parameters:
+      - description: Phase UUID
+        in: path
+        name: phase_uuid
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/db.TicketPlan'
+            type: array
+      summary: Get Ticket Plans by Phase
+      tags:
+      - Ticket Plans
+  /bounties/ticket/plan/review:
+    post:
+      consumes:
+      - application/json
+      description: Process the review of a ticket plan
+      parameters:
+      - description: Ticket Plan Review Request
+        in: body
+        name: planReview
+        required: true
+        schema:
+          $ref: '#/definitions/db.TicketPlanReviewRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/db.TicketPlanReviewResponse'
+      summary: Process Ticket Plan Review
+      tags:
+      - Ticket Plans
+  /bounties/ticket/plan/send:
+    post:
+      consumes:
+      - application/json
+      description: Send a ticket plan to Stakwork for processing
+      parameters:
+      - description: Send Ticket Plan Request
+        in: body
+        name: planRequest
+        required: true
+        schema:
+          $ref: '#/definitions/handlers.SendTicketPlanRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/handlers.SendTicketPlanResponse'
+      summary: Send Ticket Plan to Stakwork
+      tags:
+      - Ticket Plans
+  /bounties/ticket/plan/workspace/{workspace_uuid}:
+    get:
+      consumes:
+      - application/json
+      description: Get ticket plans by workspace UUID
+      parameters:
+      - description: Workspace UUID
+        in: path
+        name: workspace_uuid
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/db.TicketPlan'
+            type: array
+      summary: Get Ticket Plans by Workspace
+      tags:
+      - Ticket Plans
+  /bounties/ticket/review:
+    post:
+      consumes:
+      - application/json
+      description: Process the review of a ticket
+      parameters:
+      - description: Ticket Review Request
+        in: body
+        name: reviewReq
+        required: true
+        schema:
+          $ref: '#/definitions/utils.TicketReviewRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/db.Tickets'
+      summary: Process Ticket Review
+      tags:
+      - Tickets
+  /bounties/ticket/review/send:
+    post:
+      consumes:
+      - application/json
+      description: Post ticket data to Stakwork for processing
+      parameters:
+      - description: Update Ticket Request
+        in: body
+        name: ticketRequest
+        required: true
+        schema:
+          $ref: '#/definitions/handlers.UpdateTicketRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/handlers.TicketResponse'
+      summary: Post Ticket Data to Stakwork
+      tags:
+      - Tickets
+  /bounties/ticket/workspace/{workspace_uuid}/draft:
+    post:
+      consumes:
+      - application/json
+      description: Create a draft ticket for a workspace
+      parameters:
+      - description: Workspace UUID
+        in: path
+        name: workspace_uuid
+        required: true
+        type: string
+      - description: Create Draft Ticket Request
+        in: body
+        name: ticketRequest
+        required: true
+        schema:
+          $ref: '#/definitions/handlers.CreateOrEditTicket'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/db.Tickets'
+      summary: Create Workspace Draft Ticket
+      tags:
+      - Tickets
+  /bounties/ticket/workspace/{workspace_uuid}/draft/{uuid}:
+    delete:
+      consumes:
+      - application/json
+      description: Delete a draft ticket for a workspace by its UUID
+      parameters:
+      - description: Workspace UUID
+        in: path
+        name: workspace_uuid
+        required: true
+        type: string
+      - description: Ticket UUID
+        in: path
+        name: uuid
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "204":
+          description: No Content
+          schema:
+            type: string
+      summary: Delete Workspace Draft Ticket
+      tags:
+      - Tickets
+    get:
+      consumes:
+      - application/json
+      description: Get a draft ticket for a workspace by its UUID
+      parameters:
+      - description: Workspace UUID
+        in: path
+        name: workspace_uuid
+        required: true
+        type: string
+      - description: Ticket UUID
+        in: path
+        name: uuid
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/db.Tickets'
+      summary: Get Workspace Draft Ticket
+      tags:
+      - Tickets
+    post:
+      consumes:
+      - application/json
+      description: Update a draft ticket for a workspace
+      parameters:
+      - description: Workspace UUID
+        in: path
+        name: workspace_uuid
+        required: true
+        type: string
+      - description: Ticket UUID
+        in: path
+        name: uuid
+        required: true
+        type: string
+      - description: Update Draft Ticket Request
+        in: body
+        name: ticketRequest
+        required: true
+        schema:
+          $ref: '#/definitions/handlers.CreateOrEditTicket'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/db.Tickets'
+      summary: Update Workspace Draft Ticket
+      tags:
+      - Tickets
+  /bounty/leaderboard:
+    get:
+      description: Get bounties leaderboard
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              items:
+                $ref: '#/definitions/db.LeaderData'
+              type: array
+            type: array
+      summary: Get bounties leaderboard
+      tags:
+      - Go Bounties
+  /feature_flags:
+    get:
+      description: Get a list of all feature flags
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/handlers.FeatureFlagResponse'
+      summary: Get all feature flags
+      tags:
+      - Feature Flag
+    post:
+      description: Create a new feature flag with specified details
+      parameters:
+      - description: Feature flag details
+        in: body
+        name: feature_flag
+        required: true
+        schema:
+          $ref: '#/definitions/handlers.CreateFeatureFlagRequest'
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/handlers.FeatureFlagResponse'
+      summary: Create a new feature flag
+      tags:
+      - Feature Flag
+  /feature_flags/{feature_flag_id}/endpoints:
+    post:
+      description: Add new endpoints to an existing feature flag
+      parameters:
+      - description: Feature flag ID
+        in: path
+        name: feature_flag_id
+        required: true
+        type: string
+      - description: Endpoints to add
+        in: body
+        name: endpoints
+        required: true
+        schema:
+          $ref: '#/definitions/handlers.AddFeatureFlagEndpointRequest'
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/handlers.FeatureFlagResponse'
+      summary: Add endpoints to a feature flag
+      tags:
+      - Feature Flag
+  /feature_flags/{feature_flag_id}/endpoints/{endpoint_id}:
+    delete:
+      description: Delete an endpoint of a feature flag by ID
+      parameters:
+      - description: Feature flag ID
+        in: path
+        name: feature_flag_id
+        required: true
+        type: string
+      - description: Endpoint ID
+        in: path
+        name: endpoint_id
+        required: true
+        type: string
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/handlers.FeatureFlagResponse'
+      summary: Delete an endpoint of a feature flag
+      tags:
+      - Feature Flag
+    put:
+      description: Update the details of an endpoint of an existing feature flag
+      parameters:
+      - description: Feature flag ID
+        in: path
+        name: feature_flag_id
+        required: true
+        type: string
+      - description: Endpoint ID
+        in: path
+        name: endpoint_id
+        required: true
+        type: string
+      - description: Updated endpoint details
+        in: body
+        name: endpoint
+        required: true
+        schema:
+          $ref: '#/definitions/handlers.UpdateFeatureFlagEndpointRequest'
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/handlers.FeatureFlagResponse'
+      summary: Update an endpoint of a feature flag
+      tags:
+      - Feature Flag
+  /feature_flags/{id}:
+    delete:
+      description: Delete a feature flag by ID
+      parameters:
+      - description: Feature flag ID
+        in: path
+        name: id
+        required: true
+        type: string
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/handlers.FeatureFlagResponse'
+      summary: Delete a feature flag
+      tags:
+      - Feature Flag
+    put:
+      description: Update the details of an existing feature flag
+      parameters:
+      - description: Feature flag ID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Updated feature flag details
+        in: body
+        name: feature_flag
+        required: true
+        schema:
+          $ref: '#/definitions/handlers.UpdateFeatureFlagRequest'
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/handlers.FeatureFlagResponse'
+      summary: Update an existing feature flag
+      tags:
+      - Feature Flag
+  /features:
+    post:
+      consumes:
+      - application/json
+      description: Create or edit features
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/db.WorkspaceFeatures'
+      summary: Create or Edit Features
+      tags:
+      - Features
+  /features/{feature_uuid}/phase:
+    get:
+      consumes:
+      - application/json
+      description: Get phases of a feature by its UUID
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/db.FeaturePhase'
+            type: array
+      summary: Get Feature Phases
+      tags:
+      - Features
+  /features/{feature_uuid}/phase/{phase_uuid}:
+    delete:
+      consumes:
+      - application/json
+      description: Delete a phase of a feature by its UUID
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Phase deleted successfully
+          schema:
+            type: string
+      summary: Delete Feature Phase
+      tags:
+      - Features
+    get:
+      consumes:
+      - application/json
+      description: Get a phase of a feature by its UUID
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/db.FeaturePhase'
+      summary: Get Feature Phase by UUID
+      tags:
+      - Features
+  /features/{feature_uuid}/phase/{phase_uuid}/bounty:
+    get:
+      consumes:
+      - application/json
+      description: Get bounties of a feature by its UUID and phase UUID
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/db.BountyResponse'
+            type: array
+      summary: Get Bounties by Feature and Phase UUID
+      tags:
+      - Features
+  /features/{feature_uuid}/phase/{phase_uuid}/bounty/count:
+    get:
+      consumes:
+      - application/json
+      description: Get the count of bounties of a feature by its UUID and phase UUID
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: int
+      summary: Get Bounties Count by Feature and Phase UUID
+      tags:
+      - Features
+  /features/{feature_uuid}/quick-bounties:
+    get:
+      consumes:
+      - application/json
+      description: Get quick bounties of a feature by its UUID
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/db.QuickBountiesResponse'
+      summary: Get Quick Bounties
+      tags:
+      - Features
+  /features/{feature_uuid}/quick-tickets:
+    get:
+      consumes:
+      - application/json
+      description: Get quick tickets of a feature by its UUID
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/db.QuickTicketsResponse'
+      summary: Get Quick Tickets
+      tags:
+      - Features
+  /features/{feature_uuid}/story:
+    get:
+      consumes:
+      - application/json
+      description: Get stories of a feature by its UUID
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/db.FeatureStory'
+            type: array
+      summary: Get Stories by Feature UUID
+      tags:
+      - Features
+  /features/{feature_uuid}/story/{story_uuid}:
+    delete:
+      consumes:
+      - application/json
+      description: Delete a story of a feature by its UUID
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Story deleted successfully
+          schema:
+            type: string
+      summary: Delete Story
+      tags:
+      - Features
+    get:
+      consumes:
+      - application/json
+      description: Get a story of a feature by its UUID
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/db.FeatureStory'
+      summary: Get Story by UUID
+      tags:
+      - Features
+  /features/{uuid}:
+    delete:
+      consumes:
+      - application/json
+      description: Delete a feature by its UUID
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Feature deleted successfully
+          schema:
+            type: string
+      summary: Delete Feature
+      tags:
+      - Features
+    get:
+      consumes:
+      - application/json
+      description: Get a feature by its UUID
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/db.WorkspaceFeatures'
+      summary: Get Feature by UUID
+      tags:
+      - Features
+  /features/{uuid}/status:
+    put:
+      consumes:
+      - application/json
+      description: Update the status of a feature
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/db.WorkspaceFeatures'
+      summary: Update Feature Status
+      tags:
+      - Features
+  /features/brief:
+    post:
+      consumes:
+      - application/json
+      description: Update the brief of a feature
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/db.WorkspaceFeatures'
+      summary: Update Feature Brief
+      tags:
+      - Features
+  /features/brief/send:
+    post:
+      consumes:
+      - application/json
+      description: Send the brief of a feature
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Successfully sent
+          schema:
+            type: string
+      summary: Send Feature Brief
+      tags:
+      - Features
+  /features/forworkspace/{workspace_uuid}:
+    get:
+      consumes:
+      - application/json
+      description: Get features by workspace UUID
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/db.WorkspaceFeatures'
+            type: array
+      summary: Get Features by Workspace UUID
+      tags:
+      - Features
+  /features/phase:
+    post:
+      consumes:
+      - application/json
+      description: Create or edit a phase of a feature
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/db.FeaturePhase'
+      summary: Create or Edit Feature Phase
+      tags:
+      - Features
+  /features/stories:
+    post:
+      consumes:
+      - application/json
+      description: Get stories for a feature
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/db.FeatureStoriesReponse'
+      summary: Get Feature Stories
+      tags:
+      - Features
+  /features/stories/send:
+    post:
+      consumes:
+      - application/json
+      description: Send stories of a feature
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Successfully sent
+          schema:
+            type: string
+      summary: Send Stories
+      tags:
+      - Features
+  /features/story:
+    post:
+      consumes:
+      - application/json
+      description: Create or edit a story of a feature
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/db.FeatureStory'
+      summary: Create or Edit Story
+      tags:
+      - Features
+  /features/workspace/count/{uuid}:
+    get:
+      consumes:
+      - application/json
+      description: Get the count of features in a workspace
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: int
+      summary: Get Workspace Features Count
+      tags:
+      - Features
+  /feed:
+    get:
+      consumes:
+      - application/json
+      description: Get a generic feed by URL
+      parameters:
+      - description: Feed URL
+        in: query
+        name: url
+        required: true
+        type: string
+      - description: Tribe UUID
+        in: query
+        name: uuid
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/feeds.Feed'
+      summary: Get Generic Feed
+      tags:
+      - Feeds
+  /feed/download:
+    post:
+      consumes:
+      - application/json
+      description: Download a Youtube feed
+      parameters:
+      - description: Youtube Download
+        in: body
+        name: youtube_download
+        required: true
+        schema:
+          $ref: '#/definitions/db.YoutubeDownload'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Youtube download processed successfully
+          schema:
+            type: string
+      summary: Download Youtube Feed
+      tags:
+      - Feeds
+  /github_issues/{owner}/{repo}/{issue}:
+    get:
+      consumes:
+      - application/json
+      description: Get a Github issue by owner, repo, and issue number
+      parameters:
+      - description: Owner
+        in: path
+        name: owner
+        required: true
+        type: string
+      - description: Repository
+        in: path
+        name: repo
+        required: true
+        type: string
+      - description: Issue Number
+        in: path
+        name: issue
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/db.GithubIssue'
+      summary: Get Github Issue
+      tags:
+      - Github
+  /github_issues/status/open:
+    get:
+      consumes:
+      - application/json
+      description: Get the count of open Github issues
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: int
+      summary: Get Open Github Issues
+      tags:
+      - Github
   /gobounties:
     post:
       description: Create or edit a bounty
@@ -1298,7 +3729,7 @@ paths:
             $ref: '#/definitions/db.NewBounty'
       summary: Create or edit a bounty
       tags:
-      - Go-Bounties
+      - Go Bounties
   /gobounties/{id}/proof:
     post:
       description: Add proof of work to a bounty
@@ -1321,7 +3752,7 @@ paths:
             $ref: '#/definitions/db.ProofOfWork'
       summary: Add proof of work
       tags:
-      - Go-Bounties
+      - Go Bounties
   /gobounties/{id}/proofs:
     get:
       description: Get proofs by bounty ID
@@ -1340,7 +3771,7 @@ paths:
             type: array
       summary: Get proofs by bounty
       tags:
-      - Go-Bounties
+      - Go Bounties
   /gobounties/{id}/proofs/{proofId}:
     delete:
       description: Delete proof by ID
@@ -1360,7 +3791,7 @@ paths:
           description: No Content
       summary: Delete proof
       tags:
-      - Go-Bounties
+      - Go Bounties
   /gobounties/{id}/timing:
     delete:
       description: Delete bounty timing by ID
@@ -1375,7 +3806,7 @@ paths:
           description: No Content
       summary: Delete bounty timing
       tags:
-      - Go-Bounties
+      - Go Bounties
     get:
       description: Get bounty timing stats by ID
       parameters:
@@ -1391,7 +3822,7 @@ paths:
             $ref: '#/definitions/handlers.BountyTimingResponse'
       summary: Get bounty timing stats
       tags:
-      - Go-Bounties
+      - Go Bounties
   /gobounties/{id}/timing/close:
     post:
       description: Close bounty timing by ID
@@ -1406,7 +3837,7 @@ paths:
           description: OK
       summary: Close bounty timing
       tags:
-      - Go-Bounties
+      - Go Bounties
   /gobounties/{id}/timing/start:
     post:
       description: Start bounty timing by ID
@@ -1421,7 +3852,7 @@ paths:
           description: OK
       summary: Start bounty timing
       tags:
-      - Go-Bounties
+      - Go Bounties
   /gobounties/{pubkey}/{created}:
     delete:
       description: Delete a bounty by ID
@@ -1443,7 +3874,7 @@ paths:
             type: boolean
       summary: Delete a bounty
       tags:
-      - Go-Bounties
+      - Go Bounties
   /gobounties/all:
     get:
       description: Get a list of all bounties
@@ -1456,7 +3887,7 @@ paths:
             type: array
       summary: Get all bounties
       tags:
-      - Go-Bounties
+      - Go Bounties
   /gobounties/bounty-cards:
     get:
       description: Get bounty cards
@@ -1469,7 +3900,7 @@ paths:
             type: array
       summary: Get bounty cards
       tags:
-      - Go-Bounties
+      - Go Bounties
   /gobounties/budget/withdraw:
     post:
       description: Withdraw bounty budget
@@ -1487,7 +3918,7 @@ paths:
             $ref: '#/definitions/db.InvoicePaySuccess'
       summary: Withdraw bounty budget
       tags:
-      - Go-Bounties
+      - Go Bounties
   /gobounties/completedstatus/{created}:
     post:
       description: Update completed status by created date
@@ -1504,7 +3935,7 @@ paths:
             $ref: '#/definitions/db.NewBounty'
       summary: Update completed status
       tags:
-      - Go-Bounties
+      - Go Bounties
   /gobounties/count:
     get:
       description: Get bounty count
@@ -1515,7 +3946,7 @@ paths:
             type: integer
       summary: Get bounty count
       tags:
-      - Go-Bounties
+      - Go Bounties
   /gobounties/count/{personKey}/{tabType}:
     get:
       description: Get user bounty count by person key and tab type
@@ -1537,7 +3968,7 @@ paths:
             type: integer
       summary: Get user bounty count
       tags:
-      - Go-Bounties
+      - Go Bounties
   /gobounties/created/{created}:
     get:
       description: Get bounty by created date
@@ -1554,7 +3985,7 @@ paths:
             $ref: '#/definitions/db.Bounty'
       summary: Get bounty by created date
       tags:
-      - Go-Bounties
+      - Go Bounties
   /gobounties/featured/all:
     get:
       description: Get all featured bounties
@@ -1567,7 +3998,7 @@ paths:
             type: array
       summary: Get all featured bounties
       tags:
-      - Go-Bounties
+      - Go Bounties
   /gobounties/featured/create:
     post:
       description: Create a featured bounty
@@ -1585,7 +4016,7 @@ paths:
             $ref: '#/definitions/db.FeaturedBounty'
       summary: Create a featured bounty
       tags:
-      - Go-Bounties
+      - Go Bounties
   /gobounties/featured/delete/{bountyId}:
     delete:
       description: Delete a featured bounty by ID
@@ -1600,7 +4031,7 @@ paths:
           description: No Content
       summary: Delete a featured bounty
       tags:
-      - Go-Bounties
+      - Go Bounties
   /gobounties/featured/update:
     put:
       description: Update a featured bounty
@@ -1618,7 +4049,7 @@ paths:
             $ref: '#/definitions/db.FeaturedBounty'
       summary: Update a featured bounty
       tags:
-      - Go-Bounties
+      - Go Bounties
   /gobounties/filter/count:
     get:
       description: Get filter count
@@ -1629,7 +4060,7 @@ paths:
             $ref: '#/definitions/db.FilterStatusCount'
       summary: Get filter count
       tags:
-      - Go-Bounties
+      - Go Bounties
   /gobounties/id/{bountyId}:
     get:
       description: Get a bounty by ID
@@ -1646,7 +4077,7 @@ paths:
             $ref: '#/definitions/db.Bounty'
       summary: Get a bounty
       tags:
-      - Go-Bounties
+      - Go Bounties
   /gobounties/index/{bountyId}:
     get:
       description: Get bounty index by ID
@@ -1663,7 +4094,7 @@ paths:
             type: integer
       summary: Get bounty index
       tags:
-      - Go-Bounties
+      - Go Bounties
   /gobounties/invoice/{paymentRequest}:
     get:
       description: Get invoice data by payment request
@@ -1680,7 +4111,7 @@ paths:
             $ref: '#/definitions/db.InvoiceResult'
       summary: Get invoice data
       tags:
-      - Go-Bounties
+      - Go Bounties
   /gobounties/invoice/poll/{paymentRequest}:
     get:
       description: Poll invoice by payment request
@@ -1697,22 +4128,7 @@ paths:
             $ref: '#/definitions/db.InvoiceResult'
       summary: Poll invoice
       tags:
-      - Go-Bounties
-  /gobounties/leaderboard:
-    get:
-      description: Get bounties leaderboard
-      responses:
-        "200":
-          description: OK
-          schema:
-            items:
-              items:
-                $ref: '#/definitions/db.LeaderData'
-              type: array
-            type: array
-      summary: Get bounties leaderboard
-      tags:
-      - Go-Bounties
+      - Go Bounties
   /gobounties/next/{created}:
     get:
       description: Get next bounty by created date
@@ -1729,7 +4145,7 @@ paths:
             $ref: '#/definitions/db.Bounty'
       summary: Get next bounty
       tags:
-      - Go-Bounties
+      - Go Bounties
   /gobounties/pay/{id}:
     post:
       description: Make a bounty payment
@@ -1746,7 +4162,7 @@ paths:
             $ref: '#/definitions/db.NewBounty'
       summary: Make a bounty payment
       tags:
-      - Go-Bounties
+      - Go Bounties
   /gobounties/payment/{bountyId}:
     get:
       description: Get payment by bounty ID
@@ -1763,7 +4179,7 @@ paths:
             $ref: '#/definitions/db.NewPaymentHistory'
       summary: Get payment by bounty ID
       tags:
-      - Go-Bounties
+      - Go Bounties
   /gobounties/payment/status/{id}:
     get:
       description: Get bounty payment status by ID
@@ -1780,7 +4196,7 @@ paths:
             $ref: '#/definitions/db.NewPaymentHistory'
       summary: Get bounty payment status
       tags:
-      - Go-Bounties
+      - Go Bounties
     put:
       description: Update bounty payment status by ID
       parameters:
@@ -1796,7 +4212,7 @@ paths:
             $ref: '#/definitions/db.NewPaymentHistory'
       summary: Update bounty payment status
       tags:
-      - Go-Bounties
+      - Go Bounties
   /gobounties/paymentstatus/{created}:
     post:
       description: Update payment status by created date
@@ -1813,7 +4229,7 @@ paths:
             $ref: '#/definitions/db.NewBounty'
       summary: Update payment status
       tags:
-      - Go-Bounties
+      - Go Bounties
   /gobounties/previous/{created}:
     get:
       description: Get previous bounty by created date
@@ -1830,7 +4246,7 @@ paths:
             $ref: '#/definitions/db.Bounty'
       summary: Get previous bounty
       tags:
-      - Go-Bounties
+      - Go Bounties
   /gobounties/workspace/next/{uuid}/{created}:
     get:
       description: Get next workspace bounty by created date
@@ -1852,7 +4268,7 @@ paths:
             $ref: '#/definitions/db.Bounty'
       summary: Get next workspace bounty
       tags:
-      - Go-Bounties
+      - Go Bounties
   /gobounties/workspace/previous/{uuid}/{created}:
     get:
       description: Get previous workspace bounty by created date
@@ -1874,7 +4290,7 @@ paths:
             $ref: '#/definitions/db.Bounty'
       summary: Get previous workspace bounty
       tags:
-      - Go-Bounties
+      - Go Bounties
   /gobounties/workspace/timerange/{workspaceId}/{daysStart}/{daysEnd}:
     get:
       description: Get bounties by workspace time range
@@ -1901,7 +4317,389 @@ paths:
             $ref: '#/definitions/db.NodeListResponse'
       summary: Get bounties by workspace time
       tags:
-      - Go-Bounties
+      - Go Bounties
+  /hivechat:
+    get:
+      description: Retrieve chats for a workspace with the given ID and status
+      parameters:
+      - description: Workspace ID
+        in: query
+        name: workspace_id
+        required: true
+        type: string
+      - description: Chat status
+        in: query
+        name: status
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/handlers.ChatResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/handlers.ChatResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/handlers.ChatResponse'
+      summary: Retrieve chats for a workspace
+      tags:
+      - Hive Chat
+    post:
+      consumes:
+      - application/json
+      description: Create a new chat with the given workspace ID and title
+      parameters:
+      - description: Chat creation request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/handlers.CreateOrEditChatRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/handlers.ChatResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/handlers.ChatResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/handlers.ChatResponse'
+      summary: Create a new chat
+      tags:
+      - Hive Chat
+  /hivechat/{chat_id}:
+    put:
+      consumes:
+      - application/json
+      description: Update the title of an existing chat
+      parameters:
+      - description: Chat ID
+        in: path
+        name: chat_id
+        required: true
+        type: string
+      - description: Chat update request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/handlers.CreateOrEditChatRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/handlers.ChatResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/handlers.ChatResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/handlers.ChatResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/handlers.ChatResponse'
+      summary: Update an existing chat
+      tags:
+      - Hive Chat
+  /hivechat/{chat_id}/archive:
+    put:
+      consumes:
+      - application/json
+      description: Archive a chat by changing its status to archived
+      parameters:
+      - description: Chat ID
+        in: path
+        name: chat_id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/handlers.ChatResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/handlers.ChatResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/handlers.ChatResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/handlers.ChatResponse'
+      summary: Archive an existing chat
+      tags:
+      - Hive Chat
+  /hivechat/file/{id}:
+    delete:
+      description: Delete a file from a chat with the given ID
+      parameters:
+      - description: File ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/handlers.ChatResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/handlers.ChatResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/handlers.ChatResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/handlers.ChatResponse'
+      summary: Delete a file from a chat
+      tags:
+      - Hive Chat
+    get:
+      description: Retrieve a file from a chat with the given ID
+      parameters:
+      - description: File ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/handlers.FileResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/handlers.ChatResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/handlers.ChatResponse'
+      summary: Retrieve a file from a chat
+      tags:
+      - Hive Chat
+  /hivechat/file/all:
+    get:
+      description: List all files in a chat with the given parameters
+      parameters:
+      - description: File status
+        in: query
+        name: status
+        type: string
+      - description: File MIME type
+        in: query
+        name: mimeType
+        type: string
+      - description: Workspace ID
+        in: query
+        name: workspaceId
+        type: string
+      - description: Page number
+        in: query
+        name: page
+        type: integer
+      - description: Page size
+        in: query
+        name: pageSize
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/handlers.ChatResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/handlers.ChatResponse'
+      summary: List all files in a chat
+      tags:
+      - Hive Chat
+  /hivechat/history/{uuid}:
+    get:
+      description: Retrieve the history of a chat with the given ID
+      parameters:
+      - description: Chat ID
+        in: path
+        name: uuid
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/handlers.HistoryChatResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/handlers.ChatResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/handlers.ChatResponse'
+      summary: Retrieve chat history
+      tags:
+      - Hive Chat
+  /hivechat/response:
+    post:
+      consumes:
+      - application/json
+      description: Process a chat response with the given details
+      parameters:
+      - description: Chat response request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/handlers.ProcessChatRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/handlers.ChatResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/handlers.ChatResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/handlers.ChatResponse'
+      summary: Process a chat response
+      tags:
+      - Hive Chat
+  /hivechat/send:
+    post:
+      consumes:
+      - application/json
+      description: Send a message in a chat with the given details
+      parameters:
+      - description: Send message request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/handlers.SendMessageRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/handlers.ChatResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/handlers.ChatResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/handlers.ChatResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/handlers.ChatResponse'
+      summary: Send a message in a chat
+      tags:
+      - Hive Chat
+  /hivechat/send/build:
+    post:
+      consumes:
+      - application/json
+      description: Send a build message in a chat with the given details
+      parameters:
+      - description: Build message request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/handlers.BuildMessageRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/handlers.ChatResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/handlers.ChatResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/handlers.ChatResponse'
+      summary: Send a build message in a chat
+      tags:
+      - Hive Chat
+  /hivechat/upload:
+    post:
+      consumes:
+      - multipart/form-data
+      description: Upload a file to a chat with the given details
+      parameters:
+      - description: File to upload
+        in: formData
+        name: file
+        required: true
+        type: file
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/handlers.FileResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/handlers.ChatResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/handlers.ChatResponse'
+      summary: Upload a file to a chat
+      tags:
+      - Hive Chat
   /invoice:
     post:
       description: Generate an invoice for a tribe
@@ -1946,6 +4744,236 @@ paths:
       summary: Receive LNURL auth data
       tags:
       - Auth
+  /meme_upload:
+    post:
+      consumes:
+      - multipart/form-data
+      description: Upload an image for a meme
+      parameters:
+      - description: Meme Image File
+        in: formData
+        name: file
+        required: true
+        type: file
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Meme image URL
+          schema:
+            type: string
+      summary: Meme Image Upload
+      tags:
+      - Memes
+  /metrics/bounties:
+    post:
+      consumes:
+      - application/json
+      description: Get bounties by date range
+      parameters:
+      - description: Payment Date Range
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/db.PaymentDateRange'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/db.BountyData'
+            type: array
+      summary: Get Bounties
+      tags:
+      - Metrics
+  /metrics/bounties/count:
+    post:
+      consumes:
+      - application/json
+      description: Get the count of bounties by date range
+      parameters:
+      - description: Payment Date Range
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/db.PaymentDateRange'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: int
+      summary: Get Bounties Count
+      tags:
+      - Metrics
+  /metrics/bounties/providers:
+    post:
+      consumes:
+      - application/json
+      description: Get bounties providers by date range
+      parameters:
+      - description: Payment Date Range
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/db.PaymentDateRange'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              items:
+                $ref: '#/definitions/db.Person'
+              type: array
+            type: array
+      summary: Get Bounties Providers
+      tags:
+      - Metrics
+  /metrics/bounty_stats:
+    post:
+      consumes:
+      - application/json
+      description: Get bounty metrics for a workspace
+      parameters:
+      - description: Workspace
+        in: query
+        name: workspace
+        required: true
+        type: string
+      - description: Payment Date Range
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/db.PaymentDateRange'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/db.BountyMetrics'
+      summary: Get Bounty Metrics
+      tags:
+      - Metrics
+  /metrics/csv:
+    post:
+      consumes:
+      - application/json
+      description: Generate a CSV file for metrics
+      parameters:
+      - description: Payment Date Range
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/db.PaymentDateRange'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: CSV file URL
+          schema:
+            type: string
+      summary: Generate Metrics CSV
+      tags:
+      - Metrics
+  /metrics/organization:
+    post:
+      consumes:
+      - application/json
+      description: Get workspace metrics
+      parameters:
+      - description: Payment Date Range
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/db.PaymentDateRange'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: integer
+      summary: Get Workspace Metrics
+      tags:
+      - Metrics
+  /metrics/payment:
+    post:
+      consumes:
+      - application/json
+      description: Get payment metrics for a workspace
+      parameters:
+      - description: Workspace
+        in: query
+        name: workspace
+        required: true
+        type: string
+      - description: Payment Date Range
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/db.PaymentDateRange'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: integer
+      summary: Get Payment Metrics
+      tags:
+      - Metrics
+  /metrics/people:
+    post:
+      consumes:
+      - application/json
+      description: Get people metrics
+      parameters:
+      - description: Payment Date Range
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/db.PaymentDateRange'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: integer
+      summary: Get People Metrics
+      tags:
+      - Metrics
+  /metrics/workspaces:
+    get:
+      consumes:
+      - application/json
+      description: Get all workspaces for admin
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/db.Workspace'
+            type: array
+      summary: Get Admin Workspaces
+      tags:
+      - Metrics
   /migrate_bounties:
     post:
       description: Migrate bounties from extras to the new structure
@@ -1969,6 +4997,220 @@ paths:
       summary: Migrate bounties
       tags:
       - Others
+  /people:
+    get:
+      consumes:
+      - application/json
+      description: Get listed people
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/db.Person'
+            type: array
+      summary: Get Listed People
+      tags:
+      - People
+    post:
+      consumes:
+      - application/json
+      description: Create a new person
+      parameters:
+      - description: Referred By
+        in: query
+        name: referred_by
+        type: string
+      - description: Person
+        in: body
+        name: person
+        required: true
+        schema:
+          $ref: '#/definitions/db.Person'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/db.Person'
+      summary: Create Person
+      tags:
+      - People
+    put:
+      consumes:
+      - application/json
+      description: Update an existing person
+      parameters:
+      - description: Person
+        in: body
+        name: person
+        required: true
+        schema:
+          $ref: '#/definitions/db.Person'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/db.Person'
+      summary: Update Person
+      tags:
+      - People
+  /people/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: Delete a person by their ID
+      parameters:
+      - description: ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Person deleted successfully
+          schema:
+            type: string
+      summary: Delete Person
+      tags:
+      - People
+  /people/{pubkey}:
+    get:
+      consumes:
+      - application/json
+      description: Get a person by their public key
+      parameters:
+      - description: Public Key
+        in: path
+        name: pubkey
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/db.Person'
+      summary: Get Person by Pubkey
+      tags:
+      - People
+  /people/assets/{uuid}:
+    get:
+      consumes:
+      - application/json
+      description: Get assets of a person by their UUID
+      parameters:
+      - description: UUID
+        in: path
+        name: uuid
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/db.AssetListData'
+            type: array
+      summary: Get Person Assets by UUID
+      tags:
+      - People
+  /people/badge:
+    post:
+      consumes:
+      - application/json
+      description: Add or remove a badge for a person
+      parameters:
+      - description: Badge Creation Data
+        in: body
+        name: badgeCreationData
+        required: true
+        schema:
+          $ref: '#/definitions/db.BadgeCreationData'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/db.Tribe'
+      summary: Add or Remove Badge
+      tags:
+      - People
+  /people/github/{github}:
+    get:
+      consumes:
+      - application/json
+      description: Get a person by their Github name
+      parameters:
+      - description: Github Name
+        in: path
+        name: github
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/db.Person'
+      summary: Get Person by Github Name
+      tags:
+      - People
+  /people/id/{id}:
+    get:
+      consumes:
+      - application/json
+      description: Get a person by their ID
+      parameters:
+      - description: ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/db.Person'
+      summary: Get Person by ID
+      tags:
+      - People
+  /people/login:
+    post:
+      consumes:
+      - application/json
+      description: Upsert login for a person
+      parameters:
+      - description: Person
+        in: body
+        name: person
+        required: true
+        schema:
+          $ref: '#/definitions/db.Person'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: JWT Token
+          schema:
+            type: string
+      summary: Upsert Login
+      tags:
+      - People
   /people/offers:
     get:
       description: Get a list of listed offers
@@ -1982,6 +5224,107 @@ paths:
       summary: Get listed offers
       tags:
       - People
+  /people/posts:
+    get:
+      consumes:
+      - application/json
+      description: Get listed posts
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              items:
+                $ref: '#/definitions/db.PeopleExtra'
+              type: array
+            type: array
+      summary: Get Listed Posts
+      tags:
+      - People
+  /people/search:
+    get:
+      consumes:
+      - application/json
+      description: Get people by search query
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/db.Person'
+            type: array
+      summary: Get People by Search
+      tags:
+      - People
+  /people/short:
+    get:
+      consumes:
+      - application/json
+      description: Get a short list of people
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/db.Person'
+            type: array
+      summary: Get People Short List
+      tags:
+      - People
+  /people/ticket/{pubKey}/{created}:
+    delete:
+      consumes:
+      - application/json
+      description: Delete a ticket by admin
+      parameters:
+      - description: Public Key
+        in: path
+        name: pubKey
+        required: true
+        type: string
+      - description: Created Timestamp
+        in: path
+        name: created
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Ticket deleted successfully
+          schema:
+            type: string
+      summary: Delete Ticket by Admin
+      tags:
+      - People
+  /people/uuid/{uuid}:
+    get:
+      consumes:
+      - application/json
+      description: Get a person by their UUID
+      parameters:
+      - description: UUID
+        in: path
+        name: uuid
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+      summary: Get Person by UUID
+      tags:
+      - People
   /people/wanteds/header:
     get:
       description: Get the header information for wanteds
@@ -1993,6 +5336,30 @@ paths:
       summary: Get wanteds header
       tags:
       - People
+  /podcast:
+    get:
+      consumes:
+      - application/json
+      description: Get a podcast by URL or ID
+      parameters:
+      - description: Feed URL
+        in: query
+        name: url
+        type: string
+      - description: Feed ID
+        in: query
+        name: id
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/feeds.Podcast'
+      summary: Get Podcast
+      tags:
+      - Feeds
   /refresh_jwt:
     get:
       description: Refresh the JWT token
@@ -2006,9 +5373,220 @@ paths:
       summary: Refresh JWT token
       tags:
       - Auth
+  /search_podcast_episodes:
+    get:
+      consumes:
+      - application/json
+      description: Search for podcast episodes by query
+      parameters:
+      - description: Search Query
+        in: query
+        name: q
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/feeds.Item'
+            type: array
+      summary: Search Podcast Episodes
+      tags:
+      - Feeds
+  /search_podcasts:
+    get:
+      consumes:
+      - application/json
+      description: Search for podcasts by query
+      parameters:
+      - description: Search Query
+        in: query
+        name: q
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/feeds.Feed'
+            type: array
+      summary: Search Podcasts
+      tags:
+      - Feeds
+  /search_youtube:
+    get:
+      consumes:
+      - application/json
+      description: Search for Youtube videos by query
+      parameters:
+      - description: Search Query
+        in: query
+        name: q
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/feeds.Feed'
+            type: array
+      summary: Search Youtube
+      tags:
+      - Feeds
+  /search_youtube_videos:
+    get:
+      consumes:
+      - application/json
+      description: Search for Youtube videos by query
+      parameters:
+      - description: Search Query
+        in: query
+        name: q
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              items:
+                $ref: '#/definitions/feeds.Item'
+              type: array
+            type: array
+      summary: Search Youtube Videos
+      tags:
+      - Feeds
+  /snippet/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: Delete a snippet by its ID
+      parameters:
+      - description: Snippet ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Snippet deleted successfully
+          schema:
+            type: string
+      summary: Delete Snippet
+      tags:
+      - Snippets
+    get:
+      consumes:
+      - application/json
+      description: Get a snippet by its ID
+      parameters:
+      - description: Snippet ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/db.TextSnippet'
+      summary: Get Snippet by ID
+      tags:
+      - Snippets
+    put:
+      consumes:
+      - application/json
+      description: Update an existing snippet
+      parameters:
+      - description: Snippet ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: Snippet Request
+        in: body
+        name: snippet
+        required: true
+        schema:
+          $ref: '#/definitions/handlers.SnippetRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/db.TextSnippet'
+      summary: Update Snippet
+      tags:
+      - Snippets
+  /snippet/create:
+    post:
+      consumes:
+      - application/json
+      description: Create a new snippet
+      parameters:
+      - description: Workspace UUID
+        in: query
+        name: workspace_uuid
+        required: true
+        type: string
+      - description: Snippet Request
+        in: body
+        name: snippet
+        required: true
+        schema:
+          $ref: '#/definitions/handlers.SnippetRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/db.TextSnippet'
+      summary: Create Snippet
+      tags:
+      - Snippets
+  /snippet/workspace/{workspace_uuid}:
+    get:
+      consumes:
+      - application/json
+      description: Get snippets by workspace UUID
+      parameters:
+      - description: Workspace UUID
+        in: path
+        name: workspace_uuid
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/db.TextSnippet'
+            type: array
+      summary: Get Snippets by Workspace
+      tags:
+      - Snippets
   /tribes:
     get:
-      description: Get a list of all tribes
+      description: Get a list of listed tribes
       responses:
         "200":
           description: OK
@@ -2016,10 +5594,10 @@ paths:
             items:
               $ref: '#/definitions/db.Tribe'
             type: array
-      summary: Get all tribes
+      summary: Get listed tribes
       tags:
       - Tribes
-    put:
+    post:
       description: Create or edit a tribe
       parameters:
       - description: Tribe object
@@ -2087,7 +5665,7 @@ paths:
       summary: Update tribe activity
       tags:
       - Tribes
-  /tribes/app/{app_url}:
+  /tribes/app_url/{app_url}:
     get:
       description: Get a list of tribes by app URL
       parameters:
@@ -2106,7 +5684,7 @@ paths:
       summary: Get tribes by app URL
       tags:
       - Tribes
-  /tribes/apps/{app_urls}:
+  /tribes/apps_urls/{app_urls}:
     get:
       description: Get a list of tribes by multiple app URLs
       parameters:
@@ -2128,6 +5706,24 @@ paths:
       tags:
       - Tribes
   /tribes/budget_invoice:
+    post:
+      description: Generate a budget invoice for a tribe
+      parameters:
+      - description: Budget invoice request
+        in: body
+        name: invoice
+        required: true
+        schema:
+          $ref: '#/definitions/db.BudgetInvoiceRequest'
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/db.InvoiceResponse'
+      summary: Generate a budget invoice
+      tags:
+      - Tribes
+  /tribes/budget_invoice_v1:
     post:
       description: Generate a budget invoice for a tribe
       parameters:
@@ -2247,19 +5843,6 @@ paths:
       summary: Update a leaderboard
       tags:
       - Tribes
-  /tribes/listed:
-    get:
-      description: Get a list of listed tribes
-      responses:
-        "200":
-          description: OK
-          schema:
-            items:
-              $ref: '#/definitions/db.Tribe'
-            type: array
-      summary: Get listed tribes
-      tags:
-      - Tribes
   /tribes/owner/{pubkey}:
     get:
       description: Get a list of tribes by owner public key
@@ -2369,4 +5952,910 @@ paths:
       summary: Get unique name from tribe name
       tags:
       - Tribes
+  /workflows/request:
+    post:
+      consumes:
+      - application/json
+      description: Handle a workflow request
+      parameters:
+      - description: Workflow Request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/db.WfRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Handle Workflow Request
+      tags:
+      - Workflows
+  /workflows/response:
+    post:
+      consumes:
+      - application/json
+      description: Handle a workflow response
+      parameters:
+      - description: Workflow Response
+        in: body
+        name: response
+        required: true
+        schema:
+          $ref: '#/definitions/handlers.CreateWorkflowRequestRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Handle Workflow Response
+      tags:
+      - Workflows
+  /workspace:
+    get:
+      consumes:
+      - application/json
+      description: Get all workspaces
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/db.Workspace'
+            type: array
+      summary: Get Workspaces
+      tags:
+      - Workspaces
+    post:
+      consumes:
+      - application/json
+      description: Create or edit a workspace
+      parameters:
+      - description: Workspace
+        in: body
+        name: workspace
+        required: true
+        schema:
+          $ref: '#/definitions/db.Workspace'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/db.Workspace'
+      summary: Create or Edit Workspace
+      tags:
+      - Workspaces
+  /workspace/{uuid}:
+    get:
+      consumes:
+      - application/json
+      description: Get a workspace by its UUID
+      parameters:
+      - description: Workspace UUID
+        in: path
+        name: uuid
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/db.Workspace'
+      summary: Get Workspace by UUID
+      tags:
+      - Workspaces
+  /workspace/{workspace_uuid}/codegraph:
+    get:
+      consumes:
+      - application/json
+      description: Get code graphs of a workspace by its UUID
+      parameters:
+      - description: Workspace UUID
+        in: path
+        name: workspace_uuid
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/db.WorkspaceCodeGraph'
+            type: array
+      summary: Get Code Graph by Workspace UUID
+      tags:
+      - Workspaces
+  /workspace/{workspace_uuid}/features:
+    get:
+      consumes:
+      - application/json
+      description: Get features of a workspace by its UUID
+      parameters:
+      - description: Workspace UUID
+        in: path
+        name: workspace_uuid
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/db.WorkspaceFeatures'
+            type: array
+      summary: Get Features by Workspace UUID
+      tags:
+      - Workspaces
+  /workspace/{workspace_uuid}/lastwithdrawal:
+    get:
+      consumes:
+      - application/json
+      description: Get the last withdrawal of a workspace by its UUID
+      parameters:
+      - description: Workspace UUID
+        in: path
+        name: workspace_uuid
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Hours since last withdrawal
+          schema:
+            type: int
+      summary: Get Last Withdrawal
+      tags:
+      - Workspaces
+  /workspace/{workspace_uuid}/payments:
+    put:
+      consumes:
+      - application/json
+      description: Update pending payments of a workspace by its UUID
+      parameters:
+      - description: Workspace UUID
+        in: path
+        name: workspace_uuid
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Updated Payments Successfully
+          schema:
+            type: string
+      summary: Update Workspace Pending Payments
+      tags:
+      - Workspaces
+  /workspace/bounties/{uuid}:
+    get:
+      consumes:
+      - application/json
+      description: Get bounties of a workspace by its UUID
+      parameters:
+      - description: Workspace UUID
+        in: path
+        name: uuid
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/db.BountyResponse'
+            type: array
+      summary: Get Workspace Bounties
+      tags:
+      - Workspaces
+  /workspace/bounties/{uuid}/count:
+    get:
+      consumes:
+      - application/json
+      description: Get the count of bounties in a workspace
+      parameters:
+      - description: Workspace UUID
+        in: path
+        name: uuid
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: int
+      summary: Get Workspace Bounties Count
+      tags:
+      - Workspaces
+  /workspace/bounty/roles:
+    get:
+      consumes:
+      - application/json
+      description: Get all bounty roles
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              items:
+                $ref: '#/definitions/db.BountyRoles'
+              type: array
+            type: array
+      summary: Get Bounty Roles
+      tags:
+      - Workspaces
+  /workspace/budget/{uuid}:
+    get:
+      consumes:
+      - application/json
+      description: Get the budget of a workspace by its UUID
+      parameters:
+      - description: Workspace UUID
+        in: path
+        name: uuid
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/db.StatusBudget'
+      summary: Get Workspace Budget
+      tags:
+      - Workspaces
+  /workspace/budget/history/{uuid}:
+    get:
+      consumes:
+      - application/json
+      description: Get the budget history of a workspace by its UUID
+      parameters:
+      - description: Workspace UUID
+        in: path
+        name: uuid
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              items:
+                $ref: '#/definitions/db.BudgetHistoryData'
+              type: array
+            type: array
+      summary: Get Workspace Budget History
+      tags:
+      - Workspaces
+  /workspace/codegraph:
+    post:
+      consumes:
+      - application/json
+      description: Create or edit a code graph for a workspace
+      parameters:
+      - description: Workspace Code Graph
+        in: body
+        name: codeGraph
+        required: true
+        schema:
+          $ref: '#/definitions/db.WorkspaceCodeGraph'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/db.WorkspaceCodeGraph'
+      summary: Create or Edit Workspace Code Graph
+      tags:
+      - Workspaces
+  /workspace/codegraph/{uuid}:
+    delete:
+      consumes:
+      - application/json
+      description: Delete a code graph from a workspace by its UUID
+      parameters:
+      - description: Workspace UUID
+        in: path
+        name: workspace_uuid
+        required: true
+        type: string
+      - description: Code Graph UUID
+        in: path
+        name: uuid
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Code graph deleted successfully
+          schema:
+            type: string
+      summary: Delete Workspace Code Graph
+      tags:
+      - Workspaces
+    get:
+      consumes:
+      - application/json
+      description: Get a code graph of a workspace by its UUID
+      parameters:
+      - description: Code Graph UUID
+        in: path
+        name: uuid
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/db.WorkspaceCodeGraph'
+      summary: Get Workspace Code Graph by UUID
+      tags:
+      - Workspaces
+  /workspace/count:
+    get:
+      consumes:
+      - application/json
+      description: Get the count of all workspaces
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: int
+      summary: Get Workspaces Count
+      tags:
+      - Workspaces
+  /workspace/delete/{uuid}:
+    delete:
+      consumes:
+      - application/json
+      description: Delete a workspace by its UUID
+      parameters:
+      - description: Workspace UUID
+        in: path
+        name: uuid
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/db.Workspace'
+      summary: Delete Workspace
+      tags:
+      - Workspaces
+  /workspace/foruser/{uuid}:
+    get:
+      consumes:
+      - application/json
+      description: Get a user of a workspace by its UUID
+      parameters:
+      - description: Workspace UUID
+        in: path
+        name: uuid
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/db.WorkspaceUsers'
+      summary: Get Workspace User
+      tags:
+      - Workspaces
+  /workspace/invoices/count/{uuid}:
+    get:
+      consumes:
+      - application/json
+      description: Get the count of invoices in a workspace by its UUID
+      parameters:
+      - description: Workspace UUID
+        in: path
+        name: uuid
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: int
+      summary: Get Invoices Count
+      tags:
+      - Workspaces
+  /workspace/mission:
+    post:
+      consumes:
+      - application/json
+      description: Update a workspace
+      parameters:
+      - description: Workspace
+        in: body
+        name: workspace
+        required: true
+        schema:
+          $ref: '#/definitions/db.Workspace'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/db.Workspace'
+      summary: Update Workspace
+      tags:
+      - Workspaces
+  /workspace/payments/{uuid}:
+    get:
+      consumes:
+      - application/json
+      description: Get the payment history of a workspace by its UUID
+      parameters:
+      - description: Workspace UUID
+        in: path
+        name: uuid
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/db.PaymentHistoryData'
+            type: array
+      summary: Get Payment History
+      tags:
+      - Workspaces
+  /workspace/poll/invoices/{uuid}:
+    get:
+      consumes:
+      - application/json
+      description: Poll budget invoices of a workspace by its UUID
+      parameters:
+      - description: Workspace UUID
+        in: path
+        name: uuid
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Polled invoices
+          schema:
+            type: string
+      summary: Poll Budget Invoices
+      tags:
+      - Workspaces
+  /workspace/poll/user/invoices:
+    get:
+      consumes:
+      - application/json
+      description: Poll budget invoices of all workspaces of a user
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Polled user workspace invoices
+          schema:
+            type: string
+      summary: Poll User Workspaces Budget
+      tags:
+      - Workspaces
+  /workspace/repositories:
+    post:
+      consumes:
+      - application/json
+      description: Create or edit a repository for a workspace
+      parameters:
+      - description: Workspace Repository
+        in: body
+        name: workspaceRepo
+        required: true
+        schema:
+          $ref: '#/definitions/db.WorkspaceRepositories'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/db.WorkspaceRepositories'
+      summary: Create or Edit Workspace Repository
+      tags:
+      - Workspaces
+  /workspace/repositories/{uuid}:
+    get:
+      consumes:
+      - application/json
+      description: Get repositories of a workspace by its UUID
+      parameters:
+      - description: Workspace UUID
+        in: path
+        name: uuid
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/db.WorkspaceRepositories'
+            type: array
+      summary: Get Workspace Repositories
+      tags:
+      - Workspaces
+  /workspace/repository/{uuid}:
+    delete:
+      consumes:
+      - application/json
+      description: Delete a repository from a workspace by its UUID
+      parameters:
+      - description: Workspace UUID
+        in: path
+        name: workspace_uuid
+        required: true
+        type: string
+      - description: Repository UUID
+        in: path
+        name: uuid
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Repository deleted successfully
+          schema:
+            type: string
+      summary: Delete Workspace Repository
+      tags:
+      - Workspaces
+    get:
+      consumes:
+      - application/json
+      description: Get a repository of a workspace by its UUID
+      parameters:
+      - description: Workspace UUID
+        in: path
+        name: workspace_uuid
+        required: true
+        type: string
+      - description: Repository UUID
+        in: path
+        name: uuid
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/db.WorkspaceRepositories'
+      summary: Get Workspace Repository by UUID
+      tags:
+      - Workspaces
+  /workspace/schematicurl:
+    post:
+      consumes:
+      - application/json
+      description: Update a workspace
+      parameters:
+      - description: Workspace
+        in: body
+        name: workspace
+        required: true
+        schema:
+          $ref: '#/definitions/db.Workspace'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/db.Workspace'
+      summary: Update Workspace
+      tags:
+      - Workspaces
+  /workspace/tactics:
+    post:
+      consumes:
+      - application/json
+      description: Update a workspace
+      parameters:
+      - description: Workspace
+        in: body
+        name: workspace
+        required: true
+        schema:
+          $ref: '#/definitions/db.Workspace'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/db.Workspace'
+      summary: Update Workspace
+      tags:
+      - Workspaces
+  /workspace/user/{userId}:
+    get:
+      consumes:
+      - application/json
+      description: Get workspaces of a user by their ID
+      parameters:
+      - description: User ID
+        in: path
+        name: userId
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/db.Workspace'
+            type: array
+      summary: Get User Workspaces
+      tags:
+      - Workspaces
+  /workspace/user/dropdown/{userId}:
+    get:
+      consumes:
+      - application/json
+      description: Get dropdown workspaces of a user by their ID
+      parameters:
+      - description: User ID
+        in: path
+        name: userId
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/db.Workspace'
+            type: array
+      summary: Get User Dropdown Workspaces
+      tags:
+      - Workspaces
+  /workspace/user/invoices/count:
+    get:
+      consumes:
+      - application/json
+      description: Get the count of all invoices of a user
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: int
+      summary: Get All User Invoices Count
+      tags:
+      - Workspaces
+  /workspace/users/{uuid}:
+    delete:
+      consumes:
+      - application/json
+      description: Delete a user from a workspace
+      parameters:
+      - description: Workspace User Data
+        in: body
+        name: workspaceUser
+        required: true
+        schema:
+          $ref: '#/definitions/db.WorkspaceUsersData'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/db.WorkspaceUsersData'
+      summary: Delete Workspace User
+      tags:
+      - Workspaces
+    get:
+      consumes:
+      - application/json
+      description: Get users of a workspace by its UUID
+      parameters:
+      - description: Workspace UUID
+        in: path
+        name: uuid
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/db.WorkspaceUsers'
+            type: array
+      summary: Get Workspace Users
+      tags:
+      - Workspaces
+    post:
+      consumes:
+      - application/json
+      description: Create a user for a workspace
+      parameters:
+      - description: Workspace User
+        in: body
+        name: workspaceUser
+        required: true
+        schema:
+          $ref: '#/definitions/db.WorkspaceUsers'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/db.WorkspaceUsers'
+      summary: Create Workspace User
+      tags:
+      - Workspaces
+  /workspace/users/{uuid}/count:
+    get:
+      consumes:
+      - application/json
+      description: Get the count of users in a workspace
+      parameters:
+      - description: Workspace UUID
+        in: path
+        name: uuid
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: int
+      summary: Get Workspace Users Count
+      tags:
+      - Workspaces
+  /workspace/users/role/{uuid}/{user}:
+    get:
+      consumes:
+      - application/json
+      description: Get roles of a user in a workspace
+      parameters:
+      - description: Workspace UUID
+        in: path
+        name: uuid
+        required: true
+        type: string
+      - description: User PubKey
+        in: path
+        name: user
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/db.WorkspaceUserRoles'
+            type: array
+      summary: Get User Roles
+      tags:
+      - Workspaces
+    post:
+      consumes:
+      - application/json
+      description: Add roles to a user in a workspace
+      parameters:
+      - description: Workspace UUID
+        in: path
+        name: uuid
+        required: true
+        type: string
+      - description: User PubKey
+        in: path
+        name: user
+        required: true
+        type: string
+      - description: Workspace User Roles
+        in: body
+        name: roles
+        required: true
+        schema:
+          items:
+            $ref: '#/definitions/db.WorkspaceUserRoles'
+          type: array
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/db.WorkspaceUserRoles'
+            type: array
+      summary: Add User Roles
+      tags:
+      - Workspaces
+  /youtube_videos:
+    get:
+      consumes:
+      - application/json
+      description: Get Youtube videos for a specific channel
+      parameters:
+      - description: Channel ID
+        in: query
+        name: channelId
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              items:
+                $ref: '#/definitions/feeds.Item'
+              type: array
+            type: array
+      summary: Get Youtube Videos for Channel
+      tags:
+      - Feeds
 swagger: "2.0"

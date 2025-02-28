@@ -14,12 +14,25 @@ type workflowHandler struct {
 	db db.Database
 }
 
+type CreateWorkflowRequestRequest struct {
+	RequestID    string         `json:"request_id"`
+	ResponseData db.PropertyMap `json:"response_data"`
+}
+
 func NewWorkFlowHandler(database db.Database) *workflowHandler {
 	return &workflowHandler{
 		db: database,
 	}
 }
 
+//	@Summary		Handle Workflow Request
+//	@Description	Handle a workflow request
+//	@Tags			Workflows
+//	@Accept			json
+//	@Produce		json
+//	@Param			request	body		db.WfRequest	true	"Workflow Request"
+//	@Success		201		{object}	map[string]string
+//	@Router			/workflows/request [post]
 func (wh *workflowHandler) HandleWorkflowRequest(w http.ResponseWriter, r *http.Request) {
 
 	body, err := io.ReadAll(r.Body)
@@ -60,6 +73,14 @@ func (wh *workflowHandler) HandleWorkflowRequest(w http.ResponseWriter, r *http.
 	})
 }
 
+//	@Summary		Handle Workflow Response
+//	@Description	Handle a workflow response
+//	@Tags			Workflows
+//	@Accept			json
+//	@Produce		json
+//	@Param			response	body		CreateWorkflowRequestRequest	true	"Workflow Response"
+//	@Success		200			{object}	map[string]string
+//	@Router			/workflows/response [post]
 func (wh *workflowHandler) HandleWorkflowResponse(w http.ResponseWriter, r *http.Request) {
 	body, err := io.ReadAll(r.Body)
 	if err != nil {
@@ -67,10 +88,7 @@ func (wh *workflowHandler) HandleWorkflowResponse(w http.ResponseWriter, r *http
 		return
 	}
 
-	var response struct {
-		RequestID    string         `json:"request_id"`
-		ResponseData db.PropertyMap `json:"response_data"`
-	}
+	var response CreateWorkflowRequestRequest
 
 	if err := json.Unmarshal(body, &response); err != nil {
 		http.Error(w, "Invalid response format", http.StatusBadRequest)

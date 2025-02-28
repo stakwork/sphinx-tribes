@@ -17,15 +17,16 @@ import (
 	"github.com/stakwork/sphinx-tribes/utils"
 )
 
-type authHandler struct {
+// AuthHandler struct
+type AuthHandler struct {
 	db                        db.Database
 	makeConnectionCodeRequest func(inviter_pubkey string, inviter_route_hint string, msats_amount uint64) string
 	decodeJwt                 func(token string) (jwt.MapClaims, error)
 	encodeJwt                 func(pubkey string) (string, error)
 }
 
-func NewAuthHandler(db db.Database) *authHandler {
-	return &authHandler{
+func NewAuthHandler(db db.Database) *AuthHandler {
+	return &AuthHandler{
 		db:                        db,
 		makeConnectionCodeRequest: MakeConnectionCodeRequest,
 		decodeJwt:                 auth.DecodeJwt,
@@ -34,13 +35,20 @@ func NewAuthHandler(db db.Database) *authHandler {
 }
 
 type ConnectionCodesListResponse struct {
-    Success bool `json:"success"`
-    Data    struct {
-        Codes []db.ConnectionCodesList `json:"codes"`
-        Total int64                   `json:"total"`
-    } `json:"data"`
+	Success bool `json:"success"`
+	Data    struct {
+		Codes []db.ConnectionCodesList `json:"codes"`
+		Total int64                    `json:"total"`
+	} `json:"data"`
 }
 
+// GetAdminPubkeys godoc
+//
+//	@Summary		Get admin pubkeys
+//	@Description	Get a list of admin pubkeys
+//	@Tags			Auth
+//	@Success		200	{array}	string
+//	@Router			/admin_pubkeys [get]
 func GetAdminPubkeys(w http.ResponseWriter, r *http.Request) {
 	type PubKeysReturn struct {
 		Pubkeys []string `json:"pubkeys"`
@@ -52,7 +60,14 @@ func GetAdminPubkeys(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusOK)
 }
 
-func (ah *authHandler) GetIsAdmin(w http.ResponseWriter, r *http.Request) {
+// GetIsAdmin godoc
+//
+//	@Summary		Check if user is admin
+//	@Description	Check if the user is an admin
+//	@Tags			Auth
+//	@Success		200	{object}	map[string]bool
+//	@Router			/admin/auth [get]
+func (ah *AuthHandler) GetIsAdmin(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 	pubKeyFromAuth, _ := ctx.Value(auth.ContextKey).(string)
 	isAdmin := auth.AdminCheck(pubKeyFromAuth)
@@ -67,7 +82,7 @@ func (ah *authHandler) GetIsAdmin(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func (ah *authHandler) CreateConnectionCode(w http.ResponseWriter, r *http.Request) {
+func (ah *AuthHandler) CreateConnectionCode(w http.ResponseWriter, r *http.Request) {
 	codeBody := db.InviteBody{}
 	codeArr := []db.ConnectionCodes{}
 
@@ -166,13 +181,20 @@ func MakeConnectionCodeRequest(inviter_pubkey string, inviter_route_hint string,
 	return inviteReponse.Invite
 }
 
-func (ah *authHandler) GetConnectionCode(w http.ResponseWriter, _ *http.Request) {
+func (ah *AuthHandler) GetConnectionCode(w http.ResponseWriter, _ *http.Request) {
 	connectionCode := ah.db.GetConnectionCode()
 
 	w.WriteHeader(http.StatusOK)
 	json.NewEncoder(w).Encode(connectionCode)
 }
 
+// GetLnurlAuth godoc
+//
+//	@Summary		Get LNURL auth
+//	@Description	Get LNURL auth details
+//	@Tags			Auth
+//	@Success		200	{object}	map[string]string
+//	@Router			/lnauth [get]
 func GetLnurlAuth(w http.ResponseWriter, r *http.Request) {
 	socketKey := r.URL.Query().Get("socketKey")
 	socket, _ := db.Store.GetSocketConnections(socketKey)
@@ -206,6 +228,13 @@ func GetLnurlAuth(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(responseData)
 }
 
+// ReceiveLnAuthData godoc
+//
+//	@Summary		Receive LNURL auth data
+//	@Description	Receive LNURL auth data
+//	@Tags			Auth
+//	@Success		200	{object}	map[string]string
+//	@Router			/lnauth_login [get]
 func ReceiveLnAuthData(w http.ResponseWriter, r *http.Request) {
 	userKey := r.URL.Query().Get("key")
 	k1 := r.URL.Query().Get("k1")
@@ -269,7 +298,14 @@ func ReceiveLnAuthData(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(responseMsg)
 }
 
-func (ah *authHandler) RefreshToken(w http.ResponseWriter, r *http.Request) {
+// RefreshToken godoc
+//
+//	@Summary		Refresh JWT token
+//	@Description	Refresh the JWT token
+//	@Tags			Auth
+//	@Success		200	{object}	map[string]string
+//	@Router			/refresh_jwt [get]
+func (ah *AuthHandler) RefreshToken(w http.ResponseWriter, r *http.Request) {
 	token := r.Header.Get("x-jwt")
 
 	if token == "" {
@@ -345,17 +381,17 @@ func returnUserMap(p db.Person) map[string]interface{} {
 	return user
 }
 
-func (ah *authHandler) ListConnectionCodes(w http.ResponseWriter, r *http.Request) {
+func (ah *AuthHandler) ListConnectionCodes(w http.ResponseWriter, r *http.Request) {
 
 	page := 1
 	limit := 20
-	
+
 	if pageStr := r.URL.Query().Get("page"); pageStr != "" {
 		if p, err := strconv.Atoi(pageStr); err == nil && p > 0 {
 			page = p
 		}
 	}
-	
+
 	if limitStr := r.URL.Query().Get("limit"); limitStr != "" {
 		if l, err := strconv.Atoi(limitStr); err == nil && l > 0 {
 			limit = l
@@ -363,32 +399,32 @@ func (ah *authHandler) ListConnectionCodes(w http.ResponseWriter, r *http.Reques
 	}
 
 	codes, total, err := ah.db.GetConnectionCodesList(page, limit)
-    if err != nil {
-        w.WriteHeader(http.StatusOK)
-        json.NewEncoder(w).Encode(ConnectionCodesListResponse{
-            Success: false,
-            Data: struct {
-                Codes []db.ConnectionCodesList `json:"codes"`
-                Total int64                   `json:"total"`
-            }{
-                Codes: []db.ConnectionCodesList{},
-                Total: 0,
-            },
-        })
-        return
-    }
+	if err != nil {
+		w.WriteHeader(http.StatusOK)
+		json.NewEncoder(w).Encode(ConnectionCodesListResponse{
+			Success: false,
+			Data: struct {
+				Codes []db.ConnectionCodesList `json:"codes"`
+				Total int64                    `json:"total"`
+			}{
+				Codes: []db.ConnectionCodesList{},
+				Total: 0,
+			},
+		})
+		return
+	}
 
-    response := ConnectionCodesListResponse{
-        Success: true,
-        Data: struct {
-            Codes []db.ConnectionCodesList `json:"codes"`
-            Total int64                   `json:"total"`
-        }{
-            Codes: codes,
-            Total: total,
-        },
-    }
+	response := ConnectionCodesListResponse{
+		Success: true,
+		Data: struct {
+			Codes []db.ConnectionCodesList `json:"codes"`
+			Total int64                    `json:"total"`
+		}{
+			Codes: codes,
+			Total: total,
+		},
+	}
 
-    w.WriteHeader(http.StatusOK)
-    json.NewEncoder(w).Encode(response)
+	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode(response)
 }

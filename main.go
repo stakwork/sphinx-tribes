@@ -20,12 +20,11 @@ import (
 	"gopkg.in/go-playground/validator.v9"
 )
 
-//	@title			Sphinx Tribes API
-//	@version		1.0
-//	@description	This is the API documentation for Sphinx Tribes.
-//	@host			localhost:5002
-//	@BasePath		/
-
+// @title			Sphinx Tribes API
+// @version		1.0
+// @description	This is the API documentation for Sphinx Tribes.
+// @host			localhost:5002
+// @BasePath		/
 func main() {
 	if err := godotenv.Load(); err != nil {
 		fmt.Println("no .env file")

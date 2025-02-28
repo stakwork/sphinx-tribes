@@ -18,6 +18,15 @@ import (
 	"google.golang.org/api/youtube/v3"
 )
 
+//	@Summary		Get Generic Feed
+//	@Description	Get a generic feed by URL
+//	@Tags			Feeds
+//	@Accept			json
+//	@Produce		json
+//	@Param			url		query		string	true	"Feed URL"
+//	@Param			uuid	query		string	false	"Tribe UUID"
+//	@Success		200		{object}	feeds.Feed
+//	@Router			/feed [get]
 func GetGenericFeed(w http.ResponseWriter, r *http.Request) {
 	url := r.URL.Query().Get("url")
 
@@ -48,6 +57,14 @@ func GetGenericFeed(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(feed)
 }
 
+//	@Summary		Download Youtube Feed
+//	@Description	Download a Youtube feed
+//	@Tags			Feeds
+//	@Accept			json
+//	@Produce		json
+//	@Param			youtube_download	body		db.YoutubeDownload	true	"Youtube Download"
+//	@Success		200					{string}	string				"Youtube download processed successfully"
+//	@Router			/feed/download [post]
 func DownloadYoutubeFeed(w http.ResponseWriter, r *http.Request) {
 	apiKey := os.Getenv("YOUTUBE_KEY")
 	ctx := context.Background()
@@ -152,6 +169,15 @@ func processYoutubeDownload(data []string) {
 	}
 }
 
+//	@Summary		Get Podcast
+//	@Description	Get a podcast by URL or ID
+//	@Tags			Feeds
+//	@Accept			json
+//	@Produce		json
+//	@Param			url	query		string	false	"Feed URL"
+//	@Param			id	query		string	false	"Feed ID"
+//	@Success		200	{object}	feeds.Podcast
+//	@Router			/podcast [get]
 func GetPodcast(w http.ResponseWriter, r *http.Request) {
 	url := r.URL.Query().Get("url")
 	feedid := r.URL.Query().Get("id")
@@ -172,6 +198,14 @@ func GetPodcast(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+//	@Summary		Search Podcasts
+//	@Description	Search for podcasts by query
+//	@Tags			Feeds
+//	@Accept			json
+//	@Produce		json
+//	@Param			q	query	string	true	"Search Query"
+//	@Success		200	{array}	feeds.Feed
+//	@Router			/search_podcasts [get]
 func SearchPodcasts(w http.ResponseWriter, r *http.Request) {
 	q := r.URL.Query().Get("q")
 	podcasts, err := searchPodcastIndex(q)
@@ -192,6 +226,14 @@ func SearchPodcasts(w http.ResponseWriter, r *http.Request) {
 	err = json.NewEncoder(w).Encode(fs)
 }
 
+//	@Summary		Search Podcast Episodes
+//	@Description	Search for podcast episodes by query
+//	@Tags			Feeds
+//	@Accept			json
+//	@Produce		json
+//	@Param			q	query	string	true	"Search Query"
+//	@Success		200	{array}	feeds.Item
+//	@Router			/search_podcast_episodes [get]
 func SearchPodcastEpisodes(w http.ResponseWriter, r *http.Request) {
 	q := r.URL.Query().Get("q")
 	eps, err := feeds.PodcastEpisodesByPerson(q, false)
@@ -210,6 +252,14 @@ func SearchPodcastEpisodes(w http.ResponseWriter, r *http.Request) {
 	err = json.NewEncoder(w).Encode(fs)
 }
 
+//	@Summary		Search Youtube
+//	@Description	Search for Youtube videos by query
+//	@Tags			Feeds
+//	@Accept			json
+//	@Produce		json
+//	@Param			q	query	string	true	"Search Query"
+//	@Success		200	{array}	feeds.Feed
+//	@Router			/search_youtube [get]
 func SearchYoutube(w http.ResponseWriter, r *http.Request) {
 	q := r.URL.Query().Get("q")
 	fs, err := feeds.YoutubeSearch(q)
@@ -222,6 +272,14 @@ func SearchYoutube(w http.ResponseWriter, r *http.Request) {
 	err = json.NewEncoder(w).Encode(fs)
 }
 
+//	@Summary		Search Youtube Videos
+//	@Description	Search for Youtube videos by query
+//	@Tags			Feeds
+//	@Accept			json
+//	@Produce		json
+//	@Param			q	query	string	true	"Search Query"
+//	@Success		200	{array}	[]feeds.Item
+//	@Router			/search_youtube_videos [get]
 func SearchYoutubeVideos(w http.ResponseWriter, r *http.Request) {
 	q := r.URL.Query().Get("q")
 	fs, err := feeds.YoutubeVideoSearch(q)
@@ -234,6 +292,14 @@ func SearchYoutubeVideos(w http.ResponseWriter, r *http.Request) {
 	err = json.NewEncoder(w).Encode(fs)
 }
 
+//	@Summary		Get Youtube Videos for Channel
+//	@Description	Get Youtube videos for a specific channel
+//	@Tags			Feeds
+//	@Accept			json
+//	@Produce		json
+//	@Param			channelId	query	string	true	"Channel ID"
+//	@Success		200			{array}	[]feeds.Item
+//	@Router			/youtube_videos [get]
 func YoutubeVideosForChannel(w http.ResponseWriter, r *http.Request) {
 	q := r.URL.Query().Get("channelId")
 	fs, err := feeds.YoutubeVideosForChannel(q)
