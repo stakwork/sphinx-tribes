@@ -89,14 +89,14 @@ type CreateOrEditTicket struct {
 	Status      db.TicketStatus `json:"status,omitempty"`
 }
 
-//	@Summary		Get Ticket
-//	@Description	Get a ticket by its UUID
-//	@Tags			Tickets
-//	@Accept			json
-//	@Produce		json
-//	@Param			uuid	path		string	true	"Ticket UUID"
-//	@Success		200		{object}	db.Tickets
-//	@Router			/bounties/ticket/{uuid} [get]
+// @Summary		Get Ticket
+// @Description	Get a ticket by its UUID
+// @Tags			Bounty Tickets
+// @Accept			json
+// @Produce		json
+// @Param			uuid	path		string	true	"Ticket UUID"
+// @Success		200		{object}	db.Tickets
+// @Router			/bounties/ticket/{uuid} [get]
 func (th *ticketHandler) GetTicket(w http.ResponseWriter, r *http.Request) {
 	uuid := chi.URLParam(r, "uuid")
 	if uuid == "" {
@@ -121,15 +121,15 @@ func (th *ticketHandler) GetTicket(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(ticket)
 }
 
-//	@Summary		Update Ticket
-//	@Description	Update an existing ticket
-//	@Tags			Tickets
-//	@Accept			json
-//	@Produce		json
-//	@Param			uuid	path		string				true	"Ticket UUID"
-//	@Param			ticket	body		UpdateTicketRequest	true	"Update Ticket Request"
-//	@Success		200		{object}	db.Tickets
-//	@Router			/bounties/ticket/{uuid} [post]
+// @Summary		Update Ticket
+// @Description	Update an existing ticket
+// @Tags			Bounty Tickets
+// @Accept			json
+// @Produce		json
+// @Param			uuid	path		string				true	"Ticket UUID"
+// @Param			ticket	body		UpdateTicketRequest	true	"Update Ticket Request"
+// @Success		200		{object}	db.Tickets
+// @Router			/bounties/ticket/{uuid} [post]
 func (th *ticketHandler) UpdateTicket(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 	pubKeyFromAuth, _ := ctx.Value(auth.ContextKey).(string)
@@ -259,15 +259,15 @@ func (th *ticketHandler) UpdateTicket(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(createdTicket)
 }
 
-//	@Summary		Update Ticket Sequence
-//	@Description	Update the sequence of tickets in a group
-//	@Tags			Tickets
-//	@Accept			json
-//	@Produce		json
-//	@Param			ticket_group	path		string						true	"Ticket Group UUID"
-//	@Param			ticket			body		UpdateTicketSequenceRequest	true	"Update Ticket Sequence Request"
-//	@Success		200				{string}	string						"Ticket sequences updated successfully"
-//	@Router			/bounties/ticket/{ticket_group}/sequence [post]
+// @Summary		Update Ticket Sequence
+// @Description	Update the sequence of tickets in a group
+// @Tags			Bounty Tickets
+// @Accept			json
+// @Produce		json
+// @Param			ticket_group	path		string						true	"Ticket Group UUID"
+// @Param			ticket			body		UpdateTicketSequenceRequest	true	"Update Ticket Sequence Request"
+// @Success		200				{string}	string						"Ticket sequences updated successfully"
+// @Router			/bounties/ticket/{ticket_group}/sequence [post]
 func (th *ticketHandler) UpdateTicketSequence(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 	pubKeyFromAuth, _ := ctx.Value(auth.ContextKey).(string)
@@ -333,14 +333,14 @@ func (th *ticketHandler) UpdateTicketSequence(w http.ResponseWriter, r *http.Req
 	json.NewEncoder(w).Encode(map[string]string{"message": "Ticket sequences updated successfully"})
 }
 
-//	@Summary		Delete Ticket
-//	@Description	Delete a ticket by its UUID
-//	@Tags			Tickets
-//	@Accept			json
-//	@Produce		json
-//	@Param			uuid	path		string	true	"Ticket UUID"
-//	@Success		200		{string}	string	"Ticket group deleted successfully"
-//	@Router			/bounties/ticket/{uuid} [delete]
+// @Summary		Delete Ticket
+// @Description	Delete a ticket by its UUID
+// @Tags			Bounty Tickets
+// @Accept			json
+// @Produce		json
+// @Param			uuid	path		string	true	"Ticket UUID"
+// @Success		200		{string}	string	"Ticket group deleted successfully"
+// @Router			/bounties/ticket/{uuid} [delete]
 func (th *ticketHandler) DeleteTicket(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 	pubKeyFromAuth, _ := ctx.Value(auth.ContextKey).(string)
@@ -387,14 +387,14 @@ func (th *ticketHandler) DeleteTicket(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(map[string]string{"message": "Ticket group deleted successfully"})
 }
 
-//	@Summary		Post Ticket Data to Stakwork
-//	@Description	Post ticket data to Stakwork for processing
-//	@Tags			Tickets
-//	@Accept			json
-//	@Produce		json
-//	@Param			ticketRequest	body		UpdateTicketRequest	true	"Update Ticket Request"
-//	@Success		200				{object}	TicketResponse
-//	@Router			/bounties/ticket/review/send [post]
+// @Summary		Post Ticket Data to Stakwork
+// @Description	Post ticket data to Stakwork for processing
+// @Tags			Bounty Tickets
+// @Accept			json
+// @Produce		json
+// @Param			ticketRequest	body		UpdateTicketRequest	true	"Update Ticket Request"
+// @Success		200				{object}	TicketResponse
+// @Router			/bounties/ticket/review/send [post]
 func (th *ticketHandler) PostTicketDataToStakwork(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 	pubKeyFromAuth, _ := ctx.Value(auth.ContextKey).(string)
@@ -735,14 +735,14 @@ func (th *ticketHandler) PostTicketDataToStakwork(w http.ResponseWriter, r *http
 	})
 }
 
-//	@Summary		Process Ticket Review
-//	@Description	Process the review of a ticket
-//	@Tags			Tickets
-//	@Accept			json
-//	@Produce		json
-//	@Param			reviewReq	body		utils.TicketReviewRequest	true	"Ticket Review Request"
-//	@Success		200			{object}	db.Tickets
-//	@Router			/bounties/ticket/review [post]
+// @Summary		Process Ticket Review
+// @Description	Process the review of a ticket
+// @Tags			Bounty Tickets
+// @Accept			json
+// @Produce		json
+// @Param			reviewReq	body		utils.TicketReviewRequest	true	"Ticket Review Request"
+// @Success		200			{object}	db.Tickets
+// @Router			/bounties/ticket/review [post]
 func (th *ticketHandler) ProcessTicketReview(w http.ResponseWriter, r *http.Request) {
 
 	body, err := io.ReadAll(r.Body)
@@ -835,15 +835,15 @@ func (th *ticketHandler) ProcessTicketReview(w http.ResponseWriter, r *http.Requ
 	json.NewEncoder(w).Encode(createdTicket)
 }
 
-//	@Summary		Get Tickets by Phase UUID
-//	@Description	Get tickets by phase UUID
-//	@Tags			Tickets
-//	@Accept			json
-//	@Produce		json
-//	@Param			feature_uuid	path	string	true	"Feature UUID"
-//	@Param			phase_uuid		path	string	true	"Phase UUID"
-//	@Success		200				{array}	db.Tickets
-//	@Router			/bounties/ticket/feature/{feature_uuid}/phase/{phase_uuid} [get]
+// @Summary		Get Tickets by Phase UUID
+// @Description	Get tickets by phase UUID
+// @Tags			Bounty Tickets
+// @Accept			json
+// @Produce		json
+// @Param			feature_uuid	path	string	true	"Feature UUID"
+// @Param			phase_uuid		path	string	true	"Phase UUID"
+// @Success		200				{array}	db.Tickets
+// @Router			/bounties/ticket/feature/{feature_uuid}/phase/{phase_uuid} [get]
 func (th *ticketHandler) GetTicketsByPhaseUUID(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 	pubKeyFromAuth, _ := ctx.Value(auth.ContextKey).(string)
@@ -893,14 +893,14 @@ func (th *ticketHandler) GetTicketsByPhaseUUID(w http.ResponseWriter, r *http.Re
 	json.NewEncoder(w).Encode(tickets)
 }
 
-//	@Summary		Convert Ticket to Bounty
-//	@Description	Convert a ticket to a bounty
-//	@Tags			Tickets
-//	@Accept			json
-//	@Produce		json
-//	@Param			ticket_uuid	path		string	true	"Ticket UUID"
-//	@Success		201			{object}	CreateBountyResponse
-//	@Router			/bounties/ticket/{ticket_uuid}/bounty [post]
+// @Summary		Convert Ticket to Bounty
+// @Description	Convert a ticket to a bounty
+// @Tags			Bounty Tickets
+// @Accept			json
+// @Produce		json
+// @Param			ticket_uuid	path		string	true	"Ticket UUID"
+// @Success		201			{object}	CreateBountyResponse
+// @Router			/bounties/ticket/{ticket_uuid}/bounty [post]
 func (th *ticketHandler) TicketToBounty(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 	pubKeyFromAuth, _ := ctx.Value(auth.ContextKey).(string)
@@ -974,14 +974,14 @@ func (th *ticketHandler) TicketToBounty(w http.ResponseWriter, r *http.Request) 
 	})
 }
 
-//	@Summary		Get Tickets by Group
-//	@Description	Get tickets by group UUID
-//	@Tags			Tickets
-//	@Accept			json
-//	@Produce		json
-//	@Param			group_uuid	path	string	true	"Group UUID"
-//	@Success		200			{array}	db.Tickets
-//	@Router			/bounties/ticket/group/{group_uuid} [get]
+// @Summary		Get Tickets by Group
+// @Description	Get tickets by group UUID
+// @Tags			Bounty Tickets
+// @Accept			json
+// @Produce		json
+// @Param			group_uuid	path	string	true	"Group UUID"
+// @Success		200			{array}	db.Tickets
+// @Router			/bounties/ticket/group/{group_uuid} [get]
 func (th *ticketHandler) GetTicketsByGroup(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 	pubKeyFromAuth, _ := ctx.Value(auth.ContextKey).(string)
@@ -1016,15 +1016,15 @@ func (th *ticketHandler) GetTicketsByGroup(w http.ResponseWriter, r *http.Reques
 	json.NewEncoder(w).Encode(tickets)
 }
 
-//	@Summary		Create Workspace Draft Ticket
-//	@Description	Create a draft ticket for a workspace
-//	@Tags			Tickets
-//	@Accept			json
-//	@Produce		json
-//	@Param			workspace_uuid	path		string				true	"Workspace UUID"
-//	@Param			ticketRequest	body		CreateOrEditTicket	true	"Create Draft Ticket Request"
-//	@Success		201				{object}	db.Tickets
-//	@Router			/bounties/ticket/workspace/{workspace_uuid}/draft [post]
+// @Summary		Create Workspace Draft Ticket
+// @Description	Create a draft ticket for a workspace
+// @Tags			Bounty Tickets
+// @Accept			json
+// @Produce		json
+// @Param			workspace_uuid	path		string				true	"Workspace UUID"
+// @Param			ticketRequest	body		CreateOrEditTicket	true	"Create Draft Ticket Request"
+// @Success		201				{object}	db.Tickets
+// @Router			/bounties/ticket/workspace/{workspace_uuid}/draft [post]
 func (th *ticketHandler) CreateWorkspaceDraftTicket(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 	workspaceUuid := chi.URLParam(r, "workspace_uuid")
@@ -1083,15 +1083,15 @@ func (th *ticketHandler) CreateWorkspaceDraftTicket(w http.ResponseWriter, r *ht
 	json.NewEncoder(w).Encode(createdTicket)
 }
 
-//	@Summary		Get Workspace Draft Ticket
-//	@Description	Get a draft ticket for a workspace by its UUID
-//	@Tags			Tickets
-//	@Accept			json
-//	@Produce		json
-//	@Param			workspace_uuid	path		string	true	"Workspace UUID"
-//	@Param			uuid			path		string	true	"Ticket UUID"
-//	@Success		200				{object}	db.Tickets
-//	@Router			/bounties/ticket/workspace/{workspace_uuid}/draft/{uuid} [get]
+// @Summary		Get Workspace Draft Ticket
+// @Description	Get a draft ticket for a workspace by its UUID
+// @Tags			Bounty Tickets
+// @Accept			json
+// @Produce		json
+// @Param			workspace_uuid	path		string	true	"Workspace UUID"
+// @Param			uuid			path		string	true	"Ticket UUID"
+// @Success		200				{object}	db.Tickets
+// @Router			/bounties/ticket/workspace/{workspace_uuid}/draft/{uuid} [get]
 func (th *ticketHandler) GetWorkspaceDraftTicket(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 	workspaceUuid := chi.URLParam(r, "workspace_uuid")
@@ -1127,16 +1127,16 @@ func (th *ticketHandler) GetWorkspaceDraftTicket(w http.ResponseWriter, r *http.
 	json.NewEncoder(w).Encode(ticket)
 }
 
-//	@Summary		Update Workspace Draft Ticket
-//	@Description	Update a draft ticket for a workspace
-//	@Tags			Tickets
-//	@Accept			json
-//	@Produce		json
-//	@Param			workspace_uuid	path		string				true	"Workspace UUID"
-//	@Param			uuid			path		string				true	"Ticket UUID"
-//	@Param			ticketRequest	body		CreateOrEditTicket	true	"Update Draft Ticket Request"
-//	@Success		200				{object}	db.Tickets
-//	@Router			/bounties/ticket/workspace/{workspace_uuid}/draft/{uuid} [post]
+// @Summary		Update Workspace Draft Ticket
+// @Description	Update a draft ticket for a workspace
+// @Tags			Bounty Tickets
+// @Accept			json
+// @Produce		json
+// @Param			workspace_uuid	path		string				true	"Workspace UUID"
+// @Param			uuid			path		string				true	"Ticket UUID"
+// @Param			ticketRequest	body		CreateOrEditTicket	true	"Update Draft Ticket Request"
+// @Success		200				{object}	db.Tickets
+// @Router			/bounties/ticket/workspace/{workspace_uuid}/draft/{uuid} [post]
 func (th *ticketHandler) UpdateWorkspaceDraftTicket(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 	workspaceUuid := chi.URLParam(r, "workspace_uuid")
@@ -1223,15 +1223,15 @@ func (th *ticketHandler) UpdateWorkspaceDraftTicket(w http.ResponseWriter, r *ht
 	json.NewEncoder(w).Encode(updatedTicket)
 }
 
-//	@Summary		Delete Workspace Draft Ticket
-//	@Description	Delete a draft ticket for a workspace by its UUID
-//	@Tags			Tickets
-//	@Accept			json
-//	@Produce		json
-//	@Param			workspace_uuid	path		string	true	"Workspace UUID"
-//	@Param			uuid			path		string	true	"Ticket UUID"
-//	@Success		204				{string}	string	"No Content"
-//	@Router			/bounties/ticket/workspace/{workspace_uuid}/draft/{uuid} [delete]
+// @Summary		Delete Workspace Draft Ticket
+// @Description	Delete a draft ticket for a workspace by its UUID
+// @Tags			Bounty Tickets
+// @Accept			json
+// @Produce		json
+// @Param			workspace_uuid	path		string	true	"Workspace UUID"
+// @Param			uuid			path		string	true	"Ticket UUID"
+// @Success		204				{string}	string	"No Content"
+// @Router			/bounties/ticket/workspace/{workspace_uuid}/draft/{uuid} [delete]
 func (th *ticketHandler) DeleteWorkspaceDraftTicket(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 	workspaceUuid := chi.URLParam(r, "workspace_uuid")
@@ -1286,14 +1286,14 @@ func (th *ticketHandler) DeleteWorkspaceDraftTicket(w http.ResponseWriter, r *ht
 	w.WriteHeader(http.StatusNoContent)
 }
 
-//	@Summary		Convert Tickets to Bounties
-//	@Description	Convert multiple tickets to bounties
-//	@Tags			Tickets
-//	@Accept			json
-//	@Produce		json
-//	@Param			req	body		BulkTicketToBountyRequest	true	"Bulk Ticket to Bounty Request"
-//	@Success		200	{object}	BulkConversionResponse
-//	@Router			/bounties/ticket/bounty/bulk [post]
+// @Summary		Convert Tickets to Bounties
+// @Description	Convert multiple tickets to bounties
+// @Tags			Bounty Tickets
+// @Accept			json
+// @Produce		json
+// @Param			req	body		BulkTicketToBountyRequest	true	"Bulk Ticket to Bounty Request"
+// @Success		200	{object}	BulkConversionResponse
+// @Router			/bounties/ticket/bounty/bulk [post]
 func (th *ticketHandler) TicketsToBounties(w http.ResponseWriter, r *http.Request) {
 
 	ctx := r.Context()
