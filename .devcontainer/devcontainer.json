@@ -1,10 +1,9 @@
 {
-  "name": "Sphinx Tribes Dev",
-  "service": "workspace",
-  "runServices": ["workspace", "postgres"],
-  "dockerComposeFile": "docker-compose.yml",
-  "workspaceFolder": "/workspaces/sphinx-tribes",
-  "forwardPorts": [8080, 5432, 3000],
+  "name": "Go & PostgreSQL",
+	"dockerComposeFile": "docker-compose.yml",
+	"service": "app",
+	"workspaceFolder": "/workspaces/sphinx-tribes",
+  "forwardPorts": [13007, 5432, 5002],
   "postCreateCommand": "bash .devcontainer/setup.sh",
   "customizations": {
     "codespaces": {
@@ -18,5 +17,6 @@
       }
     }
   },
+  "remoteUser": "root",
   "shutdownAction": "stopCompose"
 }
