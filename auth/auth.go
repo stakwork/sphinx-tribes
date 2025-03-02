@@ -33,8 +33,8 @@ type contextKey string
 // ContextKey ...
 var ContextKey = contextKey("key")
 
-// PubKeyContext parses pukey from signed timestamp
 // PubKeyContext godoc
+//
 //	@Summary					Authentication middleware that extracts public key from token
 //	@Description				Parses public key from either a JWT token or signed timestamp
 //	@SecurityDefinitions.apikey	PubKeyContextAuth
@@ -93,8 +93,8 @@ func PubKeyContext(next http.Handler) http.Handler {
 	})
 }
 
-// PubKeyContext parses pukey from signed timestamp
 // PubKeyContextSuperAdmin godoc
+//
 //	@Summary					Super admin authentication middleware
 //	@Description				Parses public key from token and verifies admin privileges
 //	@SecurityDefinitions.apikey	SuperAdminAuth
@@ -204,6 +204,7 @@ func CombinedAuthContext(next http.Handler) http.Handler {
 
 // ConnectionContext parses token for connection code
 // ConnectionCodeContext godoc
+//
 //	@Summary					Connection code authentication middleware
 //	@Description				Verifies connection authorization token
 //	@SecurityDefinitions.apikey	ConnectionAuth
@@ -235,8 +236,8 @@ func ConnectionCodeContext(next http.Handler) http.Handler {
 	})
 }
 
-// CypressContext allows testing for cypress
 // CypressContext godoc
+//
 //	@Summary					Test environment bypass middleware
 //	@Description				Allows testing access in cypress environment
 //	@SecurityDefinitions.apikey	CypressAuth
