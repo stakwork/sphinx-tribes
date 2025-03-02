@@ -1,8 +1,6 @@
 module github.com/stakwork/sphinx-tribes
 
-go 1.22.0
-
-toolchain go1.23.4
+go 1.2
 
 require (
 	github.com/DATA-DOG/go-sqlmock v1.5.1
@@ -164,9 +162,11 @@ require (
 	github.com/lightningnetwork/lnd/ticker v1.1.1 // indirect
 	github.com/lightningnetwork/lnd/tlv v1.1.1 // indirect
 	github.com/lightningnetwork/lnd/tor v1.1.2 // indirect
+	github.com/onsi/gomega v1.26.0 // indirect
 	github.com/posthog/posthog-go v1.2.24
 	github.com/robfig/cron v1.2.0
 	github.com/swaggo/http-swagger v1.3.4
+	github.com/swaggo/swag v1.16.4
 	github.com/urfave/negroni v1.0.0
 	github.com/xhd2015/xgo/runtime v1.0.52
 	golang.org/x/exp v0.0.0-20230315142452-642cacee5cc0
