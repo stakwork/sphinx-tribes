@@ -23,6 +23,7 @@ Sphinx-Tribes is a decentralized message broker for public groups within the Sph
   - [Unit Testing](#unit-testing)
   - [Mocking Interfaces](#mocking-interfaces)
 - [Backend API Data Validations](#backend-api-data-validations)
+- [API Documentation](#api-documentation)
 - [Contributing](#contributing)
 - [License](#license)
 
@@ -205,6 +206,91 @@ if err != nil {
 }
 
 ```
+
+## API Documentation
+
+We use [swaggo](https://github.com/swaggo/swag) for generating Swagger documentation from Go annotations.
+
+### Installing Swaggo CLI
+
+To install the swaggo CLI tool, run the following command:
+
+```sh
+# Using go install
+go install github.com/swaggo/swag/cmd/swag@latest
+```
+
+After installation, verify that the CLI is working correctly:
+
+```sh
+swag -v
+```
+
+### Generating API Documentation
+
+Initialize and update the Swagger docs with:
+
+```sh
+swag init -g main.go
+```
+
+This will parse your Go code comments and generate documentation in the `docs` directory.
+
+To format your Swagger annotations for better readability and consistency:
+
+```sh
+swag fmt
+```
+
+### Writing Documentation for Handlers
+
+Swaggo uses special annotations in your code comments to generate documentation. Here's how to document a handler:
+
+```go
+// CreateUser 
+//
+// @Summary Create a new user
+// @Description Create a new user with the provided information
+// @Tags users
+// @Accept json
+// @Produce json
+// @Param user body UserRequest true "User details"
+// @Success 200 {object} UserResponse
+// @Failure 400 {object} ErrorResponse
+// @Failure 500 {object} ErrorResponse
+// @Router /users [post]
+func (h *Handler) CreateUser(w http.ResponseWriter, r *http.Request) {
+    // Handler implementation
+}
+```
+
+Common annotations:
+
+- `@Summary`: Short summary of what the endpoint does
+- `@Description`: Longer description of the endpoint
+- `@Tags`: Group the endpoint under a tag
+- `@Accept`: Accepted MIME types (e.g., json, xml)
+- `@Produce`: Response MIME types
+- `@Param`: Parameters (format: name, type, data type, required, description)
+- `@Success`: Success response with HTTP code and response model
+- `@Failure`: Error response with HTTP code and response model
+- `@Router`: URL path and HTTP method
+
+For struct documentation:
+
+```go
+// UserRequest represents the request body for creating or updating a user
+// swagger:model
+type UserRequest struct {
+    Name     string `json:"name" example:"John Doe"`    // User's full name
+    Email    string `json:"email" example:"john@example.com"` // User's email address
+    Password string `json:"password" example:"secret123"` // User's password
+}
+```
+
+### Viewing the Documentation
+
+After generating the docs, you can view them by accessing the Swagger UI at `/docs/index.html` when your server is running.
 
 ## Contributing
 
