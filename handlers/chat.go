@@ -102,6 +102,19 @@ type ProcessChatRequest struct {
 	} `json:"value"`
 }
 
+type PaginationResponse struct {
+	CurrentPage int `json:"currentPage"`
+	PageSize    int `json:"pageSize"`
+	TotalItems  int `json:"totalItems"`
+	TotalPages  int `json:"totalPages"`
+}
+
+type ListFilesResponse struct {
+	Success    bool               `json:"success" example:"true"`
+	Data       []db.FileAsset     `json:"data"`
+	Pagination PaginationResponse `json:"pagination"`
+}
+
 func NewChatHandler(httpClient *http.Client, database db.Database) *ChatHandler {
 	return &ChatHandler{
 		httpClient: httpClient,
@@ -116,6 +129,7 @@ func NewChatHandler(httpClient *http.Client, database db.Database) *ChatHandler 
 //	@Tags			Hive Chat
 //	@Accept			json
 //	@Produce		json
+//	@Security		PubKeyContextAuth
 //	@Param			request	body		CreateOrEditChatRequest	true	"Chat creation request"
 //	@Success		200		{object}	ChatResponse
 //	@Failure		400		{object}	ChatResponse
@@ -174,6 +188,7 @@ func (ch *ChatHandler) CreateChat(w http.ResponseWriter, r *http.Request) {
 //	@Tags			Hive Chat
 //	@Accept			json
 //	@Produce		json
+//	@Security		PubKeyContextAuth
 //	@Param			chat_id	path		string					true	"Chat ID"
 //	@Param			request	body		CreateOrEditChatRequest	true	"Chat update request"
 //	@Success		200		{object}	ChatResponse
@@ -241,6 +256,7 @@ func (ch *ChatHandler) UpdateChat(w http.ResponseWriter, r *http.Request) {
 //	@Tags			Hive Chat
 //	@Accept			json
 //	@Produce		json
+//	@Security		PubKeyContextAuth
 //	@Param			chat_id	path		string	true	"Chat ID"
 //	@Success		200		{object}	ChatResponse
 //	@Failure		400		{object}	ChatResponse
@@ -322,6 +338,7 @@ func buildVarsPayload(request SendMessageRequest, createdMessage *db.ChatMessage
 //	@Tags			Hive Chat
 //	@Accept			json
 //	@Produce		json
+//	@Security		PubKeyContextAuth
 //	@Param			request	body		SendMessageRequest	true	"Send message request"
 //	@Success		200		{object}	ChatResponse
 //	@Failure		400		{object}	ChatResponse
@@ -534,6 +551,7 @@ func (ch *ChatHandler) sendToStakwork(payload StakworkChatPayload) (int64, error
 //	@Description	Retrieve chats for a workspace with the given ID and status
 //	@Tags			Hive Chat
 //	@Produce		json
+//	@Security		PubKeyContextAuth
 //	@Param			workspace_id	query		string	true	"Workspace ID"
 //	@Param			status			query		string	false	"Chat status"
 //	@Success		200				{object}	ChatResponse
@@ -576,6 +594,7 @@ func (ch *ChatHandler) GetChat(w http.ResponseWriter, r *http.Request) {
 //	@Description	Retrieve the history of a chat with the given ID
 //	@Tags			Hive Chat
 //	@Produce		json
+//	@Security		PubKeyContextAuth
 //	@Param			uuid	path		string	true	"Chat ID"
 //	@Success		200		{object}	HistoryChatResponse
 //	@Failure		400		{object}	ChatResponse
@@ -693,6 +712,7 @@ func (ch *ChatHandler) ProcessChatResponse(w http.ResponseWriter, r *http.Reques
 //	@Tags			Hive Chat
 //	@Accept			multipart/form-data
 //	@Produce		json
+//	@Security		PubKeyContextAuth
 //	@Param			file	formData	file	true	"File to upload"
 //	@Success		200		{object}	FileResponse
 //	@Failure		400		{object}	ChatResponse
@@ -803,6 +823,7 @@ func (ch *ChatHandler) UploadFile(w http.ResponseWriter, r *http.Request) {
 //	@Description	Retrieve a file from a chat with the given ID
 //	@Tags			Hive Chat
 //	@Produce		json
+//	@Security		PubKeyContextAuth
 //	@Param			id	path		string	true	"File ID"
 //	@Success		200	{object}	FileResponse
 //	@Failure		400	{object}	ChatResponse
@@ -855,12 +876,13 @@ func (ch *ChatHandler) GetFile(w http.ResponseWriter, r *http.Request) {
 //	@Description	List all files in a chat with the given parameters
 //	@Tags			Hive Chat
 //	@Produce		json
+//	@Security		PubKeyContextAuth
 //	@Param			status		query		string	false	"File status"
 //	@Param			mimeType	query		string	false	"File MIME type"
 //	@Param			workspaceId	query		string	false	"Workspace ID"
 //	@Param			page		query		int		false	"Page number"
 //	@Param			pageSize	query		int		false	"Page size"
-//	@Success		200			{object}	map[string]interface{}
+//	@Success		200			{object}	ListFilesResponse
 //	@Failure		400			{object}	ChatResponse
 //	@Failure		500			{object}	ChatResponse
 //	@Router			/hivechat/file/all [get]
@@ -924,6 +946,7 @@ func (ch *ChatHandler) ListFiles(w http.ResponseWriter, r *http.Request) {
 //	@Description	Delete a file from a chat with the given ID
 //	@Tags			Hive Chat
 //	@Produce		json
+//	@Security		PubKeyContextAuth
 //	@Param			id	path		string	true	"File ID"
 //	@Success		200	{object}	ChatResponse
 //	@Failure		400	{object}	ChatResponse
@@ -983,6 +1006,7 @@ func (ch *ChatHandler) DeleteFile(w http.ResponseWriter, r *http.Request) {
 //	@Tags			Hive Chat
 //	@Accept			json
 //	@Produce		json
+//	@Security		PubKeyContextAuth
 //	@Param			request	body		BuildMessageRequest	true	"Build message request"
 //	@Success		200		{object}	ChatResponse
 //	@Failure		400		{object}	ChatResponse

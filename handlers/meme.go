@@ -19,11 +19,14 @@ import (
 	"github.com/stakwork/sphinx-tribes/logger"
 )
 
+// MemeImageUpload godoc
+//
 //	@Summary		Meme Image Upload
 //	@Description	Upload an image for a meme
 //	@Tags			Memes
 //	@Accept			multipart/form-data
 //	@Produce		json
+//	@Security		PubKeyContextAuth
 //	@Param			file	formData	file	true	"Meme Image File"
 //	@Success		200		{string}	string	"Meme image URL"
 //	@Router			/meme_upload [post]

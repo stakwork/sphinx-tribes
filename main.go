@@ -20,11 +20,26 @@ import (
 	"gopkg.in/go-playground/validator.v9"
 )
 
-// @title			Sphinx Tribes API
-// @version		1.0
-// @description	This is the API documentation for Sphinx Tribes.
-// @host			localhost:5002
-// @BasePath		/
+// @title						Sphinx Tribes API
+// @version					1.0
+// @description				This is the API documentation for Sphinx Tribes.
+// @host						localhost:5002
+// @BasePath					/
+//
+// @SecurityDefinitions.apiKey	PubKeyContextAuth
+// @In							header
+// @Name						x-jwt
+// @Description				JWT token for authentication. Can also be provided as a query parameter named 'token'
+//
+// @SecurityDefinitions.apiKey	SuperAdminAuth
+// @In							header
+// @Name						x-jwt
+// @Description				JWT token for super admin authentication. Can also be provided as a query parameter named 'token'
+//
+// @SecurityDefinitions.apikey	CypressAuth
+// @In							header
+// @Name						x-cypress
+// @Description				No authentication needed when in test mode
 func main() {
 	if err := godotenv.Load(); err != nil {
 		fmt.Println("no .env file")

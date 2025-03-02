@@ -1,5 +1,12 @@
 basePath: /
 definitions:
+  auth.LnEncodeData:
+    properties:
+      encode:
+        type: string
+      k1:
+        type: string
+    type: object
   db.Activity:
     properties:
       actions:
@@ -512,6 +519,43 @@ definitions:
     - BackendDevelopment
     - Design
     - Other
+  db.Channel:
+    properties:
+      created:
+        type: string
+      deleted:
+        type: boolean
+      id:
+        type: integer
+      name:
+        type: string
+      tribe_uuid:
+        type: string
+    type: object
+  db.ConnectionCodesList:
+    properties:
+      connection_string:
+        type: string
+      date_created:
+        type: string
+      id:
+        type: integer
+      is_used:
+        type: boolean
+      pubkey:
+        type: string
+      route_hint:
+        type: string
+      sats_amount:
+        type: integer
+    type: object
+  db.ConnectionCodesShort:
+    properties:
+      connection_string:
+        type: string
+      date_created:
+        type: string
+    type: object
   db.ContentType:
     enum:
     - feature_creation
@@ -524,6 +568,13 @@ definitions:
     - StoryUpdate
     - RequirementChange
     - GeneralUpdate
+  db.DeleteBountyAssignee:
+    properties:
+      created:
+        type: string
+      owner_pubkey:
+        type: string
+    type: object
   db.FeatureOutput:
     properties:
       featureContext:
@@ -690,6 +741,17 @@ definitions:
         type: string
       title:
         type: string
+    type: object
+  db.InviteBody:
+    properties:
+      number:
+        type: integer
+      pubkey:
+        type: string
+      route_hint:
+        type: string
+      sats_amount:
+        type: integer
     type: object
   db.Invoice:
     properties:
@@ -1145,6 +1207,22 @@ definitions:
           $ref: '#/definitions/db.QuickTicketItem'
         type: array
     type: object
+  db.Save:
+    properties:
+      body:
+        type: string
+      key:
+        type: string
+      method:
+        type: string
+      path:
+        type: string
+    type: object
+  db.SaveResponse:
+    properties:
+      key:
+        type: string
+    type: object
   db.StatusBudget:
     properties:
       assigned_budget:
@@ -1385,6 +1463,36 @@ definitions:
       updated:
         type: string
       uuid:
+        type: string
+    type: object
+  db.VerifyPayload:
+    properties:
+      alias:
+        type: string
+      contact_key:
+        type: string
+      description:
+        type: string
+      extras:
+        additionalProperties: true
+        type: object
+      id:
+        type: integer
+      jwt:
+        type: string
+      photo_url:
+        type: string
+      price_to_meet:
+        type: integer
+      pubkey:
+        type: string
+      route_hint:
+        type: string
+      tribe_jwt:
+        type: string
+      url:
+        type: string
+      verification_signature:
         type: string
     type: object
   db.WfRequest:
@@ -1801,6 +1909,17 @@ definitions:
       model:
         $ref: '#/definitions/feeds.Model'
     type: object
+  handlers.ActivitiesResponse:
+    properties:
+      data:
+        items:
+          $ref: '#/definitions/db.Activity'
+        type: array
+      error:
+        type: string
+      success:
+        type: boolean
+    type: object
   handlers.ActivityContentRequest:
     properties:
       content:
@@ -1810,6 +1929,17 @@ definitions:
     properties:
       data:
         $ref: '#/definitions/db.Activity'
+      error:
+        type: string
+      success:
+        type: boolean
+    type: object
+  handlers.ActivityThreadResponse:
+    properties:
+      data:
+        items:
+          $ref: '#/definitions/db.Activity'
+        type: array
       error:
         type: string
       success:
@@ -1880,6 +2010,20 @@ definitions:
       data: {}
       message:
         type: string
+      success:
+        type: boolean
+    type: object
+  handlers.ConnectionCodesListResponse:
+    properties:
+      data:
+        properties:
+          codes:
+            items:
+              $ref: '#/definitions/db.ConnectionCodesList'
+            type: array
+          total:
+            type: integer
+        type: object
       success:
         type: boolean
     type: object
@@ -1999,6 +2143,38 @@ definitions:
       success:
         type: boolean
     type: object
+  handlers.ListFilesResponse:
+    properties:
+      data:
+        items:
+          $ref: '#/definitions/db.FileAsset'
+        type: array
+      pagination:
+        $ref: '#/definitions/handlers.PaginationResponse'
+      success:
+        example: true
+        type: boolean
+    type: object
+  handlers.LnAuthResponse:
+    properties:
+      jwt:
+        type: string
+      message:
+        type: string
+      status:
+        type: string
+    type: object
+  handlers.PaginationResponse:
+    properties:
+      currentPage:
+        type: integer
+      pageSize:
+        type: integer
+      totalItems:
+        type: integer
+      totalPages:
+        type: integer
+    type: object
   handlers.ProcessChatRequest:
     properties:
       value:
@@ -2012,6 +2188,17 @@ definitions:
           sourceWebsocketId:
             type: string
         type: object
+    type: object
+  handlers.RefreshTokenResponse:
+    properties:
+      jwt:
+        type: string
+      k1:
+        type: string
+      status:
+        type: boolean
+      user:
+        $ref: '#/definitions/db.Person'
     type: object
   handlers.SendMessageRequest:
     properties:
@@ -2117,6 +2304,11 @@ definitions:
       name:
         type: string
     type: object
+  handlers.UpdateProofStatusResponse:
+    properties:
+      status:
+        $ref: '#/definitions/db.ProofOfWorkStatus'
+    type: object
   handlers.UpdateTicketRequest:
     properties:
       metadata:
@@ -2144,6 +2336,44 @@ definitions:
         items:
           $ref: '#/definitions/db.PersonInShort'
         type: array
+    type: object
+  handlers.WebhookActivityRequest:
+    properties:
+      actions:
+        items:
+          type: string
+        type: array
+      author:
+        $ref: '#/definitions/db.AuthorType'
+      author_ref:
+        type: string
+      content:
+        type: string
+      content_type:
+        type: string
+      feature_uuid:
+        type: string
+      phase_uuid:
+        type: string
+      questions:
+        items:
+          type: string
+        type: array
+      thread_id:
+        type: string
+      title:
+        type: string
+      workspace:
+        type: string
+    type: object
+  handlers.WebhookResponse:
+    properties:
+      activity_id:
+        type: string
+      error:
+        type: string
+      success:
+        type: boolean
     type: object
   utils.TicketReviewRequest:
     properties:
@@ -2185,11 +2415,15 @@ paths:
         required: true
         schema:
           $ref: '#/definitions/handlers.CreateActivityRequest'
+      produces:
+      - application/json
       responses:
         "201":
           description: Created
           schema:
             $ref: '#/definitions/handlers.ActivityResponse'
+      security:
+      - PubKeyContextAuth: []
       summary: Create an activity
       tags:
       - Activities
@@ -2202,29 +2436,47 @@ paths:
         name: id
         required: true
         type: string
+      produces:
+      - application/json
       responses:
         "200":
           description: OK
           schema:
             additionalProperties: true
             type: object
+      security:
+      - PubKeyContextAuth: []
       summary: Delete an activity
       tags:
       - Activities
     get:
-      description: Get an activity by ID
+      description: Fetch a specific activity by its unique identifier
       parameters:
       - description: Activity ID
         in: path
         name: id
         required: true
         type: string
+      produces:
+      - application/json
       responses:
         "200":
           description: OK
           schema:
             $ref: '#/definitions/handlers.ActivityResponse'
-      summary: Get an activity
+        "400":
+          description: ID is required
+          schema:
+            type: string
+        "404":
+          description: activity not found
+          schema:
+            type: string
+        "500":
+          description: Internal server error
+          schema:
+            type: string
+      summary: Retrieve activity details
       tags:
       - Activities
     put:
@@ -2241,11 +2493,15 @@ paths:
         required: true
         schema:
           $ref: '#/definitions/db.Activity'
+      produces:
+      - application/json
       responses:
         "200":
           description: OK
           schema:
             $ref: '#/definitions/handlers.ActivityResponse'
+      security:
+      - PubKeyContextAuth: []
       summary: Update an activity
       tags:
       - Activities
@@ -2264,11 +2520,15 @@ paths:
         required: true
         schema:
           $ref: '#/definitions/handlers.ActivityContentRequest'
+      produces:
+      - application/json
       responses:
         "200":
           description: OK
           schema:
             $ref: '#/definitions/handlers.ActivityResponse'
+      security:
+      - PubKeyContextAuth: []
       summary: Add actions to an activity
       tags:
       - Activities
@@ -2286,11 +2546,15 @@ paths:
         name: action_id
         required: true
         type: string
+      produces:
+      - application/json
       responses:
         "200":
           description: OK
           schema:
             $ref: '#/definitions/handlers.ActivityResponse'
+      security:
+      - PubKeyContextAuth: []
       summary: Remove an action from an activity
       tags:
       - Activities
@@ -2309,11 +2573,15 @@ paths:
         required: true
         schema:
           $ref: '#/definitions/handlers.ActivityContentRequest'
+      produces:
+      - application/json
       responses:
         "200":
           description: OK
           schema:
             $ref: '#/definitions/handlers.ActivityResponse'
+      security:
+      - PubKeyContextAuth: []
       summary: Add questions to an activity
       tags:
       - Activities
@@ -2331,11 +2599,15 @@ paths:
         name: question_id
         required: true
         type: string
+      produces:
+      - application/json
       responses:
         "200":
           description: OK
           schema:
             $ref: '#/definitions/handlers.ActivityResponse'
+      security:
+      - PubKeyContextAuth: []
       summary: Remove a question from an activity
       tags:
       - Activities
@@ -2348,12 +2620,15 @@ paths:
         name: feature_uuid
         required: true
         type: string
+      produces:
+      - application/json
       responses:
         "200":
           description: OK
           schema:
-            additionalProperties: true
-            type: object
+            $ref: '#/definitions/handlers.ActivitiesResponse'
+      security:
+      - PubKeyContextAuth: []
       summary: Get activities by feature
       tags:
       - Activities
@@ -2366,13 +2641,48 @@ paths:
         name: phase_uuid
         required: true
         type: string
+      produces:
+      - application/json
       responses:
         "200":
           description: OK
           schema:
-            additionalProperties: true
-            type: object
+            $ref: '#/definitions/handlers.ActivitiesResponse'
+      security:
+      - PubKeyContextAuth: []
       summary: Get activities by phase
+      tags:
+      - Activities
+  /activities/receive:
+    post:
+      consumes:
+      - application/json
+      description: Receives activity data from a webhook, validates it, and creates
+        a new activity record
+      parameters:
+      - description: Activity information
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/handlers.WebhookActivityRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/handlers.WebhookResponse'
+        "400":
+          description: Invalid request payload, invalid public key format, invalid
+            source ID format, or other validation errors
+          schema:
+            $ref: '#/definitions/handlers.WebhookResponse'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/handlers.WebhookResponse'
+      summary: Receive and process a new activity
       tags:
       - Activities
   /activities/thread:
@@ -2390,11 +2700,15 @@ paths:
         name: source_id
         required: true
         type: string
+      produces:
+      - application/json
       responses:
         "201":
           description: Created
           schema:
             $ref: '#/definitions/handlers.ActivityResponse'
+      security:
+      - PubKeyContextAuth: []
       summary: Create an activity thread
       tags:
       - Activities
@@ -2407,12 +2721,21 @@ paths:
         name: thread_id
         required: true
         type: string
+      produces:
+      - application/json
       responses:
         "200":
           description: OK
           schema:
-            additionalProperties: true
-            type: object
+            $ref: '#/definitions/handlers.ActivityThreadResponse'
+        "400":
+          description: thread_id is required
+          schema:
+            type: string
+        "500":
+          description: Failed to get activities
+          schema:
+            type: string
       summary: Get activities by thread
       tags:
       - Activities
@@ -2425,11 +2748,21 @@ paths:
         name: thread_id
         required: true
         type: string
+      produces:
+      - application/json
       responses:
         "200":
           description: OK
           schema:
             $ref: '#/definitions/handlers.ActivityResponse'
+        "400":
+          description: thread_id is required
+          schema:
+            type: string
+        "500":
+          description: Failed to get latest activity
+          schema:
+            type: string
       summary: Get the latest activity by thread
       tags:
       - Activities
@@ -2442,25 +2775,38 @@ paths:
         name: workspace
         required: true
         type: string
+      produces:
+      - application/json
       responses:
         "200":
           description: OK
           schema:
-            additionalProperties: true
-            type: object
+            $ref: '#/definitions/handlers.ActivitiesResponse'
+      security:
+      - PubKeyContextAuth: []
       summary: Get activities by workspace
       tags:
       - Activities
   /admin/auth:
     get:
-      description: Check if the user is an admin
+      consumes:
+      - application/json
+      description: Check if the user is an admin. Requires a valid JWT token in the
+        request context.
+      produces:
+      - application/json
       responses:
         "200":
-          description: OK
+          description: Returns a success message if the user is an admin
           schema:
-            additionalProperties:
-              type: boolean
-            type: object
+            type: string
+        "401":
+          description: 'Unauthorized: User is not an admin or missing/invalid JWT
+            token'
+          schema:
+            type: string
+      security:
+      - PubKeyContextAuth: []
       summary: Check if user is admin
       tags:
       - Auth
@@ -2477,6 +2823,30 @@ paths:
       summary: Get admin pubkeys
       tags:
       - Auth
+  /badges:
+    post:
+      consumes:
+      - application/json
+      description: Add or remove a badge for a person
+      parameters:
+      - description: Badge Creation Data
+        in: body
+        name: badgeCreationData
+        required: true
+        schema:
+          $ref: '#/definitions/db.BadgeCreationData'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/db.Tribe'
+      security:
+      - PubKeyContextAuth: []
+      summary: Add or Remove Badge
+      tags:
+      - People
   /bot/{name}:
     get:
       description: Get a bot by unique name
@@ -2508,7 +2878,26 @@ paths:
           description: OK
           schema:
             type: boolean
+      security:
+      - PubKeyContextAuth: []
       summary: Delete a bot
+      tags:
+      - Bots
+  /bot/unique_name:
+    get:
+      description: Get unique name from bot name
+      parameters:
+      - description: Bot name
+        in: query
+        name: name
+        required: true
+        type: string
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: string
+      summary: Get unique name from bot name
       tags:
       - Bots
   /bots:
@@ -2525,6 +2914,8 @@ paths:
       tags:
       - Bots
     put:
+      consumes:
+      - application/json
       description: Create or edit a bot
       parameters:
       - description: Bot object
@@ -2533,11 +2924,15 @@ paths:
         required: true
         schema:
           $ref: '#/definitions/db.Bot'
+      produces:
+      - application/json
       responses:
         "200":
           description: OK
           schema:
             $ref: '#/definitions/db.Bot'
+      security:
+      - PubKeyContextAuth: []
       summary: Create or edit a bot
       tags:
       - Bots
@@ -2577,42 +2972,6 @@ paths:
       summary: Get bots by owner
       tags:
       - Bots
-  /bots/search:
-    get:
-      description: Search for bots
-      parameters:
-      - description: Search query
-        in: query
-        name: query
-        required: true
-        type: string
-      responses:
-        "200":
-          description: OK
-          schema:
-            items:
-              $ref: '#/definitions/db.Bot'
-            type: array
-      summary: Search bots
-      tags:
-      - Bots
-  /bots/unique_name:
-    get:
-      description: Get unique name from bot name
-      parameters:
-      - description: Bot name
-        in: query
-        name: name
-        required: true
-        type: string
-      responses:
-        "200":
-          description: OK
-          schema:
-            type: string
-      summary: Get unique name from bot name
-      tags:
-      - Bots
   /bounties/ticket/{ticket_group}/sequence:
     post:
       consumes:
@@ -2637,6 +2996,8 @@ paths:
           description: Ticket sequences updated successfully
           schema:
             type: string
+      security:
+      - PubKeyContextAuth: []
       summary: Update Ticket Sequence
       tags:
       - Bounty Tickets
@@ -2658,6 +3019,8 @@ paths:
           description: Created
           schema:
             $ref: '#/definitions/handlers.CreateBountyResponse'
+      security:
+      - PubKeyContextAuth: []
       summary: Convert Ticket to Bounty
       tags:
       - Bounty Tickets
@@ -2679,6 +3042,8 @@ paths:
           description: Ticket group deleted successfully
           schema:
             type: string
+      security:
+      - PubKeyContextAuth: []
       summary: Delete Ticket
       tags:
       - Bounty Tickets
@@ -2725,6 +3090,8 @@ paths:
           description: OK
           schema:
             $ref: '#/definitions/db.Tickets'
+      security:
+      - PubKeyContextAuth: []
       summary: Update Ticket
       tags:
       - Bounty Tickets
@@ -2747,6 +3114,8 @@ paths:
           description: OK
           schema:
             $ref: '#/definitions/handlers.BulkConversionResponse'
+      security:
+      - PubKeyContextAuth: []
       summary: Convert Tickets to Bounties
       tags:
       - Bounty Tickets
@@ -2775,6 +3144,8 @@ paths:
             items:
               $ref: '#/definitions/db.Tickets'
             type: array
+      security:
+      - PubKeyContextAuth: []
       summary: Get Tickets by Phase UUID
       tags:
       - Bounty Tickets
@@ -2798,6 +3169,8 @@ paths:
             items:
               $ref: '#/definitions/db.Tickets'
             type: array
+      security:
+      - PubKeyContextAuth: []
       summary: Get Tickets by Group
       tags:
       - Bounty Tickets
@@ -2820,6 +3193,8 @@ paths:
           description: Created
           schema:
             $ref: '#/definitions/handlers.TicketPlanResponse'
+      security:
+      - PubKeyContextAuth: []
       summary: Create Ticket Plan
       tags:
       - Ticket Plans
@@ -2841,6 +3216,8 @@ paths:
           description: Ticket plan deleted successfully
           schema:
             type: string
+      security:
+      - PubKeyContextAuth: []
       summary: Delete Ticket Plan
       tags:
       - Ticket Plans
@@ -2861,6 +3238,8 @@ paths:
           description: OK
           schema:
             $ref: '#/definitions/db.TicketPlan'
+      security:
+      - PubKeyContextAuth: []
       summary: Get Ticket Plan
       tags:
       - Ticket Plans
@@ -2884,6 +3263,8 @@ paths:
             items:
               $ref: '#/definitions/db.TicketPlan'
             type: array
+      security:
+      - PubKeyContextAuth: []
       summary: Get Ticket Plans by Feature
       tags:
       - Ticket Plans
@@ -2907,6 +3288,8 @@ paths:
             items:
               $ref: '#/definitions/db.TicketPlan'
             type: array
+      security:
+      - PubKeyContextAuth: []
       summary: Get Ticket Plans by Phase
       tags:
       - Ticket Plans
@@ -2951,6 +3334,8 @@ paths:
           description: OK
           schema:
             $ref: '#/definitions/handlers.SendTicketPlanResponse'
+      security:
+      - PubKeyContextAuth: []
       summary: Send Ticket Plan to Stakwork
       tags:
       - Ticket Plans
@@ -2974,6 +3359,8 @@ paths:
             items:
               $ref: '#/definitions/db.TicketPlan'
             type: array
+      security:
+      - PubKeyContextAuth: []
       summary: Get Ticket Plans by Workspace
       tags:
       - Ticket Plans
@@ -3018,6 +3405,8 @@ paths:
           description: OK
           schema:
             $ref: '#/definitions/handlers.TicketResponse'
+      security:
+      - PubKeyContextAuth: []
       summary: Post Ticket Data to Stakwork
       tags:
       - Bounty Tickets
@@ -3045,6 +3434,8 @@ paths:
           description: Created
           schema:
             $ref: '#/definitions/db.Tickets'
+      security:
+      - PubKeyContextAuth: []
       summary: Create Workspace Draft Ticket
       tags:
       - Bounty Tickets
@@ -3071,6 +3462,8 @@ paths:
           description: No Content
           schema:
             type: string
+      security:
+      - PubKeyContextAuth: []
       summary: Delete Workspace Draft Ticket
       tags:
       - Bounty Tickets
@@ -3096,6 +3489,8 @@ paths:
           description: OK
           schema:
             $ref: '#/definitions/db.Tickets'
+      security:
+      - PubKeyContextAuth: []
       summary: Get Workspace Draft Ticket
       tags:
       - Bounty Tickets
@@ -3127,9 +3522,87 @@ paths:
           description: OK
           schema:
             $ref: '#/definitions/db.Tickets'
+      security:
+      - PubKeyContextAuth: []
       summary: Update Workspace Draft Ticket
       tags:
       - Bounty Tickets
+  /bounty/{id}/proof/{proofId}/status:
+    put:
+      consumes:
+      - application/json
+      description: Update the status of a proof of work for a specific bounty. Valid
+        statuses are "accepted", "rejected", and "change_requested".
+      parameters:
+      - description: Bounty ID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Proof of Work ID
+        in: path
+        name: proofId
+        required: true
+        type: string
+      - description: New status for the proof of work
+        in: body
+        name: status
+        required: true
+        schema:
+          $ref: '#/definitions/handlers.UpdateProofStatusResponse'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Status updated successfully
+          schema:
+            $ref: '#/definitions/handlers.UpdateProofStatusResponse'
+        "400":
+          description: 'Bad request: Invalid proof ID, bounty ID, or status'
+          schema:
+            type: string
+        "500":
+          description: 'Internal server error: Failed to update status'
+          schema:
+            type: string
+      summary: Update the status of a proof of work
+      tags:
+      - Bounties - Proof of Work
+  /bounty/assignee:
+    delete:
+      consumes:
+      - application/json
+      description: Delete the assignee of a bounty. Only the bounty owner can perform
+        this action.
+      parameters:
+      - description: Request body containing owner_pubkey and created timestamp
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/db.DeleteBountyAssignee'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Assignee deleted successfully
+          schema:
+            type: boolean
+        "400":
+          description: 'Bad request: Missing or invalid parameters'
+          schema:
+            type: string
+        "406":
+          description: 'Not acceptable: Invalid request body'
+          schema:
+            type: string
+        "500":
+          description: 'Internal server error: Failed to delete assignee'
+          schema:
+            type: string
+      summary: Delete a bounty assignee
+      tags:
+      - Bounties
   /bounty/leaderboard:
     get:
       description: Get bounties leaderboard
@@ -3138,25 +3611,172 @@ paths:
           description: OK
           schema:
             items:
-              items:
-                $ref: '#/definitions/db.LeaderData'
-              type: array
+              $ref: '#/definitions/db.LeaderData'
             type: array
       summary: Get bounties leaderboard
       tags:
       - Bounties
-  /feature_flags:
+  /channel:
+    post:
+      consumes:
+      - application/json
+      description: Create a new channel within a tribe. Only the tribe owner can perform
+        this action.
+      parameters:
+      - description: Request body containing tribe UUID and channel name
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/db.Channel'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Channel created successfully
+          schema:
+            $ref: '#/definitions/db.Channel'
+        "400":
+          description: 'Bad request: Invalid request body'
+        "401":
+          description: 'Unauthorized: User is not the tribe owner'
+        "406":
+          description: 'Not acceptable: Channel name already in use or invalid data'
+      security:
+      - PubKeyContextAuth: []
+      summary: Create a channel
+      tags:
+      - Channel
+  /channel/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: Delete a channel by marking it as deleted. Only the tribe owner
+        can perform this action.
+      parameters:
+      - description: Channel ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Channel deleted successfully
+          schema:
+            type: boolean
+        "400":
+          description: 'Bad request: Invalid channel ID'
+        "401":
+          description: 'Unauthorized: User is not the tribe owner or invalid credentials'
+        "404":
+          description: 'Not found: Channel does not exist'
+      security:
+      - PubKeyContextAuth: []
+      summary: Delete a channel
+      tags:
+      - Channel
+  /connectioncodes:
+    get:
+      consumes:
+      - application/json
+      description: Retrieve a single connection code from the database.
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Connection code retrieved successfully
+          schema:
+            $ref: '#/definitions/db.ConnectionCodesShort'
+      summary: Get a connection code
+      tags:
+      - Auth
+    post:
+      consumes:
+      - application/json
+      description: Create one or more connection codes for a user. Requires a valid
+        pubkey and route hint.
+      parameters:
+      - description: Request body containing pubkey, route hint, sats amount, and
+          number of codes
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/db.InviteBody'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Connection codes created successfully
+          schema:
+            type: string
+        "400":
+          description: 'Bad request: Missing or invalid parameters'
+          schema:
+            type: string
+        "406":
+          description: 'Not acceptable: Invalid request body'
+          schema:
+            type: string
+      security:
+      - SuperAdminAuth: []
+      summary: Create connection codes
+      tags:
+      - Auth
+  /connectioncodes/list:
+    get:
+      consumes:
+      - application/json
+      description: List all connection codes with pagination support.
+      parameters:
+      - description: 'Page number (default: 1)'
+        in: query
+        name: page
+        type: integer
+      - description: 'Number of items per page (default: 20)'
+        in: query
+        name: limit
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Connection codes retrieved successfully
+          schema:
+            $ref: '#/definitions/handlers.ConnectionCodesListResponse'
+        "400":
+          description: 'Bad request: Invalid pagination parameters'
+          schema:
+            $ref: '#/definitions/handlers.ConnectionCodesListResponse'
+        "500":
+          description: 'Internal server error: Failed to retrieve connection codes'
+          schema:
+            $ref: '#/definitions/handlers.ConnectionCodesListResponse'
+      security:
+      - SuperAdminAuth: []
+      summary: List connection codes
+      tags:
+      - Auth
+  /feature-flags:
     get:
       description: Get a list of all feature flags
+      produces:
+      - application/json
       responses:
         "200":
           description: OK
           schema:
             $ref: '#/definitions/handlers.FeatureFlagResponse'
+      security:
+      - PubKeyContextAuth: []
       summary: Get all feature flags
       tags:
       - Feature Flag
     post:
+      consumes:
+      - application/json
       description: Create a new feature flag with specified details
       parameters:
       - description: Feature flag details
@@ -3165,15 +3785,19 @@ paths:
         required: true
         schema:
           $ref: '#/definitions/handlers.CreateFeatureFlagRequest'
+      produces:
+      - application/json
       responses:
         "201":
           description: Created
           schema:
             $ref: '#/definitions/handlers.FeatureFlagResponse'
+      security:
+      - PubKeyContextAuth: []
       summary: Create a new feature flag
       tags:
       - Feature Flag
-  /feature_flags/{feature_flag_id}/endpoints:
+  /feature-flags/{feature_flag_id}/endpoints:
     post:
       description: Add new endpoints to an existing feature flag
       parameters:
@@ -3188,15 +3812,19 @@ paths:
         required: true
         schema:
           $ref: '#/definitions/handlers.AddFeatureFlagEndpointRequest'
+      produces:
+      - application/json
       responses:
         "201":
           description: Created
           schema:
             $ref: '#/definitions/handlers.FeatureFlagResponse'
+      security:
+      - PubKeyContextAuth: []
       summary: Add endpoints to a feature flag
       tags:
       - Feature Flag
-  /feature_flags/{feature_flag_id}/endpoints/{endpoint_id}:
+  /feature-flags/{feature_flag_id}/endpoints/{endpoint_id}:
     delete:
       description: Delete an endpoint of a feature flag by ID
       parameters:
@@ -3210,11 +3838,15 @@ paths:
         name: endpoint_id
         required: true
         type: string
+      produces:
+      - application/json
       responses:
         "200":
           description: OK
           schema:
             $ref: '#/definitions/handlers.FeatureFlagResponse'
+      security:
+      - PubKeyContextAuth: []
       summary: Delete an endpoint of a feature flag
       tags:
       - Feature Flag
@@ -3237,15 +3869,19 @@ paths:
         required: true
         schema:
           $ref: '#/definitions/handlers.UpdateFeatureFlagEndpointRequest'
+      produces:
+      - application/json
       responses:
         "200":
           description: OK
           schema:
             $ref: '#/definitions/handlers.FeatureFlagResponse'
+      security:
+      - PubKeyContextAuth: []
       summary: Update an endpoint of a feature flag
       tags:
       - Feature Flag
-  /feature_flags/{id}:
+  /feature-flags/{id}:
     delete:
       description: Delete a feature flag by ID
       parameters:
@@ -3254,15 +3890,21 @@ paths:
         name: id
         required: true
         type: string
+      produces:
+      - application/json
       responses:
         "200":
           description: OK
           schema:
             $ref: '#/definitions/handlers.FeatureFlagResponse'
+      security:
+      - PubKeyContextAuth: []
       summary: Delete a feature flag
       tags:
       - Feature Flag
     put:
+      consumes:
+      - application/json
       description: Update the details of an existing feature flag
       parameters:
       - description: Feature flag ID
@@ -3276,11 +3918,15 @@ paths:
         required: true
         schema:
           $ref: '#/definitions/handlers.UpdateFeatureFlagRequest'
+      produces:
+      - application/json
       responses:
         "200":
           description: OK
           schema:
             $ref: '#/definitions/handlers.FeatureFlagResponse'
+      security:
+      - PubKeyContextAuth: []
       summary: Update an existing feature flag
       tags:
       - Feature Flag
@@ -3296,6 +3942,8 @@ paths:
           description: OK
           schema:
             $ref: '#/definitions/db.WorkspaceFeatures'
+      security:
+      - PubKeyContextAuth: []
       summary: Create or Edit Features
       tags:
       - Features
@@ -3313,6 +3961,8 @@ paths:
             items:
               $ref: '#/definitions/db.FeaturePhase'
             type: array
+      security:
+      - PubKeyContextAuth: []
       summary: Get Feature Phases
       tags:
       - Feature - Phases
@@ -3328,6 +3978,8 @@ paths:
           description: Phase deleted successfully
           schema:
             type: string
+      security:
+      - PubKeyContextAuth: []
       summary: Delete Feature Phase
       tags:
       - Feature - Phases
@@ -3342,6 +3994,8 @@ paths:
           description: OK
           schema:
             $ref: '#/definitions/db.FeaturePhase'
+      security:
+      - PubKeyContextAuth: []
       summary: Get Feature Phase by UUID
       tags:
       - Feature - Phases
@@ -3359,6 +4013,8 @@ paths:
             items:
               $ref: '#/definitions/db.BountyResponse'
             type: array
+      security:
+      - PubKeyContextAuth: []
       summary: Get Bounties by Feature and Phase UUID
       tags:
       - Feature - Phases
@@ -3374,6 +4030,8 @@ paths:
           description: OK
           schema:
             type: int
+      security:
+      - PubKeyContextAuth: []
       summary: Get Bounties Count by Feature and Phase UUID
       tags:
       - Feature - Phases
@@ -3389,6 +4047,8 @@ paths:
           description: OK
           schema:
             $ref: '#/definitions/db.QuickBountiesResponse'
+      security:
+      - PubKeyContextAuth: []
       summary: Get Quick Bounties
       tags:
       - Features
@@ -3404,6 +4064,8 @@ paths:
           description: OK
           schema:
             $ref: '#/definitions/db.QuickTicketsResponse'
+      security:
+      - PubKeyContextAuth: []
       summary: Get Quick Tickets
       tags:
       - Features
@@ -3421,6 +4083,8 @@ paths:
             items:
               $ref: '#/definitions/db.FeatureStory'
             type: array
+      security:
+      - PubKeyContextAuth: []
       summary: Get Stories by Feature UUID
       tags:
       - Feature - Stories
@@ -3436,6 +4100,8 @@ paths:
           description: Story deleted successfully
           schema:
             type: string
+      security:
+      - PubKeyContextAuth: []
       summary: Delete Story
       tags:
       - Feature - Stories
@@ -3450,6 +4116,8 @@ paths:
           description: OK
           schema:
             $ref: '#/definitions/db.FeatureStory'
+      security:
+      - PubKeyContextAuth: []
       summary: Get Story by UUID
       tags:
       - Feature - Stories
@@ -3465,6 +4133,8 @@ paths:
           description: Feature deleted successfully
           schema:
             type: string
+      security:
+      - PubKeyContextAuth: []
       summary: Delete Feature
       tags:
       - Features
@@ -3479,6 +4149,8 @@ paths:
           description: OK
           schema:
             $ref: '#/definitions/db.WorkspaceFeatures'
+      security:
+      - PubKeyContextAuth: []
       summary: Get Feature by UUID
       tags:
       - Features
@@ -3494,6 +4166,8 @@ paths:
           description: OK
           schema:
             $ref: '#/definitions/db.WorkspaceFeatures'
+      security:
+      - PubKeyContextAuth: []
       summary: Update Feature Status
       tags:
       - Features
@@ -3509,6 +4183,8 @@ paths:
           description: OK
           schema:
             $ref: '#/definitions/db.WorkspaceFeatures'
+      security:
+      - PubKeyContextAuth: []
       summary: Update Feature Brief
       tags:
       - Features
@@ -3524,6 +4200,8 @@ paths:
           description: Successfully sent
           schema:
             type: string
+      security:
+      - PubKeyContextAuth: []
       summary: Send Feature Brief
       tags:
       - Features
@@ -3541,6 +4219,8 @@ paths:
             items:
               $ref: '#/definitions/db.WorkspaceFeatures'
             type: array
+      security:
+      - PubKeyContextAuth: []
       summary: Get Features by Workspace UUID
       tags:
       - Feature - Workspaces
@@ -3556,6 +4236,8 @@ paths:
           description: Created
           schema:
             $ref: '#/definitions/db.FeaturePhase'
+      security:
+      - PubKeyContextAuth: []
       summary: Create or Edit Feature Phase
       tags:
       - Feature - Phases
@@ -3586,6 +4268,8 @@ paths:
           description: Successfully sent
           schema:
             type: string
+      security:
+      - PubKeyContextAuth: []
       summary: Send Stories
       tags:
       - Feature - Stories
@@ -3601,6 +4285,8 @@ paths:
           description: Created
           schema:
             $ref: '#/definitions/db.FeatureStory'
+      security:
+      - PubKeyContextAuth: []
       summary: Create or Edit Story
       tags:
       - Feature - Stories
@@ -3616,6 +4302,8 @@ paths:
           description: OK
           schema:
             type: int
+      security:
+      - PubKeyContextAuth: []
       summary: Get Workspace Features Count
       tags:
       - Feature - Workspaces
@@ -3714,6 +4402,8 @@ paths:
       - Github
   /gobounties:
     post:
+      consumes:
+      - application/json
       description: Create or edit a bounty
       parameters:
       - description: Bounty object
@@ -3722,16 +4412,22 @@ paths:
         required: true
         schema:
           $ref: '#/definitions/db.NewBounty'
+      produces:
+      - application/json
       responses:
         "200":
           description: OK
           schema:
             $ref: '#/definitions/db.NewBounty'
+      security:
+      - PubKeyContextAuth: []
       summary: Create or edit a bounty
       tags:
       - Bounties
   /gobounties/{id}/proof:
     post:
+      consumes:
+      - application/json
       description: Add proof of work to a bounty
       parameters:
       - description: Bounty ID
@@ -3745,11 +4441,15 @@ paths:
         required: true
         schema:
           $ref: '#/definitions/db.ProofOfWork'
+      produces:
+      - application/json
       responses:
         "201":
           description: Created
           schema:
             $ref: '#/definitions/db.ProofOfWork'
+      security:
+      - PubKeyContextAuth: []
       summary: Add proof of work
       tags:
       - Bounties - Proof of Work
@@ -3762,6 +4462,8 @@ paths:
         name: id
         required: true
         type: string
+      produces:
+      - application/json
       responses:
         "200":
           description: OK
@@ -3769,6 +4471,8 @@ paths:
             items:
               $ref: '#/definitions/db.ProofOfWork'
             type: array
+      security:
+      - PubKeyContextAuth: []
       summary: Get proofs by bounty
       tags:
       - Bounties - Proof of Work
@@ -3786,9 +4490,13 @@ paths:
         name: proofId
         required: true
         type: string
+      produces:
+      - application/json
       responses:
         "204":
           description: No Content
+      security:
+      - PubKeyContextAuth: []
       summary: Delete proof
       tags:
       - Bounties - Proof of Work
@@ -3801,9 +4509,13 @@ paths:
         name: id
         required: true
         type: string
+      produces:
+      - application/json
       responses:
         "204":
           description: No Content
+      security:
+      - PubKeyContextAuth: []
       summary: Delete bounty timing
       tags:
       - Bounties - Timing
@@ -3815,16 +4527,22 @@ paths:
         name: id
         required: true
         type: string
+      produces:
+      - application/json
       responses:
         "200":
           description: OK
           schema:
             $ref: '#/definitions/handlers.BountyTimingResponse'
+      security:
+      - PubKeyContextAuth: []
       summary: Get bounty timing stats
       tags:
       - Bounties - Timing
   /gobounties/{id}/timing/close:
     post:
+      consumes:
+      - application/json
       description: Close bounty timing by ID
       parameters:
       - description: Bounty ID
@@ -3832,14 +4550,20 @@ paths:
         name: id
         required: true
         type: string
+      produces:
+      - application/json
       responses:
         "200":
           description: OK
+      security:
+      - PubKeyContextAuth: []
       summary: Close bounty timing
       tags:
       - Bounties - Timing
   /gobounties/{id}/timing/start:
     post:
+      consumes:
+      - application/json
       description: Start bounty timing by ID
       parameters:
       - description: Bounty ID
@@ -3847,14 +4571,20 @@ paths:
         name: id
         required: true
         type: string
+      produces:
+      - application/json
       responses:
         "200":
           description: OK
+      security:
+      - PubKeyContextAuth: []
       summary: Start bounty timing
       tags:
       - Bounties - Timing
   /gobounties/{pubkey}/{created}:
     delete:
+      consumes:
+      - application/json
       description: Delete a bounty by ID
       parameters:
       - description: PubKey
@@ -3867,11 +4597,15 @@ paths:
         name: created
         required: true
         type: string
+      produces:
+      - application/json
       responses:
         "200":
           description: OK
           schema:
             type: boolean
+      security:
+      - PubKeyContextAuth: []
       summary: Delete a bounty
       tags:
       - Bounties
@@ -3891,6 +4625,8 @@ paths:
   /gobounties/bounty-cards:
     get:
       description: Get bounty cards
+      produces:
+      - application/json
       responses:
         "200":
           description: OK
@@ -3898,11 +4634,15 @@ paths:
             items:
               $ref: '#/definitions/db.BountyCard'
             type: array
+      security:
+      - PubKeyContextAuth: []
       summary: Get bounty cards
       tags:
       - Bounties
   /gobounties/budget/withdraw:
     post:
+      consumes:
+      - application/json
       description: Withdraw bounty budget
       parameters:
       - description: Withdraw Budget Request
@@ -3911,16 +4651,22 @@ paths:
         required: true
         schema:
           $ref: '#/definitions/db.NewWithdrawBudgetRequest'
+      produces:
+      - application/json
       responses:
         "200":
           description: OK
           schema:
             $ref: '#/definitions/db.InvoicePaySuccess'
+      security:
+      - PubKeyContextAuth: []
       summary: Withdraw bounty budget
       tags:
       - Bounties - Payment
   /gobounties/completedstatus/{created}:
     post:
+      consumes:
+      - application/json
       description: Update completed status by created date
       parameters:
       - description: Created
@@ -3928,11 +4674,15 @@ paths:
         name: created
         required: true
         type: string
+      produces:
+      - application/json
       responses:
         "200":
           description: OK
           schema:
             $ref: '#/definitions/db.NewBounty'
+      security:
+      - PubKeyContextAuth: []
       summary: Update completed status
       tags:
       - Bounties
@@ -4001,6 +4751,8 @@ paths:
       - Featured Bounties
   /gobounties/featured/create:
     post:
+      consumes:
+      - application/json
       description: Create a featured bounty
       parameters:
       - description: Featured Bounty object
@@ -4009,11 +4761,15 @@ paths:
         required: true
         schema:
           $ref: '#/definitions/db.FeaturedBounty'
+      produces:
+      - application/json
       responses:
         "201":
           description: Created
           schema:
             $ref: '#/definitions/db.FeaturedBounty'
+      security:
+      - PubKeyContextAuth: []
       summary: Create a featured bounty
       tags:
       - Featured Bounties
@@ -4026,14 +4782,20 @@ paths:
         name: bountyId
         required: true
         type: string
+      produces:
+      - application/json
       responses:
         "204":
           description: No Content
+      security:
+      - PubKeyContextAuth: []
       summary: Delete a featured bounty
       tags:
       - Featured Bounties
   /gobounties/featured/update:
     put:
+      consumes:
+      - application/json
       description: Update a featured bounty
       parameters:
       - description: Featured Bounty object
@@ -4042,11 +4804,15 @@ paths:
         required: true
         schema:
           $ref: '#/definitions/db.FeaturedBounty'
+      produces:
+      - application/json
       responses:
         "200":
           description: OK
           schema:
             $ref: '#/definitions/db.FeaturedBounty'
+      security:
+      - PubKeyContextAuth: []
       summary: Update a featured bounty
       tags:
       - Featured Bounties
@@ -4112,23 +4878,6 @@ paths:
       summary: Get invoice data
       tags:
       - Bounties - Payment
-  /gobounties/invoice/poll/{paymentRequest}:
-    get:
-      description: Poll invoice by payment request
-      parameters:
-      - description: Payment Request
-        in: path
-        name: paymentRequest
-        required: true
-        type: string
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/db.InvoiceResult'
-      summary: Poll invoice
-      tags:
-      - Bounties - Payment
   /gobounties/next/{created}:
     get:
       description: Get next bounty by created date
@@ -4146,108 +4895,7 @@ paths:
       summary: Get next bounty
       tags:
       - Bounties
-  /gobounties/pay/{id}:
-    post:
-      description: Make a bounty payment
-      parameters:
-      - description: Bounty ID
-        in: path
-        name: id
-        required: true
-        type: string
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/db.NewBounty'
-      summary: Make a bounty payment
-      tags:
-      - Bounties - Payment
-  /gobounties/payment/{bountyId}:
-    get:
-      description: Get payment by bounty ID
-      parameters:
-      - description: Bounty ID
-        in: path
-        name: bountyId
-        required: true
-        type: string
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/db.NewPaymentHistory'
-      summary: Get payment by bounty ID
-      tags:
-      - Bounties - Payment
-  /gobounties/payment/status/{id}:
-    get:
-      description: Get bounty payment status by ID
-      parameters:
-      - description: Bounty ID
-        in: path
-        name: id
-        required: true
-        type: string
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/db.NewPaymentHistory'
-      summary: Get bounty payment status
-      tags:
-      - Bounties - Payment
-    put:
-      description: Update bounty payment status by ID
-      parameters:
-      - description: Bounty ID
-        in: path
-        name: id
-        required: true
-        type: string
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/db.NewPaymentHistory'
-      summary: Update bounty payment status
-      tags:
-      - Bounties - Payment
-  /gobounties/paymentstatus/{created}:
-    post:
-      description: Update payment status by created date
-      parameters:
-      - description: Created
-        in: path
-        name: created
-        required: true
-        type: string
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/db.NewBounty'
-      summary: Update payment status
-      tags:
-      - Bounties - Payment
-  /gobounties/previous/{created}:
-    get:
-      description: Get previous bounty by created date
-      parameters:
-      - description: Created date
-        in: path
-        name: created
-        required: true
-        type: string
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/db.Bounty'
-      summary: Get previous bounty
-      tags:
-      - Bounties
-  /gobounties/workspace/next/{uuid}/{created}:
+  /gobounties/org/next/{uuid}/{created}:
     get:
       description: Get next workspace bounty by created date
       parameters:
@@ -4269,7 +4917,7 @@ paths:
       summary: Get next workspace bounty
       tags:
       - Bounties
-  /gobounties/workspace/previous/{uuid}/{created}:
+  /gobounties/org/previous/{uuid}/{created}:
     get:
       description: Get previous workspace bounty by created date
       parameters:
@@ -4291,7 +4939,7 @@ paths:
       summary: Get previous workspace bounty
       tags:
       - Bounties
-  /gobounties/workspace/timerange/{workspaceId}/{daysStart}/{daysEnd}:
+  /gobounties/org/timerange/{workspaceId}/{daysStart}/{daysEnd}:
     get:
       description: Get bounties by workspace time range
       parameters:
@@ -4316,6 +4964,133 @@ paths:
           schema:
             $ref: '#/definitions/db.NodeListResponse'
       summary: Get bounties by workspace time
+      tags:
+      - Bounties
+  /gobounties/pay/{id}:
+    post:
+      consumes:
+      - application/json
+      description: Make a bounty payment
+      parameters:
+      - description: Bounty ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/db.NewBounty'
+      security:
+      - PubKeyContextAuth: []
+      summary: Make a bounty payment
+      tags:
+      - Bounties - Payment
+  /gobounties/payment/{bountyId}:
+    get:
+      description: Get payment by bounty ID
+      parameters:
+      - description: Bounty ID
+        in: path
+        name: bountyId
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/db.NewPaymentHistory'
+      security:
+      - PubKeyContextAuth: []
+      summary: Get payment by bounty ID
+      tags:
+      - Bounties - Payment
+  /gobounties/payment/status/{id}:
+    get:
+      description: Get bounty payment status by ID
+      parameters:
+      - description: Bounty ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/db.NewPaymentHistory'
+      security:
+      - PubKeyContextAuth: []
+      summary: Get bounty payment status
+      tags:
+      - Bounties - Payment
+    put:
+      consumes:
+      - application/json
+      description: Update bounty payment status by ID
+      parameters:
+      - description: Bounty ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/db.NewPaymentHistory'
+      security:
+      - PubKeyContextAuth: []
+      summary: Update bounty payment status
+      tags:
+      - Bounties - Payment
+  /gobounties/paymentstatus/{created}:
+    post:
+      consumes:
+      - application/json
+      description: Update payment status by created date
+      parameters:
+      - description: Created
+        in: path
+        name: created
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/db.NewBounty'
+      security:
+      - PubKeyContextAuth: []
+      summary: Update payment status
+      tags:
+      - Bounties - Payment
+  /gobounties/previous/{created}:
+    get:
+      description: Get previous bounty by created date
+      parameters:
+      - description: Created date
+        in: path
+        name: created
+        required: true
+        type: string
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/db.Bounty'
+      summary: Get previous bounty
       tags:
       - Bounties
   /hivechat:
@@ -4346,6 +5121,8 @@ paths:
           description: Internal Server Error
           schema:
             $ref: '#/definitions/handlers.ChatResponse'
+      security:
+      - PubKeyContextAuth: []
       summary: Retrieve chats for a workspace
       tags:
       - Hive Chat
@@ -4375,6 +5152,8 @@ paths:
           description: Internal Server Error
           schema:
             $ref: '#/definitions/handlers.ChatResponse'
+      security:
+      - PubKeyContextAuth: []
       summary: Create a new chat
       tags:
       - Hive Chat
@@ -4414,6 +5193,8 @@ paths:
           description: Internal Server Error
           schema:
             $ref: '#/definitions/handlers.ChatResponse'
+      security:
+      - PubKeyContextAuth: []
       summary: Update an existing chat
       tags:
       - Hive Chat
@@ -4447,6 +5228,8 @@ paths:
           description: Internal Server Error
           schema:
             $ref: '#/definitions/handlers.ChatResponse'
+      security:
+      - PubKeyContextAuth: []
       summary: Archive an existing chat
       tags:
       - Hive Chat
@@ -4478,6 +5261,8 @@ paths:
           description: Internal Server Error
           schema:
             $ref: '#/definitions/handlers.ChatResponse'
+      security:
+      - PubKeyContextAuth: []
       summary: Delete a file from a chat
       tags:
       - Hive Chat
@@ -4504,6 +5289,8 @@ paths:
           description: Not Found
           schema:
             $ref: '#/definitions/handlers.ChatResponse'
+      security:
+      - PubKeyContextAuth: []
       summary: Retrieve a file from a chat
       tags:
       - Hive Chat
@@ -4537,8 +5324,7 @@ paths:
         "200":
           description: OK
           schema:
-            additionalProperties: true
-            type: object
+            $ref: '#/definitions/handlers.ListFilesResponse'
         "400":
           description: Bad Request
           schema:
@@ -4547,6 +5333,8 @@ paths:
           description: Internal Server Error
           schema:
             $ref: '#/definitions/handlers.ChatResponse'
+      security:
+      - PubKeyContextAuth: []
       summary: List all files in a chat
       tags:
       - Hive Chat
@@ -4574,6 +5362,8 @@ paths:
           description: Internal Server Error
           schema:
             $ref: '#/definitions/handlers.ChatResponse'
+      security:
+      - PubKeyContextAuth: []
       summary: Retrieve chat history
       tags:
       - Hive Chat
@@ -4638,6 +5428,8 @@ paths:
           description: Internal Server Error
           schema:
             $ref: '#/definitions/handlers.ChatResponse'
+      security:
+      - PubKeyContextAuth: []
       summary: Send a message in a chat
       tags:
       - Hive Chat
@@ -4668,6 +5460,8 @@ paths:
           description: Internal Server Error
           schema:
             $ref: '#/definitions/handlers.ChatResponse'
+      security:
+      - PubKeyContextAuth: []
       summary: Send a build message in a chat
       tags:
       - Hive Chat
@@ -4697,6 +5491,8 @@ paths:
           description: Internal Server Error
           schema:
             $ref: '#/definitions/handlers.ChatResponse'
+      security:
+      - PubKeyContextAuth: []
       summary: Upload a file to a chat
       tags:
       - Hive Chat
@@ -4718,30 +5514,152 @@ paths:
       summary: Generate an invoice
       tags:
       - Tribes
-  /lnauth:
+  /leaderboard/{tribe_uuid}:
     get:
-      description: Get LNURL auth details
+      description: Get a leaderboard for a tribe
+      parameters:
+      - description: Tribe UUID
+        in: path
+        name: tribe_uuid
+        required: true
+        type: string
+      - description: Alias
+        in: query
+        name: alias
+        type: string
+      responses:
+        "200":
+          description: OK
+          schema: {}
+      summary: Get a leaderboard
+      tags:
+      - Tribes
+    post:
+      consumes:
+      - application/json
+      description: Create a leaderboard for a tribe
+      parameters:
+      - description: Tribe UUID
+        in: path
+        name: tribe_uuid
+        required: true
+        type: string
+      - description: Leaderboard object
+        in: body
+        name: leaderboard
+        required: true
+        schema:
+          items:
+            $ref: '#/definitions/db.LeaderBoard'
+          type: array
+      produces:
+      - application/json
       responses:
         "200":
           description: OK
           schema:
-            additionalProperties:
-              type: string
-            type: object
-      summary: Get LNURL auth
+            type: boolean
+      security:
+      - PubKeyContextAuth: []
+      summary: Create a leaderboard
       tags:
-      - Auth
+      - Tribes
+    put:
+      consumes:
+      - application/json
+      description: Update a leaderboard for a tribe
+      parameters:
+      - description: Tribe UUID
+        in: path
+        name: tribe_uuid
+        required: true
+        type: string
+      - description: Leaderboard object
+        in: body
+        name: leaderboard
+        required: true
+        schema:
+          $ref: '#/definitions/db.LeaderBoard'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: boolean
+      security:
+      - PubKeyContextAuth: []
+      summary: Update a leaderboard
+      tags:
+      - Tribes
   /lnauth_login:
     get:
-      description: Receive LNURL auth data
+      consumes:
+      - application/json
+      description: Receive LNURL auth data and authenticate the user using LNURL-auth
+        protocol.
+      parameters:
+      - description: User's public key
+        in: query
+        name: key
+        required: true
+        type: string
+      - description: Unique challenge string (k1)
+        in: query
+        name: k1
+        required: true
+        type: string
+      - description: Signature of the challenge signed by the user's private key
+        in: query
+        name: sig
+        required: true
+        type: string
+      produces:
+      - application/json
       responses:
         "200":
-          description: OK
+          description: Authentication successful
           schema:
-            additionalProperties:
-              type: string
-            type: object
+            $ref: '#/definitions/handlers.LnAuthResponse'
+        "400":
+          description: Invalid request or missing parameters
+          schema:
+            $ref: '#/definitions/handlers.LnAuthResponse'
+        "401":
+          description: 'Unauthorized: Signature verification failed'
+          schema:
+            $ref: '#/definitions/handlers.LnAuthResponse'
+        "406":
+          description: 'Not Acceptable: JWT creation failed'
+          schema:
+            $ref: '#/definitions/handlers.LnAuthResponse'
       summary: Receive LNURL auth data
+      tags:
+      - Auth
+  /lnurl_auth:
+    get:
+      consumes:
+      - application/json
+      description: Generate a unique LNURL-auth challenge (k1) and encoded LNURL for
+        authentication.
+      parameters:
+      - description: Socket connection key to associate with the LNURL-auth challenge
+        in: query
+        name: socketKey
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: LNURL-auth data generated successfully
+          schema:
+            $ref: '#/definitions/auth.LnEncodeData'
+        "400":
+          description: 'Bad request: Failed to generate LNURL-auth data'
+          schema:
+            $ref: '#/definitions/auth.LnEncodeData'
+      summary: Generate LNURL-auth data
       tags:
       - Auth
   /meme_upload:
@@ -4762,6 +5680,8 @@ paths:
           description: Meme image URL
           schema:
             type: string
+      security:
+      - PubKeyContextAuth: []
       summary: Meme Image Upload
       tags:
       - Memes
@@ -4786,6 +5706,8 @@ paths:
             items:
               $ref: '#/definitions/db.BountyData'
             type: array
+      security:
+      - SuperAdminAuth: []
       summary: Get Bounties
       tags:
       - Metrics
@@ -4808,6 +5730,8 @@ paths:
           description: OK
           schema:
             type: int
+      security:
+      - SuperAdminAuth: []
       summary: Get Bounties Count
       tags:
       - Metrics
@@ -4830,10 +5754,10 @@ paths:
           description: OK
           schema:
             items:
-              items:
-                $ref: '#/definitions/db.Person'
-              type: array
+              $ref: '#/definitions/db.Person'
             type: array
+      security:
+      - SuperAdminAuth: []
       summary: Get Bounties Providers
       tags:
       - Metrics
@@ -4861,6 +5785,8 @@ paths:
           description: OK
           schema:
             $ref: '#/definitions/db.BountyMetrics'
+      security:
+      - SuperAdminAuth: []
       summary: Get Bounty Metrics
       tags:
       - Metrics
@@ -4883,6 +5809,8 @@ paths:
           description: CSV file URL
           schema:
             type: string
+      security:
+      - SuperAdminAuth: []
       summary: Generate Metrics CSV
       tags:
       - Metrics
@@ -4905,6 +5833,8 @@ paths:
           description: OK
           schema:
             type: integer
+      security:
+      - SuperAdminAuth: []
       summary: Get Workspace Metrics
       tags:
       - Metrics
@@ -4932,6 +5862,8 @@ paths:
           description: OK
           schema:
             type: integer
+      security:
+      - SuperAdminAuth: []
       summary: Get Payment Metrics
       tags:
       - Metrics
@@ -4954,6 +5886,8 @@ paths:
           description: OK
           schema:
             type: integer
+      security:
+      - SuperAdminAuth: []
       summary: Get People Metrics
       tags:
       - Metrics
@@ -4971,6 +5905,8 @@ paths:
             items:
               $ref: '#/definitions/db.Workspace'
             type: array
+      security:
+      - SuperAdminAuth: []
       summary: Get Admin Workspaces
       tags:
       - Metrics
@@ -5036,6 +5972,8 @@ paths:
           description: OK
           schema:
             $ref: '#/definitions/db.Person'
+      security:
+      - PubKeyContextAuth: []
       summary: Create Person
       tags:
       - People
@@ -5057,10 +5995,36 @@ paths:
           description: OK
           schema:
             $ref: '#/definitions/db.Person'
+      security:
+      - PubKeyContextAuth: []
       summary: Update Person
       tags:
       - People
-  /people/{id}:
+  /people/offers:
+    get:
+      description: Get a list of listed offers
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/db.Person'
+            type: array
+      summary: Get listed offers
+      tags:
+      - People
+  /people/wanteds/header:
+    get:
+      description: Get the header information for wanteds
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/handlers.WantedsHeaderResponse'
+      summary: Get wanteds header
+      tags:
+      - People
+  /person/{id}:
     delete:
       consumes:
       - application/json
@@ -5078,10 +6042,12 @@ paths:
           description: Person deleted successfully
           schema:
             type: string
+      security:
+      - PubKeyContextAuth: []
       summary: Delete Person
       tags:
       - People
-  /people/{pubkey}:
+  /person/{pubkey}:
     get:
       consumes:
       - application/json
@@ -5102,7 +6068,7 @@ paths:
       summary: Get Person by Pubkey
       tags:
       - People
-  /people/assets/{uuid}:
+  /person/assets/{uuid}:
     get:
       consumes:
       - application/json
@@ -5125,29 +6091,7 @@ paths:
       summary: Get Person Assets by UUID
       tags:
       - People
-  /people/badge:
-    post:
-      consumes:
-      - application/json
-      description: Add or remove a badge for a person
-      parameters:
-      - description: Badge Creation Data
-        in: body
-        name: badgeCreationData
-        required: true
-        schema:
-          $ref: '#/definitions/db.BadgeCreationData'
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/db.Tribe'
-      summary: Add or Remove Badge
-      tags:
-      - People
-  /people/github/{github}:
+  /person/github/{github}:
     get:
       consumes:
       - application/json
@@ -5168,7 +6112,7 @@ paths:
       summary: Get Person by Github Name
       tags:
       - People
-  /people/id/{id}:
+  /person/id/{id}:
     get:
       consumes:
       - application/json
@@ -5189,7 +6133,7 @@ paths:
       summary: Get Person by ID
       tags:
       - People
-  /people/login:
+  /person/login:
     post:
       consumes:
       - application/json
@@ -5208,23 +6152,12 @@ paths:
           description: JWT Token
           schema:
             type: string
+      security:
+      - CypressAuth: []
       summary: Upsert Login
       tags:
       - People
-  /people/offers:
-    get:
-      description: Get a list of listed offers
-      responses:
-        "200":
-          description: OK
-          schema:
-            items:
-              $ref: '#/definitions/db.Person'
-            type: array
-      summary: Get listed offers
-      tags:
-      - People
-  /people/posts:
+  /person/posts:
     get:
       consumes:
       - application/json
@@ -5236,14 +6169,12 @@ paths:
           description: OK
           schema:
             items:
-              items:
-                $ref: '#/definitions/db.PeopleExtra'
-              type: array
+              $ref: '#/definitions/db.PeopleExtra'
             type: array
       summary: Get Listed Posts
       tags:
       - People
-  /people/search:
+  /person/search:
     get:
       consumes:
       - application/json
@@ -5260,7 +6191,7 @@ paths:
       summary: Get People by Search
       tags:
       - People
-  /people/short:
+  /person/short:
     get:
       consumes:
       - application/json
@@ -5277,33 +6208,7 @@ paths:
       summary: Get People Short List
       tags:
       - People
-  /people/ticket/{pubKey}/{created}:
-    delete:
-      consumes:
-      - application/json
-      description: Delete a ticket by admin
-      parameters:
-      - description: Public Key
-        in: path
-        name: pubKey
-        required: true
-        type: string
-      - description: Created Timestamp
-        in: path
-        name: created
-        required: true
-        type: integer
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: Ticket deleted successfully
-          schema:
-            type: string
-      summary: Delete Ticket by Admin
-      tags:
-      - People
-  /people/uuid/{uuid}:
+  /person/uuid/{uuid}:
     get:
       consumes:
       - application/json
@@ -5323,17 +6228,6 @@ paths:
             additionalProperties: true
             type: object
       summary: Get Person by UUID
-      tags:
-      - People
-  /people/wanteds/header:
-    get:
-      description: Get the header information for wanteds
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/handlers.WantedsHeaderResponse'
-      summary: Get wanteds header
       tags:
       - People
   /podcast:
@@ -5360,19 +6254,152 @@ paths:
       summary: Get Podcast
       tags:
       - Feeds
-  /refresh_jwt:
+  /poll/{challenge}:
     get:
-      description: Refresh the JWT token
+      consumes:
+      - application/json
+      description: Poll a challenge to verify the user's authentication and retrieve
+        user details.
+      parameters:
+      - description: Challenge string
+        in: path
+        name: challenge
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Challenge verified successfully and user details returned
+          schema:
+            $ref: '#/definitions/db.VerifyPayload'
+        "401":
+          description: 'Unauthorized: Invalid challenge or user not found'
+      summary: Poll a challenge
+      tags:
+      - Auth
+  /poll/invoice/{paymentRequest}:
+    get:
+      consumes:
+      - application/json
+      description: Poll invoice by payment request
+      parameters:
+      - description: Payment Request
+        in: path
+        name: paymentRequest
+        required: true
+        type: string
+      produces:
+      - application/json
       responses:
         "200":
           description: OK
           schema:
-            additionalProperties:
-              type: string
-            type: object
+            $ref: '#/definitions/db.InvoiceResult'
+      security:
+      - PubKeyContextAuth: []
+      summary: Poll invoice
+      tags:
+      - Bounties - Payment
+  /refresh_jwt:
+    get:
+      consumes:
+      - application/json
+      description: Refresh the JWT token using a valid existing token.
+      parameters:
+      - description: Existing JWT token
+        in: header
+        name: x-jwt
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Token refreshed successfully
+          schema:
+            $ref: '#/definitions/handlers.RefreshTokenResponse'
+        "401":
+          description: 'Unauthorized: Missing or invalid JWT token'
+          schema:
+            type: string
+        "406":
+          description: 'Not Acceptable: Failed to create a new JWT token'
+          schema:
+            type: string
       summary: Refresh JWT token
       tags:
       - Auth
+  /save:
+    post:
+      consumes:
+      - application/json
+      description: Save data with a unique key in the cache.
+      parameters:
+      - description: Request body containing the key and value to save
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/db.Save'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Data saved successfully
+          schema:
+            $ref: '#/definitions/db.SaveResponse'
+        "400":
+          description: 'Bad request: Invalid request body'
+        "401":
+          description: 'Unauthorized: Failed to process payload'
+        "406":
+          description: 'Not acceptable: Invalid data format'
+      summary: Save data
+      tags:
+      - Storage
+  /save/{key}:
+    get:
+      consumes:
+      - application/json
+      description: Retrieve saved data using a unique key from the cache.
+      parameters:
+      - description: Unique key for the saved data
+        in: path
+        name: key
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Data retrieved successfully
+          schema:
+            $ref: '#/definitions/db.Save'
+        "401":
+          description: 'Unauthorized: Invalid key or data not found'
+      summary: Retrieve saved data
+      tags:
+      - Storage
+  /search/bots/{query}:
+    get:
+      description: Search for bots
+      parameters:
+      - description: Search query
+        in: query
+        name: query
+        required: true
+        type: string
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/db.Bot'
+            type: array
+      summary: Search bots
+      tags:
+      - Bots
   /search_podcast_episodes:
     get:
       consumes:
@@ -5460,9 +6487,7 @@ paths:
           description: OK
           schema:
             items:
-              items:
-                $ref: '#/definitions/feeds.Item'
-              type: array
+              $ref: '#/definitions/feeds.Item'
             type: array
       summary: Search Youtube Videos
       tags:
@@ -5485,6 +6510,8 @@ paths:
           description: Snippet deleted successfully
           schema:
             type: string
+      security:
+      - PubKeyContextAuth: []
       summary: Delete Snippet
       tags:
       - Snippets
@@ -5505,6 +6532,8 @@ paths:
           description: OK
           schema:
             $ref: '#/definitions/db.TextSnippet'
+      security:
+      - PubKeyContextAuth: []
       summary: Get Snippet by ID
       tags:
       - Snippets
@@ -5531,6 +6560,8 @@ paths:
           description: OK
           schema:
             $ref: '#/definitions/db.TextSnippet'
+      security:
+      - PubKeyContextAuth: []
       summary: Update Snippet
       tags:
       - Snippets
@@ -5558,6 +6589,8 @@ paths:
           description: Created
           schema:
             $ref: '#/definitions/db.TextSnippet'
+      security:
+      - PubKeyContextAuth: []
       summary: Create Snippet
       tags:
       - Snippets
@@ -5581,9 +6614,167 @@ paths:
             items:
               $ref: '#/definitions/db.TextSnippet'
             type: array
+      security:
+      - PubKeyContextAuth: []
       summary: Get Snippets by Workspace
       tags:
       - Snippets
+  /ticket/{pubKey}/{created}:
+    delete:
+      consumes:
+      - application/json
+      description: Delete a ticket by admin
+      parameters:
+      - description: Public Key
+        in: path
+        name: pubKey
+        required: true
+        type: string
+      - description: Created Timestamp
+        in: path
+        name: created
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Ticket deleted successfully
+          schema:
+            type: string
+      security:
+      - PubKeyContextAuth: []
+      summary: Delete Ticket by Admin
+      tags:
+      - People
+  /tribe:
+    post:
+      consumes:
+      - application/json
+      description: Create or edit a tribe
+      parameters:
+      - description: Tribe object
+        in: body
+        name: tribe
+        required: true
+        schema:
+          $ref: '#/definitions/db.Tribe'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/db.Tribe'
+      security:
+      - PubKeyContextAuth: []
+      summary: Create or edit a tribe
+      tags:
+      - Tribes
+  /tribe/{uuid}:
+    delete:
+      consumes:
+      - application/json
+      description: Delete a tribe by UUID
+      parameters:
+      - description: Tribe UUID
+        in: path
+        name: uuid
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: boolean
+      security:
+      - PubKeyContextAuth: []
+      summary: Delete a tribe
+      tags:
+      - Tribes
+  /tribe_by_feed:
+    get:
+      description: Get the first tribe by feed URL
+      parameters:
+      - description: Feed URL
+        in: query
+        name: url
+        required: true
+        type: string
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+      summary: Get the first tribe by feed URL
+      tags:
+      - Tribes
+  /tribe_by_un/{un}:
+    get:
+      description: Get a tribe by unique name
+      parameters:
+      - description: Unique name
+        in: path
+        name: un
+        required: true
+        type: string
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+      summary: Get a tribe by unique name
+      tags:
+      - Tribes
+  /tribeactivity/{uuid}:
+    put:
+      consumes:
+      - application/json
+      description: Update the activity of a tribe
+      parameters:
+      - description: Tribe UUID
+        in: path
+        name: uuid
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: boolean
+      security:
+      - PubKeyContextAuth: []
+      summary: Update tribe activity
+      tags:
+      - Tribes
+  /tribepreview/{uuid}:
+    put:
+      description: Set the preview of a tribe
+      parameters:
+      - description: Tribe UUID
+        in: path
+        name: uuid
+        required: true
+        type: string
+      - description: Preview URL
+        in: query
+        name: preview
+        required: true
+        type: string
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: boolean
+      summary: Set tribe preview
+      tags:
+      - Tribes
   /tribes:
     get:
       description: Get a list of listed tribes
@@ -5597,40 +6788,7 @@ paths:
       summary: Get listed tribes
       tags:
       - Tribes
-    post:
-      description: Create or edit a tribe
-      parameters:
-      - description: Tribe object
-        in: body
-        name: tribe
-        required: true
-        schema:
-          $ref: '#/definitions/db.Tribe'
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/db.Tribe'
-      summary: Create or edit a tribe
-      tags:
-      - Tribes
   /tribes/{uuid}:
-    delete:
-      description: Delete a tribe by UUID
-      parameters:
-      - description: Tribe UUID
-        in: path
-        name: uuid
-        required: true
-        type: string
-      responses:
-        "200":
-          description: OK
-          schema:
-            type: boolean
-      summary: Delete a tribe
-      tags:
-      - Tribes
     get:
       description: Get a tribe by UUID
       parameters:
@@ -5646,23 +6804,6 @@ paths:
             additionalProperties: true
             type: object
       summary: Get a tribe
-      tags:
-      - Tribes
-  /tribes/activity/{uuid}:
-    put:
-      description: Update the activity of a tribe
-      parameters:
-      - description: Tribe UUID
-        in: path
-        name: uuid
-        required: true
-        type: string
-      responses:
-        "200":
-          description: OK
-          schema:
-            type: boolean
-      summary: Update tribe activity
       tags:
       - Tribes
   /tribes/app_url/{app_url}:
@@ -5723,42 +6864,6 @@ paths:
       summary: Generate a budget invoice
       tags:
       - Tribes
-  /tribes/budget_invoice_v1:
-    post:
-      description: Generate a budget invoice for a tribe
-      parameters:
-      - description: Budget invoice request
-        in: body
-        name: invoice
-        required: true
-        schema:
-          $ref: '#/definitions/db.BudgetInvoiceRequest'
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/db.InvoiceResponse'
-      summary: Generate a budget invoice
-      tags:
-      - Tribes
-  /tribes/feed:
-    get:
-      description: Get the first tribe by feed URL
-      parameters:
-      - description: Feed URL
-        in: query
-        name: url
-        required: true
-        type: string
-      responses:
-        "200":
-          description: OK
-          schema:
-            additionalProperties: true
-            type: object
-      summary: Get the first tribe by feed URL
-      tags:
-      - Tribes
   /tribes/invoice:
     post:
       description: Generate an invoice for a tribe
@@ -5777,73 +6882,35 @@ paths:
       summary: Generate an invoice
       tags:
       - Tribes
-  /tribes/leaderboard/{tribe_uuid}:
+  /tribes/total:
     get:
-      description: Get a leaderboard for a tribe
+      description: Get the total number of tribes
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: integer
+      summary: Get total number of tribes
+      tags:
+      - Tribes
+  /tribes/unique_name:
+    get:
+      description: Get unique name from tribe name
       parameters:
-      - description: Tribe UUID
-        in: path
-        name: tribe_uuid
-        required: true
-        type: string
-      - description: Alias
+      - description: Tribe name
         in: query
-        name: alias
-        type: string
-      responses:
-        "200":
-          description: OK
-          schema: {}
-      summary: Get a leaderboard
-      tags:
-      - Tribes
-    post:
-      description: Create a leaderboard for a tribe
-      parameters:
-      - description: Tribe UUID
-        in: path
-        name: tribe_uuid
+        name: name
         required: true
         type: string
-      - description: Leaderboard object
-        in: body
-        name: leaderboard
-        required: true
-        schema:
-          items:
-            $ref: '#/definitions/db.LeaderBoard'
-          type: array
       responses:
         "200":
           description: OK
           schema:
-            type: boolean
-      summary: Create a leaderboard
+            type: string
+      summary: Get unique name from tribe name
       tags:
       - Tribes
-    put:
-      description: Update a leaderboard for a tribe
-      parameters:
-      - description: Tribe UUID
-        in: path
-        name: tribe_uuid
-        required: true
-        type: string
-      - description: Leaderboard object
-        in: body
-        name: leaderboard
-        required: true
-        schema:
-          $ref: '#/definitions/db.LeaderBoard'
-      responses:
-        "200":
-          description: OK
-          schema:
-            type: boolean
-      summary: Update a leaderboard
-      tags:
-      - Tribes
-  /tribes/owner/{pubkey}:
+  /tribes_by_owner/{pubkey}:
     get:
       description: Get a list of tribes by owner public key
       parameters:
@@ -5866,30 +6933,10 @@ paths:
       summary: Get tribes by owner
       tags:
       - Tribes
-  /tribes/preview/{uuid}:
+  /tribestats:
     put:
-      description: Set the preview of a tribe
-      parameters:
-      - description: Tribe UUID
-        in: path
-        name: uuid
-        required: true
-        type: string
-      - description: Preview URL
-        in: query
-        name: preview
-        required: true
-        type: string
-      responses:
-        "200":
-          description: OK
-          schema:
-            type: boolean
-      summary: Set tribe preview
-      tags:
-      - Tribes
-  /tribes/stats:
-    put:
+      consumes:
+      - application/json
       description: Update the stats of a tribe
       parameters:
       - description: Tribe object
@@ -5898,60 +6945,56 @@ paths:
         required: true
         schema:
           $ref: '#/definitions/db.Tribe'
+      produces:
+      - application/json
       responses:
         "200":
           description: OK
           schema:
             type: boolean
+      security:
+      - PubKeyContextAuth: []
       summary: Update tribe stats
       tags:
       - Tribes
-  /tribes/total:
-    get:
-      description: Get the total number of tribes
-      responses:
-        "200":
-          description: OK
-          schema:
-            type: integer
-      summary: Get total number of tribes
-      tags:
-      - Tribes
-  /tribes/unique/{un}:
-    get:
-      description: Get a tribe by unique name
+  /verify/{challenge}:
+    post:
+      consumes:
+      - application/json
+      description: Verify a challenge by validating the signature and storing the
+        result in the cache.
       parameters:
-      - description: Unique name
+      - description: Challenge string
         in: path
-        name: un
+        name: challenge
         required: true
         type: string
+      - description: Request body containing the public key and signature
+        in: body
+        name: payload
+        required: true
+        schema:
+          $ref: '#/definitions/db.VerifyPayload'
+      produces:
+      - application/json
       responses:
         "200":
-          description: OK
+          description: Challenge verified successfully
           schema:
-            additionalProperties: true
-            type: object
-      summary: Get a tribe by unique name
-      tags:
-      - Tribes
-  /tribes/unique_name:
-    get:
-      description: Get unique name from tribe name
-      parameters:
-      - description: Tribe name
-        in: query
-        name: name
-        required: true
-        type: string
-      responses:
-        "200":
-          description: OK
+            $ref: '#/definitions/db.VerifyPayload'
+        "401":
+          description: 'Unauthorized: Challenge not found or invalid signature'
           schema:
             type: string
-      summary: Get unique name from tribe name
+        "406":
+          description: 'Not acceptable: Invalid request body'
+          schema:
+            type: string
+      security:
+      - PubKeyContextAuth: []
+      summary: Verify a challenge
       tags:
-      - Tribes
+      - Auth
   /workflows/request:
     post:
       consumes:
@@ -6035,6 +7078,8 @@ paths:
           description: OK
           schema:
             $ref: '#/definitions/db.Workspace'
+      security:
+      - PubKeyContextAuth: []
       summary: Create or Edit Workspace
       tags:
       - Workspaces
@@ -6079,7 +7124,37 @@ paths:
             items:
               $ref: '#/definitions/db.WorkspaceCodeGraph'
             type: array
+      security:
+      - PubKeyContextAuth: []
       summary: Get Code Graph by Workspace UUID
+      tags:
+      - Workspace -  Code Graph
+  /workspace/{workspace_uuid}/codegraph/{uuid}:
+    delete:
+      consumes:
+      - application/json
+      description: Delete a code graph from a workspace by its UUID
+      parameters:
+      - description: Workspace UUID
+        in: path
+        name: workspace_uuid
+        required: true
+        type: string
+      - description: Code Graph UUID
+        in: path
+        name: uuid
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Code graph deleted successfully
+          schema:
+            type: string
+      security:
+      - PubKeyContextAuth: []
+      summary: Delete Workspace Code Graph
       tags:
       - Workspace -  Code Graph
   /workspace/{workspace_uuid}/features:
@@ -6102,6 +7177,8 @@ paths:
             items:
               $ref: '#/definitions/db.WorkspaceFeatures'
             type: array
+      security:
+      - PubKeyContextAuth: []
       summary: Get Features by Workspace UUID
       tags:
       - Workspaces
@@ -6123,6 +7200,8 @@ paths:
           description: Hours since last withdrawal
           schema:
             type: int
+      security:
+      - PubKeyContextAuth: []
       summary: Get Last Withdrawal
       tags:
       - Workspace -  Payments
@@ -6144,6 +7223,8 @@ paths:
           description: Updated Payments Successfully
           schema:
             type: string
+      security:
+      - PubKeyContextAuth: []
       summary: Update Workspace Pending Payments
       tags:
       - Workspace -  Payments
@@ -6203,10 +7284,10 @@ paths:
           description: OK
           schema:
             items:
-              items:
-                $ref: '#/definitions/db.BountyRoles'
-              type: array
+              $ref: '#/definitions/db.BountyRoles'
             type: array
+      security:
+      - PubKeyContextAuth: []
       summary: Get Bounty Roles
       tags:
       - Workspace -  Bounties
@@ -6228,6 +7309,8 @@ paths:
           description: OK
           schema:
             $ref: '#/definitions/db.StatusBudget'
+      security:
+      - PubKeyContextAuth: []
       summary: Get Workspace Budget
       tags:
       - Workspace -  Payments
@@ -6249,10 +7332,10 @@ paths:
           description: OK
           schema:
             items:
-              items:
-                $ref: '#/definitions/db.BudgetHistoryData'
-              type: array
+              $ref: '#/definitions/db.BudgetHistoryData'
             type: array
+      security:
+      - PubKeyContextAuth: []
       summary: Get Workspace Budget History
       tags:
       - Workspace -  Payments
@@ -6275,35 +7358,12 @@ paths:
           description: OK
           schema:
             $ref: '#/definitions/db.WorkspaceCodeGraph'
+      security:
+      - PubKeyContextAuth: []
       summary: Create or Edit Workspace Code Graph
       tags:
       - Workspace -  Code Graph
   /workspace/codegraph/{uuid}:
-    delete:
-      consumes:
-      - application/json
-      description: Delete a code graph from a workspace by its UUID
-      parameters:
-      - description: Workspace UUID
-        in: path
-        name: workspace_uuid
-        required: true
-        type: string
-      - description: Code Graph UUID
-        in: path
-        name: uuid
-        required: true
-        type: string
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: Code graph deleted successfully
-          schema:
-            type: string
-      summary: Delete Workspace Code Graph
-      tags:
-      - Workspace -  Code Graph
     get:
       consumes:
       - application/json
@@ -6321,6 +7381,8 @@ paths:
           description: OK
           schema:
             $ref: '#/definitions/db.WorkspaceCodeGraph'
+      security:
+      - PubKeyContextAuth: []
       summary: Get Workspace Code Graph by UUID
       tags:
       - Workspace -  Code Graph
@@ -6357,6 +7419,8 @@ paths:
           description: OK
           schema:
             $ref: '#/definitions/db.Workspace'
+      security:
+      - PubKeyContextAuth: []
       summary: Delete Workspace
       tags:
       - Workspaces
@@ -6378,6 +7442,8 @@ paths:
           description: OK
           schema:
             $ref: '#/definitions/db.WorkspaceUsers'
+      security:
+      - PubKeyContextAuth: []
       summary: Get Workspace User
       tags:
       - Workspace -  Users
@@ -6399,6 +7465,8 @@ paths:
           description: OK
           schema:
             type: int
+      security:
+      - PubKeyContextAuth: []
       summary: Get Invoices Count
       tags:
       - Workspace -  Payments
@@ -6421,6 +7489,8 @@ paths:
           description: OK
           schema:
             $ref: '#/definitions/db.Workspace'
+      security:
+      - PubKeyContextAuth: []
       summary: Update Workspace
       tags:
       - Workspaces
@@ -6444,6 +7514,8 @@ paths:
             items:
               $ref: '#/definitions/db.PaymentHistoryData'
             type: array
+      security:
+      - PubKeyContextAuth: []
       summary: Get Payment History
       tags:
       - Workspace -  Payments
@@ -6465,6 +7537,8 @@ paths:
           description: Polled invoices
           schema:
             type: string
+      security:
+      - PubKeyContextAuth: []
       summary: Poll Budget Invoices
       tags:
       - Workspace -  Payments
@@ -6480,6 +7554,8 @@ paths:
           description: Polled user workspace invoices
           schema:
             type: string
+      security:
+      - PubKeyContextAuth: []
       summary: Poll User Workspaces Budget
       tags:
       - Workspace -  Payments
@@ -6502,6 +7578,8 @@ paths:
           description: OK
           schema:
             $ref: '#/definitions/db.WorkspaceRepositories'
+      security:
+      - PubKeyContextAuth: []
       summary: Create or Edit Workspace Repository
       tags:
       - Workspace -  Repositories
@@ -6551,6 +7629,8 @@ paths:
           description: Repository deleted successfully
           schema:
             type: string
+      security:
+      - PubKeyContextAuth: []
       summary: Delete Workspace Repository
       tags:
       - Workspace -  Repositories
@@ -6576,6 +7656,8 @@ paths:
           description: OK
           schema:
             $ref: '#/definitions/db.WorkspaceRepositories'
+      security:
+      - PubKeyContextAuth: []
       summary: Get Workspace Repository by UUID
       tags:
       - Workspace -  Repositories
@@ -6598,6 +7680,8 @@ paths:
           description: OK
           schema:
             $ref: '#/definitions/db.Workspace'
+      security:
+      - PubKeyContextAuth: []
       summary: Update Workspace
       tags:
       - Workspaces
@@ -6620,6 +7704,8 @@ paths:
           description: OK
           schema:
             $ref: '#/definitions/db.Workspace'
+      security:
+      - PubKeyContextAuth: []
       summary: Update Workspace
       tags:
       - Workspaces
@@ -6681,6 +7767,8 @@ paths:
           description: OK
           schema:
             type: int
+      security:
+      - PubKeyContextAuth: []
       summary: Get All User Invoices Count
       tags:
       - Workspace -  Payments
@@ -6690,6 +7778,11 @@ paths:
       - application/json
       description: Delete a user from a workspace
       parameters:
+      - description: Workspace UUID
+        in: path
+        name: uuid
+        required: true
+        type: string
       - description: Workspace User Data
         in: body
         name: workspaceUser
@@ -6703,6 +7796,8 @@ paths:
           description: OK
           schema:
             $ref: '#/definitions/db.WorkspaceUsersData'
+      security:
+      - PubKeyContextAuth: []
       summary: Delete Workspace User
       tags:
       - Workspace -  Users
@@ -6746,6 +7841,8 @@ paths:
           description: OK
           schema:
             $ref: '#/definitions/db.WorkspaceUsers'
+      security:
+      - PubKeyContextAuth: []
       summary: Create Workspace User
       tags:
       - Workspace -  Users
@@ -6795,6 +7892,8 @@ paths:
             items:
               $ref: '#/definitions/db.WorkspaceUserRoles'
             type: array
+      security:
+      - PubKeyContextAuth: []
       summary: Get User Roles
       tags:
       - Workspace -  Users
@@ -6818,9 +7917,7 @@ paths:
         name: roles
         required: true
         schema:
-          items:
-            $ref: '#/definitions/db.WorkspaceUserRoles'
-          type: array
+          $ref: '#/definitions/db.WorkspaceUserRoles'
       produces:
       - application/json
       responses:
@@ -6830,6 +7927,8 @@ paths:
             items:
               $ref: '#/definitions/db.WorkspaceUserRoles'
             type: array
+      security:
+      - PubKeyContextAuth: []
       summary: Add User Roles
       tags:
       - Workspace -  Users
@@ -6851,11 +7950,27 @@ paths:
           description: OK
           schema:
             items:
-              items:
-                $ref: '#/definitions/feeds.Item'
-              type: array
+              $ref: '#/definitions/feeds.Item'
             type: array
       summary: Get Youtube Videos for Channel
       tags:
       - Feeds
+securityDefinitions:
+  CypressAuth:
+    description: No authentication needed when in test mode
+    in: header
+    name: x-cypress
+    type: apiKey
+  PubKeyContextAuth:
+    description: JWT token for authentication. Can also be provided as a query parameter
+      named 'token'
+    in: header
+    name: x-jwt
+    type: apiKey
+  SuperAdminAuth:
+    description: JWT token for super admin authentication. Can also be provided as
+      a query parameter named 'token'
+    in: header
+    name: x-jwt
+    type: apiKey
 swagger: "2.0"

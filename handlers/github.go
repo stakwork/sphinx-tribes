@@ -17,6 +17,8 @@ import (
 	"golang.org/x/oauth2"
 )
 
+// GithubIssue godoc
+//
 //	@Summary		Get Github Issue
 //	@Description	Get a Github issue by owner, repo, and issue number
 //	@Tags			Github
@@ -45,6 +47,8 @@ func GetGithubIssue(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(issue)
 }
 
+// GetOpenGithubIssues godoc
+//
 //	@Summary		Get Open Github Issues
 //	@Description	Get the count of open Github issues
 //	@Tags			Github

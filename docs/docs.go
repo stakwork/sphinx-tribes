@@ -17,7 +17,15 @@ const docTemplate = `{
     "paths": {
         "/activities": {
             "post": {
+                "security": [
+                    {
+                        "PubKeyContextAuth": []
+                    }
+                ],
                 "description": "Create a new activity",
+                "produces": [
+                    "application/json"
+                ],
                 "tags": [
                     "Activities"
                 ],
@@ -45,7 +53,15 @@ const docTemplate = `{
         },
         "/activities/feature/{feature_uuid}": {
             "get": {
+                "security": [
+                    {
+                        "PubKeyContextAuth": []
+                    }
+                ],
                 "description": "Get activities by feature UUID",
+                "produces": [
+                    "application/json"
+                ],
                 "tags": [
                     "Activities"
                 ],
@@ -63,8 +79,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "type": "object",
-                            "additionalProperties": true
+                            "$ref": "#/definitions/handlers.ActivitiesResponse"
                         }
                     }
                 }
@@ -72,7 +87,15 @@ const docTemplate = `{
         },
         "/activities/phase/{phase_uuid}": {
             "get": {
+                "security": [
+                    {
+                        "PubKeyContextAuth": []
+                    }
+                ],
                 "description": "Get activities by phase UUID",
+                "produces": [
+                    "application/json"
+                ],
                 "tags": [
                     "Activities"
                 ],
@@ -90,8 +113,53 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "type": "object",
-                            "additionalProperties": true
+                            "$ref": "#/definitions/handlers.ActivitiesResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/activities/receive": {
+            "post": {
+                "description": "Receives activity data from a webhook, validates it, and creates a new activity record",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Activities"
+                ],
+                "summary": "Receive and process a new activity",
+                "parameters": [
+                    {
+                        "description": "Activity information",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/handlers.WebhookActivityRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "schema": {
+                            "$ref": "#/definitions/handlers.WebhookResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid request payload, invalid public key format, invalid source ID format, or other validation errors",
+                        "schema": {
+                            "$ref": "#/definitions/handlers.WebhookResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "$ref": "#/definitions/handlers.WebhookResponse"
                         }
                     }
                 }
@@ -99,7 +167,15 @@ const docTemplate = `{
         },
         "/activities/thread": {
             "post": {
+                "security": [
+                    {
+                        "PubKeyContextAuth": []
+                    }
+                ],
                 "description": "Create a new activity thread",
+                "produces": [
+                    "application/json"
+                ],
                 "tags": [
                     "Activities"
                 ],
@@ -135,6 +211,9 @@ const docTemplate = `{
         "/activities/thread/{thread_id}": {
             "get": {
                 "description": "Get activities by thread ID",
+                "produces": [
+                    "application/json"
+                ],
                 "tags": [
                     "Activities"
                 ],
@@ -152,8 +231,19 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "type": "object",
-                            "additionalProperties": true
+                            "$ref": "#/definitions/handlers.ActivityThreadResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "thread_id is required",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "500": {
+                        "description": "Failed to get activities",
+                        "schema": {
+                            "type": "string"
                         }
                     }
                 }
@@ -162,6 +252,9 @@ const docTemplate = `{
         "/activities/thread/{thread_id}/latest": {
             "get": {
                 "description": "Get the latest activity by thread ID",
+                "produces": [
+                    "application/json"
+                ],
                 "tags": [
                     "Activities"
                 ],
@@ -181,13 +274,33 @@ const docTemplate = `{
                         "schema": {
                             "$ref": "#/definitions/handlers.ActivityResponse"
                         }
+                    },
+                    "400": {
+                        "description": "thread_id is required",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "500": {
+                        "description": "Failed to get latest activity",
+                        "schema": {
+                            "type": "string"
+                        }
                     }
                 }
             }
         },
         "/activities/workspace/{workspace}": {
             "get": {
+                "security": [
+                    {
+                        "PubKeyContextAuth": []
+                    }
+                ],
                 "description": "Get activities by workspace",
+                "produces": [
+                    "application/json"
+                ],
                 "tags": [
                     "Activities"
                 ],
@@ -205,8 +318,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "type": "object",
-                            "additionalProperties": true
+                            "$ref": "#/definitions/handlers.ActivitiesResponse"
                         }
                     }
                 }
@@ -214,11 +326,14 @@ const docTemplate = `{
         },
         "/activities/{id}": {
             "get": {
-                "description": "Get an activity by ID",
+                "description": "Fetch a specific activity by its unique identifier",
+                "produces": [
+                    "application/json"
+                ],
                 "tags": [
                     "Activities"
                 ],
-                "summary": "Get an activity",
+                "summary": "Retrieve activity details",
                 "parameters": [
                     {
                         "type": "string",
@@ -234,11 +349,37 @@ const docTemplate = `{
                         "schema": {
                             "$ref": "#/definitions/handlers.ActivityResponse"
                         }
+                    },
+                    "400": {
+                        "description": "ID is required",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "404": {
+                        "description": "activity not found",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "type": "string"
+                        }
                     }
                 }
             },
             "put": {
+                "security": [
+                    {
+                        "PubKeyContextAuth": []
+                    }
+                ],
                 "description": "Update an existing activity",
+                "produces": [
+                    "application/json"
+                ],
                 "tags": [
                     "Activities"
                 ],
@@ -271,7 +412,15 @@ const docTemplate = `{
                 }
             },
             "delete": {
+                "security": [
+                    {
+                        "PubKeyContextAuth": []
+                    }
+                ],
                 "description": "Delete an activity by ID",
+                "produces": [
+                    "application/json"
+                ],
                 "tags": [
                     "Activities"
                 ],
@@ -298,7 +447,15 @@ const docTemplate = `{
         },
         "/activities/{id}/actions": {
             "post": {
+                "security": [
+                    {
+                        "PubKeyContextAuth": []
+                    }
+                ],
                 "description": "Add actions to an activity by ID",
+                "produces": [
+                    "application/json"
+                ],
                 "tags": [
                     "Activities"
                 ],
@@ -333,7 +490,15 @@ const docTemplate = `{
         },
         "/activities/{id}/actions/{action_id}": {
             "delete": {
+                "security": [
+                    {
+                        "PubKeyContextAuth": []
+                    }
+                ],
                 "description": "Remove an action from an activity by ID",
+                "produces": [
+                    "application/json"
+                ],
                 "tags": [
                     "Activities"
                 ],
@@ -366,7 +531,15 @@ const docTemplate = `{
         },
         "/activities/{id}/questions": {
             "post": {
+                "security": [
+                    {
+                        "PubKeyContextAuth": []
+                    }
+                ],
                 "description": "Add questions to an activity by ID",
+                "produces": [
+                    "application/json"
+                ],
                 "tags": [
                     "Activities"
                 ],
@@ -401,7 +574,15 @@ const docTemplate = `{
         },
         "/activities/{id}/questions/{question_id}": {
             "delete": {
+                "security": [
+                    {
+                        "PubKeyContextAuth": []
+                    }
+                ],
                 "description": "Remove a question from an activity by ID",
+                "produces": [
+                    "application/json"
+                ],
                 "tags": [
                     "Activities"
                 ],
@@ -434,19 +615,33 @@ const docTemplate = `{
         },
         "/admin/auth": {
             "get": {
-                "description": "Check if the user is an admin",
+                "security": [
+                    {
+                        "PubKeyContextAuth": []
+                    }
+                ],
+                "description": "Check if the user is an admin. Requires a valid JWT token in the request context.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
                 "tags": [
                     "Auth"
                 ],
                 "summary": "Check if user is admin",
                 "responses": {
                     "200": {
-                        "description": "OK",
+                        "description": "Returns a success message if the user is an admin",
                         "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "boolean"
-                            }
+                            "type": "string"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized: User is not an admin or missing/invalid JWT token",
+                        "schema": {
+                            "type": "string"
                         }
                     }
                 }
@@ -467,6 +662,71 @@ const docTemplate = `{
                             "items": {
                                 "type": "string"
                             }
+                        }
+                    }
+                }
+            }
+        },
+        "/badges": {
+            "post": {
+                "security": [
+                    {
+                        "PubKeyContextAuth": []
+                    }
+                ],
+                "description": "Add or remove a badge for a person",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "People"
+                ],
+                "summary": "Add or Remove Badge",
+                "parameters": [
+                    {
+                        "description": "Badge Creation Data",
+                        "name": "badgeCreationData",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/db.BadgeCreationData"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/db.Tribe"
+                        }
+                    }
+                }
+            }
+        },
+        "/bot/unique_name": {
+            "get": {
+                "description": "Get unique name from bot name",
+                "tags": [
+                    "Bots"
+                ],
+                "summary": "Get unique name from bot name",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Bot name",
+                        "name": "name",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "string"
                         }
                     }
                 }
@@ -500,6 +760,11 @@ const docTemplate = `{
         },
         "/bot/{uuid}": {
             "delete": {
+                "security": [
+                    {
+                        "PubKeyContextAuth": []
+                    }
+                ],
                 "description": "Delete a bot by UUID",
                 "tags": [
                     "Bots"
@@ -544,7 +809,18 @@ const docTemplate = `{
                 }
             },
             "put": {
+                "security": [
+                    {
+                        "PubKeyContextAuth": []
+                    }
+                ],
                 "description": "Create or edit a bot",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
                 "tags": [
                     "Bots"
                 ],
@@ -599,61 +875,6 @@ const docTemplate = `{
                 }
             }
         },
-        "/bots/search": {
-            "get": {
-                "description": "Search for bots",
-                "tags": [
-                    "Bots"
-                ],
-                "summary": "Search bots",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "Search query",
-                        "name": "query",
-                        "in": "query",
-                        "required": true
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "type": "array",
-                            "items": {
-                                "$ref": "#/definitions/db.Bot"
-                            }
-                        }
-                    }
-                }
-            }
-        },
-        "/bots/unique_name": {
-            "get": {
-                "description": "Get unique name from bot name",
-                "tags": [
-                    "Bots"
-                ],
-                "summary": "Get unique name from bot name",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "Bot name",
-                        "name": "name",
-                        "in": "query",
-                        "required": true
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "type": "string"
-                        }
-                    }
-                }
-            }
-        },
         "/bots/{uuid}": {
             "get": {
                 "description": "Get a bot by UUID",
@@ -682,6 +903,11 @@ const docTemplate = `{
         },
         "/bounties/ticket/bounty/bulk": {
             "post": {
+                "security": [
+                    {
+                        "PubKeyContextAuth": []
+                    }
+                ],
                 "description": "Convert multiple tickets to bounties",
                 "consumes": [
                     "application/json"
@@ -716,6 +942,11 @@ const docTemplate = `{
         },
         "/bounties/ticket/feature/{feature_uuid}/phase/{phase_uuid}": {
             "get": {
+                "security": [
+                    {
+                        "PubKeyContextAuth": []
+                    }
+                ],
                 "description": "Get tickets by phase UUID",
                 "consumes": [
                     "application/json"
@@ -758,6 +989,11 @@ const docTemplate = `{
         },
         "/bounties/ticket/group/{group_uuid}": {
             "get": {
+                "security": [
+                    {
+                        "PubKeyContextAuth": []
+                    }
+                ],
                 "description": "Get tickets by group UUID",
                 "consumes": [
                     "application/json"
@@ -793,6 +1029,11 @@ const docTemplate = `{
         },
         "/bounties/ticket/plan": {
             "post": {
+                "security": [
+                    {
+                        "PubKeyContextAuth": []
+                    }
+                ],
                 "description": "Create a new ticket plan",
                 "consumes": [
                     "application/json"
@@ -827,6 +1068,11 @@ const docTemplate = `{
         },
         "/bounties/ticket/plan/feature/{feature_uuid}": {
             "get": {
+                "security": [
+                    {
+                        "PubKeyContextAuth": []
+                    }
+                ],
                 "description": "Get ticket plans by feature UUID",
                 "consumes": [
                     "application/json"
@@ -862,6 +1108,11 @@ const docTemplate = `{
         },
         "/bounties/ticket/plan/phase/{phase_uuid}": {
             "get": {
+                "security": [
+                    {
+                        "PubKeyContextAuth": []
+                    }
+                ],
                 "description": "Get ticket plans by phase UUID",
                 "consumes": [
                     "application/json"
@@ -931,6 +1182,11 @@ const docTemplate = `{
         },
         "/bounties/ticket/plan/send": {
             "post": {
+                "security": [
+                    {
+                        "PubKeyContextAuth": []
+                    }
+                ],
                 "description": "Send a ticket plan to Stakwork for processing",
                 "consumes": [
                     "application/json"
@@ -965,6 +1221,11 @@ const docTemplate = `{
         },
         "/bounties/ticket/plan/workspace/{workspace_uuid}": {
             "get": {
+                "security": [
+                    {
+                        "PubKeyContextAuth": []
+                    }
+                ],
                 "description": "Get ticket plans by workspace UUID",
                 "consumes": [
                     "application/json"
@@ -1000,6 +1261,11 @@ const docTemplate = `{
         },
         "/bounties/ticket/plan/{uuid}": {
             "get": {
+                "security": [
+                    {
+                        "PubKeyContextAuth": []
+                    }
+                ],
                 "description": "Get a ticket plan by its UUID",
                 "consumes": [
                     "application/json"
@@ -1030,6 +1296,11 @@ const docTemplate = `{
                 }
             },
             "delete": {
+                "security": [
+                    {
+                        "PubKeyContextAuth": []
+                    }
+                ],
                 "description": "Delete a ticket plan by its UUID",
                 "consumes": [
                     "application/json"
@@ -1096,6 +1367,11 @@ const docTemplate = `{
         },
         "/bounties/ticket/review/send": {
             "post": {
+                "security": [
+                    {
+                        "PubKeyContextAuth": []
+                    }
+                ],
                 "description": "Post ticket data to Stakwork for processing",
                 "consumes": [
                     "application/json"
@@ -1130,6 +1406,11 @@ const docTemplate = `{
         },
         "/bounties/ticket/workspace/{workspace_uuid}/draft": {
             "post": {
+                "security": [
+                    {
+                        "PubKeyContextAuth": []
+                    }
+                ],
                 "description": "Create a draft ticket for a workspace",
                 "consumes": [
                     "application/json"
@@ -1171,6 +1452,11 @@ const docTemplate = `{
         },
         "/bounties/ticket/workspace/{workspace_uuid}/draft/{uuid}": {
             "get": {
+                "security": [
+                    {
+                        "PubKeyContextAuth": []
+                    }
+                ],
                 "description": "Get a draft ticket for a workspace by its UUID",
                 "consumes": [
                     "application/json"
@@ -1208,6 +1494,11 @@ const docTemplate = `{
                 }
             },
             "post": {
+                "security": [
+                    {
+                        "PubKeyContextAuth": []
+                    }
+                ],
                 "description": "Update a draft ticket for a workspace",
                 "consumes": [
                     "application/json"
@@ -1254,6 +1545,11 @@ const docTemplate = `{
                 }
             },
             "delete": {
+                "security": [
+                    {
+                        "PubKeyContextAuth": []
+                    }
+                ],
                 "description": "Delete a draft ticket for a workspace by its UUID",
                 "consumes": [
                     "application/json"
@@ -1293,6 +1589,11 @@ const docTemplate = `{
         },
         "/bounties/ticket/{ticket_group}/sequence": {
             "post": {
+                "security": [
+                    {
+                        "PubKeyContextAuth": []
+                    }
+                ],
                 "description": "Update the sequence of tickets in a group",
                 "consumes": [
                     "application/json"
@@ -1334,6 +1635,11 @@ const docTemplate = `{
         },
         "/bounties/ticket/{ticket_uuid}/bounty": {
             "post": {
+                "security": [
+                    {
+                        "PubKeyContextAuth": []
+                    }
+                ],
                 "description": "Convert a ticket to a bounty",
                 "consumes": [
                     "application/json"
@@ -1396,6 +1702,11 @@ const docTemplate = `{
                 }
             },
             "post": {
+                "security": [
+                    {
+                        "PubKeyContextAuth": []
+                    }
+                ],
                 "description": "Update an existing ticket",
                 "consumes": [
                     "application/json"
@@ -1435,6 +1746,11 @@ const docTemplate = `{
                 }
             },
             "delete": {
+                "security": [
+                    {
+                        "PubKeyContextAuth": []
+                    }
+                ],
                 "description": "Delete a ticket by its UUID",
                 "consumes": [
                     "application/json"
@@ -1465,6 +1781,58 @@ const docTemplate = `{
                 }
             }
         },
+        "/bounty/assignee": {
+            "delete": {
+                "description": "Delete the assignee of a bounty. Only the bounty owner can perform this action.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Bounties"
+                ],
+                "summary": "Delete a bounty assignee",
+                "parameters": [
+                    {
+                        "description": "Request body containing owner_pubkey and created timestamp",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/db.DeleteBountyAssignee"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Assignee deleted successfully",
+                        "schema": {
+                            "type": "boolean"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad request: Missing or invalid parameters",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "406": {
+                        "description": "Not acceptable: Invalid request body",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error: Failed to delete assignee",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
         "/bounty/leaderboard": {
             "get": {
                 "description": "Get bounties leaderboard",
@@ -1478,19 +1846,304 @@ const docTemplate = `{
                         "schema": {
                             "type": "array",
                             "items": {
-                                "type": "array",
-                                "items": {
-                                    "$ref": "#/definitions/db.LeaderData"
-                                }
+                                "$ref": "#/definitions/db.LeaderData"
                             }
                         }
                     }
                 }
             }
         },
-        "/feature_flags": {
+        "/bounty/{id}/proof/{proofId}/status": {
+            "put": {
+                "description": "Update the status of a proof of work for a specific bounty. Valid statuses are \"accepted\", \"rejected\", and \"change_requested\".",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Bounties - Proof of Work"
+                ],
+                "summary": "Update the status of a proof of work",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Bounty ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Proof of Work ID",
+                        "name": "proofId",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "New status for the proof of work",
+                        "name": "status",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/handlers.UpdateProofStatusResponse"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Status updated successfully",
+                        "schema": {
+                            "$ref": "#/definitions/handlers.UpdateProofStatusResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad request: Invalid proof ID, bounty ID, or status",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error: Failed to update status",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
+        "/channel": {
+            "post": {
+                "security": [
+                    {
+                        "PubKeyContextAuth": []
+                    }
+                ],
+                "description": "Create a new channel within a tribe. Only the tribe owner can perform this action.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Channel"
+                ],
+                "summary": "Create a channel",
+                "parameters": [
+                    {
+                        "description": "Request body containing tribe UUID and channel name",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/db.Channel"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Channel created successfully",
+                        "schema": {
+                            "$ref": "#/definitions/db.Channel"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad request: Invalid request body"
+                    },
+                    "401": {
+                        "description": "Unauthorized: User is not the tribe owner"
+                    },
+                    "406": {
+                        "description": "Not acceptable: Channel name already in use or invalid data"
+                    }
+                }
+            }
+        },
+        "/channel/{id}": {
+            "delete": {
+                "security": [
+                    {
+                        "PubKeyContextAuth": []
+                    }
+                ],
+                "description": "Delete a channel by marking it as deleted. Only the tribe owner can perform this action.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Channel"
+                ],
+                "summary": "Delete a channel",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Channel ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Channel deleted successfully",
+                        "schema": {
+                            "type": "boolean"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad request: Invalid channel ID"
+                    },
+                    "401": {
+                        "description": "Unauthorized: User is not the tribe owner or invalid credentials"
+                    },
+                    "404": {
+                        "description": "Not found: Channel does not exist"
+                    }
+                }
+            }
+        },
+        "/connectioncodes": {
             "get": {
+                "description": "Retrieve a single connection code from the database.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Auth"
+                ],
+                "summary": "Get a connection code",
+                "responses": {
+                    "200": {
+                        "description": "Connection code retrieved successfully",
+                        "schema": {
+                            "$ref": "#/definitions/db.ConnectionCodesShort"
+                        }
+                    }
+                }
+            },
+            "post": {
+                "security": [
+                    {
+                        "SuperAdminAuth": []
+                    }
+                ],
+                "description": "Create one or more connection codes for a user. Requires a valid pubkey and route hint.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Auth"
+                ],
+                "summary": "Create connection codes",
+                "parameters": [
+                    {
+                        "description": "Request body containing pubkey, route hint, sats amount, and number of codes",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/db.InviteBody"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Connection codes created successfully",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad request: Missing or invalid parameters",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "406": {
+                        "description": "Not acceptable: Invalid request body",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
+        "/connectioncodes/list": {
+            "get": {
+                "security": [
+                    {
+                        "SuperAdminAuth": []
+                    }
+                ],
+                "description": "List all connection codes with pagination support.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Auth"
+                ],
+                "summary": "List connection codes",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Page number (default: 1)",
+                        "name": "page",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "Number of items per page (default: 20)",
+                        "name": "limit",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Connection codes retrieved successfully",
+                        "schema": {
+                            "$ref": "#/definitions/handlers.ConnectionCodesListResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad request: Invalid pagination parameters",
+                        "schema": {
+                            "$ref": "#/definitions/handlers.ConnectionCodesListResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error: Failed to retrieve connection codes",
+                        "schema": {
+                            "$ref": "#/definitions/handlers.ConnectionCodesListResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/feature-flags": {
+            "get": {
+                "security": [
+                    {
+                        "PubKeyContextAuth": []
+                    }
+                ],
                 "description": "Get a list of all feature flags",
+                "produces": [
+                    "application/json"
+                ],
                 "tags": [
                     "Feature Flag"
                 ],
@@ -1505,7 +2158,18 @@ const docTemplate = `{
                 }
             },
             "post": {
+                "security": [
+                    {
+                        "PubKeyContextAuth": []
+                    }
+                ],
                 "description": "Create a new feature flag with specified details",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
                 "tags": [
                     "Feature Flag"
                 ],
@@ -1531,9 +2195,17 @@ const docTemplate = `{
                 }
             }
         },
-        "/feature_flags/{feature_flag_id}/endpoints": {
+        "/feature-flags/{feature_flag_id}/endpoints": {
             "post": {
+                "security": [
+                    {
+                        "PubKeyContextAuth": []
+                    }
+                ],
                 "description": "Add new endpoints to an existing feature flag",
+                "produces": [
+                    "application/json"
+                ],
                 "tags": [
                     "Feature Flag"
                 ],
@@ -1566,9 +2238,17 @@ const docTemplate = `{
                 }
             }
         },
-        "/feature_flags/{feature_flag_id}/endpoints/{endpoint_id}": {
+        "/feature-flags/{feature_flag_id}/endpoints/{endpoint_id}": {
             "put": {
+                "security": [
+                    {
+                        "PubKeyContextAuth": []
+                    }
+                ],
                 "description": "Update the details of an endpoint of an existing feature flag",
+                "produces": [
+                    "application/json"
+                ],
                 "tags": [
                     "Feature Flag"
                 ],
@@ -1608,7 +2288,15 @@ const docTemplate = `{
                 }
             },
             "delete": {
+                "security": [
+                    {
+                        "PubKeyContextAuth": []
+                    }
+                ],
                 "description": "Delete an endpoint of a feature flag by ID",
+                "produces": [
+                    "application/json"
+                ],
                 "tags": [
                     "Feature Flag"
                 ],
@@ -1639,9 +2327,20 @@ const docTemplate = `{
                 }
             }
         },
-        "/feature_flags/{id}": {
+        "/feature-flags/{id}": {
             "put": {
+                "security": [
+                    {
+                        "PubKeyContextAuth": []
+                    }
+                ],
                 "description": "Update the details of an existing feature flag",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
                 "tags": [
                     "Feature Flag"
                 ],
@@ -1674,7 +2373,15 @@ const docTemplate = `{
                 }
             },
             "delete": {
+                "security": [
+                    {
+                        "PubKeyContextAuth": []
+                    }
+                ],
                 "description": "Delete a feature flag by ID",
+                "produces": [
+                    "application/json"
+                ],
                 "tags": [
                     "Feature Flag"
                 ],
@@ -1700,6 +2407,11 @@ const docTemplate = `{
         },
         "/features": {
             "post": {
+                "security": [
+                    {
+                        "PubKeyContextAuth": []
+                    }
+                ],
                 "description": "Create or edit features",
                 "consumes": [
                     "application/json"
@@ -1723,6 +2435,11 @@ const docTemplate = `{
         },
         "/features/brief": {
             "post": {
+                "security": [
+                    {
+                        "PubKeyContextAuth": []
+                    }
+                ],
                 "description": "Update the brief of a feature",
                 "consumes": [
                     "application/json"
@@ -1746,6 +2463,11 @@ const docTemplate = `{
         },
         "/features/brief/send": {
             "post": {
+                "security": [
+                    {
+                        "PubKeyContextAuth": []
+                    }
+                ],
                 "description": "Send the brief of a feature",
                 "consumes": [
                     "application/json"
@@ -1769,6 +2491,11 @@ const docTemplate = `{
         },
         "/features/forworkspace/{workspace_uuid}": {
             "get": {
+                "security": [
+                    {
+                        "PubKeyContextAuth": []
+                    }
+                ],
                 "description": "Get features by workspace UUID",
                 "consumes": [
                     "application/json"
@@ -1795,6 +2522,11 @@ const docTemplate = `{
         },
         "/features/phase": {
             "post": {
+                "security": [
+                    {
+                        "PubKeyContextAuth": []
+                    }
+                ],
                 "description": "Create or edit a phase of a feature",
                 "consumes": [
                     "application/json"
@@ -1841,6 +2573,11 @@ const docTemplate = `{
         },
         "/features/stories/send": {
             "post": {
+                "security": [
+                    {
+                        "PubKeyContextAuth": []
+                    }
+                ],
                 "description": "Send stories of a feature",
                 "consumes": [
                     "application/json"
@@ -1864,6 +2601,11 @@ const docTemplate = `{
         },
         "/features/story": {
             "post": {
+                "security": [
+                    {
+                        "PubKeyContextAuth": []
+                    }
+                ],
                 "description": "Create or edit a story of a feature",
                 "consumes": [
                     "application/json"
@@ -1887,6 +2629,11 @@ const docTemplate = `{
         },
         "/features/workspace/count/{uuid}": {
             "get": {
+                "security": [
+                    {
+                        "PubKeyContextAuth": []
+                    }
+                ],
                 "description": "Get the count of features in a workspace",
                 "consumes": [
                     "application/json"
@@ -1910,6 +2657,11 @@ const docTemplate = `{
         },
         "/features/{feature_uuid}/phase": {
             "get": {
+                "security": [
+                    {
+                        "PubKeyContextAuth": []
+                    }
+                ],
                 "description": "Get phases of a feature by its UUID",
                 "consumes": [
                     "application/json"
@@ -1936,6 +2688,11 @@ const docTemplate = `{
         },
         "/features/{feature_uuid}/phase/{phase_uuid}": {
             "get": {
+                "security": [
+                    {
+                        "PubKeyContextAuth": []
+                    }
+                ],
                 "description": "Get a phase of a feature by its UUID",
                 "consumes": [
                     "application/json"
@@ -1957,6 +2714,11 @@ const docTemplate = `{
                 }
             },
             "delete": {
+                "security": [
+                    {
+                        "PubKeyContextAuth": []
+                    }
+                ],
                 "description": "Delete a phase of a feature by its UUID",
                 "consumes": [
                     "application/json"
@@ -1980,6 +2742,11 @@ const docTemplate = `{
         },
         "/features/{feature_uuid}/phase/{phase_uuid}/bounty": {
             "get": {
+                "security": [
+                    {
+                        "PubKeyContextAuth": []
+                    }
+                ],
                 "description": "Get bounties of a feature by its UUID and phase UUID",
                 "consumes": [
                     "application/json"
@@ -2006,6 +2773,11 @@ const docTemplate = `{
         },
         "/features/{feature_uuid}/phase/{phase_uuid}/bounty/count": {
             "get": {
+                "security": [
+                    {
+                        "PubKeyContextAuth": []
+                    }
+                ],
                 "description": "Get the count of bounties of a feature by its UUID and phase UUID",
                 "consumes": [
                     "application/json"
@@ -2029,6 +2801,11 @@ const docTemplate = `{
         },
         "/features/{feature_uuid}/quick-bounties": {
             "get": {
+                "security": [
+                    {
+                        "PubKeyContextAuth": []
+                    }
+                ],
                 "description": "Get quick bounties of a feature by its UUID",
                 "consumes": [
                     "application/json"
@@ -2052,6 +2829,11 @@ const docTemplate = `{
         },
         "/features/{feature_uuid}/quick-tickets": {
             "get": {
+                "security": [
+                    {
+                        "PubKeyContextAuth": []
+                    }
+                ],
                 "description": "Get quick tickets of a feature by its UUID",
                 "consumes": [
                     "application/json"
@@ -2075,6 +2857,11 @@ const docTemplate = `{
         },
         "/features/{feature_uuid}/story": {
             "get": {
+                "security": [
+                    {
+                        "PubKeyContextAuth": []
+                    }
+                ],
                 "description": "Get stories of a feature by its UUID",
                 "consumes": [
                     "application/json"
@@ -2101,6 +2888,11 @@ const docTemplate = `{
         },
         "/features/{feature_uuid}/story/{story_uuid}": {
             "get": {
+                "security": [
+                    {
+                        "PubKeyContextAuth": []
+                    }
+                ],
                 "description": "Get a story of a feature by its UUID",
                 "consumes": [
                     "application/json"
@@ -2122,6 +2914,11 @@ const docTemplate = `{
                 }
             },
             "delete": {
+                "security": [
+                    {
+                        "PubKeyContextAuth": []
+                    }
+                ],
                 "description": "Delete a story of a feature by its UUID",
                 "consumes": [
                     "application/json"
@@ -2145,6 +2942,11 @@ const docTemplate = `{
         },
         "/features/{uuid}": {
             "get": {
+                "security": [
+                    {
+                        "PubKeyContextAuth": []
+                    }
+                ],
                 "description": "Get a feature by its UUID",
                 "consumes": [
                     "application/json"
@@ -2166,6 +2968,11 @@ const docTemplate = `{
                 }
             },
             "delete": {
+                "security": [
+                    {
+                        "PubKeyContextAuth": []
+                    }
+                ],
                 "description": "Delete a feature by its UUID",
                 "consumes": [
                     "application/json"
@@ -2189,6 +2996,11 @@ const docTemplate = `{
         },
         "/features/{uuid}/status": {
             "put": {
+                "security": [
+                    {
+                        "PubKeyContextAuth": []
+                    }
+                ],
                 "description": "Update the status of a feature",
                 "consumes": [
                     "application/json"
@@ -2353,7 +3165,18 @@ const docTemplate = `{
         },
         "/gobounties": {
             "post": {
+                "security": [
+                    {
+                        "PubKeyContextAuth": []
+                    }
+                ],
                 "description": "Create or edit a bounty",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
                 "tags": [
                     "Bounties"
                 ],
@@ -2401,7 +3224,15 @@ const docTemplate = `{
         },
         "/gobounties/bounty-cards": {
             "get": {
+                "security": [
+                    {
+                        "PubKeyContextAuth": []
+                    }
+                ],
                 "description": "Get bounty cards",
+                "produces": [
+                    "application/json"
+                ],
                 "tags": [
                     "Bounties"
                 ],
@@ -2421,7 +3252,18 @@ const docTemplate = `{
         },
         "/gobounties/budget/withdraw": {
             "post": {
+                "security": [
+                    {
+                        "PubKeyContextAuth": []
+                    }
+                ],
                 "description": "Withdraw bounty budget",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
                 "tags": [
                     "Bounties - Payment"
                 ],
@@ -2449,7 +3291,18 @@ const docTemplate = `{
         },
         "/gobounties/completedstatus/{created}": {
             "post": {
+                "security": [
+                    {
+                        "PubKeyContextAuth": []
+                    }
+                ],
                 "description": "Update completed status by created date",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
                 "tags": [
                     "Bounties"
                 ],
@@ -2571,7 +3424,18 @@ const docTemplate = `{
         },
         "/gobounties/featured/create": {
             "post": {
+                "security": [
+                    {
+                        "PubKeyContextAuth": []
+                    }
+                ],
                 "description": "Create a featured bounty",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
                 "tags": [
                     "Featured Bounties"
                 ],
@@ -2599,7 +3463,15 @@ const docTemplate = `{
         },
         "/gobounties/featured/delete/{bountyId}": {
             "delete": {
+                "security": [
+                    {
+                        "PubKeyContextAuth": []
+                    }
+                ],
                 "description": "Delete a featured bounty by ID",
+                "produces": [
+                    "application/json"
+                ],
                 "tags": [
                     "Featured Bounties"
                 ],
@@ -2622,7 +3494,18 @@ const docTemplate = `{
         },
         "/gobounties/featured/update": {
             "put": {
+                "security": [
+                    {
+                        "PubKeyContextAuth": []
+                    }
+                ],
                 "description": "Update a featured bounty",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
                 "tags": [
                     "Featured Bounties"
                 ],
@@ -2717,32 +3600,6 @@ const docTemplate = `{
                 }
             }
         },
-        "/gobounties/invoice/poll/{paymentRequest}": {
-            "get": {
-                "description": "Poll invoice by payment request",
-                "tags": [
-                    "Bounties - Payment"
-                ],
-                "summary": "Poll invoice",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "Payment Request",
-                        "name": "paymentRequest",
-                        "in": "path",
-                        "required": true
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/db.InvoiceResult"
-                        }
-                    }
-                }
-            }
-        },
         "/gobounties/invoice/{paymentRequest}": {
             "get": {
                 "description": "Get invoice data by payment request",
@@ -2795,9 +3652,126 @@ const docTemplate = `{
                 }
             }
         },
+        "/gobounties/org/next/{uuid}/{created}": {
+            "get": {
+                "description": "Get next workspace bounty by created date",
+                "tags": [
+                    "Bounties"
+                ],
+                "summary": "Get next workspace bounty",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Workspace UUID",
+                        "name": "uuid",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Created date",
+                        "name": "created",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/db.Bounty"
+                        }
+                    }
+                }
+            }
+        },
+        "/gobounties/org/previous/{uuid}/{created}": {
+            "get": {
+                "description": "Get previous workspace bounty by created date",
+                "tags": [
+                    "Bounties"
+                ],
+                "summary": "Get previous workspace bounty",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Workspace UUID",
+                        "name": "uuid",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Created date",
+                        "name": "created",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/db.Bounty"
+                        }
+                    }
+                }
+            }
+        },
+        "/gobounties/org/timerange/{workspaceId}/{daysStart}/{daysEnd}": {
+            "get": {
+                "description": "Get bounties by workspace time range",
+                "tags": [
+                    "Bounties"
+                ],
+                "summary": "Get bounties by workspace time",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Workspace ID",
+                        "name": "workspaceId",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Days Start",
+                        "name": "daysStart",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Days End",
+                        "name": "daysEnd",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/db.NodeListResponse"
+                        }
+                    }
+                }
+            }
+        },
         "/gobounties/pay/{id}": {
             "post": {
+                "security": [
+                    {
+                        "PubKeyContextAuth": []
+                    }
+                ],
                 "description": "Make a bounty payment",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
                 "tags": [
                     "Bounties - Payment"
                 ],
@@ -2823,7 +3797,15 @@ const docTemplate = `{
         },
         "/gobounties/payment/status/{id}": {
             "get": {
+                "security": [
+                    {
+                        "PubKeyContextAuth": []
+                    }
+                ],
                 "description": "Get bounty payment status by ID",
+                "produces": [
+                    "application/json"
+                ],
                 "tags": [
                     "Bounties - Payment"
                 ],
@@ -2847,7 +3829,18 @@ const docTemplate = `{
                 }
             },
             "put": {
+                "security": [
+                    {
+                        "PubKeyContextAuth": []
+                    }
+                ],
                 "description": "Update bounty payment status by ID",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
                 "tags": [
                     "Bounties - Payment"
                 ],
@@ -2873,7 +3866,15 @@ const docTemplate = `{
         },
         "/gobounties/payment/{bountyId}": {
             "get": {
+                "security": [
+                    {
+                        "PubKeyContextAuth": []
+                    }
+                ],
                 "description": "Get payment by bounty ID",
+                "produces": [
+                    "application/json"
+                ],
                 "tags": [
                     "Bounties - Payment"
                 ],
@@ -2899,7 +3900,18 @@ const docTemplate = `{
         },
         "/gobounties/paymentstatus/{created}": {
             "post": {
+                "security": [
+                    {
+                        "PubKeyContextAuth": []
+                    }
+                ],
                 "description": "Update payment status by created date",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
                 "tags": [
                     "Bounties - Payment"
                 ],
@@ -2949,115 +3961,20 @@ const docTemplate = `{
                 }
             }
         },
-        "/gobounties/workspace/next/{uuid}/{created}": {
-            "get": {
-                "description": "Get next workspace bounty by created date",
-                "tags": [
-                    "Bounties"
-                ],
-                "summary": "Get next workspace bounty",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "Workspace UUID",
-                        "name": "uuid",
-                        "in": "path",
-                        "required": true
-                    },
-                    {
-                        "type": "string",
-                        "description": "Created date",
-                        "name": "created",
-                        "in": "path",
-                        "required": true
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/db.Bounty"
-                        }
-                    }
-                }
-            }
-        },
-        "/gobounties/workspace/previous/{uuid}/{created}": {
-            "get": {
-                "description": "Get previous workspace bounty by created date",
-                "tags": [
-                    "Bounties"
-                ],
-                "summary": "Get previous workspace bounty",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "Workspace UUID",
-                        "name": "uuid",
-                        "in": "path",
-                        "required": true
-                    },
-                    {
-                        "type": "string",
-                        "description": "Created date",
-                        "name": "created",
-                        "in": "path",
-                        "required": true
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/db.Bounty"
-                        }
-                    }
-                }
-            }
-        },
-        "/gobounties/workspace/timerange/{workspaceId}/{daysStart}/{daysEnd}": {
-            "get": {
-                "description": "Get bounties by workspace time range",
-                "tags": [
-                    "Bounties"
-                ],
-                "summary": "Get bounties by workspace time",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "Workspace ID",
-                        "name": "workspaceId",
-                        "in": "path",
-                        "required": true
-                    },
-                    {
-                        "type": "string",
-                        "description": "Days Start",
-                        "name": "daysStart",
-                        "in": "path",
-                        "required": true
-                    },
-                    {
-                        "type": "string",
-                        "description": "Days End",
-                        "name": "daysEnd",
-                        "in": "path",
-                        "required": true
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/db.NodeListResponse"
-                        }
-                    }
-                }
-            }
-        },
         "/gobounties/{id}/proof": {
             "post": {
+                "security": [
+                    {
+                        "PubKeyContextAuth": []
+                    }
+                ],
                 "description": "Add proof of work to a bounty",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
                 "tags": [
                     "Bounties - Proof of Work"
                 ],
@@ -3092,7 +4009,15 @@ const docTemplate = `{
         },
         "/gobounties/{id}/proofs": {
             "get": {
+                "security": [
+                    {
+                        "PubKeyContextAuth": []
+                    }
+                ],
                 "description": "Get proofs by bounty ID",
+                "produces": [
+                    "application/json"
+                ],
                 "tags": [
                     "Bounties - Proof of Work"
                 ],
@@ -3121,7 +4046,15 @@ const docTemplate = `{
         },
         "/gobounties/{id}/proofs/{proofId}": {
             "delete": {
+                "security": [
+                    {
+                        "PubKeyContextAuth": []
+                    }
+                ],
                 "description": "Delete proof by ID",
+                "produces": [
+                    "application/json"
+                ],
                 "tags": [
                     "Bounties - Proof of Work"
                 ],
@@ -3151,7 +4084,15 @@ const docTemplate = `{
         },
         "/gobounties/{id}/timing": {
             "get": {
+                "security": [
+                    {
+                        "PubKeyContextAuth": []
+                    }
+                ],
                 "description": "Get bounty timing stats by ID",
+                "produces": [
+                    "application/json"
+                ],
                 "tags": [
                     "Bounties - Timing"
                 ],
@@ -3175,7 +4116,15 @@ const docTemplate = `{
                 }
             },
             "delete": {
+                "security": [
+                    {
+                        "PubKeyContextAuth": []
+                    }
+                ],
                 "description": "Delete bounty timing by ID",
+                "produces": [
+                    "application/json"
+                ],
                 "tags": [
                     "Bounties - Timing"
                 ],
@@ -3198,7 +4147,18 @@ const docTemplate = `{
         },
         "/gobounties/{id}/timing/close": {
             "post": {
+                "security": [
+                    {
+                        "PubKeyContextAuth": []
+                    }
+                ],
                 "description": "Close bounty timing by ID",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
                 "tags": [
                     "Bounties - Timing"
                 ],
@@ -3221,7 +4181,18 @@ const docTemplate = `{
         },
         "/gobounties/{id}/timing/start": {
             "post": {
+                "security": [
+                    {
+                        "PubKeyContextAuth": []
+                    }
+                ],
                 "description": "Start bounty timing by ID",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
                 "tags": [
                     "Bounties - Timing"
                 ],
@@ -3244,7 +4215,18 @@ const docTemplate = `{
         },
         "/gobounties/{pubkey}/{created}": {
             "delete": {
+                "security": [
+                    {
+                        "PubKeyContextAuth": []
+                    }
+                ],
                 "description": "Delete a bounty by ID",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
                 "tags": [
                     "Bounties"
                 ],
@@ -3277,6 +4259,11 @@ const docTemplate = `{
         },
         "/hivechat": {
             "get": {
+                "security": [
+                    {
+                        "PubKeyContextAuth": []
+                    }
+                ],
                 "description": "Retrieve chats for a workspace with the given ID and status",
                 "produces": [
                     "application/json"
@@ -3322,6 +4309,11 @@ const docTemplate = `{
                 }
             },
             "post": {
+                "security": [
+                    {
+                        "PubKeyContextAuth": []
+                    }
+                ],
                 "description": "Create a new chat with the given workspace ID and title",
                 "consumes": [
                     "application/json"
@@ -3368,6 +4360,11 @@ const docTemplate = `{
         },
         "/hivechat/file/all": {
             "get": {
+                "security": [
+                    {
+                        "PubKeyContextAuth": []
+                    }
+                ],
                 "description": "List all files in a chat with the given parameters",
                 "produces": [
                     "application/json"
@@ -3412,8 +4409,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "type": "object",
-                            "additionalProperties": true
+                            "$ref": "#/definitions/handlers.ListFilesResponse"
                         }
                     },
                     "400": {
@@ -3433,6 +4429,11 @@ const docTemplate = `{
         },
         "/hivechat/file/{id}": {
             "get": {
+                "security": [
+                    {
+                        "PubKeyContextAuth": []
+                    }
+                ],
                 "description": "Retrieve a file from a chat with the given ID",
                 "produces": [
                     "application/json"
@@ -3472,6 +4473,11 @@ const docTemplate = `{
                 }
             },
             "delete": {
+                "security": [
+                    {
+                        "PubKeyContextAuth": []
+                    }
+                ],
                 "description": "Delete a file from a chat with the given ID",
                 "produces": [
                     "application/json"
@@ -3519,6 +4525,11 @@ const docTemplate = `{
         },
         "/hivechat/history/{uuid}": {
             "get": {
+                "security": [
+                    {
+                        "PubKeyContextAuth": []
+                    }
+                ],
                 "description": "Retrieve the history of a chat with the given ID",
                 "produces": [
                     "application/json"
@@ -3606,6 +4617,11 @@ const docTemplate = `{
         },
         "/hivechat/send": {
             "post": {
+                "security": [
+                    {
+                        "PubKeyContextAuth": []
+                    }
+                ],
                 "description": "Send a message in a chat with the given details",
                 "consumes": [
                     "application/json"
@@ -3658,6 +4674,11 @@ const docTemplate = `{
         },
         "/hivechat/send/build": {
             "post": {
+                "security": [
+                    {
+                        "PubKeyContextAuth": []
+                    }
+                ],
                 "description": "Send a build message in a chat with the given details",
                 "consumes": [
                     "application/json"
@@ -3704,6 +4725,11 @@ const docTemplate = `{
         },
         "/hivechat/upload": {
             "post": {
+                "security": [
+                    {
+                        "PubKeyContextAuth": []
+                    }
+                ],
                 "description": "Upload a file to a chat with the given details",
                 "consumes": [
                     "multipart/form-data"
@@ -3748,6 +4774,11 @@ const docTemplate = `{
         },
         "/hivechat/{chat_id}": {
             "put": {
+                "security": [
+                    {
+                        "PubKeyContextAuth": []
+                    }
+                ],
                 "description": "Update the title of an existing chat",
                 "consumes": [
                     "application/json"
@@ -3807,6 +4838,11 @@ const docTemplate = `{
         },
         "/hivechat/{chat_id}/archive": {
             "put": {
+                "security": [
+                    {
+                        "PubKeyContextAuth": []
+                    }
+                ],
                 "description": "Archive a chat by changing its status to archived",
                 "consumes": [
                     "application/json"
@@ -3883,21 +4919,122 @@ const docTemplate = `{
                 }
             }
         },
-        "/lnauth": {
+        "/leaderboard/{tribe_uuid}": {
             "get": {
-                "description": "Get LNURL auth details",
+                "description": "Get a leaderboard for a tribe",
                 "tags": [
-                    "Auth"
+                    "Tribes"
                 ],
-                "summary": "Get LNURL auth",
+                "summary": "Get a leaderboard",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Tribe UUID",
+                        "name": "tribe_uuid",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Alias",
+                        "name": "alias",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {}
+                    }
+                }
+            },
+            "put": {
+                "security": [
+                    {
+                        "PubKeyContextAuth": []
+                    }
+                ],
+                "description": "Update a leaderboard for a tribe",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Tribes"
+                ],
+                "summary": "Update a leaderboard",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Tribe UUID",
+                        "name": "tribe_uuid",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "Leaderboard object",
+                        "name": "leaderboard",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/db.LeaderBoard"
+                        }
+                    }
+                ],
                 "responses": {
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
+                            "type": "boolean"
+                        }
+                    }
+                }
+            },
+            "post": {
+                "security": [
+                    {
+                        "PubKeyContextAuth": []
+                    }
+                ],
+                "description": "Create a leaderboard for a tribe",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Tribes"
+                ],
+                "summary": "Create a leaderboard",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Tribe UUID",
+                        "name": "tribe_uuid",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "Leaderboard object",
+                        "name": "leaderboard",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/db.LeaderBoard"
                             }
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "boolean"
                         }
                     }
                 }
@@ -3905,19 +5042,101 @@ const docTemplate = `{
         },
         "/lnauth_login": {
             "get": {
-                "description": "Receive LNURL auth data",
+                "description": "Receive LNURL auth data and authenticate the user using LNURL-auth protocol.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
                 "tags": [
                     "Auth"
                 ],
                 "summary": "Receive LNURL auth data",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "User's public key",
+                        "name": "key",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Unique challenge string (k1)",
+                        "name": "k1",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Signature of the challenge signed by the user's private key",
+                        "name": "sig",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
                 "responses": {
                     "200": {
-                        "description": "OK",
+                        "description": "Authentication successful",
                         "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
+                            "$ref": "#/definitions/handlers.LnAuthResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid request or missing parameters",
+                        "schema": {
+                            "$ref": "#/definitions/handlers.LnAuthResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized: Signature verification failed",
+                        "schema": {
+                            "$ref": "#/definitions/handlers.LnAuthResponse"
+                        }
+                    },
+                    "406": {
+                        "description": "Not Acceptable: JWT creation failed",
+                        "schema": {
+                            "$ref": "#/definitions/handlers.LnAuthResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/lnurl_auth": {
+            "get": {
+                "description": "Generate a unique LNURL-auth challenge (k1) and encoded LNURL for authentication.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Auth"
+                ],
+                "summary": "Generate LNURL-auth data",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Socket connection key to associate with the LNURL-auth challenge",
+                        "name": "socketKey",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "LNURL-auth data generated successfully",
+                        "schema": {
+                            "$ref": "#/definitions/auth.LnEncodeData"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad request: Failed to generate LNURL-auth data",
+                        "schema": {
+                            "$ref": "#/definitions/auth.LnEncodeData"
                         }
                     }
                 }
@@ -3925,6 +5144,11 @@ const docTemplate = `{
         },
         "/meme_upload": {
             "post": {
+                "security": [
+                    {
+                        "PubKeyContextAuth": []
+                    }
+                ],
                 "description": "Upload an image for a meme",
                 "consumes": [
                     "multipart/form-data"
@@ -3957,6 +5181,11 @@ const docTemplate = `{
         },
         "/metrics/bounties": {
             "post": {
+                "security": [
+                    {
+                        "SuperAdminAuth": []
+                    }
+                ],
                 "description": "Get bounties by date range",
                 "consumes": [
                     "application/json"
@@ -3994,6 +5223,11 @@ const docTemplate = `{
         },
         "/metrics/bounties/count": {
             "post": {
+                "security": [
+                    {
+                        "SuperAdminAuth": []
+                    }
+                ],
                 "description": "Get the count of bounties by date range",
                 "consumes": [
                     "application/json"
@@ -4028,6 +5262,11 @@ const docTemplate = `{
         },
         "/metrics/bounties/providers": {
             "post": {
+                "security": [
+                    {
+                        "SuperAdminAuth": []
+                    }
+                ],
                 "description": "Get bounties providers by date range",
                 "consumes": [
                     "application/json"
@@ -4056,10 +5295,7 @@ const docTemplate = `{
                         "schema": {
                             "type": "array",
                             "items": {
-                                "type": "array",
-                                "items": {
-                                    "$ref": "#/definitions/db.Person"
-                                }
+                                "$ref": "#/definitions/db.Person"
                             }
                         }
                     }
@@ -4068,6 +5304,11 @@ const docTemplate = `{
         },
         "/metrics/bounty_stats": {
             "post": {
+                "security": [
+                    {
+                        "SuperAdminAuth": []
+                    }
+                ],
                 "description": "Get bounty metrics for a workspace",
                 "consumes": [
                     "application/json"
@@ -4109,6 +5350,11 @@ const docTemplate = `{
         },
         "/metrics/csv": {
             "post": {
+                "security": [
+                    {
+                        "SuperAdminAuth": []
+                    }
+                ],
                 "description": "Generate a CSV file for metrics",
                 "consumes": [
                     "application/json"
@@ -4143,6 +5389,11 @@ const docTemplate = `{
         },
         "/metrics/organization": {
             "post": {
+                "security": [
+                    {
+                        "SuperAdminAuth": []
+                    }
+                ],
                 "description": "Get workspace metrics",
                 "consumes": [
                     "application/json"
@@ -4177,6 +5428,11 @@ const docTemplate = `{
         },
         "/metrics/payment": {
             "post": {
+                "security": [
+                    {
+                        "SuperAdminAuth": []
+                    }
+                ],
                 "description": "Get payment metrics for a workspace",
                 "consumes": [
                     "application/json"
@@ -4218,6 +5474,11 @@ const docTemplate = `{
         },
         "/metrics/people": {
             "post": {
+                "security": [
+                    {
+                        "SuperAdminAuth": []
+                    }
+                ],
                 "description": "Get people metrics",
                 "consumes": [
                     "application/json"
@@ -4252,6 +5513,11 @@ const docTemplate = `{
         },
         "/metrics/workspaces": {
             "get": {
+                "security": [
+                    {
+                        "SuperAdminAuth": []
+                    }
+                ],
                 "description": "Get all workspaces for admin",
                 "consumes": [
                     "application/json"
@@ -4339,6 +5605,11 @@ const docTemplate = `{
                 }
             },
             "put": {
+                "security": [
+                    {
+                        "PubKeyContextAuth": []
+                    }
+                ],
                 "description": "Update an existing person",
                 "consumes": [
                     "application/json"
@@ -4371,6 +5642,11 @@ const docTemplate = `{
                 }
             },
             "post": {
+                "security": [
+                    {
+                        "PubKeyContextAuth": []
+                    }
+                ],
                 "description": "Create a new person",
                 "consumes": [
                     "application/json"
@@ -4409,7 +5685,44 @@ const docTemplate = `{
                 }
             }
         },
-        "/people/assets/{uuid}": {
+        "/people/offers": {
+            "get": {
+                "description": "Get a list of listed offers",
+                "tags": [
+                    "People"
+                ],
+                "summary": "Get listed offers",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/db.Person"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/people/wanteds/header": {
+            "get": {
+                "description": "Get the header information for wanteds",
+                "tags": [
+                    "People"
+                ],
+                "summary": "Get wanteds header",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/handlers.WantedsHeaderResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/person/assets/{uuid}": {
             "get": {
                 "description": "Get assets of a person by their UUID",
                 "consumes": [
@@ -4444,41 +5757,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/people/badge": {
-            "post": {
-                "description": "Add or remove a badge for a person",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "People"
-                ],
-                "summary": "Add or Remove Badge",
-                "parameters": [
-                    {
-                        "description": "Badge Creation Data",
-                        "name": "badgeCreationData",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/db.BadgeCreationData"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/db.Tribe"
-                        }
-                    }
-                }
-            }
-        },
-        "/people/github/{github}": {
+        "/person/github/{github}": {
             "get": {
                 "description": "Get a person by their Github name",
                 "consumes": [
@@ -4510,7 +5789,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/people/id/{id}": {
+        "/person/id/{id}": {
             "get": {
                 "description": "Get a person by their ID",
                 "consumes": [
@@ -4542,8 +5821,13 @@ const docTemplate = `{
                 }
             }
         },
-        "/people/login": {
+        "/person/login": {
             "post": {
+                "security": [
+                    {
+                        "CypressAuth": []
+                    }
+                ],
                 "description": "Upsert login for a person",
                 "consumes": [
                     "application/json"
@@ -4576,27 +5860,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/people/offers": {
-            "get": {
-                "description": "Get a list of listed offers",
-                "tags": [
-                    "People"
-                ],
-                "summary": "Get listed offers",
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "type": "array",
-                            "items": {
-                                "$ref": "#/definitions/db.Person"
-                            }
-                        }
-                    }
-                }
-            }
-        },
-        "/people/posts": {
+        "/person/posts": {
             "get": {
                 "description": "Get listed posts",
                 "consumes": [
@@ -4615,17 +5879,14 @@ const docTemplate = `{
                         "schema": {
                             "type": "array",
                             "items": {
-                                "type": "array",
-                                "items": {
-                                    "$ref": "#/definitions/db.PeopleExtra"
-                                }
+                                "$ref": "#/definitions/db.PeopleExtra"
                             }
                         }
                     }
                 }
             }
         },
-        "/people/search": {
+        "/person/search": {
             "get": {
                 "description": "Get people by search query",
                 "consumes": [
@@ -4651,7 +5912,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/people/short": {
+        "/person/short": {
             "get": {
                 "description": "Get a short list of people",
                 "consumes": [
@@ -4677,46 +5938,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/people/ticket/{pubKey}/{created}": {
-            "delete": {
-                "description": "Delete a ticket by admin",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "People"
-                ],
-                "summary": "Delete Ticket by Admin",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "Public Key",
-                        "name": "pubKey",
-                        "in": "path",
-                        "required": true
-                    },
-                    {
-                        "type": "integer",
-                        "description": "Created Timestamp",
-                        "name": "created",
-                        "in": "path",
-                        "required": true
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "Ticket deleted successfully",
-                        "schema": {
-                            "type": "string"
-                        }
-                    }
-                }
-            }
-        },
-        "/people/uuid/{uuid}": {
+        "/person/uuid/{uuid}": {
             "get": {
                 "description": "Get a person by their UUID",
                 "consumes": [
@@ -4749,25 +5971,13 @@ const docTemplate = `{
                 }
             }
         },
-        "/people/wanteds/header": {
-            "get": {
-                "description": "Get the header information for wanteds",
-                "tags": [
-                    "People"
-                ],
-                "summary": "Get wanteds header",
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/handlers.WantedsHeaderResponse"
-                        }
-                    }
-                }
-            }
-        },
-        "/people/{id}": {
+        "/person/{id}": {
             "delete": {
+                "security": [
+                    {
+                        "PubKeyContextAuth": []
+                    }
+                ],
                 "description": "Delete a person by their ID",
                 "consumes": [
                     "application/json"
@@ -4798,7 +6008,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/people/{pubkey}": {
+        "/person/{pubkey}": {
             "get": {
                 "description": "Get a person by their public key",
                 "consumes": [
@@ -4867,20 +6077,223 @@ const docTemplate = `{
                 }
             }
         },
-        "/refresh_jwt": {
+        "/poll/invoice/{paymentRequest}": {
             "get": {
-                "description": "Refresh the JWT token",
-                "tags": [
-                    "Auth"
+                "security": [
+                    {
+                        "PubKeyContextAuth": []
+                    }
                 ],
-                "summary": "Refresh JWT token",
+                "description": "Poll invoice by payment request",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Bounties - Payment"
+                ],
+                "summary": "Poll invoice",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Payment Request",
+                        "name": "paymentRequest",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
                 "responses": {
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
+                            "$ref": "#/definitions/db.InvoiceResult"
+                        }
+                    }
+                }
+            }
+        },
+        "/poll/{challenge}": {
+            "get": {
+                "description": "Poll a challenge to verify the user's authentication and retrieve user details.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Auth"
+                ],
+                "summary": "Poll a challenge",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Challenge string",
+                        "name": "challenge",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Challenge verified successfully and user details returned",
+                        "schema": {
+                            "$ref": "#/definitions/db.VerifyPayload"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized: Invalid challenge or user not found"
+                    }
+                }
+            }
+        },
+        "/refresh_jwt": {
+            "get": {
+                "description": "Refresh the JWT token using a valid existing token.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Auth"
+                ],
+                "summary": "Refresh JWT token",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Existing JWT token",
+                        "name": "x-jwt",
+                        "in": "header",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Token refreshed successfully",
+                        "schema": {
+                            "$ref": "#/definitions/handlers.RefreshTokenResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized: Missing or invalid JWT token",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "406": {
+                        "description": "Not Acceptable: Failed to create a new JWT token",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
+        "/save": {
+            "post": {
+                "description": "Save data with a unique key in the cache.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Storage"
+                ],
+                "summary": "Save data",
+                "parameters": [
+                    {
+                        "description": "Request body containing the key and value to save",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/db.Save"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Data saved successfully",
+                        "schema": {
+                            "$ref": "#/definitions/db.SaveResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad request: Invalid request body"
+                    },
+                    "401": {
+                        "description": "Unauthorized: Failed to process payload"
+                    },
+                    "406": {
+                        "description": "Not acceptable: Invalid data format"
+                    }
+                }
+            }
+        },
+        "/save/{key}": {
+            "get": {
+                "description": "Retrieve saved data using a unique key from the cache.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Storage"
+                ],
+                "summary": "Retrieve saved data",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Unique key for the saved data",
+                        "name": "key",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Data retrieved successfully",
+                        "schema": {
+                            "$ref": "#/definitions/db.Save"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized: Invalid key or data not found"
+                    }
+                }
+            }
+        },
+        "/search/bots/{query}": {
+            "get": {
+                "description": "Search for bots",
+                "tags": [
+                    "Bots"
+                ],
+                "summary": "Search bots",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Search query",
+                        "name": "query",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/db.Bot"
                             }
                         }
                     }
@@ -5020,10 +6433,7 @@ const docTemplate = `{
                         "schema": {
                             "type": "array",
                             "items": {
-                                "type": "array",
-                                "items": {
-                                    "$ref": "#/definitions/feeds.Item"
-                                }
+                                "$ref": "#/definitions/feeds.Item"
                             }
                         }
                     }
@@ -5032,6 +6442,11 @@ const docTemplate = `{
         },
         "/snippet/create": {
             "post": {
+                "security": [
+                    {
+                        "PubKeyContextAuth": []
+                    }
+                ],
                 "description": "Create a new snippet",
                 "consumes": [
                     "application/json"
@@ -5073,6 +6488,11 @@ const docTemplate = `{
         },
         "/snippet/workspace/{workspace_uuid}": {
             "get": {
+                "security": [
+                    {
+                        "PubKeyContextAuth": []
+                    }
+                ],
                 "description": "Get snippets by workspace UUID",
                 "consumes": [
                     "application/json"
@@ -5108,6 +6528,11 @@ const docTemplate = `{
         },
         "/snippet/{id}": {
             "get": {
+                "security": [
+                    {
+                        "PubKeyContextAuth": []
+                    }
+                ],
                 "description": "Get a snippet by its ID",
                 "consumes": [
                     "application/json"
@@ -5138,6 +6563,11 @@ const docTemplate = `{
                 }
             },
             "put": {
+                "security": [
+                    {
+                        "PubKeyContextAuth": []
+                    }
+                ],
                 "description": "Update an existing snippet",
                 "consumes": [
                     "application/json"
@@ -5177,6 +6607,11 @@ const docTemplate = `{
                 }
             },
             "delete": {
+                "security": [
+                    {
+                        "PubKeyContextAuth": []
+                    }
+                ],
                 "description": "Delete a snippet by its ID",
                 "consumes": [
                     "application/json"
@@ -5207,27 +6642,64 @@ const docTemplate = `{
                 }
             }
         },
-        "/tribes": {
-            "get": {
-                "description": "Get a list of listed tribes",
-                "tags": [
-                    "Tribes"
+        "/ticket/{pubKey}/{created}": {
+            "delete": {
+                "security": [
+                    {
+                        "PubKeyContextAuth": []
+                    }
                 ],
-                "summary": "Get listed tribes",
+                "description": "Delete a ticket by admin",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "People"
+                ],
+                "summary": "Delete Ticket by Admin",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Public Key",
+                        "name": "pubKey",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "integer",
+                        "description": "Created Timestamp",
+                        "name": "created",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
                 "responses": {
                     "200": {
-                        "description": "OK",
+                        "description": "Ticket deleted successfully",
                         "schema": {
-                            "type": "array",
-                            "items": {
-                                "$ref": "#/definitions/db.Tribe"
-                            }
+                            "type": "string"
                         }
                     }
                 }
-            },
+            }
+        },
+        "/tribe": {
             "post": {
+                "security": [
+                    {
+                        "PubKeyContextAuth": []
+                    }
+                ],
                 "description": "Create or edit a tribe",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
                 "tags": [
                     "Tribes"
                 ],
@@ -5253,9 +6725,111 @@ const docTemplate = `{
                 }
             }
         },
-        "/tribes/activity/{uuid}": {
+        "/tribe/{uuid}": {
+            "delete": {
+                "security": [
+                    {
+                        "PubKeyContextAuth": []
+                    }
+                ],
+                "description": "Delete a tribe by UUID",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Tribes"
+                ],
+                "summary": "Delete a tribe",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Tribe UUID",
+                        "name": "uuid",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "boolean"
+                        }
+                    }
+                }
+            }
+        },
+        "/tribe_by_feed": {
+            "get": {
+                "description": "Get the first tribe by feed URL",
+                "tags": [
+                    "Tribes"
+                ],
+                "summary": "Get the first tribe by feed URL",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Feed URL",
+                        "name": "url",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    }
+                }
+            }
+        },
+        "/tribe_by_un/{un}": {
+            "get": {
+                "description": "Get a tribe by unique name",
+                "tags": [
+                    "Tribes"
+                ],
+                "summary": "Get a tribe by unique name",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Unique name",
+                        "name": "un",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    }
+                }
+            }
+        },
+        "/tribeactivity/{uuid}": {
             "put": {
+                "security": [
+                    {
+                        "PubKeyContextAuth": []
+                    }
+                ],
                 "description": "Update the activity of a tribe",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
                 "tags": [
                     "Tribes"
                 ],
@@ -5274,6 +6848,59 @@ const docTemplate = `{
                         "description": "OK",
                         "schema": {
                             "type": "boolean"
+                        }
+                    }
+                }
+            }
+        },
+        "/tribepreview/{uuid}": {
+            "put": {
+                "description": "Set the preview of a tribe",
+                "tags": [
+                    "Tribes"
+                ],
+                "summary": "Set tribe preview",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Tribe UUID",
+                        "name": "uuid",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Preview URL",
+                        "name": "preview",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "boolean"
+                        }
+                    }
+                }
+            }
+        },
+        "/tribes": {
+            "get": {
+                "description": "Get a list of listed tribes",
+                "tags": [
+                    "Tribes"
+                ],
+                "summary": "Get listed tribes",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/db.Tribe"
+                            }
                         }
                     }
                 }
@@ -5368,61 +6995,6 @@ const docTemplate = `{
                 }
             }
         },
-        "/tribes/budget_invoice_v1": {
-            "post": {
-                "description": "Generate a budget invoice for a tribe",
-                "tags": [
-                    "Tribes"
-                ],
-                "summary": "Generate a budget invoice",
-                "parameters": [
-                    {
-                        "description": "Budget invoice request",
-                        "name": "invoice",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/db.BudgetInvoiceRequest"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/db.InvoiceResponse"
-                        }
-                    }
-                }
-            }
-        },
-        "/tribes/feed": {
-            "get": {
-                "description": "Get the first tribe by feed URL",
-                "tags": [
-                    "Tribes"
-                ],
-                "summary": "Get the first tribe by feed URL",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "Feed URL",
-                        "name": "url",
-                        "in": "query",
-                        "required": true
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": true
-                        }
-                    }
-                }
-            }
-        },
         "/tribes/invoice": {
             "post": {
                 "description": "Generate an invoice for a tribe",
@@ -5451,201 +7023,6 @@ const docTemplate = `{
                 }
             }
         },
-        "/tribes/leaderboard/{tribe_uuid}": {
-            "get": {
-                "description": "Get a leaderboard for a tribe",
-                "tags": [
-                    "Tribes"
-                ],
-                "summary": "Get a leaderboard",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "Tribe UUID",
-                        "name": "tribe_uuid",
-                        "in": "path",
-                        "required": true
-                    },
-                    {
-                        "type": "string",
-                        "description": "Alias",
-                        "name": "alias",
-                        "in": "query"
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {}
-                    }
-                }
-            },
-            "put": {
-                "description": "Update a leaderboard for a tribe",
-                "tags": [
-                    "Tribes"
-                ],
-                "summary": "Update a leaderboard",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "Tribe UUID",
-                        "name": "tribe_uuid",
-                        "in": "path",
-                        "required": true
-                    },
-                    {
-                        "description": "Leaderboard object",
-                        "name": "leaderboard",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/db.LeaderBoard"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "type": "boolean"
-                        }
-                    }
-                }
-            },
-            "post": {
-                "description": "Create a leaderboard for a tribe",
-                "tags": [
-                    "Tribes"
-                ],
-                "summary": "Create a leaderboard",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "Tribe UUID",
-                        "name": "tribe_uuid",
-                        "in": "path",
-                        "required": true
-                    },
-                    {
-                        "description": "Leaderboard object",
-                        "name": "leaderboard",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "type": "array",
-                            "items": {
-                                "$ref": "#/definitions/db.LeaderBoard"
-                            }
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "type": "boolean"
-                        }
-                    }
-                }
-            }
-        },
-        "/tribes/owner/{pubkey}": {
-            "get": {
-                "description": "Get a list of tribes by owner public key",
-                "tags": [
-                    "Tribes"
-                ],
-                "summary": "Get tribes by owner",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "Owner public key",
-                        "name": "pubkey",
-                        "in": "path",
-                        "required": true
-                    },
-                    {
-                        "type": "string",
-                        "description": "Include all tribes",
-                        "name": "all",
-                        "in": "query"
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "type": "array",
-                            "items": {
-                                "$ref": "#/definitions/db.Tribe"
-                            }
-                        }
-                    }
-                }
-            }
-        },
-        "/tribes/preview/{uuid}": {
-            "put": {
-                "description": "Set the preview of a tribe",
-                "tags": [
-                    "Tribes"
-                ],
-                "summary": "Set tribe preview",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "Tribe UUID",
-                        "name": "uuid",
-                        "in": "path",
-                        "required": true
-                    },
-                    {
-                        "type": "string",
-                        "description": "Preview URL",
-                        "name": "preview",
-                        "in": "query",
-                        "required": true
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "type": "boolean"
-                        }
-                    }
-                }
-            }
-        },
-        "/tribes/stats": {
-            "put": {
-                "description": "Update the stats of a tribe",
-                "tags": [
-                    "Tribes"
-                ],
-                "summary": "Update tribe stats",
-                "parameters": [
-                    {
-                        "description": "Tribe object",
-                        "name": "tribe",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/db.Tribe"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "type": "boolean"
-                        }
-                    }
-                }
-            }
-        },
         "/tribes/total": {
             "get": {
                 "description": "Get the total number of tribes",
@@ -5658,33 +7035,6 @@ const docTemplate = `{
                         "description": "OK",
                         "schema": {
                             "type": "integer"
-                        }
-                    }
-                }
-            }
-        },
-        "/tribes/unique/{un}": {
-            "get": {
-                "description": "Get a tribe by unique name",
-                "tags": [
-                    "Tribes"
-                ],
-                "summary": "Get a tribe by unique name",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "Unique name",
-                        "name": "un",
-                        "in": "path",
-                        "required": true
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": true
                         }
                     }
                 }
@@ -5741,20 +7091,70 @@ const docTemplate = `{
                         }
                     }
                 }
-            },
-            "delete": {
-                "description": "Delete a tribe by UUID",
+            }
+        },
+        "/tribes_by_owner/{pubkey}": {
+            "get": {
+                "description": "Get a list of tribes by owner public key",
                 "tags": [
                     "Tribes"
                 ],
-                "summary": "Delete a tribe",
+                "summary": "Get tribes by owner",
                 "parameters": [
                     {
                         "type": "string",
-                        "description": "Tribe UUID",
-                        "name": "uuid",
+                        "description": "Owner public key",
+                        "name": "pubkey",
                         "in": "path",
                         "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Include all tribes",
+                        "name": "all",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/db.Tribe"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/tribestats": {
+            "put": {
+                "security": [
+                    {
+                        "PubKeyContextAuth": []
+                    }
+                ],
+                "description": "Update the stats of a tribe",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Tribes"
+                ],
+                "summary": "Update tribe stats",
+                "parameters": [
+                    {
+                        "description": "Tribe object",
+                        "name": "tribe",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/db.Tribe"
+                        }
                     }
                 ],
                 "responses": {
@@ -5762,6 +7162,64 @@ const docTemplate = `{
                         "description": "OK",
                         "schema": {
                             "type": "boolean"
+                        }
+                    }
+                }
+            }
+        },
+        "/verify/{challenge}": {
+            "post": {
+                "security": [
+                    {
+                        "PubKeyContextAuth": []
+                    }
+                ],
+                "description": "Verify a challenge by validating the signature and storing the result in the cache.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Auth"
+                ],
+                "summary": "Verify a challenge",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Challenge string",
+                        "name": "challenge",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "Request body containing the public key and signature",
+                        "name": "payload",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/db.VerifyPayload"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Challenge verified successfully",
+                        "schema": {
+                            "$ref": "#/definitions/db.VerifyPayload"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized: Challenge not found or invalid signature",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "406": {
+                        "description": "Not acceptable: Invalid request body",
+                        "schema": {
+                            "type": "string"
                         }
                     }
                 }
@@ -5867,6 +7325,11 @@ const docTemplate = `{
                 }
             },
             "post": {
+                "security": [
+                    {
+                        "PubKeyContextAuth": []
+                    }
+                ],
                 "description": "Create or edit a workspace",
                 "consumes": [
                     "application/json"
@@ -5968,6 +7431,11 @@ const docTemplate = `{
         },
         "/workspace/bounty/roles": {
             "get": {
+                "security": [
+                    {
+                        "PubKeyContextAuth": []
+                    }
+                ],
                 "description": "Get all bounty roles",
                 "consumes": [
                     "application/json"
@@ -5985,10 +7453,7 @@ const docTemplate = `{
                         "schema": {
                             "type": "array",
                             "items": {
-                                "type": "array",
-                                "items": {
-                                    "$ref": "#/definitions/db.BountyRoles"
-                                }
+                                "$ref": "#/definitions/db.BountyRoles"
                             }
                         }
                     }
@@ -5997,6 +7462,11 @@ const docTemplate = `{
         },
         "/workspace/budget/history/{uuid}": {
             "get": {
+                "security": [
+                    {
+                        "PubKeyContextAuth": []
+                    }
+                ],
                 "description": "Get the budget history of a workspace by its UUID",
                 "consumes": [
                     "application/json"
@@ -6023,10 +7493,7 @@ const docTemplate = `{
                         "schema": {
                             "type": "array",
                             "items": {
-                                "type": "array",
-                                "items": {
-                                    "$ref": "#/definitions/db.BudgetHistoryData"
-                                }
+                                "$ref": "#/definitions/db.BudgetHistoryData"
                             }
                         }
                     }
@@ -6035,6 +7502,11 @@ const docTemplate = `{
         },
         "/workspace/budget/{uuid}": {
             "get": {
+                "security": [
+                    {
+                        "PubKeyContextAuth": []
+                    }
+                ],
                 "description": "Get the budget of a workspace by its UUID",
                 "consumes": [
                     "application/json"
@@ -6067,6 +7539,11 @@ const docTemplate = `{
         },
         "/workspace/codegraph": {
             "post": {
+                "security": [
+                    {
+                        "PubKeyContextAuth": []
+                    }
+                ],
                 "description": "Create or edit a code graph for a workspace",
                 "consumes": [
                     "application/json"
@@ -6101,6 +7578,11 @@ const docTemplate = `{
         },
         "/workspace/codegraph/{uuid}": {
             "get": {
+                "security": [
+                    {
+                        "PubKeyContextAuth": []
+                    }
+                ],
                 "description": "Get a code graph of a workspace by its UUID",
                 "consumes": [
                     "application/json"
@@ -6126,43 +7608,6 @@ const docTemplate = `{
                         "description": "OK",
                         "schema": {
                             "$ref": "#/definitions/db.WorkspaceCodeGraph"
-                        }
-                    }
-                }
-            },
-            "delete": {
-                "description": "Delete a code graph from a workspace by its UUID",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "Workspace -  Code Graph"
-                ],
-                "summary": "Delete Workspace Code Graph",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "Workspace UUID",
-                        "name": "workspace_uuid",
-                        "in": "path",
-                        "required": true
-                    },
-                    {
-                        "type": "string",
-                        "description": "Code Graph UUID",
-                        "name": "uuid",
-                        "in": "path",
-                        "required": true
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "Code graph deleted successfully",
-                        "schema": {
-                            "type": "string"
                         }
                     }
                 }
@@ -6193,6 +7638,11 @@ const docTemplate = `{
         },
         "/workspace/delete/{uuid}": {
             "delete": {
+                "security": [
+                    {
+                        "PubKeyContextAuth": []
+                    }
+                ],
                 "description": "Delete a workspace by its UUID",
                 "consumes": [
                     "application/json"
@@ -6225,6 +7675,11 @@ const docTemplate = `{
         },
         "/workspace/foruser/{uuid}": {
             "get": {
+                "security": [
+                    {
+                        "PubKeyContextAuth": []
+                    }
+                ],
                 "description": "Get a user of a workspace by its UUID",
                 "consumes": [
                     "application/json"
@@ -6257,6 +7712,11 @@ const docTemplate = `{
         },
         "/workspace/invoices/count/{uuid}": {
             "get": {
+                "security": [
+                    {
+                        "PubKeyContextAuth": []
+                    }
+                ],
                 "description": "Get the count of invoices in a workspace by its UUID",
                 "consumes": [
                     "application/json"
@@ -6289,6 +7749,11 @@ const docTemplate = `{
         },
         "/workspace/mission": {
             "post": {
+                "security": [
+                    {
+                        "PubKeyContextAuth": []
+                    }
+                ],
                 "description": "Update a workspace",
                 "consumes": [
                     "application/json"
@@ -6323,6 +7788,11 @@ const docTemplate = `{
         },
         "/workspace/payments/{uuid}": {
             "get": {
+                "security": [
+                    {
+                        "PubKeyContextAuth": []
+                    }
+                ],
                 "description": "Get the payment history of a workspace by its UUID",
                 "consumes": [
                     "application/json"
@@ -6358,6 +7828,11 @@ const docTemplate = `{
         },
         "/workspace/poll/invoices/{uuid}": {
             "get": {
+                "security": [
+                    {
+                        "PubKeyContextAuth": []
+                    }
+                ],
                 "description": "Poll budget invoices of a workspace by its UUID",
                 "consumes": [
                     "application/json"
@@ -6390,6 +7865,11 @@ const docTemplate = `{
         },
         "/workspace/poll/user/invoices": {
             "get": {
+                "security": [
+                    {
+                        "PubKeyContextAuth": []
+                    }
+                ],
                 "description": "Poll budget invoices of all workspaces of a user",
                 "consumes": [
                     "application/json"
@@ -6413,6 +7893,11 @@ const docTemplate = `{
         },
         "/workspace/repositories": {
             "post": {
+                "security": [
+                    {
+                        "PubKeyContextAuth": []
+                    }
+                ],
                 "description": "Create or edit a repository for a workspace",
                 "consumes": [
                     "application/json"
@@ -6482,6 +7967,11 @@ const docTemplate = `{
         },
         "/workspace/repository/{uuid}": {
             "get": {
+                "security": [
+                    {
+                        "PubKeyContextAuth": []
+                    }
+                ],
                 "description": "Get a repository of a workspace by its UUID",
                 "consumes": [
                     "application/json"
@@ -6519,6 +8009,11 @@ const docTemplate = `{
                 }
             },
             "delete": {
+                "security": [
+                    {
+                        "PubKeyContextAuth": []
+                    }
+                ],
                 "description": "Delete a repository from a workspace by its UUID",
                 "consumes": [
                     "application/json"
@@ -6558,6 +8053,11 @@ const docTemplate = `{
         },
         "/workspace/schematicurl": {
             "post": {
+                "security": [
+                    {
+                        "PubKeyContextAuth": []
+                    }
+                ],
                 "description": "Update a workspace",
                 "consumes": [
                     "application/json"
@@ -6592,6 +8092,11 @@ const docTemplate = `{
         },
         "/workspace/tactics": {
             "post": {
+                "security": [
+                    {
+                        "PubKeyContextAuth": []
+                    }
+                ],
                 "description": "Update a workspace",
                 "consumes": [
                     "application/json"
@@ -6661,6 +8166,11 @@ const docTemplate = `{
         },
         "/workspace/user/invoices/count": {
             "get": {
+                "security": [
+                    {
+                        "PubKeyContextAuth": []
+                    }
+                ],
                 "description": "Get the count of all invoices of a user",
                 "consumes": [
                     "application/json"
@@ -6719,6 +8229,11 @@ const docTemplate = `{
         },
         "/workspace/users/role/{uuid}/{user}": {
             "get": {
+                "security": [
+                    {
+                        "PubKeyContextAuth": []
+                    }
+                ],
                 "description": "Get roles of a user in a workspace",
                 "consumes": [
                     "application/json"
@@ -6759,6 +8274,11 @@ const docTemplate = `{
                 }
             },
             "post": {
+                "security": [
+                    {
+                        "PubKeyContextAuth": []
+                    }
+                ],
                 "description": "Add roles to a user in a workspace",
                 "consumes": [
                     "application/json"
@@ -6791,10 +8311,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "type": "array",
-                            "items": {
-                                "$ref": "#/definitions/db.WorkspaceUserRoles"
-                            }
+                            "$ref": "#/definitions/db.WorkspaceUserRoles"
                         }
                     }
                 ],
@@ -6846,6 +8363,11 @@ const docTemplate = `{
                 }
             },
             "post": {
+                "security": [
+                    {
+                        "PubKeyContextAuth": []
+                    }
+                ],
                 "description": "Create a user for a workspace",
                 "consumes": [
                     "application/json"
@@ -6878,6 +8400,11 @@ const docTemplate = `{
                 }
             },
             "delete": {
+                "security": [
+                    {
+                        "PubKeyContextAuth": []
+                    }
+                ],
                 "description": "Delete a user from a workspace",
                 "consumes": [
                     "application/json"
@@ -6890,6 +8417,13 @@ const docTemplate = `{
                 ],
                 "summary": "Delete Workspace User",
                 "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Workspace UUID",
+                        "name": "uuid",
+                        "in": "path",
+                        "required": true
+                    },
                     {
                         "description": "Workspace User Data",
                         "name": "workspaceUser",
@@ -6976,6 +8510,11 @@ const docTemplate = `{
         },
         "/workspace/{workspace_uuid}/codegraph": {
             "get": {
+                "security": [
+                    {
+                        "PubKeyContextAuth": []
+                    }
+                ],
                 "description": "Get code graphs of a workspace by its UUID",
                 "consumes": [
                     "application/json"
@@ -7009,8 +8548,57 @@ const docTemplate = `{
                 }
             }
         },
+        "/workspace/{workspace_uuid}/codegraph/{uuid}": {
+            "delete": {
+                "security": [
+                    {
+                        "PubKeyContextAuth": []
+                    }
+                ],
+                "description": "Delete a code graph from a workspace by its UUID",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Workspace -  Code Graph"
+                ],
+                "summary": "Delete Workspace Code Graph",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Workspace UUID",
+                        "name": "workspace_uuid",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Code Graph UUID",
+                        "name": "uuid",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Code graph deleted successfully",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
         "/workspace/{workspace_uuid}/features": {
             "get": {
+                "security": [
+                    {
+                        "PubKeyContextAuth": []
+                    }
+                ],
                 "description": "Get features of a workspace by its UUID",
                 "consumes": [
                     "application/json"
@@ -7046,6 +8634,11 @@ const docTemplate = `{
         },
         "/workspace/{workspace_uuid}/lastwithdrawal": {
             "get": {
+                "security": [
+                    {
+                        "PubKeyContextAuth": []
+                    }
+                ],
                 "description": "Get the last withdrawal of a workspace by its UUID",
                 "consumes": [
                     "application/json"
@@ -7078,6 +8671,11 @@ const docTemplate = `{
         },
         "/workspace/{workspace_uuid}/payments": {
             "put": {
+                "security": [
+                    {
+                        "PubKeyContextAuth": []
+                    }
+                ],
                 "description": "Update pending payments of a workspace by its UUID",
                 "consumes": [
                     "application/json"
@@ -7136,10 +8734,7 @@ const docTemplate = `{
                         "schema": {
                             "type": "array",
                             "items": {
-                                "type": "array",
-                                "items": {
-                                    "$ref": "#/definitions/feeds.Item"
-                                }
+                                "$ref": "#/definitions/feeds.Item"
                             }
                         }
                     }
@@ -7148,6 +8743,17 @@ const docTemplate = `{
         }
     },
     "definitions": {
+        "auth.LnEncodeData": {
+            "type": "object",
+            "properties": {
+                "encode": {
+                    "type": "string"
+                },
+                "k1": {
+                    "type": "string"
+                }
+            }
+        },
         "db.Activity": {
             "type": "object",
             "properties": {
@@ -7912,6 +9518,63 @@ const docTemplate = `{
                 "Other"
             ]
         },
+        "db.Channel": {
+            "type": "object",
+            "properties": {
+                "created": {
+                    "type": "string"
+                },
+                "deleted": {
+                    "type": "boolean"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "tribe_uuid": {
+                    "type": "string"
+                }
+            }
+        },
+        "db.ConnectionCodesList": {
+            "type": "object",
+            "properties": {
+                "connection_string": {
+                    "type": "string"
+                },
+                "date_created": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "is_used": {
+                    "type": "boolean"
+                },
+                "pubkey": {
+                    "type": "string"
+                },
+                "route_hint": {
+                    "type": "string"
+                },
+                "sats_amount": {
+                    "type": "integer"
+                }
+            }
+        },
+        "db.ConnectionCodesShort": {
+            "type": "object",
+            "properties": {
+                "connection_string": {
+                    "type": "string"
+                },
+                "date_created": {
+                    "type": "string"
+                }
+            }
+        },
         "db.ContentType": {
             "type": "string",
             "enum": [
@@ -7926,6 +9589,17 @@ const docTemplate = `{
                 "RequirementChange",
                 "GeneralUpdate"
             ]
+        },
+        "db.DeleteBountyAssignee": {
+            "type": "object",
+            "properties": {
+                "created": {
+                    "type": "string"
+                },
+                "owner_pubkey": {
+                    "type": "string"
+                }
+            }
         },
         "db.FeatureOutput": {
             "type": "object",
@@ -8176,6 +9850,23 @@ const docTemplate = `{
                 },
                 "title": {
                     "type": "string"
+                }
+            }
+        },
+        "db.InviteBody": {
+            "type": "object",
+            "properties": {
+                "number": {
+                    "type": "integer"
+                },
+                "pubkey": {
+                    "type": "string"
+                },
+                "route_hint": {
+                    "type": "string"
+                },
+                "sats_amount": {
+                    "type": "integer"
                 }
             }
         },
@@ -8864,6 +10555,31 @@ const docTemplate = `{
                 }
             }
         },
+        "db.Save": {
+            "type": "object",
+            "properties": {
+                "body": {
+                    "type": "string"
+                },
+                "key": {
+                    "type": "string"
+                },
+                "method": {
+                    "type": "string"
+                },
+                "path": {
+                    "type": "string"
+                }
+            }
+        },
+        "db.SaveResponse": {
+            "type": "object",
+            "properties": {
+                "key": {
+                    "type": "string"
+                }
+            }
+        },
         "db.StatusBudget": {
             "type": "object",
             "properties": {
@@ -9221,6 +10937,51 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "uuid": {
+                    "type": "string"
+                }
+            }
+        },
+        "db.VerifyPayload": {
+            "type": "object",
+            "properties": {
+                "alias": {
+                    "type": "string"
+                },
+                "contact_key": {
+                    "type": "string"
+                },
+                "description": {
+                    "type": "string"
+                },
+                "extras": {
+                    "type": "object",
+                    "additionalProperties": true
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "jwt": {
+                    "type": "string"
+                },
+                "photo_url": {
+                    "type": "string"
+                },
+                "price_to_meet": {
+                    "type": "integer"
+                },
+                "pubkey": {
+                    "type": "string"
+                },
+                "route_hint": {
+                    "type": "string"
+                },
+                "tribe_jwt": {
+                    "type": "string"
+                },
+                "url": {
+                    "type": "string"
+                },
+                "verification_signature": {
                     "type": "string"
                 }
             }
@@ -9849,6 +11610,23 @@ const docTemplate = `{
                 }
             }
         },
+        "handlers.ActivitiesResponse": {
+            "type": "object",
+            "properties": {
+                "data": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/db.Activity"
+                    }
+                },
+                "error": {
+                    "type": "string"
+                },
+                "success": {
+                    "type": "boolean"
+                }
+            }
+        },
         "handlers.ActivityContentRequest": {
             "type": "object",
             "properties": {
@@ -9862,6 +11640,23 @@ const docTemplate = `{
             "properties": {
                 "data": {
                     "$ref": "#/definitions/db.Activity"
+                },
+                "error": {
+                    "type": "string"
+                },
+                "success": {
+                    "type": "boolean"
+                }
+            }
+        },
+        "handlers.ActivityThreadResponse": {
+            "type": "object",
+            "properties": {
+                "data": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/db.Activity"
+                    }
                 },
                 "error": {
                     "type": "string"
@@ -9970,6 +11765,28 @@ const docTemplate = `{
                 "data": {},
                 "message": {
                     "type": "string"
+                },
+                "success": {
+                    "type": "boolean"
+                }
+            }
+        },
+        "handlers.ConnectionCodesListResponse": {
+            "type": "object",
+            "properties": {
+                "data": {
+                    "type": "object",
+                    "properties": {
+                        "codes": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/db.ConnectionCodesList"
+                            }
+                        },
+                        "total": {
+                            "type": "integer"
+                        }
+                    }
                 },
                 "success": {
                     "type": "boolean"
@@ -10154,6 +11971,55 @@ const docTemplate = `{
                 }
             }
         },
+        "handlers.ListFilesResponse": {
+            "type": "object",
+            "properties": {
+                "data": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/db.FileAsset"
+                    }
+                },
+                "pagination": {
+                    "$ref": "#/definitions/handlers.PaginationResponse"
+                },
+                "success": {
+                    "type": "boolean",
+                    "example": true
+                }
+            }
+        },
+        "handlers.LnAuthResponse": {
+            "type": "object",
+            "properties": {
+                "jwt": {
+                    "type": "string"
+                },
+                "message": {
+                    "type": "string"
+                },
+                "status": {
+                    "type": "string"
+                }
+            }
+        },
+        "handlers.PaginationResponse": {
+            "type": "object",
+            "properties": {
+                "currentPage": {
+                    "type": "integer"
+                },
+                "pageSize": {
+                    "type": "integer"
+                },
+                "totalItems": {
+                    "type": "integer"
+                },
+                "totalPages": {
+                    "type": "integer"
+                }
+            }
+        },
         "handlers.ProcessChatRequest": {
             "type": "object",
             "properties": {
@@ -10173,6 +12039,23 @@ const docTemplate = `{
                             "type": "string"
                         }
                     }
+                }
+            }
+        },
+        "handlers.RefreshTokenResponse": {
+            "type": "object",
+            "properties": {
+                "jwt": {
+                    "type": "string"
+                },
+                "k1": {
+                    "type": "string"
+                },
+                "status": {
+                    "type": "boolean"
+                },
+                "user": {
+                    "$ref": "#/definitions/db.Person"
                 }
             }
         },
@@ -10337,6 +12220,14 @@ const docTemplate = `{
                 }
             }
         },
+        "handlers.UpdateProofStatusResponse": {
+            "type": "object",
+            "properties": {
+                "status": {
+                    "$ref": "#/definitions/db.ProofOfWorkStatus"
+                }
+            }
+        },
         "handlers.UpdateTicketRequest": {
             "type": "object",
             "properties": {
@@ -10381,6 +12272,64 @@ const docTemplate = `{
                 }
             }
         },
+        "handlers.WebhookActivityRequest": {
+            "type": "object",
+            "properties": {
+                "actions": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "author": {
+                    "$ref": "#/definitions/db.AuthorType"
+                },
+                "author_ref": {
+                    "type": "string"
+                },
+                "content": {
+                    "type": "string"
+                },
+                "content_type": {
+                    "type": "string"
+                },
+                "feature_uuid": {
+                    "type": "string"
+                },
+                "phase_uuid": {
+                    "type": "string"
+                },
+                "questions": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "thread_id": {
+                    "type": "string"
+                },
+                "title": {
+                    "type": "string"
+                },
+                "workspace": {
+                    "type": "string"
+                }
+            }
+        },
+        "handlers.WebhookResponse": {
+            "type": "object",
+            "properties": {
+                "activity_id": {
+                    "type": "string"
+                },
+                "error": {
+                    "type": "string"
+                },
+                "success": {
+                    "type": "boolean"
+                }
+            }
+        },
         "utils.TicketReviewRequest": {
             "type": "object",
             "properties": {
@@ -10415,6 +12364,26 @@ const docTemplate = `{
                     }
                 }
             }
+        }
+    },
+    "securityDefinitions": {
+        "CypressAuth": {
+            "description": "No authentication needed when in test mode",
+            "type": "apiKey",
+            "name": "x-cypress",
+            "in": "header"
+        },
+        "PubKeyContextAuth": {
+            "description": "JWT token for authentication. Can also be provided as a query parameter named 'token'",
+            "type": "apiKey",
+            "name": "x-jwt",
+            "in": "header"
+        },
+        "SuperAdminAuth": {
+            "description": "JWT token for super admin authentication. Can also be provided as a query parameter named 'token'",
+            "type": "apiKey",
+            "name": "x-jwt",
+            "in": "header"
         }
     }
 }`
