@@ -27,6 +27,17 @@ func NewBotHandler(db db.Database) *botHandler {
 	}
 }
 
+// CreateOrEditBot godoc
+//
+//	@Summary		Create or edit a bot
+//	@Description	Create or edit a bot
+//	@Tags			Bots
+//	@Accept			json
+//	@Produce		json
+//	@Security		PubKeyContextAuth
+//	@Param			bot	body		db.Bot	true	"Bot object"
+//	@Success		200	{object}	db.Bot
+//	@Router			/bots [put]
 func (bt *botHandler) CreateOrEditBot(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 	pubKeyFromAuth, _ := ctx.Value(auth.ContextKey).(string)
@@ -79,12 +90,27 @@ func (bt *botHandler) CreateOrEditBot(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(bot)
 }
 
+// GetListedBots godoc
+//
+//	@Summary		Get listed bots
+//	@Description	Get a list of listed bots
+//	@Tags			Bots
+//	@Success		200	{array}	db.Bot
+//	@Router			/bots [get]
 func (bt *botHandler) GetListedBots(w http.ResponseWriter, r *http.Request) {
 	bots := bt.db.GetListedBots(r)
 	w.WriteHeader(http.StatusOK)
 	json.NewEncoder(w).Encode(bots)
 }
 
+// GetBot godoc
+//
+//	@Summary		Get a bot
+//	@Description	Get a bot by UUID
+//	@Tags			Bots
+//	@Param			uuid	path		string	true	"Bot UUID"
+//	@Success		200		{object}	db.Bot
+//	@Router			/bots/{uuid} [get]
 func (bt *botHandler) GetBot(w http.ResponseWriter, r *http.Request) {
 	uuid := chi.URLParam(r, "uuid")
 	bot := bt.db.GetBot(uuid)
@@ -92,6 +118,14 @@ func (bt *botHandler) GetBot(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(bot)
 }
 
+// GetBotByUniqueName godoc
+//
+//	@Summary		Get a bot by unique name
+//	@Description	Get a bot by unique name
+//	@Tags			Bots
+//	@Param			unique_name	path		string	true	"Unique name"
+//	@Success		200			{object}	db.Bot
+//	@Router			/bot/{name} [get]
 func (bt *botHandler) GetBotByUniqueName(w http.ResponseWriter, r *http.Request) {
 	name := chi.URLParam(r, "name")
 	bot := bt.db.GetBotByUniqueName(name)
@@ -99,6 +133,14 @@ func (bt *botHandler) GetBotByUniqueName(w http.ResponseWriter, r *http.Request)
 	json.NewEncoder(w).Encode(bot)
 }
 
+// GetBotsByOwner godoc
+//
+//	@Summary		Get bots by owner
+//	@Description	Get a list of bots by owner public key
+//	@Tags			Bots
+//	@Param			pubkey	path	string	true	"Owner public key"
+//	@Success		200		{array}	db.Bot
+//	@Router			/bots/owner/{pubkey} [get]
 func (bt *botHandler) GetBotsByOwner(w http.ResponseWriter, r *http.Request) {
 	name := chi.URLParam(r, "pubkey")
 	bots := bt.db.GetBotsByOwner(name)
@@ -106,6 +148,14 @@ func (bt *botHandler) GetBotsByOwner(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(bots)
 }
 
+// SearchBots godoc
+//
+//	@Summary		Search bots
+//	@Description	Search for bots
+//	@Tags			Bots
+//	@Param			query	query	string	true	"Search query"
+//	@Success		200		{array}	db.Bot
+//	@Router			/search/bots/{query} [get]
 func (bt *botHandler) SearchBots(w http.ResponseWriter, r *http.Request) {
 	query := chi.URLParam(r, "query")
 	limitString := r.URL.Query().Get("limit")
@@ -121,6 +171,15 @@ func (bt *botHandler) SearchBots(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(bots)
 }
 
+// DeleteBot godoc
+//
+//	@Summary		Delete a bot
+//	@Description	Delete a bot by UUID
+//	@Tags			Bots
+//	@Security		PubKeyContextAuth
+//	@Param			uuid	path		string	true	"Bot UUID"
+//	@Success		200		{object}	bool
+//	@Router			/bot/{uuid} [delete]
 func (bt *botHandler) DeleteBot(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 	pubKeyFromAuth, _ := ctx.Value(auth.ContextKey).(string)
@@ -155,6 +214,14 @@ func (bt *botHandler) DeleteBot(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(true)
 }
 
+// BotUniqueNameFromName godoc
+//
+//	@Summary		Get unique name from bot name
+//	@Description	Get unique name from bot name
+//	@Tags			Bots
+//	@Param			name	query		string	true	"Bot name"
+//	@Success		200		{object}	string
+//	@Router			/bot/unique_name [get]
 func (h *botHandler) BotUniqueNameFromName(name string) (string, error) {
 	pathOne := strings.ToLower(strings.Join(strings.Fields(name), ""))
 	reg, err := regexp.Compile("[^a-zA-Z0-9]+")
@@ -179,6 +246,14 @@ func (h *botHandler) BotUniqueNameFromName(name string) (string, error) {
 	return path, nil
 }
 
+// TribeUniqueNameFromName godoc
+//
+//	@Summary		Get unique name from tribe name
+//	@Description	Get unique name from tribe name
+//	@Tags			Tribes
+//	@Param			name	query		string	true	"Tribe name"
+//	@Success		200		{object}	string
+//	@Router			/tribes/unique_name [get]
 func TribeUniqueNameFromName(name string) (string, error) {
 	pathOne := strings.ToLower(strings.Join(strings.Fields(name), ""))
 	reg, err := regexp.Compile("[^a-zA-Z0-9]+")

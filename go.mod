@@ -59,10 +59,12 @@ require (
 	github.com/lightningnetwork/lnd/tlv v1.1.1 // indirect
 	github.com/lightningnetwork/lnd/tor v1.1.2 // indirect
 	github.com/onsi/gomega v1.26.0 // indirect
-	github.com/posthog/posthog-go v1.2.24 // indirect
+	github.com/posthog/posthog-go v1.2.24
 	github.com/robfig/cron v1.2.0
-	github.com/urfave/negroni v1.0.0 // indirect
-	github.com/xhd2015/xgo/runtime v1.0.52 // indirect
-	golang.org/x/exp v0.0.0-20230315142452-642cacee5cc0 // indirect
+	github.com/swaggo/http-swagger v1.3.4
+	github.com/swaggo/swag v1.16.4
+	github.com/urfave/negroni v1.0.0
+	github.com/xhd2015/xgo/runtime v1.0.52
+	golang.org/x/exp v0.0.0-20230315142452-642cacee5cc0
 	gopkg.in/go-playground/assert.v1 v1.2.1 // indirect
 )

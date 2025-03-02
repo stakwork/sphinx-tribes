@@ -32,24 +32,54 @@ func NewTribeHandler(db db.Database) *tribeHandler {
 	}
 }
 
+// GetAllTribes godoc
+//
+//	@Summary		Get all tribes
+//	@Description	Get a list of all tribes
+//	@Tags			Tribes
+//	@Success		200	{array}	db.Tribe
+//	@Router			/tribes [get]
 func (th *tribeHandler) GetAllTribes(w http.ResponseWriter, r *http.Request) {
 	tribes := th.db.GetAllTribes()
 	w.WriteHeader(http.StatusOK)
 	json.NewEncoder(w).Encode(tribes)
 }
 
-func (th *tribeHandler) GetTotalribes(w http.ResponseWriter, r *http.Request) {
+// GetTotalTribes godoc
+//
+//	@Summary		Get total number of tribes
+//	@Description	Get the total number of tribes
+//	@Tags			Tribes
+//	@Success		200	{object}	int
+//	@Router			/tribes/total [get]
+func (th *tribeHandler) GetTotalTribes(w http.ResponseWriter, r *http.Request) {
 	tribesTotal := th.db.GetTribesTotal()
 	w.WriteHeader(http.StatusOK)
 	json.NewEncoder(w).Encode(tribesTotal)
 }
 
+// GetListedTribes godoc
+//
+//	@Summary		Get listed tribes
+//	@Description	Get a list of listed tribes
+//	@Tags			Tribes
+//	@Success		200	{array}	db.Tribe
+//	@Router			/tribes [get]
 func (th *tribeHandler) GetListedTribes(w http.ResponseWriter, r *http.Request) {
 	tribes := th.db.GetListedTribes(r)
 	w.WriteHeader(http.StatusOK)
 	json.NewEncoder(w).Encode(tribes)
 }
 
+// GetTribesByOwner godoc
+//
+//	@Summary		Get tribes by owner
+//	@Description	Get a list of tribes by owner public key
+//	@Tags			Tribes
+//	@Param			pubkey	path	string	true	"Owner public key"
+//	@Param			all		query	string	false	"Include all tribes"
+//	@Success		200		{array}	db.Tribe
+//	@Router			/tribes_by_owner/{pubkey} [get]
 func (th *tribeHandler) GetTribesByOwner(w http.ResponseWriter, r *http.Request) {
 	all := r.URL.Query().Get("all")
 	tribes := []db.Tribe{}
@@ -63,6 +93,14 @@ func (th *tribeHandler) GetTribesByOwner(w http.ResponseWriter, r *http.Request)
 	json.NewEncoder(w).Encode(tribes)
 }
 
+// GetTribesByAppUrl godoc
+//
+//	@Summary		Get tribes by app URL
+//	@Description	Get a list of tribes by app URL
+//	@Tags			Tribes
+//	@Param			app_url	path	string	true	"App URL"
+//	@Success		200		{array}	db.Tribe
+//	@Router			/tribes/app_url/{app_url} [get]
 func (th *tribeHandler) GetTribesByAppUrl(w http.ResponseWriter, r *http.Request) {
 	tribes := []db.Tribe{}
 	app_url := chi.URLParam(r, "app_url")
@@ -71,6 +109,14 @@ func (th *tribeHandler) GetTribesByAppUrl(w http.ResponseWriter, r *http.Request
 	json.NewEncoder(w).Encode(tribes)
 }
 
+// GetTribesByAppUrls godoc
+//
+//	@Summary		Get tribes by multiple app URLs
+//	@Description	Get a list of tribes by multiple app URLs
+//	@Tags			Tribes
+//	@Param			app_urls	path		string	true	"Comma-separated list of app URLs"
+//	@Success		200			{object}	map[string][]db.Tribe
+//	@Router			/tribes/apps_urls/{app_urls} [get]
 func GetTribesByAppUrls(w http.ResponseWriter, r *http.Request) {
 	app_urls := chi.URLParam(r, "app_urls")
 	app_url_list := strings.Split(app_urls, ",")
@@ -83,6 +129,17 @@ func GetTribesByAppUrls(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(m)
 }
 
+// PutTribeStats godoc
+//
+//	@Summary		Update tribe stats
+//	@Description	Update the stats of a tribe
+//	@Tags			Tribes
+//	@Accept			json
+//	@Produce		json
+//	@Security		PubKeyContextAuth
+//	@Param			tribe	body		db.Tribe	true	"Tribe object"
+//	@Success		200		{object}	bool
+//	@Router			/tribestats [put]
 func PutTribeStats(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 	pubKeyFromAuth, _ := ctx.Value(auth.ContextKey).(string)
@@ -127,6 +184,17 @@ func PutTribeStats(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(true)
 }
 
+// DeleteTribe godoc
+//
+//	@Summary		Delete a tribe
+//	@Description	Delete a tribe by UUID
+//	@Tags			Tribes
+//	@Accept			json
+//	@Produce		json
+//	@Security		PubKeyContextAuth
+//	@Param			uuid	path		string	true	"Tribe UUID"
+//	@Success		200		{object}	bool
+//	@Router			/tribe/{uuid} [delete]
 func (th *tribeHandler) DeleteTribe(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 	pubKeyFromAuth, _ := ctx.Value(auth.ContextKey).(string)
@@ -159,6 +227,14 @@ func (th *tribeHandler) DeleteTribe(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(true)
 }
 
+// GetTribe godoc
+//
+//	@Summary		Get a tribe
+//	@Description	Get a tribe by UUID
+//	@Tags			Tribes
+//	@Param			uuid	path		string	true	"Tribe UUID"
+//	@Success		200		{object}	map[string]interface{}
+//	@Router			/tribes/{uuid} [get]
 func (th *tribeHandler) GetTribe(w http.ResponseWriter, r *http.Request) {
 	uuid := chi.URLParam(r, "uuid")
 	tribe := th.db.GetTribe(uuid)
@@ -173,6 +249,14 @@ func (th *tribeHandler) GetTribe(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(theTribe)
 }
 
+// GetFirstTribeByFeed godoc
+//
+//	@Summary		Get the first tribe by feed URL
+//	@Description	Get the first tribe by feed URL
+//	@Tags			Tribes
+//	@Param			url	query		string	true	"Feed URL"
+//	@Success		200	{object}	map[string]interface{}
+//	@Router			/tribe_by_feed [get]
 func (th *tribeHandler) GetFirstTribeByFeed(w http.ResponseWriter, r *http.Request) {
 	url := r.URL.Query().Get("url")
 	tribe := th.db.GetFirstTribeByFeedURL(url)
@@ -192,6 +276,14 @@ func (th *tribeHandler) GetFirstTribeByFeed(w http.ResponseWriter, r *http.Reque
 	json.NewEncoder(w).Encode(theTribe)
 }
 
+// GetTribeByUniqueName godoc
+//
+//	@Summary		Get a tribe by unique name
+//	@Description	Get a tribe by unique name
+//	@Tags			Tribes
+//	@Param			un	path		string	true	"Unique name"
+//	@Success		200	{object}	map[string]interface{}
+//	@Router			/tribe_by_un/{un} [get]
 func (th *tribeHandler) GetTribeByUniqueName(w http.ResponseWriter, r *http.Request) {
 	uuid := chi.URLParam(r, "un")
 	tribe := th.db.GetTribeByUniqueName(uuid)
@@ -206,6 +298,17 @@ func (th *tribeHandler) GetTribeByUniqueName(w http.ResponseWriter, r *http.Requ
 	json.NewEncoder(w).Encode(theTribe)
 }
 
+// CreateOrEditTribe godoc
+//
+//	@Summary		Create or edit a tribe
+//	@Description	Create or edit a tribe
+//	@Tags			Tribes
+//	@Accept			json
+//	@Produce		json
+//	@Security		PubKeyContextAuth
+//	@Param			tribe	body		db.Tribe	true	"Tribe object"
+//	@Success		200		{object}	db.Tribe
+//	@Router			/tribe [post]
 func (th *tribeHandler) CreateOrEditTribe(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 	pubKeyFromAuth, _ := ctx.Value(auth.ContextKey).(string)
@@ -273,6 +376,17 @@ func (th *tribeHandler) CreateOrEditTribe(w http.ResponseWriter, r *http.Request
 	json.NewEncoder(w).Encode(tribe)
 }
 
+// PutTribeActivity godoc
+//
+//	@Summary		Update tribe activity
+//	@Description	Update the activity of a tribe
+//	@Tags			Tribes
+//	@Accept			json
+//	@Produce		json
+//	@Security		PubKeyContextAuth
+//	@Param			uuid	path		string	true	"Tribe UUID"
+//	@Success		200		{object}	bool
+//	@Router			/tribeactivity/{uuid} [put]
 func PutTribeActivity(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 	pubKeyFromAuth, _ := ctx.Value(auth.ContextKey).(string)
@@ -305,6 +419,15 @@ func PutTribeActivity(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(true)
 }
 
+// SetTribePreview godoc
+//
+//	@Summary		Set tribe preview
+//	@Description	Set the preview of a tribe
+//	@Tags			Tribes
+//	@Param			uuid	path		string	true	"Tribe UUID"
+//	@Param			preview	query		string	true	"Preview URL"
+//	@Success		200		{object}	bool
+//	@Router			/tribepreview/{uuid} [put]
 func (th *tribeHandler) SetTribePreview(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 	pubKeyFromAuth, _ := ctx.Value(auth.ContextKey).(string)
@@ -337,6 +460,18 @@ func (th *tribeHandler) SetTribePreview(w http.ResponseWriter, r *http.Request) 
 	json.NewEncoder(w).Encode(true)
 }
 
+// CreateLeaderBoard godoc
+//
+//	@Summary		Create a leaderboard
+//	@Description	Create a leaderboard for a tribe
+//	@Tags			Tribes
+//	@Accept			json
+//	@Produce		json
+//	@Security		PubKeyContextAuth
+//	@Param			tribe_uuid	path		string				true	"Tribe UUID"
+//	@Param			leaderboard	body		[]db.LeaderBoard	true	"Leaderboard object"
+//	@Success		200			{object}	bool
+//	@Router			/leaderboard/{tribe_uuid} [post]
 func CreateLeaderBoard(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 	pubKeyFromAuth, _ := ctx.Value(auth.ContextKey).(string)
@@ -383,6 +518,15 @@ func CreateLeaderBoard(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(true)
 }
 
+// GetLeaderBoard godoc
+//
+//	@Summary		Get a leaderboard
+//	@Description	Get a leaderboard for a tribe
+//	@Tags			Tribes
+//	@Param			tribe_uuid	path		string	true	"Tribe UUID"
+//	@Param			alias		query		string	false	"Alias"
+//	@Success		200			{object}	interface{}
+//	@Router			/leaderboard/{tribe_uuid} [get]
 func GetLeaderBoard(w http.ResponseWriter, r *http.Request) {
 	uuid := chi.URLParam(r, "tribe_uuid")
 	alias := r.URL.Query().Get("alias")
@@ -410,6 +554,18 @@ func GetLeaderBoard(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+// UpdateLeaderBoard godoc
+//
+//	@Summary		Update a leaderboard
+//	@Description	Update a leaderboard for a tribe
+//	@Tags			Tribes
+//	@Accept			json
+//	@Produce		json
+//	@Security		PubKeyContextAuth
+//	@Param			tribe_uuid	path		string			true	"Tribe UUID"
+//	@Param			leaderboard	body		db.LeaderBoard	true	"Leaderboard object"
+//	@Success		200			{object}	bool
+//	@Router			/leaderboard/{tribe_uuid} [put]
 func UpdateLeaderBoard(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 	pubKeyFromAuth, _ := ctx.Value(auth.ContextKey).(string)
@@ -463,6 +619,14 @@ func UpdateLeaderBoard(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(true)
 }
 
+// GenerateInvoice godoc
+//
+//	@Summary		Generate an invoice
+//	@Description	Generate an invoice for a tribe
+//	@Tags			Tribes
+//	@Param			invoice	body		db.InvoiceRequest	true	"Invoice request"
+//	@Success		200		{object}	db.InvoiceResponse
+//	@Router			/invoice [post]
 func GenerateInvoice(w http.ResponseWriter, r *http.Request) {
 	invoiceRes, invoiceErr := db.InvoiceResponse{}, db.InvoiceError{}
 
@@ -590,6 +754,14 @@ func GenerateV1Invoice(w http.ResponseWriter, r *http.Request) (db.InvoiceRespon
 	return invoiceRes, db.InvoiceError{Success: true}
 }
 
+// GenerateInvoice godoc
+//
+//	@Summary		Generate an invoice
+//	@Description	Generate an invoice for a tribe
+//	@Tags			Tribes
+//	@Param			invoice	body		db.InvoiceRequest	true	"Invoice request"
+//	@Success		200		{object}	db.InvoiceResponse
+//	@Router			/tribes/invoice [post]
 func GenerateV2Invoice(w http.ResponseWriter, r *http.Request) (db.InvoiceResponse, db.InvoiceError) {
 	invoice := db.InvoiceRequest{}
 
@@ -656,6 +828,14 @@ func GenerateV2Invoice(w http.ResponseWriter, r *http.Request) (db.InvoiceRespon
 	}, db.InvoiceError{Success: true}
 }
 
+// GenerateBudgetInvoice godoc
+//
+//	@Summary		Generate a budget invoice
+//	@Description	Generate a budget invoice for a tribe
+//	@Tags			Tribes
+//	@Param			invoice	body		db.BudgetInvoiceRequest	true	"Budget invoice request"
+//	@Success		200		{object}	db.InvoiceResponse
+//	@Router			/tribes/budget_invoice [post]
 func (th *tribeHandler) GenerateBudgetInvoice(w http.ResponseWriter, r *http.Request) {
 	if config.IsV2Payment {
 		th.GenerateV2BudgetInvoice(w, r)

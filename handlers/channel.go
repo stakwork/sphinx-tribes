@@ -22,6 +22,20 @@ func NewChannelHandler(db db.Database) *channelHandler {
 	}
 }
 
+// DeleteChannel godoc
+//
+//	@Summary		Delete a channel
+//	@Description	Delete a channel by marking it as deleted. Only the tribe owner can perform this action.
+//	@Tags			Channel
+//	@Accept			json
+//	@Produce		json
+//	@Security		PubKeyContextAuth
+//	@Param			id	path		int		true	"Channel ID"
+//	@Success		200	{object}	bool	"Channel deleted successfully"
+//	@Failure		400	{object}	nil		"Bad request: Invalid channel ID"
+//	@Failure		401	{object}	nil		"Unauthorized: User is not the tribe owner or invalid credentials"
+//	@Failure		404	{object}	nil		"Not found: Channel does not exist"
+//	@Router			/channel/{id} [delete]
 func (ch *channelHandler) DeleteChannel(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 	pubKeyFromAuth, _ := ctx.Value(auth.ContextKey).(string)
@@ -48,7 +62,7 @@ func (ch *channelHandler) DeleteChannel(w http.ResponseWriter, r *http.Request) 
 		return
 	}
 	if existingTribe.OwnerPubKey != pubKeyFromAuth {
-		 logger.Log.Info("keys dont match")
+		logger.Log.Info("keys dont match")
 		w.WriteHeader(http.StatusUnauthorized)
 		return
 	}
@@ -61,6 +75,20 @@ func (ch *channelHandler) DeleteChannel(w http.ResponseWriter, r *http.Request) 
 	json.NewEncoder(w).Encode(true)
 }
 
+// CreateChannel godoc
+//
+//	@Summary		Create a channel
+//	@Description	Create a new channel within a tribe. Only the tribe owner can perform this action.
+//	@Tags			Channel
+//	@Accept			json
+//	@Produce		json
+//	@Security		PubKeyContextAuth
+//	@Param			request	body		db.Channel	true	"Request body containing tribe UUID and channel name"
+//	@Success		200		{object}	db.Channel				"Channel created successfully"
+//	@Failure		400		{object}	nil			"Bad request: Invalid request body"
+//	@Failure		401		{object}	nil			"Unauthorized: User is not the tribe owner"
+//	@Failure		406		{object}	nil			"Not acceptable: Channel name already in use or invalid data"
+//	@Router			/channel [post]
 func (ch *channelHandler) CreateChannel(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 	pubKeyFromAuth, _ := ctx.Value(auth.ContextKey).(string)

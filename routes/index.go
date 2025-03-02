@@ -25,10 +25,12 @@ import (
 	"github.com/stakwork/sphinx-tribes/auth"
 	"github.com/stakwork/sphinx-tribes/config"
 	"github.com/stakwork/sphinx-tribes/db"
+	_ "github.com/stakwork/sphinx-tribes/docs"
 	"github.com/stakwork/sphinx-tribes/handlers"
 	"github.com/stakwork/sphinx-tribes/logger"
 	customMiddleware "github.com/stakwork/sphinx-tribes/middlewares"
 	"github.com/stakwork/sphinx-tribes/utils"
+	httpSwagger "github.com/swaggo/http-swagger"
 )
 
 // NewRouter creates a chi router
@@ -58,6 +60,7 @@ func NewRouter() *http.Server {
 	r.Mount("/feature-flags", FeatureFlagRoutes())
 	r.Mount("/snippet", SnippetRoutes())
 	r.Mount("/activities", ActivityRoutes())
+	r.Get("/docs/*", httpSwagger.WrapHandler)
 
 	r.Group(func(r chi.Router) {
 		r.Get("/tribe_by_feed", tribeHandlers.GetFirstTribeByFeed)
