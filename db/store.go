@@ -165,6 +165,20 @@ type VerifyPayload struct {
 	TribeJWT              string                 `json:"tribe_jwt"`
 }
 
+// Verify godoc
+//
+//	@Summary		Verify a challenge
+//	@Description	Verify a challenge by validating the signature and storing the result in the cache.
+//	@Tags			Auth
+//	@Accept			json
+//	@Produce		json
+//	@Security		PubKeyContextAuth
+//	@Param			challenge	path		string			true	"Challenge string"
+//	@Param			payload		body		VerifyPayload	true	"Request body containing the public key and signature"
+//	@Success		200			{object}	VerifyPayload	"Challenge verified successfully"
+//	@Failure		401			{object}	string			"Unauthorized: Challenge not found or invalid signature"
+//	@Failure		406			{object}	string			"Not acceptable: Invalid request body"
+//	@Router			/verify/{challenge} [post]
 func Verify(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 	pubKeyFromAuth, _ := ctx.Value(auth.ContextKey).(string)
@@ -201,6 +215,17 @@ func Verify(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(map[string]string{})
 }
 
+// Poll godoc
+//
+//	@Summary		Poll a challenge
+//	@Description	Poll a challenge to verify the user's authentication and retrieve user details.
+//	@Tags			Auth
+//	@Accept			json
+//	@Produce		json
+//	@Param			challenge	path		string			true	"Challenge string"
+//	@Success		200			{object}	VerifyPayload	"Challenge verified successfully and user details returned"
+//	@Failure		401			{object}	nil				"Unauthorized: Invalid challenge or user not found"
+//	@Router			/poll/{challenge} [get]
 func Poll(w http.ResponseWriter, r *http.Request) {
 
 	challenge := chi.URLParam(r, "challenge")
@@ -263,6 +288,23 @@ type Save struct {
 	Method string `json:"method"`
 }
 
+type SaveResponse struct {
+	Key string `json:"key"`
+}
+
+// PostSave godoc
+//
+//	@Summary		Save data
+//	@Description	Save data with a unique key in the cache.
+//	@Tags			Storage
+//	@Accept			json
+//	@Produce		json
+//	@Param			request	body		Save			true	"Request body containing the key and value to save"
+//	@Success		200		{object}	SaveResponse	"Data saved successfully"
+//	@Failure		400		{object}	nil				"Bad request: Invalid request body"
+//	@Failure		406		{object}	nil				"Not acceptable: Invalid data format"
+//	@Failure		401		{object}	nil				"Unauthorized: Failed to process payload"
+//	@Router			/save [post]
 func PostSave(w http.ResponseWriter, r *http.Request) {
 
 	save := Save{}
@@ -285,11 +327,22 @@ func PostSave(w http.ResponseWriter, r *http.Request) {
 	Store.SetCache(save.Key, string(s))
 
 	w.WriteHeader(http.StatusOK)
-	json.NewEncoder(w).Encode(map[string]string{
-		"key": save.Key,
+	json.NewEncoder(w).Encode(SaveResponse{
+		Key: save.Key,
 	})
 }
 
+// PollSave godoc
+//
+//	@Summary		Retrieve saved data
+//	@Description	Retrieve saved data using a unique key from the cache.
+//	@Tags			Storage
+//	@Accept			json
+//	@Produce		json
+//	@Param			key	path		string	true	"Unique key for the saved data"
+//	@Success		200	{object}	Save	"Data retrieved successfully"
+//	@Failure		401	{object}	nil		"Unauthorized: Invalid key or data not found"
+//	@Router			/save/{key} [get]
 func PollSave(w http.ResponseWriter, r *http.Request) {
 
 	key := chi.URLParam(r, "key")

@@ -18,6 +18,8 @@ import (
 	"google.golang.org/api/youtube/v3"
 )
 
+// GetGenericFeed godoc
+//
 //	@Summary		Get Generic Feed
 //	@Description	Get a generic feed by URL
 //	@Tags			Feeds
@@ -57,6 +59,8 @@ func GetGenericFeed(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(feed)
 }
 
+// DownloadYoutubeFeed godoc
+//
 //	@Summary		Download Youtube Feed
 //	@Description	Download a Youtube feed
 //	@Tags			Feeds
@@ -169,6 +173,8 @@ func processYoutubeDownload(data []string) {
 	}
 }
 
+// GetPodcast godoc
+//
 //	@Summary		Get Podcast
 //	@Description	Get a podcast by URL or ID
 //	@Tags			Feeds
@@ -198,6 +204,8 @@ func GetPodcast(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+// SearchPodcasts godoc
+//
 //	@Summary		Search Podcasts
 //	@Description	Search for podcasts by query
 //	@Tags			Feeds
@@ -226,6 +234,8 @@ func SearchPodcasts(w http.ResponseWriter, r *http.Request) {
 	err = json.NewEncoder(w).Encode(fs)
 }
 
+// SearchPodcastEpisodes godoc
+//
 //	@Summary		Search Podcast Episodes
 //	@Description	Search for podcast episodes by query
 //	@Tags			Feeds
@@ -252,6 +262,8 @@ func SearchPodcastEpisodes(w http.ResponseWriter, r *http.Request) {
 	err = json.NewEncoder(w).Encode(fs)
 }
 
+// SearchYoutube godoc
+//
 //	@Summary		Search Youtube
 //	@Description	Search for Youtube videos by query
 //	@Tags			Feeds
@@ -272,13 +284,15 @@ func SearchYoutube(w http.ResponseWriter, r *http.Request) {
 	err = json.NewEncoder(w).Encode(fs)
 }
 
+// SearchYoutubeVideos godoc
+//
 //	@Summary		Search Youtube Videos
 //	@Description	Search for Youtube videos by query
 //	@Tags			Feeds
 //	@Accept			json
 //	@Produce		json
 //	@Param			q	query	string	true	"Search Query"
-//	@Success		200	{array}	[]feeds.Item
+//	@Success		200	{array}	feeds.Item
 //	@Router			/search_youtube_videos [get]
 func SearchYoutubeVideos(w http.ResponseWriter, r *http.Request) {
 	q := r.URL.Query().Get("q")
@@ -292,13 +306,15 @@ func SearchYoutubeVideos(w http.ResponseWriter, r *http.Request) {
 	err = json.NewEncoder(w).Encode(fs)
 }
 
+// YoutubeVideosForChannel godoc
+//
 //	@Summary		Get Youtube Videos for Channel
 //	@Description	Get Youtube videos for a specific channel
 //	@Tags			Feeds
 //	@Accept			json
 //	@Produce		json
 //	@Param			channelId	query	string	true	"Channel ID"
-//	@Success		200			{array}	[]feeds.Item
+//	@Success		200			{array}	feeds.Item
 //	@Router			/youtube_videos [get]
 func YoutubeVideosForChannel(w http.ResponseWriter, r *http.Request) {
 	q := r.URL.Query().Get("channelId")

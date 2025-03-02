@@ -65,13 +65,16 @@ func NewFeatureHandler(database db.Database) *featureHandler {
 	}
 }
 
-// @Summary		Create or Edit Features
-// @Description	Create or edit features
-// @Tags			Features
-// @Accept			json
-// @Produce		json
-// @Success		200	{object}	db.WorkspaceFeatures
-// @Router			/features [post]
+// CreateOrEditFeatures godoc
+//
+//	@Summary		Create or Edit Features
+//	@Description	Create or edit features
+//	@Tags			Features
+//	@Accept			json
+//	@Produce		json
+//	@Security		PubKeyContextAuth
+//	@Success		200	{object}	db.WorkspaceFeatures
+//	@Router			/features [post]
 func (oh *featureHandler) CreateOrEditFeatures(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 	pubKeyFromAuth, _ := ctx.Value(auth.ContextKey).(string)
@@ -128,13 +131,16 @@ func (oh *featureHandler) CreateOrEditFeatures(w http.ResponseWriter, r *http.Re
 	json.NewEncoder(w).Encode(p)
 }
 
-// @Summary		Delete Feature
-// @Description	Delete a feature by its UUID
-// @Tags			Features
-// @Accept			json
-// @Produce		json
-// @Success		200	{string}	string	"Feature deleted successfully"
-// @Router			/features/{uuid} [delete]
+// DeleteFeature godoc
+//
+//	@Summary		Delete Feature
+//	@Description	Delete a feature by its UUID
+//	@Tags			Features
+//	@Accept			json
+//	@Produce		json
+//	@Security		PubKeyContextAuth
+//	@Success		200	{string}	string	"Feature deleted successfully"
+//	@Router			/features/{uuid} [delete]
 func (oh *featureHandler) DeleteFeature(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 	pubKeyFromAuth, _ := ctx.Value(auth.ContextKey).(string)
@@ -156,13 +162,16 @@ func (oh *featureHandler) DeleteFeature(w http.ResponseWriter, r *http.Request) 
 	fmt.Fprint(w, "Feature deleted successfully")
 }
 
-// @Summary		Get Features by Workspace UUID
-// @Description	Get features by workspace UUID
-// @Tags			Feature - Workspaces
-// @Accept			json
-// @Produce		json
-// @Success		200	{array}	db.WorkspaceFeatures
-// @Router			/features/forworkspace/{workspace_uuid} [get]
+// GetFeaturesByWorkspaceUuid godoc
+//
+//	@Summary		Get Features by Workspace UUID
+//	@Description	Get features by workspace UUID
+//	@Tags			Feature - Workspaces
+//	@Accept			json
+//	@Produce		json
+//	@Security		PubKeyContextAuth
+//	@Success		200	{array}	db.WorkspaceFeatures
+//	@Router			/features/forworkspace/{workspace_uuid} [get]
 func (oh *featureHandler) GetFeaturesByWorkspaceUuid(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 	pubKeyFromAuth, _ := ctx.Value(auth.ContextKey).(string)
@@ -179,13 +188,16 @@ func (oh *featureHandler) GetFeaturesByWorkspaceUuid(w http.ResponseWriter, r *h
 	json.NewEncoder(w).Encode(workspaceFeatures)
 }
 
-// @Summary		Get Workspace Features Count
-// @Description	Get the count of features in a workspace
-// @Tags			Feature - Workspaces
-// @Accept			json
-// @Produce		json
-// @Success		200	{int}	int
-// @Router			/features/workspace/count/{uuid} [get]
+// GetWorkspaceFeaturesCount godoc
+//
+//	@Summary		Get Workspace Features Count
+//	@Description	Get the count of features in a workspace
+//	@Tags			Feature - Workspaces
+//	@Accept			json
+//	@Produce		json
+//	@Security		PubKeyContextAuth
+//	@Success		200	{int}	int
+//	@Router			/features/workspace/count/{uuid} [get]
 func (oh *featureHandler) GetWorkspaceFeaturesCount(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 	pubKeyFromAuth, _ := ctx.Value(auth.ContextKey).(string)
@@ -216,13 +228,16 @@ func (oh *featureHandler) GetWorkspaceFeaturesCount(w http.ResponseWriter, r *ht
 	json.NewEncoder(w).Encode(workspaceFeatures)
 }
 
-// @Summary		Get Feature by UUID
-// @Description	Get a feature by its UUID
-// @Tags			Features
-// @Accept			json
-// @Produce		json
-// @Success		200	{object}	db.WorkspaceFeatures
-// @Router			/features/{uuid} [get]
+// GetFeatureByUuid godoc
+//
+//	@Summary		Get Feature by UUID
+//	@Description	Get a feature by its UUID
+//	@Tags			Features
+//	@Accept			json
+//	@Produce		json
+//	@Security		PubKeyContextAuth
+//	@Success		200	{object}	db.WorkspaceFeatures
+//	@Router			/features/{uuid} [get]
 func (oh *featureHandler) GetFeatureByUuid(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 	pubKeyFromAuth, _ := ctx.Value(auth.ContextKey).(string)
@@ -247,13 +262,16 @@ func (oh *featureHandler) GetFeatureByUuid(w http.ResponseWriter, r *http.Reques
 	json.NewEncoder(w).Encode(workspaceFeature)
 }
 
-// @Summary		Update Feature Brief
-// @Description	Update the brief of a feature
-// @Tags			Features
-// @Accept			json
-// @Produce		json
-// @Success		200	{object}	db.WorkspaceFeatures
-// @Router			/features/brief [post]
+// UpdateFeatureStatus godoc
+//
+//	@Summary		Update Feature Brief
+//	@Description	Update the brief of a feature
+//	@Tags			Features
+//	@Accept			json
+//	@Produce		json
+//	@Security		PubKeyContextAuth
+//	@Success		200	{object}	db.WorkspaceFeatures
+//	@Router			/features/brief [post]
 func (oh *featureHandler) UpdateFeatureBrief(w http.ResponseWriter, r *http.Request) {
 
 	ctx := r.Context()
@@ -320,13 +338,16 @@ func (oh *featureHandler) UpdateFeatureBrief(w http.ResponseWriter, r *http.Requ
 	json.NewEncoder(w).Encode(p)
 }
 
-// @Summary		Create or Edit Feature Phase
-// @Description	Create or edit a phase of a feature
-// @Tags			Feature - Phases
-// @Accept			json
-// @Produce		json
-// @Success		201	{object}	db.FeaturePhase
-// @Router			/features/phase [post]
+// CreateOrEditFeaturePhase godoc
+//
+//	@Summary		Create or Edit Feature Phase
+//	@Description	Create or edit a phase of a feature
+//	@Tags			Feature - Phases
+//	@Accept			json
+//	@Produce		json
+//	@Security		PubKeyContextAuth
+//	@Success		201	{object}	db.FeaturePhase
+//	@Router			/features/phase [post]
 func (oh *featureHandler) CreateOrEditFeaturePhase(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 	pubKeyFromAuth, _ := ctx.Value(auth.ContextKey).(string)
@@ -376,13 +397,16 @@ func (oh *featureHandler) CreateOrEditFeaturePhase(w http.ResponseWriter, r *htt
 	json.NewEncoder(w).Encode(phase)
 }
 
-// @Summary		Get Feature Phases
-// @Description	Get phases of a feature by its UUID
-// @Tags			Feature - Phases
-// @Accept			json
-// @Produce		json
-// @Success		200	{array}	db.FeaturePhase
-// @Router			/features/{feature_uuid}/phase [get]
+// GetFeaturePhases godoc
+//
+//	@Summary		Get Feature Phases
+//	@Description	Get phases of a feature by its UUID
+//	@Tags			Feature - Phases
+//	@Accept			json
+//	@Produce		json
+//	@Security		PubKeyContextAuth
+//	@Success		200	{array}	db.FeaturePhase
+//	@Router			/features/{feature_uuid}/phase [get]
 func (oh *featureHandler) GetFeaturePhases(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 	pubKeyFromAuth, _ := ctx.Value(auth.ContextKey).(string)
@@ -399,13 +423,16 @@ func (oh *featureHandler) GetFeaturePhases(w http.ResponseWriter, r *http.Reques
 	json.NewEncoder(w).Encode(phases)
 }
 
-// @Summary		Get Feature Phase by UUID
-// @Description	Get a phase of a feature by its UUID
-// @Tags			Feature - Phases
-// @Accept			json
-// @Produce		json
-// @Success		200	{object}	db.FeaturePhase
-// @Router			/features/{feature_uuid}/phase/{phase_uuid} [get]
+// GetFeaturePhaseByUUID godoc
+//
+//	@Summary		Get Feature Phase by UUID
+//	@Description	Get a phase of a feature by its UUID
+//	@Tags			Feature - Phases
+//	@Accept			json
+//	@Produce		json
+//	@Security		PubKeyContextAuth
+//	@Success		200	{object}	db.FeaturePhase
+//	@Router			/features/{feature_uuid}/phase/{phase_uuid} [get]
 func (oh *featureHandler) GetFeaturePhaseByUUID(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 	pubKeyFromAuth, _ := ctx.Value(auth.ContextKey).(string)
@@ -435,13 +462,16 @@ func (oh *featureHandler) GetFeaturePhaseByUUID(w http.ResponseWriter, r *http.R
 	json.NewEncoder(w).Encode(phase)
 }
 
-// @Summary		Delete Feature Phase
-// @Description	Delete a phase of a feature by its UUID
-// @Tags			Feature - Phases
-// @Accept			json
-// @Produce		json
-// @Success		200	{string}	string	"Phase deleted successfully"
-// @Router			/features/{feature_uuid}/phase/{phase_uuid} [delete]
+// DeleteFeaturePhase godoc
+//
+//	@Summary		Delete Feature Phase
+//	@Description	Delete a phase of a feature by its UUID
+//	@Tags			Feature - Phases
+//	@Accept			json
+//	@Produce		json
+//	@Security		PubKeyContextAuth
+//	@Success		200	{string}	string	"Phase deleted successfully"
+//	@Router			/features/{feature_uuid}/phase/{phase_uuid} [delete]
 func (oh *featureHandler) DeleteFeaturePhase(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 	pubKeyFromAuth, _ := ctx.Value(auth.ContextKey).(string)
@@ -472,13 +502,16 @@ func (oh *featureHandler) DeleteFeaturePhase(w http.ResponseWriter, r *http.Requ
 	json.NewEncoder(w).Encode(map[string]string{"message": "Phase deleted successfully"})
 }
 
-// @Summary		Create or Edit Story
-// @Description	Create or edit a story of a feature
-// @Tags			Feature - Stories
-// @Accept			json
-// @Produce		json
-// @Success		201	{object}	db.FeatureStory
-// @Router			/features/story [post]
+// CreateOrEditStory godoc
+//
+//	@Summary		Create or Edit Story
+//	@Description	Create or edit a story of a feature
+//	@Tags			Feature - Stories
+//	@Accept			json
+//	@Produce		json
+//	@Security		PubKeyContextAuth
+//	@Success		201	{object}	db.FeatureStory
+//	@Router			/features/story [post]
 func (oh *featureHandler) CreateOrEditStory(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 	pubKeyFromAuth, _ := ctx.Value(auth.ContextKey).(string)
@@ -520,13 +553,16 @@ func (oh *featureHandler) CreateOrEditStory(w http.ResponseWriter, r *http.Reque
 	json.NewEncoder(w).Encode(story)
 }
 
-// @Summary		Get Stories by Feature UUID
-// @Description	Get stories of a feature by its UUID
-// @Tags			Feature - Stories
-// @Accept			json
-// @Produce		json
-// @Success		200	{array}	db.FeatureStory
-// @Router			/features/{feature_uuid}/story [get]
+// GetStoriesByFeatureUuid godoc
+//
+//	@Summary		Get Stories by Feature UUID
+//	@Description	Get stories of a feature by its UUID
+//	@Tags			Feature - Stories
+//	@Accept			json
+//	@Produce		json
+//	@Security		PubKeyContextAuth
+//	@Success		200	{array}	db.FeatureStory
+//	@Router			/features/{feature_uuid}/story [get]
 func (oh *featureHandler) GetStoriesByFeatureUuid(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 	pubKeyFromAuth, _ := ctx.Value(auth.ContextKey).(string)
@@ -553,13 +589,16 @@ func (oh *featureHandler) GetStoriesByFeatureUuid(w http.ResponseWriter, r *http
 	json.NewEncoder(w).Encode(stories)
 }
 
-// @Summary		Get Story by UUID
-// @Description	Get a story of a feature by its UUID
-// @Tags			Feature - Stories
-// @Accept			json
-// @Produce		json
-// @Success		200	{object}	db.FeatureStory
-// @Router			/features/{feature_uuid}/story/{story_uuid} [get]
+// GetStoryByUuid godoc
+//
+//	@Summary		Get Story by UUID
+//	@Description	Get a story of a feature by its UUID
+//	@Tags			Feature - Stories
+//	@Accept			json
+//	@Produce		json
+//	@Security		PubKeyContextAuth
+//	@Success		200	{object}	db.FeatureStory
+//	@Router			/features/{feature_uuid}/story/{story_uuid} [get]
 func (oh *featureHandler) GetStoryByUuid(w http.ResponseWriter, r *http.Request) {
 	featureUuid := chi.URLParam(r, "feature_uuid")
 	storyUuid := chi.URLParam(r, "story_uuid")
@@ -582,13 +621,16 @@ func (oh *featureHandler) GetStoryByUuid(w http.ResponseWriter, r *http.Request)
 	json.NewEncoder(w).Encode(story)
 }
 
-// @Summary		Delete Story
-// @Description	Delete a story of a feature by its UUID
-// @Tags			Feature - Stories
-// @Accept			json
-// @Produce		json
-// @Success		200	{string}	string	"Story deleted successfully"
-// @Router			/features/{feature_uuid}/story/{story_uuid} [delete]
+// DeleteStory godoc
+//
+//	@Summary		Delete Story
+//	@Description	Delete a story of a feature by its UUID
+//	@Tags			Feature - Stories
+//	@Accept			json
+//	@Produce		json
+//	@Security		PubKeyContextAuth
+//	@Success		200	{string}	string	"Story deleted successfully"
+//	@Router			/features/{feature_uuid}/story/{story_uuid} [delete]
 func (oh *featureHandler) DeleteStory(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 	pubKeyFromAuth, _ := ctx.Value(auth.ContextKey).(string)
@@ -612,13 +654,16 @@ func (oh *featureHandler) DeleteStory(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(map[string]string{"message": "Story deleted successfully"})
 }
 
-// @Summary		Get Bounties by Feature and Phase UUID
-// @Description	Get bounties of a feature by its UUID and phase UUID
-// @Tags			Feature - Phases
-// @Accept			json
-// @Produce		json
-// @Success		200	{array}	db.BountyResponse
-// @Router			/features/{feature_uuid}/phase/{phase_uuid}/bounty [get]
+// GetBountiesByFeatureAndPhaseUuid godoc
+//
+//	@Summary		Get Bounties by Feature and Phase UUID
+//	@Description	Get bounties of a feature by its UUID and phase UUID
+//	@Tags			Feature - Phases
+//	@Accept			json
+//	@Produce		json
+//	@Security		PubKeyContextAuth
+//	@Success		200	{array}	db.BountyResponse
+//	@Router			/features/{feature_uuid}/phase/{phase_uuid}/bounty [get]
 func (oh *featureHandler) GetBountiesByFeatureAndPhaseUuid(w http.ResponseWriter, r *http.Request) {
 	featureUuid := chi.URLParam(r, "feature_uuid")
 	phaseUuid := chi.URLParam(r, "phase_uuid")
@@ -643,13 +688,16 @@ func (oh *featureHandler) GetBountiesByFeatureAndPhaseUuid(w http.ResponseWriter
 	json.NewEncoder(w).Encode(bountyResponses)
 }
 
-// @Summary		Get Bounties Count by Feature and Phase UUID
-// @Description	Get the count of bounties of a feature by its UUID and phase UUID
-// @Tags			Feature - Phases
-// @Accept			json
-// @Produce		json
-// @Success		200	{int}	int
-// @Router			/features/{feature_uuid}/phase/{phase_uuid}/bounty/count [get]
+// GetBountiesCountByFeatureAndPhaseUuid godoc
+//
+//	@Summary		Get Bounties Count by Feature and Phase UUID
+//	@Description	Get the count of bounties of a feature by its UUID and phase UUID
+//	@Tags			Feature - Phases
+//	@Accept			json
+//	@Produce		json
+//	@Security		PubKeyContextAuth
+//	@Success		200	{int}	int
+//	@Router			/features/{feature_uuid}/phase/{phase_uuid}/bounty/count [get]
 func (oh *featureHandler) GetBountiesCountByFeatureAndPhaseUuid(w http.ResponseWriter, r *http.Request) {
 	featureUuid := chi.URLParam(r, "feature_uuid")
 	phaseUuid := chi.URLParam(r, "phase_uuid")
@@ -668,13 +716,15 @@ func (oh *featureHandler) GetBountiesCountByFeatureAndPhaseUuid(w http.ResponseW
 	json.NewEncoder(w).Encode(bountiesCount)
 }
 
-// @Summary		Get Feature Stories
-// @Description	Get stories for a feature
-// @Tags			Feature - Stories
-// @Accept			json
-// @Produce		json
-// @Success		200	{object}	db.FeatureStoriesReponse
-// @Router			/features/stories [post]
+// GetFeatureStories godoc
+//
+//	@Summary		Get Feature Stories
+//	@Description	Get stories for a feature
+//	@Tags			Feature - Stories
+//	@Accept			json
+//	@Produce		json
+//	@Success		200	{object}	db.FeatureStoriesReponse
+//	@Router			/features/stories [post]
 func (oh *featureHandler) GetFeatureStories(w http.ResponseWriter, r *http.Request) {
 	featureStories := db.FeatureStoriesReponse{}
 
@@ -739,13 +789,16 @@ func (oh *featureHandler) GetFeatureStories(w http.ResponseWriter, r *http.Reque
 	json.NewEncoder(w).Encode("User stories added successfully")
 }
 
-// @Summary		Send Stories
-// @Description	Send stories of a feature
-// @Tags			Feature - Stories
-// @Accept			json
-// @Produce		json
-// @Success		200	{string}	string	"Successfully sent"
-// @Router			/features/stories/send [post]
+// SendStories godoc
+//
+//	@Summary		Send Stories
+//	@Description	Send stories of a feature
+//	@Tags			Feature - Stories
+//	@Accept			json
+//	@Produce		json
+//	@Security		PubKeyContextAuth
+//	@Success		200	{string}	string	"Successfully sent"
+//	@Router			/features/stories/send [post]
 func (oh *featureHandler) StoriesSend(w http.ResponseWriter, r *http.Request) {
 
 	ctx := r.Context()
@@ -826,13 +879,16 @@ func (oh *featureHandler) StoriesSend(w http.ResponseWriter, r *http.Request) {
 	w.Write(respBody)
 }
 
-// @Summary		Send Feature Brief
-// @Description	Send the brief of a feature
-// @Tags			Features
-// @Accept			json
-// @Produce		json
-// @Success		200	{string}	string	"Successfully sent"
-// @Router			/features/brief/send [post]
+// BriefSend godoc
+//
+//	@Summary		Send Feature Brief
+//	@Description	Send the brief of a feature
+//	@Tags			Features
+//	@Accept			json
+//	@Produce		json
+//	@Security		PubKeyContextAuth
+//	@Success		200	{string}	string	"Successfully sent"
+//	@Router			/features/brief/send [post]
 func (oh *featureHandler) BriefSend(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 	pubKeyFromAuth, _ := ctx.Value(auth.ContextKey).(string)
@@ -933,13 +989,16 @@ func (oh *featureHandler) BriefSend(w http.ResponseWriter, r *http.Request) {
 	w.Write(respBody)
 }
 
-// @Summary		Update Feature Status
-// @Description	Update the status of a feature
-// @Tags			Features
-// @Accept			json
-// @Produce		json
-// @Success		200	{object}	db.WorkspaceFeatures
-// @Router			/features/{uuid}/status [put]
+// UpdateFeatureStatus godoc
+//
+//	@Summary		Update Feature Status
+//	@Description	Update the status of a feature
+//	@Tags			Features
+//	@Accept			json
+//	@Produce		json
+//	@Security		PubKeyContextAuth
+//	@Success		200	{object}	db.WorkspaceFeatures
+//	@Router			/features/{uuid}/status [put]
 func (oh *featureHandler) UpdateFeatureStatus(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 	pubKeyFromAuth, _ := ctx.Value(auth.ContextKey).(string)
@@ -1006,13 +1065,16 @@ func (oh *featureHandler) UpdateFeatureStatus(w http.ResponseWriter, r *http.Req
 	json.NewEncoder(w).Encode(updatedFeature)
 }
 
-// @Summary		Get Quick Bounties
-// @Description	Get quick bounties of a feature by its UUID
-// @Tags			Features
-// @Accept			json
-// @Produce		json
-// @Success		200	{object}	db.QuickBountiesResponse
-// @Router			/features/{feature_uuid}/quick-bounties [get]
+// GetQuickBounties godoc
+//
+//	@Summary		Get Quick Bounties
+//	@Description	Get quick bounties of a feature by its UUID
+//	@Tags			Features
+//	@Accept			json
+//	@Produce		json
+//	@Security		PubKeyContextAuth
+//	@Success		200	{object}	db.QuickBountiesResponse
+//	@Router			/features/{feature_uuid}/quick-bounties [get]
 func (oh *featureHandler) GetQuickBounties(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 	pubKeyFromAuth, _ := ctx.Value(auth.ContextKey).(string)
@@ -1089,13 +1151,16 @@ func (oh *featureHandler) GetQuickBounties(w http.ResponseWriter, r *http.Reques
 	json.NewEncoder(w).Encode(response)
 }
 
-// @Summary		Get Quick Tickets
-// @Description	Get quick tickets of a feature by its UUID
-// @Tags			Features
-// @Accept			json
-// @Produce		json
-// @Success		200	{object}	db.QuickTicketsResponse
-// @Router			/features/{feature_uuid}/quick-tickets [get]
+// GetQuickTickets godoc
+//
+//	@Summary		Get Quick Tickets
+//	@Description	Get quick tickets of a feature by its UUID
+//	@Tags			Features
+//	@Accept			json
+//	@Produce		json
+//	@Security		PubKeyContextAuth
+//	@Success		200	{object}	db.QuickTicketsResponse
+//	@Router			/features/{feature_uuid}/quick-tickets [get]
 func (oh *featureHandler) GetQuickTickets(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 	pubKeyFromAuth, _ := ctx.Value(auth.ContextKey).(string)

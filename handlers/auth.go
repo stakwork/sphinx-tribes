@@ -34,6 +34,19 @@ func NewAuthHandler(db db.Database) *AuthHandler {
 	}
 }
 
+type LnAuthResponse struct {
+	Status  string `json:"status"`
+	Message string `json:"message,omitempty"`
+	JWT     string `json:"jwt,omitempty"`
+}
+
+type RefreshTokenResponse struct {
+	K1     string    `json:"k1,omitempty"`
+	Status bool      `json:"status"`
+	JWT    string    `json:"jwt"`
+	User   db.Person `json:"user"`
+}
+
 type ConnectionCodesListResponse struct {
 	Success bool `json:"success"`
 	Data    struct {
@@ -63,9 +76,13 @@ func GetAdminPubkeys(w http.ResponseWriter, r *http.Request) {
 // GetIsAdmin godoc
 //
 //	@Summary		Check if user is admin
-//	@Description	Check if the user is an admin
+//	@Description	Check if the user is an admin. Requires a valid JWT token in the request context.
 //	@Tags			Auth
-//	@Success		200	{object}	map[string]bool
+//	@Accept			json
+//	@Produce		json
+//	@Security		PubKeyContextAuth
+//	@Success		200	{string}	string	"Returns a success message if the user is an admin"
+//	@Failure		401	{string}	string	"Unauthorized: User is not an admin or missing/invalid JWT token"
 //	@Router			/admin/auth [get]
 func (ah *AuthHandler) GetIsAdmin(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
@@ -82,6 +99,19 @@ func (ah *AuthHandler) GetIsAdmin(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+// CreateConnectionCode godoc
+//
+//	@Summary		Create connection codes
+//	@Description	Create one or more connection codes for a user. Requires a valid pubkey and route hint.
+//	@Tags			Auth
+//	@Accept			json
+//	@Produce		json
+//	@Param			request	body	db.InviteBody	true	"Request body containing pubkey, route hint, sats amount, and number of codes"
+//	@Security		SuperAdminAuth
+//	@Success		200	{string}	string	"Connection codes created successfully"
+//	@Failure		400	{string}	string	"Bad request: Missing or invalid parameters"
+//	@Failure		406	{string}	string	"Not acceptable: Invalid request body"
+//	@Router			/connectioncodes [post]
 func (ah *AuthHandler) CreateConnectionCode(w http.ResponseWriter, r *http.Request) {
 	codeBody := db.InviteBody{}
 	codeArr := []db.ConnectionCodes{}
@@ -181,6 +211,15 @@ func MakeConnectionCodeRequest(inviter_pubkey string, inviter_route_hint string,
 	return inviteReponse.Invite
 }
 
+// GetConnectionCode godoc
+//
+//	@Summary		Get a connection code
+//	@Description	Retrieve a single connection code from the database.
+//	@Tags			Auth
+//	@Accept			json
+//	@Produce		json
+//	@Success		200	{object}	db.ConnectionCodesShort	"Connection code retrieved successfully"
+//	@Router			/connectioncodes [get]
 func (ah *AuthHandler) GetConnectionCode(w http.ResponseWriter, _ *http.Request) {
 	connectionCode := ah.db.GetConnectionCode()
 
@@ -190,11 +229,15 @@ func (ah *AuthHandler) GetConnectionCode(w http.ResponseWriter, _ *http.Request)
 
 // GetLnurlAuth godoc
 //
-//	@Summary		Get LNURL auth
-//	@Description	Get LNURL auth details
+//	@Summary		Generate LNURL-auth data
+//	@Description	Generate a unique LNURL-auth challenge (k1) and encoded LNURL for authentication.
 //	@Tags			Auth
-//	@Success		200	{object}	map[string]string
-//	@Router			/lnauth [get]
+//	@Accept			json
+//	@Produce		json
+//	@Param			socketKey	query		string				true	"Socket connection key to associate with the LNURL-auth challenge"
+//	@Success		200			{object}	auth.LnEncodeData	"LNURL-auth data generated successfully"
+//	@Failure		400			{object}	auth.LnEncodeData	"Bad request: Failed to generate LNURL-auth data"
+//	@Router			/lnurl_auth [get]
 func GetLnurlAuth(w http.ResponseWriter, r *http.Request) {
 	socketKey := r.URL.Query().Get("socketKey")
 	socket, _ := db.Store.GetSocketConnections(socketKey)
@@ -231,9 +274,17 @@ func GetLnurlAuth(w http.ResponseWriter, r *http.Request) {
 // ReceiveLnAuthData godoc
 //
 //	@Summary		Receive LNURL auth data
-//	@Description	Receive LNURL auth data
+//	@Description	Receive LNURL auth data and authenticate the user using LNURL-auth protocol.
 //	@Tags			Auth
-//	@Success		200	{object}	map[string]string
+//	@Accept			json
+//	@Produce		json
+//	@Param			key	query		string			true	"User's public key"
+//	@Param			k1	query		string			true	"Unique challenge string (k1)"
+//	@Param			sig	query		string			true	"Signature of the challenge signed by the user's private key"
+//	@Success		200	{object}	LnAuthResponse	"Authentication successful"
+//	@Failure		400	{object}	LnAuthResponse	"Invalid request or missing parameters"
+//	@Failure		401	{object}	LnAuthResponse	"Unauthorized: Signature verification failed"
+//	@Failure		406	{object}	LnAuthResponse	"Not Acceptable: JWT creation failed"
 //	@Router			/lnauth_login [get]
 func ReceiveLnAuthData(w http.ResponseWriter, r *http.Request) {
 	userKey := r.URL.Query().Get("key")
@@ -248,7 +299,7 @@ func ReceiveLnAuthData(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	responseMsg := make(map[string]string)
+	responseMsg := LnAuthResponse{}
 
 	if userKey != "" {
 		// Save in DB if the user does not exists already
@@ -288,12 +339,12 @@ func ReceiveLnAuthData(w http.ResponseWriter, r *http.Request) {
 			logger.Log.Error("[auth] Socket Error: %v", err)
 		}
 
-		responseMsg["status"] = "OK"
+		responseMsg.Status = "OK"
 		w.WriteHeader(http.StatusOK)
 		json.NewEncoder(w).Encode(responseMsg)
 	}
 
-	responseMsg["status"] = "ERROR"
+	responseMsg.Status = "ERROR"
 	w.WriteHeader(http.StatusBadRequest)
 	json.NewEncoder(w).Encode(responseMsg)
 }
@@ -301,9 +352,14 @@ func ReceiveLnAuthData(w http.ResponseWriter, r *http.Request) {
 // RefreshToken godoc
 //
 //	@Summary		Refresh JWT token
-//	@Description	Refresh the JWT token
+//	@Description	Refresh the JWT token using a valid existing token.
 //	@Tags			Auth
-//	@Success		200	{object}	map[string]string
+//	@Accept			json
+//	@Produce		json
+//	@Param			x-jwt	header		string					true	"Existing JWT token"
+//	@Success		200		{object}	RefreshTokenResponse	"Token refreshed successfully"
+//	@Failure		401		{object}	string					"Unauthorized: Missing or invalid JWT token"
+//	@Failure		406		{object}	string					"Not Acceptable: Failed to create a new JWT token"
 //	@Router			/refresh_jwt [get]
 func (ah *AuthHandler) RefreshToken(w http.ResponseWriter, r *http.Request) {
 	token := r.Header.Get("x-jwt")
@@ -381,6 +437,20 @@ func returnUserMap(p db.Person) map[string]interface{} {
 	return user
 }
 
+// ListConnectionCodes godoc
+//
+//	@Summary		List connection codes
+//	@Description	List all connection codes with pagination support.
+//	@Tags			Auth
+//	@Accept			json
+//	@Produce		json
+//	@Security		SuperAdminAuth
+//	@Param			page	query		int							false	"Page number (default: 1)"
+//	@Param			limit	query		int							false	"Number of items per page (default: 20)"
+//	@Success		200		{object}	ConnectionCodesListResponse	"Connection codes retrieved successfully"
+//	@Failure		400		{object}	ConnectionCodesListResponse	"Bad request: Invalid pagination parameters"
+//	@Failure		500		{object}	ConnectionCodesListResponse	"Internal server error: Failed to retrieve connection codes"
+//	@Router			/connectioncodes/list [get]
 func (ah *AuthHandler) ListConnectionCodes(w http.ResponseWriter, r *http.Request) {
 
 	page := 1

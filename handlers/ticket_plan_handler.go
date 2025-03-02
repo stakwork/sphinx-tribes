@@ -54,11 +54,14 @@ type SendTicketPlanResponse struct {
 	Errors      []string `json:"errors,omitempty"`
 }
 
+// CreateTicketPlan godoc
+//
 //	@Summary		Create Ticket Plan
 //	@Description	Create a new ticket plan
 //	@Tags			Ticket Plans
 //	@Accept			json
 //	@Produce		json
+//	@Security		PubKeyContextAuth
 //	@Param			planRequest	body		CreateTicketPlanRequest	true	"Create Ticket Plan Request"
 //	@Success		201			{object}	TicketPlanResponse
 //	@Router			/bounties/ticket/plan [post]
@@ -160,11 +163,14 @@ func (th *ticketHandler) CreateTicketPlan(w http.ResponseWriter, r *http.Request
 	})
 }
 
+// GetTicketPlan godoc
+//
 //	@Summary		Get Ticket Plan
 //	@Description	Get a ticket plan by its UUID
 //	@Tags			Ticket Plans
 //	@Accept			json
 //	@Produce		json
+//	@Security		PubKeyContextAuth
 //	@Param			uuid	path		string	true	"Ticket Plan UUID"
 //	@Success		200		{object}	db.TicketPlan
 //	@Router			/bounties/ticket/plan/{uuid} [get]
@@ -201,11 +207,14 @@ func (th *ticketHandler) GetTicketPlan(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(plan)
 }
 
+// DeleteTicketPlan godoc
+//
 //	@Summary		Delete Ticket Plan
 //	@Description	Delete a ticket plan by its UUID
 //	@Tags			Ticket Plans
 //	@Accept			json
 //	@Produce		json
+//	@Security		PubKeyContextAuth
 //	@Param			uuid	path		string	true	"Ticket Plan UUID"
 //	@Success		200		{string}	string	"Ticket plan deleted successfully"
 //	@Router			/bounties/ticket/plan/{uuid} [delete]
@@ -242,11 +251,14 @@ func (th *ticketHandler) DeleteTicketPlan(w http.ResponseWriter, r *http.Request
 	json.NewEncoder(w).Encode(map[string]string{"message": "Ticket plan deleted successfully"})
 }
 
+// GetTicketPlansByFeature godoc
+//
 //	@Summary		Get Ticket Plans by Feature
 //	@Description	Get ticket plans by feature UUID
 //	@Tags			Ticket Plans
 //	@Accept			json
 //	@Produce		json
+//	@Security		PubKeyContextAuth
 //	@Param			feature_uuid	path	string	true	"Feature UUID"
 //	@Success		200				{array}	db.TicketPlan
 //	@Router			/bounties/ticket/plan/feature/{feature_uuid} [get]
@@ -279,11 +291,14 @@ func (th *ticketHandler) GetTicketPlansByFeature(w http.ResponseWriter, r *http.
 	json.NewEncoder(w).Encode(plans)
 }
 
+// GetTicketPlansByPhase godoc
+//
 //	@Summary		Get Ticket Plans by Phase
 //	@Description	Get ticket plans by phase UUID
 //	@Tags			Ticket Plans
 //	@Accept			json
 //	@Produce		json
+//	@Security		PubKeyContextAuth
 //	@Param			phase_uuid	path	string	true	"Phase UUID"
 //	@Success		200			{array}	db.TicketPlan
 //	@Router			/bounties/ticket/plan/phase/{phase_uuid} [get]
@@ -316,11 +331,14 @@ func (th *ticketHandler) GetTicketPlansByPhase(w http.ResponseWriter, r *http.Re
 	json.NewEncoder(w).Encode(plans)
 }
 
+// GetTicketPlansByWorkspace godoc
+//
 //	@Summary		Get Ticket Plans by Workspace
 //	@Description	Get ticket plans by workspace UUID
 //	@Tags			Ticket Plans
 //	@Accept			json
 //	@Produce		json
+//	@Security		PubKeyContextAuth
 //	@Param			workspace_uuid	path	string	true	"Workspace UUID"
 //	@Success		200				{array}	db.TicketPlan
 //	@Router			/bounties/ticket/plan/workspace/{workspace_uuid} [get]
@@ -353,11 +371,14 @@ func (th *ticketHandler) GetTicketPlansByWorkspace(w http.ResponseWriter, r *htt
 	json.NewEncoder(w).Encode(plans)
 }
 
+// SendTicketPlanToStakwork godoc
+//
 //	@Summary		Send Ticket Plan to Stakwork
 //	@Description	Send a ticket plan to Stakwork for processing
 //	@Tags			Ticket Plans
 //	@Accept			json
 //	@Produce		json
+//	@Security		PubKeyContextAuth
 //	@Param			planRequest	body		SendTicketPlanRequest	true	"Send Ticket Plan Request"
 //	@Success		200			{object}	SendTicketPlanResponse
 //	@Router			/bounties/ticket/plan/send [post]
@@ -668,6 +689,8 @@ func (th *ticketHandler) SendTicketPlanToStakwork(w http.ResponseWriter, r *http
 	})
 }
 
+// ProcessTicketPlanReview godoc
+//
 //	@Summary		Process Ticket Plan Review
 //	@Description	Process the review of a ticket plan
 //	@Tags			Ticket Plans

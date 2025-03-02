@@ -32,6 +32,9 @@ func NewBotHandler(db db.Database) *botHandler {
 //	@Summary		Create or edit a bot
 //	@Description	Create or edit a bot
 //	@Tags			Bots
+//	@Accept			json
+//	@Produce		json
+//	@Security		PubKeyContextAuth
 //	@Param			bot	body		db.Bot	true	"Bot object"
 //	@Success		200	{object}	db.Bot
 //	@Router			/bots [put]
@@ -152,7 +155,7 @@ func (bt *botHandler) GetBotsByOwner(w http.ResponseWriter, r *http.Request) {
 //	@Tags			Bots
 //	@Param			query	query	string	true	"Search query"
 //	@Success		200		{array}	db.Bot
-//	@Router			/bots/search [get]
+//	@Router			/search/bots/{query} [get]
 func (bt *botHandler) SearchBots(w http.ResponseWriter, r *http.Request) {
 	query := chi.URLParam(r, "query")
 	limitString := r.URL.Query().Get("limit")
@@ -173,6 +176,7 @@ func (bt *botHandler) SearchBots(w http.ResponseWriter, r *http.Request) {
 //	@Summary		Delete a bot
 //	@Description	Delete a bot by UUID
 //	@Tags			Bots
+//	@Security		PubKeyContextAuth
 //	@Param			uuid	path		string	true	"Bot UUID"
 //	@Success		200		{object}	bool
 //	@Router			/bot/{uuid} [delete]
@@ -217,7 +221,7 @@ func (bt *botHandler) DeleteBot(w http.ResponseWriter, r *http.Request) {
 //	@Tags			Bots
 //	@Param			name	query		string	true	"Bot name"
 //	@Success		200		{object}	string
-//	@Router			/bots/unique_name [get]
+//	@Router			/bot/unique_name [get]
 func (h *botHandler) BotUniqueNameFromName(name string) (string, error) {
 	pathOne := strings.ToLower(strings.Join(strings.Fields(name), ""))
 	reg, err := regexp.Compile("[^a-zA-Z0-9]+")

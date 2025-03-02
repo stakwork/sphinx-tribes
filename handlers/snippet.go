@@ -29,14 +29,18 @@ type SnippetRequest struct {
 	Snippet string `json:"snippet"`
 }
 
+// CreateSnippet godoc
+//
 //	@Summary		Create Snippet
 //	@Description	Create a new snippet
 //	@Tags			Snippets
 //	@Accept			json
 //	@Produce		json
-//	@Param			workspace_uuid	query		string			true	"Workspace UUID"
-//	@Param			snippet			body		SnippetRequest	true	"Snippet Request"
-//	@Success		201				{object}	db.TextSnippet
+//	@Param			workspace_uuid	query	string			true	"Workspace UUID"
+//	@Param			snippet			body	SnippetRequest	true	"Snippet Request"
+//
+//	@Security		PubKeyContextAuth
+//	@Success		201	{object}	db.TextSnippet
 //	@Router			/snippet/create [post]
 func (sh *snippetHandler) CreateSnippet(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
@@ -83,13 +87,16 @@ func (sh *snippetHandler) CreateSnippet(w http.ResponseWriter, r *http.Request) 
 	json.NewEncoder(w).Encode(createdSnippet)
 }
 
+// GetSnippetsByWorkspace godoc
+//
 //	@Summary		Get Snippets by Workspace
 //	@Description	Get snippets by workspace UUID
 //	@Tags			Snippets
 //	@Accept			json
 //	@Produce		json
 //	@Param			workspace_uuid	path	string	true	"Workspace UUID"
-//	@Success		200				{array}	db.TextSnippet
+//	@Security		PubKeyContextAuth
+//	@Success		200	{array}	db.TextSnippet
 //	@Router			/snippet/workspace/{workspace_uuid} [get]
 func (sh *snippetHandler) GetSnippetsByWorkspace(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
@@ -118,11 +125,14 @@ func (sh *snippetHandler) GetSnippetsByWorkspace(w http.ResponseWriter, r *http.
 	json.NewEncoder(w).Encode(snippets)
 }
 
+// GetSnippetByID godoc
+//
 //	@Summary		Get Snippet by ID
 //	@Description	Get a snippet by its ID
 //	@Tags			Snippets
 //	@Accept			json
 //	@Produce		json
+//	@Security		PubKeyContextAuth
 //	@Param			id	path		uint	true	"Snippet ID"
 //	@Success		200	{object}	db.TextSnippet
 //	@Router			/snippet/{id} [get]
@@ -158,14 +168,17 @@ func (sh *snippetHandler) GetSnippetByID(w http.ResponseWriter, r *http.Request)
 	json.NewEncoder(w).Encode(snippet)
 }
 
+// UpdateSnippet godoc
+//
 //	@Summary		Update Snippet
 //	@Description	Update an existing snippet
 //	@Tags			Snippets
 //	@Accept			json
 //	@Produce		json
-//	@Param			id		path		uint			true	"Snippet ID"
-//	@Param			snippet	body		SnippetRequest	true	"Snippet Request"
-//	@Success		200		{object}	db.TextSnippet
+//	@Param			id		path	uint			true	"Snippet ID"
+//	@Param			snippet	body	SnippetRequest	true	"Snippet Request"
+//	@Security		PubKeyContextAuth
+//	@Success		200	{object}	db.TextSnippet
 //	@Router			/snippet/{id} [put]
 func (sh *snippetHandler) UpdateSnippet(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
@@ -216,6 +229,8 @@ func (sh *snippetHandler) UpdateSnippet(w http.ResponseWriter, r *http.Request) 
 	json.NewEncoder(w).Encode(updatedSnippet)
 }
 
+// DeleteSnippet godoc
+//
 //	@Summary		Delete Snippet
 //	@Description	Delete a snippet by its ID
 //	@Tags			Snippets
@@ -223,6 +238,7 @@ func (sh *snippetHandler) UpdateSnippet(w http.ResponseWriter, r *http.Request) 
 //	@Produce		json
 //	@Param			id	path		uint	true	"Snippet ID"
 //	@Success		200	{string}	string	"Snippet deleted successfully"
+//	@Security		PubKeyContextAuth
 //	@Router			/snippet/{id} [delete]
 func (sh *snippetHandler) DeleteSnippet(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
