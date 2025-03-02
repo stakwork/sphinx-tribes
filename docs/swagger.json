@@ -7356,7 +7356,7 @@
                 }
             }
         },
-        "/workspace/bounties/{uuid}": {
+        "/workspaces/bounties/{uuid}": {
             "get": {
                 "description": "Get bounties of a workspace by its UUID",
                 "consumes": [
@@ -7391,7 +7391,7 @@
                 }
             }
         },
-        "/workspace/bounties/{uuid}/count": {
+        "/workspaces/bounties/{uuid}/count": {
             "get": {
                 "description": "Get the count of bounties in a workspace",
                 "consumes": [
@@ -7423,7 +7423,7 @@
                 }
             }
         },
-        "/workspace/bounty/roles": {
+        "/workspaces/bounty/roles": {
             "get": {
                 "security": [
                     {
@@ -7454,7 +7454,7 @@
                 }
             }
         },
-        "/workspace/budget/history/{uuid}": {
+        "/workspaces/budget/history/{uuid}": {
             "get": {
                 "security": [
                     {
@@ -7494,7 +7494,7 @@
                 }
             }
         },
-        "/workspace/budget/{uuid}": {
+        "/workspaces/budget/{uuid}": {
             "get": {
                 "security": [
                     {
@@ -7531,7 +7531,7 @@
                 }
             }
         },
-        "/workspace/codegraph": {
+        "/workspaces/codegraph": {
             "post": {
                 "security": [
                     {
@@ -7570,7 +7570,7 @@
                 }
             }
         },
-        "/workspace/codegraph/{uuid}": {
+        "/workspaces/codegraph/{uuid}": {
             "get": {
                 "security": [
                     {
@@ -7607,7 +7607,7 @@
                 }
             }
         },
-        "/workspace/count": {
+        "/workspaces/count": {
             "get": {
                 "description": "Get the count of all workspaces",
                 "consumes": [
@@ -7630,7 +7630,7 @@
                 }
             }
         },
-        "/workspace/delete/{uuid}": {
+        "/workspaces/delete/{uuid}": {
             "delete": {
                 "security": [
                     {
@@ -7667,7 +7667,7 @@
                 }
             }
         },
-        "/workspace/foruser/{uuid}": {
+        "/workspaces/foruser/{uuid}": {
             "get": {
                 "security": [
                     {
@@ -7704,7 +7704,7 @@
                 }
             }
         },
-        "/workspace/invoices/count/{uuid}": {
+        "/workspaces/invoices/count/{uuid}": {
             "get": {
                 "security": [
                     {
@@ -7741,7 +7741,7 @@
                 }
             }
         },
-        "/workspace/mission": {
+        "/workspaces/mission": {
             "post": {
                 "security": [
                     {
@@ -7780,7 +7780,7 @@
                 }
             }
         },
-        "/workspace/payments/{uuid}": {
+        "/workspaces/payments/{uuid}": {
             "get": {
                 "security": [
                     {
@@ -7820,7 +7820,7 @@
                 }
             }
         },
-        "/workspace/poll/invoices/{uuid}": {
+        "/workspaces/poll/invoices/{uuid}": {
             "get": {
                 "security": [
                     {
@@ -7857,7 +7857,7 @@
                 }
             }
         },
-        "/workspace/poll/user/invoices": {
+        "/workspaces/poll/user/invoices": {
             "get": {
                 "security": [
                     {
@@ -7885,7 +7885,7 @@
                 }
             }
         },
-        "/workspace/repositories": {
+        "/workspaces/repositories": {
             "post": {
                 "security": [
                     {
@@ -7924,7 +7924,7 @@
                 }
             }
         },
-        "/workspace/repositories/{uuid}": {
+        "/workspaces/repositories/{uuid}": {
             "get": {
                 "description": "Get repositories of a workspace by its UUID",
                 "consumes": [
@@ -7959,7 +7959,7 @@
                 }
             }
         },
-        "/workspace/repository/{uuid}": {
+        "/workspaces/repository/{uuid}": {
             "get": {
                 "security": [
                     {
@@ -8045,7 +8045,7 @@
                 }
             }
         },
-        "/workspace/schematicurl": {
+        "/workspaces/schematicurl": {
             "post": {
                 "security": [
                     {
@@ -8084,7 +8084,7 @@
                 }
             }
         },
-        "/workspace/tactics": {
+        "/workspaces/tactics": {
             "post": {
                 "security": [
                     {
@@ -8123,7 +8123,7 @@
                 }
             }
         },
-        "/workspace/user/dropdown/{userId}": {
+        "/workspaces/user/dropdown/{userId}": {
             "get": {
                 "description": "Get dropdown workspaces of a user by their ID",
                 "consumes": [
@@ -8158,7 +8158,7 @@
                 }
             }
         },
-        "/workspace/user/invoices/count": {
+        "/workspaces/user/invoices/count": {
             "get": {
                 "security": [
                     {
@@ -8186,7 +8186,7 @@
                 }
             }
         },
-        "/workspace/user/{userId}": {
+        "/workspaces/user/{userId}": {
             "get": {
                 "description": "Get workspaces of a user by their ID",
                 "consumes": [
@@ -8221,7 +8221,7 @@
                 }
             }
         },
-        "/workspace/users/role/{uuid}/{user}": {
+        "/workspaces/users/role/{uuid}/{user}": {
             "get": {
                 "security": [
                     {
@@ -8322,7 +8322,7 @@
                 }
             }
         },
-        "/workspace/users/{uuid}": {
+        "/workspaces/users/{uuid}": {
             "get": {
                 "description": "Get users of a workspace by its UUID",
                 "consumes": [
@@ -8438,7 +8438,7 @@
                 }
             }
         },
-        "/workspace/users/{uuid}/count": {
+        "/workspaces/users/{uuid}/count": {
             "get": {
                 "description": "Get the count of users in a workspace",
                 "consumes": [
@@ -8470,7 +8470,7 @@
                 }
             }
         },
-        "/workspace/{uuid}": {
+        "/workspaces/{uuid}": {
             "get": {
                 "description": "Get a workspace by its UUID",
                 "consumes": [
@@ -8502,7 +8502,7 @@
                 }
             }
         },
-        "/workspace/{workspace_uuid}/codegraph": {
+        "/workspaces/{workspace_uuid}/codegraph": {
             "get": {
                 "security": [
                     {
@@ -8542,7 +8542,7 @@
                 }
             }
         },
-        "/workspace/{workspace_uuid}/codegraph/{uuid}": {
+        "/workspaces/{workspace_uuid}/codegraph/{uuid}": {
             "delete": {
                 "security": [
                     {
@@ -8586,7 +8586,7 @@
                 }
             }
         },
-        "/workspace/{workspace_uuid}/features": {
+        "/workspaces/{workspace_uuid}/features": {
             "get": {
                 "security": [
                     {
@@ -8626,7 +8626,7 @@
                 }
             }
         },
-        "/workspace/{workspace_uuid}/lastwithdrawal": {
+        "/workspaces/{workspace_uuid}/lastwithdrawal": {
             "get": {
                 "security": [
                     {
@@ -8663,7 +8663,7 @@
                 }
             }
         },
-        "/workspace/{workspace_uuid}/payments": {
+        "/workspaces/{workspace_uuid}/payments": {
             "put": {
                 "security": [
                     {

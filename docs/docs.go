@@ -7362,7 +7362,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/workspace/bounties/{uuid}": {
+        "/workspaces/bounties/{uuid}": {
             "get": {
                 "description": "Get bounties of a workspace by its UUID",
                 "consumes": [
@@ -7397,7 +7397,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/workspace/bounties/{uuid}/count": {
+        "/workspaces/bounties/{uuid}/count": {
             "get": {
                 "description": "Get the count of bounties in a workspace",
                 "consumes": [
@@ -7429,7 +7429,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/workspace/bounty/roles": {
+        "/workspaces/bounty/roles": {
             "get": {
                 "security": [
                     {
@@ -7460,7 +7460,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/workspace/budget/history/{uuid}": {
+        "/workspaces/budget/history/{uuid}": {
             "get": {
                 "security": [
                     {
@@ -7500,7 +7500,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/workspace/budget/{uuid}": {
+        "/workspaces/budget/{uuid}": {
             "get": {
                 "security": [
                     {
@@ -7537,7 +7537,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/workspace/codegraph": {
+        "/workspaces/codegraph": {
             "post": {
                 "security": [
                     {
@@ -7576,7 +7576,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/workspace/codegraph/{uuid}": {
+        "/workspaces/codegraph/{uuid}": {
             "get": {
                 "security": [
                     {
@@ -7613,7 +7613,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/workspace/count": {
+        "/workspaces/count": {
             "get": {
                 "description": "Get the count of all workspaces",
                 "consumes": [
@@ -7636,7 +7636,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/workspace/delete/{uuid}": {
+        "/workspaces/delete/{uuid}": {
             "delete": {
                 "security": [
                     {
@@ -7673,7 +7673,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/workspace/foruser/{uuid}": {
+        "/workspaces/foruser/{uuid}": {
             "get": {
                 "security": [
                     {
@@ -7710,7 +7710,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/workspace/invoices/count/{uuid}": {
+        "/workspaces/invoices/count/{uuid}": {
             "get": {
                 "security": [
                     {
@@ -7747,7 +7747,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/workspace/mission": {
+        "/workspaces/mission": {
             "post": {
                 "security": [
                     {
@@ -7786,7 +7786,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/workspace/payments/{uuid}": {
+        "/workspaces/payments/{uuid}": {
             "get": {
                 "security": [
                     {
@@ -7826,7 +7826,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/workspace/poll/invoices/{uuid}": {
+        "/workspaces/poll/invoices/{uuid}": {
             "get": {
                 "security": [
                     {
@@ -7863,7 +7863,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/workspace/poll/user/invoices": {
+        "/workspaces/poll/user/invoices": {
             "get": {
                 "security": [
                     {
@@ -7891,7 +7891,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/workspace/repositories": {
+        "/workspaces/repositories": {
             "post": {
                 "security": [
                     {
@@ -7930,7 +7930,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/workspace/repositories/{uuid}": {
+        "/workspaces/repositories/{uuid}": {
             "get": {
                 "description": "Get repositories of a workspace by its UUID",
                 "consumes": [
@@ -7965,7 +7965,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/workspace/repository/{uuid}": {
+        "/workspaces/repository/{uuid}": {
             "get": {
                 "security": [
                     {
@@ -8051,7 +8051,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/workspace/schematicurl": {
+        "/workspaces/schematicurl": {
             "post": {
                 "security": [
                     {
@@ -8090,7 +8090,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/workspace/tactics": {
+        "/workspaces/tactics": {
             "post": {
                 "security": [
                     {
@@ -8129,7 +8129,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/workspace/user/dropdown/{userId}": {
+        "/workspaces/user/dropdown/{userId}": {
             "get": {
                 "description": "Get dropdown workspaces of a user by their ID",
                 "consumes": [
@@ -8164,7 +8164,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/workspace/user/invoices/count": {
+        "/workspaces/user/invoices/count": {
             "get": {
                 "security": [
                     {
@@ -8192,7 +8192,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/workspace/user/{userId}": {
+        "/workspaces/user/{userId}": {
             "get": {
                 "description": "Get workspaces of a user by their ID",
                 "consumes": [
@@ -8227,7 +8227,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/workspace/users/role/{uuid}/{user}": {
+        "/workspaces/users/role/{uuid}/{user}": {
             "get": {
                 "security": [
                     {
@@ -8328,7 +8328,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/workspace/users/{uuid}": {
+        "/workspaces/users/{uuid}": {
             "get": {
                 "description": "Get users of a workspace by its UUID",
                 "consumes": [
@@ -8444,7 +8444,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/workspace/users/{uuid}/count": {
+        "/workspaces/users/{uuid}/count": {
             "get": {
                 "description": "Get the count of users in a workspace",
                 "consumes": [
@@ -8476,7 +8476,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/workspace/{uuid}": {
+        "/workspaces/{uuid}": {
             "get": {
                 "description": "Get a workspace by its UUID",
                 "consumes": [
@@ -8508,7 +8508,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/workspace/{workspace_uuid}/codegraph": {
+        "/workspaces/{workspace_uuid}/codegraph": {
             "get": {
                 "security": [
                     {
@@ -8548,7 +8548,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/workspace/{workspace_uuid}/codegraph/{uuid}": {
+        "/workspaces/{workspace_uuid}/codegraph/{uuid}": {
             "delete": {
                 "security": [
                     {
@@ -8592,7 +8592,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/workspace/{workspace_uuid}/features": {
+        "/workspaces/{workspace_uuid}/features": {
             "get": {
                 "security": [
                     {
@@ -8632,7 +8632,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/workspace/{workspace_uuid}/lastwithdrawal": {
+        "/workspaces/{workspace_uuid}/lastwithdrawal": {
             "get": {
                 "security": [
                     {
@@ -8669,7 +8669,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/workspace/{workspace_uuid}/payments": {
+        "/workspaces/{workspace_uuid}/payments": {
             "put": {
                 "security": [
                     {

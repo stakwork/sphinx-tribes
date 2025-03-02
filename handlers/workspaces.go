@@ -184,7 +184,7 @@ func GetWorkspaces(w http.ResponseWriter, r *http.Request) {
 //	@Accept			json
 //	@Produce		json
 //	@Success		200	{int}	int
-//	@Router			/workspace/count [get]
+//	@Router			/workspaces/count [get]
 func GetWorkspacesCount(w http.ResponseWriter, r *http.Request) {
 	count := db.DB.GetWorkspacesCount()
 
@@ -201,7 +201,7 @@ func GetWorkspacesCount(w http.ResponseWriter, r *http.Request) {
 //	@Produce		json
 //	@Param			uuid	path		string	true	"Workspace UUID"
 //	@Success		200		{object}	db.Workspace
-//	@Router			/workspace/{uuid} [get]
+//	@Router			/workspaces/{uuid} [get]
 func GetWorkspaceByUuid(w http.ResponseWriter, r *http.Request) {
 	uuid := chi.URLParam(r, "uuid")
 	workspace := db.DB.GetWorkspaceByUuid(uuid)
@@ -220,7 +220,7 @@ func GetWorkspaceByUuid(w http.ResponseWriter, r *http.Request) {
 //	@Security		PubKeyContextAuth
 //	@Param			workspaceUser	body		db.WorkspaceUsers	true	"Workspace User"
 //	@Success		200				{object}	db.WorkspaceUsers
-//	@Router			/workspace/users/{uuid} [post]
+//	@Router			/workspaces/users/{uuid} [post]
 func (oh *workspaceHandler) CreateWorkspaceUser(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 	pubKeyFromAuth, _ := ctx.Value(auth.ContextKey).(string)
@@ -314,7 +314,7 @@ func (oh *workspaceHandler) CreateWorkspaceUser(w http.ResponseWriter, r *http.R
 //	@Produce		json
 //	@Param			uuid	path	string	true	"Workspace UUID"
 //	@Success		200		{array}	db.WorkspaceUsers
-//	@Router			/workspace/users/{uuid} [get]
+//	@Router			/workspaces/users/{uuid} [get]
 func GetWorkspaceUsers(w http.ResponseWriter, r *http.Request) {
 	uuid := chi.URLParam(r, "uuid")
 	workspaceUsers, _ := db.DB.GetWorkspaceUsers(uuid)
@@ -333,7 +333,7 @@ func GetWorkspaceUsers(w http.ResponseWriter, r *http.Request) {
 //	@Security		PubKeyContextAuth
 //	@Param			uuid	path		string	true	"Workspace UUID"
 //	@Success		200		{object}	db.WorkspaceUsers
-//	@Router			/workspace/foruser/{uuid} [get]
+//	@Router			/workspaces/foruser/{uuid} [get]
 func GetWorkspaceUser(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 	pubKeyFromAuth, _ := ctx.Value(auth.ContextKey).(string)
@@ -360,7 +360,7 @@ func GetWorkspaceUser(w http.ResponseWriter, r *http.Request) {
 //	@Produce		json
 //	@Param			uuid	path	string	true	"Workspace UUID"
 //	@Success		200		{int}	int
-//	@Router			/workspace/users/{uuid}/count [get]
+//	@Router			/workspaces/users/{uuid}/count [get]
 func GetWorkspaceUsersCount(w http.ResponseWriter, r *http.Request) {
 	uuid := chi.URLParam(r, "uuid")
 	count := db.DB.GetWorkspaceUsersCount(uuid)
@@ -380,7 +380,7 @@ func GetWorkspaceUsersCount(w http.ResponseWriter, r *http.Request) {
 //	@Param			uuid			path		string					true	"Workspace UUID"
 //	@Param			workspaceUser	body		db.WorkspaceUsersData	true	"Workspace User Data"
 //	@Success		200				{object}	db.WorkspaceUsersData
-//	@Router			/workspace/users/{uuid} [delete]
+//	@Router			/workspaces/users/{uuid} [delete]
 func DeleteWorkspaceUser(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 	pubKeyFromAuth, _ := ctx.Value(auth.ContextKey).(string)
@@ -443,7 +443,7 @@ func DeleteWorkspaceUser(w http.ResponseWriter, r *http.Request) {
 //	@Produce		json
 //	@Security		PubKeyContextAuth
 //	@Success		200	{array}	db.BountyRoles
-//	@Router			/workspace/bounty/roles [get]
+//	@Router			/workspaces/bounty/roles [get]
 func GetBountyRoles(w http.ResponseWriter, r *http.Request) {
 	roles := db.DB.GetBountyRoles()
 
@@ -463,7 +463,7 @@ func GetBountyRoles(w http.ResponseWriter, r *http.Request) {
 //	@Param			user	path	string					true	"User PubKey"
 //	@Param			roles	body	db.WorkspaceUserRoles	true	"Workspace User Roles"
 //	@Success		200		{array}	db.WorkspaceUserRoles
-//	@Router			/workspace/users/role/{uuid}/{user} [post]
+//	@Router			/workspaces/users/role/{uuid}/{user} [post]
 func (oh *workspaceHandler) AddUserRoles(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 	pubKeyFromAuth, _ := ctx.Value(auth.ContextKey).(string)
@@ -581,7 +581,7 @@ func (oh *workspaceHandler) AddUserRoles(w http.ResponseWriter, r *http.Request)
 //	@Param			uuid	path	string	true	"Workspace UUID"
 //	@Param			user	path	string	true	"User PubKey"
 //	@Success		200		{array}	db.WorkspaceUserRoles
-//	@Router			/workspace/users/role/{uuid}/{user} [get]
+//	@Router			/workspaces/users/role/{uuid}/{user} [get]
 func (oh *workspaceHandler) GetUserRoles(w http.ResponseWriter, r *http.Request) {
 	uuid := chi.URLParam(r, "uuid")
 	user := chi.URLParam(r, "user")
@@ -601,7 +601,7 @@ func (oh *workspaceHandler) GetUserRoles(w http.ResponseWriter, r *http.Request)
 //	@Produce		json
 //	@Param			userId	path	uint	true	"User ID"
 //	@Success		200		{array}	db.Workspace
-//	@Router			/workspace/user/{userId} [get]
+//	@Router			/workspaces/user/{userId} [get]
 func GetUserWorkspaces(w http.ResponseWriter, r *http.Request) {
 	userIdParam := chi.URLParam(r, "userId")
 	userId, _ := utils.ConvertStringToUint(userIdParam)
@@ -629,7 +629,7 @@ func GetUserWorkspaces(w http.ResponseWriter, r *http.Request) {
 //	@Produce		json
 //	@Param			userId	path	uint	true	"User ID"
 //	@Success		200		{array}	db.Workspace
-//	@Router			/workspace/user/dropdown/{userId} [get]
+//	@Router			/workspaces/user/dropdown/{userId} [get]
 func (oh *workspaceHandler) GetUserDropdownWorkspaces(w http.ResponseWriter, r *http.Request) {
 	userIdParam := chi.URLParam(r, "userId")
 	userId, _ := utils.ConvertStringToUint(userIdParam)
@@ -735,7 +735,7 @@ func (oh *workspaceHandler) GetCreatedWorkspaces(pubkey string) []db.Workspace {
 //	@Produce		json
 //	@Param			uuid	path	string	true	"Workspace UUID"
 //	@Success		200		{array}	db.BountyResponse
-//	@Router			/workspace/bounties/{uuid} [get]
+//	@Router			/workspaces/bounties/{uuid} [get]
 func (oh *workspaceHandler) GetWorkspaceBounties(w http.ResponseWriter, r *http.Request) {
 	uuid := chi.URLParam(r, "uuid")
 
@@ -756,7 +756,7 @@ func (oh *workspaceHandler) GetWorkspaceBounties(w http.ResponseWriter, r *http.
 //	@Produce		json
 //	@Param			uuid	path	string	true	"Workspace UUID"
 //	@Success		200		{int}	int
-//	@Router			/workspace/bounties/{uuid}/count [get]
+//	@Router			/workspaces/bounties/{uuid}/count [get]
 func (oh *workspaceHandler) GetWorkspaceBountiesCount(w http.ResponseWriter, r *http.Request) {
 	uuid := chi.URLParam(r, "uuid")
 
@@ -776,7 +776,7 @@ func (oh *workspaceHandler) GetWorkspaceBountiesCount(w http.ResponseWriter, r *
 //	@Security		PubKeyContextAuth
 //	@Param			uuid	path		string	true	"Workspace UUID"
 //	@Success		200		{object}	db.StatusBudget
-//	@Router			/workspace/budget/{uuid} [get]
+//	@Router			/workspaces/budget/{uuid} [get]
 func (oh *workspaceHandler) GetWorkspaceBudget(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 	pubKeyFromAuth, _ := ctx.Value(auth.ContextKey).(string)
@@ -813,7 +813,7 @@ func (oh *workspaceHandler) GetWorkspaceBudget(w http.ResponseWriter, r *http.Re
 //	@Security		PubKeyContextAuth
 //	@Param			uuid	path	string	true	"Workspace UUID"
 //	@Success		200		{array}	db.BudgetHistoryData
-//	@Router			/workspace/budget/history/{uuid} [get]
+//	@Router			/workspaces/budget/history/{uuid} [get]
 func (oh *workspaceHandler) GetWorkspaceBudgetHistory(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 	pubKeyFromAuth, _ := ctx.Value(auth.ContextKey).(string)
@@ -844,7 +844,7 @@ func (oh *workspaceHandler) GetWorkspaceBudgetHistory(w http.ResponseWriter, r *
 //	@Security		PubKeyContextAuth
 //	@Param			uuid	path	string	true	"Workspace UUID"
 //	@Success		200		{array}	db.PaymentHistoryData
-//	@Router			/workspace/payments/{uuid} [get]
+//	@Router			/workspaces/payments/{uuid} [get]
 func GetPaymentHistory(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 	pubKeyFromAuth, _ := ctx.Value(auth.ContextKey).(string)
@@ -895,7 +895,7 @@ func GetPaymentHistory(w http.ResponseWriter, r *http.Request) {
 //	@Security		PubKeyContextAuth
 //	@Param			workspace_uuid	path		string	true	"Workspace UUID"
 //	@Success		200				{string}	string	"Updated Payments Successfully"
-//	@Router			/workspace/{workspace_uuid}/payments [put]
+//	@Router			/workspaces/{workspace_uuid}/payments [put]
 func UpdateWorkspacePendingPayments(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 	pubKeyFromAuth, _ := ctx.Value(auth.ContextKey).(string)
@@ -960,7 +960,7 @@ func UpdateWorkspacePendingPayments(w http.ResponseWriter, r *http.Request) {
 //	@Security		PubKeyContextAuth
 //	@Param			uuid	path		string	true	"Workspace UUID"
 //	@Success		200		{string}	string	"Polled invoices"
-//	@Router			/workspace/poll/invoices/{uuid} [get]
+//	@Router			/workspaces/poll/invoices/{uuid} [get]
 func (oh *workspaceHandler) PollBudgetInvoices(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 	pubKeyFromAuth, _ := ctx.Value(auth.ContextKey).(string)
@@ -1010,7 +1010,7 @@ func (oh *workspaceHandler) PollBudgetInvoices(w http.ResponseWriter, r *http.Re
 //	@Produce		json
 //	@Security		PubKeyContextAuth
 //	@Success		200	{string}	string	"Polled user workspace invoices"
-//	@Router			/workspace/poll/user/invoices [get]
+//	@Router			/workspaces/poll/user/invoices [get]
 func (oh *workspaceHandler) PollUserWorkspacesBudget(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 	pubKeyFromAuth, _ := ctx.Value(auth.ContextKey).(string)
@@ -1067,7 +1067,7 @@ func (oh *workspaceHandler) PollUserWorkspacesBudget(w http.ResponseWriter, r *h
 //	@Security		PubKeyContextAuth
 //	@Param			uuid	path	string	true	"Workspace UUID"
 //	@Success		200		{int}	int
-//	@Router			/workspace/invoices/count/{uuid} [get]
+//	@Router			/workspaces/invoices/count/{uuid} [get]
 func GetInvoicesCount(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 	pubKeyFromAuth, _ := ctx.Value(auth.ContextKey).(string)
@@ -1093,7 +1093,7 @@ func GetInvoicesCount(w http.ResponseWriter, r *http.Request) {
 //	@Produce		json
 //	@Security		PubKeyContextAuth
 //	@Success		200	{int}	int
-//	@Router			/workspace/user/invoices/count [get]
+//	@Router			/workspaces/user/invoices/count [get]
 func GetAllUserInvoicesCount(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 	pubKeyFromAuth, _ := ctx.Value(auth.ContextKey).(string)
@@ -1124,7 +1124,7 @@ func GetAllUserInvoicesCount(w http.ResponseWriter, r *http.Request) {
 //	@Param			uuid	path	string	true	"Workspace UUID"
 //	@Security		PubKeyContextAuth
 //	@Success		200	{object}	db.Workspace
-//	@Router			/workspace/delete/{uuid} [delete]
+//	@Router			/workspaces/delete/{uuid} [delete]
 func (oh *workspaceHandler) DeleteWorkspace(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 	pubKeyFromAuth, _ := ctx.Value(auth.ContextKey).(string)
@@ -1168,9 +1168,9 @@ func (oh *workspaceHandler) DeleteWorkspace(w http.ResponseWriter, r *http.Reque
 //	@Security		PubKeyContextAuth
 //	@Param			workspace	body		db.Workspace	true	"Workspace"
 //	@Success		200			{object}	db.Workspace
-//	@Router			/workspace/mission [post]
-//	@Router			/workspace/tactics [post]
-//	@Router			/workspace/schematicurl [post]
+//	@Router			/workspaces/mission [post]
+//	@Router			/workspaces/tactics [post]
+//	@Router			/workspaces/schematicurl [post]
 func (oh *workspaceHandler) UpdateWorkspace(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 	pubKeyFromAuth, _ := ctx.Value(auth.ContextKey).(string)
@@ -1232,7 +1232,7 @@ func (oh *workspaceHandler) UpdateWorkspace(w http.ResponseWriter, r *http.Reque
 //	@Security		PubKeyContextAuth
 //	@Param			workspaceRepo	body		db.WorkspaceRepositories	true	"Workspace Repository"
 //	@Success		200				{object}	db.WorkspaceRepositories
-//	@Router			/workspace/repositories [post]
+//	@Router			/workspaces/repositories [post]
 func (oh *workspaceHandler) CreateOrEditWorkspaceRepository(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 	pubKeyFromAuth, _ := ctx.Value(auth.ContextKey).(string)
@@ -1302,7 +1302,7 @@ func (oh *workspaceHandler) CreateOrEditWorkspaceRepository(w http.ResponseWrite
 //	@Produce		json
 //	@Param			uuid	path	string	true	"Workspace UUID"
 //	@Success		200		{array}	db.WorkspaceRepositories
-//	@Router			/workspace/repositories/{uuid} [get]
+//	@Router			/workspaces/repositories/{uuid} [get]
 func (oh *workspaceHandler) GetWorkspaceRepositorByWorkspaceUuid(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 	pubKeyFromAuth, _ := ctx.Value(auth.ContextKey).(string)
@@ -1330,7 +1330,7 @@ func (oh *workspaceHandler) GetWorkspaceRepositorByWorkspaceUuid(w http.Response
 //	@Param			workspace_uuid	path		string	true	"Workspace UUID"
 //	@Param			uuid			path		string	true	"Repository UUID"
 //	@Success		200				{object}	db.WorkspaceRepositories
-//	@Router			/workspace/repository/{uuid} [get]
+//	@Router			/workspaces/repository/{uuid} [get]
 func (oh *workspaceHandler) GetWorkspaceRepoByWorkspaceUuidAndRepoUuid(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 	pubKeyFromAuth, _ := ctx.Value(auth.ContextKey).(string)
@@ -1366,7 +1366,7 @@ func (oh *workspaceHandler) GetWorkspaceRepoByWorkspaceUuidAndRepoUuid(w http.Re
 //	@Param			workspace_uuid	path		string	true	"Workspace UUID"
 //	@Param			uuid			path		string	true	"Repository UUID"
 //	@Success		200				{string}	string	"Repository deleted successfully"
-//	@Router			/workspace/repository/{uuid} [delete]
+//	@Router			/workspaces/repository/{uuid} [delete]
 func (oh *workspaceHandler) DeleteWorkspaceRepository(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 	pubKeyFromAuth, _ := ctx.Value(auth.ContextKey).(string)
@@ -1402,7 +1402,7 @@ func isValidUUID(uuid string) bool {
 //	@Security		PubKeyContextAuth
 //	@Param			workspace_uuid	path	string	true	"Workspace UUID"
 //	@Success		200				{array}	db.WorkspaceFeatures
-//	@Router			/workspace/{workspace_uuid}/features [get]
+//	@Router			/workspaces/{workspace_uuid}/features [get]
 func (oh *workspaceHandler) GetFeaturesByWorkspaceUuid(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 	pubKeyFromAuth, _ := ctx.Value(auth.ContextKey).(string)
@@ -1461,7 +1461,7 @@ func (oh *workspaceHandler) GetFeaturesByWorkspaceUuid(w http.ResponseWriter, r 
 //	@Security		PubKeyContextAuth
 //	@Param			workspace_uuid	path	string	true	"Workspace UUID"
 //	@Success		200				{int}	int		"Hours since last withdrawal"
-//	@Router			/workspace/{workspace_uuid}/lastwithdrawal [get]
+//	@Router			/workspaces/{workspace_uuid}/lastwithdrawal [get]
 func (oh *workspaceHandler) GetLastWithdrawal(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 	pubKeyFromAuth, _ := ctx.Value(auth.ContextKey).(string)
@@ -1544,7 +1544,7 @@ func GetAllUserWorkspaces(pubkey string) []db.Workspace {
 //	@Security		PubKeyContextAuth
 //	@Param			codeGraph	body		db.WorkspaceCodeGraph	true	"Workspace Code Graph"
 //	@Success		200			{object}	db.WorkspaceCodeGraph
-//	@Router			/workspace/codegraph [post]
+//	@Router			/workspaces/codegraph [post]
 func (oh *workspaceHandler) CreateOrEditWorkspaceCodeGraph(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 	pubKeyFromAuth, _ := ctx.Value(auth.ContextKey).(string)
@@ -1606,7 +1606,7 @@ func (oh *workspaceHandler) CreateOrEditWorkspaceCodeGraph(w http.ResponseWriter
 //	@Security		PubKeyContextAuth
 //	@Param			uuid	path		string	true	"Code Graph UUID"
 //	@Success		200		{object}	db.WorkspaceCodeGraph
-//	@Router			/workspace/codegraph/{uuid} [get]
+//	@Router			/workspaces/codegraph/{uuid} [get]
 func (oh *workspaceHandler) GetWorkspaceCodeGraphByUUID(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 	pubKeyFromAuth, _ := ctx.Value(auth.ContextKey).(string)
@@ -1640,7 +1640,7 @@ func (oh *workspaceHandler) GetWorkspaceCodeGraphByUUID(w http.ResponseWriter, r
 //	@Security		PubKeyContextAuth
 //	@Param			workspace_uuid	path	string	true	"Workspace UUID"
 //	@Success		200				{array}	db.WorkspaceCodeGraph
-//	@Router			/workspace/{workspace_uuid}/codegraph [get]
+//	@Router			/workspaces/{workspace_uuid}/codegraph [get]
 func (oh *workspaceHandler) GetCodeGraphByWorkspaceUuid(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 	pubKeyFromAuth, _ := ctx.Value(auth.ContextKey).(string)
@@ -1673,7 +1673,7 @@ func (oh *workspaceHandler) GetCodeGraphByWorkspaceUuid(w http.ResponseWriter, r
 //	@Param			workspace_uuid	path		string	true	"Workspace UUID"
 //	@Param			uuid			path		string	true	"Code Graph UUID"
 //	@Success		200				{string}	string	"Code graph deleted successfully"
-//	@Router			/workspace/{workspace_uuid}/codegraph/{uuid} [delete]
+//	@Router			/workspaces/{workspace_uuid}/codegraph/{uuid} [delete]
 func (oh *workspaceHandler) DeleteWorkspaceCodeGraph(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 	pubKeyFromAuth, _ := ctx.Value(auth.ContextKey).(string)

@@ -7083,7 +7083,7 @@ paths:
       summary: Create or Edit Workspace
       tags:
       - Workspaces
-  /workspace/{uuid}:
+  /workspaces/{uuid}:
     get:
       consumes:
       - application/json
@@ -7104,7 +7104,7 @@ paths:
       summary: Get Workspace by UUID
       tags:
       - Workspaces
-  /workspace/{workspace_uuid}/codegraph:
+  /workspaces/{workspace_uuid}/codegraph:
     get:
       consumes:
       - application/json
@@ -7129,7 +7129,7 @@ paths:
       summary: Get Code Graph by Workspace UUID
       tags:
       - Workspace -  Code Graph
-  /workspace/{workspace_uuid}/codegraph/{uuid}:
+  /workspaces/{workspace_uuid}/codegraph/{uuid}:
     delete:
       consumes:
       - application/json
@@ -7157,7 +7157,7 @@ paths:
       summary: Delete Workspace Code Graph
       tags:
       - Workspace -  Code Graph
-  /workspace/{workspace_uuid}/features:
+  /workspaces/{workspace_uuid}/features:
     get:
       consumes:
       - application/json
@@ -7182,7 +7182,7 @@ paths:
       summary: Get Features by Workspace UUID
       tags:
       - Workspaces
-  /workspace/{workspace_uuid}/lastwithdrawal:
+  /workspaces/{workspace_uuid}/lastwithdrawal:
     get:
       consumes:
       - application/json
@@ -7205,7 +7205,7 @@ paths:
       summary: Get Last Withdrawal
       tags:
       - Workspace -  Payments
-  /workspace/{workspace_uuid}/payments:
+  /workspaces/{workspace_uuid}/payments:
     put:
       consumes:
       - application/json
@@ -7228,7 +7228,7 @@ paths:
       summary: Update Workspace Pending Payments
       tags:
       - Workspace -  Payments
-  /workspace/bounties/{uuid}:
+  /workspaces/bounties/{uuid}:
     get:
       consumes:
       - application/json
@@ -7251,7 +7251,7 @@ paths:
       summary: Get Workspace Bounties
       tags:
       - Workspace -  Bounties
-  /workspace/bounties/{uuid}/count:
+  /workspaces/bounties/{uuid}/count:
     get:
       consumes:
       - application/json
@@ -7272,7 +7272,7 @@ paths:
       summary: Get Workspace Bounties Count
       tags:
       - Workspace -  Bounties
-  /workspace/bounty/roles:
+  /workspaces/bounty/roles:
     get:
       consumes:
       - application/json
@@ -7291,7 +7291,7 @@ paths:
       summary: Get Bounty Roles
       tags:
       - Workspace -  Bounties
-  /workspace/budget/{uuid}:
+  /workspaces/budget/{uuid}:
     get:
       consumes:
       - application/json
@@ -7314,7 +7314,7 @@ paths:
       summary: Get Workspace Budget
       tags:
       - Workspace -  Payments
-  /workspace/budget/history/{uuid}:
+  /workspaces/budget/history/{uuid}:
     get:
       consumes:
       - application/json
@@ -7339,7 +7339,7 @@ paths:
       summary: Get Workspace Budget History
       tags:
       - Workspace -  Payments
-  /workspace/codegraph:
+  /workspaces/codegraph:
     post:
       consumes:
       - application/json
@@ -7363,7 +7363,7 @@ paths:
       summary: Create or Edit Workspace Code Graph
       tags:
       - Workspace -  Code Graph
-  /workspace/codegraph/{uuid}:
+  /workspaces/codegraph/{uuid}:
     get:
       consumes:
       - application/json
@@ -7386,7 +7386,7 @@ paths:
       summary: Get Workspace Code Graph by UUID
       tags:
       - Workspace -  Code Graph
-  /workspace/count:
+  /workspaces/count:
     get:
       consumes:
       - application/json
@@ -7401,7 +7401,7 @@ paths:
       summary: Get Workspaces Count
       tags:
       - Workspaces
-  /workspace/delete/{uuid}:
+  /workspaces/delete/{uuid}:
     delete:
       consumes:
       - application/json
@@ -7424,7 +7424,7 @@ paths:
       summary: Delete Workspace
       tags:
       - Workspaces
-  /workspace/foruser/{uuid}:
+  /workspaces/foruser/{uuid}:
     get:
       consumes:
       - application/json
@@ -7447,7 +7447,7 @@ paths:
       summary: Get Workspace User
       tags:
       - Workspace -  Users
-  /workspace/invoices/count/{uuid}:
+  /workspaces/invoices/count/{uuid}:
     get:
       consumes:
       - application/json
@@ -7470,7 +7470,7 @@ paths:
       summary: Get Invoices Count
       tags:
       - Workspace -  Payments
-  /workspace/mission:
+  /workspaces/mission:
     post:
       consumes:
       - application/json
@@ -7494,7 +7494,7 @@ paths:
       summary: Update Workspace
       tags:
       - Workspaces
-  /workspace/payments/{uuid}:
+  /workspaces/payments/{uuid}:
     get:
       consumes:
       - application/json
@@ -7519,7 +7519,7 @@ paths:
       summary: Get Payment History
       tags:
       - Workspace -  Payments
-  /workspace/poll/invoices/{uuid}:
+  /workspaces/poll/invoices/{uuid}:
     get:
       consumes:
       - application/json
@@ -7542,7 +7542,7 @@ paths:
       summary: Poll Budget Invoices
       tags:
       - Workspace -  Payments
-  /workspace/poll/user/invoices:
+  /workspaces/poll/user/invoices:
     get:
       consumes:
       - application/json
@@ -7559,7 +7559,7 @@ paths:
       summary: Poll User Workspaces Budget
       tags:
       - Workspace -  Payments
-  /workspace/repositories:
+  /workspaces/repositories:
     post:
       consumes:
       - application/json
@@ -7583,7 +7583,7 @@ paths:
       summary: Create or Edit Workspace Repository
       tags:
       - Workspace -  Repositories
-  /workspace/repositories/{uuid}:
+  /workspaces/repositories/{uuid}:
     get:
       consumes:
       - application/json
@@ -7606,7 +7606,7 @@ paths:
       summary: Get Workspace Repositories
       tags:
       - Workspace -  Repositories
-  /workspace/repository/{uuid}:
+  /workspaces/repository/{uuid}:
     delete:
       consumes:
       - application/json
@@ -7661,7 +7661,7 @@ paths:
       summary: Get Workspace Repository by UUID
       tags:
       - Workspace -  Repositories
-  /workspace/schematicurl:
+  /workspaces/schematicurl:
     post:
       consumes:
       - application/json
@@ -7685,7 +7685,7 @@ paths:
       summary: Update Workspace
       tags:
       - Workspaces
-  /workspace/tactics:
+  /workspaces/tactics:
     post:
       consumes:
       - application/json
@@ -7709,7 +7709,7 @@ paths:
       summary: Update Workspace
       tags:
       - Workspaces
-  /workspace/user/{userId}:
+  /workspaces/user/{userId}:
     get:
       consumes:
       - application/json
@@ -7732,7 +7732,7 @@ paths:
       summary: Get User Workspaces
       tags:
       - Workspace -  Users
-  /workspace/user/dropdown/{userId}:
+  /workspaces/user/dropdown/{userId}:
     get:
       consumes:
       - application/json
@@ -7755,7 +7755,7 @@ paths:
       summary: Get User Dropdown Workspaces
       tags:
       - Workspace -  Users
-  /workspace/user/invoices/count:
+  /workspaces/user/invoices/count:
     get:
       consumes:
       - application/json
@@ -7772,7 +7772,7 @@ paths:
       summary: Get All User Invoices Count
       tags:
       - Workspace -  Payments
-  /workspace/users/{uuid}:
+  /workspaces/users/{uuid}:
     delete:
       consumes:
       - application/json
@@ -7846,7 +7846,7 @@ paths:
       summary: Create Workspace User
       tags:
       - Workspace -  Users
-  /workspace/users/{uuid}/count:
+  /workspaces/users/{uuid}/count:
     get:
       consumes:
       - application/json
@@ -7867,7 +7867,7 @@ paths:
       summary: Get Workspace Users Count
       tags:
       - Workspace -  Users
-  /workspace/users/role/{uuid}/{user}:
+  /workspaces/users/role/{uuid}/{user}:
     get:
       consumes:
       - application/json
