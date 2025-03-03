@@ -34,6 +34,7 @@ type TicketMessage struct {
 	Action          string         `json:"action"`
 	TicketDetails   TicketData     `json:"ticketDetails"`
 	ChatMessage     db.ChatMessage `json:"chatMessage"`
+	Artifacts       []db.Artifact  `json:"artifacts"`
 }
 
 type TicketData struct {

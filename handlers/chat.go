@@ -34,9 +34,10 @@ type ChatHandler struct {
 }
 
 type ChatResponse struct {
-	Success bool        `json:"success"`
-	Message string      `json:"message"`
-	Data    interface{} `json:"data,omitempty"`
+	Success    bool            `json:"success"`
+	Message    string          `json:"message"`
+	Data       interface{}     `json:"data,omitempty"`
+	Artifacts  []db.Artifact   `json:"artifacts,omitempty"`
 }
 
 type HistoryChatResponse struct {
@@ -84,6 +85,22 @@ type SendMessageRequest struct {
 
 type BuildMessageRequest struct {
 	Question string `json:"question"`
+}
+
+type ChatResponseRequest struct {
+	Value struct {
+		ChatID            string                `json:"chatId"`
+		MessageID         string                `json:"messageId"`
+		Response          string                `json:"response"`
+		SourceWebsocketID string                `json:"sourceWebsocketId"`
+		Artifacts         []ChatMessageArtifact `json:"artifacts,omitempty"`
+	} `json:"value"`
+}
+
+type ChatMessageArtifact struct {
+	ID      string          `json:"id"`
+	Type    db.ArtifactType `json:"type"`
+	Content interface{}     `json:"content"`
 }
 
 func NewChatHandler(httpClient *http.Client, database db.Database) *ChatHandler {
@@ -525,15 +542,8 @@ func (ch *ChatHandler) GetChatHistory(w http.ResponseWriter, r *http.Request) {
 }
 
 func (ch *ChatHandler) ProcessChatResponse(w http.ResponseWriter, r *http.Request) {
-	var request struct {
-		Value struct {
-			ChatID            string `json:"chatId"`
-			MessageID         string `json:"messageId"`
-			Response          string `json:"response"`
-			SourceWebsocketID string `json:"sourceWebsocketId"`
-		} `json:"value"`
-	}
-
+	var request ChatResponseRequest
+	
 	if err := json.NewDecoder(r.Body).Decode(&request); err != nil {
 		w.WriteHeader(http.StatusBadRequest)
 		json.NewEncoder(w).Encode(ChatResponse{
@@ -542,24 +552,20 @@ func (ch *ChatHandler) ProcessChatResponse(w http.ResponseWriter, r *http.Reques
 		})
 		return
 	}
-
-	chatID := request.Value.ChatID
-	response := request.Value.Response
-	sourceWebsocketID := request.Value.SourceWebsocketID
-
-	if chatID == "" {
-		w.WriteHeader(http.StatusBadRequest)
-		json.NewEncoder(w).Encode(ChatResponse{
-			Success: false,
-			Message: "ChatID is required for message creation",
-		})
-		return
-	}
+	
+	if request.Value.ChatID == "" {
+        w.WriteHeader(http.StatusBadRequest)
+        json.NewEncoder(w).Encode(ChatResponse{
+            Success: false,
+            Message: "ChatID is required for message creation",
+        })
+        return
+    }
 
 	message := &db.ChatMessage{
-		ID:        xid.New().String(),
-		ChatID:    chatID,
-		Message:   response,
+		ID:        request.Value.MessageID,
+		ChatID:    request.Value.ChatID,
+		Message:   request.Value.Response,
 		Role:      "assistant",
 		Timestamp: time.Now(),
 		Status:    "sent",
@@ -576,14 +582,41 @@ func (ch *ChatHandler) ProcessChatResponse(w http.ResponseWriter, r *http.Reques
 		return
 	}
 
+	var artifacts []db.Artifact
+	if len(request.Value.Artifacts) > 0 {
+		for _, artifact := range request.Value.Artifacts {
+			content := db.PropertyMap{}
+			if contentMap, ok := artifact.Content.(map[string]interface{}); ok {
+				content = db.PropertyMap(contentMap)
+			}
+
+			newArtifact := &db.Artifact{
+				ID:        uuid.New(),
+				MessageID: createdMessage.ID,
+				Type:      artifact.Type,
+				Content:   content,
+				CreatedAt: time.Now(),
+				UpdatedAt: time.Now(),
+			}
+
+			processedArtifact, err := ch.db.CreateArtifact(newArtifact)
+			if err != nil {
+				log.Printf("Error processing artifact: %v", err)
+				continue
+			}
+			artifacts = append(artifacts, *processedArtifact)
+		}
+	}
+
 	wsMessage := websocket.TicketMessage{
 		BroadcastType:   "direct",
-		SourceSessionID: sourceWebsocketID,
+		SourceSessionID: request.Value.SourceWebsocketID,
 		Message:         "Response received",
 		Action:          "message",
 		ChatMessage:     createdMessage,
+		Artifacts:       artifacts,
 	}
-
+	
 	if err := websocket.WebsocketPool.SendTicketMessage(wsMessage); err != nil {
 		log.Printf("Failed to send websocket message: %v", err)
 	}
@@ -593,6 +626,7 @@ func (ch *ChatHandler) ProcessChatResponse(w http.ResponseWriter, r *http.Reques
 		Success: true,
 		Message: "Response processed successfully",
 		Data:    createdMessage,
+		Artifacts: artifacts,
 	})
 }
 
