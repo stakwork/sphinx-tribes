@@ -50,7 +50,8 @@ type UpdateTicketRequest struct {
 		Source string `json:"source"`
 		ID     string `json:"id"`
 	} `json:"metadata"`
-	Ticket *db.Tickets `json:"ticket"`
+	Ticket *db.Tickets             `json:"ticket"`
+	Mode   db.TicketProcessingMode `json:"mode"`
 }
 
 type UpdateTicketSequenceRequest struct {
@@ -399,6 +400,20 @@ func (th *ticketHandler) PostTicketDataToStakwork(w http.ResponseWriter, r *http
 		return
 	}
 
+	if ticketRequest.Mode == "" {
+		ticketRequest.Mode = db.ThinkingMode
+	}
+
+	if ticketRequest.Mode != db.ThinkingMode && ticketRequest.Mode != db.SpeedMode {
+		w.WriteHeader(http.StatusBadRequest)
+		json.NewEncoder(w).Encode(TicketResponse{
+			Success: false,
+			Message: "Validation failed",
+			Errors:  []string{fmt.Sprintf("Invalid mode: %s. Must be either 'thinking' or 'speed'", ticketRequest.Mode)},
+		})
+		return
+	}
+
 	ticket := ticketRequest.Ticket
 	var validationErrors []string
 	if ticket.UUID == uuid.Nil {
@@ -540,6 +555,7 @@ func (th *ticketHandler) PostTicketDataToStakwork(w http.ResponseWriter, r *http
 						"codeGraph":           codeGraphURL,
 						"codeGraphAlias":      codeGraphAlias,
 						"alias":               user.OwnerAlias,
+						"mode":                string(ticketRequest.Mode),
 					},
 				},
 			},

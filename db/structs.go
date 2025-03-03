@@ -1040,26 +1040,34 @@ const (
 	Other              Category = "Other"
 )
 
+type TicketProcessingMode string
+
+const (
+	ThinkingMode TicketProcessingMode = "thinking"
+	SpeedMode    TicketProcessingMode = "speed"
+)
+
 type Tickets struct {
-	UUID          uuid.UUID         `gorm:"primaryKey;type:uuid"`
-	TicketGroup   *uuid.UUID        `gorm:"type:uuid;index:group_index" json:"ticket_group,omitempty"`
-	WorkspaceUuid string            `gorm:"type:varchar(255);index:workspace_index" json:"workspace_uuid"`
-	FeatureUUID   string            `gorm:"type:varchar(255);index:composite_index;default:null" json:"feature_uuid"`
-	Features      WorkspaceFeatures `gorm:"foreignKey:FeatureUUID;references:Uuid;constraint:OnDelete:SET NULL"`
-	PhaseUUID     string            `gorm:"type:varchar(255);index:phase_index;default:null" json:"phase_uuid"`
-	FeaturePhase  FeaturePhase      `gorm:"foreignKey:PhaseUUID;references:Uuid;constraint:OnDelete:SET NULL"`
-	Name          string            `gorm:"type:varchar(255)" json:"name"`
-	Sequence      int               `gorm:"type:integer;index:composite_index;default:0" json:"sequence"`
-	Dependency    []int             `gorm:"type:integer[]" json:"dependency"`
-	Description   string            `gorm:"type:text" json:"description"`
-	Status        TicketStatus      `gorm:"type:varchar(50);default:'DRAFT'" json:"status"`
-	Version       int               `gorm:"type:integer;default:0" json:"version"`
-	Author        *Author           `gorm:"type:varchar(50)" json:"author,omitempty"`
-	AuthorID      *string           `gorm:"type:varchar(255)" json:"author_id,omitempty"`
-	Amount        *int64            `gorm:"type:bigint;default:null" json:"amount,omitempty"`
-	Category      *Category         `gorm:"type:varchar(50);default:null" json:"category,omitempty"`
-	CreatedAt     time.Time         `gorm:"type:timestamp;default:current_timestamp" json:"created_at"`
-	UpdatedAt     time.Time         `gorm:"type:timestamp;default:current_timestamp" json:"updated_at"`
+	UUID          uuid.UUID             `gorm:"primaryKey;type:uuid"`
+	TicketGroup   *uuid.UUID            `gorm:"type:uuid;index:group_index" json:"ticket_group,omitempty"`
+	WorkspaceUuid string                `gorm:"type:varchar(255);index:workspace_index" json:"workspace_uuid"`
+	FeatureUUID   string                `gorm:"type:varchar(255);index:composite_index;default:null" json:"feature_uuid"`
+	Features      WorkspaceFeatures     `gorm:"foreignKey:FeatureUUID;references:Uuid;constraint:OnDelete:SET NULL"`
+	PhaseUUID     string                `gorm:"type:varchar(255);index:phase_index;default:null" json:"phase_uuid"`
+	FeaturePhase  FeaturePhase          `gorm:"foreignKey:PhaseUUID;references:Uuid;constraint:OnDelete:SET NULL"`
+	Name          string                `gorm:"type:varchar(255)" json:"name"`
+	Sequence      int                   `gorm:"type:integer;index:composite_index;default:0" json:"sequence"`
+	Dependency    []int                 `gorm:"type:integer[]" json:"dependency"`
+	Description   string                `gorm:"type:text" json:"description"`
+	Status        TicketStatus          `gorm:"type:varchar(50);default:'DRAFT'" json:"status"`
+	Version       int                   `gorm:"type:integer;default:0" json:"version"`
+	Author        *Author               `gorm:"type:varchar(50)" json:"author,omitempty"`
+	AuthorID      *string               `gorm:"type:varchar(255)" json:"author_id,omitempty"`
+	Amount        *int64                `gorm:"type:bigint;default:null" json:"amount,omitempty"`
+	Category      *Category             `gorm:"type:varchar(50);default:null" json:"category,omitempty"`
+	Mode          *TicketProcessingMode `gorm:"type:varchar(50);default:'thinking'" json:"mode,omitempty"`
+	CreatedAt     time.Time             `gorm:"type:timestamp;default:current_timestamp" json:"created_at"`
+	UpdatedAt     time.Time             `gorm:"type:timestamp;default:current_timestamp" json:"updated_at"`
 }
 
 type TicketArrayItem struct {
@@ -1414,7 +1422,6 @@ type Node struct {
 type NodeListResponse struct {
 	NodeList []Node `json:"node_list"`
 }
-
 
 type ArtifactType string
 
