@@ -1012,3 +1012,136 @@ func uploadToStorage(file multipart.File, filename string) (string, error) {
 
 	return response.URL, nil
 }
+
+func jsonErrorResponse(w http.ResponseWriter, message string, statusCode int) {
+	w.WriteHeader(statusCode)
+	json.NewEncoder(w).Encode(map[string]string{"error": message})
+}
+
+func (ch *ChatHandler) CreateArtefact(w http.ResponseWriter, r *http.Request) {
+	var artifact db.Artifact
+	if err := json.NewDecoder(r.Body).Decode(&artifact); err != nil {
+		jsonErrorResponse(w, "Invalid request payload", http.StatusBadRequest)
+		return
+	}
+
+	createdArtifact, err := ch.db.CreateArtifact(&artifact)
+	if err != nil {
+		jsonErrorResponse(w, fmt.Sprintf("Failed to create artifact: %v", err), http.StatusInternalServerError)
+		return
+	}
+
+	w.WriteHeader(http.StatusCreated)
+	json.NewEncoder(w).Encode(createdArtifact)
+}
+
+func (ch *ChatHandler) GetArtefactsByChatID(w http.ResponseWriter, r *http.Request) {
+	chatID := chi.URLParam(r, "chatId")
+	if chatID == "" {
+		jsonErrorResponse(w, "Chat ID is required", http.StatusBadRequest)
+		return
+	}
+
+	artifacts, err := ch.db.GetAllArtifactsByChatID(chatID)
+	if err != nil {
+		jsonErrorResponse(w, fmt.Sprintf("Failed to fetch artifacts: %v", err), http.StatusInternalServerError)
+		return
+	}
+
+	json.NewEncoder(w).Encode(artifacts)
+}
+
+func (ch *ChatHandler) GetArtefactByID(w http.ResponseWriter, r *http.Request) {
+	artifactIDStr := chi.URLParam(r, "artifactId")
+	if artifactIDStr == "" {
+		jsonErrorResponse(w, "Artifact ID is required", http.StatusBadRequest)
+		return
+	}
+
+	artifactID, err := uuid.Parse(artifactIDStr)
+	if err != nil {
+		jsonErrorResponse(w, "Invalid artifact ID format", http.StatusBadRequest)
+		return
+	}
+
+	artifact, err := ch.db.GetArtifactByID(artifactID)
+	if err != nil {
+		jsonErrorResponse(w, fmt.Sprintf("Failed to fetch artifact: %v", err), http.StatusInternalServerError)
+		return
+	}
+
+	if artifact == nil {
+		jsonErrorResponse(w, "Artifact not found", http.StatusNotFound)
+		return
+	}
+
+	json.NewEncoder(w).Encode(artifact)
+}
+
+func (ch *ChatHandler) GetArtefactsByMessageID(w http.ResponseWriter, r *http.Request) {
+	messageID := chi.URLParam(r, "messageId")
+	if messageID == "" {
+		jsonErrorResponse(w, "Message ID is required", http.StatusBadRequest)
+		return
+	}
+
+	artifacts, err := ch.db.GetArtifactsByMessageID(messageID)
+	if err != nil {
+		jsonErrorResponse(w, fmt.Sprintf("Failed to fetch artifacts: %v", err), http.StatusInternalServerError)
+		return
+	}
+
+	json.NewEncoder(w).Encode(artifacts)
+}
+
+func (ch *ChatHandler) UpdateArtefact(w http.ResponseWriter, r *http.Request) {
+	var artifact db.Artifact
+	if err := json.NewDecoder(r.Body).Decode(&artifact); err != nil {
+		jsonErrorResponse(w, "Invalid request payload", http.StatusBadRequest)
+		return
+	}
+
+	updatedArtifact, err := ch.db.UpdateArtifact(&artifact)
+	if err != nil {
+		jsonErrorResponse(w, fmt.Sprintf("Failed to update artifact: %v", err), http.StatusInternalServerError)
+		return
+	}
+
+	json.NewEncoder(w).Encode(updatedArtifact)
+}
+
+func (ch *ChatHandler) DeleteArtefactByID(w http.ResponseWriter, r *http.Request) {
+	artifactIDStr := chi.URLParam(r, "artifactId")
+	if artifactIDStr == "" {
+		jsonErrorResponse(w, "Artifact ID is required", http.StatusBadRequest)
+		return
+	}
+
+	artifactID, err := uuid.Parse(artifactIDStr)
+	if err != nil {
+		jsonErrorResponse(w, "Invalid artifact ID format", http.StatusBadRequest)
+		return
+	}
+
+	if err := ch.db.DeleteArtifactByID(artifactID); err != nil {
+		jsonErrorResponse(w, fmt.Sprintf("Failed to delete artifact: %v", err), http.StatusInternalServerError)
+		return
+	}
+
+	w.WriteHeader(http.StatusNoContent)
+}
+
+func (ch *ChatHandler) DeleteAllArtefactsByChatID(w http.ResponseWriter, r *http.Request) {
+	chatID := chi.URLParam(r, "chatId")
+	if chatID == "" {
+		jsonErrorResponse(w, "Chat ID is required", http.StatusBadRequest)
+		return
+	}
+
+	if err := ch.db.DeleteAllArtifactsByChatID(chatID); err != nil {
+		jsonErrorResponse(w, fmt.Sprintf("Failed to delete artifacts: %v", err), http.StatusInternalServerError)
+		return
+	}
+
+	w.WriteHeader(http.StatusNoContent)
+}
