@@ -34,9 +34,10 @@ type ChatHandler struct {
 }
 
 type ChatResponse struct {
-	Success bool        `json:"success"`
-	Message string      `json:"message"`
-	Data    interface{} `json:"data,omitempty"`
+	Success    bool            `json:"success"`
+	Message    string          `json:"message"`
+	Data       interface{}     `json:"data,omitempty"`
+	Artifacts  []db.Artifact   `json:"artifacts,omitempty"`
 }
 
 type HistoryChatResponse struct {
@@ -84,6 +85,22 @@ type SendMessageRequest struct {
 
 type BuildMessageRequest struct {
 	Question string `json:"question"`
+}
+
+type ChatResponseRequest struct {
+	Value struct {
+		ChatID            string                `json:"chatId"`
+		MessageID         string                `json:"messageId"`
+		Response          string                `json:"response"`
+		SourceWebsocketID string                `json:"sourceWebsocketId"`
+		Artifacts         []ChatMessageArtifact `json:"artifacts,omitempty"`
+	} `json:"value"`
+}
+
+type ChatMessageArtifact struct {
+	ID      string          `json:"id"`
+	Type    db.ArtifactType `json:"type"`
+	Content interface{}     `json:"content"`
 }
 
 func NewChatHandler(httpClient *http.Client, database db.Database) *ChatHandler {
@@ -525,15 +542,8 @@ func (ch *ChatHandler) GetChatHistory(w http.ResponseWriter, r *http.Request) {
 }
 
 func (ch *ChatHandler) ProcessChatResponse(w http.ResponseWriter, r *http.Request) {
-	var request struct {
-		Value struct {
-			ChatID            string `json:"chatId"`
-			MessageID         string `json:"messageId"`
-			Response          string `json:"response"`
-			SourceWebsocketID string `json:"sourceWebsocketId"`
-		} `json:"value"`
-	}
-
+	var request ChatResponseRequest
+	
 	if err := json.NewDecoder(r.Body).Decode(&request); err != nil {
 		w.WriteHeader(http.StatusBadRequest)
 		json.NewEncoder(w).Encode(ChatResponse{
@@ -542,24 +552,20 @@ func (ch *ChatHandler) ProcessChatResponse(w http.ResponseWriter, r *http.Reques
 		})
 		return
 	}
-
-	chatID := request.Value.ChatID
-	response := request.Value.Response
-	sourceWebsocketID := request.Value.SourceWebsocketID
-
-	if chatID == "" {
-		w.WriteHeader(http.StatusBadRequest)
-		json.NewEncoder(w).Encode(ChatResponse{
-			Success: false,
-			Message: "ChatID is required for message creation",
-		})
-		return
-	}
+	
+	if request.Value.ChatID == "" {
+        w.WriteHeader(http.StatusBadRequest)
+        json.NewEncoder(w).Encode(ChatResponse{
+            Success: false,
+            Message: "ChatID is required for message creation",
+        })
+        return
+    }
 
 	message := &db.ChatMessage{
-		ID:        xid.New().String(),
-		ChatID:    chatID,
-		Message:   response,
+		ID:        request.Value.MessageID,
+		ChatID:    request.Value.ChatID,
+		Message:   request.Value.Response,
 		Role:      "assistant",
 		Timestamp: time.Now(),
 		Status:    "sent",
@@ -576,14 +582,41 @@ func (ch *ChatHandler) ProcessChatResponse(w http.ResponseWriter, r *http.Reques
 		return
 	}
 
+	var artifacts []db.Artifact
+	if len(request.Value.Artifacts) > 0 {
+		for _, artifact := range request.Value.Artifacts {
+			content := db.PropertyMap{}
+			if contentMap, ok := artifact.Content.(map[string]interface{}); ok {
+				content = db.PropertyMap(contentMap)
+			}
+
+			newArtifact := &db.Artifact{
+				ID:        uuid.New(),
+				MessageID: createdMessage.ID,
+				Type:      artifact.Type,
+				Content:   content,
+				CreatedAt: time.Now(),
+				UpdatedAt: time.Now(),
+			}
+
+			processedArtifact, err := ch.db.CreateArtifact(newArtifact)
+			if err != nil {
+				log.Printf("Error processing artifact: %v", err)
+				continue
+			}
+			artifacts = append(artifacts, *processedArtifact)
+		}
+	}
+
 	wsMessage := websocket.TicketMessage{
 		BroadcastType:   "direct",
-		SourceSessionID: sourceWebsocketID,
+		SourceSessionID: request.Value.SourceWebsocketID,
 		Message:         "Response received",
 		Action:          "message",
 		ChatMessage:     createdMessage,
+		Artifacts:       artifacts,
 	}
-
+	
 	if err := websocket.WebsocketPool.SendTicketMessage(wsMessage); err != nil {
 		log.Printf("Failed to send websocket message: %v", err)
 	}
@@ -593,6 +626,7 @@ func (ch *ChatHandler) ProcessChatResponse(w http.ResponseWriter, r *http.Reques
 		Success: true,
 		Message: "Response processed successfully",
 		Data:    createdMessage,
+		Artifacts: artifacts,
 	})
 }
 
@@ -977,4 +1011,137 @@ func uploadToStorage(file multipart.File, filename string) (string, error) {
 	}
 
 	return response.URL, nil
+}
+
+func jsonErrorResponse(w http.ResponseWriter, message string, statusCode int) {
+	w.WriteHeader(statusCode)
+	json.NewEncoder(w).Encode(map[string]string{"error": message})
+}
+
+func (ch *ChatHandler) CreateArtefact(w http.ResponseWriter, r *http.Request) {
+	var artifact db.Artifact
+	if err := json.NewDecoder(r.Body).Decode(&artifact); err != nil {
+		jsonErrorResponse(w, "Invalid request payload", http.StatusBadRequest)
+		return
+	}
+
+	createdArtifact, err := ch.db.CreateArtifact(&artifact)
+	if err != nil {
+		jsonErrorResponse(w, fmt.Sprintf("Failed to create artifact: %v", err), http.StatusInternalServerError)
+		return
+	}
+
+	w.WriteHeader(http.StatusCreated)
+	json.NewEncoder(w).Encode(createdArtifact)
+}
+
+func (ch *ChatHandler) GetArtefactsByChatID(w http.ResponseWriter, r *http.Request) {
+	chatID := chi.URLParam(r, "chatId")
+	if chatID == "" {
+		jsonErrorResponse(w, "Chat ID is required", http.StatusBadRequest)
+		return
+	}
+
+	artifacts, err := ch.db.GetAllArtifactsByChatID(chatID)
+	if err != nil {
+		jsonErrorResponse(w, fmt.Sprintf("Failed to fetch artifacts: %v", err), http.StatusInternalServerError)
+		return
+	}
+
+	json.NewEncoder(w).Encode(artifacts)
+}
+
+func (ch *ChatHandler) GetArtefactByID(w http.ResponseWriter, r *http.Request) {
+	artifactIDStr := chi.URLParam(r, "artifactId")
+	if artifactIDStr == "" {
+		jsonErrorResponse(w, "Artifact ID is required", http.StatusBadRequest)
+		return
+	}
+
+	artifactID, err := uuid.Parse(artifactIDStr)
+	if err != nil {
+		jsonErrorResponse(w, "Invalid artifact ID format", http.StatusBadRequest)
+		return
+	}
+
+	artifact, err := ch.db.GetArtifactByID(artifactID)
+	if err != nil {
+		jsonErrorResponse(w, fmt.Sprintf("Failed to fetch artifact: %v", err), http.StatusInternalServerError)
+		return
+	}
+
+	if artifact == nil {
+		jsonErrorResponse(w, "Artifact not found", http.StatusNotFound)
+		return
+	}
+
+	json.NewEncoder(w).Encode(artifact)
+}
+
+func (ch *ChatHandler) GetArtefactsByMessageID(w http.ResponseWriter, r *http.Request) {
+	messageID := chi.URLParam(r, "messageId")
+	if messageID == "" {
+		jsonErrorResponse(w, "Message ID is required", http.StatusBadRequest)
+		return
+	}
+
+	artifacts, err := ch.db.GetArtifactsByMessageID(messageID)
+	if err != nil {
+		jsonErrorResponse(w, fmt.Sprintf("Failed to fetch artifacts: %v", err), http.StatusInternalServerError)
+		return
+	}
+
+	json.NewEncoder(w).Encode(artifacts)
+}
+
+func (ch *ChatHandler) UpdateArtefact(w http.ResponseWriter, r *http.Request) {
+	var artifact db.Artifact
+	if err := json.NewDecoder(r.Body).Decode(&artifact); err != nil {
+		jsonErrorResponse(w, "Invalid request payload", http.StatusBadRequest)
+		return
+	}
+
+	updatedArtifact, err := ch.db.UpdateArtifact(&artifact)
+	if err != nil {
+		jsonErrorResponse(w, fmt.Sprintf("Failed to update artifact: %v", err), http.StatusInternalServerError)
+		return
+	}
+
+	json.NewEncoder(w).Encode(updatedArtifact)
+}
+
+func (ch *ChatHandler) DeleteArtefactByID(w http.ResponseWriter, r *http.Request) {
+	artifactIDStr := chi.URLParam(r, "artifactId")
+	if artifactIDStr == "" {
+		jsonErrorResponse(w, "Artifact ID is required", http.StatusBadRequest)
+		return
+	}
+
+	artifactID, err := uuid.Parse(artifactIDStr)
+	if err != nil {
+		jsonErrorResponse(w, "Invalid artifact ID format", http.StatusBadRequest)
+		return
+	}
+
+	if err := ch.db.DeleteArtifactByID(artifactID); err != nil {
+		jsonErrorResponse(w, fmt.Sprintf("Failed to delete artifact: %v", err), http.StatusInternalServerError)
+		return
+	}
+
+	w.WriteHeader(http.StatusNoContent)
+}
+
+func (ch *ChatHandler) DeleteAllArtefactsByChatID(w http.ResponseWriter, r *http.Request) {
+	chatID := chi.URLParam(r, "chatId")
+	if chatID == "" {
+		jsonErrorResponse(w, "Chat ID is required", http.StatusBadRequest)
+		return
+	}
+
+	if err := ch.db.DeleteAllArtifactsByChatID(chatID); err != nil {
+		jsonErrorResponse(w, fmt.Sprintf("Failed to delete artifacts: %v", err), http.StatusInternalServerError)
+		return
+	}
+
+	w.WriteHeader(http.StatusNoContent)
 }

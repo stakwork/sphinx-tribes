@@ -29,6 +29,14 @@ func ChatRoutes() chi.Router {
 		r.Get("/file/{id}", chatHandler.GetFile)
 		r.Get("/file/all", chatHandler.ListFiles)
 		r.Delete("/file/{id}", chatHandler.DeleteFile)
+
+		r.Post("/artefacts", chatHandler.CreateArtefact)
+		r.Get("/artefacts/chat/{chatId}", chatHandler.GetArtefactsByChatID)
+		r.Get("/artefacts/{artefactId}", chatHandler.GetArtefactByID)
+		r.Get("/artefacts/message/{messageId}", chatHandler.GetArtefactsByMessageID)
+		r.Put("/artefacts/{artefactId}", chatHandler.UpdateArtefact)
+		r.Delete("/artefacts/{artefactId}", chatHandler.DeleteArtefactByID)
+		r.Delete("/artefacts/chat/{chatId}", chatHandler.DeleteAllArtefactsByChatID)
 	})
 
 	return r
