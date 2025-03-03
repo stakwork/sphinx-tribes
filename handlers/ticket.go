@@ -514,6 +514,11 @@ func (th *ticketHandler) PostTicketDataToStakwork(w http.ResponseWriter, r *http
 		return
 	}
 
+	mode := "thinking"
+   if ticketRequest.Ticket.Mode != "" {
+      mode = ticketRequest.Ticket.Mode
+   }
+
 	stakworkPayload := map[string]interface{}{
 		"name":        "Hive Ticket Builder",
 		"workflow_id": 37324,
@@ -540,6 +545,7 @@ func (th *ticketHandler) PostTicketDataToStakwork(w http.ResponseWriter, r *http
 						"codeGraph":           codeGraphURL,
 						"codeGraphAlias":      codeGraphAlias,
 						"alias":               user.OwnerAlias,
+						"mode":                mode,
 					},
 				},
 			},
