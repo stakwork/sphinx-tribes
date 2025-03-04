@@ -1058,6 +1058,7 @@ type Tickets struct {
 	AuthorID      *string           `gorm:"type:varchar(255)" json:"author_id,omitempty"`
 	Amount        *int64            `gorm:"type:bigint;default:null" json:"amount,omitempty"`
 	Category      *Category         `gorm:"type:varchar(50);default:null" json:"category,omitempty"`
+	Mode          string            `json:"mode,omitempty"`
 	CreatedAt     time.Time         `gorm:"type:timestamp;default:current_timestamp" json:"created_at"`
 	UpdatedAt     time.Time         `gorm:"type:timestamp;default:current_timestamp" json:"updated_at"`
 }
