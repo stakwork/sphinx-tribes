@@ -5,6 +5,7 @@ import (
 	"crypto/sha256"
 	"encoding/hex"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"io"
 	"log"
@@ -19,6 +20,7 @@ import (
 
 	"github.com/stakwork/sphinx-tribes/auth"
 	"github.com/stakwork/sphinx-tribes/logger"
+	"gorm.io/gorm"
 
 	"github.com/google/uuid"
 	"github.com/rs/xid"
@@ -101,6 +103,25 @@ type ChatMessageArtifact struct {
 	ID      string          `json:"id"`
 	Type    db.ArtifactType `json:"type"`
 	Content interface{}     `json:"content"`
+}
+
+type ActionMessageRequest struct {
+	ActionWebhook     string `json:"action_webhook"`
+	ChatID           string `json:"chatId"`
+	MessageID        string `json:"messageId"`
+	Message          string `json:"message"`
+	SourceWebsocketID string `json:"sourceWebsocketId"`
+}
+
+type ActionPayload struct {
+	ChatID            string              `json:"chatId"`
+	MessageID         string              `json:"messageId"`
+	Message           string              `json:"message"`
+	History           []db.ChatMessage    `json:"history"`
+	CodeGraph         string              `json:"codeGraph,omitempty"`
+	CodeGraphAlias    string              `json:"codeGraphAlias,omitempty"`
+	SourceWebsocketID string              `json:"sourceWebsocketId"`
+	WebhookURL        string              `json:"webhook_url"`
 }
 
 func NewChatHandler(httpClient *http.Client, database db.Database) *ChatHandler {
@@ -1144,4 +1165,121 @@ func (ch *ChatHandler) DeleteAllArtefactsByChatID(w http.ResponseWriter, r *http
 	}
 
 	w.WriteHeader(http.StatusNoContent)
+}
+
+func (ch *ChatHandler) SendActionMessage(w http.ResponseWriter, r *http.Request) {
+	var request ActionMessageRequest
+	if err := json.NewDecoder(r.Body).Decode(&request); err != nil {
+		w.WriteHeader(http.StatusBadRequest)
+		json.NewEncoder(w).Encode(ChatResponse{
+			Success: false,
+			Message: "Invalid request body",
+		})
+		return
+	}
+
+	if request.ActionWebhook == "" || request.ChatID == "" || request.MessageID == "" {
+		w.WriteHeader(http.StatusBadRequest)
+		json.NewEncoder(w).Encode(ChatResponse{
+			Success: false,
+			Message: "action_webhook, chatId, and messageId are required",
+		})
+		return
+	}
+
+	history, err := ch.db.GetChatMessagesForChatID(request.ChatID)
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		json.NewEncoder(w).Encode(ChatResponse{
+			Success: false,
+			Message: fmt.Sprintf("Failed to get chat history: %v", err),
+		})
+		return
+	}
+
+	chat, err := ch.db.GetChatByChatID(request.ChatID)
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		json.NewEncoder(w).Encode(ChatResponse{
+			Success: false,
+			Message: fmt.Sprintf("Failed to get chat: %v", err),
+		})
+		return
+	}
+
+	codeGraph, err := ch.db.GetCodeGraphByWorkspaceUuid(chat.WorkspaceID)
+	if err != nil && !errors.Is(err, gorm.ErrRecordNotFound) {
+		w.WriteHeader(http.StatusInternalServerError)
+		json.NewEncoder(w).Encode(ChatResponse{
+			Success: false,
+			Message: fmt.Sprintf("Failed to get code graph: %v", err),
+		})
+		return
+	}
+
+	payload := ActionPayload{
+		ChatID:            request.ChatID,
+		MessageID:         request.MessageID,
+		Message:           request.Message,
+		History:           history,
+		SourceWebsocketID: request.SourceWebsocketID,
+		WebhookURL:        fmt.Sprintf("%s/hivechat/response", os.Getenv("HOST")),
+	}
+
+	if codeGraph.Url != "" {
+		url := strings.TrimSuffix(codeGraph.Url, "/")
+		if !strings.HasPrefix(url, "https://") {
+			url = "https://" + url
+		}
+		payload.CodeGraph = url
+		payload.CodeGraphAlias = codeGraph.SecretAlias
+	}
+
+	payloadBytes, err := json.Marshal(payload)
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		json.NewEncoder(w).Encode(ChatResponse{
+			Success: false,
+			Message: fmt.Sprintf("Failed to marshal payload: %v", err),
+		})
+		return
+	}
+
+	req, err := http.NewRequest("POST", request.ActionWebhook, bytes.NewBuffer(payloadBytes))
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		json.NewEncoder(w).Encode(ChatResponse{
+			Success: false,
+			Message: fmt.Sprintf("Failed to create request: %v", err),
+		})
+		return
+	}
+
+	req.Header.Set("Content-Type", "application/json")
+	resp, err := ch.httpClient.Do(req)
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		json.NewEncoder(w).Encode(ChatResponse{
+			Success: false,
+			Message: fmt.Sprintf("Failed to send message to action webhook: %v", err),
+		})
+		return
+	}
+	defer resp.Body.Close()
+
+	if resp.StatusCode != http.StatusOK {
+		body, _ := io.ReadAll(resp.Body)
+		w.WriteHeader(resp.StatusCode)
+		json.NewEncoder(w).Encode(ChatResponse{
+			Success: false,
+			Message: fmt.Sprintf("Action webhook returned error: %s", string(body)),
+		})
+		return
+	}
+
+	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode(ChatResponse{
+		Success: true,
+		Message: "Message sent to action webhook successfully",
+	})
 }
