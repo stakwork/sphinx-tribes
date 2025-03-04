@@ -34,10 +34,10 @@ type ChatHandler struct {
 }
 
 type ChatResponse struct {
-	Success    bool            `json:"success"`
-	Message    string          `json:"message"`
-	Data       interface{}     `json:"data,omitempty"`
-	Artifacts  []db.Artifact   `json:"artifacts,omitempty"`
+	Success   bool          `json:"success"`
+	Message   string        `json:"message"`
+	Data      interface{}   `json:"data,omitempty"`
+	Artifacts []db.Artifact `json:"artifacts,omitempty"`
 }
 
 type HistoryChatResponse struct {
@@ -81,6 +81,7 @@ type SendMessageRequest struct {
 	} `json:"contextTags"`
 	SourceWebsocketID string `json:"sourceWebsocketId"`
 	WorkspaceUUID     string `json:"workspaceUUID"`
+	Mode              string `json:"mode,omitempty"`
 }
 
 type BuildMessageRequest struct {
@@ -257,7 +258,7 @@ func (ch *ChatHandler) ArchiveChat(w http.ResponseWriter, r *http.Request) {
 	})
 }
 
-func buildVarsPayload(request SendMessageRequest, createdMessage *db.ChatMessage, messageHistory []map[string]string, context interface{}, user *db.Person, codeGraph *db.WorkspaceCodeGraph) map[string]interface{} {
+func buildVarsPayload(request SendMessageRequest, createdMessage *db.ChatMessage, messageHistory []map[string]string, context interface{}, user *db.Person, codeGraph *db.WorkspaceCodeGraph, mode string) map[string]interface{} {
 	vars := map[string]interface{}{
 		"chatId":            request.ChatID,
 		"messageId":         createdMessage.ID,
@@ -278,6 +279,10 @@ func buildVarsPayload(request SendMessageRequest, createdMessage *db.ChatMessage
 		}
 		vars["codeGraph"] = url
 		vars["codeGraphAlias"] = codeGraph.SecretAlias
+	}
+
+	if mode == "Build" {
+		vars["query"] = request.Message
 	}
 
 	return vars
@@ -382,7 +387,12 @@ func (ch *ChatHandler) SendMessage(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
-	vars := buildVarsPayload(request, &createdMessage, messageHistory, context, &user, codeGraph)
+	mode := "Chat"
+	if request.Mode != "" {
+		mode = request.Mode
+	}
+
+	vars := buildVarsPayload(request, &createdMessage, messageHistory, context, &user, codeGraph, mode)
 
 	stakworkPayload := StakworkChatPayload{
 		Name:       "Hive Chat Processor",
@@ -396,7 +406,27 @@ func (ch *ChatHandler) SendMessage(w http.ResponseWriter, r *http.Request) {
 		},
 	}
 
-	projectID, err := ch.sendToStakwork(stakworkPayload)
+	if mode == "Build" {
+		stakworkPayload.Name = "hive_autogen"
+		stakworkPayload.WorkflowID = 43198
+	}
+
+	apiKeyEnv := "SWWFKEY"
+	if mode == "Build" {
+		apiKeyEnv = "SWWFSWKEY"
+	}
+
+	apiKey := os.Getenv(apiKeyEnv)
+	if apiKey == "" {
+		w.WriteHeader(http.StatusInternalServerError)
+		json.NewEncoder(w).Encode(ChatResponse{
+			Success: false,
+			Message: "environment variable is not set",
+		})
+		return
+	}
+
+	projectID, err := ch.sendToStakwork(stakworkPayload, apiKey)
 	if err != nil {
 		createdMessage.Status = "error"
 		ch.db.UpdateChatMessage(&createdMessage)
@@ -440,7 +470,7 @@ func (ch *ChatHandler) SendMessage(w http.ResponseWriter, r *http.Request) {
 	})
 }
 
-func (ch *ChatHandler) sendToStakwork(payload StakworkChatPayload) (int64, error) {
+func (ch *ChatHandler) sendToStakwork(payload StakworkChatPayload, apiKey string) (int64, error) {
 
 	payloadJSON, err := json.Marshal(payload)
 	if err != nil {
@@ -454,11 +484,6 @@ func (ch *ChatHandler) sendToStakwork(payload StakworkChatPayload) (int64, error
 	)
 	if err != nil {
 		return 0, fmt.Errorf("error creating request: %v", err)
-	}
-
-	apiKey := os.Getenv("SWWFKEY")
-	if apiKey == "" {
-		return 0, fmt.Errorf("SWWFKEY environment variable not set")
 	}
 
 	req.Header.Set("Authorization", "Token token="+apiKey)
@@ -543,7 +568,7 @@ func (ch *ChatHandler) GetChatHistory(w http.ResponseWriter, r *http.Request) {
 
 func (ch *ChatHandler) ProcessChatResponse(w http.ResponseWriter, r *http.Request) {
 	var request ChatResponseRequest
-	
+
 	if err := json.NewDecoder(r.Body).Decode(&request); err != nil {
 		w.WriteHeader(http.StatusBadRequest)
 		json.NewEncoder(w).Encode(ChatResponse{
@@ -552,15 +577,15 @@ func (ch *ChatHandler) ProcessChatResponse(w http.ResponseWriter, r *http.Reques
 		})
 		return
 	}
-	
+
 	if request.Value.ChatID == "" {
-        w.WriteHeader(http.StatusBadRequest)
-        json.NewEncoder(w).Encode(ChatResponse{
-            Success: false,
-            Message: "ChatID is required for message creation",
-        })
-        return
-    }
+		w.WriteHeader(http.StatusBadRequest)
+		json.NewEncoder(w).Encode(ChatResponse{
+			Success: false,
+			Message: "ChatID is required for message creation",
+		})
+		return
+	}
 
 	message := &db.ChatMessage{
 		ID:        request.Value.MessageID,
@@ -616,16 +641,16 @@ func (ch *ChatHandler) ProcessChatResponse(w http.ResponseWriter, r *http.Reques
 		ChatMessage:     createdMessage,
 		Artifacts:       artifacts,
 	}
-	
+
 	if err := websocket.WebsocketPool.SendTicketMessage(wsMessage); err != nil {
 		log.Printf("Failed to send websocket message: %v", err)
 	}
 
 	w.WriteHeader(http.StatusOK)
 	json.NewEncoder(w).Encode(ChatResponse{
-		Success: true,
-		Message: "Response processed successfully",
-		Data:    createdMessage,
+		Success:   true,
+		Message:   "Response processed successfully",
+		Data:      createdMessage,
 		Artifacts: artifacts,
 	})
 }
