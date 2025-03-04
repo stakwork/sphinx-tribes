@@ -298,8 +298,13 @@ func buildVarsPayload(request SendMessageRequest, createdMessage *db.ChatMessage
 		if !strings.HasPrefix(url, "https://") {
 			url = "https://" + url
 		}
-		vars["codeGraph"] = url
-		vars["codeGraphAlias"] = codeGraph.SecretAlias
+		if mode == "Build" {
+			vars["2b_base_url"] = url
+			vars["secret"] = codeGraph.SecretAlias
+		} else {
+			vars["codeGraph"] = url
+			vars["codeGraphAlias"] = codeGraph.SecretAlias
+		}
 	}
 
 	if mode == "Build" {
