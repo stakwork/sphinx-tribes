@@ -24,6 +24,7 @@ func ChatRoutes() chi.Router {
 		r.Post("/send", chatHandler.SendMessage)
 		r.Get("/history/{uuid}", chatHandler.GetChatHistory)
 		r.Post("/send/build", chatHandler.SendBuildMessage)
+		r.Post("/send/action", chatHandler.SendActionMessage)
 
 		r.Post("/upload", chatHandler.UploadFile)
 		r.Get("/file/{id}", chatHandler.GetFile)
