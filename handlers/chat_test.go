@@ -2940,6 +2940,112 @@ func TestSendMessage(t *testing.T) {
 		_, exists := vars["codeGraph"]
 		assert.False(t, exists, "codeGraph should not exist in vars")
 	})
+	t.Run("should successfully send message with code graph in build mode", func(t *testing.T) {
+
+		person := db.Person{
+			Uuid:        uuid.New().String(),
+			OwnerAlias:  "test-alias-build-mode",
+			UniqueName:  "test-unique-name-build-mode",
+			OwnerPubKey: "test-pubkey-build-mode",
+			PriceToMeet: 0,
+			Description: "test-description",
+		}
+		createdPerson, err := db.TestDB.CreateOrEditPerson(person)
+		require.NoError(t, err)
+	
+		workspace := db.Workspace{
+			Uuid:        uuid.New().String(),
+			Name:        "test-workspace" + uuid.New().String(),
+			OwnerPubKey: createdPerson.OwnerPubKey,
+			Github:      "https://github.com/test",
+			Website:     "https://www.testwebsite.com",
+			Description: "test-description",
+		}
+		createdWorkspace, err := db.TestDB.CreateOrEditWorkspace(workspace)
+		require.NoError(t, err)
+	
+		codeGraphUUID := uuid.New().String()
+		codeGraph := db.WorkspaceCodeGraph{
+			Uuid:          codeGraphUUID,
+			WorkspaceUuid: createdWorkspace.Uuid,
+			Url:           "boltwall.swarm38.sphinx.chat/",
+			SecretAlias:   "{{test-secret-alias}}",
+			CreatedBy:     createdPerson.OwnerPubKey,
+			UpdatedBy:     createdPerson.OwnerPubKey,
+		}
+		_, err = db.TestDB.CreateOrEditCodeGraph(codeGraph)
+        require.NoError(t, err)
+	
+		retrievedCodeGraph, err := db.TestDB.GetCodeGraphByWorkspaceUuid(createdWorkspace.Uuid)
+		require.NoError(t, err)
+		require.NotNil(t, retrievedCodeGraph)
+	
+		chat := &db.Chat{
+			ID:          uuid.New().String(),
+			WorkspaceID: createdWorkspace.Uuid,
+			Title:       "Test Chat with Code Graph in Build Mode",
+			Status:      db.ActiveStatus,
+		}
+		createdChat, err := db.TestDB.AddChat(chat)
+		require.NoError(t, err)
+	
+		requestBody := SendMessageRequest{
+			ChatID:            createdChat.ID,
+			Message:           "Test message with code graph in build mode",
+			ContextTags:       []struct {
+				Type string `json:"type"`
+				ID   string `json:"id"`
+			}{},
+			SourceWebsocketID: "test-websocket-id",
+			WorkspaceUUID:     createdWorkspace.Uuid,
+			Mode:              "Build",
+		}
+		bodyBytes, err := json.Marshal(requestBody)
+		require.NoError(t, err)
+	
+		req := httptest.NewRequest(http.MethodPost, "/send", bytes.NewReader(bodyBytes))
+		rr := httptest.NewRecorder()
+	
+		ctx := context.WithValue(req.Context(), auth.ContextKey, createdPerson.OwnerPubKey)
+		req = req.WithContext(ctx)
+	
+		var capturedPayload StakworkChatPayload
+		stakworkServer := &http.Client{
+			Transport: RoundTripFunc(func(req *http.Request) (*http.Response, error) {
+				body, _ := io.ReadAll(req.Body)
+				json.Unmarshal(body, &capturedPayload)
+				return &http.Response{
+					StatusCode: http.StatusOK,
+					Body: io.NopCloser(bytes.NewBufferString(`{
+						"success": true,
+						"data": {
+							"project_id": 12345
+						}
+					}`)),
+					Header: make(http.Header),
+				}, nil
+			}),
+		}
+	
+		originalKey := os.Getenv("SWWFSWKEY")
+		os.Setenv("SWWFSWKEY", "test-key")
+		defer os.Setenv("SWWFSWKEY", originalKey)
+	
+		chatHandler := NewChatHandler(stakworkServer, db.TestDB)
+		chatHandler.SendMessage(rr, req)
+	
+		require.Equal(t, http.StatusOK, rr.Code)
+	
+		vars, ok := capturedPayload.WorkflowParams["set_var"].(map[string]interface{})["attributes"].(map[string]interface{})["vars"].(map[string]interface{})
+		require.True(t, ok, "Workflow params should contain vars")
+	
+		baseUrl, exist := vars["2b_base_url"].(string)
+		secret, exists := vars["secret"].(string)
+		require.True(t, exist, "2b_base_url should exist in vars")
+		assert.Equal(t, "https://boltwall.swarm38.sphinx.chat", baseUrl)
+		require.True(t, exists, "secret should exist in vars")
+		assert.Equal(t, "{{test-secret-alias}}", secret)
+	})
 }
 
 func TestSendBuildMessage(t *testing.T) {
