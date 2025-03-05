@@ -5679,7 +5679,7 @@ func TestCreateOrUpdateFeatureCall(t *testing.T) {
 	}
 	db.TestDB.CreateOrEditWorkspace(workspace)
 
-	t.Run("should return 401 error if not authorized", func(t *testing.T) {
+	t.Run("should return 401 error if not the authorized", func(t *testing.T) {
 		rr := httptest.NewRecorder()
 		handler := http.HandlerFunc(fHandler.CreateOrUpdateFeatureCall)
 
