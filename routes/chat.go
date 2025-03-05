@@ -33,10 +33,10 @@ func ChatRoutes() chi.Router {
 
 		r.Post("/artefacts", chatHandler.CreateArtefact)
 		r.Get("/artefacts/chat/{chatId}", chatHandler.GetArtefactsByChatID)
-		r.Get("/artefacts/{artefactId}", chatHandler.GetArtefactByID)
+		r.Get("/artefacts/{artifactId}", chatHandler.GetArtefactByID)
 		r.Get("/artefacts/message/{messageId}", chatHandler.GetArtefactsByMessageID)
-		r.Put("/artefacts/{artefactId}", chatHandler.UpdateArtefact)
-		r.Delete("/artefacts/{artefactId}", chatHandler.DeleteArtefactByID)
+		r.Put("/artefacts/{artifactId}", chatHandler.UpdateArtefact)
+		r.Delete("/artefacts/{artifactId}", chatHandler.DeleteArtefactByID)
 		r.Delete("/artefacts/chat/{chatId}", chatHandler.DeleteAllArtefactsByChatID)
 	})
 
