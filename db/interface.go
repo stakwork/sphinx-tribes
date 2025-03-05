@@ -317,4 +317,7 @@ type Database interface {
 	UpdateArtifact(artifact *Artifact) (*Artifact, error)
 	DeleteArtifactByID(id uuid.UUID) error
 	DeleteAllArtifactsByChatID(chatID string) error
+	CreateOrUpdateFeatureCall(workspaceID string, url string) (*FeatureCall, error)
+	GetFeatureCallByWorkspaceID(workspaceID string) (*FeatureCall, error)
+	DeleteFeatureCall(workspaceID string) error
 }
