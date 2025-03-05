@@ -156,13 +156,31 @@ func PubKeyContextSuperAdmin(next http.Handler) http.Handler {
 	})
 }
 
+func CombinedAuthContext(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		// Check for token x-api-token first
+		tokenHeader := r.Header.Get("x-api-token")
+		expectedToken := config.SWAuth
+
+		if tokenHeader != "" && tokenHeader == expectedToken {
+			// Token auth succeeded
+			ctx := context.WithValue(r.Context(), ContextKey, tokenHeader)
+			next.ServeHTTP(w, r.WithContext(ctx))
+			return
+		}
+
+		// Token auth failed, try pubkey auth
+		pubKeyHandler := PubKeyContext(next)
+		pubKeyHandler.ServeHTTP(w, r)
+	})
+}
+
 // ConnectionContext parses token for connection code
 func ConnectionCodeContext(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 
 		if r == nil {
 			panic(http.StatusText(http.StatusInternalServerError))
-			return
 		}
 
 		token := r.Header.Get("token")
