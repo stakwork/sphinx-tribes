@@ -368,6 +368,16 @@ type Client struct {
 	Conn *websocket.Conn
 }
 
+type AccessRestrictionType string
+
+const (
+	BlankAccess     AccessRestrictionType = ""
+	WorkspaceAccess AccessRestrictionType = "workspace"
+	OwnerAccess     AccessRestrictionType = "owner" 
+	AssignedAccess  AccessRestrictionType = "assigned"
+	AdminAccess     AccessRestrictionType = "admins"
+)
+
 type Bounty struct {
 	ID                      uint           `json:"id"`
 	OwnerID                 string         `json:"owner_id"`
@@ -403,6 +413,7 @@ type Bounty struct {
 	PhasePriority           *int           `json:"phase_priority"`
 	PaymentPending          bool           `gorm:"default:false" json:"payment_pending"`
 	PaymentFailed           bool           `gorm:"default:false" json:"payment_failed"`
+	AccessRestriction       *AccessRestrictionType `gorm:"type:varchar(20);default:null" json:"access_restriction,omitempty"`
 }
 
 // Todo: Change back to Bounty
@@ -444,6 +455,7 @@ type NewBounty struct {
 	PaymentPending          bool           `gorm:"default:false" json:"payment_pending"`
 	PaymentFailed           bool           `gorm:"default:false" json:"payment_failed"`
 	ProofOfWorkCount        int            `gorm:"type:integer;default:0;not null" json:"pow"`
+	AccessRestriction       *AccessRestrictionType `gorm:"type:varchar(20);default:null" json:"access_restriction,omitempty"`
 }
 
 type BountyOwners struct {
