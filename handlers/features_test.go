@@ -5656,9 +5656,9 @@ func TestTokenAuthentication(t *testing.T) {
 	db.CleanTestData()
 
 	// Set the test environment variable for token authentication
-	originalEnv := os.Getenv("swauth")
-	os.Setenv("swauth", "test-token-value")
-	defer os.Setenv("swauth", originalEnv)
+	originalEnv := os.Getenv("SWAUTH")
+	os.Setenv("SWAUTH", "test-token-value")
+	defer os.Setenv("SWAUTH", originalEnv)
 
 	// Create test data
 	person := db.Person{
@@ -5731,11 +5731,9 @@ func TestTokenAuthentication(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			// Test on GetFeatureByUuid endpoint which requires authentication
 			rr := httptest.NewRecorder()
 			req := httptest.NewRequest(http.MethodGet, "/features/"+feature.Uuid, nil)
 
-			// Set auth header if needed
 			if tt.setAuthHeader {
 				req.Header.Set(tt.authHeaderName, tt.authValue)
 			}
