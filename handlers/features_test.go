@@ -5709,7 +5709,7 @@ func TestTokenAuthentication(t *testing.T) {
 		{
 			name:           "Valid Token Authentication",
 			setAuthHeader:  true,
-			authHeaderName: "x-api-token",
+			authHeaderName: "token",
 			authValue:      "test-token-value",
 			expectedStatus: http.StatusOK,
 		},
