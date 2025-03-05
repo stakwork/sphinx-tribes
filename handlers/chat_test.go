@@ -3054,9 +3054,9 @@ func TestSendBuildMessage(t *testing.T) {
 
 	db.CleanTestData()
 
-	originalKey := os.Getenv("SWWFKEY")
-	os.Setenv("SWWFKEY", "test-key")
-	defer os.Setenv("SWWFKEY", originalKey)
+	originalKey := os.Getenv("SWWFSWKEY")
+	os.Setenv("SWWFSWKEY", "test-key")
+	defer os.Setenv("SWWFSWKEY", originalKey)
 
 	var capturedPayload map[string]interface{}
 	stakworkServer := &http.Client{
@@ -3132,9 +3132,9 @@ func TestSendBuildMessage(t *testing.T) {
 	})
 
 	t.Run("should return internal server error when API key missing", func(t *testing.T) {
-		originalKey := os.Getenv("SWWFKEY")
-		os.Unsetenv("SWWFKEY")
-		defer os.Setenv("SWWFKEY", originalKey)
+		originalKey := os.Getenv("SWWFSWKEY")
+		os.Unsetenv("SWWFSWKEY")
+		defer os.Setenv("SWWFSWKEY", originalKey)
 
 		requestBody := map[string]string{
 			"question": "What is the status of my build?",
