@@ -85,6 +85,7 @@ func InitTestDB() {
 	db.AutoMigrate(&TicketPlan{})
 	db.AutoMigrate(&Activity{})
 	db.AutoMigrate(&Artifact{})
+	db.AutoMigrate(&FeatureCall{})
 
 	people := TestDB.GetAllPeople()
 	for _, p := range people {
@@ -117,6 +118,10 @@ func DeleteAllFeatureStories() {
 func DeleteAllArtifacts() {
 	TestDB.db.Exec("DELETE FROM chat_messages")
 	TestDB.db.Exec("DELETE FROM artifacts")
+}
+
+func DeleteAllFeatureCalls() {
+	TestDB.db.Exec("DELETE FROM feature_calls")
 }
 
 func CleanTestData() {

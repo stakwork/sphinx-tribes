@@ -15630,3 +15630,156 @@ func (_c *Database_DeleteAllArtifactsByChatID_Call) RunAndReturn(run func(string
 	_c.Call.Return(run)
 	return _c
 }
+
+
+func (_m *Database) CreateOrUpdateFeatureCall(workspaceID string, url string) (*db.FeatureCall, error) {
+	ret := _m.Called(workspaceID, url)
+
+	if len(ret) == 0 {
+		panic("no return value specified for CreateOrUpdateFeatureCall")
+	}
+
+	var r0 *db.FeatureCall
+	var r1 error
+	if rf, ok := ret.Get(0).(func(string, string) (*db.FeatureCall, error)); ok {
+		return rf(workspaceID, url)
+	}
+	if rf, ok := ret.Get(0).(func(string, string) *db.FeatureCall); ok {
+		r0 = rf(workspaceID, url)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(*db.FeatureCall)
+		}
+	}
+
+	if rf, ok := ret.Get(1).(func(string, string) error); ok {
+		r1 = rf(workspaceID, url)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
+type Database_CreateOrUpdateFeatureCall_Call struct {
+	*mock.Call
+}
+
+func (_e *Database_Expecter) CreateOrUpdateFeatureCall(workspaceID interface{}, url interface{}) *Database_CreateOrUpdateFeatureCall_Call {
+	return &Database_CreateOrUpdateFeatureCall_Call{Call: _e.mock.On("CreateOrUpdateFeatureCall", workspaceID, url)}
+}
+
+func (_c *Database_CreateOrUpdateFeatureCall_Call) Run(run func(workspaceID string, url string)) *Database_CreateOrUpdateFeatureCall_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(string), args[1].(string))
+	})
+	return _c
+}
+
+func (_c *Database_CreateOrUpdateFeatureCall_Call) Return(_a0 *db.FeatureCall, _a1 error) *Database_CreateOrUpdateFeatureCall_Call {
+	_c.Call.Return(_a0, _a1)
+	return _c
+}
+
+func (_c *Database_CreateOrUpdateFeatureCall_Call) RunAndReturn(run func(string, string) (*db.FeatureCall, error)) *Database_CreateOrUpdateFeatureCall_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
+
+func (_m *Database) GetFeatureCallByWorkspaceID(workspaceID string) (*db.FeatureCall, error) {
+	ret := _m.Called(workspaceID)
+
+	if len(ret) == 0 {
+		panic("no return value specified for GetFeatureCallByWorkspaceID")
+	}
+
+	var r0 *db.FeatureCall
+	var r1 error
+	if rf, ok := ret.Get(0).(func(string) (*db.FeatureCall, error)); ok {
+		return rf(workspaceID)
+	}
+	if rf, ok := ret.Get(0).(func(string) *db.FeatureCall); ok {
+		r0 = rf(workspaceID)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(*db.FeatureCall)
+		}
+	}
+
+	if rf, ok := ret.Get(1).(func(string) error); ok {
+		r1 = rf(workspaceID)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
+type Database_GetFeatureCallByWorkspaceID_Call struct {
+	*mock.Call
+}
+
+func (_e *Database_Expecter) GetFeatureCallByWorkspaceID(workspaceID interface{}) *Database_GetFeatureCallByWorkspaceID_Call {
+	return &Database_GetFeatureCallByWorkspaceID_Call{Call: _e.mock.On("GetFeatureCallByWorkspaceID", workspaceID)}
+}
+
+func (_c *Database_GetFeatureCallByWorkspaceID_Call) Run(run func(workspaceID string)) *Database_GetFeatureCallByWorkspaceID_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(string))
+	})
+	return _c
+}
+
+func (_c *Database_GetFeatureCallByWorkspaceID_Call) Return(_a0 *db.FeatureCall, _a1 error) *Database_GetFeatureCallByWorkspaceID_Call {
+	_c.Call.Return(_a0, _a1)
+	return _c
+}
+
+func (_c *Database_GetFeatureCallByWorkspaceID_Call) RunAndReturn(run func(string) (*db.FeatureCall, error)) *Database_GetFeatureCallByWorkspaceID_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
+
+func (_m *Database) DeleteFeatureCall(workspaceID string) error {
+	ret := _m.Called(workspaceID)
+
+	if len(ret) == 0 {
+		panic("no return value specified for DeleteFeatureCall")
+	}
+
+	var r0 error
+	if rf, ok := ret.Get(0).(func(string) error); ok {
+		r0 = rf(workspaceID)
+	} else {
+		r0 = ret.Error(0)
+	}
+
+	return r0
+}
+
+type Database_DeleteFeatureCall_Call struct {
+	*mock.Call
+}
+
+func (_e *Database_Expecter) DeleteFeatureCall(workspaceID interface{}) *Database_DeleteFeatureCall_Call {
+	return &Database_DeleteFeatureCall_Call{Call: _e.mock.On("DeleteFeatureCall", workspaceID)}
+}
+
+func (_c *Database_DeleteFeatureCall_Call) Run(run func(workspaceID string)) *Database_DeleteFeatureCall_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(string))
+	})
+	return _c
+}
+
+func (_c *Database_DeleteFeatureCall_Call) Return(_a0 error) *Database_DeleteFeatureCall_Call {
+	_c.Call.Return(_a0)
+	return _c
+}
+
+func (_c *Database_DeleteFeatureCall_Call) RunAndReturn(run func(string) error) *Database_DeleteFeatureCall_Call {
+	_c.Call.Return(run)
+	return _c
+}

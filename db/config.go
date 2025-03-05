@@ -100,6 +100,7 @@ func InitDB() {
 	db.AutoMigrate(&TicketPlan{})
 	db.AutoMigrate(&Activity{})
 	db.AutoMigrate(&Artifact{})
+	db.AutoMigrate(&FeatureCall{})
 
 	DB.MigrateTablesWithOrgUuid()
 	DB.MigrateOrganizationToWorkspace()

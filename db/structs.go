@@ -1474,6 +1474,15 @@ type Option struct {
 	Webhook        string `json:"webhook"`
 }
 
+type FeatureCall struct {
+	ID          uuid.UUID      `gorm:"type:uuid;primaryKey;default:gen_random_uuid()" json:"id"`
+	WorkspaceID string         `gorm:"type:varchar(255);uniqueIndex;not null" json:"workspace_id"`
+	URL         string         `gorm:"type:text" json:"url"`
+	CreatedAt   time.Time      `gorm:"autoCreateTime" json:"created_at"`
+	UpdatedAt   time.Time      `gorm:"autoUpdateTime" json:"updated_at"`
+	DeletedAt   gorm.DeletedAt  `gorm:"index" json:"-"`
+}
+
 func (Person) TableName() string {
 	return "people"
 }
