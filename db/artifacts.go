@@ -10,6 +10,28 @@ import (
 )
 
 func (db database) CreateArtifact(artifact *Artifact) (*Artifact, error) {
+
+	if artifact.MessageID == "" {
+		return nil, fmt.Errorf("message ID cannot be empty")
+	}
+	
+	var count int64
+	if err := db.db.Model(&ChatMessage{}).Where("id = ?", artifact.MessageID).Count(&count).Error; err != nil {
+		return nil, fmt.Errorf("failed to check message existence: %w", err)
+	}
+	if count == 0 {
+		return nil, fmt.Errorf("message with ID %s does not exist", artifact.MessageID)
+	}
+	
+	validTypes := map[ArtifactType]bool{
+		TextArtifact:   true,
+		VisualArtifact: true,
+		ActionArtifact: true,
+	}
+	if !validTypes[artifact.Type] {
+		return nil, fmt.Errorf("invalid artifact type: %s", artifact.Type)
+	}
+
 	if artifact.ID == uuid.Nil {
 		artifact.ID = uuid.New()
 	}
