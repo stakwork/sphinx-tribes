@@ -577,6 +577,7 @@ func (db database) GetWorkspaceBounties(r *http.Request, workspace_uuid string) 
 	pending := keys.Get("Pending")
 	failed := keys.Get("Failed")
 	languages := keys.Get("languages")
+	accessRestriction := keys.Get("access_restriction")
 	languageArray := strings.Split(languages, ",")
 	languageLength := len(languageArray)
 
@@ -586,6 +587,7 @@ func (db database) GetWorkspaceBounties(r *http.Request, workspace_uuid string) 
 	limitQuery := ""
 	searchQuery := ""
 	languageQuery := ""
+	accessRestrictionQuery := ""
 
 	if sortBy != "" && direction != "" {
 		orderQuery = "ORDER BY " + sortBy + " " + direction
@@ -600,6 +602,9 @@ func (db database) GetWorkspaceBounties(r *http.Request, workspace_uuid string) 
 	}
 	if search != "" {
 		searchQuery = fmt.Sprintf("AND LOWER(title) LIKE %s", "'%"+strings.ToLower(search)+"%'")
+	}
+	if accessRestriction != "" {
+		accessRestrictionQuery = fmt.Sprintf("AND access_restriction = '%s'", accessRestriction)
 	}
 
 	var statusConditions []string
@@ -645,7 +650,7 @@ func (db database) GetWorkspaceBounties(r *http.Request, workspace_uuid string) 
 	}
 
 	query := `SELECT * FROM bounty WHERE workspace_uuid = '` + workspace_uuid + `'`
-	allQuery := query + " " + statusQuery + " " + searchQuery + " " + languageQuery + " " + orderQuery + " " + limitQuery
+	allQuery := query + " " + statusQuery + " " + searchQuery + " " + languageQuery + " " + accessRestrictionQuery + " " + orderQuery + " " + limitQuery
 	theQuery := db.db.Raw(allQuery)
 
 	if tags != "" {
@@ -1200,6 +1205,7 @@ func (db database) GetAllBounties(r *http.Request) []NewBounty {
 	languageLength := len(languageArray)
 	PhaseUuid := keys.Get("phase_uuid")
 	PhasePriority := keys.Get("phase_priority")
+	accessRestriction := keys.Get("access_restriction")
 
 	if workspaceUuid == "" && orgUuid != "" {
 		workspaceUuid = orgUuid
@@ -1214,6 +1220,7 @@ func (db database) GetAllBounties(r *http.Request) []NewBounty {
 	languageQuery := ""
 	phaseUuidQuery := ""
 	phasePriorityQuery := ""
+	accessRestrictionQuery := ""
 
 	if sortBy != "" && direction != "" {
 		orderQuery = "ORDER BY " + sortBy + " " + direction
@@ -1233,6 +1240,10 @@ func (db database) GetAllBounties(r *http.Request) []NewBounty {
 
 	if PhasePriority != "" {
 		phasePriorityQuery = "AND phase_priority = '" + PhasePriority + "'"
+	}
+	
+	if accessRestriction != "" {
+		accessRestrictionQuery = fmt.Sprintf("AND access_restriction = '%s'", accessRestriction)
 	}
 
 	var statusConditions []string
@@ -1282,7 +1293,7 @@ func (db database) GetAllBounties(r *http.Request) []NewBounty {
 
 	query := "SELECT * FROM public.bounty WHERE show != false"
 
-	allQuery := query + " " + statusQuery + " " + searchQuery + " " + workspaceQuery + " " + languageQuery + " " + phaseUuidQuery + " " + phasePriorityQuery + " " + orderQuery + " " + limitQuery
+	allQuery := query + " " + statusQuery + " " + searchQuery + " " + workspaceQuery + " " + languageQuery + " " + phaseUuidQuery + " " + phasePriorityQuery + " " + accessRestrictionQuery + " " + orderQuery + " " + limitQuery
 
 	theQuery := db.db.Raw(allQuery)
 
