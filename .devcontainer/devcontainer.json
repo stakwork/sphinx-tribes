@@ -1,9 +1,14 @@
 {
   "name": "Sphinx Tribes Dev",
-	"dockerComposeFile": "docker-compose.yml",
-	"service": "app",
-	"workspaceFolder": "/workspaces",
-  "forwardPorts": [13008, 5432, 5002],
+  "dockerComposeFile": "docker-compose.yml",
+  "service": "app",
+  "workspaceFolder": "/workspaces",
+  "forwardPorts": [
+    13008,
+    5432,
+    5002,
+    33335
+  ],
   "postCreateCommand": "bash sphinx-tribes/.devcontainer/setup.sh",
   "customizations": {
     "codespaces": {
@@ -19,7 +24,20 @@
     "vscode": {
       "settings": {
         "git.autofetch": true,
-        "editor.formatOnSave": true
+        "editor.formatOnSave": true,
+        "staklink.port": 33335,
+        "staklink.start": {
+          "sphinx-tribes-frontend": [
+            "yarn",
+            "yarn start:codespace"
+          ]
+        },
+        "staklink.restart": {
+          "sphinx-tribes": [
+            "go build",
+            "./sphinx-tribes"
+          ]
+        }
       },
       "extensions": [
         "golang.go",
@@ -27,7 +45,10 @@
       ]
     }
   },
-  "hostRequirements": {"cpus": 4, "memory": "8gb"},
+  "hostRequirements": {
+    "cpus": 4,
+    "memory": "8gb"
+  },
   "remoteUser": "root",
   "shutdownAction": "stopCompose"
 }
