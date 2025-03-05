@@ -47,6 +47,7 @@ var V2BotUrl string
 var V2BotToken string
 var IsV2Payment bool = false
 var FfWebsocket bool = false
+var SWAuth string
 
 func InitConfig() {
 	Host = os.Getenv("LN_SERVER_BASE_URL")
@@ -69,6 +70,7 @@ func InitConfig() {
 	V2BotToken = os.Getenv("V2_BOT_TOKEN")
 	FfWebsocket = os.Getenv("FF_WEBSOCKET") == "true"
 	LogLevel = strings.ToUpper(os.Getenv("LOG_LEVEL"))
+	SWAuth = os.Getenv("SWAUTH")
 
 	// Add to super admins
 	SuperAdmins = StripSuperAdmins(AdminStrings)
