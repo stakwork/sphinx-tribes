@@ -158,20 +158,33 @@ func PubKeyContextSuperAdmin(next http.Handler) http.Handler {
 
 func CombinedAuthContext(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		// Check for token x-api-token first
+		// Check for x-api-token first.
 		tokenHeader := r.Header.Get("x-api-token")
 		expectedToken := config.SWAuth
 
-		if tokenHeader != "" && tokenHeader == expectedToken {
-			// Token auth succeeded
-			ctx := context.WithValue(r.Context(), ContextKey, tokenHeader)
-			next.ServeHTTP(w, r.WithContext(ctx))
+		// No x-api-token provided: try pubkey authentication.
+		token := r.URL.Query().Get("token")
+		if token == "" {
+			token = r.Header.Get("x-jwt")
+		}
+
+		if tokenHeader != "" && token == "" {
+			if tokenHeader == expectedToken {
+				ctx := context.WithValue(r.Context(), ContextKey, tokenHeader)
+				next.ServeHTTP(w, r.WithContext(ctx))
+				return
+			}
+		}
+
+		if token != "" {
+			pubKeyHandler := PubKeyContext(next)
+			pubKeyHandler.ServeHTTP(w, r)
 			return
 		}
 
-		// Token auth failed, try pubkey auth
-		pubKeyHandler := PubKeyContext(next)
-		pubKeyHandler.ServeHTTP(w, r)
+		// No token provided at all.
+		logger.Log.Info("[auth] no token provided")
+		http.Error(w, http.StatusText(http.StatusUnauthorized), http.StatusUnauthorized)
 	})
 }
 

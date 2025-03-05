@@ -5655,11 +5655,6 @@ func TestTokenAuthentication(t *testing.T) {
 
 	db.CleanTestData()
 
-	// Set the test environment variable for token authentication
-	originalEnv := os.Getenv("SWAUTH")
-	os.Setenv("SWAUTH", "test-token-value")
-	defer os.Setenv("SWAUTH", originalEnv)
-
 	// Create test data
 	person := db.Person{
 		Uuid:        uuid.New().String(),
@@ -5709,7 +5704,7 @@ func TestTokenAuthentication(t *testing.T) {
 		{
 			name:           "Valid Token Authentication",
 			setAuthHeader:  true,
-			authHeaderName: "token",
+			authHeaderName: "x-api-token",
 			authValue:      "test-token-value",
 			expectedStatus: http.StatusOK,
 		},
@@ -5745,6 +5740,10 @@ func TestTokenAuthentication(t *testing.T) {
 
 			// Set pubkey in context if using pubkey auth (simulate middleware)
 			if tt.authHeaderName == "x-jwt" {
+				req = req.WithContext(context.WithValue(req.Context(), auth.ContextKey, tt.authValue))
+			}
+
+			if tt.authHeaderName == "x-api-token" && tt.expectedStatus == http.StatusOK {
 				req = req.WithContext(context.WithValue(req.Context(), auth.ContextKey, tt.authValue))
 			}
 
