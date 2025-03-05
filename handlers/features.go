@@ -33,6 +33,11 @@ type PostData struct {
 	SourceWebsocketId string   `json:"sourceWebsocketId"`
 }
 
+type FeatureCallRequest struct {
+    WorkspaceID string `json:"workspace_id"`
+    URL         string `json:"url"`
+}
+
 type FeatureBriefRequest struct {
 	Output struct {
 		FeatureBrief string `json:"featureBrief"`
@@ -1004,4 +1009,100 @@ func (oh *featureHandler) GetQuickTickets(w http.ResponseWriter, r *http.Request
 
 	w.WriteHeader(http.StatusOK)
 	json.NewEncoder(w).Encode(response)
+}
+
+func (oh *featureHandler) CreateOrUpdateFeatureCall(w http.ResponseWriter, r *http.Request) {
+	ctx := r.Context()
+	pubKeyFromAuth, _ := ctx.Value(auth.ContextKey).(string)
+	if pubKeyFromAuth == "" {
+		logger.Log.Info("no pubkey from auth")
+		w.WriteHeader(http.StatusUnauthorized)
+		return
+	}
+
+	var req FeatureCallRequest
+
+	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
+		logger.Log.Error("invalid request body", err)
+		w.WriteHeader(http.StatusBadRequest)
+		json.NewEncoder(w).Encode(map[string]string{"error": "Invalid request body"})
+		return
+	}
+
+	workspace := oh.db.GetWorkspaceByUuid(req.WorkspaceID)
+	if workspace.Uuid == "" {
+		logger.Log.Info("workspace not found")
+		w.WriteHeader(http.StatusNotFound)
+		json.NewEncoder(w).Encode(map[string]string{"error": "Workspace not found"})
+		return
+	}
+
+	featureCall, err := oh.db.CreateOrUpdateFeatureCall(req.WorkspaceID, req.URL)
+	if err != nil {
+		logger.Log.Error("failed to create/update feature call", err)
+		w.WriteHeader(http.StatusBadRequest)
+		json.NewEncoder(w).Encode(map[string]string{"error": err.Error()})
+		return
+	}
+
+	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode(featureCall)
+}
+
+func (oh *featureHandler) GetFeatureCall(w http.ResponseWriter, r *http.Request) {
+	ctx := r.Context()
+	pubKeyFromAuth, _ := ctx.Value(auth.ContextKey).(string)
+	if pubKeyFromAuth == "" {
+		logger.Log.Info("no pubkey from auth")
+		w.WriteHeader(http.StatusUnauthorized)
+		return
+	}
+
+	workspaceID := chi.URLParam(r, "workspace_uuid")
+	if workspaceID == "" {
+		logger.Log.Info("missing workspace_uuid parameter")
+		w.WriteHeader(http.StatusBadRequest)
+		json.NewEncoder(w).Encode(map[string]string{"error": "workspace_uuid parameter is required"})
+		return
+	}
+
+	featureCall, err := oh.db.GetFeatureCallByWorkspaceID(workspaceID)
+	if err != nil {
+		logger.Log.Error("failed to get feature call", err)
+		w.WriteHeader(http.StatusNotFound)
+		json.NewEncoder(w).Encode(map[string]string{"error": err.Error()})
+		return
+	}
+
+	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode(featureCall)
+}
+
+func (oh *featureHandler) DeleteFeatureCall(w http.ResponseWriter, r *http.Request) {
+	ctx := r.Context()
+	pubKeyFromAuth, _ := ctx.Value(auth.ContextKey).(string)
+	if pubKeyFromAuth == "" {
+		logger.Log.Info("no pubkey from auth")
+		w.WriteHeader(http.StatusUnauthorized)
+		return
+	}
+
+	workspaceID := chi.URLParam(r, "workspace_uuid")
+	if workspaceID == "" {
+		logger.Log.Info("missing workspace_uuid parameter")
+		w.WriteHeader(http.StatusBadRequest)
+		json.NewEncoder(w).Encode(map[string]string{"error": "workspace_uuid parameter is required"})
+		return
+	}
+
+	err := oh.db.DeleteFeatureCall(workspaceID)
+	if err != nil {
+		logger.Log.Error("failed to delete feature call", err)
+		w.WriteHeader(http.StatusNotFound)
+		json.NewEncoder(w).Encode(map[string]string{"error": err.Error()})
+		return
+	}
+
+	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode(map[string]string{"message": "Feature call deleted successfully"})
 }

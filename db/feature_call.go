@@ -62,7 +62,7 @@ func (db database) DeleteFeatureCall(workspaceID string) error {
 		return errors.New("workspace_id is required")
 	}
 
-	result := db.db.Where("workspace_id = ?", workspaceID).Delete(&FeatureCall{})
+	result := db.db.Unscoped().Where("workspace_id = ?", workspaceID).Delete(&FeatureCall{})
 	if result.Error != nil {
 		return result.Error
 	}
