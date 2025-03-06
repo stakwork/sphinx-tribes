@@ -16,14 +16,16 @@ import (
 func (db database) GetFeaturesByWorkspaceUuid(uuid string, r *http.Request) []WorkspaceFeatures {
 	offset, limit, sortBy, direction, _ := utils.GetPaginationParams(r)
 	statusFilter := r.URL.Query().Get("status")
-	if statusFilter == "" {
-		statusFilter = string(ActiveFeature)
-	}
 
 	orderQuery := ""
 	limitQuery := ""
+	whereClause := "WHERE workspace_uuid = ?"
+	queryParams := []interface{}{uuid}
 
-	ms := []WorkspaceFeatures{}
+	if statusFilter != "" {
+		whereClause += " AND feat_status = ?"
+		queryParams = append(queryParams, statusFilter)
+	}
 
 	if sortBy != "" && direction != "" {
 		orderQuery = "ORDER BY " + sortBy + " " + direction
@@ -35,10 +37,11 @@ func (db database) GetFeaturesByWorkspaceUuid(uuid string, r *http.Request) []Wo
 		limitQuery = fmt.Sprintf("LIMIT %d  OFFSET %d", limit, offset)
 	}
 
-	query := `SELECT * FROM public.workspace_features WHERE workspace_uuid = ? AND feat_status = ? `
+	query := `SELECT * FROM public.workspace_features ` + whereClause
 	allQuery := query + " " + orderQuery + " " + limitQuery
 
-	db.db.Raw(allQuery, uuid, statusFilter).Scan(&ms)
+	ms := []WorkspaceFeatures{}
+	db.db.Raw(allQuery, queryParams...).Scan(&ms)
 
 	return ms
 }
