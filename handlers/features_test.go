@@ -5649,6 +5649,159 @@ func TestGetQuickTickets(t *testing.T) {
 	})
 }
 
+func TestDeleteFeatureCall(t *testing.T) {
+	teardownSuite := SetupSuite(t)
+	defer teardownSuite(t)
+
+	fHandler := NewFeatureHandler(db.TestDB)
+
+	db.DeleteAllFeatureCalls()
+	db.CleanTestData()
+
+	person := db.Person{
+		Uuid:        uuid.New().String(),
+		OwnerAlias:  "test-alias",
+		UniqueName:  "test-unique-name",
+		OwnerPubKey: "test-pubkey",
+		PriceToMeet: 0,
+		Description: "test-description",
+	}
+	db.TestDB.CreateOrEditPerson(person)
+
+	workspace := db.Workspace{
+		Uuid:        uuid.New().String(),
+		Name:        "test-workspace-" + uuid.New().String(),
+		OwnerPubKey: person.OwnerPubKey,
+		Github:      "https://github.com/test",
+		Website:     "https://www.testwebsite.com",
+		Description: "test-description",
+	}
+
+	db.TestDB.CreateOrEditWorkspace(workspace)
+
+	db.TestDB.CreateOrUpdateFeatureCall(workspace.Uuid, "https://meet.google.com/test")
+
+	t.Run("should return 401 error if not authorized", func(t *testing.T) {
+		rr := httptest.NewRecorder()
+		handler := http.HandlerFunc(fHandler.DeleteFeatureCall)
+
+		req, err := http.NewRequest(http.MethodDelete, "/features/call/"+workspace.Uuid, nil)
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		rctx := chi.NewRouteContext()
+		rctx.URLParams.Add("workspace_uuid", workspace.Uuid)
+		req = req.WithContext(context.WithValue(req.Context(), chi.RouteCtxKey, rctx))
+
+		handler.ServeHTTP(rr, req)
+		assert.Equal(t, http.StatusUnauthorized, rr.Code)
+	})
+
+	t.Run("should return 400 if workspace_uuid parameter is missing", func(t *testing.T) {
+		rr := httptest.NewRecorder()
+		handler := http.HandlerFunc(fHandler.DeleteFeatureCall)
+
+		req, err := http.NewRequest(http.MethodDelete, "/features/call/", nil)
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		ctx := context.WithValue(req.Context(), auth.ContextKey, person.OwnerPubKey)
+		req = req.WithContext(ctx)
+
+		rctx := chi.NewRouteContext()
+		req = req.WithContext(context.WithValue(req.Context(), chi.RouteCtxKey, rctx))
+
+		handler.ServeHTTP(rr, req)
+		assert.Equal(t, http.StatusBadRequest, rr.Code)
+
+		var response map[string]string
+		err = json.NewDecoder(rr.Body).Decode(&response)
+		assert.NoError(t, err)
+		assert.Equal(t, "workspace_uuid parameter is required", response["error"])
+	})
+
+	t.Run("should return 404 if feature call does not exist", func(t *testing.T) {
+		rr := httptest.NewRecorder()
+		handler := http.HandlerFunc(fHandler.DeleteFeatureCall)
+
+		nonExistentUUID := uuid.New().String()
+		req, err := http.NewRequest(http.MethodDelete, "/features/call/"+nonExistentUUID, nil)
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		ctx := context.WithValue(req.Context(), auth.ContextKey, person.OwnerPubKey)
+		req = req.WithContext(ctx)
+
+		rctx := chi.NewRouteContext()
+		rctx.URLParams.Add("workspace_uuid", nonExistentUUID)
+		req = req.WithContext(context.WithValue(req.Context(), chi.RouteCtxKey, rctx))
+
+		handler.ServeHTTP(rr, req)
+		assert.Equal(t, http.StatusNotFound, rr.Code)
+
+		var response map[string]string
+		err = json.NewDecoder(rr.Body).Decode(&response)
+		assert.NoError(t, err)
+		assert.Equal(t, "feature call not found", response["error"])
+	})
+
+	t.Run("should successfully delete feature call", func(t *testing.T) {
+		rr := httptest.NewRecorder()
+		handler := http.HandlerFunc(fHandler.DeleteFeatureCall)
+
+		req, err := http.NewRequest(http.MethodDelete, "/features/call/"+workspace.Uuid, nil)
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		ctx := context.WithValue(req.Context(), auth.ContextKey, person.OwnerPubKey)
+		req = req.WithContext(ctx)
+
+		rctx := chi.NewRouteContext()
+		rctx.URLParams.Add("workspace_uuid", workspace.Uuid)
+		req = req.WithContext(context.WithValue(req.Context(), chi.RouteCtxKey, rctx))
+
+		handler.ServeHTTP(rr, req)
+		assert.Equal(t, http.StatusOK, rr.Code)
+
+		var response map[string]string
+		err = json.NewDecoder(rr.Body).Decode(&response)
+		assert.NoError(t, err)
+		assert.Equal(t, "Feature call deleted successfully", response["message"])
+
+		_, err = db.TestDB.GetFeatureCallByWorkspaceID(workspace.Uuid)
+		assert.Error(t, err)
+	})
+
+	t.Run("should return 404 when trying to delete already deleted feature call", func(t *testing.T) {
+		rr := httptest.NewRecorder()
+		handler := http.HandlerFunc(fHandler.DeleteFeatureCall)
+
+		req, err := http.NewRequest(http.MethodDelete, "/features/call/"+workspace.Uuid, nil)
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		ctx := context.WithValue(req.Context(), auth.ContextKey, person.OwnerPubKey)
+		req = req.WithContext(ctx)
+
+		rctx := chi.NewRouteContext()
+		rctx.URLParams.Add("workspace_uuid", workspace.Uuid)
+		req = req.WithContext(context.WithValue(req.Context(), chi.RouteCtxKey, rctx))
+
+		handler.ServeHTTP(rr, req)
+		assert.Equal(t, http.StatusNotFound, rr.Code)
+
+		var response map[string]string
+		err = json.NewDecoder(rr.Body).Decode(&response)
+		assert.NoError(t, err)
+		assert.Equal(t, "feature call not found", response["error"])
+	})
+}
+
 func TestTokenAuthentication(t *testing.T) {
 	teardownSuite := SetupSuite(t)
 	defer teardownSuite(t)
