@@ -17,7 +17,7 @@ func FeatureRoutes() chi.Router {
 	})
 
 	r.Group(func(r chi.Router) {
-		r.Use(auth.PubKeyContext)
+		r.Use(auth.CombinedAuthContext)
 
 		r.Post("/", featureHandlers.CreateOrEditFeatures)
 		r.Post("/brief", featureHandlers.UpdateFeatureBrief)

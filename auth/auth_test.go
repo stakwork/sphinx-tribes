@@ -9,6 +9,7 @@ import (
 	"fmt"
 	"net/http"
 	"net/http/httptest"
+	"os"
 	"strings"
 	"testing"
 	"time"
@@ -2022,4 +2023,115 @@ func TestPubKeyContext(t *testing.T) {
 		}
 		assert.Equal(t, 500, nextCalled)
 	})
+}
+
+func TestCombinedAuthContext(t *testing.T) {
+	// Initialize configuration and override the expected x-api-token value.
+	originalEnv := os.Getenv("SWAUTH")
+	os.Setenv("SWAUTH", "test-token-value")
+	defer os.Setenv("SWAUTH", originalEnv)
+
+	config.InitConfig()
+	InitJwt() // Initialize JWT-related globals required by PubKeyContext
+
+	// Setup for generating a valid JWT for pubkey auth fallback.
+	privKey, err := btcec.NewPrivateKey()
+	assert.NoError(t, err)
+	expectedPubKeyHex := hex.EncodeToString(privKey.PubKey().SerializeCompressed())
+	createValidJWT := func(pubkey string, expireHours int) string {
+		claims := map[string]interface{}{
+			"pubkey": pubkey,
+			"exp":    time.Now().Add(time.Hour * time.Duration(expireHours)).Unix(),
+		}
+		_, tokenString, _ := TokenAuth.Encode(claims)
+		return tokenString
+	}
+
+	tests := []struct {
+		name           string
+		setupToken     func(r *http.Request)
+		expectedStatus int
+		expectNextCall bool
+		// expectContext indicates whether the context should be set from the x-api-token branch.
+		expectContext bool
+	}{
+		{
+			name: "Valid x-api-token header",
+			setupToken: func(r *http.Request) {
+				r.Header.Set("x-api-token", config.SWAuth)
+			},
+			expectedStatus: http.StatusOK,
+			expectNextCall: true,
+			expectContext:  true,
+		},
+		{
+			name: "Invalid x-api-token header, no valid JWT",
+			setupToken: func(r *http.Request) {
+				// x-api-token provided but does not match config.SWAuth, and no pubkey token.
+				r.Header.Set("x-api-token", "invalid-token")
+			},
+			// PubKeyContext will be used as fallback and then fail since no valid pubkey token is provided.
+			expectedStatus: http.StatusUnauthorized,
+			expectNextCall: false,
+			expectContext:  false,
+		},
+		{
+			name: "No token provided",
+			setupToken: func(r *http.Request) {
+				// Neither x-api-token nor pubkey token is provided.
+			},
+			expectedStatus: http.StatusUnauthorized,
+			expectNextCall: false,
+			expectContext:  false,
+		},
+		{
+			name: "Invalid x-api-token header with valid x-jwt token",
+			setupToken: func(r *http.Request) {
+				// x-api-token is present but invalid so it falls back to pubkey auth.
+				r.Header.Set("x-api-token", "invalid-token")
+				r.Header.Set("x-jwt", createValidJWT(expectedPubKeyHex, 24))
+			},
+			expectedStatus: http.StatusOK,
+			expectNextCall: true,
+			// Since the valid x-api-token branch wasn’t taken, no value is set in context.
+			expectContext: false,
+		},
+		{
+			name: "No x-api-token header with valid x-jwt token",
+			setupToken: func(r *http.Request) {
+				// No x-api-token header so pubkey auth (using x-jwt) is used.
+				r.Header.Set("x-jwt", createValidJWT(expectedPubKeyHex, 24))
+			},
+			expectedStatus: http.StatusOK,
+			expectNextCall: true,
+			expectContext:  false,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			nextCalled := false
+			var ctxValue interface{}
+			// The next handler will record if it was called and capture the context value.
+			next := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+				nextCalled = true
+				ctxValue = r.Context().Value(ContextKey)
+				w.WriteHeader(http.StatusOK)
+			})
+			req := httptest.NewRequest(http.MethodGet, "/", nil)
+			tt.setupToken(req)
+			rr := httptest.NewRecorder()
+
+			// CombinedAuthContext will either authenticate using x-api-token or fallback to PubKeyContext.
+			handler := CombinedAuthContext(next)
+			handler.ServeHTTP(rr, req)
+
+			assert.Equal(t, tt.expectedStatus, rr.Code)
+			assert.Equal(t, tt.expectNextCall, nextCalled)
+			if tt.expectContext {
+				// When authenticated via x-api-token the middleware should set the token into the request context.
+				assert.Equal(t, config.SWAuth, ctxValue)
+			}
+		})
+	}
 }
