@@ -143,7 +143,7 @@ Use the release page link [mockery releases](https://github.com/vektra/mockery/r
 If you have go already installed on your device you can use the go install command to download mockery.
 
 ```sh
-go install github.com/vektra/mockery/v2@v2.51
+go install github.com/vektra/mockery/v2@v2.50
 ```
 
 ##### Using homebrew
