@@ -14,4 +14,4 @@ RUN (type -p wget >/dev/null || (sudo apt update && sudo apt-get install wget -y
 	&& sudo apt update \
 	&& sudo apt install gh -y
 
-go install github.com/vektra/mockery/v2@v2.51
+RUN go install github.com/vektra/mockery/v2@v2.51
