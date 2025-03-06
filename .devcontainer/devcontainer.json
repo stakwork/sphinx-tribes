@@ -35,6 +35,7 @@
         },
         "staklink.restart": {
           "sphinx-tribes": [
+            "mockery",
             "go build",
             "./sphinx-tribes"
           ]
