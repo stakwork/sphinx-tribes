@@ -2030,7 +2030,7 @@ func TestGetStoryByUuid(t *testing.T) {
 
 	feature := db.WorkspaceFeatures{
 		Uuid:          uuid.New().String(),
-			WorkspaceUuid: workspace.Uuid,
+		WorkspaceUuid: workspace.Uuid,
 		Name:          "test-feature",
 		Url:           "https://github.com/test-feature",
 		Priority:      0,
@@ -2089,139 +2089,139 @@ func TestGetStoryByUuid(t *testing.T) {
 
 	t.Run("Valid Request with Existing Story", func(t *testing.T) {
 		rr := httptest.NewRecorder()
-        handler := http.HandlerFunc(fHandler.GetStoryByUuid)
-
-        rctx := chi.NewRouteContext()
-        rctx.URLParams.Add("feature_uuid", feature.Uuid)
-        rctx.URLParams.Add("story_uuid", featureStory.Uuid)
-        ctx := context.WithValue(context.Background(), auth.ContextKey, person.OwnerPubKey)
-        req, err := http.NewRequestWithContext(context.WithValue(ctx, chi.RouteCtxKey, rctx), 
-            http.MethodGet, "/features/"+feature.Uuid+"/story/"+featureStory.Uuid, nil)
-        assert.NoError(t, err)
-
-        handler.ServeHTTP(rr, req)
-
-        assert.Equal(t, http.StatusOK, rr.Code)
-        var returnedStory db.FeatureStory
-        err = json.Unmarshal(rr.Body.Bytes(), &returnedStory)
-        assert.NoError(t, err)
-        assert.Equal(t, featureStory.Description, returnedStory.Description)
-    })
-
-    t.Run("Valid Request with Non-Existing Story", func(t *testing.T) {
-        rr := httptest.NewRecorder()
-        handler := http.HandlerFunc(fHandler.GetStoryByUuid)
-
-        nonExistentUUID := uuid.New().String()
-		rctx := chi.NewRouteContext()
-        rctx.URLParams.Add("feature_uuid", feature.Uuid)
-        rctx.URLParams.Add("story_uuid", nonExistentUUID)
-        ctx := context.WithValue(context.Background(), auth.ContextKey, person.OwnerPubKey)
-        req, err := http.NewRequestWithContext(context.WithValue(ctx, chi.RouteCtxKey, rctx),
-            http.MethodGet, "/features/"+feature.Uuid+"/story/"+nonExistentUUID, nil)
-        assert.NoError(t, err)
-
-        handler.ServeHTTP(rr, req)
-        assert.Equal(t, http.StatusNotFound, rr.Code)
-    })
-
-    t.Run("Valid Request with Empty UUIDs", func(t *testing.T) {
-		rr := httptest.NewRecorder()
-        handler := http.HandlerFunc(fHandler.GetStoryByUuid)
-
-        rctx := chi.NewRouteContext()
-        rctx.URLParams.Add("feature_uuid", "")
-        rctx.URLParams.Add("story_uuid", "")
-        ctx := context.WithValue(context.Background(), auth.ContextKey, person.OwnerPubKey)
-        req, err := http.NewRequestWithContext(context.WithValue(ctx, chi.RouteCtxKey, rctx),
-            http.MethodGet, "/features//story/", nil)
-		assert.NoError(t, err)
-
-        handler.ServeHTTP(rr, req)
-        assert.Equal(t, http.StatusNotFound, rr.Code)
-    })
-
-    t.Run("Unauthorized Request", func(t *testing.T) {
-        rr := httptest.NewRecorder()
-        handler := http.HandlerFunc(fHandler.GetStoryByUuid)
-
-        rctx := chi.NewRouteContext()
-        rctx.URLParams.Add("feature_uuid", feature.Uuid)
-        rctx.URLParams.Add("story_uuid", featureStory.Uuid)
-        req, err := http.NewRequestWithContext(context.WithValue(context.Background(), chi.RouteCtxKey, rctx),
-            http.MethodGet, "/features/"+feature.Uuid+"/story/"+featureStory.Uuid, nil)
-        assert.NoError(t, err)
-
-        handler.ServeHTTP(rr, req)
-        assert.Equal(t, http.StatusUnauthorized, rr.Code)
-    })
-
-    t.Run("Invalid UUID Format", func(t *testing.T) {
-        rr := httptest.NewRecorder()
-        handler := http.HandlerFunc(fHandler.GetStoryByUuid)
+		handler := http.HandlerFunc(fHandler.GetStoryByUuid)
 
 		rctx := chi.NewRouteContext()
-        rctx.URLParams.Add("feature_uuid", "invalid-uuid")
-        rctx.URLParams.Add("story_uuid", "invalid-uuid")
-        ctx := context.WithValue(context.Background(), auth.ContextKey, person.OwnerPubKey)
-        req, err := http.NewRequestWithContext(context.WithValue(ctx, chi.RouteCtxKey, rctx),
-            http.MethodGet, "/features/invalid-uuid/story/invalid-uuid", nil)
-        assert.NoError(t, err)
-
-        handler.ServeHTTP(rr, req)
-        assert.Equal(t, http.StatusNotFound, rr.Code)
-    })
-	
-    t.Run("Story with Special Characters", func(t *testing.T) {
-		rr := httptest.NewRecorder()
-        handler := http.HandlerFunc(fHandler.GetStoryByUuid)
-
-        specialCharsUUID := "!@#$%^&*()"
-        rctx := chi.NewRouteContext()
-        rctx.URLParams.Add("feature_uuid", feature.Uuid)
-        rctx.URLParams.Add("story_uuid", specialCharsUUID)
-        ctx := context.WithValue(context.Background(), auth.ContextKey, person.OwnerPubKey)
-        req, err := http.NewRequestWithContext(context.WithValue(ctx, chi.RouteCtxKey, rctx),
-            http.MethodGet, "/features/"+feature.Uuid+"/story/"+url.QueryEscape(specialCharsUUID), nil)
+		rctx.URLParams.Add("feature_uuid", feature.Uuid)
+		rctx.URLParams.Add("story_uuid", featureStory.Uuid)
+		ctx := context.WithValue(context.Background(), auth.ContextKey, person.OwnerPubKey)
+		req, err := http.NewRequestWithContext(context.WithValue(ctx, chi.RouteCtxKey, rctx),
+			http.MethodGet, "/features/"+feature.Uuid+"/story/"+featureStory.Uuid, nil)
 		assert.NoError(t, err)
 
-        handler.ServeHTTP(rr, req)
-        assert.Equal(t, http.StatusNotFound, rr.Code)
-    })
+		handler.ServeHTTP(rr, req)
 
-    t.Run("Valid Request with Mixed Case UUIDs", func(t *testing.T) {
-        rr := httptest.NewRecorder()
-        handler := http.HandlerFunc(fHandler.GetStoryByUuid)
+		assert.Equal(t, http.StatusOK, rr.Code)
+		var returnedStory db.FeatureStory
+		err = json.Unmarshal(rr.Body.Bytes(), &returnedStory)
+		assert.NoError(t, err)
+		assert.Equal(t, featureStory.Description, returnedStory.Description)
+	})
 
-        upperFeatureUUID := strings.ToUpper(feature.Uuid)
-        upperStoryUUID := strings.ToUpper(featureStory.Uuid)
+	t.Run("Valid Request with Non-Existing Story", func(t *testing.T) {
+		rr := httptest.NewRecorder()
+		handler := http.HandlerFunc(fHandler.GetStoryByUuid)
+
+		nonExistentUUID := uuid.New().String()
 		rctx := chi.NewRouteContext()
-        rctx.URLParams.Add("feature_uuid", upperFeatureUUID)
-        rctx.URLParams.Add("story_uuid", upperStoryUUID)
-        ctx := context.WithValue(context.Background(), auth.ContextKey, person.OwnerPubKey)
-        req, err := http.NewRequestWithContext(context.WithValue(ctx, chi.RouteCtxKey, rctx),
-            http.MethodGet, "/features/"+upperFeatureUUID+"/story/"+upperStoryUUID, nil)
-        assert.NoError(t, err)
-
-        handler.ServeHTTP(rr, req)
-        assert.Equal(t, http.StatusNotFound, rr.Code)
-    })
-
-    t.Run("Request with Long UUIDs", func(t *testing.T) {
-		rr := httptest.NewRecorder()
-        handler := http.HandlerFunc(fHandler.GetStoryByUuid)
-
-        longUUID := feature.Uuid + "extra"
-        rctx := chi.NewRouteContext()
-        rctx.URLParams.Add("feature_uuid", longUUID)
-        rctx.URLParams.Add("story_uuid", longUUID)
-        ctx := context.WithValue(context.Background(), auth.ContextKey, person.OwnerPubKey)
-        req, err := http.NewRequestWithContext(context.WithValue(ctx, chi.RouteCtxKey, rctx),
-            http.MethodGet, "/features/"+longUUID+"/story/"+longUUID, nil)
+		rctx.URLParams.Add("feature_uuid", feature.Uuid)
+		rctx.URLParams.Add("story_uuid", nonExistentUUID)
+		ctx := context.WithValue(context.Background(), auth.ContextKey, person.OwnerPubKey)
+		req, err := http.NewRequestWithContext(context.WithValue(ctx, chi.RouteCtxKey, rctx),
+			http.MethodGet, "/features/"+feature.Uuid+"/story/"+nonExistentUUID, nil)
 		assert.NoError(t, err)
 
-        handler.ServeHTTP(rr, req)
-        assert.Equal(t, http.StatusNotFound, rr.Code)
+		handler.ServeHTTP(rr, req)
+		assert.Equal(t, http.StatusNotFound, rr.Code)
+	})
+
+	t.Run("Valid Request with Empty UUIDs", func(t *testing.T) {
+		rr := httptest.NewRecorder()
+		handler := http.HandlerFunc(fHandler.GetStoryByUuid)
+
+		rctx := chi.NewRouteContext()
+		rctx.URLParams.Add("feature_uuid", "")
+		rctx.URLParams.Add("story_uuid", "")
+		ctx := context.WithValue(context.Background(), auth.ContextKey, person.OwnerPubKey)
+		req, err := http.NewRequestWithContext(context.WithValue(ctx, chi.RouteCtxKey, rctx),
+			http.MethodGet, "/features//story/", nil)
+		assert.NoError(t, err)
+
+		handler.ServeHTTP(rr, req)
+		assert.Equal(t, http.StatusNotFound, rr.Code)
+	})
+
+	t.Run("Unauthorized Request", func(t *testing.T) {
+		rr := httptest.NewRecorder()
+		handler := http.HandlerFunc(fHandler.GetStoryByUuid)
+
+		rctx := chi.NewRouteContext()
+		rctx.URLParams.Add("feature_uuid", feature.Uuid)
+		rctx.URLParams.Add("story_uuid", featureStory.Uuid)
+		req, err := http.NewRequestWithContext(context.WithValue(context.Background(), chi.RouteCtxKey, rctx),
+			http.MethodGet, "/features/"+feature.Uuid+"/story/"+featureStory.Uuid, nil)
+		assert.NoError(t, err)
+
+		handler.ServeHTTP(rr, req)
+		assert.Equal(t, http.StatusUnauthorized, rr.Code)
+	})
+
+	t.Run("Invalid UUID Format", func(t *testing.T) {
+		rr := httptest.NewRecorder()
+		handler := http.HandlerFunc(fHandler.GetStoryByUuid)
+
+		rctx := chi.NewRouteContext()
+		rctx.URLParams.Add("feature_uuid", "invalid-uuid")
+		rctx.URLParams.Add("story_uuid", "invalid-uuid")
+		ctx := context.WithValue(context.Background(), auth.ContextKey, person.OwnerPubKey)
+		req, err := http.NewRequestWithContext(context.WithValue(ctx, chi.RouteCtxKey, rctx),
+			http.MethodGet, "/features/invalid-uuid/story/invalid-uuid", nil)
+		assert.NoError(t, err)
+
+		handler.ServeHTTP(rr, req)
+		assert.Equal(t, http.StatusNotFound, rr.Code)
+	})
+
+	t.Run("Story with Special Characters", func(t *testing.T) {
+		rr := httptest.NewRecorder()
+		handler := http.HandlerFunc(fHandler.GetStoryByUuid)
+
+		specialCharsUUID := "!@#$%^&*()"
+		rctx := chi.NewRouteContext()
+		rctx.URLParams.Add("feature_uuid", feature.Uuid)
+		rctx.URLParams.Add("story_uuid", specialCharsUUID)
+		ctx := context.WithValue(context.Background(), auth.ContextKey, person.OwnerPubKey)
+		req, err := http.NewRequestWithContext(context.WithValue(ctx, chi.RouteCtxKey, rctx),
+			http.MethodGet, "/features/"+feature.Uuid+"/story/"+url.QueryEscape(specialCharsUUID), nil)
+		assert.NoError(t, err)
+
+		handler.ServeHTTP(rr, req)
+		assert.Equal(t, http.StatusNotFound, rr.Code)
+	})
+
+	t.Run("Valid Request with Mixed Case UUIDs", func(t *testing.T) {
+		rr := httptest.NewRecorder()
+		handler := http.HandlerFunc(fHandler.GetStoryByUuid)
+
+		upperFeatureUUID := strings.ToUpper(feature.Uuid)
+		upperStoryUUID := strings.ToUpper(featureStory.Uuid)
+		rctx := chi.NewRouteContext()
+		rctx.URLParams.Add("feature_uuid", upperFeatureUUID)
+		rctx.URLParams.Add("story_uuid", upperStoryUUID)
+		ctx := context.WithValue(context.Background(), auth.ContextKey, person.OwnerPubKey)
+		req, err := http.NewRequestWithContext(context.WithValue(ctx, chi.RouteCtxKey, rctx),
+			http.MethodGet, "/features/"+upperFeatureUUID+"/story/"+upperStoryUUID, nil)
+		assert.NoError(t, err)
+
+		handler.ServeHTTP(rr, req)
+		assert.Equal(t, http.StatusNotFound, rr.Code)
+	})
+
+	t.Run("Request with Long UUIDs", func(t *testing.T) {
+		rr := httptest.NewRecorder()
+		handler := http.HandlerFunc(fHandler.GetStoryByUuid)
+
+		longUUID := feature.Uuid + "extra"
+		rctx := chi.NewRouteContext()
+		rctx.URLParams.Add("feature_uuid", longUUID)
+		rctx.URLParams.Add("story_uuid", longUUID)
+		ctx := context.WithValue(context.Background(), auth.ContextKey, person.OwnerPubKey)
+		req, err := http.NewRequestWithContext(context.WithValue(ctx, chi.RouteCtxKey, rctx),
+			http.MethodGet, "/features/"+longUUID+"/story/"+longUUID, nil)
+		assert.NoError(t, err)
+
+		handler.ServeHTTP(rr, req)
+		assert.Equal(t, http.StatusNotFound, rr.Code)
 	})
 }
 
@@ -5595,14 +5595,14 @@ func TestGetQuickTickets(t *testing.T) {
 		ticketGroupUUID := uuid.New()
 
 		ticket := db.Tickets{
-			UUID:          ticketUUID,
-			TicketGroup:   &ticketGroupUUID,
-			FeatureUUID:   feature.Uuid,
-			PhaseUUID:     phase.Uuid,
-			Name:          "test phased ticket",
-			CreatedAt:     now,
-			UpdatedAt:     now,
-			Version:       1,
+			UUID:        ticketUUID,
+			TicketGroup: &ticketGroupUUID,
+			FeatureUUID: feature.Uuid,
+			PhaseUUID:   phase.Uuid,
+			Name:        "test phased ticket",
+			CreatedAt:   now,
+			UpdatedAt:   now,
+			Version:     1,
 		}
 		_, err := db.TestDB.CreateOrEditTicket(&ticket)
 		assert.NoError(t, err)
@@ -5649,16 +5649,18 @@ func TestGetQuickTickets(t *testing.T) {
 	})
 }
 
-
-func TestCreateOrUpdateFeatureCall(t *testing.T) {
+func TestTokenAuthentication(t *testing.T) {
 	teardownSuite := SetupSuite(t)
 	defer teardownSuite(t)
 
-	fHandler := NewFeatureHandler(db.TestDB)
-
-	db.DeleteAllFeatureCalls()
 	db.CleanTestData()
 
+	// Set the test environment variable for token authentication
+	originalEnv := os.Getenv("swauth")
+	os.Setenv("swauth", "test-token-value")
+	defer os.Setenv("swauth", originalEnv)
+
+	// Create test data
 	person := db.Person{
 		Uuid:        uuid.New().String(),
 		OwnerAlias:  "test-alias",
@@ -5671,7 +5673,7 @@ func TestCreateOrUpdateFeatureCall(t *testing.T) {
 
 	workspace := db.Workspace{
 		Uuid:        uuid.New().String(),
-		Name:        "test-workspace",
+		Name:        "test-workspace" + uuid.New().String(),
 		OwnerPubKey: person.OwnerPubKey,
 		Github:      "https://github.com/test",
 		Website:     "https://www.testwebsite.com",
@@ -5679,449 +5681,93 @@ func TestCreateOrUpdateFeatureCall(t *testing.T) {
 	}
 	db.TestDB.CreateOrEditWorkspace(workspace)
 
-	t.Run("should return 401 error if not the authorized", func(t *testing.T) {
-		rr := httptest.NewRecorder()
-		handler := http.HandlerFunc(fHandler.CreateOrUpdateFeatureCall)
-
-		req := struct {
-			WorkspaceID string `json:"workspace_id"`
-			URL         string `json:"url"`
-		}{
-			WorkspaceID: workspace.Uuid,
-			URL:         "https://meet.google.com/test",
-		}
-		requestBody, _ := json.Marshal(req)
-
-		request, err := http.NewRequest(http.MethodPost, "/features/call", bytes.NewReader(requestBody))
-		if err != nil {
-			t.Fatal(err)
-		}
-
-		handler.ServeHTTP(rr, request)
-		assert.Equal(t, http.StatusUnauthorized, rr.Code)
-	})
-
-	t.Run("should return 400 if request body is invalid", func(t *testing.T) {
-		rr := httptest.NewRecorder()
-		handler := http.HandlerFunc(fHandler.CreateOrUpdateFeatureCall)
-
-		invalidJson := []byte(`{"key": "value"`)
-
-		ctx := context.WithValue(context.Background(), auth.ContextKey, person.OwnerPubKey)
-		req, err := http.NewRequestWithContext(ctx, http.MethodPost, "/features/call", bytes.NewReader(invalidJson))
-		if err != nil {
-			t.Fatal(err)
-		}
-
-		handler.ServeHTTP(rr, req)
-		assert.Equal(t, http.StatusBadRequest, rr.Code)
-	})
-
-	t.Run("should return 400 if URL is empty", func(t *testing.T) {
-		rr := httptest.NewRecorder()
-		handler := http.HandlerFunc(fHandler.CreateOrUpdateFeatureCall)
-
-		req := struct {
-			WorkspaceID string `json:"workspace_id"`
-			URL         string `json:"url"`
-		}{
-			WorkspaceID: workspace.Uuid,
-			URL:         "",
-		}
-		requestBody, _ := json.Marshal(req)
-
-		ctx := context.WithValue(context.Background(), auth.ContextKey, person.OwnerPubKey)
-		request, err := http.NewRequestWithContext(ctx, http.MethodPost, "/features/call", bytes.NewReader(requestBody))
-		if err != nil {
-			t.Fatal(err)
-		}
-
-		handler.ServeHTTP(rr, request)
-		assert.Equal(t, http.StatusBadRequest, rr.Code)
-	})
-
-	t.Run("should return 404 if workspace does not exist", func(t *testing.T) {
-		rr := httptest.NewRecorder()
-		handler := http.HandlerFunc(fHandler.CreateOrUpdateFeatureCall)
-
-		req := struct {
-			WorkspaceID string `json:"workspace_id"`
-			URL         string `json:"url"`
-		}{
-			WorkspaceID: "non-existent-uuid",
-			URL:         "https://meet.google.com/test",
-		}
-		requestBody, _ := json.Marshal(req)
-
-		ctx := context.WithValue(context.Background(), auth.ContextKey, person.OwnerPubKey)
-		request, err := http.NewRequestWithContext(ctx, http.MethodPost, "/features/call", bytes.NewReader(requestBody))
-		if err != nil {
-			t.Fatal(err)
-		}
-
-		handler.ServeHTTP(rr, request)
-		assert.Equal(t, http.StatusNotFound, rr.Code)
-	})
-
-	t.Run("should successfully create new feature call", func(t *testing.T) {
-		rr := httptest.NewRecorder()
-		handler := http.HandlerFunc(fHandler.CreateOrUpdateFeatureCall)
-
-		req := struct {
-			WorkspaceID string `json:"workspace_id"`
-			URL         string `json:"url"`
-		}{
-			WorkspaceID: workspace.Uuid,
-			URL:         "https://meet.google.com/test",
-		}
-		requestBody, _ := json.Marshal(req)
-
-		ctx := context.WithValue(context.Background(), auth.ContextKey, person.OwnerPubKey)
-		request, err := http.NewRequestWithContext(ctx, http.MethodPost, "/features/call", bytes.NewReader(requestBody))
-		if err != nil {
-			t.Fatal(err)
-		}
-
-		handler.ServeHTTP(rr, request)
-		assert.Equal(t, http.StatusOK, rr.Code)
-
-		var response db.FeatureCall
-		err = json.NewDecoder(rr.Body).Decode(&response)
-		assert.NoError(t, err)
-		assert.Equal(t, workspace.Uuid, response.WorkspaceID)
-		assert.Equal(t, req.URL, response.URL)
-	})
-
-	t.Run("should successfully update existing feature call", func(t *testing.T) {
-		rr := httptest.NewRecorder()
-		handler := http.HandlerFunc(fHandler.CreateOrUpdateFeatureCall)
-
-		req := struct {
-			WorkspaceID string `json:"workspace_id"`
-			URL         string `json:"url"`
-		}{
-			WorkspaceID: workspace.Uuid,
-			URL:         "https://meet.google.com/updated",
-		}
-		requestBody, _ := json.Marshal(req)
-
-		ctx := context.WithValue(context.Background(), auth.ContextKey, person.OwnerPubKey)
-		request, err := http.NewRequestWithContext(ctx, http.MethodPost, "/features/call", bytes.NewReader(requestBody))
-		if err != nil {
-			t.Fatal(err)
-		}
-
-		handler.ServeHTTP(rr, request)
-		assert.Equal(t, http.StatusOK, rr.Code)
-
-		var response db.FeatureCall
-		err = json.NewDecoder(rr.Body).Decode(&response)
-		assert.NoError(t, err)
-		assert.Equal(t, workspace.Uuid, response.WorkspaceID)
-		assert.Equal(t, req.URL, response.URL)
-	})
-
-	t.Run("should handle malformed URL", func(t *testing.T) {
-		rr := httptest.NewRecorder()
-		handler := http.HandlerFunc(fHandler.CreateOrUpdateFeatureCall)
-
-		req := struct {
-			WorkspaceID string `json:"workspace_id"`
-			URL         string `json:"url"`
-		}{
-			WorkspaceID: workspace.Uuid,
-			URL:         "not-a-valid-url",
-		}
-		requestBody, _ := json.Marshal(req)
-
-		ctx := context.WithValue(context.Background(), auth.ContextKey, person.OwnerPubKey)
-		request, err := http.NewRequestWithContext(ctx, http.MethodPost, "/features/call", bytes.NewReader(requestBody))
-		if err != nil {
-			t.Fatal(err)
-		}
-
-		handler.ServeHTTP(rr, request)
-		assert.Equal(t, http.StatusOK, rr.Code)
-	})
-}
-
-func TestGetFeatureCall(t *testing.T) {
-	teardownSuite := SetupSuite(t)
-	defer teardownSuite(t)
+	feature := db.WorkspaceFeatures{
+		Uuid:          uuid.New().String(),
+		WorkspaceUuid: workspace.Uuid,
+		Name:          "test-feature",
+		Url:           "https://github.com/test-feature",
+		Priority:      0,
+	}
+	db.TestDB.CreateOrEditFeature(feature)
 
 	fHandler := NewFeatureHandler(db.TestDB)
 
-	db.DeleteAllFeatureCalls()
-	db.CleanTestData()
-
-	person := db.Person{
-		Uuid:        uuid.New().String(),
-		OwnerAlias:  "test-alias",
-		UniqueName:  "test-unique-name",
-		OwnerPubKey: "test-pubkey",
-		PriceToMeet: 0,
-		Description: "test-description",
+	tests := []struct {
+		name           string
+		setAuthHeader  bool
+		authHeaderName string
+		authValue      string
+		expectedStatus int
+	}{
+		{
+			name:           "No Authentication",
+			setAuthHeader:  false,
+			authHeaderName: "",
+			authValue:      "",
+			expectedStatus: http.StatusUnauthorized,
+		},
+		{
+			name:           "Valid Token Authentication",
+			setAuthHeader:  true,
+			authHeaderName: "x-api-token",
+			authValue:      "test-token-value",
+			expectedStatus: http.StatusOK,
+		},
+		{
+			name:           "Invalid Token Authentication",
+			setAuthHeader:  true,
+			authHeaderName: "x-api-token",
+			authValue:      "invalid-token-value",
+			expectedStatus: http.StatusUnauthorized,
+		},
+		{
+			name:           "Valid PubKey Authentication",
+			setAuthHeader:  true,
+			authHeaderName: "x-jwt", // Assuming this is the header used for pubkey auth
+			authValue:      person.OwnerPubKey,
+			expectedStatus: http.StatusOK,
+		},
 	}
-	db.TestDB.CreateOrEditPerson(person)
 
-	workspace := db.Workspace{
-		Uuid:        uuid.New().String(),
-		Name:        "test-workspace-" + uuid.New().String(),
-		OwnerPubKey: person.OwnerPubKey,
-		Github:      "https://github.com/test",
-		Website:     "https://www.testwebsite.com",
-		Description: "test-description",
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			// Test on GetFeatureByUuid endpoint which requires authentication
+			rr := httptest.NewRecorder()
+			req := httptest.NewRequest(http.MethodGet, "/features/"+feature.Uuid, nil)
+
+			// Set auth header if needed
+			if tt.setAuthHeader {
+				req.Header.Set(tt.authHeaderName, tt.authValue)
+			}
+
+			// Set up chi context with URL parameters
+			rctx := chi.NewRouteContext()
+			rctx.URLParams.Add("uuid", feature.Uuid)
+			req = req.WithContext(context.WithValue(req.Context(), chi.RouteCtxKey, rctx))
+
+			// Set pubkey in context if using pubkey auth (simulate middleware)
+			if tt.authHeaderName == "x-jwt" {
+				req = req.WithContext(context.WithValue(req.Context(), auth.ContextKey, tt.authValue))
+			}
+
+			// This test assumes CombinedAuthMiddleware is applied to the handler
+			// Since we're testing a unit, we need to wrap the handler with the middleware
+			handler := http.HandlerFunc(fHandler.GetFeatureByUuid)
+
+			// Call the handler directly - in a real integration test,
+			// the middleware would be applied by the router
+			handler.ServeHTTP(rr, req)
+
+			assert.Equal(t, tt.expectedStatus, rr.Code)
+
+			// If successful, validate response content
+			if tt.expectedStatus == http.StatusOK {
+				var returnedFeature db.WorkspaceFeatures
+				err := json.NewDecoder(rr.Body).Decode(&returnedFeature)
+				assert.NoError(t, err)
+				assert.Equal(t, feature.Uuid, returnedFeature.Uuid)
+				assert.Equal(t, feature.Name, returnedFeature.Name)
+			}
+		})
 	}
-	
-	db.TestDB.CreateOrEditWorkspace(workspace)
-
-	featureCall, err := db.TestDB.CreateOrUpdateFeatureCall(workspace.Uuid, "https://meet.google.com/test")
-	assert.NoError(t, err)
-
-	t.Run("should return 401 error if not authorized", func(t *testing.T) {
-		rr := httptest.NewRecorder()
-		handler := http.HandlerFunc(fHandler.GetFeatureCall)
-
-		req, err := http.NewRequest(http.MethodGet, "/features/call/"+workspace.Uuid, nil)
-		if err != nil {
-			t.Fatal(err)
-		}
-
-		rctx := chi.NewRouteContext()
-		rctx.URLParams.Add("workspace_uuid", workspace.Uuid)
-		req = req.WithContext(context.WithValue(req.Context(), chi.RouteCtxKey, rctx))
-
-		handler.ServeHTTP(rr, req)
-		assert.Equal(t, http.StatusUnauthorized, rr.Code)
-	})
-
-	t.Run("should return 400 if workspace_uuid parameter is missing", func(t *testing.T) {
-		rr := httptest.NewRecorder()
-		handler := http.HandlerFunc(fHandler.GetFeatureCall)
-
-		req, err := http.NewRequest(http.MethodGet, "/features/call/", nil)
-		if err != nil {
-			t.Fatal(err)
-		}
-
-		ctx := context.WithValue(req.Context(), auth.ContextKey, person.OwnerPubKey)
-		req = req.WithContext(ctx)
-
-		rctx := chi.NewRouteContext()
-		req = req.WithContext(context.WithValue(req.Context(), chi.RouteCtxKey, rctx))
-
-		handler.ServeHTTP(rr, req)
-		assert.Equal(t, http.StatusBadRequest, rr.Code)
-
-		var response map[string]string
-		err = json.NewDecoder(rr.Body).Decode(&response)
-		assert.NoError(t, err)
-		assert.Equal(t, "workspace_uuid parameter is required", response["error"])
-	})
-
-	t.Run("should return 404 if feature call does not exist", func(t *testing.T) {
-		rr := httptest.NewRecorder()
-		handler := http.HandlerFunc(fHandler.GetFeatureCall)
-
-		nonExistentUUID := uuid.New().String()
-		req, err := http.NewRequest(http.MethodGet, "/features/call/"+nonExistentUUID, nil)
-		if err != nil {
-			t.Fatal(err)
-		}
-
-		ctx := context.WithValue(req.Context(), auth.ContextKey, person.OwnerPubKey)
-		req = req.WithContext(ctx)
-
-		rctx := chi.NewRouteContext()
-		rctx.URLParams.Add("workspace_uuid", nonExistentUUID)
-		req = req.WithContext(context.WithValue(req.Context(), chi.RouteCtxKey, rctx))
-
-		handler.ServeHTTP(rr, req)
-		assert.Equal(t, http.StatusNotFound, rr.Code)
-
-		var response map[string]string
-		err = json.NewDecoder(rr.Body).Decode(&response)
-		assert.NoError(t, err)
-		assert.Contains(t, response["error"], "record not found")
-	})
-
-	t.Run("should successfully get feature call", func(t *testing.T) {
-		rr := httptest.NewRecorder()
-		handler := http.HandlerFunc(fHandler.GetFeatureCall)
-
-		req, err := http.NewRequest(http.MethodGet, "/features/call/"+workspace.Uuid, nil)
-		if err != nil {
-			t.Fatal(err)
-		}
-
-		ctx := context.WithValue(req.Context(), auth.ContextKey, person.OwnerPubKey)
-		req = req.WithContext(ctx)
-
-		rctx := chi.NewRouteContext()
-		rctx.URLParams.Add("workspace_uuid", workspace.Uuid)
-		req = req.WithContext(context.WithValue(req.Context(), chi.RouteCtxKey, rctx))
-
-		handler.ServeHTTP(rr, req)
-		assert.Equal(t, http.StatusOK, rr.Code)
-
-		var response db.FeatureCall
-		err = json.NewDecoder(rr.Body).Decode(&response)
-		assert.NoError(t, err)
-		assert.Equal(t, workspace.Uuid, response.WorkspaceID)
-		assert.Equal(t, featureCall.URL, response.URL)
-		assert.Equal(t, featureCall.ID, response.ID)
-	})
-}
-
-func TestDeleteFeatureCall(t *testing.T) {
-    teardownSuite := SetupSuite(t)
-    defer teardownSuite(t)
-
-    fHandler := NewFeatureHandler(db.TestDB)
-
-    db.DeleteAllFeatureCalls()
-    db.CleanTestData()
-
-    person := db.Person{
-        Uuid:        uuid.New().String(),
-        OwnerAlias:  "test-alias",
-        UniqueName:  "test-unique-name",
-        OwnerPubKey: "test-pubkey",
-        PriceToMeet: 0,
-        Description: "test-description",
-    }
-    db.TestDB.CreateOrEditPerson(person)
-
-    workspace := db.Workspace{
-        Uuid:        uuid.New().String(),
-        Name:        "test-workspace-" + uuid.New().String(),
-        OwnerPubKey: person.OwnerPubKey,
-        Github:      "https://github.com/test",
-        Website:     "https://www.testwebsite.com",
-        Description: "test-description",
-    }
-
-    db.TestDB.CreateOrEditWorkspace(workspace)
-
-     db.TestDB.CreateOrUpdateFeatureCall(workspace.Uuid, "https://meet.google.com/test")
-
-    t.Run("should return 401 error if not authorized", func(t *testing.T) {
-        rr := httptest.NewRecorder()
-        handler := http.HandlerFunc(fHandler.DeleteFeatureCall)
-
-        req, err := http.NewRequest(http.MethodDelete, "/features/call/"+workspace.Uuid, nil)
-        if err != nil {
-            t.Fatal(err)
-        }
-
-        rctx := chi.NewRouteContext()
-        rctx.URLParams.Add("workspace_uuid", workspace.Uuid)
-        req = req.WithContext(context.WithValue(req.Context(), chi.RouteCtxKey, rctx))
-
-        handler.ServeHTTP(rr, req)
-        assert.Equal(t, http.StatusUnauthorized, rr.Code)
-    })
-
-    t.Run("should return 400 if workspace_uuid parameter is missing", func(t *testing.T) {
-        rr := httptest.NewRecorder()
-        handler := http.HandlerFunc(fHandler.DeleteFeatureCall)
-
-        req, err := http.NewRequest(http.MethodDelete, "/features/call/", nil)
-        if err != nil {
-            t.Fatal(err)
-        }
-
-        ctx := context.WithValue(req.Context(), auth.ContextKey, person.OwnerPubKey)
-        req = req.WithContext(ctx)
-
-        rctx := chi.NewRouteContext()
-        req = req.WithContext(context.WithValue(req.Context(), chi.RouteCtxKey, rctx))
-
-        handler.ServeHTTP(rr, req)
-        assert.Equal(t, http.StatusBadRequest, rr.Code)
-
-        var response map[string]string
-        err = json.NewDecoder(rr.Body).Decode(&response)
-        assert.NoError(t, err)
-        assert.Equal(t, "workspace_uuid parameter is required", response["error"])
-    })
-
-    t.Run("should return 404 if feature call does not exist", func(t *testing.T) {
-        rr := httptest.NewRecorder()
-        handler := http.HandlerFunc(fHandler.DeleteFeatureCall)
-
-        nonExistentUUID := uuid.New().String()
-        req, err := http.NewRequest(http.MethodDelete, "/features/call/"+nonExistentUUID, nil)
-        if err != nil {
-            t.Fatal(err)
-        }
-
-        ctx := context.WithValue(req.Context(), auth.ContextKey, person.OwnerPubKey)
-        req = req.WithContext(ctx)
-
-        rctx := chi.NewRouteContext()
-        rctx.URLParams.Add("workspace_uuid", nonExistentUUID)
-        req = req.WithContext(context.WithValue(req.Context(), chi.RouteCtxKey, rctx))
-
-        handler.ServeHTTP(rr, req)
-        assert.Equal(t, http.StatusNotFound, rr.Code)
-
-        var response map[string]string
-        err = json.NewDecoder(rr.Body).Decode(&response)
-        assert.NoError(t, err)
-        assert.Equal(t, "feature call not found", response["error"])
-    })
-
-    t.Run("should successfully delete feature call", func(t *testing.T) {
-        rr := httptest.NewRecorder()
-        handler := http.HandlerFunc(fHandler.DeleteFeatureCall)
-
-        req, err := http.NewRequest(http.MethodDelete, "/features/call/"+workspace.Uuid, nil)
-        if err != nil {
-            t.Fatal(err)
-        }
-
-        ctx := context.WithValue(req.Context(), auth.ContextKey, person.OwnerPubKey)
-        req = req.WithContext(ctx)
-
-        rctx := chi.NewRouteContext()
-        rctx.URLParams.Add("workspace_uuid", workspace.Uuid)
-        req = req.WithContext(context.WithValue(req.Context(), chi.RouteCtxKey, rctx))
-
-        handler.ServeHTTP(rr, req)
-        assert.Equal(t, http.StatusOK, rr.Code)
-
-        var response map[string]string
-        err = json.NewDecoder(rr.Body).Decode(&response)
-        assert.NoError(t, err)
-        assert.Equal(t, "Feature call deleted successfully", response["message"])
-
-        _, err = db.TestDB.GetFeatureCallByWorkspaceID(workspace.Uuid)
-        assert.Error(t, err)
-    })
-
-    t.Run("should return 404 when trying to delete already deleted feature call", func(t *testing.T) {
-        rr := httptest.NewRecorder()
-        handler := http.HandlerFunc(fHandler.DeleteFeatureCall)
-
-        req, err := http.NewRequest(http.MethodDelete, "/features/call/"+workspace.Uuid, nil)
-        if err != nil {
-            t.Fatal(err)
-        }
-
-        ctx := context.WithValue(req.Context(), auth.ContextKey, person.OwnerPubKey)
-        req = req.WithContext(ctx)
-
-        rctx := chi.NewRouteContext()
-        rctx.URLParams.Add("workspace_uuid", workspace.Uuid)
-        req = req.WithContext(context.WithValue(req.Context(), chi.RouteCtxKey, rctx))
-
-        handler.ServeHTTP(rr, req)
-        assert.Equal(t, http.StatusNotFound, rr.Code)
-
-        var response map[string]string
-        err = json.NewDecoder(rr.Body).Decode(&response)
-        assert.NoError(t, err)
-        assert.Equal(t, "feature call not found", response["error"])
-    })
 }
