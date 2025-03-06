@@ -9,6 +9,7 @@
     5002,
     15552
   ],
+  "postStartCommand": "bash sphinx-tribes/.devcontainer/ports.sh",
   "postCreateCommand": "bash sphinx-tribes/.devcontainer/setup.sh",
   "customizations": {
     "codespaces": {
