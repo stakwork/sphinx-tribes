@@ -41,6 +41,7 @@
         }
       },
       "extensions": [
+        "stakwork.staklink",
         "golang.go",
         "esbenp.prettier-vscode"
       ]
