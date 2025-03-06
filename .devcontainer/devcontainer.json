@@ -7,7 +7,7 @@
     13008,
     5432,
     5002,
-    33335
+    15552
   ],
   "postCreateCommand": "bash sphinx-tribes/.devcontainer/setup.sh",
   "customizations": {
@@ -25,7 +25,7 @@
       "settings": {
         "git.autofetch": true,
         "editor.formatOnSave": true,
-        "staklink.port": 33335,
+        "staklink.port": 15552,
         "staklink.start": {
           "sphinx-tribes-frontend": [
             "yarn",
