@@ -642,6 +642,7 @@ func (h *bountyHandler) GenerateBountyResponse(bounties []db.NewBounty) []db.Bou
 				FeatureUuid:             bounty.FeatureUuid,
 				PhasePriority:           bounty.PhasePriority,
 				ProofOfWorkCount:        bounty.ProofOfWorkCount,
+				AccessRestriction:       bounty.AccessRestriction,
 			},
 			Assignee: db.Person{
 				ID:               assignee.ID,
