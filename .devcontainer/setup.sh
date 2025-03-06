@@ -16,7 +16,7 @@ do
 done
 
 # start the services defined in staklink options
-curl -s -m 1 http://localhost:15552/start
+curl -X POST http://localhost:15552/start
 
 # Wait for PostgreSQL to become available
 until psql $DB -c '\q'
