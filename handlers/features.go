@@ -849,9 +849,17 @@ func (oh *featureHandler) UpdateFeatureStatus(w http.ResponseWriter, r *http.Req
 		return
 	}
 
-	if req.Status != db.ActiveFeature && req.Status != db.ArchivedFeature {
+	if _, valid := map[db.FeatureStatus]bool{
+		db.ActiveFeature:    true,
+		db.ArchivedFeature:  true,
+		db.CompletedFeature: true,
+		db.BacklogFeature:   true,
+	}[req.Status]; !valid {
 		logger.Log.Info("invalid feature status")
 		w.WriteHeader(http.StatusBadRequest)
+		json.NewEncoder(w).Encode(map[string]string{
+			"error": "Invalid feature status. Allowed values are: active, archived, completed, backlog",
+		})
 		return
 	}
 
