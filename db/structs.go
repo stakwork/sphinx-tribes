@@ -617,8 +617,10 @@ type WorkspaceCodeGraph struct {
 type FeatureStatus string
 
 const (
-	ActiveFeature   FeatureStatus = "active"
-	ArchivedFeature FeatureStatus = "archived"
+	ActiveFeature    FeatureStatus = "active"
+	ArchivedFeature  FeatureStatus = "archived"
+	CompletedFeature FeatureStatus = "completed"
+	BacklogFeature   FeatureStatus = "backlog"
 )
 
 type WorkspaceFeatures struct {
