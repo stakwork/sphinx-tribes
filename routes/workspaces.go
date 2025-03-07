@@ -22,7 +22,7 @@ func WorkspaceRoutes() chi.Router {
 		r.Get("/user/dropdown/{userId}", workspaceHandlers.GetUserDropdownWorkspaces)
 	})
 	r.Group(func(r chi.Router) {
-		r.Use(auth.PubKeyContext)
+		r.Use(auth.CombinedAuthContext)
 
 		r.Post("/", workspaceHandlers.CreateOrEditWorkspace)
 		r.Post("/users/{uuid}", workspaceHandlers.CreateWorkspaceUser)
