@@ -10,6 +10,7 @@
     15552
   ],
   "postStartCommand": "bash sphinx-tribes/.devcontainer/ports.sh",
+  "postAttachCommand": "bash sphinx-tribes/.devcontainer/ports.sh",
   "postCreateCommand": "bash sphinx-tribes/.devcontainer/setup.sh",
   "customizations": {
     "codespaces": {
