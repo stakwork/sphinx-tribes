@@ -28,18 +28,21 @@
         "git.autofetch": true,
         "editor.formatOnSave": true,
         "staklink.port": 15552,
-        "staklink.start": {
-          "sphinx-tribes-frontend": [
-            "yarn",
-            "yarn start:codespace"
-          ]
-        },
-        "staklink.restart": {
-          "sphinx-tribes": [
-            "mockery",
-            "go build",
-            "./sphinx-tribes"
-          ]
+        "staklink.repos": {
+          "sphinx-tribes-frontend": {
+            "start": [
+              "yarn",
+              "yarn start:codespace"
+            ],
+            "port": 13008
+          },
+          "sphinx-tribes": {
+            "restart": [
+              "go build",
+              "./sphinx-tribes"
+            ],
+            "port": 5002
+          }
         }
       },
       "extensions": [
