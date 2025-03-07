@@ -1421,6 +1421,26 @@ func (ch *ChatHandler) SendActionMessage(w http.ResponseWriter, r *http.Request)
 		return
 	}
 
+	message := &db.ChatMessage{
+		ID:        xid.New().String(),
+		ChatID:    request.ChatID,
+		Message:   request.Message,
+		Role:      "user",
+		Timestamp: time.Now(),
+		Status:    "sending",
+		Source:    "user",
+	}
+
+	createdMessage, err := ch.db.AddChatMessage(message)
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		json.NewEncoder(w).Encode(ChatResponse{
+			Success: false,
+			Message: fmt.Sprintf("Failed to save message: %v", err),
+		})
+		return
+	}
+
 	payload := ActionPayload{
 		ChatID:            request.ChatID,
 		MessageID:         request.MessageID,
@@ -1479,6 +1499,18 @@ func (ch *ChatHandler) SendActionMessage(w http.ResponseWriter, r *http.Request)
 			Message: fmt.Sprintf("Action webhook returned error: %s", string(body)),
 		})
 		return
+	}
+
+	wsMessage := websocket.TicketMessage{
+		BroadcastType:   "direct",
+		SourceSessionID: request.SourceWebsocketID,
+		Message:         "Message sent",
+		Action:          "process",
+		ChatMessage:     createdMessage,
+	}
+
+	if err := websocket.WebsocketPool.SendTicketMessage(wsMessage); err != nil {
+		log.Printf("Failed to send websocket message: %v", err)
 	}
 
 	w.WriteHeader(http.StatusOK)
