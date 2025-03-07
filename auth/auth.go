@@ -33,7 +33,14 @@ type contextKey string
 // ContextKey ...
 var ContextKey = contextKey("key")
 
-// PubKeyContext parses pukey from signed timestamp
+// PubKeyContext godoc
+//
+//	@Summary					Authentication middleware that extracts public key from token
+//	@Description				Parses public key from either a JWT token or signed timestamp
+//	@SecurityDefinitions.apikey	PubKeyContextAuth
+//	@In							header
+//	@Name						x-jwt
+//	@Description				JWT token for authentication. Can also be provided as a query parameter named 'token'
 func PubKeyContext(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		token := r.URL.Query().Get("token")
@@ -86,7 +93,14 @@ func PubKeyContext(next http.Handler) http.Handler {
 	})
 }
 
-// PubKeyContext parses pukey from signed timestamp
+// PubKeyContextSuperAdmin godoc
+//
+//	@Summary					Super admin authentication middleware
+//	@Description				Parses public key from token and verifies admin privileges
+//	@SecurityDefinitions.apikey	SuperAdminAuth
+//	@In							header
+//	@Name						x-jwt
+//	@Description				JWT token for super admin authentication. Can also be provided as a query parameter named 'token'
 func PubKeyContextSuperAdmin(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 
@@ -189,6 +203,14 @@ func CombinedAuthContext(next http.Handler) http.Handler {
 }
 
 // ConnectionContext parses token for connection code
+// ConnectionCodeContext godoc
+//
+//	@Summary					Connection code authentication middleware
+//	@Description				Verifies connection authorization token
+//	@SecurityDefinitions.apikey	ConnectionAuth
+//	@In							header
+//	@Name						token
+//	@Description				Connection authentication token
 func ConnectionCodeContext(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 
@@ -214,7 +236,14 @@ func ConnectionCodeContext(next http.Handler) http.Handler {
 	})
 }
 
-// CypressContext allows testing for cypress
+// CypressContext godoc
+//
+//	@Summary					Test environment bypass middleware
+//	@Description				Allows testing access in cypress environment
+//	@SecurityDefinitions.apikey	CypressAuth
+//	@In							header
+//	@Name						x-cypress
+//	@Description				No authentication needed when in test mode
 func CypressContext(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		if IsFreePass() {

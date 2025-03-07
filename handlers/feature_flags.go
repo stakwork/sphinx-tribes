@@ -19,12 +19,42 @@ type FeatureFlagResponse struct {
 	Data    interface{} `json:"data,omitempty"`
 }
 
+type CreateFeatureFlagRequest struct {
+	Name        string   `json:"name"`
+	Description string   `json:"description"`
+	Enabled     bool     `json:"enabled"`
+	Endpoints   []string `json:"endpoints"`
+}
+
+type UpdateFeatureFlagRequest struct {
+	Name        string `json:"name"`
+	Description string `json:"description"`
+	Enabled     bool   `json:"enabled"`
+}
+
+type AddFeatureFlagEndpointRequest struct {
+	Endpoints []string `json:"endpoints"`
+}
+
+type UpdateFeatureFlagEndpointRequest struct {
+	Path string `json:"new_endpoint_path"`
+}
+
 func NewFeatureFlagHandler(database db.Database) *FeatureFlagHandler {
 	return &FeatureFlagHandler{
 		db: database,
 	}
 }
 
+// GetFeatureFlags godoc
+//
+//	@Summary		Get all feature flags
+//	@Description	Get a list of all feature flags
+//	@Tags			Feature Flag
+//	@Produce		json
+//	@Security		PubKeyContextAuth
+//	@Success		200	{object}	FeatureFlagResponse
+//	@Router			/feature-flags [get]
 func (fh *FeatureFlagHandler) GetFeatureFlags(w http.ResponseWriter, r *http.Request) {
 	flags, err := fh.db.GetFeatureFlags()
 	if err != nil {
@@ -44,13 +74,19 @@ func (fh *FeatureFlagHandler) GetFeatureFlags(w http.ResponseWriter, r *http.Req
 	})
 }
 
+// CreateFeatureFlag godoc
+//
+//	@Summary		Create a new feature flag
+//	@Description	Create a new feature flag with specified details
+//	@Tags			Feature Flag
+//	@Accept			json
+//	@Produce		json
+//	@Security		PubKeyContextAuth
+//	@Param			feature_flag	body		CreateFeatureFlagRequest	true	"Feature flag details"
+//	@Success		201				{object}	FeatureFlagResponse
+//	@Router			/feature-flags [post]
 func (fh *FeatureFlagHandler) CreateFeatureFlag(w http.ResponseWriter, r *http.Request) {
-	var request struct {
-		Name        string   `json:"name"`
-		Description string   `json:"description"`
-		Enabled     bool     `json:"enabled"`
-		Endpoints   []string `json:"endpoints"`
-	}
+	var request CreateFeatureFlagRequest
 
 	if err := json.NewDecoder(r.Body).Decode(&request); err != nil {
 		w.WriteHeader(http.StatusBadRequest)
@@ -109,6 +145,18 @@ func (fh *FeatureFlagHandler) CreateFeatureFlag(w http.ResponseWriter, r *http.R
 	})
 }
 
+// UpdateFeatureFlag godoc
+//
+//	@Summary		Update an existing feature flag
+//	@Description	Update the details of an existing feature flag
+//	@Tags			Feature Flag
+//	@Accept			json
+//	@Produce		json
+//	@Security		PubKeyContextAuth
+//	@Param			id				path		string						true	"Feature flag ID"
+//	@Param			feature_flag	body		UpdateFeatureFlagRequest	true	"Updated feature flag details"
+//	@Success		200				{object}	FeatureFlagResponse
+//	@Router			/feature-flags/{id} [put]
 func (fh *FeatureFlagHandler) UpdateFeatureFlag(w http.ResponseWriter, r *http.Request) {
 	flagID := chi.URLParam(r, "id")
 	if flagID == "" {
@@ -130,11 +178,7 @@ func (fh *FeatureFlagHandler) UpdateFeatureFlag(w http.ResponseWriter, r *http.R
 		return
 	}
 
-	var request struct {
-		Name        string `json:"name"`
-		Description string `json:"description"`
-		Enabled     bool   `json:"enabled"`
-	}
+	var request UpdateFeatureFlagRequest
 
 	if err := json.NewDecoder(r.Body).Decode(&request); err != nil {
 		w.WriteHeader(http.StatusBadRequest)
@@ -179,6 +223,16 @@ func (fh *FeatureFlagHandler) UpdateFeatureFlag(w http.ResponseWriter, r *http.R
 	})
 }
 
+// DeleteFeatureFlag godoc
+//
+//	@Summary		Delete a feature flag
+//	@Description	Delete a feature flag by ID
+//	@Tags			Feature Flag
+//	@Produce		json
+//	@Security		PubKeyContextAuth
+//	@Param			id	path		string	true	"Feature flag ID"
+//	@Success		200	{object}	FeatureFlagResponse
+//	@Router			/feature-flags/{id} [delete]
 func (fh *FeatureFlagHandler) DeleteFeatureFlag(w http.ResponseWriter, r *http.Request) {
 	flagID := chi.URLParam(r, "id")
 	if flagID == "" {
@@ -225,6 +279,17 @@ func (fh *FeatureFlagHandler) DeleteFeatureFlag(w http.ResponseWriter, r *http.R
 	})
 }
 
+// AddFeatureFlagEndpoint godoc
+//
+//	@Summary		Add endpoints to a feature flag
+//	@Description	Add new endpoints to an existing feature flag
+//	@Tags			Feature Flag
+//	@Produce		json
+//	@Security		PubKeyContextAuth
+//	@Param			feature_flag_id	path		string							true	"Feature flag ID"
+//	@Param			endpoints		body		AddFeatureFlagEndpointRequest	true	"Endpoints to add"
+//	@Success		201				{object}	FeatureFlagResponse
+//	@Router			/feature-flags/{feature_flag_id}/endpoints [post]
 func (fh *FeatureFlagHandler) AddFeatureFlagEndpoint(w http.ResponseWriter, r *http.Request) {
 	flagID := chi.URLParam(r, "feature_flag_id")
 	if flagID == "" {
@@ -246,9 +311,7 @@ func (fh *FeatureFlagHandler) AddFeatureFlagEndpoint(w http.ResponseWriter, r *h
 		return
 	}
 
-	var request struct {
-		Endpoints []string `json:"endpoints"`
-	}
+	var request AddFeatureFlagEndpointRequest
 	if err := json.NewDecoder(r.Body).Decode(&request); err != nil {
 		w.WriteHeader(http.StatusBadRequest)
 		json.NewEncoder(w).Encode(FeatureFlagResponse{
@@ -299,6 +362,18 @@ func (fh *FeatureFlagHandler) AddFeatureFlagEndpoint(w http.ResponseWriter, r *h
 	})
 }
 
+// UpdateFeatureFlagEndpoint godoc
+//
+//	@Summary		Update an endpoint of a feature flag
+//	@Description	Update the details of an endpoint of an existing feature flag
+//	@Tags			Feature Flag
+//	@Produce		json
+//	@Security		PubKeyContextAuth
+//	@Param			feature_flag_id	path		string								true	"Feature flag ID"
+//	@Param			endpoint_id		path		string								true	"Endpoint ID"
+//	@Param			endpoint		body		UpdateFeatureFlagEndpointRequest	true	"Updated endpoint details"
+//	@Success		200				{object}	FeatureFlagResponse
+//	@Router			/feature-flags/{feature_flag_id}/endpoints/{endpoint_id} [put]
 func (fh *FeatureFlagHandler) UpdateFeatureFlagEndpoint(w http.ResponseWriter, r *http.Request) {
 	flagID := chi.URLParam(r, "feature_flag_id")
 	endpointID := chi.URLParam(r, "endpoint_id")
@@ -341,9 +416,7 @@ func (fh *FeatureFlagHandler) UpdateFeatureFlagEndpoint(w http.ResponseWriter, r
 		return
 	}
 
-	var request struct {
-		Path string `json:"new_endpoint_path"`
-	}
+	var request UpdateFeatureFlagEndpointRequest
 	if err := json.NewDecoder(r.Body).Decode(&request); err != nil {
 		w.WriteHeader(http.StatusBadRequest)
 		json.NewEncoder(w).Encode(FeatureFlagResponse{
@@ -396,6 +469,17 @@ func (fh *FeatureFlagHandler) UpdateFeatureFlagEndpoint(w http.ResponseWriter, r
 	})
 }
 
+// DeleteFeatureFlagEndpoint godoc
+//
+//	@Summary		Delete an endpoint of a feature flag
+//	@Description	Delete an endpoint of a feature flag by ID
+//	@Tags			Feature Flag
+//	@Produce		json
+//	@Security		PubKeyContextAuth
+//	@Param			feature_flag_id	path		string	true	"Feature flag ID"
+//	@Param			endpoint_id		path		string	true	"Endpoint ID"
+//	@Success		200				{object}	FeatureFlagResponse
+//	@Router			/feature-flags/{feature_flag_id}/endpoints/{endpoint_id} [delete]
 func (fh *FeatureFlagHandler) DeleteFeatureFlagEndpoint(w http.ResponseWriter, r *http.Request) {
 	flagID := chi.URLParam(r, "feature_flag_id")
 	endpointID := chi.URLParam(r, "endpoint_id")

@@ -692,7 +692,7 @@ func TestGetTotalTribes(t *testing.T) {
 	tHandler := NewTribeHandler(db.TestDB)
 	t.Run("should return the total number of tribes", func(t *testing.T) {
 		rr := httptest.NewRecorder()
-		handler := http.HandlerFunc(tHandler.GetTotalribes)
+		handler := http.HandlerFunc(tHandler.GetTotalTribes)
 
 		tribe := db.Tribe{
 			UUID:        uuid.New().String(),
@@ -1110,9 +1110,9 @@ func TestGenerateInvoice(t *testing.T) {
 		req := httptest.NewRequest(http.MethodPost, "/invoices", strings.NewReader(`{"invalid json`))
 		req.Header.Set("Content-Type", "application/json")
 		rr := httptest.NewRecorder()
-		
+
 		GenerateInvoice(rr, req)
-		
+
 		assert.Equal(t, http.StatusInternalServerError, rr.Code)
 	})
 
@@ -1193,12 +1193,12 @@ func TestGenerateInvoice(t *testing.T) {
 
 		var wg sync.WaitGroup
 		responses := make([]*httptest.ResponseRecorder, 5)
-		
+
 		for i := 0; i < 5; i++ {
 			wg.Add(1)
 			go func(index int) {
 				defer wg.Done()
-				
+
 				requestBody := fmt.Sprintf(`{
 					"amount": "%d",
 					"user_pubkey": "test_pubkey",
@@ -1211,7 +1211,7 @@ func TestGenerateInvoice(t *testing.T) {
 				req := httptest.NewRequest(http.MethodPost, "/invoices", strings.NewReader(requestBody))
 				req.Header.Set("Content-Type", "application/json")
 				rr := httptest.NewRecorder()
-				
+
 				GenerateInvoice(rr, req)
 				responses[index] = rr
 			}(i)

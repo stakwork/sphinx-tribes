@@ -17,15 +17,16 @@ import (
 	"github.com/stakwork/sphinx-tribes/utils"
 )
 
-type authHandler struct {
+// AuthHandler struct
+type AuthHandler struct {
 	db                        db.Database
 	makeConnectionCodeRequest func(inviter_pubkey string, inviter_route_hint string, msats_amount uint64) string
 	decodeJwt                 func(token string) (jwt.MapClaims, error)
 	encodeJwt                 func(pubkey string) (string, error)
 }
 
-func NewAuthHandler(db db.Database) *authHandler {
-	return &authHandler{
+func NewAuthHandler(db db.Database) *AuthHandler {
+	return &AuthHandler{
 		db:                        db,
 		makeConnectionCodeRequest: MakeConnectionCodeRequest,
 		decodeJwt:                 auth.DecodeJwt,
@@ -33,14 +34,34 @@ func NewAuthHandler(db db.Database) *authHandler {
 	}
 }
 
-type ConnectionCodesListResponse struct {
-    Success bool `json:"success"`
-    Data    struct {
-        Codes []db.ConnectionCodesList `json:"codes"`
-        Total int64                   `json:"total"`
-    } `json:"data"`
+type LnAuthResponse struct {
+	Status  string `json:"status"`
+	Message string `json:"message,omitempty"`
+	JWT     string `json:"jwt,omitempty"`
 }
 
+type RefreshTokenResponse struct {
+	K1     string    `json:"k1,omitempty"`
+	Status bool      `json:"status"`
+	JWT    string    `json:"jwt"`
+	User   db.Person `json:"user"`
+}
+
+type ConnectionCodesListResponse struct {
+	Success bool `json:"success"`
+	Data    struct {
+		Codes []db.ConnectionCodesList `json:"codes"`
+		Total int64                    `json:"total"`
+	} `json:"data"`
+}
+
+// GetAdminPubkeys godoc
+//
+//	@Summary		Get admin pubkeys
+//	@Description	Get a list of admin pubkeys
+//	@Tags			Auth
+//	@Success		200	{array}	string
+//	@Router			/admin_pubkeys [get]
 func GetAdminPubkeys(w http.ResponseWriter, r *http.Request) {
 	type PubKeysReturn struct {
 		Pubkeys []string `json:"pubkeys"`
@@ -52,7 +73,18 @@ func GetAdminPubkeys(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusOK)
 }
 
-func (ah *authHandler) GetIsAdmin(w http.ResponseWriter, r *http.Request) {
+// GetIsAdmin godoc
+//
+//	@Summary		Check if user is admin
+//	@Description	Check if the user is an admin. Requires a valid JWT token in the request context.
+//	@Tags			Auth
+//	@Accept			json
+//	@Produce		json
+//	@Security		PubKeyContextAuth
+//	@Success		200	{string}	string	"Returns a success message if the user is an admin"
+//	@Failure		401	{string}	string	"Unauthorized: User is not an admin or missing/invalid JWT token"
+//	@Router			/admin/auth [get]
+func (ah *AuthHandler) GetIsAdmin(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 	pubKeyFromAuth, _ := ctx.Value(auth.ContextKey).(string)
 	isAdmin := auth.AdminCheck(pubKeyFromAuth)
@@ -67,7 +99,20 @@ func (ah *authHandler) GetIsAdmin(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func (ah *authHandler) CreateConnectionCode(w http.ResponseWriter, r *http.Request) {
+// CreateConnectionCode godoc
+//
+//	@Summary		Create connection codes
+//	@Description	Create one or more connection codes for a user. Requires a valid pubkey and route hint.
+//	@Tags			Auth
+//	@Accept			json
+//	@Produce		json
+//	@Param			request	body	db.InviteBody	true	"Request body containing pubkey, route hint, sats amount, and number of codes"
+//	@Security		SuperAdminAuth
+//	@Success		200	{string}	string	"Connection codes created successfully"
+//	@Failure		400	{string}	string	"Bad request: Missing or invalid parameters"
+//	@Failure		406	{string}	string	"Not acceptable: Invalid request body"
+//	@Router			/connectioncodes [post]
+func (ah *AuthHandler) CreateConnectionCode(w http.ResponseWriter, r *http.Request) {
 	codeBody := db.InviteBody{}
 	codeArr := []db.ConnectionCodes{}
 
@@ -166,13 +211,33 @@ func MakeConnectionCodeRequest(inviter_pubkey string, inviter_route_hint string,
 	return inviteReponse.Invite
 }
 
-func (ah *authHandler) GetConnectionCode(w http.ResponseWriter, _ *http.Request) {
+// GetConnectionCode godoc
+//
+//	@Summary		Get a connection code
+//	@Description	Retrieve a single connection code from the database.
+//	@Tags			Auth
+//	@Accept			json
+//	@Produce		json
+//	@Success		200	{object}	db.ConnectionCodesShort	"Connection code retrieved successfully"
+//	@Router			/connectioncodes [get]
+func (ah *AuthHandler) GetConnectionCode(w http.ResponseWriter, _ *http.Request) {
 	connectionCode := ah.db.GetConnectionCode()
 
 	w.WriteHeader(http.StatusOK)
 	json.NewEncoder(w).Encode(connectionCode)
 }
 
+// GetLnurlAuth godoc
+//
+//	@Summary		Generate LNURL-auth data
+//	@Description	Generate a unique LNURL-auth challenge (k1) and encoded LNURL for authentication.
+//	@Tags			Auth
+//	@Accept			json
+//	@Produce		json
+//	@Param			socketKey	query		string				true	"Socket connection key to associate with the LNURL-auth challenge"
+//	@Success		200			{object}	auth.LnEncodeData	"LNURL-auth data generated successfully"
+//	@Failure		400			{object}	auth.LnEncodeData	"Bad request: Failed to generate LNURL-auth data"
+//	@Router			/lnurl_auth [get]
 func GetLnurlAuth(w http.ResponseWriter, r *http.Request) {
 	socketKey := r.URL.Query().Get("socketKey")
 	socket, _ := db.Store.GetSocketConnections(socketKey)
@@ -206,6 +271,21 @@ func GetLnurlAuth(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(responseData)
 }
 
+// ReceiveLnAuthData godoc
+//
+//	@Summary		Receive LNURL auth data
+//	@Description	Receive LNURL auth data and authenticate the user using LNURL-auth protocol.
+//	@Tags			Auth
+//	@Accept			json
+//	@Produce		json
+//	@Param			key	query		string			true	"User's public key"
+//	@Param			k1	query		string			true	"Unique challenge string (k1)"
+//	@Param			sig	query		string			true	"Signature of the challenge signed by the user's private key"
+//	@Success		200	{object}	LnAuthResponse	"Authentication successful"
+//	@Failure		400	{object}	LnAuthResponse	"Invalid request or missing parameters"
+//	@Failure		401	{object}	LnAuthResponse	"Unauthorized: Signature verification failed"
+//	@Failure		406	{object}	LnAuthResponse	"Not Acceptable: JWT creation failed"
+//	@Router			/lnauth_login [get]
 func ReceiveLnAuthData(w http.ResponseWriter, r *http.Request) {
 	userKey := r.URL.Query().Get("key")
 	k1 := r.URL.Query().Get("k1")
@@ -219,7 +299,7 @@ func ReceiveLnAuthData(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	responseMsg := make(map[string]string)
+	responseMsg := LnAuthResponse{}
 
 	if userKey != "" {
 		// Save in DB if the user does not exists already
@@ -259,17 +339,29 @@ func ReceiveLnAuthData(w http.ResponseWriter, r *http.Request) {
 			logger.Log.Error("[auth] Socket Error: %v", err)
 		}
 
-		responseMsg["status"] = "OK"
+		responseMsg.Status = "OK"
 		w.WriteHeader(http.StatusOK)
 		json.NewEncoder(w).Encode(responseMsg)
 	}
 
-	responseMsg["status"] = "ERROR"
+	responseMsg.Status = "ERROR"
 	w.WriteHeader(http.StatusBadRequest)
 	json.NewEncoder(w).Encode(responseMsg)
 }
 
-func (ah *authHandler) RefreshToken(w http.ResponseWriter, r *http.Request) {
+// RefreshToken godoc
+//
+//	@Summary		Refresh JWT token
+//	@Description	Refresh the JWT token using a valid existing token.
+//	@Tags			Auth
+//	@Accept			json
+//	@Produce		json
+//	@Param			x-jwt	header		string					true	"Existing JWT token"
+//	@Success		200		{object}	RefreshTokenResponse	"Token refreshed successfully"
+//	@Failure		401		{object}	string					"Unauthorized: Missing or invalid JWT token"
+//	@Failure		406		{object}	string					"Not Acceptable: Failed to create a new JWT token"
+//	@Router			/refresh_jwt [get]
+func (ah *AuthHandler) RefreshToken(w http.ResponseWriter, r *http.Request) {
 	token := r.Header.Get("x-jwt")
 
 	if token == "" {
@@ -345,17 +437,31 @@ func returnUserMap(p db.Person) map[string]interface{} {
 	return user
 }
 
-func (ah *authHandler) ListConnectionCodes(w http.ResponseWriter, r *http.Request) {
+// ListConnectionCodes godoc
+//
+//	@Summary		List connection codes
+//	@Description	List all connection codes with pagination support.
+//	@Tags			Auth
+//	@Accept			json
+//	@Produce		json
+//	@Security		SuperAdminAuth
+//	@Param			page	query		int							false	"Page number (default: 1)"
+//	@Param			limit	query		int							false	"Number of items per page (default: 20)"
+//	@Success		200		{object}	ConnectionCodesListResponse	"Connection codes retrieved successfully"
+//	@Failure		400		{object}	ConnectionCodesListResponse	"Bad request: Invalid pagination parameters"
+//	@Failure		500		{object}	ConnectionCodesListResponse	"Internal server error: Failed to retrieve connection codes"
+//	@Router			/connectioncodes/list [get]
+func (ah *AuthHandler) ListConnectionCodes(w http.ResponseWriter, r *http.Request) {
 
 	page := 1
 	limit := 20
-	
+
 	if pageStr := r.URL.Query().Get("page"); pageStr != "" {
 		if p, err := strconv.Atoi(pageStr); err == nil && p > 0 {
 			page = p
 		}
 	}
-	
+
 	if limitStr := r.URL.Query().Get("limit"); limitStr != "" {
 		if l, err := strconv.Atoi(limitStr); err == nil && l > 0 {
 			limit = l
@@ -363,32 +469,32 @@ func (ah *authHandler) ListConnectionCodes(w http.ResponseWriter, r *http.Reques
 	}
 
 	codes, total, err := ah.db.GetConnectionCodesList(page, limit)
-    if err != nil {
-        w.WriteHeader(http.StatusOK)
-        json.NewEncoder(w).Encode(ConnectionCodesListResponse{
-            Success: false,
-            Data: struct {
-                Codes []db.ConnectionCodesList `json:"codes"`
-                Total int64                   `json:"total"`
-            }{
-                Codes: []db.ConnectionCodesList{},
-                Total: 0,
-            },
-        })
-        return
-    }
+	if err != nil {
+		w.WriteHeader(http.StatusOK)
+		json.NewEncoder(w).Encode(ConnectionCodesListResponse{
+			Success: false,
+			Data: struct {
+				Codes []db.ConnectionCodesList `json:"codes"`
+				Total int64                    `json:"total"`
+			}{
+				Codes: []db.ConnectionCodesList{},
+				Total: 0,
+			},
+		})
+		return
+	}
 
-    response := ConnectionCodesListResponse{
-        Success: true,
-        Data: struct {
-            Codes []db.ConnectionCodesList `json:"codes"`
-            Total int64                   `json:"total"`
-        }{
-            Codes: codes,
-            Total: total,
-        },
-    }
+	response := ConnectionCodesListResponse{
+		Success: true,
+		Data: struct {
+			Codes []db.ConnectionCodesList `json:"codes"`
+			Total int64                    `json:"total"`
+		}{
+			Codes: codes,
+			Total: total,
+		},
+	}
 
-    w.WriteHeader(http.StatusOK)
-    json.NewEncoder(w).Encode(response)
+	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode(response)
 }

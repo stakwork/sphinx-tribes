@@ -31,6 +31,18 @@ func NewMetricHandler(db db.Database) *metricHandler {
 	return &metricHandler{db: db}
 }
 
+// PaymentMetrics godoc
+//
+//	@Summary		Get Payment Metrics
+//	@Description	Get payment metrics for a workspace
+//	@Tags			Metrics
+//	@Accept			json
+//	@Produce		json
+//	@Security		SuperAdminAuth
+//	@Param			workspace	query		string				true	"Workspace"
+//	@Param			request		body		db.PaymentDateRange	true	"Payment Date Range"
+//	@Success		200			{object}	int
+//	@Router			/metrics/payment [post]
 func PaymentMetrics(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 	pubKeyFromAuth, _ := ctx.Value(auth.ContextKey).(string)
@@ -60,6 +72,17 @@ func PaymentMetrics(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(sumAmount)
 }
 
+// WorkspacetMetrics godoc
+//
+//	@Summary		Get Workspace Metrics
+//	@Description	Get workspace metrics
+//	@Tags			Metrics
+//	@Accept			json
+//	@Produce		json
+//	@Security		SuperAdminAuth
+//	@Param			request	body		db.PaymentDateRange	true	"Payment Date Range"
+//	@Success		200		{object}	int
+//	@Router			/metrics/organization [post]
 func WorkspacetMetrics(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 	pubKeyFromAuth, _ := ctx.Value(auth.ContextKey).(string)
@@ -87,6 +110,17 @@ func WorkspacetMetrics(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(sumAmount)
 }
 
+// PeopleMetrics godoc
+//
+//	@Summary		Get People Metrics
+//	@Description	Get people metrics
+//	@Tags			Metrics
+//	@Accept			json
+//	@Produce		json
+//	@Security		SuperAdminAuth
+//	@Param			request	body		db.PaymentDateRange	true	"Payment Date Range"
+//	@Success		200		{object}	int
+//	@Router			/metrics/people [post]
 func PeopleMetrics(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 	pubKeyFromAuth, _ := ctx.Value(auth.ContextKey).(string)
@@ -121,6 +155,18 @@ func PeopleMetrics(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(sumAmount)
 }
 
+// BountyMetrics godoc
+//
+//	@Summary		Get Bounty Metrics
+//	@Description	Get bounty metrics for a workspace
+//	@Tags			Metrics
+//	@Accept			json
+//	@Produce		json
+//	@Security		SuperAdminAuth
+//	@Param			workspace	query		string				true	"Workspace"
+//	@Param			request		body		db.PaymentDateRange	true	"Payment Date Range"
+//	@Success		200			{object}	db.BountyMetrics
+//	@Router			/metrics/bounty_stats [post]
 func (mh *metricHandler) BountyMetrics(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 	pubKeyFromAuth, _ := ctx.Value(auth.ContextKey).(string)
@@ -208,6 +254,17 @@ func (mh *metricHandler) BountyMetrics(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(bountyMetrics)
 }
 
+// MetricsBounties godoc
+//
+//	@Summary		Get Bounties
+//	@Description	Get bounties by date range
+//	@Tags			Metrics
+//	@Accept			json
+//	@Produce		json
+//	@Security		SuperAdminAuth
+//	@Param			request	body	db.PaymentDateRange	true	"Payment Date Range"
+//	@Success		200		{array}	db.BountyData
+//	@Router			/metrics/bounties [post]
 func (mh *metricHandler) MetricsBounties(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 	pubKeyFromAuth, _ := ctx.Value(auth.ContextKey).(string)
@@ -236,6 +293,17 @@ func (mh *metricHandler) MetricsBounties(w http.ResponseWriter, r *http.Request)
 	json.NewEncoder(w).Encode(metricBountiesData)
 }
 
+// MetricsBountiesCount godoc
+//
+//	@Summary		Get Bounties Count
+//	@Description	Get the count of bounties by date range
+//	@Tags			Metrics
+//	@Accept			json
+//	@Produce		json
+//	@Security		SuperAdminAuth
+//	@Param			request	body	db.PaymentDateRange	true	"Payment Date Range"
+//	@Success		200		{int}	int
+//	@Router			/metrics/bounties/count [post]
 func (mh *metricHandler) MetricsBountiesCount(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 	pubKeyFromAuth, _ := ctx.Value(auth.ContextKey).(string)
@@ -262,6 +330,17 @@ func (mh *metricHandler) MetricsBountiesCount(w http.ResponseWriter, r *http.Req
 	json.NewEncoder(w).Encode(MetricsBountiesCount)
 }
 
+// MetricsBountiesProviders godoc
+//
+//	@Summary		Get Bounties Providers
+//	@Description	Get bounties providers by date range
+//	@Tags			Metrics
+//	@Accept			json
+//	@Produce		json
+//	@Security		SuperAdminAuth
+//	@Param			request	body	db.PaymentDateRange	true	"Payment Date Range"
+//	@Success		200		{array}	db.Person
+//	@Router			/metrics/bounties/providers [post]
 func (mh *metricHandler) MetricsBountiesProviders(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 	pubKeyFromAuth, _ := ctx.Value(auth.ContextKey).(string)
@@ -288,6 +367,17 @@ func (mh *metricHandler) MetricsBountiesProviders(w http.ResponseWriter, r *http
 	json.NewEncoder(w).Encode(bountiesProviders)
 }
 
+// MetricsCsv godoc
+//
+//	@Summary		Generate Metrics CSV
+//	@Description	Generate a CSV file for metrics
+//	@Tags			Metrics
+//	@Accept			json
+//	@Produce		json
+//	@Security		SuperAdminAuth
+//	@Param			request	body		db.PaymentDateRange	true	"Payment Date Range"
+//	@Success		200		{string}	string				"CSV file URL"
+//	@Router			/metrics/csv [post]
 func MetricsCsv(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 	pubKeyFromAuth, _ := ctx.Value(auth.ContextKey).(string)
@@ -329,6 +419,16 @@ func MetricsCsv(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+// GetAdminWorkspaces godoc
+//
+//	@Summary		Get Admin Workspaces
+//	@Description	Get all workspaces for admin
+//	@Tags			Metrics
+//	@Accept			json
+//	@Produce		json
+//	@Security		SuperAdminAuth
+//	@Success		200	{array}	db.Workspace
+//	@Router			/metrics/workspaces [get]
 func GetAdminWorkspaces(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 	pubKeyFromAuth, _ := ctx.Value(auth.ContextKey).(string)

@@ -134,7 +134,7 @@ type Database interface {
 	GetSumOfDeposits(workspace_uuid string) uint
 	GetSumOfWithdrawal(workspace_uuid string) uint
 	DeleteAllUsersFromWorkspace(uuid string) error
-	GetFilterStatusCount() FilterStattuCount
+	GetFilterStatusCount() FilterStatusCount
 	UserHasManageBountyRoles(pubKeyFromAuth string, uuid string) bool
 	BountiesPaidPercentage(r PaymentDateRange, workspace string) uint
 	TotalSatsPosted(r PaymentDateRange, workspace string) uint

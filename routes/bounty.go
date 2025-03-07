@@ -32,7 +32,6 @@ func BountyRoutes() chi.Router {
 		r.Get("/invoice/{paymentRequest}", bountyHandler.GetInvoiceData)
 		r.Get("/filter/count", bountyHandler.GetFilterCount)
 		r.Get("/workspace/timerange/{workspaceId}/{daysStart}/{daysEnd}", bountyHandler.GetBountiesByWorkspaceTime)
-		
 	})
 	r.Group(func(r chi.Router) {
 		r.Use(auth.PubKeyContext)
