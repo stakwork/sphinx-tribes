@@ -34,7 +34,7 @@ func BountyRoutes() chi.Router {
 		r.Get("/workspace/timerange/{workspaceId}/{daysStart}/{daysEnd}", bountyHandler.GetBountiesByWorkspaceTime)
 	})
 	r.Group(func(r chi.Router) {
-		r.Use(auth.PubKeyContext)
+		r.Use(auth.CombinedAuthContext)
 
 		r.Post("/featured/create", bountyHandler.CreateFeaturedBounty)
 		r.Put("/featured/update", bountyHandler.UpdateFeaturedBounty)

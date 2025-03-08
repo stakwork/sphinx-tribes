@@ -21,23 +21,23 @@ func ActivityRoutes() chi.Router {
 	})
 
 	r.Group(func(r chi.Router) {
-		r.Use(auth.PubKeyContext)
-		
-		r.Post("/", activityHandler.CreateActivity)                      
-		r.Put("/{id}", activityHandler.UpdateActivity)                   
-		r.Delete("/{id}", activityHandler.DeleteActivity)             
-		
-		r.Post("/thread", activityHandler.CreateActivityThread)  
-		
-		r.Get("/feature/{feature_uuid}", activityHandler.GetActivitiesByFeature)      
-		r.Get("/phase/{phase_uuid}", activityHandler.GetActivitiesByPhase)            
-		r.Get("/workspace/{workspace}", activityHandler.GetActivitiesByWorkspace)     
+		r.Use(auth.CombinedAuthContext)
 
-		r.Post("/{id}/actions", activityHandler.AddActivityActions)      
-		r.Post("/{id}/questions", activityHandler.AddActivityQuestions) 
-		r.Delete("/{id}/actions/{action_id}", activityHandler.RemoveActivityAction)    
-		r.Delete("/{id}/questions/{question_id}", activityHandler.RemoveActivityQuestion) 
+		r.Post("/", activityHandler.CreateActivity)
+		r.Put("/{id}", activityHandler.UpdateActivity)
+		r.Delete("/{id}", activityHandler.DeleteActivity)
+
+		r.Post("/thread", activityHandler.CreateActivityThread)
+
+		r.Get("/feature/{feature_uuid}", activityHandler.GetActivitiesByFeature)
+		r.Get("/phase/{phase_uuid}", activityHandler.GetActivitiesByPhase)
+		r.Get("/workspace/{workspace}", activityHandler.GetActivitiesByWorkspace)
+
+		r.Post("/{id}/actions", activityHandler.AddActivityActions)
+		r.Post("/{id}/questions", activityHandler.AddActivityQuestions)
+		r.Delete("/{id}/actions/{action_id}", activityHandler.RemoveActivityAction)
+		r.Delete("/{id}/questions/{question_id}", activityHandler.RemoveActivityQuestion)
 	})
 
 	return r
-} 
+}

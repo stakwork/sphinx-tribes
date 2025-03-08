@@ -16,7 +16,8 @@ func ChatRoutes() chi.Router {
 	r.Post("/response", chatHandler.ProcessChatResponse)
 
 	r.Group(func(r chi.Router) {
-		r.Use(auth.PubKeyContext)
+		r.Use(auth.CombinedAuthContext)
+
 		r.Get("/", chatHandler.GetChat)
 		r.Post("/", chatHandler.CreateChat)
 		r.Put("/{chat_id}", chatHandler.UpdateChat)

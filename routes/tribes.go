@@ -2,6 +2,7 @@ package routes
 
 import (
 	"github.com/go-chi/chi"
+	"github.com/stakwork/sphinx-tribes/auth"
 	"github.com/stakwork/sphinx-tribes/db"
 	"github.com/stakwork/sphinx-tribes/handlers"
 )
@@ -15,7 +16,13 @@ func TribeRoutes() chi.Router {
 		r.Get("/app_urls/{app_urls}", handlers.GetTribesByAppUrls)
 		r.Get("/{uuid}", tribeHandlers.GetTribe)
 		r.Get("/total", tribeHandlers.GetTotalTribes)
+	})
+
+	r.Group(func(r chi.Router) {
+		r.Use(auth.CombinedAuthContext)
+
 		r.Post("/", tribeHandlers.CreateOrEditTribe)
 	})
+
 	return r
 }
