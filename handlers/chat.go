@@ -720,6 +720,40 @@ func (ch *ChatHandler) ProcessChatResponse(w http.ResponseWriter, r *http.Reques
 		return
 	}
 
+	existingMessages, err := ch.db.GetChatMessagesForChatID(request.Value.ChatID)
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		json.NewEncoder(w).Encode(ChatResponse{
+			Success: false,
+			Message: fmt.Sprintf("Failed to check existing messages: %v", err),
+		})
+		return
+	}
+
+	for _, msg := range existingMessages {
+		if msg.ID == request.Value.MessageID {
+			w.WriteHeader(http.StatusOK)
+			json.NewEncoder(w).Encode(ChatResponse{
+				Success: true,
+				Message: "Message already processed",
+			})
+			return
+		}
+	}
+
+	for _, msg := range existingMessages {
+		if msg.Role == "assistant" && 
+		   msg.Message == request.Value.Response && 
+		   time.Since(msg.Timestamp) < 5*time.Second {
+			w.WriteHeader(http.StatusOK)
+			json.NewEncoder(w).Encode(ChatResponse{
+				Success: true,
+				Message: "Similar message already processed recently",
+			})
+			return
+		}
+	}
+
 	message := &db.ChatMessage{
 		ID:        xid.New().String(),
 		ChatID:    request.Value.ChatID,
