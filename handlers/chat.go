@@ -731,17 +731,6 @@ func (ch *ChatHandler) ProcessChatResponse(w http.ResponseWriter, r *http.Reques
 	}
 
 	for _, msg := range existingMessages {
-		if msg.ID == request.Value.MessageID {
-			w.WriteHeader(http.StatusOK)
-			json.NewEncoder(w).Encode(ChatResponse{
-				Success: true,
-				Message: "Message already processed",
-			})
-			return
-		}
-	}
-
-	for _, msg := range existingMessages {
 		if msg.Role == "assistant" && 
 		   msg.Message == request.Value.Response && 
 		   time.Since(msg.Timestamp) < 5*time.Second {
