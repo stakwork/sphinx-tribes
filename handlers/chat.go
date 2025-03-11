@@ -117,14 +117,14 @@ type ActionMessageRequest struct {
 }
 
 type ActionPayload struct {
-	ChatID            string           `json:"chatId"`
-	MessageID         string           `json:"messageId"`
-	Message           string           `json:"message"`
-	History           []db.ChatMessage `json:"history"`
-	CodeGraph         string           `json:"codeGraph,omitempty"`
-	CodeGraphAlias    string           `json:"codeGraphAlias,omitempty"`
-	SourceWebsocketID string           `json:"sourceWebsocketId"`
-	WebhookURL        string           `json:"webhook_url"`
+	ChatID            string              `json:"chatId"`
+	MessageID         string              `json:"messageId"`
+	Message           string              `json:"message"`
+	History           []map[string]string `json:"history"`
+	CodeGraph         string              `json:"codeGraph,omitempty"`
+	CodeGraphAlias    string              `json:"codeGraphAlias,omitempty"`
+	SourceWebsocketID string              `json:"sourceWebsocketId"`
+	WebhookURL        string              `json:"webhook_url"`
 }
 
 type CreateOrEditChatRequest struct {
@@ -335,6 +335,21 @@ func (ch *ChatHandler) ArchiveChat(w http.ResponseWriter, r *http.Request) {
 	})
 }
 
+func buildArtifactList(artefacts []db.Artifact) []map[string]string {
+	formattedArtefacts := []map[string]string{}
+	for _, art := range artefacts {
+		contentJSON, err := json.Marshal(art.Content)
+		if err != nil {
+			contentJSON = []byte("{}")
+		}
+		formattedArtefacts = append(formattedArtefacts, map[string]string{
+			"artifactId": art.ID.String(),
+			"content":    string(contentJSON),
+		})
+	}
+	return formattedArtefacts
+}
+
 func buildVarsPayload(request SendMessageRequest, createdMessage *db.ChatMessage, messageHistory []map[string]string, context interface{}, user *db.Person, codeGraph *db.WorkspaceCodeGraph, mode string) map[string]interface{} {
 	vars := map[string]interface{}{
 		"chatId":            request.ChatID,
@@ -448,9 +463,19 @@ func (ch *ChatHandler) SendMessage(w http.ResponseWriter, r *http.Request) {
 
 	messageHistory := make([]map[string]string, len(recentHistory))
 	for i, msg := range recentHistory {
+		artefacts, err := ch.db.GetArtifactsByMessageID(msg.ID)
+		if err != nil {
+			artefacts = []db.Artifact{}
+		}
+
+		artifactJSON, err := json.Marshal(map[string]interface{}{"artifacts": buildArtifactList(artefacts)})
+		if err != nil {
+			artifactJSON = []byte(`{"artifacts": []}`)
+		}
+
 		messageHistory[i] = map[string]string{
 			"role":    string(msg.Role),
-			"content": msg.Message,
+			"content": msg.Message + "\nArtifacts: " + string(artifactJSON),
 		}
 	}
 
@@ -1401,6 +1426,30 @@ func (ch *ChatHandler) SendActionMessage(w http.ResponseWriter, r *http.Request)
 		return
 	}
 
+	start := 0
+	if len(history) > 20 {
+		start = len(history) - 20
+	}
+	recentHistory := history[start:]
+
+	messageHistory := make([]map[string]string, len(recentHistory))
+	for i, msg := range recentHistory {
+		artefacts, err := ch.db.GetArtifactsByMessageID(msg.ID)
+		if err != nil {
+			artefacts = []db.Artifact{}
+		}
+
+		artifactJSON, err := json.Marshal(map[string]interface{}{"artifacts": buildArtifactList(artefacts)})
+		if err != nil {
+			artifactJSON = []byte(`{"artifacts": []}`)
+		}
+
+		messageHistory[i] = map[string]string{
+			"role":    string(msg.Role),
+			"content": msg.Message + "\nArtifacts: " + string(artifactJSON),
+		}
+	}
+
 	chat, err := ch.db.GetChatByChatID(request.ChatID)
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
@@ -1445,7 +1494,7 @@ func (ch *ChatHandler) SendActionMessage(w http.ResponseWriter, r *http.Request)
 		ChatID:            request.ChatID,
 		MessageID:         request.MessageID,
 		Message:           request.Message,
-		History:           history,
+		History:           messageHistory,
 		SourceWebsocketID: request.SourceWebsocketID,
 		WebhookURL:        fmt.Sprintf("%s/hivechat/response", os.Getenv("HOST")),
 	}
