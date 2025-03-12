@@ -529,7 +529,7 @@ func (ch *ChatHandler) SendMessage(w http.ResponseWriter, r *http.Request) {
 
 	if mode == "Build" {
 		stakworkPayload.Name = "hive_autogen"
-		stakworkPayload.WorkflowID = 43198
+		stakworkPayload.WorkflowID = 43859
 	}
 
 	apiKeyEnv := "SWWFKEY"
@@ -756,9 +756,9 @@ func (ch *ChatHandler) ProcessChatResponse(w http.ResponseWriter, r *http.Reques
 	}
 
 	for _, msg := range existingMessages {
-		if msg.Role == "assistant" && 
-		   msg.Message == request.Value.Response && 
-		   time.Since(msg.Timestamp) < 5*time.Second {
+		if msg.Role == "assistant" &&
+			msg.Message == request.Value.Response &&
+			time.Since(msg.Timestamp) < 5*time.Second {
 			w.WriteHeader(http.StatusOK)
 			json.NewEncoder(w).Encode(ChatResponse{
 				Success: true,
