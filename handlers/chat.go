@@ -145,6 +145,18 @@ type ListFilesResponse struct {
 	Pagination PaginationResponse `json:"pagination"`
 }
 
+type ChatWorkflowRequest struct {
+	WorkspaceID string `json:"workspaceId"`
+	URL         string `json:"url"`
+	StackworkID string `json:"stackworkId,omitempty"`
+}
+
+type ChatWorkflowResponse struct {
+	Success bool          `json:"success"`
+	Message string        `json:"message,omitempty"`
+	Data    *db.ChatWorkflow `json:"data,omitempty"`
+}
+
 func NewChatHandler(httpClient *http.Client, database db.Database) *ChatHandler {
 	return &ChatHandler{
 		httpClient: httpClient,
@@ -1589,5 +1601,130 @@ func (ch *ChatHandler) SendActionMessage(w http.ResponseWriter, r *http.Request)
 	json.NewEncoder(w).Encode(ChatResponse{
 		Success: true,
 		Message: "Message sent to action webhook successfully",
+	})
+}
+
+func (ch *ChatHandler) CreateOrEditChatWorkflow(w http.ResponseWriter, r *http.Request) {
+	ctx := r.Context()
+	pubKeyFromAuth, _ := ctx.Value(auth.ContextKey).(string)
+	if pubKeyFromAuth == "" {
+		logger.Log.Info("no pubkey from auth")
+		w.WriteHeader(http.StatusUnauthorized)
+		return
+	}
+
+	var request ChatWorkflowRequest
+	if err := json.NewDecoder(r.Body).Decode(&request); err != nil {
+		w.WriteHeader(http.StatusBadRequest)
+		json.NewEncoder(w).Encode(ChatWorkflowResponse{
+			Success: false,
+			Message: "Invalid request body",
+		})
+		return
+	}
+
+	if request.WorkspaceID == "" || request.URL == "" {
+		w.WriteHeader(http.StatusBadRequest)
+		json.NewEncoder(w).Encode(ChatWorkflowResponse{
+			Success: false,
+			Message: "WorkspaceID and URL are required",
+		})
+		return
+	}
+
+	workspace := ch.db.GetWorkspaceByUuid(request.WorkspaceID)
+	if workspace.Uuid == "" {
+		w.WriteHeader(http.StatusNotFound)
+		json.NewEncoder(w).Encode(ChatWorkflowResponse{
+			Success: false,
+			Message: "Workspace not found",
+		})
+		return
+	}
+
+	workflow := &db.ChatWorkflow{
+		WorkspaceID: request.WorkspaceID,
+		URL:         request.URL,
+		StackworkID: request.StackworkID,
+	}
+
+	result, err := ch.db.CreateOrEditChatWorkflow(workflow)
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		json.NewEncoder(w).Encode(ChatWorkflowResponse{
+			Success: false,
+			Message: fmt.Sprintf("Failed to create/update chat workflow: %v", err),
+		})
+		return
+	}
+
+	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode(ChatWorkflowResponse{
+		Success: true,
+		Message: "Chat workflow created/updated successfully",
+		Data:    result,
+	})
+}
+
+func (ch *ChatHandler) GetChatWorkflow(w http.ResponseWriter, r *http.Request) {
+	workspaceID := chi.URLParam(r, "workspaceId")
+	if workspaceID == "" {
+		w.WriteHeader(http.StatusBadRequest)
+		json.NewEncoder(w).Encode(ChatWorkflowResponse{
+			Success: false,
+			Message: "WorkspaceID is required",
+		})
+		return
+	}
+
+	workflow, err := ch.db.GetChatWorkflowByWorkspaceID(workspaceID)
+	if err != nil {
+		status := http.StatusInternalServerError
+		if strings.Contains(err.Error(), "not found") {
+			status = http.StatusNotFound
+		}
+		w.WriteHeader(status)
+		json.NewEncoder(w).Encode(ChatWorkflowResponse{
+			Success: false,
+			Message: err.Error(),
+		})
+		return
+	}
+
+	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode(ChatWorkflowResponse{
+		Success: true,
+		Data:    workflow,
+	})
+}
+
+func (ch *ChatHandler) DeleteChatWorkflow(w http.ResponseWriter, r *http.Request) {
+	workspaceID := chi.URLParam(r, "workspaceId")
+	if workspaceID == "" {
+		w.WriteHeader(http.StatusBadRequest)
+		json.NewEncoder(w).Encode(ChatWorkflowResponse{
+			Success: false,
+			Message: "WorkspaceID is required",
+		})
+		return
+	}
+
+	if err := ch.db.DeleteChatWorkflow(workspaceID); err != nil {
+		status := http.StatusInternalServerError
+		if strings.Contains(err.Error(), "not found") {
+			status = http.StatusNotFound
+		}
+		w.WriteHeader(status)
+		json.NewEncoder(w).Encode(ChatWorkflowResponse{
+			Success: false,
+			Message: err.Error(),
+		})
+		return
+	}
+
+	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode(ChatWorkflowResponse{
+		Success: true,
+		Message: "Chat workflow deleted successfully",
 	})
 }

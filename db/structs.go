@@ -1485,6 +1485,15 @@ type FeatureCall struct {
 	DeletedAt   gorm.DeletedAt  `gorm:"index" json:"-"`
 }
 
+type ChatWorkflow struct {
+	ID          uint      `json:"id" gorm:"primaryKey"`
+	WorkspaceID string    `json:"workspaceId" gorm:"index;not null"`
+	URL         string    `json:"url" gorm:"type:text;not null"`
+	StackworkID string    `json:"stackworkId" gorm:"column:stackwork_id"`
+	CreatedAt   time.Time `json:"createdAt"`
+	UpdatedAt   time.Time `json:"updatedAt"`
+}
+
 func (Person) TableName() string {
 	return "people"
 }

@@ -320,4 +320,7 @@ type Database interface {
 	CreateOrUpdateFeatureCall(workspaceID string, url string) (*FeatureCall, error)
 	GetFeatureCallByWorkspaceID(workspaceID string) (*FeatureCall, error)
 	DeleteFeatureCall(workspaceID string) error
+	CreateOrEditChatWorkflow(workflow *ChatWorkflow) (*ChatWorkflow, error)
+	GetChatWorkflowByWorkspaceID(workspaceID string) (*ChatWorkflow, error)
+	DeleteChatWorkflow(workspaceID string) error
 }

@@ -39,6 +39,10 @@ func ChatRoutes() chi.Router {
 		r.Put("/artefacts/{artifactId}", chatHandler.UpdateArtefact)
 		r.Delete("/artefacts/{artifactId}", chatHandler.DeleteArtefactByID)
 		r.Delete("/artefacts/chat/{chatId}", chatHandler.DeleteAllArtefactsByChatID)
+
+		r.Post("/chatworkflow", chatHandler.CreateOrEditChatWorkflow)
+		r.Get("/chatworkflow/{workspaceId}", chatHandler.GetChatWorkflow)
+		r.Delete("/chatworkflow/{workspaceId}", chatHandler.DeleteChatWorkflow)
 	})
 
 	return r

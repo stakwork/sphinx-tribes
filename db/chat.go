@@ -274,3 +274,52 @@ func (db database) DeleteFileAsset(id uint) error {
 	}
 	return nil
 }
+
+func (db database) CreateOrEditChatWorkflow(workflow *ChatWorkflow) (*ChatWorkflow, error) {
+	var existing ChatWorkflow
+	result := db.db.Where("workspace_id = ?", workflow.WorkspaceID).First(&existing)
+
+	now := time.Now()
+	if errors.Is(result.Error, gorm.ErrRecordNotFound) {
+
+		workflow.CreatedAt = now
+		workflow.UpdatedAt = now
+		if err := db.db.Create(workflow).Error; err != nil {
+			return nil, fmt.Errorf("failed to create chat workflow: %w", err)
+		}
+		return workflow, nil
+	} else if result.Error != nil {
+		return nil, fmt.Errorf("failed to check existing workflow: %w", result.Error)
+	}
+
+	existing.URL = workflow.URL
+	existing.StackworkID = workflow.StackworkID
+	existing.UpdatedAt = now
+
+	if err := db.db.Save(&existing).Error; err != nil {
+		return nil, fmt.Errorf("failed to update chat workflow: %w", err)
+	}
+	return &existing, nil
+}
+
+func (db database) GetChatWorkflowByWorkspaceID(workspaceID string) (*ChatWorkflow, error) {
+	var workflow ChatWorkflow
+	if err := db.db.Where("workspace_id = ?", workspaceID).First(&workflow).Error; err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return nil, fmt.Errorf("chat workflow not found for workspace: %s", workspaceID)
+		}
+		return nil, fmt.Errorf("failed to fetch chat workflow: %w", err)
+	}
+	return &workflow, nil
+}
+
+func (db database) DeleteChatWorkflow(workspaceID string) error {
+	result := db.db.Where("workspace_id = ?", workspaceID).Delete(&ChatWorkflow{})
+	if result.Error != nil {
+		return fmt.Errorf("failed to delete chat workflow: %w", result.Error)
+	}
+	if result.RowsAffected == 0 {
+		return fmt.Errorf("chat workflow not found for workspace: %s", workspaceID)
+	}
+	return nil
+}
