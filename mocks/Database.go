@@ -15820,3 +15820,157 @@ func NewDatabase(t interface {
 
 	return mock
 }
+
+
+func (_m *Database) CreateOrEditChatWorkflow(workflow *db.ChatWorkflow) (*db.ChatWorkflow, error) {
+	ret := _m.Called(workflow)
+
+	if len(ret) == 0 {
+		panic("no return value specified for CreateOrEditChatWorkflow")
+	}
+
+	var r0 *db.ChatWorkflow
+	var r1 error
+	if rf, ok := ret.Get(0).(func(*db.ChatWorkflow) (*db.ChatWorkflow, error)); ok {
+		return rf(workflow)
+	}
+	if rf, ok := ret.Get(0).(func(*db.ChatWorkflow) *db.ChatWorkflow); ok {
+		r0 = rf(workflow)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(*db.ChatWorkflow)
+		}
+	}
+
+	if rf, ok := ret.Get(1).(func(*db.ChatWorkflow) error); ok {
+		r1 = rf(workflow)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
+type Database_CreateOrEditChatWorkflow_Call struct {
+	*mock.Call
+}
+
+func (_e *Database_Expecter) CreateOrEditChatWorkflow(workflow interface{}) *Database_CreateOrEditChatWorkflow_Call {
+	return &Database_CreateOrEditChatWorkflow_Call{Call: _e.mock.On("CreateOrEditChatWorkflow", workflow)}
+}
+
+func (_c *Database_CreateOrEditChatWorkflow_Call) Run(run func(workflow *db.ChatWorkflow)) *Database_CreateOrEditChatWorkflow_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(*db.ChatWorkflow))
+	})
+	return _c
+}
+
+func (_c *Database_CreateOrEditChatWorkflow_Call) Return(_a0 *db.ChatWorkflow, _a1 error) *Database_CreateOrEditChatWorkflow_Call {
+	_c.Call.Return(_a0, _a1)
+	return _c
+}
+
+func (_c *Database_CreateOrEditChatWorkflow_Call) RunAndReturn(run func(*db.ChatWorkflow) (*db.ChatWorkflow, error)) *Database_CreateOrEditChatWorkflow_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
+
+func (_m *Database) GetChatWorkflowByWorkspaceID(workspaceID string) (*db.ChatWorkflow, error) {
+	ret := _m.Called(workspaceID)
+
+	if len(ret) == 0 {
+		panic("no return value specified for GetChatWorkflowByWorkspaceID")
+	}
+
+	var r0 *db.ChatWorkflow
+	var r1 error
+	if rf, ok := ret.Get(0).(func(string) (*db.ChatWorkflow, error)); ok {
+		return rf(workspaceID)
+	}
+	if rf, ok := ret.Get(0).(func(string) *db.ChatWorkflow); ok {
+		r0 = rf(workspaceID)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(*db.ChatWorkflow)
+		}
+	}
+
+	if rf, ok := ret.Get(1).(func(string) error); ok {
+		r1 = rf(workspaceID)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
+type Database_GetChatWorkflowByWorkspaceID_Call struct {
+	*mock.Call
+}
+
+
+func (_e *Database_Expecter) GetChatWorkflowByWorkspaceID(workspaceID interface{}) *Database_GetChatWorkflowByWorkspaceID_Call {
+	return &Database_GetChatWorkflowByWorkspaceID_Call{Call: _e.mock.On("GetChatWorkflowByWorkspaceID", workspaceID)}
+}
+
+func (_c *Database_GetChatWorkflowByWorkspaceID_Call) Run(run func(workspaceID string)) *Database_GetChatWorkflowByWorkspaceID_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(string))
+	})
+	return _c
+}
+
+func (_c *Database_GetChatWorkflowByWorkspaceID_Call) Return(_a0 *db.ChatWorkflow, _a1 error) *Database_GetChatWorkflowByWorkspaceID_Call {
+	_c.Call.Return(_a0, _a1)
+	return _c
+}
+
+func (_c *Database_GetChatWorkflowByWorkspaceID_Call) RunAndReturn(run func(string) (*db.ChatWorkflow, error)) *Database_GetChatWorkflowByWorkspaceID_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
+
+func (_m *Database) DeleteChatWorkflow(workspaceID string) error {
+	ret := _m.Called(workspaceID)
+
+	if len(ret) == 0 {
+		panic("no return value specified for DeleteChatWorkflow")
+	}
+
+	var r0 error
+	if rf, ok := ret.Get(0).(func(string) error); ok {
+		r0 = rf(workspaceID)
+	} else {
+		r0 = ret.Error(0)
+	}
+
+	return r0
+}
+
+type Database_DeleteChatWorkflow_Call struct {
+	*mock.Call
+}
+
+func (_e *Database_Expecter) DeleteChatWorkflow(workspaceID interface{}) *Database_DeleteChatWorkflow_Call {
+	return &Database_DeleteChatWorkflow_Call{Call: _e.mock.On("DeleteChatWorkflow", workspaceID)}
+}
+
+func (_c *Database_DeleteChatWorkflow_Call) Run(run func(workspaceID string)) *Database_DeleteChatWorkflow_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(string))
+	})
+	return _c
+}
+
+func (_c *Database_DeleteChatWorkflow_Call) Return(_a0 error) *Database_DeleteChatWorkflow_Call {
+	_c.Call.Return(_a0)
+	return _c
+}
+
+func (_c *Database_DeleteChatWorkflow_Call) RunAndReturn(run func(string) error) *Database_DeleteChatWorkflow_Call {
+	_c.Call.Return(run)
+	return _c
+}
