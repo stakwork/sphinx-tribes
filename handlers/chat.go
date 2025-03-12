@@ -546,7 +546,8 @@ func (ch *ChatHandler) SendMessage(w http.ResponseWriter, r *http.Request) {
 
 	apiKeyEnv := "SWWFKEY"
 	if mode == "Build" {
-		apiKeyEnv = "SWWFSWKEY"
+		//apiKeyEnv = "SWWFSWKEY"
+		apiKeyEnv = "SWPR"
 	}
 
 	apiKey := os.Getenv(apiKeyEnv)
