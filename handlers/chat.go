@@ -152,8 +152,8 @@ type ChatWorkflowRequest struct {
 }
 
 type ChatWorkflowResponse struct {
-	Success bool          `json:"success"`
-	Message string        `json:"message,omitempty"`
+	Success bool             `json:"success"`
+	Message string           `json:"message,omitempty"`
 	Data    *db.ChatWorkflow `json:"data,omitempty"`
 }
 
@@ -387,12 +387,12 @@ func buildVarsPayload(request SendMessageRequest, createdMessage *db.ChatMessage
 		} else {
 			vars["codeGraph"] = url
 			vars["codeGraphAlias"] = codeGraph.SecretAlias
+			vars["2b_base_url"] = url
+			vars["secret"] = codeGraph.SecretAlias
 		}
 	}
 
-	if mode == "Build" {
-		vars["query"] = request.Message
-	}
+	vars["query"] = request.Message
 
 	return vars
 }
