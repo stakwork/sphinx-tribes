@@ -555,7 +555,7 @@ func (ch *ChatHandler) SendMessage(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusInternalServerError)
 		json.NewEncoder(w).Encode(ChatResponse{
 			Success: false,
-			Message: fmt.Sprintf("Failed to process messags: %v", err),
+			Message: fmt.Sprintf("Failed to process message: %v", err),
 		})
 		return
 	}
