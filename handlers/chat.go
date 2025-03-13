@@ -10,7 +10,6 @@ import (
 	"io"
 	"log"
 	"math"
-	"mime/multipart"
 	"net/http"
 	"os"
 	"path/filepath"
@@ -919,7 +918,21 @@ func (ch *ChatHandler) UploadFile(w http.ResponseWriter, r *http.Request) {
 	file.Seek(0, 0)
 
 	uploadFilename := uuid.New().String() + filepath.Ext(header.Filename)
-	uploadURL, err := uploadToStorage(file, uploadFilename)
+
+	challenge := GetMemeChallenge()
+	signer := SignChallenge(challenge.Challenge)
+	mErr, mToken := GetMemeToken(challenge.Id, signer.Response.Sig)
+
+	if mErr != "" {
+		w.WriteHeader(http.StatusInternalServerError)
+		json.NewEncoder(w).Encode(ChatResponse{
+			Success: false,
+			Message: "Failed to get meme token",
+		})
+		return
+	}
+
+	err, uploadURL := UploadMemeImage(file, mToken.Token, header.Filename)
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
 		json.NewEncoder(w).Encode(ChatResponse{
@@ -1234,69 +1247,6 @@ func isAllowedFileType(mimeType string) bool {
 		"application/json": true,
 	}
 	return allowedTypes[mimeType]
-}
-
-func uploadToStorage(file multipart.File, filename string) (string, error) {
-
-	var buf bytes.Buffer
-
-	if _, err := io.Copy(&buf, file); err != nil {
-		return "", fmt.Errorf("failed to copy file content: %w", err)
-	}
-
-	body := &bytes.Buffer{}
-	writer := multipart.NewWriter(body)
-
-	part, err := writer.CreateFormFile("file", filename)
-	if err != nil {
-		return "", fmt.Errorf("failed to create form file: %w", err)
-	}
-
-	if _, err := io.Copy(part, &buf); err != nil {
-		return "", fmt.Errorf("failed to copy to form file: %w", err)
-	}
-
-	if err := writer.Close(); err != nil {
-		return "", fmt.Errorf("failed to close writer: %w", err)
-	}
-
-	memeServerURL := os.Getenv("MEME_SERVER_URL")
-	if memeServerURL == "" {
-		memeServerURL = "https://meme.sphinx.chat" // TODO: CHANGE TO PROD
-	}
-
-	req, err := http.NewRequest("POST", memeServerURL+"/public", body)
-	if err != nil {
-		return "", fmt.Errorf("failed to create request: %w", err)
-	}
-
-	req.Header.Set("Content-Type", writer.FormDataContentType())
-
-	client := &http.Client{}
-	resp, err := client.Do(req)
-	if err != nil {
-		return "", fmt.Errorf("failed to send request: %w", err)
-	}
-	defer resp.Body.Close()
-
-	if resp.StatusCode != http.StatusOK {
-		return "", fmt.Errorf("meme server returned status %d", resp.StatusCode)
-	}
-
-	var response struct {
-		Success bool   `json:"success"`
-		URL     string `json:"url"`
-	}
-
-	if err := json.NewDecoder(resp.Body).Decode(&response); err != nil {
-		return "", fmt.Errorf("failed to decode response: %w", err)
-	}
-
-	if !response.Success {
-		return "", fmt.Errorf("meme server upload failed")
-	}
-
-	return response.URL, nil
 }
 
 func jsonErrorResponse(w http.ResponseWriter, message string, statusCode int) {
