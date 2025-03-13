@@ -60,6 +60,7 @@ func NewRouter() *http.Server {
 	r.Mount("/feature-flags", FeatureFlagRoutes())
 	r.Mount("/snippet", SnippetRoutes())
 	r.Mount("/activities", ActivityRoutes())
+	r.Mount("/skill", SkillRoutes())
 	r.Get("/docs/*", httpSwagger.WrapHandler)
 
 	r.Group(func(r chi.Router) {

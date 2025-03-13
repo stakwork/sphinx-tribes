@@ -102,6 +102,8 @@ func InitDB() {
 	db.AutoMigrate(&Artifact{})
 	db.AutoMigrate(&FeatureCall{})
 	db.AutoMigrate(&ChatWorkflow{})
+	db.AutoMigrate(&Skill{})
+	db.AutoMigrate(&SkillInstall{})
 
 	DB.MigrateTablesWithOrgUuid()
 	DB.MigrateOrganizationToWorkspace()
