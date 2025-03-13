@@ -331,6 +331,6 @@ type Database interface {
 	CreateSkillInstall(install *SkillInstall) (*SkillInstall, error)
 	GetSkillInstallBySkillsID(skillID uuid.UUID) ([]SkillInstall, error)
 	GetSkillInstallByID(id uuid.UUID) (*SkillInstall, error)
-	UpdateSkillInstall(install *SkillInstall) (*SkillInstall, error)
-	DeleteSkillInstall(id uuid.UUID) error
+	UpdateSkillInstallByID(install *SkillInstall) (*SkillInstall, error)
+	DeleteSkillInstallByID(id uuid.UUID) error
 }

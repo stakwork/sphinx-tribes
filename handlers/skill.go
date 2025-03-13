@@ -302,7 +302,7 @@ func (sh *skillHandler) CreateSkillInstall(w http.ResponseWriter, r *http.Reques
 	json.NewEncoder(w).Encode(createdInstall)
 }
 
-func (sh *skillHandler) GetSkillInstallsBySkillID(w http.ResponseWriter, r *http.Request) {
+func (sh *skillHandler) GetAllSkillInstallsBySkillID(w http.ResponseWriter, r *http.Request) {
 	idStr := chi.URLParam(r, "id")
 	if idStr == "" {
 		w.WriteHeader(http.StatusBadRequest)
@@ -335,4 +335,173 @@ func (sh *skillHandler) GetSkillInstallsBySkillID(w http.ResponseWriter, r *http
 
 	w.WriteHeader(http.StatusOK)
 	json.NewEncoder(w).Encode(installs)
-} 
+}
+
+func (sh *skillHandler) DeleteSkillInstallByID(w http.ResponseWriter, r *http.Request) {
+	ctx := r.Context()
+	pubKeyFromAuth, _ := ctx.Value(auth.ContextKey).(string)
+
+	if pubKeyFromAuth == "" {
+		logger.Log.Info("[skill] no pubkey from auth")
+		w.WriteHeader(http.StatusUnauthorized)
+		json.NewEncoder(w).Encode(map[string]string{"error": "Unauthorized"})
+		return
+	}
+
+	idStr := chi.URLParam(r, "id")
+	if idStr == "" {
+		w.WriteHeader(http.StatusBadRequest)
+		json.NewEncoder(w).Encode(map[string]string{"error": "Installation ID is required"})
+		return
+	}
+
+	id, err := uuid.Parse(idStr)
+	if err != nil {
+		w.WriteHeader(http.StatusBadRequest)
+		json.NewEncoder(w).Encode(map[string]string{"error": "Invalid installation ID format"})
+		return
+	}
+
+	install, err := sh.db.GetSkillInstallByID(id)
+	if err != nil {
+		logger.Log.Error("failed to get skill installation by ID", "error", err, "id", id)
+		w.WriteHeader(http.StatusNotFound)
+		json.NewEncoder(w).Encode(map[string]string{"error": err.Error()})
+		return
+	}
+
+	skill, err := sh.db.GetSkillByID(install.SkillID)
+	if err != nil {
+		logger.Log.Error("failed to get skill by ID", "error", err, "id", install.SkillID)
+		w.WriteHeader(http.StatusNotFound)
+		json.NewEncoder(w).Encode(map[string]string{"error": err.Error()})
+		return
+	}
+
+	if skill.OwnerPubkey != pubKeyFromAuth {
+		logger.Log.Info("[skill] unauthorized delete attempt", "pubkey", pubKeyFromAuth, "owner", skill.OwnerPubkey)
+		w.WriteHeader(http.StatusForbidden)
+		json.NewEncoder(w).Encode(map[string]string{"error": "You are not authorized to delete installations for this skill"})
+		return
+	}
+
+	if err := sh.db.DeleteSkillInstallByID(id); err != nil {
+		logger.Log.Error("failed to delete skill installation", "error", err)
+		w.WriteHeader(http.StatusInternalServerError)
+		json.NewEncoder(w).Encode(map[string]string{"error": err.Error()})
+		return
+	}
+
+	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode(map[string]string{
+		"success": "true",
+		"message": "Skill installation successfully deleted",
+	})
+}
+
+func (sh *skillHandler) UpdateSkillInstallByID(w http.ResponseWriter, r *http.Request) {
+	ctx := r.Context()
+	pubKeyFromAuth, _ := ctx.Value(auth.ContextKey).(string)
+
+	if pubKeyFromAuth == "" {
+		logger.Log.Info("[skill] no pubkey from auth")
+		w.WriteHeader(http.StatusUnauthorized)
+		json.NewEncoder(w).Encode(map[string]string{"error": "Unauthorized"})
+		return
+	}
+
+	idStr := chi.URLParam(r, "id")
+	if idStr == "" {
+		w.WriteHeader(http.StatusBadRequest)
+		json.NewEncoder(w).Encode(map[string]string{"error": "Installation ID is required"})
+		return
+	}
+
+	id, err := uuid.Parse(idStr)
+	if err != nil {
+		w.WriteHeader(http.StatusBadRequest)
+		json.NewEncoder(w).Encode(map[string]string{"error": "Invalid installation ID format"})
+		return
+	}
+
+	existingInstall, err := sh.db.GetSkillInstallByID(id)
+	if err != nil {
+		logger.Log.Error("failed to get skill installation by ID", "error", err, "id", id)
+		w.WriteHeader(http.StatusNotFound)
+		json.NewEncoder(w).Encode(map[string]string{"error": err.Error()})
+		return
+	}
+
+	skill, err := sh.db.GetSkillByID(existingInstall.SkillID)
+	if err != nil {
+		logger.Log.Error("failed to get skill by ID", "error", err, "id", existingInstall.SkillID)
+		w.WriteHeader(http.StatusNotFound)
+		json.NewEncoder(w).Encode(map[string]string{"error": err.Error()})
+		return
+	}
+
+	if skill.OwnerPubkey != pubKeyFromAuth {
+		logger.Log.Info("[skill] unauthorized update attempt", "pubkey", pubKeyFromAuth, "owner", skill.OwnerPubkey)
+		w.WriteHeader(http.StatusForbidden)
+		json.NewEncoder(w).Encode(map[string]string{"error": "You are not authorized to update installations for this skill"})
+		return
+	}
+
+	body, err := io.ReadAll(r.Body)
+	if err != nil {
+		logger.Log.Error("failed to read request body", "error", err)
+		w.WriteHeader(http.StatusBadRequest)
+		json.NewEncoder(w).Encode(map[string]string{"error": "Error reading request body"})
+		return
+	}
+	defer r.Body.Close()
+
+	var updatedInstall db.SkillInstall
+	if err := json.Unmarshal(body, &updatedInstall); err != nil {
+		logger.Log.Error("failed to unmarshal installation data", "error", err)
+		w.WriteHeader(http.StatusBadRequest)
+		json.NewEncoder(w).Encode(map[string]string{"error": "Invalid installation data format"})
+		return
+	}
+
+	updatedInstall.ID = id
+	updatedInstall.SkillID = existingInstall.SkillID
+
+	result, err := sh.db.UpdateSkillInstallByID(&updatedInstall)
+	if err != nil {
+		logger.Log.Error("failed to update skill installation", "error", err)
+		w.WriteHeader(http.StatusInternalServerError)
+		json.NewEncoder(w).Encode(map[string]string{"error": err.Error()})
+		return
+	}
+
+	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode(result)
+}
+
+func (sh *skillHandler) GetSkillInstallByID(w http.ResponseWriter, r *http.Request) {
+	idStr := chi.URLParam(r, "id")
+	if idStr == "" {
+		w.WriteHeader(http.StatusBadRequest)
+		json.NewEncoder(w).Encode(map[string]string{"error": "Installation ID is required"})
+		return
+	}
+
+	id, err := uuid.Parse(idStr)
+	if err != nil {
+		w.WriteHeader(http.StatusBadRequest)
+		json.NewEncoder(w).Encode(map[string]string{"error": "Invalid installation ID format"})
+		return
+	}
+
+	install, err := sh.db.GetSkillInstallByID(id)
+	if err != nil {
+		logger.Log.Error("failed to get skill installation by ID", "error", err, "id", id)
+		w.WriteHeader(http.StatusNotFound)
+		json.NewEncoder(w).Encode(map[string]string{"error": err.Error()})
+		return
+	}
+
+	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode(install)
+}

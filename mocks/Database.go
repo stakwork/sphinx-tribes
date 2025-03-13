@@ -16403,11 +16403,12 @@ func (_c *Database_GetSkillInstallByID_Call) RunAndReturn(run func(uuid.UUID) (*
 	return _c
 }
 
-func (_m *Database) UpdateSkillInstall(install *db.SkillInstall) (*db.SkillInstall, error) {
+
+func (_m *Database) UpdateSkillInstallByID(install *db.SkillInstall) (*db.SkillInstall, error) {
 	ret := _m.Called(install)
 
 	if len(ret) == 0 {
-		panic("no return value specified for UpdateSkillInstall")
+		panic("no return value specified for UpdateSkillInstallByID")
 	}
 
 	var r0 *db.SkillInstall
@@ -16432,37 +16433,37 @@ func (_m *Database) UpdateSkillInstall(install *db.SkillInstall) (*db.SkillInsta
 	return r0, r1
 }
 
-type Database_UpdateSkillInstall_Call struct {
+type Database_UpdateSkillInstallByID_Call struct {
 	*mock.Call
 }
 
-func (_e *Database_Expecter) UpdateSkillInstall(install interface{}) *Database_UpdateSkillInstall_Call {
-	return &Database_UpdateSkillInstall_Call{Call: _e.mock.On("UpdateSkillInstall", install)}
+func (_e *Database_Expecter) UpdateSkillInstallByID(install interface{}) *Database_UpdateSkillInstallByID_Call {
+	return &Database_UpdateSkillInstallByID_Call{Call: _e.mock.On("UpdateSkillInstallByID", install)}
 }
 
-func (_c *Database_UpdateSkillInstall_Call) Run(run func(install *db.SkillInstall)) *Database_UpdateSkillInstall_Call {
+func (_c *Database_UpdateSkillInstallByID_Call) Run(run func(install *db.SkillInstall)) *Database_UpdateSkillInstallByID_Call {
 	_c.Call.Run(func(args mock.Arguments) {
 		run(args[0].(*db.SkillInstall))
 	})
 	return _c
 }
 
-func (_c *Database_UpdateSkillInstall_Call) Return(_a0 *db.SkillInstall, _a1 error) *Database_UpdateSkillInstall_Call {
+func (_c *Database_UpdateSkillInstallByID_Call) Return(_a0 *db.SkillInstall, _a1 error) *Database_UpdateSkillInstallByID_Call {
 	_c.Call.Return(_a0, _a1)
 	return _c
 }
 
-func (_c *Database_UpdateSkillInstall_Call) RunAndReturn(run func(*db.SkillInstall) (*db.SkillInstall, error)) *Database_UpdateSkillInstall_Call {
+func (_c *Database_UpdateSkillInstallByID_Call) RunAndReturn(run func(*db.SkillInstall) (*db.SkillInstall, error)) *Database_UpdateSkillInstallByID_Call {
 	_c.Call.Return(run)
 	return _c
 }
 
 
-func (_m *Database) DeleteSkillInstall(id uuid.UUID) error {
+func (_m *Database) DeleteSkillInstallByID(id uuid.UUID) error {
 	ret := _m.Called(id)
 
 	if len(ret) == 0 {
-		panic("no return value specified for DeleteSkillInstall")
+		panic("no return value specified for DeleteSkillInstallByID")
 	}
 
 	var r0 error
@@ -16474,28 +16475,27 @@ func (_m *Database) DeleteSkillInstall(id uuid.UUID) error {
 
 	return r0
 }
-
-type Database_DeleteSkillInstall_Call struct {
+type Database_DeleteSkillInstallByID_Call struct {
 	*mock.Call
 }
 
-func (_e *Database_Expecter) DeleteSkillInstall(id interface{}) *Database_DeleteSkillInstall_Call {
-	return &Database_DeleteSkillInstall_Call{Call: _e.mock.On("DeleteSkillInstall", id)}
+func (_e *Database_Expecter) DeleteSkillInstallByID(id interface{}) *Database_DeleteSkillInstallByID_Call {
+	return &Database_DeleteSkillInstallByID_Call{Call: _e.mock.On("DeleteSkillInstallByID", id)}
 }
 
-func (_c *Database_DeleteSkillInstall_Call) Run(run func(id uuid.UUID)) *Database_DeleteSkillInstall_Call {
+func (_c *Database_DeleteSkillInstallByID_Call) Run(run func(id uuid.UUID)) *Database_DeleteSkillInstallByID_Call {
 	_c.Call.Run(func(args mock.Arguments) {
 		run(args[0].(uuid.UUID))
 	})
 	return _c
 }
 
-func (_c *Database_DeleteSkillInstall_Call) Return(_a0 error) *Database_DeleteSkillInstall_Call {
+func (_c *Database_DeleteSkillInstallByID_Call) Return(_a0 error) *Database_DeleteSkillInstallByID_Call {
 	_c.Call.Return(_a0)
 	return _c
 }
 
-func (_c *Database_DeleteSkillInstall_Call) RunAndReturn(run func(uuid.UUID) error) *Database_DeleteSkillInstall_Call {
+func (_c *Database_DeleteSkillInstallByID_Call) RunAndReturn(run func(uuid.UUID) error) *Database_DeleteSkillInstallByID_Call {
 	_c.Call.Return(run)
 	return _c
 }

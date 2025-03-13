@@ -147,7 +147,7 @@ func (db database) GetSkillInstallByID(id uuid.UUID) (*SkillInstall, error) {
 	return &install, nil
 }
 
-func (db database) UpdateSkillInstall(install *SkillInstall) (*SkillInstall, error) {
+func (db database) UpdateSkillInstallByID(install *SkillInstall) (*SkillInstall, error) {
 	if install.ID == uuid.Nil {
 		return nil, errors.New("skill installation ID is required")
 	}
@@ -170,7 +170,7 @@ func (db database) UpdateSkillInstall(install *SkillInstall) (*SkillInstall, err
 	return updatedInstall, nil
 }
 
-func (db database) DeleteSkillInstall(id uuid.UUID) error {
+func (db database) DeleteSkillInstallByID(id uuid.UUID) error {
 	if id == uuid.Nil {
 		return errors.New("skill installation ID is required")
 	}
