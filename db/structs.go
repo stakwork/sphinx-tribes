@@ -1494,6 +1494,56 @@ type ChatWorkflow struct {
 	UpdatedAt   time.Time `json:"updatedAt"`
 }
 
+
+type ChargeModel string
+
+const (
+	FreeChargeModel ChargeModel = "Free"
+	PAYGChargeModel ChargeModel = "PAYG"
+)
+
+type SkillStatus string
+
+const (
+	ApprovedSkillStatus SkillStatus = "Approved"
+	DraftSkillStatus    SkillStatus = "Draft"
+	ArchivedSkillStatus SkillStatus = "Archived"
+)
+
+type ClientType string
+
+const (
+	ClaudeDesktopClient ClientType = "Claude Desktop"
+	CursorClient        ClientType = "Cursor"
+	ClineClient         ClientType = "Cline"
+	GooseClient         ClientType = "Goose"
+)
+
+type Skill struct {
+	ID          uuid.UUID      `gorm:"primaryKey;type:uuid;default:gen_random_uuid()" json:"id"`
+	Name        string         `gorm:"type:varchar(255);not null" json:"name"`
+	Tagline     string         `gorm:"type:varchar(255)" json:"tagline"`
+	Description string         `gorm:"type:text" json:"description"`
+	IconURL     string         `gorm:"type:varchar(255)" json:"icon_url"`
+	OwnerPubkey string         `gorm:"type:varchar(255);not null" json:"owner_pubkey"`
+	ChargeModel ChargeModel    `gorm:"type:varchar(50);not null" json:"charge_model"`
+	Labels      pq.StringArray `gorm:"type:text[]" json:"labels"`
+	Status      SkillStatus    `gorm:"type:varchar(50);not null;default:'Draft'" json:"status"`
+	CreatedAt   time.Time      `gorm:"type:timestamp;default:current_timestamp" json:"created_at"`
+	UpdatedAt   time.Time      `gorm:"type:timestamp;default:current_timestamp" json:"updated_at"`
+}
+
+type SkillInstall struct {
+	ID                 uuid.UUID   `gorm:"primaryKey;type:uuid;default:gen_random_uuid()" json:"id"`
+	SkillID            uuid.UUID   `gorm:"type:uuid;not null;index:skill_index" json:"skill_id"`
+	Skill              Skill       `gorm:"foreignKey:SkillID;references:ID;constraint:OnDelete:CASCADE" json:"-"`
+	Client             ClientType  `gorm:"type:varchar(50);not null" json:"client"`
+	InstallDescription string      `gorm:"type:text" json:"install_description"`
+	InstallFile        string      `gorm:"type:varchar(255)" json:"install_file"`
+	CreatedAt          time.Time   `gorm:"type:timestamp;default:current_timestamp" json:"created_at"`
+	UpdatedAt          time.Time   `gorm:"type:timestamp;default:current_timestamp" json:"updated_at"`
+}
+
 func (Person) TableName() string {
 	return "people"
 }

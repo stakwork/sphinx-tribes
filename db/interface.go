@@ -323,4 +323,14 @@ type Database interface {
 	CreateOrEditChatWorkflow(workflow *ChatWorkflow) (*ChatWorkflow, error)
 	GetChatWorkflowByWorkspaceID(workspaceID string) (*ChatWorkflow, error)
 	DeleteChatWorkflow(workspaceID string) error
+	CreateSkill(skill *Skill) (*Skill, error)
+	GetAllSkills() ([]Skill, error)
+	GetSkillByID(id uuid.UUID) (*Skill, error)
+	UpdateSkillByID(skill *Skill) (*Skill, error)
+	DeleteSkillByID(id uuid.UUID) error
+	CreateSkillInstall(install *SkillInstall) (*SkillInstall, error)
+	GetSkillInstallBySkillsID(skillID uuid.UUID) ([]SkillInstall, error)
+	GetSkillInstallByID(id uuid.UUID) (*SkillInstall, error)
+	UpdateSkillInstallByID(install *SkillInstall) (*SkillInstall, error)
+	DeleteSkillInstallByID(id uuid.UUID) error
 }

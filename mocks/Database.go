@@ -15974,3 +15974,529 @@ func (_c *Database_DeleteChatWorkflow_Call) RunAndReturn(run func(string) error)
 	_c.Call.Return(run)
 	return _c
 }
+
+func (_m *Database) CreateSkill(skill *db.Skill) (*db.Skill, error) {
+	ret := _m.Called(skill)
+
+	if len(ret) == 0 {
+		panic("no return value specified for CreateSkill")
+	}
+
+	var r0 *db.Skill
+	var r1 error
+	if rf, ok := ret.Get(0).(func(*db.Skill) (*db.Skill, error)); ok {
+		return rf(skill)
+	}
+	if rf, ok := ret.Get(0).(func(*db.Skill) *db.Skill); ok {
+		r0 = rf(skill)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(*db.Skill)
+		}
+	}
+
+	if rf, ok := ret.Get(1).(func(*db.Skill) error); ok {
+		r1 = rf(skill)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
+type Database_CreateSkill_Call struct {
+	*mock.Call
+}
+
+func (_e *Database_Expecter) CreateSkill(skill interface{}) *Database_CreateSkill_Call {
+	return &Database_CreateSkill_Call{Call: _e.mock.On("CreateSkill", skill)}
+}
+
+func (_c *Database_CreateSkill_Call) Run(run func(skill *db.Skill)) *Database_CreateSkill_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(*db.Skill))
+	})
+	return _c
+}
+
+func (_c *Database_CreateSkill_Call) Return(_a0 *db.Skill, _a1 error) *Database_CreateSkill_Call {
+	_c.Call.Return(_a0, _a1)
+	return _c
+}
+
+func (_c *Database_CreateSkill_Call) RunAndReturn(run func(*db.Skill) (*db.Skill, error)) *Database_CreateSkill_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
+
+
+func (_m *Database) GetAllSkills() ([]db.Skill, error) {
+	ret := _m.Called()
+
+	if len(ret) == 0 {
+		panic("no return value specified for GetAllSkills")
+	}
+
+	var r0 []db.Skill
+	var r1 error
+	if rf, ok := ret.Get(0).(func() ([]db.Skill, error)); ok {
+		return rf()
+	}
+	if rf, ok := ret.Get(0).(func() []db.Skill); ok {
+		r0 = rf()
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).([]db.Skill)
+		}
+	}
+
+	if rf, ok := ret.Get(1).(func() error); ok {
+		r1 = rf()
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
+type Database_GetAllSkills_Call struct {
+	*mock.Call
+}
+
+func (_e *Database_Expecter) GetAllSkills() *Database_GetAllSkills_Call {
+	return &Database_GetAllSkills_Call{Call: _e.mock.On("GetAllSkills")}
+}
+
+func (_c *Database_GetAllSkills_Call) Run(run func()) *Database_GetAllSkills_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run()
+	})
+	return _c
+}
+
+func (_c *Database_GetAllSkills_Call) Return(_a0 []db.Skill, _a1 error) *Database_GetAllSkills_Call {
+	_c.Call.Return(_a0, _a1)
+	return _c
+}
+
+func (_c *Database_GetAllSkills_Call) RunAndReturn(run func() ([]db.Skill, error)) *Database_GetAllSkills_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
+func (_m *Database) GetSkillByID(id uuid.UUID) (*db.Skill, error) {
+	ret := _m.Called(id)
+
+	if len(ret) == 0 {
+		panic("no return value specified for GetSkillByID")
+	}
+
+	var r0 *db.Skill
+	var r1 error
+	if rf, ok := ret.Get(0).(func(uuid.UUID) (*db.Skill, error)); ok {
+		return rf(id)
+	}
+	if rf, ok := ret.Get(0).(func(uuid.UUID) *db.Skill); ok {
+		r0 = rf(id)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(*db.Skill)
+		}
+	}
+
+	if rf, ok := ret.Get(1).(func(uuid.UUID) error); ok {
+		r1 = rf(id)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+type Database_GetSkillByID_Call struct {
+	*mock.Call
+}
+
+func (_e *Database_Expecter) GetSkillByID(id interface{}) *Database_GetSkillByID_Call {
+	return &Database_GetSkillByID_Call{Call: _e.mock.On("GetSkillByID", id)}
+}
+
+func (_c *Database_GetSkillByID_Call) Run(run func(id uuid.UUID)) *Database_GetSkillByID_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(uuid.UUID))
+	})
+	return _c
+}
+
+func (_c *Database_GetSkillByID_Call) Return(_a0 *db.Skill, _a1 error) *Database_GetSkillByID_Call {
+	_c.Call.Return(_a0, _a1)
+	return _c
+}
+
+func (_c *Database_GetSkillByID_Call) RunAndReturn(run func(uuid.UUID) (*db.Skill, error)) *Database_GetSkillByID_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
+
+func (_m *Database) UpdateSkillByID(skill *db.Skill) (*db.Skill, error) {
+	ret := _m.Called(skill)
+
+	if len(ret) == 0 {
+		panic("no return value specified for UpdateSkillByID")
+	}
+
+	var r0 *db.Skill
+	var r1 error
+	if rf, ok := ret.Get(0).(func(*db.Skill) (*db.Skill, error)); ok {
+		return rf(skill)
+	}
+	if rf, ok := ret.Get(0).(func(*db.Skill) *db.Skill); ok {
+		r0 = rf(skill)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(*db.Skill)
+		}
+	}
+
+	if rf, ok := ret.Get(1).(func(*db.Skill) error); ok {
+		r1 = rf(skill)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
+type Database_UpdateSkillByID_Call struct {
+	*mock.Call
+}
+
+func (_e *Database_Expecter) UpdateSkillByID(skill interface{}) *Database_UpdateSkillByID_Call {
+	return &Database_UpdateSkillByID_Call{Call: _e.mock.On("UpdateSkillByID", skill)}
+}
+
+func (_c *Database_UpdateSkillByID_Call) Run(run func(skill *db.Skill)) *Database_UpdateSkillByID_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(*db.Skill))
+	})
+	return _c
+}
+
+func (_c *Database_UpdateSkillByID_Call) Return(_a0 *db.Skill, _a1 error) *Database_UpdateSkillByID_Call {
+	_c.Call.Return(_a0, _a1)
+	return _c
+}
+
+func (_c *Database_UpdateSkillByID_Call) RunAndReturn(run func(*db.Skill) (*db.Skill, error)) *Database_UpdateSkillByID_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
+
+func (_m *Database) DeleteSkillByID(id uuid.UUID) error {
+	ret := _m.Called(id)
+
+	if len(ret) == 0 {
+		panic("no return value specified for DeleteSkillByID")
+	}
+
+	var r0 error
+	if rf, ok := ret.Get(0).(func(uuid.UUID) error); ok {
+		r0 = rf(id)
+	} else {
+		r0 = ret.Error(0)
+	}
+
+	return r0
+}
+
+type Database_DeleteSkillByID_Call struct {
+	*mock.Call
+}
+
+func (_e *Database_Expecter) DeleteSkillByID(id interface{}) *Database_DeleteSkillByID_Call {
+	return &Database_DeleteSkillByID_Call{Call: _e.mock.On("DeleteSkillByID", id)}
+}
+
+func (_c *Database_DeleteSkillByID_Call) Run(run func(id uuid.UUID)) *Database_DeleteSkillByID_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(uuid.UUID))
+	})
+	return _c
+}
+
+func (_c *Database_DeleteSkillByID_Call) Return(_a0 error) *Database_DeleteSkillByID_Call {
+	_c.Call.Return(_a0)
+	return _c
+}
+
+func (_c *Database_DeleteSkillByID_Call) RunAndReturn(run func(uuid.UUID) error) *Database_DeleteSkillByID_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
+
+func (_m *Database) CreateSkillInstall(install *db.SkillInstall) (*db.SkillInstall, error) {
+	ret := _m.Called(install)
+
+	if len(ret) == 0 {
+		panic("no return value specified for CreateSkillInstall")
+	}
+
+	var r0 *db.SkillInstall
+	var r1 error
+	if rf, ok := ret.Get(0).(func(*db.SkillInstall) (*db.SkillInstall, error)); ok {
+		return rf(install)
+	}
+	if rf, ok := ret.Get(0).(func(*db.SkillInstall) *db.SkillInstall); ok {
+		r0 = rf(install)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(*db.SkillInstall)
+		}
+	}
+
+	if rf, ok := ret.Get(1).(func(*db.SkillInstall) error); ok {
+		r1 = rf(install)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
+type Database_CreateSkillInstall_Call struct {
+	*mock.Call
+}
+
+
+func (_e *Database_Expecter) CreateSkillInstall(install interface{}) *Database_CreateSkillInstall_Call {
+	return &Database_CreateSkillInstall_Call{Call: _e.mock.On("CreateSkillInstall", install)}
+}
+
+func (_c *Database_CreateSkillInstall_Call) Run(run func(install *db.SkillInstall)) *Database_CreateSkillInstall_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(*db.SkillInstall))
+	})
+	return _c
+}
+
+func (_c *Database_CreateSkillInstall_Call) Return(_a0 *db.SkillInstall, _a1 error) *Database_CreateSkillInstall_Call {
+	_c.Call.Return(_a0, _a1)
+	return _c
+}
+
+func (_c *Database_CreateSkillInstall_Call) RunAndReturn(run func(*db.SkillInstall) (*db.SkillInstall, error)) *Database_CreateSkillInstall_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
+func (_m *Database) GetSkillInstallBySkillsID(skillID uuid.UUID) ([]db.SkillInstall, error) {
+	ret := _m.Called(skillID)
+
+	if len(ret) == 0 {
+		panic("no return value specified for GetSkillInstallBySkillsID")
+	}
+
+	var r0 []db.SkillInstall
+	var r1 error
+	if rf, ok := ret.Get(0).(func(uuid.UUID) ([]db.SkillInstall, error)); ok {
+		return rf(skillID)
+	}
+	if rf, ok := ret.Get(0).(func(uuid.UUID) []db.SkillInstall); ok {
+		r0 = rf(skillID)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).([]db.SkillInstall)
+		}
+	}
+
+	if rf, ok := ret.Get(1).(func(uuid.UUID) error); ok {
+		r1 = rf(skillID)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
+type Database_GetSkillInstallBySkillsID_Call struct {
+	*mock.Call
+}
+
+
+func (_e *Database_Expecter) GetSkillInstallBySkillsID(skillID interface{}) *Database_GetSkillInstallBySkillsID_Call {
+	return &Database_GetSkillInstallBySkillsID_Call{Call: _e.mock.On("GetSkillInstallBySkillsID", skillID)}
+}
+
+func (_c *Database_GetSkillInstallBySkillsID_Call) Run(run func(skillID uuid.UUID)) *Database_GetSkillInstallBySkillsID_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(uuid.UUID))
+	})
+	return _c
+}
+
+func (_c *Database_GetSkillInstallBySkillsID_Call) Return(_a0 []db.SkillInstall, _a1 error) *Database_GetSkillInstallBySkillsID_Call {
+	_c.Call.Return(_a0, _a1)
+	return _c
+}
+
+func (_c *Database_GetSkillInstallBySkillsID_Call) RunAndReturn(run func(uuid.UUID) ([]db.SkillInstall, error)) *Database_GetSkillInstallBySkillsID_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
+
+func (_m *Database) GetSkillInstallByID(id uuid.UUID) (*db.SkillInstall, error) {
+	ret := _m.Called(id)
+
+	if len(ret) == 0 {
+		panic("no return value specified for GetSkillInstallByID")
+	}
+
+	var r0 *db.SkillInstall
+	var r1 error
+	if rf, ok := ret.Get(0).(func(uuid.UUID) (*db.SkillInstall, error)); ok {
+		return rf(id)
+	}
+	if rf, ok := ret.Get(0).(func(uuid.UUID) *db.SkillInstall); ok {
+		r0 = rf(id)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(*db.SkillInstall)
+		}
+	}
+
+	if rf, ok := ret.Get(1).(func(uuid.UUID) error); ok {
+		r1 = rf(id)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
+type Database_GetSkillInstallByID_Call struct {
+	*mock.Call
+}
+
+
+func (_e *Database_Expecter) GetSkillInstallByID(id interface{}) *Database_GetSkillInstallByID_Call {
+	return &Database_GetSkillInstallByID_Call{Call: _e.mock.On("GetSkillInstallByID", id)}
+}
+
+func (_c *Database_GetSkillInstallByID_Call) Run(run func(id uuid.UUID)) *Database_GetSkillInstallByID_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(uuid.UUID))
+	})
+	return _c
+}
+
+func (_c *Database_GetSkillInstallByID_Call) Return(_a0 *db.SkillInstall, _a1 error) *Database_GetSkillInstallByID_Call {
+	_c.Call.Return(_a0, _a1)
+	return _c
+}
+
+func (_c *Database_GetSkillInstallByID_Call) RunAndReturn(run func(uuid.UUID) (*db.SkillInstall, error)) *Database_GetSkillInstallByID_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
+
+func (_m *Database) UpdateSkillInstallByID(install *db.SkillInstall) (*db.SkillInstall, error) {
+	ret := _m.Called(install)
+
+	if len(ret) == 0 {
+		panic("no return value specified for UpdateSkillInstallByID")
+	}
+
+	var r0 *db.SkillInstall
+	var r1 error
+	if rf, ok := ret.Get(0).(func(*db.SkillInstall) (*db.SkillInstall, error)); ok {
+		return rf(install)
+	}
+	if rf, ok := ret.Get(0).(func(*db.SkillInstall) *db.SkillInstall); ok {
+		r0 = rf(install)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(*db.SkillInstall)
+		}
+	}
+
+	if rf, ok := ret.Get(1).(func(*db.SkillInstall) error); ok {
+		r1 = rf(install)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
+type Database_UpdateSkillInstallByID_Call struct {
+	*mock.Call
+}
+
+func (_e *Database_Expecter) UpdateSkillInstallByID(install interface{}) *Database_UpdateSkillInstallByID_Call {
+	return &Database_UpdateSkillInstallByID_Call{Call: _e.mock.On("UpdateSkillInstallByID", install)}
+}
+
+func (_c *Database_UpdateSkillInstallByID_Call) Run(run func(install *db.SkillInstall)) *Database_UpdateSkillInstallByID_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(*db.SkillInstall))
+	})
+	return _c
+}
+
+func (_c *Database_UpdateSkillInstallByID_Call) Return(_a0 *db.SkillInstall, _a1 error) *Database_UpdateSkillInstallByID_Call {
+	_c.Call.Return(_a0, _a1)
+	return _c
+}
+
+func (_c *Database_UpdateSkillInstallByID_Call) RunAndReturn(run func(*db.SkillInstall) (*db.SkillInstall, error)) *Database_UpdateSkillInstallByID_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
+
+func (_m *Database) DeleteSkillInstallByID(id uuid.UUID) error {
+	ret := _m.Called(id)
+
+	if len(ret) == 0 {
+		panic("no return value specified for DeleteSkillInstallByID")
+	}
+
+	var r0 error
+	if rf, ok := ret.Get(0).(func(uuid.UUID) error); ok {
+		r0 = rf(id)
+	} else {
+		r0 = ret.Error(0)
+	}
+
+	return r0
+}
+type Database_DeleteSkillInstallByID_Call struct {
+	*mock.Call
+}
+
+func (_e *Database_Expecter) DeleteSkillInstallByID(id interface{}) *Database_DeleteSkillInstallByID_Call {
+	return &Database_DeleteSkillInstallByID_Call{Call: _e.mock.On("DeleteSkillInstallByID", id)}
+}
+
+func (_c *Database_DeleteSkillInstallByID_Call) Run(run func(id uuid.UUID)) *Database_DeleteSkillInstallByID_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(uuid.UUID))
+	})
+	return _c
+}
+
+func (_c *Database_DeleteSkillInstallByID_Call) Return(_a0 error) *Database_DeleteSkillInstallByID_Call {
+	_c.Call.Return(_a0)
+	return _c
+}
+
+func (_c *Database_DeleteSkillInstallByID_Call) RunAndReturn(run func(uuid.UUID) error) *Database_DeleteSkillInstallByID_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
