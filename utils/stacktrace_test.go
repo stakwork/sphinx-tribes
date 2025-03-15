@@ -160,6 +160,219 @@ func BenchmarkFormatStacktraceToEdgeList(b *testing.B) {
 	}
 }
 
+func BenchmarkStacktrace(b *testing.B) {
+  type containsCheck struct {
+    shouldCheck bool
+    expectedFile string
+    expectedLine int
+  }
+
+  // Test Case 6: Very Large Stacktrace (Stress Case)
+  // Build a stack trace with 2 header lines (non-matching) and 100 matching lines.
+  var sb strings.Builder
+  // Two header lines that do not contain ".go:"
+  sb.WriteString("Header line 1\nHeader line 2\n")
+  for i := 1; i <= 100; i++ {
+    // each matching line: "file{i}.go:120"
+    sb.WriteString(fmt.Sprintf("file%d.go:120", i))
+    if i < 100 {
+      sb.WriteString("\n")
+    }
+  }
+  largeStackTrace := sb.String()
+
+	testCases := []struct {
+		name           string
+		stackTrace     string
+		err            interface{}
+    expectedEdgesCount int
+    expectedEffectiveFrames int
+    expectedReportError string
+    containsEdgeCheck containsCheck
+  }{
+    {
+      name:               "Standard Multi-Frame Stacktrace",
+      stackTrace:         generateTestStackTrace(),
+      err:                fmt.Errorf("benchmark error"),
+      // Matching lines: 4, but since len >1, effective frames = frames[2:] = 2.
+      // Base edges = 4, plus 2 CONTAINS and 1 NEXT = 7.
+      expectedEdgesCount:      7,
+      expectedEffectiveFrames: 2,
+      expectedReportError:     "benchmark error",
+      containsEdgeCheck: containsCheck{
+        shouldCheck:  true,
+        // The first effective frame is "/path/to/main.go:10 +0x26"
+        expectedFile: "\t/path/to/main.go",
+        expectedLine: 10,
+      },
+    },
+    {
+      name:               "Single-Frame Stacktrace",
+      stackTrace:         "file.go:123",
+      err:                fmt.Errorf("single frame error"),
+      // One matching frame yields effective frames = 1. Total edges = 4 + 1 = 5.
+      expectedEdgesCount:      5,
+      expectedEffectiveFrames: 1,
+      expectedReportError:     "single frame error",
+      containsEdgeCheck: containsCheck{
+        shouldCheck:  true,
+        expectedFile: "file.go",
+        expectedLine: 123,
+      },
+    },
+    {
+      name:               "Stacktrace with No Valid Frames",
+      stackTrace:         "this is not a valid stack trace",
+      err:                fmt.Errorf("no frames"),
+      // No matching frames. Total edges = 4.
+      expectedEdgesCount:      4,
+      expectedEffectiveFrames: 0,
+      expectedReportError:     "no frames",
+      containsEdgeCheck: containsCheck{
+        shouldCheck: false,
+      },
+    },
+    {
+      name:               "Nil Error Value",
+      stackTrace:         "file.go:50",
+      err:                nil,
+      // One matching frame. Effective frames = 1. Total edges = 5.
+      expectedEdgesCount:      5,
+      expectedEffectiveFrames: 1,
+      // fmt.Sprintf("%v", nil) yields "<nil>"
+      expectedReportError: "<nil>",
+      containsEdgeCheck: containsCheck{
+        shouldCheck:  true,
+        expectedFile: "file.go",
+        expectedLine: 50,
+      },
+    },
+    {
+      name:               "Frame with Non-Numeric Line Number",
+      stackTrace:         "file.go:abc",
+      err:                fmt.Errorf("bad line number"),
+      // One matching frame. Effective frames = 1. Total edges = 5.
+      expectedEdgesCount:      5,
+      expectedEffectiveFrames: 1,
+      expectedReportError:     "bad line number",
+      containsEdgeCheck: containsCheck{
+        shouldCheck:  true,
+        expectedFile: "file.go",
+        // On parsing failure, line number remains 0.
+        expectedLine: 0,
+      },
+    },
+    {
+      name:               "Very Large Stacktrace (Stress Case)",
+      stackTrace:         largeStackTrace,
+      err:                fmt.Errorf("stress test"),
+      // 100 matching lines minus 2 header discard equals 98 effective frames.
+      // Total edges = 4 (base) + 98 (CONTAINS) + 97 (NEXT) = 199.
+      expectedEdgesCount:      199,
+      expectedEffectiveFrames: 98,
+      expectedReportError:     "stress test",
+      containsEdgeCheck: containsCheck{
+        shouldCheck:  true,
+        // First effective frame is "file3.go:120"
+        expectedFile: "file3.go",
+        expectedLine: 120,
+      },
+    },
+    {
+      name:               "Non-error Type as err Parameter",
+      stackTrace:         "file.go:75",
+      err:                123,
+      // One matching frame. Total edges = 5.
+      expectedEdgesCount:      5,
+      expectedEffectiveFrames: 1,
+      // fmt.Sprintf("%v", 123) yields "123"
+      expectedReportError: "123",
+      containsEdgeCheck: containsCheck{
+        shouldCheck:  true,
+        expectedFile: "file.go",
+        expectedLine: 75,
+      },
+    },
+    {
+      name:               "Exactly Two Matching Frames",
+      stackTrace:         "file1.go:100\nfile2.go:200",
+      err:                fmt.Errorf("two frames only"),
+      // Two matching frames are discarded (frames[2:]) so effective frames = 0.
+      // Total edges = 4.
+      expectedEdgesCount:      4,
+      expectedEffectiveFrames: 0,
+      expectedReportError:     "two frames only",
+      containsEdgeCheck: containsCheck{
+        shouldCheck: false,
+      },
+    },
+    {
+      name:               "Empty Stacktrace",
+      stackTrace:         "",
+      err:                fmt.Errorf("empty stacktrace"),
+      // No matching frames so effective frames = 0. Total edges = 4.
+      expectedEdgesCount:      4,
+      expectedEffectiveFrames: 0,
+      expectedReportError:     "empty stacktrace",
+      containsEdgeCheck: containsCheck{
+        shouldCheck: false,
+      },
+    },
+  }
+
+  b.ResetTimer()
+
+  for _, tc := range testCases {
+    tc := tc
+    for i := 0; i < b.N; i++ {
+      b.Run(tc.name, func(b *testing.B) {
+        edgeList := FormatStacktraceToEdgeList(tc.stackTrace, tc.err)
+        totalEdges := len(edgeList.EdgeList)
+        assert.Equal(b, tc.expectedEdgesCount, totalEdges, "Total edges count mismatch for test case: %s", tc.name)
+
+        // Validate the report node error inside the first base edge.
+        if totalEdges >= 1 {
+          reportEdge := edgeList.EdgeList[0]
+          reportData, ok := reportEdge.Source.NodeData.(ReportNodeData)
+          assert.True(b, ok, "Report node data type assertion failed in test case: %s", tc.name)
+          assert.Equal(b, tc.expectedReportError, reportData.Errors, "ReportNodeData.Errors mismatch in test case: %s", tc.name)
+        }
+
+        // Determine effective frames using parseStackTrace.
+        actualFrames := parseStackTrace(tc.stackTrace)
+        assert.Equal(b, tc.expectedEffectiveFrames, len(actualFrames), "Effective frames count mismatch in test case: %s", tc.name)
+
+        // Validate CONTAINS edges for effective frames.
+        if tc.containsEdgeCheck.shouldCheck && tc.expectedEffectiveFrames > 0 {
+          containsEdgeIndex := 4
+          edge := edgeList.EdgeList[containsEdgeIndex]
+          assert.Equal(b, "CONTAINS", edge.Edge.EdgeType, "First CONTAINS edge type mismatch in test case: %s", tc.name)
+          if len(edge.Targets) > 0 {
+            traceData, ok := edge.Targets[0].NodeData.(TraceNodeData)
+            assert.True(b, ok, "Trace node data type assertion failed in test case: %s", tc.name)
+            assert.Equal(b, tc.containsEdgeCheck.expectedFile, traceData.File, "TraceNodeData.File mismatch in test case: %s", tc.name)
+            assert.Equal(b, tc.containsEdgeCheck.expectedLine, traceData.LineNumber, "TraceNodeData.LineNumber mismatch in test case: %s", tc.name)
+          } else {
+            b.Errorf("CONTAINS edge missing Targets in test case: %s", tc.name)
+          }
+        }
+
+        // Validate NEXT edges if more than one effective frame exists.
+        if tc.expectedEffectiveFrames > 1 {
+          nextEdgesStart := 4 + tc.expectedEffectiveFrames
+          nextEdgesCount := tc.expectedEffectiveFrames - 1
+          for i := 0; i < nextEdgesCount; i++ {
+            index := nextEdgesStart + i
+            assert.Less(b, index, totalEdges, "NEXT edge index out of range in test case: %s", tc.name)
+            nextEdge := edgeList.EdgeList[index]
+            assert.Equal(b, "NEXT", nextEdge.Edge.EdgeType, "NEXT edge type mismatch at index %d in test case: %s", index, tc.name)
+          }
+        }
+      })
+    }
+  }
+}
+
 func TestLongStackTraceHandling(t *testing.T) {
 
 	var longStackTraceBuilder strings.Builder
