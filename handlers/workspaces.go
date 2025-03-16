@@ -369,7 +369,7 @@ func GetWorkspaceUsersCount(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(count)
 }
 
-// DeleteWorkspace godoc
+// DeleteWorkspaceUser godoc
 //
 //	@Summary		Delete Workspace User
 //	@Description	Delete a user from a workspace
