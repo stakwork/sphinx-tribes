@@ -1779,3 +1779,63 @@ func (ch *ChatHandler) GetSSEMessagesByChatID(w http.ResponseWriter, r *http.Req
 		Data:    messages,
 	})
 }
+
+func (ch *ChatHandler) StartSSEClient(w http.ResponseWriter, r *http.Request) {
+	var request struct {
+		SSEURL     string `json:"sse_url"`
+		ChatID     string `json:"chatID"`
+		WebhookURL string `json:"webhook_url,omitempty"`
+	}
+
+	if err := json.NewDecoder(r.Body).Decode(&request); err != nil {
+		w.WriteHeader(http.StatusBadRequest)
+		json.NewEncoder(w).Encode(ChatResponse{
+			Success: false,
+			Message: "Invalid request body",
+		})
+		return
+	}
+
+	if request.SSEURL == "" || request.ChatID == "" {
+		w.WriteHeader(http.StatusBadRequest)
+		json.NewEncoder(w).Encode(ChatResponse{
+			Success: false,
+			Message: "Both sse_url and chatID are required",
+		})
+		return
+	}
+
+	if sse.ClientRegistry.HasClient(request.SSEURL, request.ChatID) {
+		w.WriteHeader(http.StatusConflict)
+		json.NewEncoder(w).Encode(ChatResponse{
+			Success: false,
+			Message: "An SSE client is already running for this URL and chat ID",
+			Data: map[string]string{
+				"chatID":  request.ChatID,
+				"sse_url": request.SSEURL,
+			},
+		})
+		return
+	}
+
+	webhookURL := request.WebhookURL
+	if webhookURL == "" {
+		webhookURL = fmt.Sprintf("%s/hivechat/response", os.Getenv("HOST"))
+	}
+
+	client := sse.NewClient(request.SSEURL, request.ChatID, webhookURL, ch.db)
+	sse.ClientRegistry.Register(client)
+
+	go client.Start()
+
+	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode(ChatResponse{
+		Success: true,
+		Message: "SSE client started successfully",
+		Data: map[string]string{
+			"chatID":      request.ChatID,
+			"sse_url":     request.SSEURL,
+			"webhook_url": webhookURL,
+		},
+	})
+}
