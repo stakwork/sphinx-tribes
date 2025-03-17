@@ -1,10 +1,10 @@
 package routes
 
 import (
-	"github.com/stakwork/sphinx-tribes/auth"
 	"net/http"
 
 	"github.com/go-chi/chi"
+	"github.com/stakwork/sphinx-tribes/auth"
 	"github.com/stakwork/sphinx-tribes/db"
 	"github.com/stakwork/sphinx-tribes/handlers"
 )
@@ -44,6 +44,7 @@ func ChatRoutes() chi.Router {
 		r.Get("/chatworkflow/{workspaceId}", chatHandler.GetChatWorkflow)
 		r.Delete("/chatworkflow/{workspaceId}", chatHandler.DeleteChatWorkflow)
 
+		r.Post("/sse/stop", chatHandler.StopSSEClient)
 		r.Get("/sse/{chat_id}", chatHandler.GetSSEMessagesByChatID)
 	})
 

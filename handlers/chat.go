@@ -27,6 +27,7 @@ import (
 
 	"github.com/go-chi/chi"
 	"github.com/stakwork/sphinx-tribes/db"
+	"github.com/stakwork/sphinx-tribes/sse"
 )
 
 // ChatHandler handles chat-related requests
@@ -154,6 +155,11 @@ type ChatWorkflowResponse struct {
 	Success bool             `json:"success"`
 	Message string           `json:"message,omitempty"`
 	Data    *db.ChatWorkflow `json:"data,omitempty"`
+}
+
+type StopSSERequest struct {
+	SSEURL string `json:"sse_url"`
+	ChatID string `json:"chatID"`
 }
 
 func NewChatHandler(httpClient *http.Client, database db.Database) *ChatHandler {
@@ -1677,6 +1683,46 @@ func (ch *ChatHandler) DeleteChatWorkflow(w http.ResponseWriter, r *http.Request
 	json.NewEncoder(w).Encode(ChatWorkflowResponse{
 		Success: true,
 		Message: "Chat workflow deleted successfully",
+	})
+}
+
+func (ch *ChatHandler) StopSSEClient(w http.ResponseWriter, r *http.Request) {
+	var request struct {
+		SSEURL string `json:"sse_url"`
+		ChatID string `json:"chatID"`
+	}
+
+	if err := json.NewDecoder(r.Body).Decode(&request); err != nil {
+		w.WriteHeader(http.StatusBadRequest)
+		json.NewEncoder(w).Encode(ChatResponse{
+			Success: false,
+			Message: "Invalid request body",
+		})
+		return
+	}
+
+	if request.SSEURL == "" || request.ChatID == "" {
+		w.WriteHeader(http.StatusBadRequest)
+		json.NewEncoder(w).Encode(ChatResponse{
+			Success: false,
+			Message: "sse_url and chatID are required",
+		})
+		return
+	}
+
+	if sse.ClientRegistry.Unregister(request.SSEURL, request.ChatID) {
+		w.WriteHeader(http.StatusOK)
+		json.NewEncoder(w).Encode(ChatResponse{
+			Success: true,
+			Message: "SSE client stopped successfully",
+		})
+		return
+	}
+
+	w.WriteHeader(http.StatusNotFound)
+	json.NewEncoder(w).Encode(ChatResponse{
+		Success: false,
+		Message: "No active SSE client found for the provided sse_url and chatID",
 	})
 }
 
