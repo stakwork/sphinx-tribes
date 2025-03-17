@@ -1679,3 +1679,69 @@ func (ch *ChatHandler) DeleteChatWorkflow(w http.ResponseWriter, r *http.Request
 		Message: "Chat workflow deleted successfully",
 	})
 }
+
+// GetSSEMessagesByChatID retrieves all unsent SSE messages for a chat and marks them as sent
+//
+//	@Summary		Get SSE messages for a chat
+//	@Description	Retrieve all unsent SSE messages for a chat and mark them as sent
+//	@Tags			Hive Chat
+//	@Produce		json
+//	@Security		PubKeyContextAuth
+//	@Param			chat_id	path		string	true	"Chat ID"
+//	@Success		200		{object}	ChatResponse
+//	@Failure		400		{object}	ChatResponse
+//	@Failure		500		{object}	ChatResponse
+//	@Router			/hivechat/sse/{chat_id} [get]
+func (ch *ChatHandler) GetSSEMessagesByChatID(w http.ResponseWriter, r *http.Request) {
+	chatID := chi.URLParam(r, "chat_id")
+	if chatID == "" {
+		w.WriteHeader(http.StatusBadRequest)
+		json.NewEncoder(w).Encode(ChatResponse{
+			Success: false,
+			Message: "Chat ID is required",
+		})
+		return
+	}
+
+	messages, err := ch.db.GetNewSSEMessageLogsByChatID(chatID)
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		json.NewEncoder(w).Encode(ChatResponse{
+			Success: false,
+			Message: fmt.Sprintf("Failed to retrieve SSE messages: %v", err),
+		})
+		return
+	}
+
+	if len(messages) == 0 {
+		w.WriteHeader(http.StatusOK)
+		json.NewEncoder(w).Encode(ChatResponse{
+			Success: true,
+			Message: "No unsent SSE messages found",
+			Data:    []interface{}{},
+		})
+		return
+	}
+
+	var messageIDs []uuid.UUID
+	for _, msg := range messages {
+		messageIDs = append(messageIDs, msg.ID)
+	}
+
+	err = ch.db.UpdateSSEMessageLogStatusBatch(messageIDs)
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		json.NewEncoder(w).Encode(ChatResponse{
+			Success: false,
+			Message: fmt.Sprintf("Failed to update message status: %v", err),
+		})
+		return
+	}
+
+	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode(ChatResponse{
+		Success: true,
+		Message: fmt.Sprintf("Retrieved %d SSE messages", len(messages)),
+		Data:    messages,
+	})
+}
