@@ -104,6 +104,7 @@ func InitDB() {
 	db.AutoMigrate(&ChatWorkflow{})
 	db.AutoMigrate(&Skill{})
 	db.AutoMigrate(&SkillInstall{})
+	db.AutoMigrate(&SSEMessageLog{})
 
 	DB.MigrateTablesWithOrgUuid()
 	DB.MigrateOrganizationToWorkspace()

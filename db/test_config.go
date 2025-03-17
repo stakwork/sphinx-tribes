@@ -89,6 +89,7 @@ func InitTestDB() {
 	db.AutoMigrate(&ChatWorkflow{})
 	db.AutoMigrate(&Skill{})
 	db.AutoMigrate(&SkillInstall{})
+	db.AutoMigrate(&SSEMessageLog{})
 
 	people := TestDB.GetAllPeople()
 	for _, p := range people {

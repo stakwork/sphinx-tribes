@@ -333,4 +333,11 @@ type Database interface {
 	GetSkillInstallByID(id uuid.UUID) (*SkillInstall, error)
 	UpdateSkillInstallByID(install *SkillInstall) (*SkillInstall, error)
 	DeleteSkillInstallByID(id uuid.UUID) error
+	CreateSSEMessageLog(event map[string]interface{}, chatID, from, to string) (*SSEMessageLog, error)
+	DeleteSSEMessageLog(id uuid.UUID) error
+	UpdateSSEMessageLogStatusBatch(ids []uuid.UUID) error
+	UpdateSSEMessageLog(id uuid.UUID, updates map[string]interface{}) (*SSEMessageLog, error)
+	GetSSEMessageLogByID(id uuid.UUID) (*SSEMessageLog, error)
+	GetSSEMessageLogsByChatID(chatID string) ([]SSEMessageLog, error)
+	GetNewSSEMessageLogsByChatID(chatID string) ([]SSEMessageLog, error)
 }
