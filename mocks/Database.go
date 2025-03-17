@@ -16500,3 +16500,362 @@ func (_c *Database_DeleteSkillInstallByID_Call) RunAndReturn(run func(uuid.UUID)
 	return _c
 }
 
+func (_m *Database) CreateSSEMessageLog(event map[string]interface{}, chatID string, from string, to string) (*db.SSEMessageLog, error) {
+	ret := _m.Called(event, chatID, from, to)
+
+	if len(ret) == 0 {
+		panic("no return value specified for CreateSSEMessageLog")
+	}
+
+	var r0 *db.SSEMessageLog
+	var r1 error
+	if rf, ok := ret.Get(0).(func(map[string]interface{}, string, string, string) (*db.SSEMessageLog, error)); ok {
+		return rf(event, chatID, from, to)
+	}
+	if rf, ok := ret.Get(0).(func(map[string]interface{}, string, string, string) *db.SSEMessageLog); ok {
+		r0 = rf(event, chatID, from, to)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(*db.SSEMessageLog)
+		}
+	}
+
+	if rf, ok := ret.Get(1).(func(map[string]interface{}, string, string, string) error); ok {
+		r1 = rf(event, chatID, from, to)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
+type Database_CreateSSEMessageLog_Call struct {
+	*mock.Call
+}
+
+func (_e *Database_Expecter) CreateSSEMessageLog(event interface{}, chatID interface{}, from interface{}, to interface{}) *Database_CreateSSEMessageLog_Call {
+	return &Database_CreateSSEMessageLog_Call{Call: _e.mock.On("CreateSSEMessageLog", event, chatID, from, to)}
+}
+
+func (_c *Database_CreateSSEMessageLog_Call) Run(run func(event map[string]interface{}, chatID string, from string, to string)) *Database_CreateSSEMessageLog_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(map[string]interface{}), args[1].(string), args[2].(string), args[3].(string))
+	})
+	return _c
+}
+
+func (_c *Database_CreateSSEMessageLog_Call) Return(_a0 *db.SSEMessageLog, _a1 error) *Database_CreateSSEMessageLog_Call {
+	_c.Call.Return(_a0, _a1)
+	return _c
+}
+
+func (_c *Database_CreateSSEMessageLog_Call) RunAndReturn(run func(map[string]interface{}, string, string, string) (*db.SSEMessageLog, error)) *Database_CreateSSEMessageLog_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
+
+func (_m *Database) DeleteSSEMessageLog(id uuid.UUID) error {
+	ret := _m.Called(id)
+
+	if len(ret) == 0 {
+		panic("no return value specified for DeleteSSEMessageLog")
+	}
+
+	var r0 error
+	if rf, ok := ret.Get(0).(func(uuid.UUID) error); ok {
+		r0 = rf(id)
+	} else {
+		r0 = ret.Error(0)
+	}
+
+	return r0
+}
+
+type Database_DeleteSSEMessageLog_Call struct {
+	*mock.Call
+}
+
+func (_e *Database_Expecter) DeleteSSEMessageLog(id interface{}) *Database_DeleteSSEMessageLog_Call {
+	return &Database_DeleteSSEMessageLog_Call{Call: _e.mock.On("DeleteSSEMessageLog", id)}
+}
+
+func (_c *Database_DeleteSSEMessageLog_Call) Run(run func(id uuid.UUID)) *Database_DeleteSSEMessageLog_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(uuid.UUID))
+	})
+	return _c
+}
+
+func (_c *Database_DeleteSSEMessageLog_Call) Return(_a0 error) *Database_DeleteSSEMessageLog_Call {
+	_c.Call.Return(_a0)
+	return _c
+}
+
+func (_c *Database_DeleteSSEMessageLog_Call) RunAndReturn(run func(uuid.UUID) error) *Database_DeleteSSEMessageLog_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
+func (_m *Database) UpdateSSEMessageLogStatusBatch(ids []uuid.UUID) error {
+	ret := _m.Called(ids)
+
+	if len(ret) == 0 {
+		panic("no return value specified for UpdateSSEMessageLogStatusBatch")
+	}
+
+	var r0 error
+	if rf, ok := ret.Get(0).(func([]uuid.UUID) error); ok {
+		r0 = rf(ids)
+	} else {
+		r0 = ret.Error(0)
+	}
+
+	return r0
+}
+
+type Database_UpdateSSEMessageLogStatusBatch_Call struct {
+	*mock.Call
+}
+
+func (_e *Database_Expecter) UpdateSSEMessageLogStatusBatch(ids interface{}) *Database_UpdateSSEMessageLogStatusBatch_Call {
+	return &Database_UpdateSSEMessageLogStatusBatch_Call{Call: _e.mock.On("UpdateSSEMessageLogStatusBatch", ids)}
+}
+
+func (_c *Database_UpdateSSEMessageLogStatusBatch_Call) Run(run func(ids []uuid.UUID)) *Database_UpdateSSEMessageLogStatusBatch_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].([]uuid.UUID))
+	})
+	return _c
+}
+
+func (_c *Database_UpdateSSEMessageLogStatusBatch_Call) Return(_a0 error) *Database_UpdateSSEMessageLogStatusBatch_Call {
+	_c.Call.Return(_a0)
+	return _c
+}
+
+func (_c *Database_UpdateSSEMessageLogStatusBatch_Call) RunAndReturn(run func([]uuid.UUID) error) *Database_UpdateSSEMessageLogStatusBatch_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
+
+func (_m *Database) UpdateSSEMessageLog(id uuid.UUID, updates map[string]interface{}) (*db.SSEMessageLog, error) {
+	ret := _m.Called(id, updates)
+
+	if len(ret) == 0 {
+		panic("no return value specified for UpdateSSEMessageLog")
+	}
+
+	var r0 *db.SSEMessageLog
+	var r1 error
+	if rf, ok := ret.Get(0).(func(uuid.UUID, map[string]interface{}) (*db.SSEMessageLog, error)); ok {
+		return rf(id, updates)
+	}
+	if rf, ok := ret.Get(0).(func(uuid.UUID, map[string]interface{}) *db.SSEMessageLog); ok {
+		r0 = rf(id, updates)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(*db.SSEMessageLog)
+		}
+	}
+
+	if rf, ok := ret.Get(1).(func(uuid.UUID, map[string]interface{}) error); ok {
+		r1 = rf(id, updates)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
+type Database_UpdateSSEMessageLog_Call struct {
+	*mock.Call
+}
+
+func (_e *Database_Expecter) UpdateSSEMessageLog(id interface{}, updates interface{}) *Database_UpdateSSEMessageLog_Call {
+	return &Database_UpdateSSEMessageLog_Call{Call: _e.mock.On("UpdateSSEMessageLog", id, updates)}
+}
+
+func (_c *Database_UpdateSSEMessageLog_Call) Run(run func(id uuid.UUID, updates map[string]interface{})) *Database_UpdateSSEMessageLog_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(uuid.UUID), args[1].(map[string]interface{}))
+	})
+	return _c
+}
+
+func (_c *Database_UpdateSSEMessageLog_Call) Return(_a0 *db.SSEMessageLog, _a1 error) *Database_UpdateSSEMessageLog_Call {
+	_c.Call.Return(_a0, _a1)
+	return _c
+}
+
+func (_c *Database_UpdateSSEMessageLog_Call) RunAndReturn(run func(uuid.UUID, map[string]interface{}) (*db.SSEMessageLog, error)) *Database_UpdateSSEMessageLog_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
+
+func (_m *Database) GetSSEMessageLogByID(id uuid.UUID) (*db.SSEMessageLog, error) {
+	ret := _m.Called(id)
+
+	if len(ret) == 0 {
+		panic("no return value specified for GetSSEMessageLogByID")
+	}
+
+	var r0 *db.SSEMessageLog
+	var r1 error
+	if rf, ok := ret.Get(0).(func(uuid.UUID) (*db.SSEMessageLog, error)); ok {
+		return rf(id)
+	}
+	if rf, ok := ret.Get(0).(func(uuid.UUID) *db.SSEMessageLog); ok {
+		r0 = rf(id)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(*db.SSEMessageLog)
+		}
+	}
+
+	if rf, ok := ret.Get(1).(func(uuid.UUID) error); ok {
+		r1 = rf(id)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
+type Database_GetSSEMessageLogByID_Call struct {
+	*mock.Call
+}
+
+
+func (_e *Database_Expecter) GetSSEMessageLogByID(id interface{}) *Database_GetSSEMessageLogByID_Call {
+	return &Database_GetSSEMessageLogByID_Call{Call: _e.mock.On("GetSSEMessageLogByID", id)}
+}
+
+func (_c *Database_GetSSEMessageLogByID_Call) Run(run func(id uuid.UUID)) *Database_GetSSEMessageLogByID_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(uuid.UUID))
+	})
+	return _c
+}
+
+func (_c *Database_GetSSEMessageLogByID_Call) Return(_a0 *db.SSEMessageLog, _a1 error) *Database_GetSSEMessageLogByID_Call {
+	_c.Call.Return(_a0, _a1)
+	return _c
+}
+
+func (_c *Database_GetSSEMessageLogByID_Call) RunAndReturn(run func(uuid.UUID) (*db.SSEMessageLog, error)) *Database_GetSSEMessageLogByID_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
+
+func (_m *Database) GetSSEMessageLogsByChatID(chatID string) ([]db.SSEMessageLog, error) {
+	ret := _m.Called(chatID)
+
+	if len(ret) == 0 {
+		panic("no return value specified for GetSSEMessageLogsByChatID")
+	}
+
+	var r0 []db.SSEMessageLog
+	var r1 error
+	if rf, ok := ret.Get(0).(func(string) ([]db.SSEMessageLog, error)); ok {
+		return rf(chatID)
+	}
+	if rf, ok := ret.Get(0).(func(string) []db.SSEMessageLog); ok {
+		r0 = rf(chatID)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).([]db.SSEMessageLog)
+		}
+	}
+
+	if rf, ok := ret.Get(1).(func(string) error); ok {
+		r1 = rf(chatID)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
+type Database_GetSSEMessageLogsByChatID_Call struct {
+	*mock.Call
+}
+
+func (_e *Database_Expecter) GetSSEMessageLogsByChatID(chatID interface{}) *Database_GetSSEMessageLogsByChatID_Call {
+	return &Database_GetSSEMessageLogsByChatID_Call{Call: _e.mock.On("GetSSEMessageLogsByChatID", chatID)}
+}
+
+func (_c *Database_GetSSEMessageLogsByChatID_Call) Run(run func(chatID string)) *Database_GetSSEMessageLogsByChatID_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(string))
+	})
+	return _c
+}
+
+func (_c *Database_GetSSEMessageLogsByChatID_Call) Return(_a0 []db.SSEMessageLog, _a1 error) *Database_GetSSEMessageLogsByChatID_Call {
+	_c.Call.Return(_a0, _a1)
+	return _c
+}
+
+func (_c *Database_GetSSEMessageLogsByChatID_Call) RunAndReturn(run func(string) ([]db.SSEMessageLog, error)) *Database_GetSSEMessageLogsByChatID_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
+
+func (_m *Database) GetNewSSEMessageLogsByChatID(chatID string) ([]db.SSEMessageLog, error) {
+	ret := _m.Called(chatID)
+
+	if len(ret) == 0 {
+		panic("no return value specified for GetNewSSEMessageLogsByChatID")
+	}
+
+	var r0 []db.SSEMessageLog
+	var r1 error
+	if rf, ok := ret.Get(0).(func(string) ([]db.SSEMessageLog, error)); ok {
+		return rf(chatID)
+	}
+	if rf, ok := ret.Get(0).(func(string) []db.SSEMessageLog); ok {
+		r0 = rf(chatID)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).([]db.SSEMessageLog)
+		}
+	}
+
+	if rf, ok := ret.Get(1).(func(string) error); ok {
+		r1 = rf(chatID)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
+type Database_GetNewSSEMessageLogsByChatID_Call struct {
+	*mock.Call
+}
+
+func (_e *Database_Expecter) GetNewSSEMessageLogsByChatID(chatID interface{}) *Database_GetNewSSEMessageLogsByChatID_Call {
+	return &Database_GetNewSSEMessageLogsByChatID_Call{Call: _e.mock.On("GetNewSSEMessageLogsByChatID", chatID)}
+}
+
+func (_c *Database_GetNewSSEMessageLogsByChatID_Call) Run(run func(chatID string)) *Database_GetNewSSEMessageLogsByChatID_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(string))
+	})
+	return _c
+}
+
+func (_c *Database_GetNewSSEMessageLogsByChatID_Call) Return(_a0 []db.SSEMessageLog, _a1 error) *Database_GetNewSSEMessageLogsByChatID_Call {
+	_c.Call.Return(_a0, _a1)
+	return _c
+}
+
+func (_c *Database_GetNewSSEMessageLogsByChatID_Call) RunAndReturn(run func(string) ([]db.SSEMessageLog, error)) *Database_GetNewSSEMessageLogsByChatID_Call {
+	_c.Call.Return(run)
+	return _c
+}

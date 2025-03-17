@@ -1544,6 +1544,25 @@ type SkillInstall struct {
 	UpdatedAt          time.Time   `gorm:"type:timestamp;default:current_timestamp" json:"updated_at"`
 }
 
+
+type SSEMessageStatus string
+
+const (
+	SSEStatusNew  SSEMessageStatus = "new"
+	SSEStatusSent SSEMessageStatus = "sent"
+)
+
+type SSEMessageLog struct {
+	ID        uuid.UUID        `gorm:"primaryKey;type:uuid" json:"id"`
+	CreatedAt time.Time        `gorm:"type:timestamp;default:current_timestamp" json:"created_at"`
+	UpdatedAt time.Time        `gorm:"type:timestamp;default:current_timestamp" json:"updated_at"`
+	Event     PropertyMap      `gorm:"type:jsonb;not null;default:'{}'::jsonb" json:"event"`
+	ChatID    string           `gorm:"index;not null" json:"chat_id"`
+	From      string           `gorm:"not null" json:"from"`
+	To        string           `gorm:"not null" json:"to"`
+	Status    SSEMessageStatus `gorm:"type:varchar(10);default:'new'" json:"status"`
+}
+
 func (Person) TableName() string {
 	return "people"
 }
