@@ -46,6 +46,7 @@ func ChatRoutes() chi.Router {
 
 		r.Post("/sse/stop", chatHandler.StopSSEClient)
 		r.Get("/sse/{chat_id}", chatHandler.GetSSEMessagesByChatID)
+		r.Post("/sse", chatHandler.StartSSEClient)
 	})
 
 	return r

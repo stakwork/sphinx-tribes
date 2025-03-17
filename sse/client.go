@@ -65,7 +65,7 @@ func NewClient(sseURL string, chatID string, webhookURL string, database db.Data
 		WebhookURL:    webhookURL,
 		RetryInterval: 3 * time.Second,
 		Client: &http.Client{
-			Timeout: 0, 
+			Timeout: 0,
 		},
 		DB:       database,
 		stopChan: make(chan struct{}),
@@ -75,13 +75,13 @@ func NewClient(sseURL string, chatID string, webhookURL string, database db.Data
 func (c *Client) Start() {
 
 	ClientRegistry.Register(c)
-	
+
 	go func() {
 		defer func() {
 
 			ClientRegistry.Unregister(c.URL, c.ChatID)
 		}()
-		
+
 		for {
 			select {
 			case <-c.stopChan:
@@ -160,7 +160,7 @@ func (c *Client) processEvents(resp *http.Response) error {
 			return nil
 		default:
 			line := scanner.Text()
-			
+
 			if line == "" {
 				if eventData["data"] != "" {
 
@@ -168,11 +168,11 @@ func (c *Client) processEvents(resp *http.Response) error {
 					if err != nil {
 						logger.Log.Error("[ChatID: %s] Error storing event: %v", c.ChatID, err)
 					}
-					
+
 					if eventData["id"] != "" {
 						c.LastEventID = eventData["id"]
 					}
-					
+
 					eventData = map[string]string{
 						"id":    "",
 						"event": "",
@@ -181,14 +181,14 @@ func (c *Client) processEvents(resp *http.Response) error {
 				}
 				continue
 			}
-			
+
 			if strings.HasPrefix(line, "data:") {
 				data := strings.TrimPrefix(line, "data:")
 
 				if len(data) > 0 && data[0] == ' ' {
 					data = data[1:]
 				}
-				
+
 				if eventData["data"] != "" {
 					eventData["data"] += "\n"
 				}
@@ -243,4 +243,14 @@ func (c *Client) storeEvent(eventData map[string]string) error {
 
 	logger.Log.Info("[ChatID: %s] Stored SSE event with ID: %s", c.ChatID, messageLog.ID)
 	return nil
-} 
+}
+
+func (r *Registry) HasClient(sseURL, chatID string) bool {
+	r.mutex.RLock()
+	defer r.mutex.RUnlock()
+
+	key := GenerateClientKey(sseURL, chatID)
+	_, exists := r.clients[key]
+
+	return exists
+}
