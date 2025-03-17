@@ -13,7 +13,7 @@ import (
 	"github.com/stakwork/sphinx-tribes/logger"
 )
 
-func GetRandomToken(length int) string {
+func GetRandomTokens(length int) string {
 	randomBytes := make([]byte, 32)
 	_, err := rand.Read(randomBytes)
 	if err != nil {
