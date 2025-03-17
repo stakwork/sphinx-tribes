@@ -16,10 +16,7 @@
     "codespaces": {
       "repositories": {
         "stakwork/sphinx-tribes-frontend": {
-          "permissions": {
-            "content": "write",
-            "pull_requests": "write"
-          }
+          "permissions": "write-all"
         }
       }
     },
