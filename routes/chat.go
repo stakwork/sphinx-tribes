@@ -45,6 +45,7 @@ func ChatRoutes() chi.Router {
 		r.Delete("/chatworkflow/{workspaceId}", chatHandler.DeleteChatWorkflow)
 
 		r.Post("/sse/stop", chatHandler.StopSSEClient)
+		r.Get("/sse/{chat_id}", chatHandler.GetSSEMessagesByChatID)
 	})
 
 	return r

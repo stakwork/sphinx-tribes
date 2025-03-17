@@ -1725,3 +1725,57 @@ func (ch *ChatHandler) StopSSEClient(w http.ResponseWriter, r *http.Request) {
 		Message: "No active SSE client found for the provided sse_url and chatID",
 	})
 }
+
+func (ch *ChatHandler) GetSSEMessagesByChatID(w http.ResponseWriter, r *http.Request) {
+	chatID := chi.URLParam(r, "chat_id")
+	if chatID == "" {
+		w.WriteHeader(http.StatusBadRequest)
+		json.NewEncoder(w).Encode(ChatResponse{
+			Success: false,
+			Message: "Chat ID is required",
+		})
+		return
+	}
+
+	messages, err := ch.db.GetNewSSEMessageLogsByChatID(chatID)
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		json.NewEncoder(w).Encode(ChatResponse{
+			Success: false,
+			Message: fmt.Sprintf("Failed to retrieve SSE messages: %v", err),
+		})
+		return
+	}
+
+	if len(messages) == 0 {
+		w.WriteHeader(http.StatusOK)
+		json.NewEncoder(w).Encode(ChatResponse{
+			Success: true,
+			Message: "No unsent SSE messages found",
+			Data:    []interface{}{},
+		})
+		return
+	}
+
+	var messageIDs []uuid.UUID
+	for _, msg := range messages {
+		messageIDs = append(messageIDs, msg.ID)
+	}
+
+	err = ch.db.UpdateSSEMessageLogStatusBatch(messageIDs)
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		json.NewEncoder(w).Encode(ChatResponse{
+			Success: false,
+			Message: fmt.Sprintf("Failed to update message status: %v", err),
+		})
+		return
+	}
+
+	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode(ChatResponse{
+		Success: true,
+		Message: fmt.Sprintf("Retrieved %d SSE messages", len(messages)),
+		Data:    messages,
+	})
+}
