@@ -125,6 +125,7 @@ type ActionPayload struct {
 	CodeGraphAlias    string              `json:"codeGraphAlias,omitempty"`
 	SourceWebsocketID string              `json:"sourceWebsocketId"`
 	WebhookURL        string              `json:"webhook_url"`
+	CodeSpaceURL      string              `json:"codeSpaceURL"`
 }
 
 type CreateOrEditChatRequest struct {
@@ -367,7 +368,7 @@ func buildArtifactList(artefacts []db.Artifact) []map[string]string {
 	return formattedArtefacts
 }
 
-func buildVarsPayload(request SendMessageRequest, createdMessage *db.ChatMessage, messageHistory []map[string]string, context interface{}, user *db.Person, codeGraph *db.WorkspaceCodeGraph, mode string) map[string]interface{} {
+func buildVarsPayload(request SendMessageRequest, createdMessage *db.ChatMessage, messageHistory []map[string]string, context interface{}, user *db.Person, codeGraph *db.WorkspaceCodeGraph, codeSpace db.CodeSpaceMap, mode string) map[string]interface{} {
 	vars := map[string]interface{}{
 		"chatId":            request.ChatID,
 		"messageId":         createdMessage.ID,
@@ -395,6 +396,10 @@ func buildVarsPayload(request SendMessageRequest, createdMessage *db.ChatMessage
 			vars["2b_base_url"] = url
 			vars["secret"] = codeGraph.SecretAlias
 		}
+	}
+
+	if codeSpace.CodeSpaceURL != "" {
+		vars["codeSpaceURL"] = codeSpace.CodeSpaceURL
 	}
 
 	vars["query"] = request.Message
@@ -530,7 +535,15 @@ func (ch *ChatHandler) SendMessage(w http.ResponseWriter, r *http.Request) {
 		mode = request.Mode
 	}
 
-	vars := buildVarsPayload(request, &createdMessage, messageHistory, context, &user, codeGraph, mode)
+	var codeSpace db.CodeSpaceMap
+	if workspaceID := request.WorkspaceUUID; workspaceID != "" {
+		codeSpaceResult, err := ch.db.GetCodeSpaceMapByWorkspaceAndUser(workspaceID, pubKeyFromAuth)
+		if err == nil {
+			codeSpace = codeSpaceResult
+		}
+	}
+
+	vars := buildVarsPayload(request, &createdMessage, messageHistory, context, &user, codeGraph, codeSpace, mode)
 
 	stakworkPayload := StakworkChatPayload{
 		Name:       "Hive Chat Processor",
@@ -1393,6 +1406,9 @@ func (ch *ChatHandler) DeleteAllArtefactsByChatID(w http.ResponseWriter, r *http
 }
 
 func (ch *ChatHandler) SendActionMessage(w http.ResponseWriter, r *http.Request) {
+	ctx := r.Context()
+	pubKeyFromAuth, _ := ctx.Value(auth.ContextKey).(string)
+
 	var request ActionMessageRequest
 	if err := json.NewDecoder(r.Body).Decode(&request); err != nil {
 		w.WriteHeader(http.StatusBadRequest)
@@ -1486,6 +1502,14 @@ func (ch *ChatHandler) SendActionMessage(w http.ResponseWriter, r *http.Request)
 		return
 	}
 
+	var codeSpace db.CodeSpaceMap
+	if workspaceID := chat.WorkspaceID; workspaceID != "" {
+		codeSpaceResult, err := ch.db.GetCodeSpaceMapByWorkspaceAndUser(workspaceID, pubKeyFromAuth)
+		if err == nil {
+			codeSpace = codeSpaceResult
+		}
+	}
+
 	payload := ActionPayload{
 		ChatID:            request.ChatID,
 		MessageID:         request.MessageID,
@@ -1502,6 +1526,10 @@ func (ch *ChatHandler) SendActionMessage(w http.ResponseWriter, r *http.Request)
 		}
 		payload.CodeGraph = url
 		payload.CodeGraphAlias = codeGraph.SecretAlias
+	}
+
+	if codeSpace.CodeSpaceURL != "" {
+		payload.CodeSpaceURL = codeSpace.CodeSpaceURL
 	}
 
 	payloadBytes, err := json.Marshal(payload)
