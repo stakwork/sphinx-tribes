@@ -90,6 +90,7 @@ func InitTestDB() {
 	db.AutoMigrate(&Skill{})
 	db.AutoMigrate(&SkillInstall{})
 	db.AutoMigrate(&SSEMessageLog{})
+	db.AutoMigrate(&CodeSpaceMap{})
 
 	people := TestDB.GetAllPeople()
 	for _, p := range people {
