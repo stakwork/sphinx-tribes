@@ -373,88 +373,88 @@ type AccessRestrictionType string
 const (
 	BlankAccess     AccessRestrictionType = ""
 	WorkspaceAccess AccessRestrictionType = "workspace"
-	OwnerAccess     AccessRestrictionType = "owner" 
+	OwnerAccess     AccessRestrictionType = "owner"
 	AssignedAccess  AccessRestrictionType = "assigned"
 	AdminAccess     AccessRestrictionType = "admins"
 )
 
 type Bounty struct {
-	ID                      uint           `json:"id"`
-	OwnerID                 string         `json:"owner_id"`
-	Paid                    bool           `json:"paid"`
-	Show                    bool           `gorm:"default:false" json:"show"`
-	Completed               bool           `gorm:"default:false" json:"completed"`
-	Type                    string         `json:"type"`
-	Award                   string         `json:"award"`
-	AssignedHours           uint8          `json:"assigned_hours"`
-	BountyExpires           string         `json:"bounty_expires"`
-	CommitmentFee           uint64         `json:"commitment_fee"`
-	Price                   uint           `json:"price"`
-	Title                   string         `json:"title"`
-	Tribe                   string         `json:"tribe"`
-	Assignee                string         `json:"assignee"`
-	TicketUrl               string         `json:"ticket_url"`
-	OrgUuid                 string         `json:"org_uuid"`
-	Description             string         `json:"description"`
-	WantedType              string         `json:"wanted_type"`
-	Deliverables            string         `json:"deliverables"`
-	GithubDescription       bool           `json:"github_description"`
-	OneSentenceSummary      string         `json:"one_sentence_summary"`
-	EstimatedSessionLength  string         `json:"estimated_session_length"`
-	EstimatedCompletionDate string         `json:"estimated_completion_date"`
-	Created                 int64          `json:"created"`
-	Updated                 *time.Time     `json:"updated"`
-	AssignedDate            *time.Time     `json:"assigned_date,omitempty"`
-	CompletionDate          *time.Time     `json:"completion_date,omitempty"`
-	MarkAsPaidDate          *time.Time     `json:"mark_as_paid_date,omitempty"`
-	PaidDate                *time.Time     `json:"paid_date,omitempty"`
-	CodingLanguages         pq.StringArray `gorm:"type:text[];not null default:'[]'" json:"coding_languages"`
-	PhaseUuid               *string        `json:"phase_uuid"`
-	PhasePriority           *int           `json:"phase_priority"`
-	PaymentPending          bool           `gorm:"default:false" json:"payment_pending"`
-	PaymentFailed           bool           `gorm:"default:false" json:"payment_failed"`
+	ID                      uint                   `json:"id"`
+	OwnerID                 string                 `json:"owner_id"`
+	Paid                    bool                   `json:"paid"`
+	Show                    bool                   `gorm:"default:false" json:"show"`
+	Completed               bool                   `gorm:"default:false" json:"completed"`
+	Type                    string                 `json:"type"`
+	Award                   string                 `json:"award"`
+	AssignedHours           uint8                  `json:"assigned_hours"`
+	BountyExpires           string                 `json:"bounty_expires"`
+	CommitmentFee           uint64                 `json:"commitment_fee"`
+	Price                   uint                   `json:"price"`
+	Title                   string                 `json:"title"`
+	Tribe                   string                 `json:"tribe"`
+	Assignee                string                 `json:"assignee"`
+	TicketUrl               string                 `json:"ticket_url"`
+	OrgUuid                 string                 `json:"org_uuid"`
+	Description             string                 `json:"description"`
+	WantedType              string                 `json:"wanted_type"`
+	Deliverables            string                 `json:"deliverables"`
+	GithubDescription       bool                   `json:"github_description"`
+	OneSentenceSummary      string                 `json:"one_sentence_summary"`
+	EstimatedSessionLength  string                 `json:"estimated_session_length"`
+	EstimatedCompletionDate string                 `json:"estimated_completion_date"`
+	Created                 int64                  `json:"created"`
+	Updated                 *time.Time             `json:"updated"`
+	AssignedDate            *time.Time             `json:"assigned_date,omitempty"`
+	CompletionDate          *time.Time             `json:"completion_date,omitempty"`
+	MarkAsPaidDate          *time.Time             `json:"mark_as_paid_date,omitempty"`
+	PaidDate                *time.Time             `json:"paid_date,omitempty"`
+	CodingLanguages         pq.StringArray         `gorm:"type:text[];not null default:'[]'" json:"coding_languages"`
+	PhaseUuid               *string                `json:"phase_uuid"`
+	PhasePriority           *int                   `json:"phase_priority"`
+	PaymentPending          bool                   `gorm:"default:false" json:"payment_pending"`
+	PaymentFailed           bool                   `gorm:"default:false" json:"payment_failed"`
 	AccessRestriction       *AccessRestrictionType `gorm:"type:varchar(20);default:null" json:"access_restriction,omitempty"`
 }
 
 // Todo: Change back to Bounty
 type NewBounty struct {
-	ID                      uint           `json:"id"`
-	OwnerID                 string         `json:"owner_id"`
-	Paid                    bool           `json:"paid"`
-	Show                    bool           `gorm:"default:false" json:"show"`
-	Completed               bool           `gorm:"default:false" json:"completed"`
-	Type                    string         `json:"type"`
-	Award                   string         `json:"award"`
-	AssignedHours           uint8          `json:"assigned_hours"`
-	BountyExpires           string         `json:"bounty_expires"`
-	CommitmentFee           uint64         `json:"commitment_fee"`
-	Price                   uint           `json:"price"`
-	Title                   string         `json:"title"`
-	Tribe                   string         `json:"tribe"`
-	Assignee                string         `json:"assignee"`
-	TicketUrl               string         `json:"ticket_url"`
-	OrgUuid                 string         `gorm:"-" json:"org_uuid"`
-	WorkspaceUuid           string         `json:"workspace_uuid"`
-	FeatureUuid             string         `json:"feature_uuid"`
-	Description             string         `json:"description"`
-	WantedType              string         `json:"wanted_type"`
-	Deliverables            string         `json:"deliverables"`
-	GithubDescription       bool           `json:"github_description"`
-	OneSentenceSummary      string         `json:"one_sentence_summary"`
-	EstimatedSessionLength  string         `json:"estimated_session_length"`
-	EstimatedCompletionDate string         `json:"estimated_completion_date"`
-	Created                 int64          `json:"created"`
-	Updated                 *time.Time     `json:"updated"`
-	AssignedDate            *time.Time     `json:"assigned_date,omitempty"`
-	CompletionDate          *time.Time     `json:"completion_date,omitempty"`
-	MarkAsPaidDate          *time.Time     `json:"mark_as_paid_date,omitempty"`
-	PaidDate                *time.Time     `json:"paid_date,omitempty"`
-	CodingLanguages         pq.StringArray `gorm:"type:text[];not null default:'[]'" json:"coding_languages"`
-	PhaseUuid               string         `json:"phase_uuid"`
-	PhasePriority           int            `json:"phase_priority"`
-	PaymentPending          bool           `gorm:"default:false" json:"payment_pending"`
-	PaymentFailed           bool           `gorm:"default:false" json:"payment_failed"`
-	ProofOfWorkCount        int            `gorm:"type:integer;default:0;not null" json:"pow"`
+	ID                      uint                   `json:"id"`
+	OwnerID                 string                 `json:"owner_id"`
+	Paid                    bool                   `json:"paid"`
+	Show                    bool                   `gorm:"default:false" json:"show"`
+	Completed               bool                   `gorm:"default:false" json:"completed"`
+	Type                    string                 `json:"type"`
+	Award                   string                 `json:"award"`
+	AssignedHours           uint8                  `json:"assigned_hours"`
+	BountyExpires           string                 `json:"bounty_expires"`
+	CommitmentFee           uint64                 `json:"commitment_fee"`
+	Price                   uint                   `json:"price"`
+	Title                   string                 `json:"title"`
+	Tribe                   string                 `json:"tribe"`
+	Assignee                string                 `json:"assignee"`
+	TicketUrl               string                 `json:"ticket_url"`
+	OrgUuid                 string                 `gorm:"-" json:"org_uuid"`
+	WorkspaceUuid           string                 `json:"workspace_uuid"`
+	FeatureUuid             string                 `json:"feature_uuid"`
+	Description             string                 `json:"description"`
+	WantedType              string                 `json:"wanted_type"`
+	Deliverables            string                 `json:"deliverables"`
+	GithubDescription       bool                   `json:"github_description"`
+	OneSentenceSummary      string                 `json:"one_sentence_summary"`
+	EstimatedSessionLength  string                 `json:"estimated_session_length"`
+	EstimatedCompletionDate string                 `json:"estimated_completion_date"`
+	Created                 int64                  `json:"created"`
+	Updated                 *time.Time             `json:"updated"`
+	AssignedDate            *time.Time             `json:"assigned_date,omitempty"`
+	CompletionDate          *time.Time             `json:"completion_date,omitempty"`
+	MarkAsPaidDate          *time.Time             `json:"mark_as_paid_date,omitempty"`
+	PaidDate                *time.Time             `json:"paid_date,omitempty"`
+	CodingLanguages         pq.StringArray         `gorm:"type:text[];not null default:'[]'" json:"coding_languages"`
+	PhaseUuid               string                 `json:"phase_uuid"`
+	PhasePriority           int                    `json:"phase_priority"`
+	PaymentPending          bool                   `gorm:"default:false" json:"payment_pending"`
+	PaymentFailed           bool                   `gorm:"default:false" json:"payment_failed"`
+	ProofOfWorkCount        int                    `gorm:"type:integer;default:0;not null" json:"pow"`
 	AccessRestriction       *AccessRestrictionType `gorm:"type:varchar(20);default:null" json:"access_restriction,omitempty"`
 }
 
@@ -1430,13 +1430,13 @@ type NodeListResponse struct {
 	NodeList []Node `json:"node_list"`
 }
 
-
 type ArtifactType string
 
 const (
 	TextArtifact   ArtifactType = "text"
 	VisualArtifact ArtifactType = "visual"
 	ActionArtifact ArtifactType = "action"
+	SSEArtifact    ArtifactType = "sse_connection"
 )
 
 type Artifact struct {
@@ -1482,7 +1482,7 @@ type FeatureCall struct {
 	URL         string         `gorm:"type:text" json:"url"`
 	CreatedAt   time.Time      `gorm:"autoCreateTime" json:"created_at"`
 	UpdatedAt   time.Time      `gorm:"autoUpdateTime" json:"updated_at"`
-	DeletedAt   gorm.DeletedAt  `gorm:"index" json:"-"`
+	DeletedAt   gorm.DeletedAt `gorm:"index" json:"-"`
 }
 
 type ChatWorkflow struct {
@@ -1493,7 +1493,6 @@ type ChatWorkflow struct {
 	CreatedAt   time.Time `json:"createdAt"`
 	UpdatedAt   time.Time `json:"updatedAt"`
 }
-
 
 type ChargeModel string
 
@@ -1534,16 +1533,15 @@ type Skill struct {
 }
 
 type SkillInstall struct {
-	ID                 uuid.UUID   `gorm:"primaryKey;type:uuid;default:gen_random_uuid()" json:"id"`
-	SkillID            uuid.UUID   `gorm:"type:uuid;not null;index:skill_index" json:"skill_id"`
-	Skill              Skill       `gorm:"foreignKey:SkillID;references:ID;constraint:OnDelete:CASCADE" json:"-"`
-	Client             ClientType  `gorm:"type:varchar(50);not null" json:"client"`
-	InstallDescription string      `gorm:"type:text" json:"install_description"`
-	InstallFile        string      `gorm:"type:varchar(255)" json:"install_file"`
-	CreatedAt          time.Time   `gorm:"type:timestamp;default:current_timestamp" json:"created_at"`
-	UpdatedAt          time.Time   `gorm:"type:timestamp;default:current_timestamp" json:"updated_at"`
+	ID                 uuid.UUID  `gorm:"primaryKey;type:uuid;default:gen_random_uuid()" json:"id"`
+	SkillID            uuid.UUID  `gorm:"type:uuid;not null;index:skill_index" json:"skill_id"`
+	Skill              Skill      `gorm:"foreignKey:SkillID;references:ID;constraint:OnDelete:CASCADE" json:"-"`
+	Client             ClientType `gorm:"type:varchar(50);not null" json:"client"`
+	InstallDescription string     `gorm:"type:text" json:"install_description"`
+	InstallFile        string     `gorm:"type:varchar(255)" json:"install_file"`
+	CreatedAt          time.Time  `gorm:"type:timestamp;default:current_timestamp" json:"created_at"`
+	UpdatedAt          time.Time  `gorm:"type:timestamp;default:current_timestamp" json:"updated_at"`
 }
-
 
 type SSEMessageStatus string
 

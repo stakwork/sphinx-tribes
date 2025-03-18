@@ -829,6 +829,10 @@ func (ch *ChatHandler) ProcessChatResponse(w http.ResponseWriter, r *http.Reques
 				continue
 			}
 			artifacts = append(artifacts, *processedArtifact)
+
+			if artifact.Type == db.SSEArtifact {
+				go HandleSSEConnectionArtifact(ch.db, artifact, request.Value.ChatID)
+			}
 		}
 	}
 
@@ -1838,4 +1842,112 @@ func (ch *ChatHandler) StartSSEClient(w http.ResponseWriter, r *http.Request) {
 			"webhook_url": webhookURL,
 		},
 	})
+}
+
+func HandleSSEConnectionArtifact(database db.Database, artifact ChatMessageArtifact, chatID string) {
+
+	content, ok := artifact.Content.(map[string]interface{})
+	if !ok {
+		log.Printf("Invalid SSE connection artifact content format")
+		return
+	}
+
+	sseURL, ok := content["sse_url"].(string)
+	if !ok || sseURL == "" {
+		log.Printf("Missing or invalid sse_url in SSE connection artifact")
+		return
+	}
+
+	webhookURL, ok := content["webhook_url"].(string)
+	if !ok || webhookURL == "" {
+		log.Printf("Missing or invalid webhook_url in SSE connection artifact")
+		return
+	}
+
+	var delayMs int64 = 0
+	switch v := content["delay"].(type) {
+	case string:
+		if parsedDelay, err := strconv.ParseInt(v, 10, 64); err == nil {
+			delayMs = parsedDelay
+		}
+	case float64:
+		delayMs = int64(v)
+	}
+
+	client := sse.NewClient(sseURL, chatID, webhookURL, database)
+	sse.ClientRegistry.Register(client)
+
+	go client.Start()
+
+	log.Printf("Started SSE client for chatID %s connecting to %s", chatID, sseURL)
+
+	if delayMs > 0 {
+		log.Printf("Triggering webhook payload with delay: %dms", delayMs)
+		go func() {
+			time.Sleep(time.Duration(delayMs) * time.Millisecond)
+			SendEventPayloadToWebhook(database, chatID, webhookURL, delayMs)
+		}()
+	}
+}
+
+func SendEventPayloadToWebhook(database db.Database, chatID string, webhookURL string, delayMs int64) {
+	if delayMs > 0 {
+		time.Sleep(time.Duration(delayMs) * time.Millisecond)
+	}
+
+	unsentEvents, err := database.GetNewSSEMessageLogsByChatID(chatID)
+	if err != nil {
+		log.Printf("Error retrieving unsent events for chatID %s: %v", chatID, err)
+		return
+	}
+
+	sseURL := ""
+	if len(unsentEvents) > 0 {
+		sseURL = unsentEvents[0].From
+	}
+
+	eventsList := make([]map[string]interface{}, len(unsentEvents))
+	for i, event := range unsentEvents {
+		eventsList[i] = map[string]interface{}{
+			"event": event.Event,
+		}
+	}
+
+	payload := map[string]interface{}{
+		"chatID":  chatID,
+		"events":  eventsList,
+		"sse_url": sseURL,
+	}
+
+	payloadJSON, err := json.Marshal(payload)
+	if err != nil {
+		log.Printf("Error marshaling webhook payload: %v", err)
+		return
+	}
+
+	resp, err := http.Post(webhookURL, "application/json", bytes.NewBuffer(payloadJSON))
+	if err != nil {
+		log.Printf("Error sending events to webhook %s: %v", webhookURL, err)
+		return
+	}
+	defer resp.Body.Close()
+
+	if resp.StatusCode < 200 || resp.StatusCode >= 300 {
+		body, _ := io.ReadAll(resp.Body)
+		log.Printf("Webhook returned non-success status %d: %s", resp.StatusCode, string(body))
+		return
+	}
+
+	var eventIDs []uuid.UUID
+	for _, event := range unsentEvents {
+		eventIDs = append(eventIDs, event.ID)
+	}
+
+	err = database.UpdateSSEMessageLogStatusBatch(eventIDs)
+	if err != nil {
+		log.Printf("Error updating event status: %v", err)
+		return
+	}
+
+	log.Printf("Successfully sent %d events for chatID %s to webhook %s", len(unsentEvents), chatID, webhookURL)
 }
