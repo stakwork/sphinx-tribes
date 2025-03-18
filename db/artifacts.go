@@ -14,7 +14,7 @@ func (db database) CreateArtifact(artifact *Artifact) (*Artifact, error) {
 	if artifact.MessageID == "" {
 		return nil, fmt.Errorf("message ID cannot be empty")
 	}
-	
+
 	var count int64
 	if err := db.db.Model(&ChatMessage{}).Where("id = ?", artifact.MessageID).Count(&count).Error; err != nil {
 		return nil, fmt.Errorf("failed to check message existence: %w", err)
@@ -22,11 +22,12 @@ func (db database) CreateArtifact(artifact *Artifact) (*Artifact, error) {
 	if count == 0 {
 		return nil, fmt.Errorf("message with ID %s does not exist", artifact.MessageID)
 	}
-	
+
 	validTypes := map[ArtifactType]bool{
 		TextArtifact:   true,
 		VisualArtifact: true,
 		ActionArtifact: true,
+		SSEArtifact:    true,
 	}
 	if !validTypes[artifact.Type] {
 		return nil, fmt.Errorf("invalid artifact type: %s", artifact.Type)
@@ -61,7 +62,7 @@ func (db database) GetArtifactByID(id uuid.UUID) (*Artifact, error) {
 
 func (db database) GetArtifactsByMessageID(messageID string) ([]Artifact, error) {
 	var artifacts []Artifact
-	
+
 	if err := db.db.Where("message_id = ?", messageID).
 		Order("created_at DESC").
 		Find(&artifacts).Error; err != nil {
@@ -135,4 +136,4 @@ func (db database) DeleteAllArtifactsByChatID(chatID string) error {
 	}
 
 	return nil
-} 
+}
