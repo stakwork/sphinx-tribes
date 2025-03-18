@@ -340,4 +340,13 @@ type Database interface {
 	GetSSEMessageLogByID(id uuid.UUID) (*SSEMessageLog, error)
 	GetSSEMessageLogsByChatID(chatID string) ([]SSEMessageLog, error)
 	GetNewSSEMessageLogsByChatID(chatID string) ([]SSEMessageLog, error)
+	CreateCodeSpaceMap(codeSpace CodeSpaceMap) (CodeSpaceMap, error)
+	GetCodeSpaceMaps() ([]CodeSpaceMap, error)
+	GetCodeSpaceMapByWorkspace(workspaceID string) ([]CodeSpaceMap, error)
+	GetCodeSpaceMapByUser(userPubkey string) ([]CodeSpaceMap, error)
+	GetCodeSpaceMapByURL(codeSpaceURL string) ([]CodeSpaceMap, error)
+	GetCodeSpaceMapByWorkspaceAndUser(workspaceID, userPubkey string) (CodeSpaceMap, error)
+	GetCodeSpaceMapByID(id uuid.UUID) (CodeSpaceMap, error)
+	UpdateCodeSpaceMap(id uuid.UUID, updates map[string]interface{}) (CodeSpaceMap, error)
+	DeleteCodeSpaceMap(id uuid.UUID) error
 }

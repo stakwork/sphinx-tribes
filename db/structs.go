@@ -1561,6 +1561,15 @@ type SSEMessageLog struct {
 	Status    SSEMessageStatus `gorm:"type:varchar(10);default:'new'" json:"status"`
 }
 
+type CodeSpaceMap struct {
+	ID           uuid.UUID `json:"id" gorm:"type:uuid;primaryKey"`
+	CreatedAt    time.Time `json:"createdAt"`
+	UpdatedAt    time.Time `json:"updatedAt"`
+	WorkspaceID  string    `json:"workspaceID" gorm:"index"`
+	CodeSpaceURL string    `json:"codeSpaceURL"`
+	UserPubkey   string    `json:"userPubkey" gorm:"index"`
+}
+
 func (Person) TableName() string {
 	return "people"
 }

@@ -16859,3 +16859,472 @@ func (_c *Database_GetNewSSEMessageLogsByChatID_Call) RunAndReturn(run func(stri
 	_c.Call.Return(run)
 	return _c
 }
+
+func (_m *Database) CreateCodeSpaceMap(codeSpace db.CodeSpaceMap) (db.CodeSpaceMap, error) {
+	ret := _m.Called(codeSpace)
+
+	if len(ret) == 0 {
+		panic("no return value specified for CreateCodeSpaceMap")
+	}
+
+	var r0 db.CodeSpaceMap
+	var r1 error
+	if rf, ok := ret.Get(0).(func(db.CodeSpaceMap) (db.CodeSpaceMap, error)); ok {
+		return rf(codeSpace)
+	}
+	if rf, ok := ret.Get(0).(func(db.CodeSpaceMap) db.CodeSpaceMap); ok {
+		r0 = rf(codeSpace)
+	} else {
+		r0 = ret.Get(0).(db.CodeSpaceMap)
+	}
+
+	if rf, ok := ret.Get(1).(func(db.CodeSpaceMap) error); ok {
+		r1 = rf(codeSpace)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
+type Database_CreateCodeSpaceMap_Call struct {
+	*mock.Call
+}
+
+func (_e *Database_Expecter) CreateCodeSpaceMap(codeSpace interface{}) *Database_CreateCodeSpaceMap_Call {
+	return &Database_CreateCodeSpaceMap_Call{Call: _e.mock.On("CreateCodeSpaceMap", codeSpace)}
+}
+
+func (_c *Database_CreateCodeSpaceMap_Call) Run(run func(codeSpace db.CodeSpaceMap)) *Database_CreateCodeSpaceMap_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(db.CodeSpaceMap))
+	})
+	return _c
+}
+
+func (_c *Database_CreateCodeSpaceMap_Call) Return(_a0 db.CodeSpaceMap, _a1 error) *Database_CreateCodeSpaceMap_Call {
+	_c.Call.Return(_a0, _a1)
+	return _c
+}
+
+func (_c *Database_CreateCodeSpaceMap_Call) RunAndReturn(run func(db.CodeSpaceMap) (db.CodeSpaceMap, error)) *Database_CreateCodeSpaceMap_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
+func (_m *Database) GetCodeSpaceMaps() ([]db.CodeSpaceMap, error) {
+	ret := _m.Called()
+
+	if len(ret) == 0 {
+		panic("no return value specified for GetCodeSpaceMaps")
+	}
+
+	var r0 []db.CodeSpaceMap
+	var r1 error
+	if rf, ok := ret.Get(0).(func() ([]db.CodeSpaceMap, error)); ok {
+		return rf()
+	}
+	if rf, ok := ret.Get(0).(func() []db.CodeSpaceMap); ok {
+		r0 = rf()
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).([]db.CodeSpaceMap)
+		}
+	}
+
+	if rf, ok := ret.Get(1).(func() error); ok {
+		r1 = rf()
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
+type Database_GetCodeSpaceMaps_Call struct {
+	*mock.Call
+}
+
+func (_e *Database_Expecter) GetCodeSpaceMaps() *Database_GetCodeSpaceMaps_Call {
+	return &Database_GetCodeSpaceMaps_Call{Call: _e.mock.On("GetCodeSpaceMaps")}
+}
+
+func (_c *Database_GetCodeSpaceMaps_Call) Run(run func()) *Database_GetCodeSpaceMaps_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run()
+	})
+	return _c
+}
+
+func (_c *Database_GetCodeSpaceMaps_Call) Return(_a0 []db.CodeSpaceMap, _a1 error) *Database_GetCodeSpaceMaps_Call {
+	_c.Call.Return(_a0, _a1)
+	return _c
+}
+
+func (_c *Database_GetCodeSpaceMaps_Call) RunAndReturn(run func() ([]db.CodeSpaceMap, error)) *Database_GetCodeSpaceMaps_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
+
+func (_m *Database) GetCodeSpaceMapByWorkspace(workspaceID string) ([]db.CodeSpaceMap, error) {
+	ret := _m.Called(workspaceID)
+
+	if len(ret) == 0 {
+		panic("no return value specified for GetCodeSpaceMapByWorkspace")
+	}
+
+	var r0 []db.CodeSpaceMap
+	var r1 error
+	if rf, ok := ret.Get(0).(func(string) ([]db.CodeSpaceMap, error)); ok {
+		return rf(workspaceID)
+	}
+	if rf, ok := ret.Get(0).(func(string) []db.CodeSpaceMap); ok {
+		r0 = rf(workspaceID)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).([]db.CodeSpaceMap)
+		}
+	}
+
+	if rf, ok := ret.Get(1).(func(string) error); ok {
+		r1 = rf(workspaceID)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
+type Database_GetCodeSpaceMapByWorkspace_Call struct {
+	*mock.Call
+}
+
+func (_e *Database_Expecter) GetCodeSpaceMapByWorkspace(workspaceID interface{}) *Database_GetCodeSpaceMapByWorkspace_Call {
+	return &Database_GetCodeSpaceMapByWorkspace_Call{Call: _e.mock.On("GetCodeSpaceMapByWorkspace", workspaceID)}
+}
+
+func (_c *Database_GetCodeSpaceMapByWorkspace_Call) Run(run func(workspaceID string)) *Database_GetCodeSpaceMapByWorkspace_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(string))
+	})
+	return _c
+}
+
+func (_c *Database_GetCodeSpaceMapByWorkspace_Call) Return(_a0 []db.CodeSpaceMap, _a1 error) *Database_GetCodeSpaceMapByWorkspace_Call {
+	_c.Call.Return(_a0, _a1)
+	return _c
+}
+
+func (_c *Database_GetCodeSpaceMapByWorkspace_Call) RunAndReturn(run func(string) ([]db.CodeSpaceMap, error)) *Database_GetCodeSpaceMapByWorkspace_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
+func (_m *Database) GetCodeSpaceMapByWorkspaceAndUser(workspaceID string, userPubkey string) (db.CodeSpaceMap, error) {
+	ret := _m.Called(workspaceID, userPubkey)
+
+	if len(ret) == 0 {
+		panic("no return value specified for GetCodeSpaceMapByWorkspaceAndUser")
+	}
+
+	var r0 db.CodeSpaceMap
+	var r1 error
+	if rf, ok := ret.Get(0).(func(string, string) (db.CodeSpaceMap, error)); ok {
+		return rf(workspaceID, userPubkey)
+	}
+	if rf, ok := ret.Get(0).(func(string, string) db.CodeSpaceMap); ok {
+		r0 = rf(workspaceID, userPubkey)
+	} else {
+		r0 = ret.Get(0).(db.CodeSpaceMap)
+	}
+
+	if rf, ok := ret.Get(1).(func(string, string) error); ok {
+		r1 = rf(workspaceID, userPubkey)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
+type Database_GetCodeSpaceMapByWorkspaceAndUser_Call struct {
+	*mock.Call
+}
+
+func (_e *Database_Expecter) GetCodeSpaceMapByWorkspaceAndUser(workspaceID interface{}, userPubkey interface{}) *Database_GetCodeSpaceMapByWorkspaceAndUser_Call {
+	return &Database_GetCodeSpaceMapByWorkspaceAndUser_Call{Call: _e.mock.On("GetCodeSpaceMapByWorkspaceAndUser", workspaceID, userPubkey)}
+}
+
+func (_c *Database_GetCodeSpaceMapByWorkspaceAndUser_Call) Run(run func(workspaceID string, userPubkey string)) *Database_GetCodeSpaceMapByWorkspaceAndUser_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(string), args[1].(string))
+	})
+	return _c
+}
+
+func (_c *Database_GetCodeSpaceMapByWorkspaceAndUser_Call) Return(_a0 db.CodeSpaceMap, _a1 error) *Database_GetCodeSpaceMapByWorkspaceAndUser_Call {
+	_c.Call.Return(_a0, _a1)
+	return _c
+}
+
+func (_c *Database_GetCodeSpaceMapByWorkspaceAndUser_Call) RunAndReturn(run func(string, string) (db.CodeSpaceMap, error)) *Database_GetCodeSpaceMapByWorkspaceAndUser_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
+func (_m *Database) GetCodeSpaceMapByUser(userPubkey string) ([]db.CodeSpaceMap, error) {
+	ret := _m.Called(userPubkey)
+
+	if len(ret) == 0 {
+		panic("no return value specified for GetCodeSpaceMapByUser")
+	}
+
+	var r0 []db.CodeSpaceMap
+	var r1 error
+	if rf, ok := ret.Get(0).(func(string) ([]db.CodeSpaceMap, error)); ok {
+		return rf(userPubkey)
+	}
+	if rf, ok := ret.Get(0).(func(string) []db.CodeSpaceMap); ok {
+		r0 = rf(userPubkey)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).([]db.CodeSpaceMap)
+		}
+	}
+
+	if rf, ok := ret.Get(1).(func(string) error); ok {
+		r1 = rf(userPubkey)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
+type Database_GetCodeSpaceMapByUser_Call struct {
+	*mock.Call
+}
+
+func (_e *Database_Expecter) GetCodeSpaceMapByUser(userPubkey interface{}) *Database_GetCodeSpaceMapByUser_Call {
+	return &Database_GetCodeSpaceMapByUser_Call{Call: _e.mock.On("GetCodeSpaceMapByUser", userPubkey)}
+}
+
+func (_c *Database_GetCodeSpaceMapByUser_Call) Run(run func(userPubkey string)) *Database_GetCodeSpaceMapByUser_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(string))
+	})
+	return _c
+}
+
+func (_c *Database_GetCodeSpaceMapByUser_Call) Return(_a0 []db.CodeSpaceMap, _a1 error) *Database_GetCodeSpaceMapByUser_Call {
+	_c.Call.Return(_a0, _a1)
+	return _c
+}
+
+func (_c *Database_GetCodeSpaceMapByUser_Call) RunAndReturn(run func(string) ([]db.CodeSpaceMap, error)) *Database_GetCodeSpaceMapByUser_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
+func (_m *Database) GetCodeSpaceMapByURL(codeSpaceURL string) ([]db.CodeSpaceMap, error) {
+	ret := _m.Called(codeSpaceURL)
+
+	if len(ret) == 0 {
+		panic("no return value specified for GetCodeSpaceMapByURL")
+	}
+
+	var r0 []db.CodeSpaceMap
+	var r1 error
+	if rf, ok := ret.Get(0).(func(string) ([]db.CodeSpaceMap, error)); ok {
+		return rf(codeSpaceURL)
+	}
+	if rf, ok := ret.Get(0).(func(string) []db.CodeSpaceMap); ok {
+		r0 = rf(codeSpaceURL)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).([]db.CodeSpaceMap)
+		}
+	}
+
+	if rf, ok := ret.Get(1).(func(string) error); ok {
+		r1 = rf(codeSpaceURL)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
+type Database_GetCodeSpaceMapByURL_Call struct {
+	*mock.Call
+}
+
+func (_e *Database_Expecter) GetCodeSpaceMapByURL(codeSpaceURL interface{}) *Database_GetCodeSpaceMapByURL_Call {
+	return &Database_GetCodeSpaceMapByURL_Call{Call: _e.mock.On("GetCodeSpaceMapByURL", codeSpaceURL)}
+}
+
+func (_c *Database_GetCodeSpaceMapByURL_Call) Run(run func(codeSpaceURL string)) *Database_GetCodeSpaceMapByURL_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(string))
+	})
+	return _c
+}
+
+func (_c *Database_GetCodeSpaceMapByURL_Call) Return(_a0 []db.CodeSpaceMap, _a1 error) *Database_GetCodeSpaceMapByURL_Call {
+	_c.Call.Return(_a0, _a1)
+	return _c
+}
+
+func (_c *Database_GetCodeSpaceMapByURL_Call) RunAndReturn(run func(string) ([]db.CodeSpaceMap, error)) *Database_GetCodeSpaceMapByURL_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
+
+func (_m *Database) GetCodeSpaceMapByID(id uuid.UUID) (db.CodeSpaceMap, error) {
+	ret := _m.Called(id)
+
+	if len(ret) == 0 {
+		panic("no return value specified for GetCodeSpaceMapByID")
+	}
+
+	var r0 db.CodeSpaceMap
+	var r1 error
+	if rf, ok := ret.Get(0).(func(uuid.UUID) (db.CodeSpaceMap, error)); ok {
+		return rf(id)
+	}
+	if rf, ok := ret.Get(0).(func(uuid.UUID) db.CodeSpaceMap); ok {
+		r0 = rf(id)
+	} else {
+		r0 = ret.Get(0).(db.CodeSpaceMap)
+	}
+
+	if rf, ok := ret.Get(1).(func(uuid.UUID) error); ok {
+		r1 = rf(id)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
+type Database_GetCodeSpaceMapByID_Call struct {
+	*mock.Call
+}
+
+func (_e *Database_Expecter) GetCodeSpaceMapByID(id interface{}) *Database_GetCodeSpaceMapByID_Call {
+	return &Database_GetCodeSpaceMapByID_Call{Call: _e.mock.On("GetCodeSpaceMapByID", id)}
+}
+
+func (_c *Database_GetCodeSpaceMapByID_Call) Run(run func(id uuid.UUID)) *Database_GetCodeSpaceMapByID_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(uuid.UUID))
+	})
+	return _c
+}
+
+func (_c *Database_GetCodeSpaceMapByID_Call) Return(_a0 db.CodeSpaceMap, _a1 error) *Database_GetCodeSpaceMapByID_Call {
+	_c.Call.Return(_a0, _a1)
+	return _c
+}
+
+func (_c *Database_GetCodeSpaceMapByID_Call) RunAndReturn(run func(uuid.UUID) (db.CodeSpaceMap, error)) *Database_GetCodeSpaceMapByID_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
+func (_m *Database) UpdateCodeSpaceMap(id uuid.UUID, updates map[string]interface{}) (db.CodeSpaceMap, error) {
+	ret := _m.Called(id, updates)
+
+	if len(ret) == 0 {
+		panic("no return value specified for UpdateCodeSpaceMap")
+	}
+
+	var r0 db.CodeSpaceMap
+	var r1 error
+	if rf, ok := ret.Get(0).(func(uuid.UUID, map[string]interface{}) (db.CodeSpaceMap, error)); ok {
+		return rf(id, updates)
+	}
+	if rf, ok := ret.Get(0).(func(uuid.UUID, map[string]interface{}) db.CodeSpaceMap); ok {
+		r0 = rf(id, updates)
+	} else {
+		r0 = ret.Get(0).(db.CodeSpaceMap)
+	}
+
+	if rf, ok := ret.Get(1).(func(uuid.UUID, map[string]interface{}) error); ok {
+		r1 = rf(id, updates)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
+type Database_UpdateCodeSpaceMap_Call struct {
+	*mock.Call
+}
+
+func (_e *Database_Expecter) UpdateCodeSpaceMap(id interface{}, updates interface{}) *Database_UpdateCodeSpaceMap_Call {
+	return &Database_UpdateCodeSpaceMap_Call{Call: _e.mock.On("UpdateCodeSpaceMap", id, updates)}
+}
+
+func (_c *Database_UpdateCodeSpaceMap_Call) Run(run func(id uuid.UUID, updates map[string]interface{})) *Database_UpdateCodeSpaceMap_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(uuid.UUID), args[1].(map[string]interface{}))
+	})
+	return _c
+}
+
+func (_c *Database_UpdateCodeSpaceMap_Call) Return(_a0 db.CodeSpaceMap, _a1 error) *Database_UpdateCodeSpaceMap_Call {
+	_c.Call.Return(_a0, _a1)
+	return _c
+}
+
+func (_c *Database_UpdateCodeSpaceMap_Call) RunAndReturn(run func(uuid.UUID, map[string]interface{}) (db.CodeSpaceMap, error)) *Database_UpdateCodeSpaceMap_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
+
+func (_m *Database) DeleteCodeSpaceMap(id uuid.UUID) error {
+	ret := _m.Called(id)
+
+	if len(ret) == 0 {
+		panic("no return value specified for DeleteCodeSpaceMap")
+	}
+
+	var r0 error
+	if rf, ok := ret.Get(0).(func(uuid.UUID) error); ok {
+		r0 = rf(id)
+	} else {
+		r0 = ret.Error(0)
+	}
+
+	return r0
+}
+
+type Database_DeleteCodeSpaceMap_Call struct {
+	*mock.Call
+}
+
+func (_e *Database_Expecter) DeleteCodeSpaceMap(id interface{}) *Database_DeleteCodeSpaceMap_Call {
+	return &Database_DeleteCodeSpaceMap_Call{Call: _e.mock.On("DeleteCodeSpaceMap", id)}
+}
+
+func (_c *Database_DeleteCodeSpaceMap_Call) Run(run func(id uuid.UUID)) *Database_DeleteCodeSpaceMap_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(uuid.UUID))
+	})
+	return _c
+}
+
+func (_c *Database_DeleteCodeSpaceMap_Call) Return(_a0 error) *Database_DeleteCodeSpaceMap_Call {
+	_c.Call.Return(_a0)
+	return _c
+}
+
+func (_c *Database_DeleteCodeSpaceMap_Call) RunAndReturn(run func(uuid.UUID) error) *Database_DeleteCodeSpaceMap_Call {
+	_c.Call.Return(run)
+	return _c
+}
