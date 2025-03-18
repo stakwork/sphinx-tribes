@@ -23,26 +23,35 @@ type Registry struct {
 	mutex   *sync.RWMutex
 }
 
-func GenerateClientKey(sseURL, chatID string) string {
+func GenerateClientKey(chatID, sseURL string) string {
 	return fmt.Sprintf("%s:%s", chatID, sseURL)
 }
 
 func (r *Registry) Register(client *Client) {
 	r.mutex.Lock()
 	defer r.mutex.Unlock()
-	key := GenerateClientKey(client.URL, client.ChatID)
+	key := GenerateClientKey(client.ChatID, client.URL)
 	r.clients[key] = client
 }
 
 func (r *Registry) Unregister(sseURL, chatID string) bool {
 	r.mutex.Lock()
 	defer r.mutex.Unlock()
+	
 	key := GenerateClientKey(chatID, sseURL)
+	logger.Log.Info("Attempting to unregister client with key: %s", key)
+	
 	if client, exists := r.clients[key]; exists {
 		client.Stop()
 		delete(r.clients, key)
 		return true
 	}
+	
+	logger.Log.Info("No client found. Currently registered clients:")
+	for k := range r.clients {
+		logger.Log.Info("- %s", k)
+	}
+	
 	return false
 }
 
@@ -249,7 +258,8 @@ func (r *Registry) HasClient(sseURL, chatID string) bool {
 	r.mutex.RLock()
 	defer r.mutex.RUnlock()
 
-	key := GenerateClientKey(sseURL, chatID)
+	key := GenerateClientKey(chatID, sseURL)
+	logger.Log.Info("Checking for client with key: %s", key)
 	_, exists := r.clients[key]
 
 	return exists
