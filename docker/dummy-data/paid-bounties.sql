@@ -451,4 +451,19 @@ INSERT INTO bounty (
     NOW() - INTERVAL '12 hours', 
     NOW() - INTERVAL '6 hours', 
     ARRAY['HTML', 'JavaScript', 'SEO'], 'phase-148', 3, false, false
+),
+(
+    'owner123', true, true, true, 'feature', 'cash', 25, 
+    '2023-12-30', 12500, 375000, 'Setup a Rust Rocket Web Server', 'rust-server', '0430a9b0f2a0bad383b1b3a1989571b90f7486a86629e040c603f6f9ecec857505fd2b1279ccce579dbe59cc88d8d49b7543bd62051b1417cafa6bb2e4fd011d30', 
+    'https://github.com/org/repo/issues/21', 'workspace-uuid-133', 'feature-uuid-143', 
+    'We need an Http Server the web and mobile app can connect', 'backend', 
+    'Setup Unit and Integration test', true, 'Setup the Backend Server', 
+    '8 days', '2023-12-10', 
+    EXTRACT(EPOCH FROM (NOW() - INTERVAL '15 days'))::bigint,
+    NOW() - INTERVAL '13 days', 
+    NOW() - INTERVAL '12 days', 
+    NOW() - INTERVAL '8 days', 
+    NOW() - INTERVAL '7 days', 
+    NOW() - INTERVAL '6 days', 
+    ARRAY['Rust', 'Rocket', 'YAML'], 'phase-143', 1, false, false
 );
