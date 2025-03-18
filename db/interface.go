@@ -337,6 +337,7 @@ type Database interface {
 	DeleteSSEMessageLog(id uuid.UUID) error
 	UpdateSSEMessageLogStatusBatch(ids []uuid.UUID) error
 	UpdateSSEMessageLog(id uuid.UUID, updates map[string]interface{}) (*SSEMessageLog, error)
+	GetSSEMessagesByChatID(chatID string, limit int, offset int, status string) ([]SSEMessageLog, int64, error)
 	GetSSEMessageLogByID(id uuid.UUID) (*SSEMessageLog, error)
 	GetSSEMessageLogsByChatID(chatID string) ([]SSEMessageLog, error)
 	GetNewSSEMessageLogsByChatID(chatID string) ([]SSEMessageLog, error)
