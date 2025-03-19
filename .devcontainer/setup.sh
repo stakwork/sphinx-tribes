@@ -2,7 +2,7 @@
 
 cd /workspaces
 
-git clone https://github.com/stakwork/sphinx-tribes-frontend -b fix/test-user-codespaces
+git clone https://github.com/stakwork/sphinx-tribes-frontend
 
 cd sphinx-tribes
 
