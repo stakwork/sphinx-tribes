@@ -85,7 +85,7 @@ func (db database) UpdateSSEMessageLog(id uuid.UUID, updates map[string]interfac
 	eventUpdate, hasEvent := updates["event"]
 	if hasEvent {
 		delete(updates, "event")
-		
+
 		if eventMap, ok := eventUpdate.(map[string]interface{}); ok {
 			messageLog.Event = eventMap
 		}
@@ -149,4 +149,32 @@ func (db database) GetNewSSEMessageLogsByChatID(chatID string) ([]SSEMessageLog,
 	}
 
 	return messageLogs, nil
-} 
+}
+
+func (db database) GetSSEMessagesByChatID(chatID string, limit int, offset int, status string) ([]SSEMessageLog, int64, error) {
+	var messages []SSEMessageLog
+	var total int64
+
+	if chatID == "" {
+		return nil, 0, errors.New("chat ID is required")
+	}
+
+	query := db.db.Model(&SSEMessageLog{}).Where("chat_id = ?", chatID)
+
+	if status != "" {
+		query = query.Where("status = ?", status)
+	}
+
+	if err := query.Count(&total).Error; err != nil {
+		return nil, 0, fmt.Errorf("failed to count SSE messages for chat %s: %w", chatID, err)
+	}
+
+	if err := query.Order("created_at DESC").
+		Limit(limit).
+		Offset(offset).
+		Find(&messages).Error; err != nil {
+		return nil, 0, fmt.Errorf("failed to retrieve SSE messages for chat %s: %w", chatID, err)
+	}
+
+	return messages, total, nil
+}

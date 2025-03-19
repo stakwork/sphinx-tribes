@@ -1951,3 +1951,51 @@ func SendEventPayloadToWebhook(database db.Database, chatID string, webhookURL s
 
 	log.Printf("Successfully sent %d events for chatID %s to webhook %s", len(unsentEvents), chatID, webhookURL)
 }
+
+func (ch *ChatHandler) GetAllSSEMessagesByChatID(w http.ResponseWriter, r *http.Request) {
+	chatID := chi.URLParam(r, "chat_id")
+	if chatID == "" {
+		w.WriteHeader(http.StatusBadRequest)
+		json.NewEncoder(w).Encode(ChatResponse{
+			Success: false,
+			Message: "Chat ID is required",
+		})
+		return
+	}
+
+	limit := 200
+	offset := 0
+	if limitStr := r.URL.Query().Get("limit"); limitStr != "" {
+		if l, err := strconv.Atoi(limitStr); err == nil && l > 0 {
+			limit = l
+		}
+	}
+	if offsetStr := r.URL.Query().Get("offset"); offsetStr != "" {
+		if o, err := strconv.Atoi(offsetStr); err == nil && o >= 0 {
+			offset = o
+		}
+	}
+	status := r.URL.Query().Get("status")
+
+	messages, total, err := ch.db.GetSSEMessagesByChatID(chatID, limit, offset, status)
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		json.NewEncoder(w).Encode(ChatResponse{
+			Success: false,
+			Message: fmt.Sprintf("Failed to retrieve SSE messages: %v", err),
+		})
+		return
+	}
+
+	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode(ChatResponse{
+		Success: true,
+		Message: fmt.Sprintf("Retrieved %d SSE messages", len(messages)),
+		Data: map[string]interface{}{
+			"messages": messages,
+			"total":    total,
+			"limit":    limit,
+			"offset":   offset,
+		},
+	})
+}

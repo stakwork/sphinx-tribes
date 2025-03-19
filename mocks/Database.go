@@ -15821,7 +15821,6 @@ func NewDatabase(t interface {
 	return mock
 }
 
-
 func (_m *Database) CreateOrEditChatWorkflow(workflow *db.ChatWorkflow) (*db.ChatWorkflow, error) {
 	ret := _m.Called(workflow)
 
@@ -15876,7 +15875,6 @@ func (_c *Database_CreateOrEditChatWorkflow_Call) RunAndReturn(run func(*db.Chat
 	return _c
 }
 
-
 func (_m *Database) GetChatWorkflowByWorkspaceID(workspaceID string) (*db.ChatWorkflow, error) {
 	ret := _m.Called(workspaceID)
 
@@ -15910,7 +15908,6 @@ type Database_GetChatWorkflowByWorkspaceID_Call struct {
 	*mock.Call
 }
 
-
 func (_e *Database_Expecter) GetChatWorkflowByWorkspaceID(workspaceID interface{}) *Database_GetChatWorkflowByWorkspaceID_Call {
 	return &Database_GetChatWorkflowByWorkspaceID_Call{Call: _e.mock.On("GetChatWorkflowByWorkspaceID", workspaceID)}
 }
@@ -15931,7 +15928,6 @@ func (_c *Database_GetChatWorkflowByWorkspaceID_Call) RunAndReturn(run func(stri
 	_c.Call.Return(run)
 	return _c
 }
-
 
 func (_m *Database) DeleteChatWorkflow(workspaceID string) error {
 	ret := _m.Called(workspaceID)
@@ -16029,8 +16025,6 @@ func (_c *Database_CreateSkill_Call) RunAndReturn(run func(*db.Skill) (*db.Skill
 	return _c
 }
 
-
-
 func (_m *Database) GetAllSkills() ([]db.Skill, error) {
 	ret := _m.Called()
 
@@ -16113,6 +16107,7 @@ func (_m *Database) GetSkillByID(id uuid.UUID) (*db.Skill, error) {
 
 	return r0, r1
 }
+
 type Database_GetSkillByID_Call struct {
 	*mock.Call
 }
@@ -16137,7 +16132,6 @@ func (_c *Database_GetSkillByID_Call) RunAndReturn(run func(uuid.UUID) (*db.Skil
 	_c.Call.Return(run)
 	return _c
 }
-
 
 func (_m *Database) UpdateSkillByID(skill *db.Skill) (*db.Skill, error) {
 	ret := _m.Called(skill)
@@ -16193,7 +16187,6 @@ func (_c *Database_UpdateSkillByID_Call) RunAndReturn(run func(*db.Skill) (*db.S
 	return _c
 }
 
-
 func (_m *Database) DeleteSkillByID(id uuid.UUID) error {
 	ret := _m.Called(id)
 
@@ -16236,7 +16229,6 @@ func (_c *Database_DeleteSkillByID_Call) RunAndReturn(run func(uuid.UUID) error)
 	return _c
 }
 
-
 func (_m *Database) CreateSkillInstall(install *db.SkillInstall) (*db.SkillInstall, error) {
 	ret := _m.Called(install)
 
@@ -16269,7 +16261,6 @@ func (_m *Database) CreateSkillInstall(install *db.SkillInstall) (*db.SkillInsta
 type Database_CreateSkillInstall_Call struct {
 	*mock.Call
 }
-
 
 func (_e *Database_Expecter) CreateSkillInstall(install interface{}) *Database_CreateSkillInstall_Call {
 	return &Database_CreateSkillInstall_Call{Call: _e.mock.On("CreateSkillInstall", install)}
@@ -16325,7 +16316,6 @@ type Database_GetSkillInstallBySkillsID_Call struct {
 	*mock.Call
 }
 
-
 func (_e *Database_Expecter) GetSkillInstallBySkillsID(skillID interface{}) *Database_GetSkillInstallBySkillsID_Call {
 	return &Database_GetSkillInstallBySkillsID_Call{Call: _e.mock.On("GetSkillInstallBySkillsID", skillID)}
 }
@@ -16346,7 +16336,6 @@ func (_c *Database_GetSkillInstallBySkillsID_Call) RunAndReturn(run func(uuid.UU
 	_c.Call.Return(run)
 	return _c
 }
-
 
 func (_m *Database) GetSkillInstallByID(id uuid.UUID) (*db.SkillInstall, error) {
 	ret := _m.Called(id)
@@ -16381,7 +16370,6 @@ type Database_GetSkillInstallByID_Call struct {
 	*mock.Call
 }
 
-
 func (_e *Database_Expecter) GetSkillInstallByID(id interface{}) *Database_GetSkillInstallByID_Call {
 	return &Database_GetSkillInstallByID_Call{Call: _e.mock.On("GetSkillInstallByID", id)}
 }
@@ -16402,7 +16390,6 @@ func (_c *Database_GetSkillInstallByID_Call) RunAndReturn(run func(uuid.UUID) (*
 	_c.Call.Return(run)
 	return _c
 }
-
 
 func (_m *Database) UpdateSkillInstallByID(install *db.SkillInstall) (*db.SkillInstall, error) {
 	ret := _m.Called(install)
@@ -16458,7 +16445,6 @@ func (_c *Database_UpdateSkillInstallByID_Call) RunAndReturn(run func(*db.SkillI
 	return _c
 }
 
-
 func (_m *Database) DeleteSkillInstallByID(id uuid.UUID) error {
 	ret := _m.Called(id)
 
@@ -16475,6 +16461,7 @@ func (_m *Database) DeleteSkillInstallByID(id uuid.UUID) error {
 
 	return r0
 }
+
 type Database_DeleteSkillInstallByID_Call struct {
 	*mock.Call
 }
@@ -16553,7 +16540,6 @@ func (_c *Database_CreateSSEMessageLog_Call) RunAndReturn(run func(map[string]in
 	_c.Call.Return(run)
 	return _c
 }
-
 
 func (_m *Database) DeleteSSEMessageLog(id uuid.UUID) error {
 	ret := _m.Called(id)
@@ -16639,7 +16625,6 @@ func (_c *Database_UpdateSSEMessageLogStatusBatch_Call) RunAndReturn(run func([]
 	return _c
 }
 
-
 func (_m *Database) UpdateSSEMessageLog(id uuid.UUID, updates map[string]interface{}) (*db.SSEMessageLog, error) {
 	ret := _m.Called(id, updates)
 
@@ -16694,7 +16679,6 @@ func (_c *Database_UpdateSSEMessageLog_Call) RunAndReturn(run func(uuid.UUID, ma
 	return _c
 }
 
-
 func (_m *Database) GetSSEMessageLogByID(id uuid.UUID) (*db.SSEMessageLog, error) {
 	ret := _m.Called(id)
 
@@ -16728,7 +16712,6 @@ type Database_GetSSEMessageLogByID_Call struct {
 	*mock.Call
 }
 
-
 func (_e *Database_Expecter) GetSSEMessageLogByID(id interface{}) *Database_GetSSEMessageLogByID_Call {
 	return &Database_GetSSEMessageLogByID_Call{Call: _e.mock.On("GetSSEMessageLogByID", id)}
 }
@@ -16749,7 +16732,6 @@ func (_c *Database_GetSSEMessageLogByID_Call) RunAndReturn(run func(uuid.UUID) (
 	_c.Call.Return(run)
 	return _c
 }
-
 
 func (_m *Database) GetSSEMessageLogsByChatID(chatID string) ([]db.SSEMessageLog, error) {
 	ret := _m.Called(chatID)
@@ -16804,7 +16786,6 @@ func (_c *Database_GetSSEMessageLogsByChatID_Call) RunAndReturn(run func(string)
 	_c.Call.Return(run)
 	return _c
 }
-
 
 func (_m *Database) GetNewSSEMessageLogsByChatID(chatID string) ([]db.SSEMessageLog, error) {
 	ret := _m.Called(chatID)
@@ -16965,7 +16946,6 @@ func (_c *Database_GetCodeSpaceMaps_Call) RunAndReturn(run func() ([]db.CodeSpac
 	_c.Call.Return(run)
 	return _c
 }
-
 
 func (_m *Database) GetCodeSpaceMapByWorkspace(workspaceID string) ([]db.CodeSpaceMap, error) {
 	ret := _m.Called(workspaceID)
@@ -17181,7 +17161,6 @@ func (_c *Database_GetCodeSpaceMapByURL_Call) RunAndReturn(run func(string) ([]d
 	return _c
 }
 
-
 func (_m *Database) GetCodeSpaceMapByID(id uuid.UUID) (db.CodeSpaceMap, error) {
 	ret := _m.Called(id)
 
@@ -17286,7 +17265,6 @@ func (_c *Database_UpdateCodeSpaceMap_Call) RunAndReturn(run func(uuid.UUID, map
 	return _c
 }
 
-
 func (_m *Database) DeleteCodeSpaceMap(id uuid.UUID) error {
 	ret := _m.Called(id)
 
@@ -17325,6 +17303,74 @@ func (_c *Database_DeleteCodeSpaceMap_Call) Return(_a0 error) *Database_DeleteCo
 }
 
 func (_c *Database_DeleteCodeSpaceMap_Call) RunAndReturn(run func(uuid.UUID) error) *Database_DeleteCodeSpaceMap_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
+// GetSSEMessagesByChatID provides a mock function with given fields: chatID, limit, offset, status
+func (_m *Database) GetSSEMessagesByChatID(chatID string, limit int, offset int, status string) ([]db.SSEMessageLog, int64, error) {
+	ret := _m.Called(chatID, limit, offset, status)
+
+	if len(ret) == 0 {
+		panic("no return value specified for GetSSEMessagesByChatID")
+	}
+
+	var r0 []db.SSEMessageLog
+	var r1 int64
+	var r2 error
+	if rf, ok := ret.Get(0).(func(string, int, int, string) ([]db.SSEMessageLog, int64, error)); ok {
+		return rf(chatID, limit, offset, status)
+	}
+	if rf, ok := ret.Get(0).(func(string, int, int, string) []db.SSEMessageLog); ok {
+		r0 = rf(chatID, limit, offset, status)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).([]db.SSEMessageLog)
+		}
+	}
+
+	if rf, ok := ret.Get(1).(func(string, int, int, string) int64); ok {
+		r1 = rf(chatID, limit, offset, status)
+	} else {
+		r1 = ret.Get(1).(int64)
+	}
+
+	if rf, ok := ret.Get(2).(func(string, int, int, string) error); ok {
+		r2 = rf(chatID, limit, offset, status)
+	} else {
+		r2 = ret.Error(2)
+	}
+
+	return r0, r1, r2
+}
+
+// Database_GetSSEMessagesByChatID_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'GetSSEMessagesByChatID'
+type Database_GetSSEMessagesByChatID_Call struct {
+	*mock.Call
+}
+
+// GetSSEMessagesByChatID is a helper method to define mock.On call
+//   - chatID string
+//   - limit int
+//   - offset int
+//   - status string
+func (_e *Database_Expecter) GetSSEMessagesByChatID(chatID interface{}, limit interface{}, offset interface{}, status interface{}) *Database_GetSSEMessagesByChatID_Call {
+	return &Database_GetSSEMessagesByChatID_Call{Call: _e.mock.On("GetSSEMessagesByChatID", chatID, limit, offset, status)}
+}
+
+func (_c *Database_GetSSEMessagesByChatID_Call) Run(run func(chatID string, limit int, offset int, status string)) *Database_GetSSEMessagesByChatID_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(string), args[1].(int), args[2].(int), args[3].(string))
+	})
+	return _c
+}
+
+func (_c *Database_GetSSEMessagesByChatID_Call) Return(_a0 []db.SSEMessageLog, _a1 int64, _a2 error) *Database_GetSSEMessagesByChatID_Call {
+	_c.Call.Return(_a0, _a1, _a2)
+	return _c
+}
+
+func (_c *Database_GetSSEMessagesByChatID_Call) RunAndReturn(run func(string, int, int, string) ([]db.SSEMessageLog, int64, error)) *Database_GetSSEMessagesByChatID_Call {
 	_c.Call.Return(run)
 	return _c
 }
