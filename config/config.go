@@ -110,6 +110,9 @@ func InitConfig() {
 
 	if Host == "" {
 		Host = "https://people.sphinx.chat"
+		if os.Getenv("ALT_HOST") != "" {
+			Host = os.Getenv("ALT_HOST")
+		}
 	}
 
 	if MemeUrl == "" {
