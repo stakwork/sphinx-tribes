@@ -24,8 +24,8 @@ func NewCodeSpaceHandler(database db.Database) *codeSpaceHandler {
 }
 
 type CodeSpaceQuery struct {
-	WorkspaceID  string `json:"workspaceID"`
-	UserPubkey   string `json:"userPubkey"`
+	WorkspaceID string `json:"workspaceID"`
+	UserPubkey  string `json:"userPubkey"`
 }
 
 type DeleteResponse struct {
@@ -86,6 +86,42 @@ func (ch *codeSpaceHandler) GetCodeSpaceMapsByWorkspace(w http.ResponseWriter, r
 	json.NewEncoder(w).Encode(codespaces)
 }
 
+func (ch *codeSpaceHandler) GetCodeSpaceMapByWorkspaceAndUser(w http.ResponseWriter, r *http.Request) {
+	ctx := r.Context()
+	pubKeyFromAuth, _ := ctx.Value(auth.ContextKey).(string)
+
+	if pubKeyFromAuth == "" {
+		logger.Log.Info("[codespace] no pubkey from auth")
+		w.WriteHeader(http.StatusUnauthorized)
+		json.NewEncoder(w).Encode(map[string]string{"error": "Unauthorized"})
+		return
+	}
+
+	workspaceID := chi.URLParam(r, "workspaceID")
+	userPubkey := chi.URLParam(r, "userPubkey")
+
+	if workspaceID == "" || userPubkey == "" {
+		w.WriteHeader(http.StatusBadRequest)
+		json.NewEncoder(w).Encode(map[string]string{"error": "Workspace ID and User public key are required"})
+		return
+	}
+
+	codespace, err := ch.db.GetCodeSpaceMapByWorkspaceAndUser(workspaceID, userPubkey)
+	if err != nil {
+		if err.Error() == "codespace mapping not found" {
+			w.WriteHeader(http.StatusNotFound)
+			json.NewEncoder(w).Encode(map[string]string{"error": "Codespace mapping not found"})
+			return
+		}
+		logger.Log.Error("[codespace] error getting codespace mapping: %v", err)
+		w.WriteHeader(http.StatusInternalServerError)
+		json.NewEncoder(w).Encode(map[string]string{"error": "Failed to retrieve codespace mapping"})
+		return
+	}
+
+	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode(codespace)
+}
 
 func (ch *codeSpaceHandler) GetCodeSpaceMapsByUser(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
@@ -116,7 +152,6 @@ func (ch *codeSpaceHandler) GetCodeSpaceMapsByUser(w http.ResponseWriter, r *htt
 	w.WriteHeader(http.StatusOK)
 	json.NewEncoder(w).Encode(codespaces)
 }
-
 
 func (ch *codeSpaceHandler) GetCodeSpaceMapsByURL(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
@@ -160,7 +195,7 @@ func (ch *codeSpaceHandler) QueryCodeSpaceMaps(w http.ResponseWriter, r *http.Re
 	}
 
 	w.Header().Set("Content-Type", "application/json")
-	
+
 	workspaceID := r.URL.Query().Get("workspaceID")
 	userPubkey := r.URL.Query().Get("userPubkey")
 
@@ -276,7 +311,6 @@ func (ch *codeSpaceHandler) CreateCodeSpaceMap(w http.ResponseWriter, r *http.Re
 	json.NewEncoder(w).Encode(createdCodeSpace)
 }
 
-
 func (ch *codeSpaceHandler) UpdateCodeSpaceMap(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 	pubKeyFromAuth, _ := ctx.Value(auth.ContextKey).(string)
@@ -342,7 +376,6 @@ func (ch *codeSpaceHandler) UpdateCodeSpaceMap(w http.ResponseWriter, r *http.Re
 	json.NewEncoder(w).Encode(updatedCodeSpace)
 }
 
-
 func (ch *codeSpaceHandler) DeleteCodeSpaceMap(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 	pubKeyFromAuth, _ := ctx.Value(auth.ContextKey).(string)
@@ -384,4 +417,4 @@ func (ch *codeSpaceHandler) DeleteCodeSpaceMap(w http.ResponseWriter, r *http.Re
 	}
 
 	json.NewEncoder(w).Encode(response)
-} 
+}
