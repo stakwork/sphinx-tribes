@@ -36,7 +36,7 @@
           "sphinx-tribes": {
             "restart": [
               "go build",
-              "./sphinx-tribes"
+              "HOST=app.github.dev ./sphinx-tribes"
             ],
             "port": 5002
           }
