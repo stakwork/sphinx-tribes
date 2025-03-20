@@ -17,6 +17,7 @@ func CodeSpaceRoutes() chi.Router {
 		r.Get("/workspaces", codeSpaceHandler.GetAllCodeSpaceMaps)
 		r.Get("/workspaces/workspace/{workspaceID}", codeSpaceHandler.GetCodeSpaceMapsByWorkspace)
 		r.Get("/workspaces/user/{userPubkey}", codeSpaceHandler.GetCodeSpaceMapsByUser)
+		r.Get("/workspaces/{workspaceID}/user/{userPubkey}", codeSpaceHandler.GetCodeSpaceMapByWorkspaceAndUser)
 		r.Get("/workspaces/codespace", codeSpaceHandler.GetCodeSpaceMapsByURL)
 		r.Get("/workspaces/query", codeSpaceHandler.QueryCodeSpaceMaps)
 		r.Post("/workspaces", codeSpaceHandler.CreateCodeSpaceMap)
@@ -25,4 +26,4 @@ func CodeSpaceRoutes() chi.Router {
 	})
 
 	return r
-} 
+}
