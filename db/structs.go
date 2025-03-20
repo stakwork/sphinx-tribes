@@ -414,6 +414,7 @@ type Bounty struct {
 	PaymentPending          bool                   `gorm:"default:false" json:"payment_pending"`
 	PaymentFailed           bool                   `gorm:"default:false" json:"payment_failed"`
 	AccessRestriction       *AccessRestrictionType `gorm:"type:varchar(20);default:null" json:"access_restriction,omitempty"`
+	UnlockCode              *string                `gorm:"type:varchar(6);default:null;index" json:"unlock_code,omitempty"`
 }
 
 // Todo: Change back to Bounty
@@ -456,6 +457,7 @@ type NewBounty struct {
 	PaymentFailed           bool                   `gorm:"default:false" json:"payment_failed"`
 	ProofOfWorkCount        int                    `gorm:"type:integer;default:0;not null" json:"pow"`
 	AccessRestriction       *AccessRestrictionType `gorm:"type:varchar(20);default:null" json:"access_restriction,omitempty"`
+	UnlockCode              *string                `gorm:"type:varchar(6);default:null;index" json:"unlock_code,omitempty"`
 }
 
 type BountyOwners struct {

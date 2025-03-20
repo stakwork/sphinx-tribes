@@ -877,7 +877,7 @@ func (db database) GetCreatedBounties(r *http.Request) ([]NewBounty, error) {
 
 func (db database) GetBountyById(id string) ([]NewBounty, error) {
 	ms := []NewBounty{}
-	err := db.db.Raw(`SELECT * FROM public.bounty WHERE id = '` + id + `'`).Find(&ms).Error
+	err := db.db.Raw("SELECT * FROM public.bounty WHERE id = ?", id).Find(&ms).Error
 	return ms, err
 }
 
