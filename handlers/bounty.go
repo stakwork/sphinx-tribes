@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"io"
 	"log"
+	"math/rand"
 	"net/http"
 	"net/url"
 	"strconv"
@@ -448,6 +449,11 @@ func (h *bountyHandler) CreateOrEditBounty(w http.ResponseWriter, r *http.Reques
 		return
 	}
 
+	if bounty.ID == 0 && !bounty.Show && bounty.UnlockCode == nil {
+		code := generateUnlockCode()
+		bounty.UnlockCode = &code
+	}
+
 	now := time.Now()
 
 	if bounty.WorkspaceUuid == "" && bounty.OrgUuid != "" {
@@ -569,6 +575,11 @@ func (h *bountyHandler) CreateOrEditBounty(w http.ResponseWriter, r *http.Reques
 
 	w.WriteHeader(http.StatusOK)
 	json.NewEncoder(w).Encode(b)
+}
+
+func generateUnlockCode() string {
+	rand.Seed(time.Now().UnixNano())
+	return fmt.Sprintf("%06d", rand.Intn(1000000))
 }
 
 // DeleteBounty godoc
@@ -778,6 +789,7 @@ func (h *bountyHandler) GenerateBountyResponse(bounties []db.NewBounty) []db.Bou
 				FeatureUuid:             bounty.FeatureUuid,
 				PhasePriority:           bounty.PhasePriority,
 				ProofOfWorkCount:        bounty.ProofOfWorkCount,
+				UnlockCode:              bounty.UnlockCode,
 				AccessRestriction:       bounty.AccessRestriction,
 			},
 			Assignee: db.Person{
