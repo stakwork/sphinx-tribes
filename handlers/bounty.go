@@ -102,36 +102,16 @@ func (h *bountyHandler) GetBountyById(w http.ResponseWriter, r *http.Request) {
 	bountyId := chi.URLParam(r, "bountyId")
 	if bountyId == "" {
 		w.WriteHeader(http.StatusNotFound)
-		return
 	}
-
 	bounties, err := h.db.GetBountyById(bountyId)
 	if err != nil {
 		w.WriteHeader(http.StatusBadRequest)
 		logger.Log.Error("[bounty] Error: %v", err)
-		return
+	} else {
+		var bountyResponse []db.BountyResponse = h.GenerateBountyResponse(bounties)
+		w.WriteHeader(http.StatusOK)
+		json.NewEncoder(w).Encode(bountyResponse)
 	}
-
-	if len(bounties) == 0 {
-		w.WriteHeader(http.StatusNotFound)
-		return
-	}
-
-	bounty := bounties[0]
-	if !bounty.Show && bounty.UnlockCode != nil {
-		unlockCode := r.URL.Query().Get("unlock")
-		if unlockCode == "" || unlockCode != *bounty.UnlockCode {
-			w.WriteHeader(http.StatusUnauthorized)
-			json.NewEncoder(w).Encode(map[string]string{
-				"error": "This bounty requires an unlock code",
-			})
-			return
-		}
-	}
-
-	var bountyResponse []db.BountyResponse = h.GenerateBountyResponse(bounties)
-	w.WriteHeader(http.StatusOK)
-	json.NewEncoder(w).Encode(bountyResponse)
 }
 
 // GetNextBountyByCreated godoc
