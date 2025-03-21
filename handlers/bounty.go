@@ -449,7 +449,7 @@ func (h *bountyHandler) CreateOrEditBounty(w http.ResponseWriter, r *http.Reques
 		return
 	}
 
-	if bounty.ID == 0 && !bounty.Show && bounty.UnlockCode == nil {
+	if bounty.ID == 0 && bounty.UnlockCode == nil {
 		code := generateUnlockCode()
 		bounty.UnlockCode = &code
 	}
