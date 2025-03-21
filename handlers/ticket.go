@@ -851,7 +851,7 @@ func (th *ticketHandler) ProcessTicketReview(w http.ResponseWriter, r *http.Requ
 	json.NewEncoder(w).Encode(createdTicket)
 }
 
-// GetTicketsByGroup godoc
+// GetTicketsByPhaseUUID godoc
 //
 //	@Summary		Get Tickets by Phase UUID
 //	@Description	Get tickets by phase UUID
@@ -1111,7 +1111,7 @@ func (th *ticketHandler) CreateWorkspaceDraftTicket(w http.ResponseWriter, r *ht
 	json.NewEncoder(w).Encode(createdTicket)
 }
 
-// GetWorkspaceDraftTickets godoc
+// GetWorkspaceDraftTicket godoc
 //
 //	@Summary		Get Workspace Draft Ticket
 //	@Description	Get a draft ticket for a workspace by its UUID
