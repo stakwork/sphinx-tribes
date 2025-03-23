@@ -298,7 +298,7 @@ func (h *bountyHandler) GetPersonAssignedBounties(w http.ResponseWriter, r *http
 }
 
 func getContactKey(pubkey string) (*string, error) {
-	url := fmt.Sprintf("%s/contact/%s", config.V2BotUrl, pubkey)
+	url := fmt.Sprintf("%s/get_contact/%s", config.V2BotUrl, pubkey)
 	req, err := http.NewRequest(http.MethodGet, url, nil)
 	if err != nil {
 		return nil, fmt.Errorf("error creating request: %v", err)
@@ -314,6 +314,7 @@ func getContactKey(pubkey string) (*string, error) {
 	var contactResp struct {
 		ContactKey *string `json:"contact_key"`
 	}
+
 	if err := json.NewDecoder(resp.Body).Decode(&contactResp); err != nil {
 		return nil, fmt.Errorf("error decoding contact response: %v", err)
 	}
@@ -379,7 +380,7 @@ func sendNotification(pubkey, content string) string {
 	return sendResp.Status
 }
 
-func processNotification(pubkey, event, content, alias string) string {
+func processNotification(pubkey, event, content, alias string, route_hint string) string {
 	contactKey, err := getContactKey(pubkey)
 	if err != nil {
 		logger.Log.Error("Error checking contact key: %v", err)
@@ -387,8 +388,11 @@ func processNotification(pubkey, event, content, alias string) string {
 	}
 
 	if contactKey == nil {
+
+		contact_info := fmt.Sprintf("%s_%s", pubkey, route_hint)
+		logger.Log.Info("Sending contact info: %v", contact_info)
 		addContactURL := fmt.Sprintf("%s/add_contact", config.V2BotUrl)
-		body, _ := json.Marshal(map[string]string{"contact_info": pubkey, "alias": alias})
+		body, _ := json.Marshal(map[string]string{"contact_info": contact_info, "alias": alias})
 		req, _ := http.NewRequest(http.MethodPost, addContactURL, bytes.NewBuffer(body))
 		req.Header.Set("Content-Type", "application/json")
 		req.Header.Set("x-admin-token", config.V2BotToken)
@@ -455,7 +459,7 @@ func (h *bountyHandler) CreateOrEditBounty(w http.ResponseWriter, r *http.Reques
 			bounty.UnlockCode = existingBounty.UnlockCode
 		}
 	}
-	
+
 	if bounty.UnlockCode == nil {
 		code := generateUnlockCode()
 		bounty.UnlockCode = &code
@@ -498,8 +502,6 @@ func (h *bountyHandler) CreateOrEditBounty(w http.ResponseWriter, r *http.Reques
 			}
 		}
 
-		msg := fmt.Sprintf("You have been assigned a new ticket: %s.", bounty.Title)
-		processNotification(bounty.Assignee, "bounty_assigned", msg, user.OwnerAlias)
 	}
 
 	if bounty.Tribe == "" {
@@ -566,7 +568,7 @@ func (h *bountyHandler) CreateOrEditBounty(w http.ResponseWriter, r *http.Reques
 			return
 		}
 	}
-
+	existingBounty := h.db.GetBounty(bounty.ID)
 	b, err := h.db.CreateOrEditBounty(bounty)
 	if err != nil {
 		logger.Log.Error("[bounty] Error: %v", err)
@@ -578,6 +580,22 @@ func (h *bountyHandler) CreateOrEditBounty(w http.ResponseWriter, r *http.Reques
 		if err := h.db.StartBountyTiming(b.ID); err != nil {
 			handleTimingError(w, "start_timing", err)
 		}
+	}
+
+	if bounty.Assignee != "" {
+		msg := fmt.Sprintf("You have been assigned a new ticket: %s.", bounty.Title)
+		assigneePubkey := bounty.Assignee
+		if bounty.ID != 0 {
+			if existingBounty.Assignee != "" && existingBounty.Assignee == bounty.Assignee {
+				assigneePubkey = ""
+			}
+		}
+
+		if assigneePubkey != "" {
+			person := db.DB.GetPersonByPubkey(assigneePubkey)
+			processNotification(assigneePubkey, "bounty_assigned", msg, person.OwnerAlias, person.OwnerRouteHint)
+		}
+
 	}
 
 	w.WriteHeader(http.StatusOK)
