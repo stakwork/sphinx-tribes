@@ -380,6 +380,7 @@ func buildVarsPayload(request SendMessageRequest, createdMessage *db.ChatMessage
 		"alias":             user.OwnerAlias,
 		"pdf_url":           request.PDFURL,
 		"modelSelection":    request.ModelSelection,
+		"workspaceId":       request.WorkspaceUUID,
 	}
 
 	if codeGraph != nil && codeGraph.Url != "" {
