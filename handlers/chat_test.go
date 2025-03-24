@@ -891,12 +891,12 @@ func TestProcessChatResponse(t *testing.T) {
 				Success: true,
 				Message: "Response processed successfully",
 				Data: &db.ChatMessage{
-					ID:        "msg_test_1",
-					ChatID:    "validChatId",
-					Message:   "This is a response",
-					Role:      "assistant",
-					Status:    "sent",
-					Source:    "agent",
+					ID:      "msg_test_1",
+					ChatID:  "validChatId",
+					Message: "This is a response",
+					Role:    "assistant",
+					Status:  "sent",
+					Source:  "agent",
 				},
 			},
 		},
@@ -1138,12 +1138,12 @@ func TestProcessChatResponse(t *testing.T) {
 				Success: true,
 				Message: "Response processed successfully",
 				Data: &db.ChatMessage{
-					ID:        "msg_test_artifacts_1",
-					ChatID:    "validChatId",
-					Message:   "Response with artifacts",
-					Role:      "assistant",
-					Status:    "sent",
-					Source:    "agent",
+					ID:      "msg_test_artifacts_1",
+					ChatID:  "validChatId",
+					Message: "Response with artifacts",
+					Role:    "assistant",
+					Status:  "sent",
+					Source:  "agent",
 				},
 			},
 		},
@@ -1183,12 +1183,12 @@ func TestProcessChatResponse(t *testing.T) {
 				Success: true,
 				Message: "Response processed successfully",
 				Data: &db.ChatMessage{
-					ID:        "validMessageId2",
-					ChatID:    "validChatId",
-					Message:   "Response with single artifact",
-					Role:      "assistant",
-					Status:    "sent",
-					Source:    "agent",
+					ID:      "validMessageId2",
+					ChatID:  "validChatId",
+					Message: "Response with single artifact",
+					Role:    "assistant",
+					Status:  "sent",
+					Source:  "agent",
 				},
 			},
 		},
@@ -1228,12 +1228,12 @@ func TestProcessChatResponse(t *testing.T) {
 				Success: true,
 				Message: "Response processed successfully",
 				Data: &db.ChatMessage{
-					ID:        "validMessageId3",
-					ChatID:    "validChatId",
-					Message:   "Response with invalid artifact",
-					Role:      "assistant",
-					Status:    "sent",
-					Source:    "agent",
+					ID:      "validMessageId3",
+					ChatID:  "validChatId",
+					Message: "Response with invalid artifact",
+					Role:    "assistant",
+					Status:  "sent",
+					Source:  "agent",
 				},
 			},
 		},
@@ -1264,12 +1264,12 @@ func TestProcessChatResponse(t *testing.T) {
 				Success: true,
 				Message: "Response processed successfully",
 				Data: &db.ChatMessage{
-					ID:        "validMessageId4",
-					ChatID:    "validChatId",
-					Message:   "Response with empty artifacts",
-					Role:      "assistant",
-					Status:    "sent",
-					Source:    "agent",
+					ID:      "validMessageId4",
+					ChatID:  "validChatId",
+					Message: "Response with empty artifacts",
+					Role:    "assistant",
+					Status:  "sent",
+					Source:  "agent",
 				},
 			},
 		},
@@ -2769,7 +2769,7 @@ func TestSendMessage(t *testing.T) {
 		assert.Equal(t, db.SendingStatus, messages[0].Status)
 	})
 
-	t.Run("should successfully send message with code graph", func(t *testing.T) {
+	t.Run("should successfully send message with code graph and workspaceId", func(t *testing.T) {
 		person := db.Person{
 			Uuid:        uuid.New().String(),
 			OwnerAlias:  "test-alias-code-graph",
@@ -2856,10 +2856,12 @@ func TestSendMessage(t *testing.T) {
 
 		codeGraphUrl, exist := vars["codeGraph"].(string)
 		codeGraphAlias, exists := vars["codeGraphAlias"].(string)
+		workspaceId, _ := vars["workspaceId"].(string)
 		require.True(t, exist, "codeGraph should exist in vars")
 		assert.Equal(t, "https://boltwall.swarm38.sphinx.chat", codeGraphUrl)
 		require.True(t, exists, "codeGraph should exist in vars")
 		assert.Equal(t, "{{test-secret-alias}}", codeGraphAlias)
+		assert.Equal(t, workspace.Uuid, workspaceId)
 
 	})
 
@@ -2950,65 +2952,61 @@ func TestSendMessage(t *testing.T) {
 			PriceToMeet: 0,
 			Description: "test-description",
 		}
-		createdPerson, err := db.TestDB.CreateOrEditPerson(person)
-		require.NoError(t, err)
-	
+		db.TestDB.CreateOrEditPerson(person)
+
 		workspace := db.Workspace{
 			Uuid:        uuid.New().String(),
 			Name:        "test-workspace" + uuid.New().String(),
-			OwnerPubKey: createdPerson.OwnerPubKey,
+			OwnerPubKey: person.OwnerPubKey,
 			Github:      "https://github.com/test",
 			Website:     "https://www.testwebsite.com",
 			Description: "test-description",
 		}
-		createdWorkspace, err := db.TestDB.CreateOrEditWorkspace(workspace)
-		require.NoError(t, err)
-	
+		db.TestDB.CreateOrEditWorkspace(workspace)
+
 		codeGraphUUID := uuid.New().String()
 		codeGraph := db.WorkspaceCodeGraph{
 			Uuid:          codeGraphUUID,
-			WorkspaceUuid: createdWorkspace.Uuid,
+			WorkspaceUuid: workspace.Uuid,
 			Url:           "boltwall.swarm38.sphinx.chat/",
 			SecretAlias:   "{{test-secret-alias}}",
-			CreatedBy:     createdPerson.OwnerPubKey,
-			UpdatedBy:     createdPerson.OwnerPubKey,
+			CreatedBy:     person.OwnerPubKey,
+			UpdatedBy:     person.OwnerPubKey,
 		}
-		_, err = db.TestDB.CreateOrEditCodeGraph(codeGraph)
-        require.NoError(t, err)
-	
-		retrievedCodeGraph, err := db.TestDB.GetCodeGraphByWorkspaceUuid(createdWorkspace.Uuid)
+		db.TestDB.CreateOrEditCodeGraph(codeGraph)
+
+		retrievedCodeGraph, err := db.TestDB.GetCodeGraphByWorkspaceUuid(workspace.Uuid)
 		require.NoError(t, err)
 		require.NotNil(t, retrievedCodeGraph)
-	
+
 		chat := &db.Chat{
 			ID:          uuid.New().String(),
-			WorkspaceID: createdWorkspace.Uuid,
+			WorkspaceID: workspace.Uuid,
 			Title:       "Test Chat with Code Graph in Build Mode",
 			Status:      db.ActiveStatus,
 		}
 		createdChat, err := db.TestDB.AddChat(chat)
 		require.NoError(t, err)
-	
+
 		requestBody := SendMessageRequest{
-			ChatID:            createdChat.ID,
-			Message:           "Test message with code graph in build mode",
-			ContextTags:       []struct {
+			ChatID:  createdChat.ID,
+			Message: "Test message with code graph in build mode",
+			ContextTags: []struct {
 				Type string `json:"type"`
 				ID   string `json:"id"`
 			}{},
 			SourceWebsocketID: "test-websocket-id",
-			WorkspaceUUID:     createdWorkspace.Uuid,
-			Mode:              "Build",
+			WorkspaceUUID:     workspace.Uuid,
 		}
 		bodyBytes, err := json.Marshal(requestBody)
 		require.NoError(t, err)
-	
+
 		req := httptest.NewRequest(http.MethodPost, "/send", bytes.NewReader(bodyBytes))
 		rr := httptest.NewRecorder()
-	
-		ctx := context.WithValue(req.Context(), auth.ContextKey, createdPerson.OwnerPubKey)
+
+		ctx := context.WithValue(req.Context(), auth.ContextKey, person.OwnerPubKey)
 		req = req.WithContext(ctx)
-	
+
 		var capturedPayload StakworkChatPayload
 		stakworkServer := &http.Client{
 			Transport: RoundTripFunc(func(req *http.Request) (*http.Response, error) {
@@ -3026,19 +3024,15 @@ func TestSendMessage(t *testing.T) {
 				}, nil
 			}),
 		}
-	
-		originalKey := os.Getenv("SWWFSWKEY")
-		os.Setenv("SWWFSWKEY", "test-key")
-		defer os.Setenv("SWWFSWKEY", originalKey)
-	
+
 		chatHandler := NewChatHandler(stakworkServer, db.TestDB)
 		chatHandler.SendMessage(rr, req)
-	
+
 		require.Equal(t, http.StatusOK, rr.Code)
-	
+
 		vars, ok := capturedPayload.WorkflowParams["set_var"].(map[string]interface{})["attributes"].(map[string]interface{})["vars"].(map[string]interface{})
 		require.True(t, ok, "Workflow params should contain vars")
-	
+
 		baseUrl, exist := vars["2b_base_url"].(string)
 		secret, exists := vars["secret"].(string)
 		require.True(t, exist, "2b_base_url should exist in vars")
