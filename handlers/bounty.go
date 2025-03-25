@@ -583,7 +583,7 @@ func (h *bountyHandler) CreateOrEditBounty(w http.ResponseWriter, r *http.Reques
 	}
 
 	if bounty.Assignee != "" {
-		msg := fmt.Sprintf("You have been assigned a new ticket: %s.", bounty.Title)
+		msg := fmt.Sprintf("You have been assigned a new ticket: %s. https://community.sphinx.chat/bounty/%d", bounty.Title, bounty.ID)
 		assigneePubkey := bounty.Assignee
 		if bounty.ID != 0 {
 			if existingBounty.Assignee != "" && existingBounty.Assignee == bounty.Assignee {
