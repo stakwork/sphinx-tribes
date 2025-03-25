@@ -583,7 +583,7 @@ func (h *bountyHandler) CreateOrEditBounty(w http.ResponseWriter, r *http.Reques
 	}
 
 	if bounty.Assignee != "" {
-		msg := fmt.Sprintf("You have been assigned a new ticket: %s.", bounty.Title)
+		msg := fmt.Sprintf("You have been assigned a new ticket: %s. https://community.sphinx.chat/bounty/%d", bounty.Title, bounty.ID)
 		assigneePubkey := bounty.Assignee
 		if bounty.ID != 0 {
 			if existingBounty.Assignee != "" && existingBounty.Assignee == bounty.Assignee {
@@ -2106,6 +2106,28 @@ func (h *bountyHandler) AddProofOfWork(w http.ResponseWriter, r *http.Request) {
 	if err := h.db.IncrementProofCount(proof.BountyID); err != nil {
 		http.Error(w, "Failed to update bounty proof count", http.StatusInternalServerError)
 		return
+	}
+
+	bounties, err := h.db.GetBountyById(bountyID)
+	if err != nil {
+		w.WriteHeader(http.StatusBadRequest)
+		logger.Log.Error("[bounty] Error: %v", err)
+	} else {
+		var bountyResponse []db.BountyResponse = h.GenerateBountyResponse(bounties)
+
+		ownerPubKey := bountyResponse[0].Owner.OwnerPubKey
+		ownerAlias := bountyResponse[0].Owner.OwnerAlias
+		ownerRouteHint := bountyResponse[0].Owner.OwnerRouteHint
+		assineeAlias := bountyResponse[0].Assignee.OwnerAlias
+		bountyTitle := bountyResponse[0].Bounty.Title
+		bountyId := bountyResponse[0].Bounty.ID
+
+		msg := fmt.Sprintf("%s has submitted PoW on Bounty https://community.sphinx.chat/bounty/%d. %s", assineeAlias, bountyId, bountyTitle)
+
+		if ownerPubKey != "" {
+			processNotification(ownerPubKey, "bounty_assigned", msg, ownerAlias, ownerRouteHint)
+		}
+
 	}
 
 	w.WriteHeader(http.StatusCreated)
