@@ -20,7 +20,7 @@ import (
 // AuthHandler struct
 type AuthHandler struct {
 	db                        db.Database
-	makeConnectionCodeRequest func(inviter_pubkey string, inviter_route_hint string, msats_amount uint64) string
+	makeConnectionCodeRequest func(inviter_pubkey string, inviter_route_hint string, msats_amount uint64, sessionId string) string
 	decodeJwt                 func(token string) (jwt.MapClaims, error)
 	encodeJwt                 func(pubkey string) (string, error)
 }
@@ -151,7 +151,7 @@ func (ah *AuthHandler) CreateConnectionCode(w http.ResponseWriter, r *http.Reque
 	}
 
 	for i := 0; i < int(codeBody.Number); i++ {
-		code := ah.makeConnectionCodeRequest(codeBody.Pubkey, codeBody.RouteHint, codeBody.SatsAmount)
+		code := ah.makeConnectionCodeRequest(codeBody.Pubkey, codeBody.RouteHint, codeBody.SatsAmount, r.Header.Get("x-session-id"))
 
 		if code != "" {
 			newCode := db.ConnectionCodes{
@@ -173,7 +173,7 @@ func (ah *AuthHandler) CreateConnectionCode(w http.ResponseWriter, r *http.Reque
 	json.NewEncoder(w).Encode("Codes created successfully")
 }
 
-func MakeConnectionCodeRequest(inviter_pubkey string, inviter_route_hint string, msats_amount uint64) string {
+func MakeConnectionCodeRequest(inviter_pubkey string, inviter_route_hint string, msats_amount uint64, sessionId string) string {
 	url := fmt.Sprintf("%s/invite", config.V2BotUrl)
 	client := http.Client{}
 
@@ -184,6 +184,7 @@ func MakeConnectionCodeRequest(inviter_pubkey string, inviter_route_hint string,
 	req, _ := http.NewRequest(http.MethodPost, url, bytes.NewBuffer(jsonBody))
 	req.Header.Set("x-admin-token", config.V2BotToken)
 	req.Header.Set("Content-Type", "application/json")
+	req.Header.Set("x-session-id", sessionId)
 
 	res, err := client.Do(req)
 
