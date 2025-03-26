@@ -19,6 +19,7 @@ import (
 	"github.com/lib/pq"
 	_ "github.com/lib/pq"
 	"github.com/rs/xid"
+	"gorm.io/gorm"
 
 	"github.com/stakwork/sphinx-tribes/auth"
 	"github.com/stakwork/sphinx-tribes/utils"
@@ -2201,4 +2202,158 @@ func (db database) GetBountiesByWorkspaceAndTimeRange(workspaceId string, startD
 		Find(&bounties).Error
 
 	return bounties, err
+}
+
+func (db database) CreateBountyStake(stake BountyStake) (*BountyStake, error) {
+	if stake.BountyID == 0 {
+		return nil, errors.New("bounty ID is required")
+	}
+	
+	if stake.HunterPubKey == "" {
+		return nil, errors.New("hunter public key is required")
+	}
+	
+	if stake.Amount <= 0 {
+		return nil, errors.New("stake amount must be greater than zero")
+	}
+	
+	bounty := db.GetBounty(stake.BountyID)
+	if bounty.ID == 0 {
+		return nil, errors.New("bounty not found")
+	}
+	
+	if !bounty.IsStakable {
+		return nil, errors.New("bounty is not stakable")
+	}
+	
+	if stake.Amount < bounty.StakeMin {
+		return nil, fmt.Errorf("stake amount must be at least %d", bounty.StakeMin)
+	}
+	
+	if bounty.CurrentStakers >= bounty.MaxStakers {
+		return nil, errors.New("maximum number of stakers reached for this bounty")
+	}
+	
+	if stake.Status == "" {
+		stake.Status = StakeStatusNew
+	}
+	
+	if err := db.db.Create(&stake).Error; err != nil {
+		return nil, fmt.Errorf("failed to create bounty stake: %w", err)
+	}
+	
+	if err := db.db.Model(&NewBounty{}).Where("id = ?", stake.BountyID).
+		Update("current_stakers", gorm.Expr("current_stakers + 1")).Error; err != nil {
+		return nil, fmt.Errorf("failed to update bounty stakers count: %w", err)
+	}
+	
+	return &stake, nil
+}
+
+func (db database) GetAllBountyStakes() ([]BountyStake, error) {
+	var stakes []BountyStake
+	if err := db.db.Find(&stakes).Error; err != nil {
+		return nil, fmt.Errorf("failed to retrieve bounty stakes: %w", err)
+	}
+	return stakes, nil
+}
+
+func (db database) GetBountyStakesByBountyID(bountyID uint) ([]BountyStake, error) {
+	var stakes []BountyStake
+	if err := db.db.Where("bounty_id = ?", bountyID).Find(&stakes).Error; err != nil {
+		return nil, fmt.Errorf("failed to retrieve stakes for bounty %d: %w", bountyID, err)
+	}
+	return stakes, nil
+}
+
+func (db database) GetBountyStakeByID(stakeID uuid.UUID) (*BountyStake, error) {
+	var stake BountyStake
+	if err := db.db.Where("id = ?", stakeID).First(&stake).Error; err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return nil, fmt.Errorf("stake with ID %s not found", stakeID)
+		}
+		return nil, fmt.Errorf("failed to retrieve stake with ID %s: %w", stakeID, err)
+	}
+	return &stake, nil
+}
+
+func (db database) GetBountyStakesByHunterPubKey(hunterPubKey string) ([]BountyStake, error) {
+	var stakes []BountyStake
+	if err := db.db.Where("hunter_pub_key = ?", hunterPubKey).Find(&stakes).Error; err != nil {
+		return nil, fmt.Errorf("failed to retrieve stakes for hunter %s: %w", hunterPubKey, err)
+	}
+	return stakes, nil
+}
+
+func (db database) UpdateBountyStake(stakeID uuid.UUID, updates map[string]interface{}) (*BountyStake, error) {
+
+	stake, err := db.GetBountyStakeByID(stakeID)
+	if err != nil {
+		return nil, err
+	}
+	
+	if statusVal, ok := updates["status"]; ok {
+		status, ok := statusVal.(StakeStatus)
+		if !ok {
+			statusStr, ok := statusVal.(string)
+			if ok {
+				status = StakeStatus(statusStr)
+			} else {
+				return nil, errors.New("invalid status type")
+			}
+		}
+		
+		if status == StakeStatusActive && stake.StakedAt == nil {
+			now := time.Now()
+			updates["staked_at"] = now
+		}
+		
+		if status == StakeStatusReturned && stake.ReturnedAt == nil {
+			now := time.Now()
+			updates["returned_at"] = now
+			
+			if err := db.db.Model(&NewBounty{}).Where("id = ?", stake.BountyID).
+				Update("current_stakers", gorm.Expr("current_stakers - 1")).Error; err != nil {
+				return nil, fmt.Errorf("failed to update bounty stakers count: %w", err)
+			}
+		}
+	}
+	
+	if err := db.db.Model(&BountyStake{}).Where("id = ?", stakeID).Updates(updates).Error; err != nil {
+		return nil, fmt.Errorf("failed to update stake with ID %s: %w", stakeID, err)
+	}
+	
+	return db.GetBountyStakeByID(stakeID)
+}
+
+func (db database) DeleteBountyStake(stakeID uuid.UUID) error {
+
+	stake, err := db.GetBountyStakeByID(stakeID)
+	if err != nil {
+		return err
+	}
+	
+	tx := db.db.Begin()
+	if tx.Error != nil {
+		return fmt.Errorf("failed to begin transaction: %w", tx.Error)
+	}
+	
+	if err := tx.Delete(&BountyStake{}, "id = ?", stakeID).Error; err != nil {
+		tx.Rollback()
+		return fmt.Errorf("failed to delete stake with ID %s: %w", stakeID, err)
+	}
+	
+	if stake.StakedAt != nil && stake.ReturnedAt == nil {
+		if err := tx.Model(&NewBounty{}).Where("id = ?", stake.BountyID).
+			Update("current_stakers", gorm.Expr("current_stakers - 1")).Error; err != nil {
+			tx.Rollback()
+			return fmt.Errorf("failed to update bounty stakers count: %w", err)
+		}
+	}
+	
+	if err := tx.Commit().Error; err != nil {
+		return fmt.Errorf("failed to commit transaction: %w", err)
+	}
+	
+	return nil
 }

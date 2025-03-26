@@ -32,6 +32,11 @@ func BountyRoutes() chi.Router {
 		r.Get("/invoice/{paymentRequest}", bountyHandler.GetInvoiceData)
 		r.Get("/filter/count", bountyHandler.GetFilterCount)
 		r.Get("/workspace/timerange/{workspaceId}/{daysStart}/{daysEnd}", bountyHandler.GetBountiesByWorkspaceTime)
+
+		r.Get("/stakes", bountyHandler.GetAllBountyStakes)
+		r.Get("/stake/bounty/{bountyId}", bountyHandler.GetBountyStakesByBountyID)
+		r.Get("/stake/{id}", bountyHandler.GetBountyStakeByID)
+		r.Get("/stake/hunter/{hunterPubKey}", bountyHandler.GetBountyStakesByHunterPubKey)
 	})
 	r.Group(func(r chi.Router) {
 		r.Use(auth.CombinedAuthContext)
@@ -62,6 +67,10 @@ func BountyRoutes() chi.Router {
 		r.Put("/{id}/timing/start", bountyHandler.StartBountyTiming)
 		r.Put("/{id}/timing/close", bountyHandler.CloseBountyTiming)
 		r.Delete("/{id}/timing", bountyHandler.DeleteBountyTiming)
+
+		r.Post("/stake", bountyHandler.CreateBountyStake)
+		r.Put("/stake/{id}", bountyHandler.UpdateBountyStake)
+		r.Delete("/stake/{id}", bountyHandler.DeleteBountyStake)
 	})
 	return r
 }

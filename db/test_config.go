@@ -91,7 +91,7 @@ func InitTestDB() {
 	db.AutoMigrate(&SkillInstall{})
 	db.AutoMigrate(&SSEMessageLog{})
 	db.AutoMigrate(&CodeSpaceMap{})
-
+	db.AutoMigrate(&BountyStake{})
 	people := TestDB.GetAllPeople()
 	for _, p := range people {
 		if p.Uuid == "" {

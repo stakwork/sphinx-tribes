@@ -106,6 +106,7 @@ func InitDB() {
 	db.AutoMigrate(&SkillInstall{})
 	db.AutoMigrate(&SSEMessageLog{})
 	db.AutoMigrate(&CodeSpaceMap{})
+	db.AutoMigrate(&BountyStake{})
 
 	DB.MigrateTablesWithOrgUuid()
 	DB.MigrateOrganizationToWorkspace()

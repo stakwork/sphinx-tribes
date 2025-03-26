@@ -350,4 +350,11 @@ type Database interface {
 	GetCodeSpaceMapByID(id uuid.UUID) (CodeSpaceMap, error)
 	UpdateCodeSpaceMap(id uuid.UUID, updates map[string]interface{}) (CodeSpaceMap, error)
 	DeleteCodeSpaceMap(id uuid.UUID) error
+	CreateBountyStake(stake BountyStake) (*BountyStake, error)
+	GetAllBountyStakes() ([]BountyStake, error)
+	GetBountyStakesByBountyID(bountyID uint) ([]BountyStake, error)
+	GetBountyStakeByID(stakeID uuid.UUID) (*BountyStake, error)
+	GetBountyStakesByHunterPubKey(hunterPubKey string) ([]BountyStake, error)
+	UpdateBountyStake(stakeID uuid.UUID, updates map[string]interface{}) (*BountyStake, error)
+	DeleteBountyStake(stakeID uuid.UUID) error
 }
