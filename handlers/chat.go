@@ -57,6 +57,7 @@ type StakworkChatPayload struct {
 	Name           string                 `json:"name"`
 	WorkflowID     int                    `json:"workflow_id"`
 	WorkflowParams map[string]interface{} `json:"workflow_params"`
+	WebhookURL     string                 `json:"webhook_url"`
 }
 
 type ChatWebhookResponse struct {
@@ -556,6 +557,7 @@ func (ch *ChatHandler) SendMessage(w http.ResponseWriter, r *http.Request) {
 				},
 			},
 		},
+		WebhookURL: fmt.Sprintf("https://community.sphinx.chat/chat/%s/update", request.ChatID),
 	}
 
 	if mode == "Build" {
