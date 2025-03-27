@@ -2753,3 +2753,297 @@ func (h *bountyHandler) GetBountiesByWorkspaceTime(w http.ResponseWriter, r *htt
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(response)
 }
+
+// CreateBountyStake godoc
+//
+//	@Summary		Create a bounty stake
+//	@Description	Create a new stake for a bounty
+//	@Tags			Bounties - Stakes
+//	@Accept			json
+//	@Produce		json
+//	@Security		PubKeyContextAuth
+//	@Param			stake	body		db.BountyStake	true	"Stake object"
+//	@Success		201		{object}	db.BountyStake
+//	@Failure		400		{string}	string	"Bad request"
+//	@Failure		500		{string}	string	"Internal server error"
+//	@Router			/gobounties/stake [post]
+func (h *bountyHandler) CreateBountyStake(w http.ResponseWriter, r *http.Request) {
+	ctx := r.Context()
+	pubKeyFromAuth, _ := ctx.Value(auth.ContextKey).(string)
+	
+	if pubKeyFromAuth == "" {
+		logger.Log.Error("[bounty_stake] no pubkey from auth")
+		w.WriteHeader(http.StatusUnauthorized)
+		json.NewEncoder(w).Encode(map[string]string{"error": "Unauthorized"})
+		return
+	}
+	
+	var stake db.BountyStake
+	if err := json.NewDecoder(r.Body).Decode(&stake); err != nil {
+		logger.Log.Error("[bounty_stake] invalid request body: %v", err)
+		w.WriteHeader(http.StatusBadRequest)
+		json.NewEncoder(w).Encode(map[string]string{"error": "Invalid request body"})
+		return
+	}
+	
+	stake.HunterPubKey = pubKeyFromAuth
+	
+	createdStake, err := h.db.CreateBountyStake(stake)
+	if err != nil {
+		logger.Log.Error("[bounty_stake] failed to create stake: %v", err)
+		w.WriteHeader(http.StatusInternalServerError)
+		json.NewEncoder(w).Encode(map[string]string{"error": err.Error()})
+		return
+	}
+	
+	w.WriteHeader(http.StatusCreated)
+	json.NewEncoder(w).Encode(createdStake)
+}
+
+// GetAllBountyStakes godoc
+//
+//	@Summary		Get all bounty stakes
+//	@Description	Get a list of all bounty stakes
+//	@Tags			Bounties - Stakes
+//	@Produce		json
+//	@Success		200	{array}		db.BountyStake
+//	@Failure		500	{string}	string	"Internal server error"
+//	@Router			/gobounties/stakes [get]
+func (h *bountyHandler) GetAllBountyStakes(w http.ResponseWriter, r *http.Request) {
+	stakes, err := h.db.GetAllBountyStakes()
+	if err != nil {
+		logger.Log.Error("[bounty_stake] failed to get all stakes: %v", err)
+		w.WriteHeader(http.StatusInternalServerError)
+		json.NewEncoder(w).Encode(map[string]string{"error": "Failed to retrieve stakes"})
+		return
+	}
+	
+	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode(stakes)
+}
+
+// GetBountyStakesByBountyID godoc
+//
+//	@Summary		Get bounty stakes by bounty ID
+//	@Description	Get stakes associated with a specific bounty
+//	@Tags			Bounties - Stakes
+//	@Produce		json
+//	@Param			bountyId	path		string	true	"Bounty ID"
+//	@Success		200			{array}		db.BountyStake
+//	@Failure		400			{string}	string	"Bad request"
+//	@Failure		500			{string}	string	"Internal server error"
+//	@Router			/gobounties/stake/bounty/{bountyId} [get]
+func (h *bountyHandler) GetBountyStakesByBountyID(w http.ResponseWriter, r *http.Request) {
+	bountyIDStr := chi.URLParam(r, "bountyId")
+	bountyID, err := utils.ConvertStringToUint(bountyIDStr)
+	if err != nil {
+		logger.Log.Error("[bounty_stake] invalid bounty ID: %v", err)
+		w.WriteHeader(http.StatusBadRequest)
+		json.NewEncoder(w).Encode(map[string]string{"error": "Invalid bounty ID"})
+		return
+	}
+	
+	stakes, err := h.db.GetBountyStakesByBountyID(bountyID)
+	if err != nil {
+		logger.Log.Error("[bounty_stake] failed to get stakes by bounty ID: %v", err)
+		w.WriteHeader(http.StatusInternalServerError)
+		json.NewEncoder(w).Encode(map[string]string{"error": "Failed to retrieve stakes"})
+		return
+	}
+	
+	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode(stakes)
+}
+
+// GetBountyStakeByID godoc
+//
+//	@Summary		Get bounty stake by ID
+//	@Description	Get a specific stake by its ID
+//	@Tags			Bounties - Stakes
+//	@Produce		json
+//	@Param			id	path		string	true	"Stake ID"
+//	@Success		200	{object}	db.BountyStake
+//	@Failure		400	{string}	string	"Bad request"
+//	@Failure		404	{string}	string	"Not found"
+//	@Failure		500	{string}	string	"Internal server error"
+//	@Router			/gobounties/stake/{id} [get]
+func (h *bountyHandler) GetBountyStakeByID(w http.ResponseWriter, r *http.Request) {
+	idStr := chi.URLParam(r, "id")
+	id, err := uuid.Parse(idStr)
+	if err != nil {
+		logger.Log.Error("[bounty_stake] invalid stake ID: %v", err)
+		w.WriteHeader(http.StatusBadRequest)
+		json.NewEncoder(w).Encode(map[string]string{"error": "Invalid stake ID"})
+		return
+	}
+	
+	stake, err := h.db.GetBountyStakeByID(id)
+	if err != nil {
+		logger.Log.Error("[bounty_stake] failed to get stake by ID: %v", err)
+		w.WriteHeader(http.StatusNotFound)
+		json.NewEncoder(w).Encode(map[string]string{"error": "Stake not found"})
+		return
+	}
+	
+	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode(stake)
+}
+
+// GetBountyStakesByHunterPubKey godoc
+//
+//	@Summary		Get bounty stakes by hunter public key
+//	@Description	Get stakes associated with a specific hunter
+//	@Tags			Bounties - Stakes
+//	@Produce		json
+//	@Param			hunterPubKey	path		string	true	"Hunter Public Key"
+//	@Success		200				{array}		db.BountyStake
+//	@Failure		500				{string}	string	"Internal server error"
+//	@Router			/gobounties/stake/hunter/{hunterPubKey} [get]
+func (h *bountyHandler) GetBountyStakesByHunterPubKey(w http.ResponseWriter, r *http.Request) {
+	hunterPubKey := chi.URLParam(r, "hunterPubKey")
+	
+	stakes, err := h.db.GetBountyStakesByHunterPubKey(hunterPubKey)
+	if err != nil {
+		logger.Log.Error("[bounty_stake] failed to get stakes by hunter pubkey: %v", err)
+		w.WriteHeader(http.StatusInternalServerError)
+		json.NewEncoder(w).Encode(map[string]string{"error": "Failed to retrieve stakes"})
+		return
+	}
+	
+	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode(stakes)
+}
+
+// UpdateBountyStake godoc
+//
+//	@Summary		Update a bounty stake
+//	@Description	Update a specific stake by its ID
+//	@Tags			Bounties - Stakes
+//	@Accept			json
+//	@Produce		json
+//	@Security		PubKeyContextAuth
+//	@Param			id		path		string					true	"Stake ID"
+//	@Param			updates	body		map[string]interface{}	true	"Fields to update"
+//	@Success		200		{object}	db.BountyStake
+//	@Failure		400		{string}	string	"Bad request"
+//	@Failure		401		{string}	string	"Unauthorized"
+//	@Failure		404		{string}	string	"Not found"
+//	@Failure		500		{string}	string	"Internal server error"
+//	@Router			/gobounties/stake/{id} [put]
+func (h *bountyHandler) UpdateBountyStake(w http.ResponseWriter, r *http.Request) {
+	ctx := r.Context()
+	pubKeyFromAuth, _ := ctx.Value(auth.ContextKey).(string)
+	
+	if pubKeyFromAuth == "" {
+		logger.Log.Error("[bounty_stake] no pubkey from auth")
+		w.WriteHeader(http.StatusUnauthorized)
+		json.NewEncoder(w).Encode(map[string]string{"error": "Unauthorized"})
+		return
+	}
+	
+	idStr := chi.URLParam(r, "id")
+	id, err := uuid.Parse(idStr)
+	if err != nil {
+		logger.Log.Error("[bounty_stake] invalid stake ID: %v", err)
+		w.WriteHeader(http.StatusBadRequest)
+		json.NewEncoder(w).Encode(map[string]string{"error": "Invalid stake ID"})
+		return
+	}
+	
+	existingStake, err := h.db.GetBountyStakeByID(id)
+	if err != nil {
+		logger.Log.Error("[bounty_stake] stake not found: %v", err)
+		w.WriteHeader(http.StatusNotFound)
+		json.NewEncoder(w).Encode(map[string]string{"error": "Stake not found"})
+		return
+	}
+	
+	bounty := h.db.GetBounty(existingStake.BountyID)
+	if existingStake.HunterPubKey != pubKeyFromAuth && bounty.OwnerID != pubKeyFromAuth {
+		logger.Log.Error("[bounty_stake] unauthorized update attempt")
+		w.WriteHeader(http.StatusUnauthorized)
+		json.NewEncoder(w).Encode(map[string]string{"error": "You are not authorized to update this stake"})
+		return
+	}
+	
+	var updates map[string]interface{}
+	if err := json.NewDecoder(r.Body).Decode(&updates); err != nil {
+		logger.Log.Error("[bounty_stake] invalid request body: %v", err)
+		w.WriteHeader(http.StatusBadRequest)
+		json.NewEncoder(w).Encode(map[string]string{"error": "Invalid request body"})
+		return
+	}
+	
+	updatedStake, err := h.db.UpdateBountyStake(id, updates)
+	if err != nil {
+		logger.Log.Error("[bounty_stake] failed to update stake: %v", err)
+		w.WriteHeader(http.StatusInternalServerError)
+		json.NewEncoder(w).Encode(map[string]string{"error": err.Error()})
+		return
+	}
+	
+	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode(updatedStake)
+}
+
+// DeleteBountyStake godoc
+//
+//	@Summary		Delete a bounty stake
+//	@Description	Delete a specific stake by its ID
+//	@Tags			Bounties - Stakes
+//	@Produce		json
+//	@Security		PubKeyContextAuth
+//	@Param			id	path		string	true	"Stake ID"
+//	@Success		200	{object}	map[string]string
+//	@Failure		400	{string}	string	"Bad request"
+//	@Failure		401	{string}	string	"Unauthorized"
+//	@Failure		404	{string}	string	"Not found"
+//	@Failure		500	{string}	string	"Internal server error"
+//	@Router			/gobounties/stake/{id} [delete]
+func (h *bountyHandler) DeleteBountyStake(w http.ResponseWriter, r *http.Request) {
+	ctx := r.Context()
+	pubKeyFromAuth, _ := ctx.Value(auth.ContextKey).(string)
+	
+	if pubKeyFromAuth == "" {
+		logger.Log.Error("[bounty_stake] no pubkey from auth")
+		w.WriteHeader(http.StatusUnauthorized)
+		json.NewEncoder(w).Encode(map[string]string{"error": "Unauthorized"})
+		return
+	}
+	
+	idStr := chi.URLParam(r, "id")
+	id, err := uuid.Parse(idStr)
+	if err != nil {
+		logger.Log.Error("[bounty_stake] invalid stake ID: %v", err)
+		w.WriteHeader(http.StatusBadRequest)
+		json.NewEncoder(w).Encode(map[string]string{"error": "Invalid stake ID"})
+		return
+	}
+	
+	existingStake, err := h.db.GetBountyStakeByID(id)
+	if err != nil {
+		logger.Log.Error("[bounty_stake] stake not found: %v", err)
+		w.WriteHeader(http.StatusNotFound)
+		json.NewEncoder(w).Encode(map[string]string{"error": "Stake not found"})
+		return
+	}
+	
+	bounty := h.db.GetBounty(existingStake.BountyID)
+	if existingStake.HunterPubKey != pubKeyFromAuth && bounty.OwnerID != pubKeyFromAuth {
+		logger.Log.Error("[bounty_stake] unauthorized delete attempt")
+		w.WriteHeader(http.StatusUnauthorized)
+		json.NewEncoder(w).Encode(map[string]string{"error": "You are not authorized to delete this stake"})
+		return
+	}
+	
+	err = h.db.DeleteBountyStake(id)
+	if err != nil {
+		logger.Log.Error("[bounty_stake] failed to delete stake: %v", err)
+		w.WriteHeader(http.StatusInternalServerError)
+		json.NewEncoder(w).Encode(map[string]string{"error": err.Error()})
+		return
+	}
+	
+	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode(map[string]string{"message": "Stake deleted successfully"})
+}

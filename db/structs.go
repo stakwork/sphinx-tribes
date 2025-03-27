@@ -415,6 +415,11 @@ type Bounty struct {
 	PaymentFailed           bool                   `gorm:"default:false" json:"payment_failed"`
 	AccessRestriction       *AccessRestrictionType `gorm:"type:varchar(20);default:null" json:"access_restriction,omitempty"`
 	UnlockCode              *string                `gorm:"type:varchar(6);default:null;index" json:"unlock_code,omitempty"`
+	IsStakable              bool                   `gorm:"default:false" json:"is_stakable"`
+	StakeMin                int64                  `gorm:"default:0" json:"stake_min"`
+	MaxStakers              int                    `gorm:"default:1" json:"max_stakers"`
+	CurrentStakers          int                    `gorm:"default:0" json:"current_stakers"`
+	Stakes                  []BountyStake          `gorm:"foreignKey:BountyID" json:"stakes,omitempty"`
 }
 
 // Todo: Change back to Bounty
@@ -458,6 +463,11 @@ type NewBounty struct {
 	ProofOfWorkCount        int                    `gorm:"type:integer;default:0;not null" json:"pow"`
 	AccessRestriction       *AccessRestrictionType `gorm:"type:varchar(20);default:null" json:"access_restriction,omitempty"`
 	UnlockCode              *string                `gorm:"type:varchar(6);default:null;index" json:"unlock_code,omitempty"`
+	IsStakable              bool                   `gorm:"default:false" json:"is_stakable"`
+	StakeMin                int64                  `gorm:"default:0" json:"stake_min"`
+	MaxStakers              int                    `gorm:"default:1" json:"max_stakers"`
+	CurrentStakers          int                    `gorm:"default:0" json:"current_stakers"`
+	Stakes                  []BountyStake          `gorm:"foreignKey:BountyID" json:"stakes,omitempty"`
 }
 
 type BountyOwners struct {
@@ -1570,6 +1580,33 @@ type CodeSpaceMap struct {
 	WorkspaceID  string    `json:"workspaceID" gorm:"index"`
 	CodeSpaceURL string    `json:"codeSpaceURL"`
 	UserPubkey   string    `json:"userPubkey" gorm:"index"`
+}
+
+type StakeStatus string
+
+const (
+	StakeStatusNew       StakeStatus = "NEW"
+	StakeStatusPending   StakeStatus = "PENDING"
+	StakeStatusActive    StakeStatus = "ACTIVE"
+	StakeStatusCompleted StakeStatus = "COMPLETED"
+	StakeStatusReturned  StakeStatus = "RETURNED"
+	StakeStatusFailed    StakeStatus = "FAILED"
+)
+
+type BountyStake struct {
+	ID           uuid.UUID  `json:"id" gorm:"primaryKey;type:uuid;default:gen_random_uuid()"`
+	BountyID     uint       `json:"bounty_id" gorm:"index;not null"`
+	HunterPubKey string     `json:"hunter_pubkey" gorm:"type:varchar(255);not null"`
+	Amount       int64      `json:"amount" gorm:"not null"`
+	Status       StakeStatus `json:"status" gorm:"type:varchar(20);default:'NEW'"`
+	Invoice      string     `json:"invoice" gorm:"type:text"`
+	StakeReceipt string     `json:"stake_receipt" gorm:"type:text"`
+	StakeReturn  string     `json:"stake_return" gorm:"type:text"`
+	Note         string     `json:"note" gorm:"type:text"`
+	CreatedAt    time.Time  `json:"created_at" gorm:"autoCreateTime"`
+	StakedAt     *time.Time `json:"staked_at"`
+	ReturnedAt   *time.Time `json:"returned_at"`
+	UpdatedAt    time.Time  `json:"updated_at" gorm:"autoUpdateTime"`
 }
 
 func (Person) TableName() string {

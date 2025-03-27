@@ -17374,3 +17374,372 @@ func (_c *Database_GetSSEMessagesByChatID_Call) RunAndReturn(run func(string, in
 	_c.Call.Return(run)
 	return _c
 }
+
+func (_m *Database) CreateBountyStake(stake db.BountyStake) (*db.BountyStake, error) {
+	ret := _m.Called(stake)
+
+	if len(ret) == 0 {
+		panic("no return value specified for CreateBountyStake")
+	}
+
+	var r0 *db.BountyStake
+	var r1 error
+	if rf, ok := ret.Get(0).(func(db.BountyStake) (*db.BountyStake, error)); ok {
+		return rf(stake)
+	}
+	if rf, ok := ret.Get(0).(func(db.BountyStake) *db.BountyStake); ok {
+		r0 = rf(stake)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(*db.BountyStake)
+		}
+	}
+
+	if rf, ok := ret.Get(1).(func(db.BountyStake) error); ok {
+		r1 = rf(stake)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
+type Database_CreateBountyStake_Call struct {
+	*mock.Call
+}
+
+func (_e *Database_Expecter) CreateBountyStake(stake interface{}) *Database_CreateBountyStake_Call {
+	return &Database_CreateBountyStake_Call{Call: _e.mock.On("CreateBountyStake", stake)}
+}
+
+func (_c *Database_CreateBountyStake_Call) Run(run func(stake db.BountyStake)) *Database_CreateBountyStake_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(db.BountyStake))
+	})
+	return _c
+}
+
+func (_c *Database_CreateBountyStake_Call) Return(_a0 *db.BountyStake, _a1 error) *Database_CreateBountyStake_Call {
+	_c.Call.Return(_a0, _a1)
+	return _c
+}
+
+func (_c *Database_CreateBountyStake_Call) RunAndReturn(run func(db.BountyStake) (*db.BountyStake, error)) *Database_CreateBountyStake_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
+func (_m *Database) GetAllBountyStakes() ([]db.BountyStake, error) {
+	ret := _m.Called()
+
+	if len(ret) == 0 {
+		panic("no return value specified for GetAllBountyStakes")
+	}
+
+	var r0 []db.BountyStake
+	var r1 error
+	if rf, ok := ret.Get(0).(func() ([]db.BountyStake, error)); ok {
+		return rf()
+	}
+	if rf, ok := ret.Get(0).(func() []db.BountyStake); ok {
+		r0 = rf()
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).([]db.BountyStake)
+		}
+	}
+
+	if rf, ok := ret.Get(1).(func() error); ok {
+		r1 = rf()
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
+type Database_GetAllBountyStakes_Call struct {
+	*mock.Call
+}
+
+func (_e *Database_Expecter) GetAllBountyStakes() *Database_GetAllBountyStakes_Call {
+	return &Database_GetAllBountyStakes_Call{Call: _e.mock.On("GetAllBountyStakes")}
+}
+
+func (_c *Database_GetAllBountyStakes_Call) Run(run func()) *Database_GetAllBountyStakes_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run()
+	})
+	return _c
+}
+
+func (_c *Database_GetAllBountyStakes_Call) Return(_a0 []db.BountyStake, _a1 error) *Database_GetAllBountyStakes_Call {
+	_c.Call.Return(_a0, _a1)
+	return _c
+}
+
+func (_c *Database_GetAllBountyStakes_Call) RunAndReturn(run func() ([]db.BountyStake, error)) *Database_GetAllBountyStakes_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
+
+func (_m *Database) GetBountyStakesByBountyID(bountyID uint) ([]db.BountyStake, error) {
+	ret := _m.Called(bountyID)
+
+	if len(ret) == 0 {
+		panic("no return value specified for GetBountyStakesByBountyID")
+	}
+
+	var r0 []db.BountyStake
+	var r1 error
+	if rf, ok := ret.Get(0).(func(uint) ([]db.BountyStake, error)); ok {
+		return rf(bountyID)
+	}
+	if rf, ok := ret.Get(0).(func(uint) []db.BountyStake); ok {
+		r0 = rf(bountyID)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).([]db.BountyStake)
+		}
+	}
+
+	if rf, ok := ret.Get(1).(func(uint) error); ok {
+		r1 = rf(bountyID)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
+type Database_GetBountyStakesByBountyID_Call struct {
+	*mock.Call
+}
+
+func (_e *Database_Expecter) GetBountyStakesByBountyID(bountyID interface{}) *Database_GetBountyStakesByBountyID_Call {
+	return &Database_GetBountyStakesByBountyID_Call{Call: _e.mock.On("GetBountyStakesByBountyID", bountyID)}
+}
+
+func (_c *Database_GetBountyStakesByBountyID_Call) Run(run func(bountyID uint)) *Database_GetBountyStakesByBountyID_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(uint))
+	})
+	return _c
+}
+
+func (_c *Database_GetBountyStakesByBountyID_Call) Return(_a0 []db.BountyStake, _a1 error) *Database_GetBountyStakesByBountyID_Call {
+	_c.Call.Return(_a0, _a1)
+	return _c
+}
+
+func (_c *Database_GetBountyStakesByBountyID_Call) RunAndReturn(run func(uint) ([]db.BountyStake, error)) *Database_GetBountyStakesByBountyID_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
+func (_m *Database) GetBountyStakeByID(stakeID uuid.UUID) (*db.BountyStake, error) {
+	ret := _m.Called(stakeID)
+
+	if len(ret) == 0 {
+		panic("no return value specified for GetBountyStakeByID")
+	}
+
+	var r0 *db.BountyStake
+	var r1 error
+	if rf, ok := ret.Get(0).(func(uuid.UUID) (*db.BountyStake, error)); ok {
+		return rf(stakeID)
+	}
+	if rf, ok := ret.Get(0).(func(uuid.UUID) *db.BountyStake); ok {
+		r0 = rf(stakeID)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(*db.BountyStake)
+		}
+	}
+
+	if rf, ok := ret.Get(1).(func(uuid.UUID) error); ok {
+		r1 = rf(stakeID)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
+type Database_GetBountyStakeByID_Call struct {
+	*mock.Call
+}
+
+func (_e *Database_Expecter) GetBountyStakeByID(stakeID interface{}) *Database_GetBountyStakeByID_Call {
+	return &Database_GetBountyStakeByID_Call{Call: _e.mock.On("GetBountyStakeByID", stakeID)}
+}
+
+func (_c *Database_GetBountyStakeByID_Call) Run(run func(stakeID uuid.UUID)) *Database_GetBountyStakeByID_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(uuid.UUID))
+	})
+	return _c
+}
+
+func (_c *Database_GetBountyStakeByID_Call) Return(_a0 *db.BountyStake, _a1 error) *Database_GetBountyStakeByID_Call {
+	_c.Call.Return(_a0, _a1)
+	return _c
+}
+
+func (_c *Database_GetBountyStakeByID_Call) RunAndReturn(run func(uuid.UUID) (*db.BountyStake, error)) *Database_GetBountyStakeByID_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
+func (_m *Database) GetBountyStakesByHunterPubKey(hunterPubKey string) ([]db.BountyStake, error) {
+	ret := _m.Called(hunterPubKey)
+
+	if len(ret) == 0 {
+		panic("no return value specified for GetBountyStakesByHunterPubKey")
+	}
+
+	var r0 []db.BountyStake
+	var r1 error
+	if rf, ok := ret.Get(0).(func(string) ([]db.BountyStake, error)); ok {
+		return rf(hunterPubKey)
+	}
+	if rf, ok := ret.Get(0).(func(string) []db.BountyStake); ok {
+		r0 = rf(hunterPubKey)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).([]db.BountyStake)
+		}
+	}
+
+	if rf, ok := ret.Get(1).(func(string) error); ok {
+		r1 = rf(hunterPubKey)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
+type Database_GetBountyStakesByHunterPubKey_Call struct {
+	*mock.Call
+}
+
+func (_e *Database_Expecter) GetBountyStakesByHunterPubKey(hunterPubKey interface{}) *Database_GetBountyStakesByHunterPubKey_Call {
+	return &Database_GetBountyStakesByHunterPubKey_Call{Call: _e.mock.On("GetBountyStakesByHunterPubKey", hunterPubKey)}
+}
+
+func (_c *Database_GetBountyStakesByHunterPubKey_Call) Run(run func(hunterPubKey string)) *Database_GetBountyStakesByHunterPubKey_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(string))
+	})
+	return _c
+}
+
+func (_c *Database_GetBountyStakesByHunterPubKey_Call) Return(_a0 []db.BountyStake, _a1 error) *Database_GetBountyStakesByHunterPubKey_Call {
+	_c.Call.Return(_a0, _a1)
+	return _c
+}
+
+func (_c *Database_GetBountyStakesByHunterPubKey_Call) RunAndReturn(run func(string) ([]db.BountyStake, error)) *Database_GetBountyStakesByHunterPubKey_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
+func (_m *Database) UpdateBountyStake(stakeID uuid.UUID, updates map[string]interface{}) (*db.BountyStake, error) {
+	ret := _m.Called(stakeID, updates)
+
+	if len(ret) == 0 {
+		panic("no return value specified for UpdateBountyStake")
+	}
+
+	var r0 *db.BountyStake
+	var r1 error
+	if rf, ok := ret.Get(0).(func(uuid.UUID, map[string]interface{}) (*db.BountyStake, error)); ok {
+		return rf(stakeID, updates)
+	}
+	if rf, ok := ret.Get(0).(func(uuid.UUID, map[string]interface{}) *db.BountyStake); ok {
+		r0 = rf(stakeID, updates)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(*db.BountyStake)
+		}
+	}
+
+	if rf, ok := ret.Get(1).(func(uuid.UUID, map[string]interface{}) error); ok {
+		r1 = rf(stakeID, updates)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
+type Database_UpdateBountyStake_Call struct {
+	*mock.Call
+}
+
+func (_e *Database_Expecter) UpdateBountyStake(stakeID interface{}, updates interface{}) *Database_UpdateBountyStake_Call {
+	return &Database_UpdateBountyStake_Call{Call: _e.mock.On("UpdateBountyStake", stakeID, updates)}
+}
+
+func (_c *Database_UpdateBountyStake_Call) Run(run func(stakeID uuid.UUID, updates map[string]interface{})) *Database_UpdateBountyStake_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(uuid.UUID), args[1].(map[string]interface{}))
+	})
+	return _c
+}
+
+func (_c *Database_UpdateBountyStake_Call) Return(_a0 *db.BountyStake, _a1 error) *Database_UpdateBountyStake_Call {
+	_c.Call.Return(_a0, _a1)
+	return _c
+}
+
+func (_c *Database_UpdateBountyStake_Call) RunAndReturn(run func(uuid.UUID, map[string]interface{}) (*db.BountyStake, error)) *Database_UpdateBountyStake_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
+
+func (_m *Database) DeleteBountyStake(stakeID uuid.UUID) error {
+	ret := _m.Called(stakeID)
+
+	if len(ret) == 0 {
+		panic("no return value specified for DeleteBountyStake")
+	}
+
+	var r0 error
+	if rf, ok := ret.Get(0).(func(uuid.UUID) error); ok {
+		r0 = rf(stakeID)
+	} else {
+		r0 = ret.Error(0)
+	}
+
+	return r0
+}
+
+type Database_DeleteBountyStake_Call struct {
+	*mock.Call
+}
+
+func (_e *Database_Expecter) DeleteBountyStake(stakeID interface{}) *Database_DeleteBountyStake_Call {
+	return &Database_DeleteBountyStake_Call{Call: _e.mock.On("DeleteBountyStake", stakeID)}
+}
+
+func (_c *Database_DeleteBountyStake_Call) Run(run func(stakeID uuid.UUID)) *Database_DeleteBountyStake_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(uuid.UUID))
+	})
+	return _c
+}
+
+func (_c *Database_DeleteBountyStake_Call) Return(_a0 error) *Database_DeleteBountyStake_Call {
+	_c.Call.Return(_a0)
+	return _c
+}
+
+func (_c *Database_DeleteBountyStake_Call) RunAndReturn(run func(uuid.UUID) error) *Database_DeleteBountyStake_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
