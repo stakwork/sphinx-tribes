@@ -163,6 +163,19 @@ type StopSSERequest struct {
 	ChatID string `json:"chatID"`
 }
 
+type ChatStatusRequest struct {
+	ChatID  string `json:"chat_id"`
+	Status  string `json:"status"`
+	Message string `json:"message,omitempty"`
+}
+
+type ChatStatusResponse struct {
+	Success   bool                  `json:"success"`
+	Message   string                `json:"message,omitempty"`
+	Data      *db.ChatWorkflowStatus `json:"data,omitempty"`
+	DataArray []db.ChatWorkflowStatus `json:"data_array,omitempty"`
+}
+
 func NewChatHandler(httpClient *http.Client, database db.Database) *ChatHandler {
 	return &ChatHandler{
 		httpClient: httpClient,
@@ -2026,5 +2039,317 @@ func (ch *ChatHandler) GetAllSSEMessagesByChatID(w http.ResponseWriter, r *http.
 			"limit":    limit,
 			"offset":   offset,
 		},
+	})
+}
+
+// GetChatStatus retrieves all status entries for a specific chat
+//
+//	@Summary		Get all chat statuses
+//	@Description	Retrieve all status entries for a specific chat
+//	@Tags			Hive Chat
+//	@Produce		json
+//	@Security		PubKeyContextAuth
+//	@Param			chat_id	path		string	true	"Chat ID"
+//	@Success		200		{object}	ChatStatusResponse
+//	@Failure		400		{object}	ChatStatusResponse
+//	@Failure		500		{object}	ChatStatusResponse
+//	@Router			/hivechat/status/{chat_id} [get]
+func (ch *ChatHandler) GetAllChatStatus(w http.ResponseWriter, r *http.Request) {
+	chatID := chi.URLParam(r, "chat_id")
+	if chatID == "" {
+		w.WriteHeader(http.StatusBadRequest)
+		json.NewEncoder(w).Encode(ChatStatusResponse{
+			Success: false,
+			Message: "Chat ID is required",
+		})
+		return
+	}
+
+	statuses, err := ch.db.GetChatStatusByChatID(chatID)
+	if err != nil {
+		logger.Log.Error("Failed to get chat statuses: %v", err)
+		w.WriteHeader(http.StatusInternalServerError)
+		json.NewEncoder(w).Encode(ChatStatusResponse{
+			Success: false,
+			Message: fmt.Sprintf("Failed to get chat statuses: %v", err),
+		})
+		return
+	}
+
+	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode(ChatStatusResponse{
+		Success:   true,
+		Message:   "Chat statuses retrieved successfully",
+		DataArray: statuses,
+	})
+}
+
+// GetLatestChatStatus retrieves the most recent status for a specific chat
+//
+//	@Summary		Get latest chat status
+//	@Description	Retrieve the most recent status for a specific chat
+//	@Tags			Hive Chat
+//	@Produce		json
+//	@Security		PubKeyContextAuth
+//	@Param			chat_id	path		string	true	"Chat ID"
+//	@Success		200		{object}	ChatStatusResponse
+//	@Failure		400		{object}	ChatStatusResponse
+//	@Failure		404		{object}	ChatStatusResponse
+//	@Failure		500		{object}	ChatStatusResponse
+//	@Router			/hivechat/status/{chat_id}/latest [get]
+func (ch *ChatHandler) GetLatestChatStatus(w http.ResponseWriter, r *http.Request) {
+	chatID := chi.URLParam(r, "chat_id")
+	if chatID == "" {
+		w.WriteHeader(http.StatusBadRequest)
+		json.NewEncoder(w).Encode(ChatStatusResponse{
+			Success: false,
+			Message: "Chat ID is required",
+		})
+		return
+	}
+
+	status, err := ch.db.GetLatestChatStatusByChatID(chatID)
+	if err != nil {
+		if strings.Contains(err.Error(), "no chat status found") {
+			w.WriteHeader(http.StatusNotFound)
+			json.NewEncoder(w).Encode(ChatStatusResponse{
+				Success: false,
+				Message: "No status found for this chat",
+			})
+			return
+		}
+		logger.Log.Error("Failed to get latest chat status: %v", err)
+		w.WriteHeader(http.StatusInternalServerError)
+		json.NewEncoder(w).Encode(ChatStatusResponse{
+			Success: false,
+			Message: fmt.Sprintf("Failed to get latest chat status: %v", err),
+		})
+		return
+	}
+
+	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode(ChatStatusResponse{
+		Success: true,
+		Message: "Latest chat status retrieved successfully",
+		Data:    &status,
+	})
+}
+
+// CreateChatStatus creates a new status entry for a chat
+//
+//	@Summary		Create chat status
+//	@Description	Create a new status entry for a chat
+//	@Tags			Hive Chat
+//	@Accept			json
+//	@Produce		json
+//	@Security		PubKeyContextAuth
+//	@Param			request	body		ChatStatusRequest	true	"Chat status creation request"
+//	@Success		201		{object}	ChatStatusResponse
+//	@Failure		400		{object}	ChatStatusResponse
+//	@Failure		404		{object}	ChatStatusResponse
+//	@Failure		500		{object}	ChatStatusResponse
+//	@Router			/hivechat/status [post]
+func (ch *ChatHandler) CreateChatStatus(w http.ResponseWriter, r *http.Request) {
+	var request ChatStatusRequest
+	err := json.NewDecoder(r.Body).Decode(&request)
+	if err != nil {
+		w.WriteHeader(http.StatusBadRequest)
+		json.NewEncoder(w).Encode(ChatStatusResponse{
+			Success: false,
+			Message: "Invalid request body",
+		})
+		return
+	}
+
+	if request.ChatID == "" {
+		w.WriteHeader(http.StatusBadRequest)
+		json.NewEncoder(w).Encode(ChatStatusResponse{
+			Success: false,
+			Message: "Chat ID is required",
+		})
+		return
+	}
+
+	if request.Status == "" {
+		w.WriteHeader(http.StatusBadRequest)
+		json.NewEncoder(w).Encode(ChatStatusResponse{
+			Success: false,
+			Message: "Status is required",
+		})
+		return
+	}
+
+	_, err = ch.db.GetChatByChatID(request.ChatID)
+	if err != nil {
+		w.WriteHeader(http.StatusNotFound)
+		json.NewEncoder(w).Encode(ChatStatusResponse{
+			Success: false,
+			Message: "Chat not found",
+		})
+		return
+	}
+
+	chatStatus := &db.ChatWorkflowStatus{
+		ChatID:  request.ChatID,
+		Status:  request.Status,
+		Message: request.Message,
+	}
+
+	createdStatus, err := ch.db.AddChatStatus(chatStatus)
+	if err != nil {
+		logger.Log.Error("Failed to create chat status: %v", err)
+		w.WriteHeader(http.StatusInternalServerError)
+		json.NewEncoder(w).Encode(ChatStatusResponse{
+			Success: false,
+			Message: fmt.Sprintf("Failed to create chat status: %v", err),
+		})
+		return
+	}
+
+	w.WriteHeader(http.StatusCreated)
+	json.NewEncoder(w).Encode(ChatStatusResponse{
+		Success: true,
+		Message: "Chat status created successfully",
+		Data:    &createdStatus,
+	})
+}
+
+// UpdateChatStatus updates an existing status entry
+//
+//	@Summary		Update chat status
+//	@Description	Update an existing status entry
+//	@Tags			Hive Chat
+//	@Accept			json
+//	@Produce		json
+//	@Security		PubKeyContextAuth
+//	@Param			uuid	path		string				true	"Status UUID"
+//	@Param			request	body		ChatStatusRequest	true	"Chat status update request"
+//	@Success		200		{object}	ChatStatusResponse
+//	@Failure		400		{object}	ChatStatusResponse
+//	@Failure		404		{object}	ChatStatusResponse
+//	@Failure		500		{object}	ChatStatusResponse
+//	@Router			/hivechat/status/{uuid} [put]
+func (ch *ChatHandler) UpdateChatStatus(w http.ResponseWriter, r *http.Request) {
+	statusUUID := chi.URLParam(r, "uuid")
+	if statusUUID == "" {
+		w.WriteHeader(http.StatusBadRequest)
+		json.NewEncoder(w).Encode(ChatStatusResponse{
+			Success: false,
+			Message: "Status UUID is required",
+		})
+		return
+	}
+
+	var request ChatStatusRequest
+	err := json.NewDecoder(r.Body).Decode(&request)
+	if err != nil {
+		w.WriteHeader(http.StatusBadRequest)
+		json.NewEncoder(w).Encode(ChatStatusResponse{
+			Success: false,
+			Message: "Invalid request body",
+		})
+		return
+	}
+
+	parsedUUID, err := uuid.Parse(statusUUID)
+	if err != nil {
+		w.WriteHeader(http.StatusBadRequest)
+		json.NewEncoder(w).Encode(ChatStatusResponse{
+			Success: false,
+			Message: "Invalid UUID format",
+		})
+		return
+	}
+
+	chatStatus := &db.ChatWorkflowStatus{
+		UUID:    parsedUUID,
+		Status:  request.Status,
+		Message: request.Message,
+	}
+
+	updatedStatus, err := ch.db.UpdateChatStatus(chatStatus)
+	if err != nil {
+		if strings.Contains(err.Error(), "not found") {
+			w.WriteHeader(http.StatusNotFound)
+			json.NewEncoder(w).Encode(ChatStatusResponse{
+				Success: false,
+				Message: "Chat status not found",
+			})
+			return
+		}
+		logger.Log.Error("Failed to update chat status: %v", err)
+		w.WriteHeader(http.StatusInternalServerError)
+		json.NewEncoder(w).Encode(ChatStatusResponse{
+			Success: false,
+			Message: fmt.Sprintf("Failed to update chat status: %v", err),
+		})
+		return
+	}
+
+	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode(ChatStatusResponse{
+		Success: true,
+		Message: "Chat status updated successfully",
+		Data:    &updatedStatus,
+	})
+}
+
+// DeleteChatStatus deletes an existing status entry
+//
+//	@Summary		Delete chat status
+//	@Description	Delete an existing status entry
+//	@Tags			Hive Chat
+//	@Produce		json
+//	@Security		PubKeyContextAuth
+//	@Param			uuid	path		string	true	"Status UUID"
+//	@Success		200		{object}	ChatStatusResponse
+//	@Failure		400		{object}	ChatStatusResponse
+//	@Failure		404		{object}	ChatStatusResponse
+//	@Failure		500		{object}	ChatStatusResponse
+//	@Router			/hivechat/status/{uuid} [delete]
+func (ch *ChatHandler) DeleteChatStatus(w http.ResponseWriter, r *http.Request) {
+	statusUUID := chi.URLParam(r, "uuid")
+	if statusUUID == "" {
+		w.WriteHeader(http.StatusBadRequest)
+		json.NewEncoder(w).Encode(ChatStatusResponse{
+			Success: false,
+			Message: "Status UUID is required",
+		})
+		return
+	}
+
+	parsedUUID, err := uuid.Parse(statusUUID)
+	if err != nil {
+		w.WriteHeader(http.StatusBadRequest)
+		json.NewEncoder(w).Encode(ChatStatusResponse{
+			Success: false,
+			Message: "Invalid UUID format",
+		})
+		return
+	}
+
+	err = ch.db.DeleteChatStatus(parsedUUID)
+	if err != nil {
+		if strings.Contains(err.Error(), "not found") {
+			w.WriteHeader(http.StatusNotFound)
+			json.NewEncoder(w).Encode(ChatStatusResponse{
+				Success: false,
+				Message: "Chat status not found",
+			})
+			return
+		}
+		logger.Log.Error("Failed to delete chat status: %v", err)
+		w.WriteHeader(http.StatusInternalServerError)
+		json.NewEncoder(w).Encode(ChatStatusResponse{
+			Success: false,
+			Message: fmt.Sprintf("Failed to delete chat status: %v", err),
+		})
+		return
+	}
+
+	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode(ChatStatusResponse{
+		Success: true,
+		Message: "Chat status deleted successfully",
 	})
 }

@@ -357,4 +357,9 @@ type Database interface {
 	GetBountyStakesByHunterPubKey(hunterPubKey string) ([]BountyStake, error)
 	UpdateBountyStake(stakeID uuid.UUID, updates map[string]interface{}) (*BountyStake, error)
 	DeleteBountyStake(stakeID uuid.UUID) error
+	AddChatStatus(status *ChatWorkflowStatus) (ChatWorkflowStatus, error)
+	UpdateChatStatus(status *ChatWorkflowStatus) (ChatWorkflowStatus, error)
+	GetChatStatusByChatID(chatID string) ([]ChatWorkflowStatus, error)
+	GetLatestChatStatusByChatID(chatID string) (ChatWorkflowStatus, error)
+	DeleteChatStatus(uuid uuid.UUID) error
 }

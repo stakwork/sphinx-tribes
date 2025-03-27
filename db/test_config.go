@@ -92,6 +92,8 @@ func InitTestDB() {
 	db.AutoMigrate(&SSEMessageLog{})
 	db.AutoMigrate(&CodeSpaceMap{})
 	db.AutoMigrate(&BountyStake{})
+	db.AutoMigrate(&ChatWorkflowStatus{})
+	
 	people := TestDB.GetAllPeople()
 	for _, p := range people {
 		if p.Uuid == "" {

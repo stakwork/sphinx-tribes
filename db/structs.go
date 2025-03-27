@@ -1183,6 +1183,15 @@ type Chat struct {
 	UpdatedAt   time.Time  `json:"updatedAt"`
 }
 
+type ChatWorkflowStatus struct {
+	UUID      uuid.UUID `gorm:"primaryKey;type:uuid;default:gen_random_uuid()" json:"uuid"`
+	ChatID    string    `gorm:"index;not null" json:"chat_id"`
+	Status    string    `gorm:"type:varchar(255);not null" json:"status"`
+	Message   string    `gorm:"type:text" json:"message"`
+	CreatedAt time.Time `gorm:"type:timestamp;default:current_timestamp" json:"created_at"`
+	UpdatedAt time.Time `gorm:"type:timestamp;default:current_timestamp" json:"updated_at"`
+}
+
 type ProofOfWorkStatus string
 
 const (
