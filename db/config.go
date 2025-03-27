@@ -107,6 +107,7 @@ func InitDB() {
 	db.AutoMigrate(&SSEMessageLog{})
 	db.AutoMigrate(&CodeSpaceMap{})
 	db.AutoMigrate(&BountyStake{})
+	db.AutoMigrate(&ChatWorkflowStatus{})
 
 	DB.MigrateTablesWithOrgUuid()
 	DB.MigrateOrganizationToWorkspace()

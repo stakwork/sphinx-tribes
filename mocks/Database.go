@@ -17743,3 +17743,260 @@ func (_c *Database_DeleteBountyStake_Call) RunAndReturn(run func(uuid.UUID) erro
 	return _c
 }
 
+
+func (_m *Database) AddChatStatus(status *db.ChatWorkflowStatus) (db.ChatWorkflowStatus, error) {
+	ret := _m.Called(status)
+
+	if len(ret) == 0 {
+		panic("no return value specified for AddChatStatus")
+	}
+
+	var r0 db.ChatWorkflowStatus
+	var r1 error
+	if rf, ok := ret.Get(0).(func(*db.ChatWorkflowStatus) (db.ChatWorkflowStatus, error)); ok {
+		return rf(status)
+	}
+	if rf, ok := ret.Get(0).(func(*db.ChatWorkflowStatus) db.ChatWorkflowStatus); ok {
+		r0 = rf(status)
+	} else {
+		r0 = ret.Get(0).(db.ChatWorkflowStatus)
+	}
+
+	if rf, ok := ret.Get(1).(func(*db.ChatWorkflowStatus) error); ok {
+		r1 = rf(status)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
+type Database_AddChatStatus_Call struct {
+	*mock.Call
+}
+
+
+func (_e *Database_Expecter) AddChatStatus(status interface{}) *Database_AddChatStatus_Call {
+	return &Database_AddChatStatus_Call{Call: _e.mock.On("AddChatStatus", status)}
+}
+
+func (_c *Database_AddChatStatus_Call) Run(run func(status *db.ChatWorkflowStatus)) *Database_AddChatStatus_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(*db.ChatWorkflowStatus))
+	})
+	return _c
+}
+
+func (_c *Database_AddChatStatus_Call) Return(_a0 db.ChatWorkflowStatus, _a1 error) *Database_AddChatStatus_Call {
+	_c.Call.Return(_a0, _a1)
+	return _c
+}
+
+func (_c *Database_AddChatStatus_Call) RunAndReturn(run func(*db.ChatWorkflowStatus) (db.ChatWorkflowStatus, error)) *Database_AddChatStatus_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
+
+func (_m *Database) UpdateChatStatus(status *db.ChatWorkflowStatus) (db.ChatWorkflowStatus, error) {
+	ret := _m.Called(status)
+
+	if len(ret) == 0 {
+		panic("no return value specified for UpdateChatStatus")
+	}
+
+	var r0 db.ChatWorkflowStatus
+	var r1 error
+	if rf, ok := ret.Get(0).(func(*db.ChatWorkflowStatus) (db.ChatWorkflowStatus, error)); ok {
+		return rf(status)
+	}
+	if rf, ok := ret.Get(0).(func(*db.ChatWorkflowStatus) db.ChatWorkflowStatus); ok {
+		r0 = rf(status)
+	} else {
+		r0 = ret.Get(0).(db.ChatWorkflowStatus)
+	}
+
+	if rf, ok := ret.Get(1).(func(*db.ChatWorkflowStatus) error); ok {
+		r1 = rf(status)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
+type Database_UpdateChatStatus_Call struct {
+	*mock.Call
+}
+
+
+func (_e *Database_Expecter) UpdateChatStatus(status interface{}) *Database_UpdateChatStatus_Call {
+	return &Database_UpdateChatStatus_Call{Call: _e.mock.On("UpdateChatStatus", status)}
+}
+
+func (_c *Database_UpdateChatStatus_Call) Run(run func(status *db.ChatWorkflowStatus)) *Database_UpdateChatStatus_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(*db.ChatWorkflowStatus))
+	})
+	return _c
+}
+
+func (_c *Database_UpdateChatStatus_Call) Return(_a0 db.ChatWorkflowStatus, _a1 error) *Database_UpdateChatStatus_Call {
+	_c.Call.Return(_a0, _a1)
+	return _c
+}
+
+func (_c *Database_UpdateChatStatus_Call) RunAndReturn(run func(*db.ChatWorkflowStatus) (db.ChatWorkflowStatus, error)) *Database_UpdateChatStatus_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
+func (_m *Database) GetChatStatusByChatID(chatID string) ([]db.ChatWorkflowStatus, error) {
+	ret := _m.Called(chatID)
+
+	if len(ret) == 0 {
+		panic("no return value specified for GetChatStatusByChatID")
+	}
+
+	var r0 []db.ChatWorkflowStatus
+	var r1 error
+	if rf, ok := ret.Get(0).(func(string) ([]db.ChatWorkflowStatus, error)); ok {
+		return rf(chatID)
+	}
+	if rf, ok := ret.Get(0).(func(string) []db.ChatWorkflowStatus); ok {
+		r0 = rf(chatID)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).([]db.ChatWorkflowStatus)
+		}
+	}
+
+	if rf, ok := ret.Get(1).(func(string) error); ok {
+		r1 = rf(chatID)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
+type Database_GetChatStatusByChatID_Call struct {
+	*mock.Call
+}
+
+func (_e *Database_Expecter) GetChatStatusByChatID(chatID interface{}) *Database_GetChatStatusByChatID_Call {
+	return &Database_GetChatStatusByChatID_Call{Call: _e.mock.On("GetChatStatusByChatID", chatID)}
+}
+
+func (_c *Database_GetChatStatusByChatID_Call) Run(run func(chatID string)) *Database_GetChatStatusByChatID_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(string))
+	})
+	return _c
+}
+
+func (_c *Database_GetChatStatusByChatID_Call) Return(_a0 []db.ChatWorkflowStatus, _a1 error) *Database_GetChatStatusByChatID_Call {
+	_c.Call.Return(_a0, _a1)
+	return _c
+}
+
+func (_c *Database_GetChatStatusByChatID_Call) RunAndReturn(run func(string) ([]db.ChatWorkflowStatus, error)) *Database_GetChatStatusByChatID_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
+
+func (_m *Database) GetLatestChatStatusByChatID(chatID string) (db.ChatWorkflowStatus, error) {
+	ret := _m.Called(chatID)
+
+	if len(ret) == 0 {
+		panic("no return value specified for GetLatestChatStatusByChatID")
+	}
+
+	var r0 db.ChatWorkflowStatus
+	var r1 error
+	if rf, ok := ret.Get(0).(func(string) (db.ChatWorkflowStatus, error)); ok {
+		return rf(chatID)
+	}
+	if rf, ok := ret.Get(0).(func(string) db.ChatWorkflowStatus); ok {
+		r0 = rf(chatID)
+	} else {
+		r0 = ret.Get(0).(db.ChatWorkflowStatus)
+	}
+
+	if rf, ok := ret.Get(1).(func(string) error); ok {
+		r1 = rf(chatID)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
+type Database_GetLatestChatStatusByChatID_Call struct {
+	*mock.Call
+}
+
+func (_e *Database_Expecter) GetLatestChatStatusByChatID(chatID interface{}) *Database_GetLatestChatStatusByChatID_Call {
+	return &Database_GetLatestChatStatusByChatID_Call{Call: _e.mock.On("GetLatestChatStatusByChatID", chatID)}
+}
+
+func (_c *Database_GetLatestChatStatusByChatID_Call) Run(run func(chatID string)) *Database_GetLatestChatStatusByChatID_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(string))
+	})
+	return _c
+}
+
+func (_c *Database_GetLatestChatStatusByChatID_Call) Return(_a0 db.ChatWorkflowStatus, _a1 error) *Database_GetLatestChatStatusByChatID_Call {
+	_c.Call.Return(_a0, _a1)
+	return _c
+}
+
+func (_c *Database_GetLatestChatStatusByChatID_Call) RunAndReturn(run func(string) (db.ChatWorkflowStatus, error)) *Database_GetLatestChatStatusByChatID_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
+func (_m *Database) DeleteChatStatus(_a0 uuid.UUID) error {
+	ret := _m.Called(_a0)
+
+	if len(ret) == 0 {
+		panic("no return value specified for DeleteChatStatus")
+	}
+
+	var r0 error
+	if rf, ok := ret.Get(0).(func(uuid.UUID) error); ok {
+		r0 = rf(_a0)
+	} else {
+		r0 = ret.Error(0)
+	}
+
+	return r0
+}
+
+type Database_DeleteChatStatus_Call struct {
+	*mock.Call
+}
+
+
+func (_e *Database_Expecter) DeleteChatStatus(_a0 interface{}) *Database_DeleteChatStatus_Call {
+	return &Database_DeleteChatStatus_Call{Call: _e.mock.On("DeleteChatStatus", _a0)}
+}
+
+func (_c *Database_DeleteChatStatus_Call) Run(run func(_a0 uuid.UUID)) *Database_DeleteChatStatus_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(uuid.UUID))
+	})
+	return _c
+}
+
+func (_c *Database_DeleteChatStatus_Call) Return(_a0 error) *Database_DeleteChatStatus_Call {
+	_c.Call.Return(_a0)
+	return _c
+}
+
+func (_c *Database_DeleteChatStatus_Call) RunAndReturn(run func(uuid.UUID) error) *Database_DeleteChatStatus_Call {
+	_c.Call.Return(run)
+	return _c
+}
