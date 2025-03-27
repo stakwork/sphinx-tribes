@@ -357,4 +357,5 @@ type Database interface {
 	GetBountyStakesByHunterPubKey(hunterPubKey string) ([]BountyStake, error)
 	UpdateBountyStake(stakeID uuid.UUID, updates map[string]interface{}) (*BountyStake, error)
 	DeleteBountyStake(stakeID uuid.UUID) error
+	DeleteOldSSEMessageLogs(maxAge time.Duration) (int64, error)
 }

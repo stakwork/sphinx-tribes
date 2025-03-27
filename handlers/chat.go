@@ -163,6 +163,19 @@ type StopSSERequest struct {
 	ChatID string `json:"chatID"`
 }
 
+type SSEMaintenanceRequest struct {
+	StopAllClients bool  `json:"stop_all_clients"`
+	CleanupLogs    bool  `json:"cleanup_logs"`
+	LogMaxAgeHours int64 `json:"log_max_age_hours"`
+}
+
+type SSEMaintenanceResponse struct {
+	Success        bool   `json:"success"`
+	Message        string `json:"message"`
+	ClientsStopped int    `json:"clients_stopped"`
+	LogsRemoved    int64  `json:"logs_removed"`
+}
+
 func NewChatHandler(httpClient *http.Client, database db.Database) *ChatHandler {
 	return &ChatHandler{
 		httpClient: httpClient,
@@ -2027,4 +2040,64 @@ func (ch *ChatHandler) GetAllSSEMessagesByChatID(w http.ResponseWriter, r *http.
 			"offset":   offset,
 		},
 	})
+}
+
+// SSEMaintenance performs maintenance on SSE connections and logs
+//
+//	@Summary		Perform SSE maintenance
+//	@Description	Stop all SSE client connections and clean up old logs
+//	@Tags			Hive Chat
+//	@Accept			json
+//	@Produce		json
+//	@Security		PubKeyContextAuth
+//	@Param			request	body		SSEMaintenanceRequest	true	"Maintenance options"
+//	@Success		200		{object}	SSEMaintenanceResponse
+//	@Failure		400		{object}	ChatResponse
+//	@Failure		500		{object}	ChatResponse
+//	@Router			/hivechat/sse/maintenance [post]
+func (ch *ChatHandler) SSEMaintenance(w http.ResponseWriter, r *http.Request) {
+	var request SSEMaintenanceRequest
+
+	if err := json.NewDecoder(r.Body).Decode(&request); err != nil {
+
+		request.StopAllClients = true
+		request.CleanupLogs = true
+		request.LogMaxAgeHours = 2
+	}
+
+	response := SSEMaintenanceResponse{
+		Success: true,
+	}
+
+	if request.StopAllClients {
+		response.ClientsStopped = sse.ClientRegistry.StopAllClients()
+		logger.Log.Info("Stopped %d SSE clients during maintenance", response.ClientsStopped)
+	}
+
+	if request.CleanupLogs {
+		if request.LogMaxAgeHours <= 0 {
+			request.LogMaxAgeHours = 2
+		}
+
+		maxAge := time.Duration(request.LogMaxAgeHours) * time.Hour
+		logsRemoved, err := ch.db.DeleteOldSSEMessageLogs(maxAge)
+		if err != nil {
+			logger.Log.Error("Error cleaning up SSE logs: %v", err)
+			w.WriteHeader(http.StatusInternalServerError)
+			json.NewEncoder(w).Encode(ChatResponse{
+				Success: false,
+				Message: fmt.Sprintf("Error cleaning up logs: %v", err),
+			})
+			return
+		}
+
+		response.LogsRemoved = logsRemoved
+		logger.Log.Info("Removed %d SSE logs older than %v during maintenance", logsRemoved, maxAge)
+	}
+
+	response.Message = fmt.Sprintf("Maintenance completed: stopped %d clients, removed %d logs",
+		response.ClientsStopped, response.LogsRemoved)
+
+	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode(response)
 }

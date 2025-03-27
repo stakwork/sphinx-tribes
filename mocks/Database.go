@@ -17743,3 +17743,55 @@ func (_c *Database_DeleteBountyStake_Call) RunAndReturn(run func(uuid.UUID) erro
 	return _c
 }
 
+func (_m *Database) DeleteOldSSEMessageLogs(maxAge time.Duration) (int64, error) {
+	ret := _m.Called(maxAge)
+
+	if len(ret) == 0 {
+		panic("no return value specified for DeleteOldSSEMessageLogs")
+	}
+
+	var r0 int64
+	var r1 error
+	if rf, ok := ret.Get(0).(func(time.Duration) (int64, error)); ok {
+		return rf(maxAge)
+	}
+	if rf, ok := ret.Get(0).(func(time.Duration) int64); ok {
+		r0 = rf(maxAge)
+	} else {
+		r0 = ret.Get(0).(int64)
+	}
+
+	if rf, ok := ret.Get(1).(func(time.Duration) error); ok {
+		r1 = rf(maxAge)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
+type Database_DeleteOldSSEMessageLogs_Call struct {
+	*mock.Call
+}
+
+func (_e *Database_Expecter) DeleteOldSSEMessageLogs(maxAge interface{}) *Database_DeleteOldSSEMessageLogs_Call {
+	return &Database_DeleteOldSSEMessageLogs_Call{Call: _e.mock.On("DeleteOldSSEMessageLogs", maxAge)}
+}
+
+func (_c *Database_DeleteOldSSEMessageLogs_Call) Run(run func(maxAge time.Duration)) *Database_DeleteOldSSEMessageLogs_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(time.Duration))
+	})
+	return _c
+}
+
+func (_c *Database_DeleteOldSSEMessageLogs_Call) Return(_a0 int64, _a1 error) *Database_DeleteOldSSEMessageLogs_Call {
+	_c.Call.Return(_a0, _a1)
+	return _c
+}
+
+func (_c *Database_DeleteOldSSEMessageLogs_Call) RunAndReturn(run func(time.Duration) (int64, error)) *Database_DeleteOldSSEMessageLogs_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
