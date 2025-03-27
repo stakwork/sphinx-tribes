@@ -804,10 +804,20 @@ func (db database) GetAssignedBounties(r *http.Request) ([]NewBounty, error) {
 
 	ms := []NewBounty{}
 
-	query := `SELECT * FROM public.bounty WHERE assignee = '` + pubkey + `' AND show != false`
-	allQuery := query + " " + statusQuery + " " + orderQuery + " " + limitQuery
-	err := db.db.Raw(allQuery).Find(&ms).Error
-	return ms, err
+    ctx := r.Context()
+    authenticatedPubKey, _ := ctx.Value(auth.ContextKey).(string)
+    isAuthenticated := authenticatedPubKey != "" && authenticatedPubKey == pubkey
+
+    query := `SELECT * FROM public.bounty WHERE assignee = '` + pubkey + `'`
+    if isAuthenticated {
+        query += ` AND (show = true OR show = false)`
+    } else {
+        query += ` AND show = true`
+    }
+
+    allQuery := query + " " + statusQuery + " " + orderQuery + " " + limitQuery
+    err := db.db.Raw(allQuery).Find(&ms).Error
+    return ms, err
 }
 
 func (db database) GetCreatedBounties(r *http.Request) ([]NewBounty, error) {
