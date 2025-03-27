@@ -176,6 +176,18 @@ type ChatStatusResponse struct {
 	DataArray []db.ChatWorkflowStatus `json:"data_array,omitempty"`
 }
 
+type WebhookPayload struct {
+	ProjectStatus string `json:"project_status"`
+	Error         *struct {
+		Message string `json:"message"`
+	} `json:"error,omitempty"`
+}
+
+type ChatStatusWebhookResponse struct {
+	Status  string `json:"status"`
+	Message string `json:"message"`
+}
+
 func NewChatHandler(httpClient *http.Client, database db.Database) *ChatHandler {
 	return &ChatHandler{
 		httpClient: httpClient,
@@ -2351,5 +2363,107 @@ func (ch *ChatHandler) DeleteChatStatus(w http.ResponseWriter, r *http.Request) 
 	json.NewEncoder(w).Encode(ChatStatusResponse{
 		Success: true,
 		Message: "Chat status deleted successfully",
+	})
+}
+
+// HandleChatWebhook processes webhook requests from Stakwork
+//
+//	@Summary		Process chat webhook
+//	@Description	Receives status updates from Stakwork workflow system
+//	@Tags			Hive Chat
+//	@Accept			json
+//	@Produce		json
+//	@Param			chat_id	path		string	true	"Chat ID"
+//	@Param			payload	body		WebhookPayload	true	"Webhook payload"
+//	@Success		200		{object}	ChatStatusWebhookResponse
+//	@Failure		400		{object}	ChatStatusWebhookResponse
+//	@Failure		404		{object}	ChatStatusWebhookResponse
+//	@Failure		500		{object}	ChatStatusWebhookResponse
+//	@Router			/hivechat/{chat_id}/update [post]
+func (ch *ChatHandler) HandleChatWebhook(w http.ResponseWriter, r *http.Request) {
+	chatID := chi.URLParam(r, "chat_id")
+	if chatID == "" {
+		w.WriteHeader(http.StatusBadRequest)
+		json.NewEncoder(w).Encode(ChatStatusWebhookResponse{
+			Status:  "error",
+			Message: "Chat ID is required",
+		})
+		return
+	}
+
+	_, err := ch.db.GetChatByChatID(chatID)
+	if err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			logger.Log.Error("Chat not found for webhook: %s", chatID)
+			w.WriteHeader(http.StatusNotFound)
+			json.NewEncoder(w).Encode(ChatStatusWebhookResponse{
+				Status:  "error",
+				Message: "Chat not found",
+			})
+			return
+		}
+		logger.Log.Error("Error fetching chat for webhook: %v", err)
+		w.WriteHeader(http.StatusInternalServerError)
+		json.NewEncoder(w).Encode(ChatStatusWebhookResponse{
+			Status:  "error",
+			Message: "Failed to verify chat",
+		})
+		return
+	}
+
+	var payload WebhookPayload
+	if err := json.NewDecoder(r.Body).Decode(&payload); err != nil {
+		logger.Log.Error("Error parsing webhook payload: %v", err)
+		w.WriteHeader(http.StatusBadRequest)
+		json.NewEncoder(w).Encode(ChatStatusWebhookResponse{
+			Status:  "error",
+			Message: "Invalid payload format",
+		})
+		return
+	}
+
+	payloadBytes, _ := json.Marshal(payload)
+	logger.Log.Info("Received webhook for chat %s: %s", chatID, string(payloadBytes))
+
+	status := ""
+	message := ""
+
+	if payload.ProjectStatus == "completed" {
+		status = "success"
+	} else if payload.ProjectStatus == "error" {
+		status = "error"
+		if payload.Error != nil {
+			message = payload.Error.Message
+		} else {
+			message = "An error occurred during workflow execution"
+		}
+	} else {
+		status = payload.ProjectStatus
+	}
+
+	chatStatus := &db.ChatWorkflowStatus{
+		ChatID:  chatID,
+		Status:  status,
+		Message: message,
+	}
+
+	createdStatus, err := ch.db.AddChatStatus(chatStatus)
+	if err != nil {
+		logger.Log.Error("Failed to create chat status: %v", err)
+		w.WriteHeader(http.StatusInternalServerError)
+		json.NewEncoder(w).Encode(ChatStatusWebhookResponse{
+			Status:  "error",
+			Message: "Failed to process webhook",
+		})
+		return
+	}
+
+	logger.Log.Info("Created chat status for chat %s: %s - %s", 
+		chatID, createdStatus.Status, createdStatus.Message)
+
+	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode(ChatStatusWebhookResponse{
+		Status:  "success",
+		Message: "Webhook processed successfully",
 	})
 }

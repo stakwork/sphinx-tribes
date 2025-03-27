@@ -15,6 +15,7 @@ func ChatRoutes() chi.Router {
 	chatHandler := handlers.NewChatHandler(http.DefaultClient, db.DB)
 
 	r.Post("/response", chatHandler.ProcessChatResponse)
+	r.Post("/{chat_id}/update", chatHandler.HandleChatWebhook)
 
 	r.Group(func(r chi.Router) {
 		r.Use(auth.CombinedAuthContext)
