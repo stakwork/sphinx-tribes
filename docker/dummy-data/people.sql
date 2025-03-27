@@ -85,7 +85,7 @@ INSERT INTO people (
     'oliviamartinez',
     'Backend systems architect with focus on high-performance distributed systems. I build things that scale.',
     'https://randomuser.me/api/portraits/women/89.jpg'
-);
+),
 
 -- Developer 9: Senior Rust Engineer
 (
