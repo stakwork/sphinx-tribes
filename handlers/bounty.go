@@ -584,7 +584,7 @@ func (h *bountyHandler) CreateOrEditBounty(w http.ResponseWriter, r *http.Reques
 	}
 
 	if bounty.Assignee != "" {
-		msg := fmt.Sprintf("You have been assigned a new ticket: %s. %s/bounty/%d", bounty.Title, os.Getenv("HOST"), bounty.ID)
+		msg := fmt.Sprintf("You have been assigned a new ticket: %s. %s/bounty/%d", bounty.Title, os.Getenv("HOST"), b.ID)
 		assigneePubkey := bounty.Assignee
 		if bounty.ID != 0 {
 			if existingBounty.Assignee != "" && existingBounty.Assignee == bounty.Assignee {

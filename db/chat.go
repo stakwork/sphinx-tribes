@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"time"
 
+	"github.com/google/uuid"
 	"gorm.io/gorm"
 )
 
@@ -321,5 +322,121 @@ func (db database) DeleteChatWorkflow(workspaceID string) error {
 	if result.RowsAffected == 0 {
 		return fmt.Errorf("chat workflow not found for workspace: %s", workspaceID)
 	}
+	return nil
+}
+
+func (db database) AddChatStatus(status *ChatWorkflowStatus) (ChatWorkflowStatus, error) {
+	if status.ChatID == "" {
+		return ChatWorkflowStatus{}, errors.New("chat ID is required")
+	}
+
+	if status.Status == "success" {
+		status.Message = "Agent workflow completed"
+	} else if status.Status == "error" && status.Message == "" {
+		status.Message = "An error occurred during the workflow"
+	} else if status.Message == "" {
+		status.Message = status.Status
+	}
+
+	now := time.Now()
+	status.CreatedAt = now
+	status.UpdatedAt = now
+
+	if err := db.db.Create(&status).Error; err != nil {
+		return ChatWorkflowStatus{}, fmt.Errorf("failed to create chat status: %w", err)
+	}
+
+	return *status, nil
+}
+
+func (db database) UpdateChatStatus(status *ChatWorkflowStatus) (ChatWorkflowStatus, error) {
+	if status.UUID == uuid.Nil {
+		return ChatWorkflowStatus{}, errors.New("chat status UUID is required")
+	}
+
+	var existingStatus ChatWorkflowStatus
+	if err := db.db.First(&existingStatus, "uuid = ?", status.UUID).Error; err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return ChatWorkflowStatus{}, fmt.Errorf("chat status not found")
+		}
+		return ChatWorkflowStatus{}, fmt.Errorf("failed to fetch chat status: %w", err)
+	}
+
+	if status.Status != "" {
+		existingStatus.Status = status.Status
+		
+		if status.Status == "success" {
+			existingStatus.Message = "Agent workflow completed"
+		} else if status.Status == "error" && status.Message == "" {
+			existingStatus.Message = "An error occurred during the workflow"
+		} else if status.Message == "" {
+			existingStatus.Message = status.Status
+		}
+	}
+	
+	if status.Message != "" {
+		existingStatus.Message = status.Message
+	}
+	
+	existingStatus.UpdatedAt = time.Now()
+
+	if err := db.db.Save(&existingStatus).Error; err != nil {
+		return ChatWorkflowStatus{}, fmt.Errorf("failed to update chat status: %w", err)
+	}
+
+	return existingStatus, nil
+}
+
+func (db database) GetChatStatusByChatID(chatID string) ([]ChatWorkflowStatus, error) {
+	if chatID == "" {
+		return nil, errors.New("chat ID is required")
+	}
+
+	var statuses []ChatWorkflowStatus
+	result := db.db.Where("chat_id = ?", chatID).
+		Order("created_at DESC").
+		Find(&statuses)
+
+	if result.Error != nil {
+		return nil, fmt.Errorf("failed to fetch chat statuses: %w", result.Error)
+	}
+
+	return statuses, nil
+}
+
+func (db database) GetLatestChatStatusByChatID(chatID string) (ChatWorkflowStatus, error) {
+	if chatID == "" {
+		return ChatWorkflowStatus{}, errors.New("chat ID is required")
+	}
+
+	var status ChatWorkflowStatus
+	result := db.db.Where("chat_id = ?", chatID).
+		Order("created_at DESC").
+		First(&status)
+
+	if result.Error != nil {
+		if errors.Is(result.Error, gorm.ErrRecordNotFound) {
+			return ChatWorkflowStatus{}, fmt.Errorf("no chat status found for chat ID: %s", chatID)
+		}
+		return ChatWorkflowStatus{}, fmt.Errorf("failed to fetch chat status: %w", result.Error)
+	}
+
+	return status, nil
+}
+
+func (db database) DeleteChatStatus(id uuid.UUID) error {
+	if id == uuid.Nil {
+		return errors.New("valid UUID is required")
+	}
+
+	result := db.db.Delete(&ChatWorkflowStatus{}, "uuid = ?", id)
+	if result.Error != nil {
+		return fmt.Errorf("failed to delete chat status: %w", result.Error)
+	}
+
+	if result.RowsAffected == 0 {
+		return fmt.Errorf("chat status not found with UUID: %s", id.String())
+	}
+
 	return nil
 }

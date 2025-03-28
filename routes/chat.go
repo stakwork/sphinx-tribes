@@ -15,6 +15,7 @@ func ChatRoutes() chi.Router {
 	chatHandler := handlers.NewChatHandler(http.DefaultClient, db.DB)
 
 	r.Post("/response", chatHandler.ProcessChatResponse)
+	r.Post("/{chat_id}/update", chatHandler.HandleChatWebhook)
 
 	r.Group(func(r chi.Router) {
 		r.Use(auth.CombinedAuthContext)
@@ -49,7 +50,12 @@ func ChatRoutes() chi.Router {
 		r.Get("/sse/{chat_id}", chatHandler.GetSSEMessagesByChatID)
 		r.Post("/sse", chatHandler.StartSSEClient)
 		r.Get("/sse/all/{chat_id}", chatHandler.GetAllSSEMessagesByChatID)
-		r.Post("/sse/maintenance", chatHandler.SSEMaintenance)
+		
+		r.Get("/status/{chat_id}", chatHandler.GetAllChatStatus)
+		r.Get("/status/{chat_id}/latest", chatHandler.GetLatestChatStatus)
+		r.Post("/status", chatHandler.CreateChatStatus)
+		r.Put("/status/{uuid}", chatHandler.UpdateChatStatus)
+		r.Delete("/status/{uuid}", chatHandler.DeleteChatStatus)
 	})
 
 	return r
