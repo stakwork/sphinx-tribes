@@ -362,4 +362,5 @@ type Database interface {
 	GetChatStatusByChatID(chatID string) ([]ChatWorkflowStatus, error)
 	GetLatestChatStatusByChatID(chatID string) (ChatWorkflowStatus, error)
 	DeleteChatStatus(uuid uuid.UUID) error
+	DeleteOldSSEMessageLogs(maxAge time.Duration) (int64, error)
 }

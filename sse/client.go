@@ -37,21 +37,21 @@ func (r *Registry) Register(client *Client) {
 func (r *Registry) Unregister(sseURL, chatID string) bool {
 	r.mutex.Lock()
 	defer r.mutex.Unlock()
-	
+
 	key := GenerateClientKey(chatID, sseURL)
 	logger.Log.Info("Attempting to unregister client with key: %s", key)
-	
+
 	if client, exists := r.clients[key]; exists {
 		client.Stop()
 		delete(r.clients, key)
 		return true
 	}
-	
+
 	logger.Log.Info("No client found. Currently registered clients:")
 	for k := range r.clients {
 		logger.Log.Info("- %s", k)
 	}
-	
+
 	return false
 }
 
@@ -263,4 +263,17 @@ func (r *Registry) HasClient(sseURL, chatID string) bool {
 	_, exists := r.clients[key]
 
 	return exists
+}
+
+func (r *Registry) StopAllClients() int {
+	r.mutex.Lock()
+	defer r.mutex.Unlock()
+
+	count := len(r.clients)
+	for key, client := range r.clients {
+		client.Stop()
+		delete(r.clients, key)
+	}
+
+	return count
 }

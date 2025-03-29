@@ -178,3 +178,14 @@ func (db database) GetSSEMessagesByChatID(chatID string, limit int, offset int, 
 
 	return messages, total, nil
 }
+
+func (db database) DeleteOldSSEMessageLogs(maxAge time.Duration) (int64, error) {
+	cutoffTime := time.Now().Add(-maxAge)
+
+	result := db.db.Where("created_at < ?", cutoffTime).Delete(&SSEMessageLog{})
+	if result.Error != nil {
+		return 0, fmt.Errorf("failed to delete old SSE message logs: %w", result.Error)
+	}
+
+	return result.RowsAffected, nil
+}
