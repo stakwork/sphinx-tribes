@@ -269,28 +269,70 @@ func GetMemeToken(id string, sig string) (string, db.MemeTokenSuccess) {
 }
 
 func UploadMemeImage(file multipart.File, token string, fileName string) (error, string) {
-	url := fmt.Sprintf("%s/public", config.MemeUrl)
+
+	if err := os.MkdirAll("./uploads", 0755); err != nil {
+		logger.Log.Error("Failed to create uploads directory: %v", err)
+		return err, ""
+	}
+	
 	filePath := path.Join("./uploads", fileName)
-	fileW, _ := os.Open(filePath)
-	defer file.Close()
+	tempFile, err := os.Create(filePath)
+	if err != nil {
+		logger.Log.Error("Failed to create temporary file: %v", err)
+		return err, ""
+	}
+	
+	if _, err := io.Copy(tempFile, file); err != nil {
+		tempFile.Close()
+		os.Remove(filePath)
+		logger.Log.Error("Failed to write to temporary file: %v", err)
+		return err, ""
+	}
+	tempFile.Close()
+	
+	url := fmt.Sprintf("%s/public", config.MemeUrl)
+	
+	fileW, err := os.Open(filePath)
+	if err != nil {
+		os.Remove(filePath)
+		logger.Log.Error("Failed to open temporary file: %v", err)
+		return err, ""
+	}
+	defer fileW.Close()
 
 	fileBody := &bytes.Buffer{}
 	writer := multipart.NewWriter(fileBody)
-	part, _ := writer.CreateFormFile("file", filepath.Base(filePath))
-	io.Copy(part, fileW)
+	part, err := writer.CreateFormFile("file", filepath.Base(filePath))
+	if err != nil {
+		os.Remove(filePath)
+		logger.Log.Error("Failed to create form file: %v", err)
+		return err, ""
+	}
+	
+	if _, err := io.Copy(part, fileW); err != nil {
+		os.Remove(filePath)
+		logger.Log.Error("Failed to copy file to form: %v", err)
+		return err, ""
+	}
 	writer.Close()
 
 	client := &http.Client{}
 	req, err := http.NewRequest(http.MethodPost, url, fileBody)
+	if err != nil {
+		os.Remove(filePath)
+		logger.Log.Error("Failed to create request: %v", err)
+		return err, ""
+	}
+	
 	req.Header.Set("Authorization", "BEARER "+token)
 	req.Header.Set("Content-Type", writer.FormDataContentType())
 	res, err := client.Do(req)
 
 	// Delete image from uploads folder
-	DeleteFileFromUploadsFolder(filePath)
+	os.Remove(filePath)
 
 	if err != nil {
-		logger.Log.Error("meme request Error: %v", err)
+		logger.Log.Error("Meme request Error: %v", err)
 		return err, ""
 	}
 
