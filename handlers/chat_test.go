@@ -22,6 +22,7 @@ import (
 	"github.com/google/uuid"
 	"github.com/stakwork/sphinx-tribes/auth"
 	"github.com/stakwork/sphinx-tribes/db"
+	"github.com/stakwork/sphinx-tribes/sse"
 	"github.com/stakwork/sphinx-tribes/websocket"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -3143,6 +3144,168 @@ func TestSendBuildMessage(t *testing.T) {
 
 		require.Equal(t, http.StatusInternalServerError, rr.Code)
 		assert.Contains(t, rr.Body.String(), "API key not set in environment")
+	})
+}
+
+func TestSSEMaintenance(t *testing.T) {
+	teardownSuite := SetupSuite(t)
+	defer teardownSuite(t)
+
+	db.CleanTestData()
+	chatHandler := NewChatHandler(&http.Client{}, db.TestDB)
+
+	now := time.Now()
+	oldTime := now.Add(-3 * time.Hour)
+	
+	oldEvent := map[string]interface{}{
+		"type": "test", 
+		"data": "old-data",
+	}
+	oldLog, err := db.TestDB.CreateSSEMessageLog(oldEvent, "test-chat-1", "test-sse-url", "test-webhook")
+	require.NoError(t, err)
+	
+	db.TestDB.UpdateSSEMessageLog(oldLog.ID, map[string]interface{}{
+		"created_at": oldTime,
+	})
+	
+	recentEvent := map[string]interface{}{
+		"type": "test", 
+		"data": "recent-data",
+	}
+	_, err = db.TestDB.CreateSSEMessageLog(recentEvent, "test-chat-2", "test-sse-url", "test-webhook")
+	require.NoError(t, err)
+
+	testClient := sse.NewClient("test-sse-url", "test-chat-1", "test-webhook", db.TestDB)
+	sse.ClientRegistry.Register(testClient)
+
+	t.Run("should stop all clients and clean up logs with default parameters", func(t *testing.T) {
+		rr := httptest.NewRecorder()
+		req := httptest.NewRequest(http.MethodPost, "/hivechat/sse/maintenance", nil)
+		
+		ctx := context.WithValue(req.Context(), auth.ContextKey, "test-pubkey-123")
+		req = req.WithContext(ctx)
+
+		chatHandler.SSEMaintenance(rr, req)
+
+		require.Equal(t, http.StatusOK, rr.Code)
+
+		var response SSEMaintenanceResponse
+		err := json.NewDecoder(rr.Body).Decode(&response)
+		require.NoError(t, err)
+		
+		assert.True(t, response.Success)
+		assert.True(t, response.LogsRemoved > 0, "Should have removed at least 1 old log")
+		assert.True(t, response.ClientsStopped > 0, "Should have stopped at least 1 client")
+		assert.Contains(t, response.Message, "Maintenance completed")
+	})
+
+	t.Run("should successfully perform maintenance with custom options", func(t *testing.T) {
+
+		anotherOldEvent := map[string]interface{}{
+			"type": "test", 
+			"data": "another-old-data",
+		}
+		anotherOldLog, err := db.TestDB.CreateSSEMessageLog(anotherOldEvent, "test-chat-3", "test-sse-url", "test-webhook")
+		require.NoError(t, err)
+		
+		db.TestDB.UpdateSSEMessageLog(anotherOldLog.ID, map[string]interface{}{
+			"created_at": oldTime,
+		})
+
+		anotherTestClient := sse.NewClient("test-sse-url-2", "test-chat-3", "test-webhook", db.TestDB)
+		sse.ClientRegistry.Register(anotherTestClient)
+
+		requestBody := SSEMaintenanceRequest{
+			StopAllClients:  true,
+			CleanupLogs:     true,
+			LogMaxAgeHours:  1,
+		}
+		bodyBytes, _ := json.Marshal(requestBody)
+
+		rr := httptest.NewRecorder()
+		req := httptest.NewRequest(http.MethodPost, "/hivechat/sse/maintenance", bytes.NewReader(bodyBytes))
+		
+		ctx := context.WithValue(req.Context(), auth.ContextKey, "test-pubkey-123")
+		req = req.WithContext(ctx)
+
+		chatHandler.SSEMaintenance(rr, req)
+
+		require.Equal(t, http.StatusOK, rr.Code)
+
+		var response SSEMaintenanceResponse
+		err = json.NewDecoder(rr.Body).Decode(&response)
+		require.NoError(t, err)
+		
+		assert.True(t, response.Success)
+		assert.True(t, response.LogsRemoved > 0, "Should have removed at least 1 old log")
+		assert.True(t, response.ClientsStopped > 0, "Should have stopped at least 1 client")
+		assert.Contains(t, response.Message, "Maintenance completed")
+	})
+
+	t.Run("should handle cleanup logs only", func(t *testing.T) {
+
+		anotherOldEvent := map[string]interface{}{
+			"type": "test", 
+			"data": "another-old-data",
+		}
+		anotherOldLog, err := db.TestDB.CreateSSEMessageLog(anotherOldEvent, "test-chat-4", "test-sse-url", "test-webhook")
+		require.NoError(t, err)
+		
+		db.TestDB.UpdateSSEMessageLog(anotherOldLog.ID, map[string]interface{}{
+			"created_at": oldTime,
+		})
+
+		requestBody := SSEMaintenanceRequest{
+			StopAllClients:  false,
+			CleanupLogs:     true,
+			LogMaxAgeHours:  4,
+		}
+		bodyBytes, _ := json.Marshal(requestBody)
+
+		rr := httptest.NewRecorder()
+		req := httptest.NewRequest(http.MethodPost, "/hivechat/sse/maintenance", bytes.NewReader(bodyBytes))
+		
+		ctx := context.WithValue(req.Context(), auth.ContextKey, "test-pubkey-123")
+		req = req.WithContext(ctx)
+
+		chatHandler.SSEMaintenance(rr, req)
+
+		require.Equal(t, http.StatusOK, rr.Code)
+
+		var response SSEMaintenanceResponse
+		err = json.NewDecoder(rr.Body).Decode(&response)
+		require.NoError(t, err)
+	})
+
+	t.Run("should handle stop clients only", func(t *testing.T) {
+
+		anotherTestClient := sse.NewClient("test-sse-url-3", "test-chat-5", "test-webhook", db.TestDB)
+		sse.ClientRegistry.Register(anotherTestClient)
+
+		requestBody := SSEMaintenanceRequest{
+			StopAllClients:  true,
+			CleanupLogs:     false,
+		}
+		bodyBytes, _ := json.Marshal(requestBody)
+
+		rr := httptest.NewRecorder()
+		req := httptest.NewRequest(http.MethodPost, "/hivechat/sse/maintenance", bytes.NewReader(bodyBytes))
+		
+		ctx := context.WithValue(req.Context(), auth.ContextKey, "test-pubkey-123")
+		req = req.WithContext(ctx)
+
+		chatHandler.SSEMaintenance(rr, req)
+
+		require.Equal(t, http.StatusOK, rr.Code)
+
+		var response SSEMaintenanceResponse
+		err = json.NewDecoder(rr.Body).Decode(&response)
+		require.NoError(t, err)
+		
+		assert.True(t, response.Success)
+		assert.Equal(t, int64(0), response.LogsRemoved, "Should not have removed any logs")
+		assert.True(t, response.ClientsStopped > 0, "Should have stopped at least 1 client")
+		assert.Contains(t, response.Message, "Maintenance completed")
 	})
 }
 
