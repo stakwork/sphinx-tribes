@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
+	"io/ioutil"
 	"log"
 	"net/http"
 	"regexp"
@@ -1701,4 +1702,52 @@ func (oh *workspaceHandler) DeleteWorkspaceCodeGraph(w http.ResponseWriter, r *h
 
 	w.WriteHeader(http.StatusOK)
 	json.NewEncoder(w).Encode(map[string]string{"message": "Code graph deleted successfully"})
+}
+
+func (oh *workspaceHandler) RefreshCodeGraph(w http.ResponseWriter, r *http.Request) {
+	ctx := r.Context()
+	pubKeyFromAuth, _ := ctx.Value(auth.ContextKey).(string)
+
+	if pubKeyFromAuth == "" {
+		logger.Log.Info("[workspaces] no pubkey from auth")
+		w.WriteHeader(http.StatusUnauthorized)
+		return
+	}
+
+	workspaceUuid := chi.URLParam(r, "workspace_uuid")
+
+	codeGraph, err := oh.db.GetCodeGraphByWorkspaceUuid(workspaceUuid)
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		json.NewEncoder(w).Encode(map[string]string{"error": "Failed to get code graph"})
+		return
+	}
+
+	repos := oh.db.GetWorkspaceRepositorByWorkspaceUuid(workspaceUuid)
+
+	repoURLs := []string{}
+	for _, repo := range repos {
+		repoURLs = append(repoURLs, repo.Url)
+	}
+	reposStr := strings.Join(repoURLs, ",")
+
+	requestURL := fmt.Sprintf("%s/git/sync?source_link=%s", codeGraph.Url, reposStr)
+
+	response, err := http.Get(requestURL)
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		json.NewEncoder(w).Encode(map[string]string{"error": "Failed to sync repositories"})
+		return
+	}
+	defer response.Body.Close()
+
+	body, err := ioutil.ReadAll(response.Body)
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		json.NewEncoder(w).Encode(map[string]string{"error": "Failed to read response"})
+		return
+	}
+
+	w.WriteHeader(http.StatusOK)
+	w.Write(body)
 }
