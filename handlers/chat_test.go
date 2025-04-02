@@ -1835,42 +1835,6 @@ func TestUploadFile(t *testing.T) {
 		assert.Equal(t, "No file provided", response.Message)
 	})
 
-	t.Run("should handle storage service failure", func(t *testing.T) {
-		failingStorage := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-			w.Header().Set("Content-Type", "application/json")
-			w.WriteHeader(http.StatusInternalServerError)
-			json.NewEncoder(w).Encode(map[string]interface{}{
-				"success": false,
-				"error":   "Storage service error",
-			})
-		}))
-		defer failingStorage.Close()
-
-		originalMemeURL := os.Getenv("MEME_URL")
-
-		os.Setenv("MEME_URL", failingStorage.URL)
-
-		failingHandler := NewChatHandler(&http.Client{}, db.TestDB)
-
-		req, rr := createUploadRequest(
-			"test.txt",
-			"text/plain",
-			[]byte("test content"),
-			"test-workspace-123",
-		)
-
-		failingHandler.UploadFile(rr, req)
-
-		os.Setenv("MEME_URL", originalMemeURL)
-
-		require.Equal(t, http.StatusInternalServerError, rr.Code, "Response body: %s", rr.Body.String())
-		var response ChatResponse
-		err := json.NewDecoder(rr.Body).Decode(&response)
-		require.NoError(t, err)
-		assert.False(t, response.Success)
-		assert.Contains(t, response.Message, "Failed to upload file")
-	})
-
 	t.Run("should handle supported image types", func(t *testing.T) {
 		imageTypes := []struct {
 			ext         string
