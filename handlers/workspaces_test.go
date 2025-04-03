@@ -381,6 +381,7 @@ func TestGetWorkspaceBounties(t *testing.T) {
 		WorkspaceUuid: workspace.Uuid,
 		OwnerID:       "workspace-user",
 		Price:         2000,
+		MaxStakers:    1,
 	}
 	db.TestDB.CreateOrEditBounty(bounty)
 
@@ -861,6 +862,7 @@ func TestGetWorkspaceBountiesCount(t *testing.T) {
 			WorkspaceUuid: workspace.Uuid,
 			OwnerID:       "workspace-user",
 			Price:         2000,
+			MaxStakers:    1,
 		}
 
 		db.TestDB.CreateOrEditBounty(bounty)
