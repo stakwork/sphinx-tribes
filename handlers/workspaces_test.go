@@ -1188,6 +1188,8 @@ func TestCreateWorkspaceUser(t *testing.T) {
 
 	oHandler := NewWorkspaceHandler(db.TestDB)
 
+	db.CleanTestData()
+
 	person := db.Person{
 		Uuid:        "uuid",
 		OwnerAlias:  "alias",
@@ -1210,7 +1212,7 @@ func TestCreateWorkspaceUser(t *testing.T) {
 
 	workspace := db.Workspace{
 		Uuid:        "workspace_uuid",
-		Name:        "workspace_name",
+		Name:        "workspace_name" + uuid.New().String(),
 		OwnerPubKey: "person.OwnerPubkey",
 		Github:      "gtihub",
 		Website:     "website",
