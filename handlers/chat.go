@@ -595,7 +595,7 @@ func (ch *ChatHandler) SendMessage(w http.ResponseWriter, r *http.Request) {
 				},
 			},
 		},
-		WebhookURL: fmt.Sprintf("https://community.sphinx.chat/chat/%s/update", request.ChatID),
+		WebhookURL: fmt.Sprintf("https://community.sphinx.chat/hivechat/%s/update", request.ChatID),
 	}
 
 	if mode == "Build" {
