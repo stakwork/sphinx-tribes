@@ -28,6 +28,9 @@ func TestUnitCreateOrEditWorkspace(t *testing.T) {
 	defer teardownSuite(t)
 	oHandler := NewWorkspaceHandler(db.TestDB)
 
+	db.CleanTestData()
+	db.DeleteAllBounties()
+
 	t.Run("should return error if body is not a valid json", func(t *testing.T) {
 		rr := httptest.NewRecorder()
 		handler := http.HandlerFunc(oHandler.CreateOrEditWorkspace)
@@ -215,6 +218,9 @@ func TestDeleteWorkspace(t *testing.T) {
 	defer teardownSuite(t)
 	oHandler := NewWorkspaceHandler(db.TestDB)
 
+	db.CleanTestData()
+	db.DeleteAllBounties()
+
 	workspace := db.Workspace{
 		Uuid:        uuid.New().String(),
 		Name:        fmt.Sprintf("Workspace %s", uuid.New().String()),
@@ -365,9 +371,12 @@ func TestGetWorkspaceBounties(t *testing.T) {
 	}
 	oHandler := NewWorkspaceHandler(db.TestDB)
 
+	db.CleanTestData()
+	db.DeleteAllBounties()
+
 	workspace := db.Workspace{
 		Uuid:        uuid.New().String(),
-		Name:        uuid.New().String(),
+		Name:        "test_workspace_bounties" + uuid.New().String(),
 		OwnerPubKey: "workspace_owner_bounties_pubkey",
 		Github:      "https://github.com/bounties",
 		Website:     "https://www.bountieswebsite.com",
@@ -441,6 +450,8 @@ func TestGetWorkspaceBudget(t *testing.T) {
 	defer teardownSuite(t)
 	ctx := context.WithValue(context.Background(), auth.ContextKey, "test-key")
 	oHandler := NewWorkspaceHandler(db.TestDB)
+	db.CleanTestData()
+	db.DeleteAllBounties()
 	handlerUserHasAccess := func(pubKeyFromAuth string, uuid string, role string) bool {
 		return true
 	}
@@ -748,6 +759,9 @@ func TestGetWorkspaceBudgetHistory(t *testing.T) {
 	defer teardownSuite(t)
 	oHandler := NewWorkspaceHandler(db.TestDB)
 
+	db.CleanTestData()
+	db.DeleteAllBounties()
+
 	workspace := db.Workspace{
 		Uuid:        uuid.New().String(),
 		Name:        "Workspace History Name" + uuid.New().String(),
@@ -901,6 +915,9 @@ func TestAddUserRoles(t *testing.T) {
 
 	oHandler := NewWorkspaceHandler(db.TestDB)
 
+	db.CleanTestData()
+	db.DeleteAllBounties()
+
 	person := db.Person{
 		Uuid:        uuid.New().String(),
 		OwnerAlias:  "alias",
@@ -923,7 +940,7 @@ func TestAddUserRoles(t *testing.T) {
 
 	workspace := db.Workspace{
 		Uuid:        uuid.New().String(),
-		Name:        "workspace_name",
+		Name:        "workspace_name" + uuid.New().String(),
 		OwnerPubKey: person2.OwnerPubKey,
 		Github:      "gtihub",
 		Website:     "website",
@@ -1468,6 +1485,9 @@ func TestGetUserDropdownWorkspaces(t *testing.T) {
 
 	db.TestDB.DeleteWorkspace()
 
+	db.CleanTestData()
+	db.DeleteAllBounties()
+
 	person := db.Person{
 		Uuid:        "uuid",
 		OwnerAlias:  "alias",
@@ -1490,7 +1510,7 @@ func TestGetUserDropdownWorkspaces(t *testing.T) {
 
 	workspace := db.Workspace{
 		Uuid:        "workspace_uuid",
-		Name:        "workspace_name",
+		Name:        "workspace_name" + uuid.New().String(),
 		OwnerPubKey: "person.OwnerPubkey",
 		Github:      "gtihub",
 		Website:     "website",
@@ -1562,6 +1582,9 @@ func TestCreateOrEditWorkspaceRepository(t *testing.T) {
 	defer teardownSuite(t)
 	oHandler := NewWorkspaceHandler(db.TestDB)
 
+	db.CleanTestData()
+	db.DeleteAllBounties()
+
 	t.Run("should return error if a user is not authorized", func(t *testing.T) {
 		rr := httptest.NewRecorder()
 		handler := http.HandlerFunc(oHandler.CreateOrEditWorkspaceRepository)
@@ -1597,9 +1620,12 @@ func TestCreateOrEditWorkspaceRepository(t *testing.T) {
 		rr := httptest.NewRecorder()
 		handler := http.HandlerFunc(oHandler.CreateOrEditWorkspaceRepository)
 
+		db.CleanTestData()
+	db.DeleteAllBounties()
+
 		workspace := db.Workspace{
 			Uuid:        uuid.New().String(),
-			Name:        uuid.New().String(),
+			Name:        "test_workspace_bounty" + uuid.New().String(),
 			OwnerPubKey: "workspace_owner_bounties_pubkey",
 			Github:      "https://github.com/bounties",
 			Website:     "https://www.bountieswebsite.com",
@@ -1632,9 +1658,12 @@ func TestCreateOrEditWorkspaceRepository(t *testing.T) {
 		rr := httptest.NewRecorder()
 		handler := http.HandlerFunc(oHandler.CreateOrEditWorkspaceRepository)
 
+		db.CleanTestData()
+		db.DeleteAllBounties()
+
 		workspace := db.Workspace{
 			Uuid:        uuid.New().String(),
-			Name:        uuid.New().String(),
+			Name:        "test_workspace_v1" + uuid.New().String(),
 			OwnerPubKey: "workspace_owner_bounties_pubkey",
 			Github:      "https://github.com/bounties",
 			Website:     "https://www.bountieswebsite.com",
@@ -1683,6 +1712,8 @@ func TestGetWorkspaceRepositorByWorkspaceUuid(t *testing.T) {
 	defer teardownSuite(t)
 
 	oHandler := NewWorkspaceHandler(db.TestDB)
+	db.CleanTestData()
+	db.DeleteAllBounties()
 
 	person := db.Person{
 		Uuid:        uuid.New().String(),
@@ -1757,6 +1788,8 @@ func TestGetWorkspaceRepoByWorkspaceUuidAndRepoUuid(t *testing.T) {
 	defer teardownSuite(t)
 
 	oHandler := NewWorkspaceHandler(db.TestDB)
+db.CleanTestData()
+	db.DeleteAllBounties()
 
 	person := db.Person{
 		Uuid:        uuid.New().String(),
@@ -1833,6 +1866,9 @@ func TestDeleteWorkspaceRepository(t *testing.T) {
 
 	oHandler := NewWorkspaceHandler(db.TestDB)
 
+	db.CleanTestData()
+	db.DeleteAllBounties()
+
 	person := db.Person{
 		Uuid:        "uuid",
 		OwnerAlias:  "alias",
@@ -1845,7 +1881,7 @@ func TestDeleteWorkspaceRepository(t *testing.T) {
 
 	workspace := db.Workspace{
 		Uuid:        "workspace_uuid",
-		Name:        "workspace_name",
+		Name:        "workspace_name" + uuid.New().String(),
 		OwnerPubKey: "person.OwnerPubkey",
 		Github:      "gtihub",
 		Website:     "website",
@@ -1908,6 +1944,9 @@ func TestCreateOrEditWorkspaceCodeGraph(t *testing.T) {
 	defer teardownSuite(t)
 	oHandler := NewWorkspaceHandler(db.TestDB)
 
+	db.CleanTestData()
+	db.DeleteAllBounties()
+
 	t.Run("should return error if a user is not authorized", func(t *testing.T) {
 		rr := httptest.NewRecorder()
 		handler := http.HandlerFunc(oHandler.CreateOrEditWorkspaceCodeGraph)
@@ -1942,9 +1981,12 @@ func TestCreateOrEditWorkspaceCodeGraph(t *testing.T) {
 		rr := httptest.NewRecorder()
 		handler := http.HandlerFunc(oHandler.CreateOrEditWorkspaceCodeGraph)
 
+		db.CleanTestData()
+	db.DeleteAllBounties()
+
 		workspace := db.Workspace{
 			Uuid:        uuid.New().String(),
-			Name:        uuid.New().String(),
+			Name:        "test_workspace_code" + uuid.New().String(),
 			OwnerPubKey: "workspace_owner_pubkey",
 			Github:      "https://github.com/test",
 			Website:     "https://www.test.com",
@@ -1973,10 +2015,11 @@ func TestCreateOrEditWorkspaceCodeGraph(t *testing.T) {
 	t.Run("user should be able to add a workspace code graph when the right conditions are met", func(t *testing.T) {
 		rr := httptest.NewRecorder()
 		handler := http.HandlerFunc(oHandler.CreateOrEditWorkspaceCodeGraph)
-
+		db.CleanTestData()
+		db.DeleteAllBounties()
 		workspace := db.Workspace{
 			Uuid:        uuid.New().String(),
-			Name:        uuid.New().String(),
+			Name:        "test_code" + uuid.New().String(),
 			OwnerPubKey: "workspace_owner_pubkey",
 			Github:      "https://github.com/test",
 			Website:     "https://www.test.com",
@@ -2013,9 +2056,12 @@ func TestCreateOrEditWorkspaceCodeGraph(t *testing.T) {
 		rr := httptest.NewRecorder()
 		handler := http.HandlerFunc(oHandler.CreateOrEditWorkspaceCodeGraph)
 
+		db.CleanTestData()
+	db.DeleteAllBounties()
+
 		workspace := db.Workspace{
 			Uuid:        uuid.New().String(),
-			Name:        uuid.New().String(),
+			Name:        "test_work_code" + uuid.New().String(),
 			OwnerPubKey: "workspace_owner_pubkey",
 			Github:      "https://github.com/test",
 			Website:     "https://www.test.com",
@@ -2051,10 +2097,11 @@ func TestCreateOrEditWorkspaceCodeGraph(t *testing.T) {
 	})
 
 	t.Run("should be able to update secret alias of existing code graph", func(t *testing.T) {
-
+		db.CleanTestData()
+		db.DeleteAllBounties()
 		workspace := db.Workspace{
 			Uuid:        uuid.New().String(),
-			Name:        uuid.New().String(),
+			Name:        "test_works_code" + uuid.New().String(),
 			OwnerPubKey: "workspace_owner_pubkey",
 			Github:      "https://github.com/test",
 			Website:     "https://www.test.com",
@@ -2100,6 +2147,9 @@ func TestGetWorkspaceCodeGraphByUUID(t *testing.T) {
 	defer teardownSuite(t)
 
 	oHandler := NewWorkspaceHandler(db.TestDB)
+
+	db.CleanTestData()
+	db.DeleteAllBounties()
 
 	person := db.Person{
 		Uuid:        uuid.New().String(),
@@ -2175,6 +2225,9 @@ func TestGetCodeGraphsByWorkspaceUuid(t *testing.T) {
 
 	oHandler := NewWorkspaceHandler(db.TestDB)
 
+	db.CleanTestData()
+	db.DeleteAllBounties()
+
 	person := db.Person{
 		Uuid:        uuid.New().String(),
 		OwnerAlias:  "test-alias",
@@ -2249,6 +2302,9 @@ func TestDeleteWorkspaceCodeGraph(t *testing.T) {
 
 	oHandler := NewWorkspaceHandler(db.TestDB)
 
+	db.CleanTestData()
+	db.DeleteAllBounties()
+
 	person := db.Person{
 		Uuid:        "uuid",
 		OwnerAlias:  "alias",
@@ -2261,7 +2317,7 @@ func TestDeleteWorkspaceCodeGraph(t *testing.T) {
 
 	workspace := db.Workspace{
 		Uuid:        "workspace_uuid",
-		Name:        "workspace_name",
+		Name:        "workspace_name" + uuid.New().String(),
 		OwnerPubKey: "person.OwnerPubkey",
 		Github:      "github",
 		Website:     "website",
