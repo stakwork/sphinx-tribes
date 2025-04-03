@@ -127,27 +127,37 @@ func (db database) GetChatMessagesForChatID(chatID string) ([]ChatMessage, error
 	return chatMessages, nil
 }
 
-func (db database) GetChatsForWorkspace(workspaceID string, chatStatus string) ([]Chat, error) {
-
+func (db database) GetChatsForWorkspace(workspaceID string, chatStatus string, limit int, offset int) ([]Chat, int64, error) {
 	if workspaceID == "" {
-		return []Chat{}, errors.New("workspace ID is required")
+		return []Chat{}, 0, errors.New("workspace ID is required")
 	}
 
 	var chats []Chat
+	var total int64
+
+	query := db.db.Model(&Chat{})
 
 	if chatStatus == "" {
 		chatStatus = string(ActiveStatus)
 	}
 
-	result := db.db.Where("workspace_id = ? AND status = ?", workspaceID, chatStatus).
-		Order("updated_at DESC").
-		Find(&chats)
+	query = query.Where("workspace_id = ? AND status = ?", workspaceID, chatStatus)
 
-	if result.Error != nil {
-		return nil, fmt.Errorf("failed to fetch chats: %w", result.Error)
+	if err := query.Count(&total).Error; err != nil {
+		return nil, 0, fmt.Errorf("failed to count chats: %w", err)
 	}
 
-	return chats, nil
+	query = query.Order("updated_at DESC")
+
+	if limit > 0 {
+		query = query.Limit(limit).Offset(offset)
+	}
+
+	if err := query.Find(&chats).Error; err != nil {
+		return nil, 0, fmt.Errorf("failed to fetch chats: %w", err)
+	}
+
+	return chats, total, nil
 }
 
 func (db database) GetAllChatsForWorkspace(workspaceID string) ([]Chat, error) {
