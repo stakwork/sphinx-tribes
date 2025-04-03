@@ -840,6 +840,9 @@ func TestGetWorkspaceBountiesCount(t *testing.T) {
 	defer teardownSuite(t)
 	oHandler := NewWorkspaceHandler(db.TestDB)
 
+	db.CleanTestData()
+    db.DeleteAllBounties()
+
 	t.Run("should return the count of workspace bounties", func(t *testing.T) {
 
 		rr := httptest.NewRecorder()
@@ -849,7 +852,7 @@ func TestGetWorkspaceBountiesCount(t *testing.T) {
 
 		workspace := db.Workspace{
 			Uuid:        uuid.New().String(),
-			Name:        uuid.New().String(),
+			Name:       "count_workspace" + uuid.New().String(),
 			OwnerPubKey: uuid.New().String(),
 			Github:      "https://github.com/bounties",
 			Website:     "https://www.bountieswebsite.com",
