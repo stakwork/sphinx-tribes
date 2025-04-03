@@ -1102,6 +1102,8 @@ func TestGetUserRoles(t *testing.T) {
 	defer teardownSuite(t)
 	oHandler := NewWorkspaceHandler(db.TestDB)
 
+	db.CleanTestData()
+
 	person := db.Person{
 		Uuid:        uuid.New().String(),
 		OwnerAlias:  "alias",
@@ -1124,16 +1126,16 @@ func TestGetUserRoles(t *testing.T) {
 
 	workspace := db.Workspace{
 		Uuid:        uuid.New().String(),
-		Name:        uuid.New().String(),
+		Name:        "test_workspace_" + uuid.New().String(),
 		OwnerPubKey: person2.OwnerPubKey,
-		Github:      "gtihub",
+		Github:      "github",
 		Website:     "website",
 		Description: "description",
 	}
 	db.TestDB.CreateOrEditWorkspace(workspace)
 
 	userRoles := []db.WorkspaceUserRoles{
-		db.WorkspaceUserRoles{
+		{
 			WorkspaceUuid: workspace.Uuid,
 			OwnerPubKey:   person2.OwnerPubKey,
 			Role:          "ADD BOUNTY",
