@@ -648,13 +648,24 @@ func TestMetricsBountiesProviders(t *testing.T) {
 		}
 
 		assert.Equal(t, http.StatusOK, rr.Code)
-		//Assert that the API call response matches the value returned from the DB
-		assert.EqualValues(t, fetchedProviders, actualProviders)
-		//Assert that the Providers returned are equal to the persons created
-		person1.ID = fetchedProviders[0].ID
-		person2.ID = fetchedProviders[1].ID
-		expectedProviders := []db.Person{person1, person2}
-		assert.EqualValues(t, expectedProviders, actualProviders)
+		
+		assert.ElementsMatch(t, fetchedProviders, actualProviders)
+		
+		expectedProviders := make(map[string]db.Person)
+		for _, p := range []db.Person{person1, person2} {
+			expectedProviders[p.OwnerPubKey] = p
+		}
+		
+		assert.Equal(t, len(expectedProviders), len(actualProviders))
+		for _, actual := range actualProviders {
+			expected, exists := expectedProviders[actual.OwnerPubKey]
+			assert.True(t, exists, "Unexpected provider returned: %s", actual.OwnerPubKey)
+			
+			assert.Equal(t, expected.OwnerPubKey, actual.OwnerPubKey)
+			assert.Equal(t, expected.OwnerAlias, actual.OwnerAlias)
+			assert.Equal(t, expected.UniqueName, actual.UniqueName)
+			assert.Equal(t, expected.Description, actual.Description)
+		}
 	})
 
 }
