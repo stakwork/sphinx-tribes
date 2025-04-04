@@ -13,6 +13,7 @@ import (
 func BountyRoutes() chi.Router {
 	r := chi.NewRouter()
 	bountyHandler := handlers.NewBountyHandler(http.DefaultClient, db.DB)
+	tribeHandlers := handlers.NewTribeHandler(db.DB)
 	r.Group(func(r chi.Router) {
 		r.Get("/all", bountyHandler.GetAllBounties)
 		r.Get("/featured/all", bountyHandler.GetAllFeaturedBounties)
@@ -40,7 +41,7 @@ func BountyRoutes() chi.Router {
 	})
 	r.Group(func(r chi.Router) {
 		r.Use(auth.CombinedAuthContext)
-
+		r.Post("/process_stake/{bountyId}", tribeHandlers.ProcessStake)
 		r.Post("/featured/create", bountyHandler.CreateFeaturedBounty)
 		r.Put("/featured/update", bountyHandler.UpdateFeaturedBounty)
 		r.Delete("/featured/delete/{bountyId}", bountyHandler.DeleteFeaturedBounty)
