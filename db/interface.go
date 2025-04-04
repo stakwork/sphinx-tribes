@@ -363,4 +363,11 @@ type Database interface {
 	GetLatestChatStatusByChatID(chatID string) (ChatWorkflowStatus, error)
 	DeleteChatStatus(uuid uuid.UUID) error
 	DeleteOldSSEMessageLogs(maxAge time.Duration) (int64, error)
+	CreateBountyStakeProcess(process *BountyStakeProcess) (*BountyStakeProcess, error)
+	GetBountyStakeProcessByID(id uuid.UUID) (*BountyStakeProcess, error)
+	GetBountyStakeProcessesByBountyID(bountyID uint) ([]BountyStakeProcess, error)
+	GetBountyStakeProcessesByHunterPubKey(hunterPubKey string) ([]BountyStakeProcess, error)
+	GetAllBountyStakeProcesses() ([]BountyStakeProcess, error)
+	UpdateBountyStakeProcess(id uuid.UUID, updates map[string]interface{}) (*BountyStakeProcess, error)
+	DeleteBountyStakeProcess(id uuid.UUID) error
 }

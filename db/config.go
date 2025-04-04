@@ -108,6 +108,7 @@ func InitDB() {
 	db.AutoMigrate(&CodeSpaceMap{})
 	db.AutoMigrate(&BountyStake{})
 	db.AutoMigrate(&ChatWorkflowStatus{})
+	db.AutoMigrate(&BountyStakeProcess{})
 
 	DB.MigrateTablesWithOrgUuid()
 	DB.MigrateOrganizationToWorkspace()
