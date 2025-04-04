@@ -11,7 +11,7 @@ INSERT INTO bounty (
 ) VALUES
 -- Developer 1 Bounties
 (
-    'owner123', true, true, true, 'feature', 'cash', 10, 
+    'owner123', true, true, true, 'coding_task', 'cash', 10, 
     '2023-12-15', 5000, 150000, 'Implement Authentication System', 'backend-tribe', 'developer_1', 
     'https://github.com/org/repo/issues/1', 'workspace-uuid-123', '', 
     'Implement a secure authentication system with JWT tokens', 'backend', 
@@ -26,7 +26,7 @@ INSERT INTO bounty (
     ARRAY['Go', 'JavaScript', 'SQL'], '', 1, false, false
 ),
 (
-    'owner123', true, true, true, 'bug', 'cash', 4, 
+    'owner123', true, true, true, 'coding_task', 'cash', 4, 
     '2023-12-20', 2000, 75000, 'Fix Database Connection Leaks', 'backend-tribe', 'developer_1', 
     'https://github.com/org/repo/issues/2', 'workspace-uuid-123', '', 
     'Fix connection pool issues causing memory leaks', 'backend', 
@@ -41,7 +41,7 @@ INSERT INTO bounty (
     ARRAY['Go', 'SQL'], '', 2, false, false
 ),
 (
-    'owner456', true, true, true, 'enhancement', 'cash', 6, 
+    'owner456', true, true, true, 'coding_task', 'cash', 6, 
     '2023-12-25', 3000, 95000, 'Performance Optimization for API', 'backend-tribe', 'developer_1', 
     'https://github.com/org/repo/issues/3', 'workspace-uuid-456', '', 
     'Optimize API response time by implementing caching', 'backend', 
@@ -58,7 +58,7 @@ INSERT INTO bounty (
 
 -- Developer 2 Bounties
 (
-    'owner789', true, true, true, 'feature', 'cash', 12, 
+    'owner789', true, true, true, 'coding_task', 'cash', 12, 
     '2023-12-18', 6000, 180000, 'Build Real-time Chat Module', 'frontend-tribe', 'developer_2', 
     'https://github.com/org/repo/issues/4', 'workspace-uuid-789', '', 
     'Create a WebSocket-based real-time chat system', 'fullstack', 
@@ -73,7 +73,7 @@ INSERT INTO bounty (
     ARRAY['JavaScript', 'React', 'Go'], '', 1, false, false
 ),
 (
-    'owner123', true, true, true, 'bug', 'cash', 3, 
+    'owner123', true, true, true, 'coding_task', 'cash', 3, 
     '2023-12-22', 1500, 65000, 'Fix Cross-browser Compatibility Issues', 'frontend-tribe', 'developer_2', 
     'https://github.com/org/repo/issues/5', 'workspace-uuid-123', '', 
     'Resolve rendering issues in Safari and Firefox', 'frontend', 
@@ -90,7 +90,7 @@ INSERT INTO bounty (
 
 -- Developer 3 Bounties
 (
-    'owner456', true, true, true, 'feature', 'cash', 15, 
+    'owner456', true, true, true, 'coding_task', 'cash', 15, 
     '2023-12-30', 7500, 225000, 'Design and Implement Admin Dashboard', 'design-tribe', 'developer_3', 
     'https://github.com/org/repo/issues/6', 'workspace-uuid-456', '', 
     'Create an intuitive admin dashboard with analytics', 'frontend', 
@@ -105,7 +105,7 @@ INSERT INTO bounty (
     ARRAY['React', 'TypeScript', 'CSS'], '', 1, false, false
 ),
 (
-    'owner789', true, true, true, 'enhancement', 'cash', 8, 
+    'owner789', true, true, true, 'coding_task', 'cash', 8, 
     '2023-12-28', 4000, 120000, 'Implement Dark Mode Support', 'design-tribe', 'developer_3', 
     'https://github.com/org/repo/issues/7', 'workspace-uuid-789', '', 
     'Add dark mode support with theme switching', 'frontend', 
@@ -122,7 +122,7 @@ INSERT INTO bounty (
 
 -- Developer 4 Bounties
 (
-    'owner123', true, true, true, 'feature', 'cash', 20, 
+    'owner123', true, true, true, 'coding_task', 'cash', 20, 
     '2023-12-25', 10000, 300000, 'Build Machine Learning Recommendation Engine', 'data-tribe', 'developer_4', 
     'https://github.com/org/repo/issues/8', 'workspace-uuid-123', '', 
     'Implement ML-based content recommendation system', 'backend', 
@@ -139,7 +139,7 @@ INSERT INTO bounty (
 
 -- Developer 5 Bounties
 (
-    'owner456', true, true, true, 'bug', 'cash', 5, 
+    'owner456', true, true, true, 'coding_task', 'cash', 5, 
     '2023-12-15', 2500, 85000, 'Fix Payment Processing Issues', 'payment-tribe', 'developer_5', 
     'https://github.com/org/repo/issues/9', 'workspace-uuid-456', '', 
     'Resolve payment gateway integration issues', 'backend', 
@@ -154,7 +154,7 @@ INSERT INTO bounty (
     ARRAY['Go', 'JavaScript', 'SQL'], '', 1, false, false
 ),
 (
-    'owner789', true, true, true, 'feature', 'cash', 14, 
+    'owner789', true, true, true, 'coding_task', 'cash', 14, 
     '2023-12-20', 7000, 210000, 'Implement Subscription Management System', 'payment-tribe', 'developer_5', 
     'https://github.com/org/repo/issues/10', 'workspace-uuid-789', '', 
     'Build a system to manage user subscriptions and billing', 'fullstack', 
@@ -171,7 +171,7 @@ INSERT INTO bounty (
 
 -- Developer 6 Bounties
 (
-    'owner123', true, true, true, 'feature', 'cash', 16, 
+    'owner123', true, true, true, 'coding_task', 'cash', 16, 
     '2023-12-22', 8000, 240000, 'Create Interactive Data Visualization Dashboard', 'analytics-tribe', 'developer_6', 
     'https://github.com/org/repo/issues/11', 'workspace-uuid-123', '', 
     'Build interactive charts and data visualizations', 'frontend', 
@@ -188,7 +188,7 @@ INSERT INTO bounty (
 
 -- Developer 7 Bounties
 (
-    'owner456', true, true, true, 'enhancement', 'cash', 10, 
+    'owner456', true, true, true, 'coding_task', 'cash', 10, 
     '2023-12-28', 5000, 150000, 'Optimize Database Queries', 'backend-tribe', 'developer_7', 
     'https://github.com/org/repo/issues/12', 'workspace-uuid-456', '', 
     'Improve database query performance for analytics dashboard', 'backend', 
@@ -203,7 +203,7 @@ INSERT INTO bounty (
     ARRAY['SQL', 'Go', 'PostgreSQL'], '', 1, false, false
 ),
 (
-    'owner789', true, true, true, 'feature', 'cash', 12, 
+    'owner789', true, true, true, 'coding_task', 'cash', 12, 
     '2023-12-30', 6000, 180000, 'Implement API Rate Limiting', 'security-tribe', 'developer_7', 
     'https://github.com/org/repo/issues/13', 'workspace-uuid-789', '', 
     'Add rate limiting to protect API endpoints from abuse', 'backend', 
@@ -220,7 +220,7 @@ INSERT INTO bounty (
 
 -- Developer 8 Bounties
 (
-    'owner123', true, true, true, 'bug', 'cash', 7, 
+    'owner123', true, true, true, 'coding_task', 'cash', 7, 
     '2023-12-20', 3500, 105000, 'Fix Mobile Responsiveness Issues', 'frontend-tribe', 'developer_8', 
     'https://github.com/org/repo/issues/14', 'workspace-uuid-123', '', 
     'Resolve UI layout problems on mobile devices', 'frontend', 
@@ -235,7 +235,7 @@ INSERT INTO bounty (
     ARRAY['CSS', 'HTML', 'JavaScript'], '', 3, false, false
 ),
 (
-    'owner456', true, true, true, 'feature', 'cash', 15, 
+    'owner456', true, true, true, 'coding_task', 'cash', 15, 
     '2023-12-25', 7500, 225000, 'Implement Multi-language Support', 'frontend-tribe', 'developer_8', 
     'https://github.com/org/repo/issues/15', 'workspace-uuid-456', '', 
     'Add internationalization and localization support', 'fullstack', 
@@ -250,7 +250,7 @@ INSERT INTO bounty (
     ARRAY['JavaScript', 'React', 'i18n'], '', 1, false, false
 ),
 (
-    'owner789', true, true, true, 'enhancement', 'cash', 8, 
+    'owner789', true, true, true, 'coding_task', 'cash', 8, 
     '2023-12-28', 4000, 120000, 'Improve Accessibility Compliance', 'frontend-tribe', 'developer_8', 
     'https://github.com/org/repo/issues/16', 'workspace-uuid-789', '', 
     'Enhance application to meet WCAG 2.1 AA standards', 'frontend', 
@@ -279,7 +279,7 @@ INSERT INTO bounty (
     payment_pending, payment_failed
 ) VALUES
 (
-    'owner789', true, true, true, 'feature', 'cash', 18, 
+    'owner789', true, true, true, 'coding_task', 'cash', 18, 
     '2023-12-15', 9000, 270000, 'Build Microservice Architecture', 'architecture-tribe', 'developer_1', 
     'https://github.com/org/repo/issues/17', 'workspace-uuid-789', '', 
     'Refactor monolith into microservices architecture', 'backend', 
@@ -294,7 +294,7 @@ INSERT INTO bounty (
     ARRAY['Go', 'Docker', 'Kubernetes'], '', 1, false, false
 ),
 (
-    'owner123', true, true, true, 'enhancement', 'cash', 9, 
+    'owner123', true, true, true, 'coding_task', 'cash', 9, 
     '2023-12-20', 4500, 135000, 'Implement OAuth2 Authentication', 'security-tribe', 'developer_1', 
     'https://github.com/org/repo/issues/18', 'workspace-uuid-123', '', 
     'Add OAuth2 support for third-party authentication', 'backend', 
@@ -321,7 +321,7 @@ INSERT INTO bounty (
     payment_pending, payment_failed
 ) VALUES
 (
-    'owner456', true, true, true, 'feature', 'cash', 14, 
+    'owner456', true, true, true, 'coding_task', 'cash', 14, 
     '2023-12-22', 7000, 210000, 'Create Interactive Form Builder', 'frontend-tribe', 'developer_2', 
     'https://github.com/org/repo/issues/19', 'workspace-uuid-456', '', 
     'Build a drag-and-drop form builder with validation', 'frontend', 
@@ -336,7 +336,7 @@ INSERT INTO bounty (
     ARRAY['React', 'TypeScript', 'CSS'], '', 1, false, false
 ),
 (
-    'owner789', true, true, true, 'enhancement', 'cash', 7, 
+    'owner789', true, true, true, 'coding_task', 'cash', 7, 
     '2023-12-25', 3500, 105000, 'Implement Lazy Loading for Images', 'performance-tribe', 'developer_2', 
     'https://github.com/org/repo/issues/20', 'workspace-uuid-789', '', 
     'Add lazy loading to improve initial page load time', 'frontend', 
@@ -363,7 +363,7 @@ INSERT INTO bounty (
     payment_pending, payment_failed
 ) VALUES
 (
-    'owner123', true, true, true, 'feature', 'cash', 25, 
+    'owner123', true, true, true, 'coding_task', 'cash', 25, 
     '2023-12-30', 12500, 375000, 'Build CI/CD Pipeline', 'devops-tribe', 'developer_3', 
     'https://github.com/org/repo/issues/21', 'workspace-uuid-123', '', 
     'Implement automated CI/CD pipeline for deployment', 'devops', 
@@ -378,7 +378,7 @@ INSERT INTO bounty (
     ARRAY['Docker', 'Jenkins', 'YAML'], '', 1, false, false
 ),
 (
-    'owner456', true, true, true, 'bug', 'cash', 6, 
+    'owner456', true, true, true, 'coding_task', 'cash', 6, 
     '2023-12-15', 3000, 90000, 'Fix Memory Leaks in Frontend', 'performance-tribe', 'developer_4', 
     'https://github.com/org/repo/issues/22', 'workspace-uuid-456', '', 
     'Resolve memory leaks in React components', 'frontend', 
@@ -393,7 +393,7 @@ INSERT INTO bounty (
     ARRAY['JavaScript', 'React'], '', 2, false, false
 ),
 (
-    'owner789', true, true, true, 'feature', 'cash', 20, 
+    'owner789', true, true, true, 'coding_task', 'cash', 20, 
     '2023-12-28', 10000, 300000, 'Implement Notifications System', 'backend-tribe', 'developer_5', 
     'https://github.com/org/repo/issues/23', 'workspace-uuid-789', '', 
     'Build real-time notification system with multiple channels', 'fullstack', 
@@ -408,7 +408,7 @@ INSERT INTO bounty (
     ARRAY['Go', 'React', 'WebSocket'], '', 1, false, false
 ),
 (
-    'owner123', true, true, true, 'enhancement', 'cash', 12, 
+    'owner123', true, true, true, 'coding_task', 'cash', 12, 
     '2023-12-20', 6000, 180000, 'Implement Content Delivery Network', 'infrastructure-tribe', 'developer_6', 
     'https://github.com/org/repo/issues/24', 'workspace-uuid-123', '', 
     'Set up CDN for static assets to improve load times', 'devops', 
@@ -423,7 +423,7 @@ INSERT INTO bounty (
     ARRAY['AWS', 'CloudFront', 'Terraform'], '', 2, false, false
 ),
 (
-    'owner456', true, true, true, 'feature', 'cash', 18, 
+    'owner456', true, true, true, 'coding_task', 'cash', 18, 
     '2023-12-25', 9000, 270000, 'Build Analytics Dashboard', 'data-tribe', 'developer_7', 
     'https://github.com/org/repo/issues/25', 'workspace-uuid-456', '', 
     'Create a dashboard to visualize user behavior analytics', 'fullstack', 
@@ -438,7 +438,7 @@ INSERT INTO bounty (
     ARRAY['React', 'D3.js', 'Go'], '', 1, false, false
 ),
 (
-    'owner789', true, true, true, 'bug', 'cash', 8, 
+    'owner789', true, true, true, 'coding_task', 'cash', 8, 
     '2023-12-18', 4000, 120000, 'Fix SEO Issues', 'marketing-tribe', 'developer_8', 
     'https://github.com/org/repo/issues/26', 'workspace-uuid-789', '', 
     'Resolve SEO problems and improve search engine ranking', 'frontend', 
@@ -453,7 +453,7 @@ INSERT INTO bounty (
     ARRAY['HTML', 'JavaScript', 'SEO'], '', 3, false, false
 ),
 (
-    'owner123', true, true, true, 'feature', 'cash', 25, 
+    'owner123', true, true, true, 'coding_task', 'cash', 25, 
     '2023-12-30', 12500, 375000, 'Setup a Rust Rocket Web Server', 'rust-server', '0430a9b0f2a0bad383b1b3a1989571b90f7486a86629e040c603f6f9ecec857505fd2b1279ccce579dbe59cc88d8d49b7543bd62051b1417cafa6bb2e4fd011d30', 
     'https://github.com/org/repo/issues/21', 'workspace-uuid-123', '', 
     'We need an Http Server the web and mobile app can connect', 'backend', 
