@@ -25,6 +25,7 @@ done
 echo "Inserting dummy data...."
 
 psql $DB -f docker/dummy-data/people.sql
+psql $DB -f docker/dummy-data/workspaces.sql
 psql $DB -f docker/dummy-data/paid-bounties.sql
 
 ./.devcontainer/ports.sh
