@@ -213,7 +213,7 @@ type Database interface {
 	AddChatMessage(message *ChatMessage) (ChatMessage, error)
 	UpdateChatMessage(message *ChatMessage) (ChatMessage, error)
 	GetChatMessagesForChatID(chatID string) ([]ChatMessage, error)
-	GetChatsForWorkspace(workspaceID string, chatStatus string) ([]Chat, error)
+	GetChatsForWorkspace(workspaceID string, chatStatus string, limit int, offset int) ([]Chat, int64, error)
 	GetCodeGraphByUUID(uuid string) (WorkspaceCodeGraph, error)
 	GetCodeGraphByWorkspaceUuid(workspace_uuid string) (WorkspaceCodeGraph, error)
 	CreateOrEditCodeGraph(m WorkspaceCodeGraph) (WorkspaceCodeGraph, error)

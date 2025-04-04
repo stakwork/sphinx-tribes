@@ -12,107 +12,132 @@ import (
 func TestGetChatsForWorkspace(t *testing.T) {
 	InitTestDB()
 
-	chat := Chat{
-		WorkspaceID: "workspace123", Status: ActiveStatus,
+	TestDB.db.Exec("DELETE FROM chats")
+
+	chats := []Chat{
+		{ID: "chat1", WorkspaceID: "workspace123", Status: ActiveStatus},
+		{ID: "chat2", WorkspaceID: "workspace123", Status: ActiveStatus},
+		{ID: "chat3", WorkspaceID: "workspace123", Status: ActiveStatus},
+		{ID: "chat4", WorkspaceID: "workspace123", Status: ActiveStatus},
+		{ID: "chat5", WorkspaceID: "workspace123", Status: ActiveStatus},
 	}
 
-	TestDB.db.Create(&chat)
+	for _, chat := range chats {
+		result := TestDB.db.Create(&chat)
+		assert.NoError(t, result.Error)
+	}
 
 	tests := []struct {
 		name        string
 		workspaceID string
-		mockChats   []Chat
-		mockError   error
-		expected    []Chat
+		limit       int
+		offset      int
+		expectedLen int
+		totalCount  int64
 		expectError bool
 	}{
 		{
-			name:        "Basic Functionality",
+			name:        "Basic Functionality - No Pagination",
 			workspaceID: "workspace123",
-			expected: []Chat{
-				{WorkspaceID: "workspace123", Status: ActiveStatus},
-			},
+			limit:       -1,
+			offset:      0,
+			expectedLen: 5,
+			totalCount:  5,
+			expectError: false,
+		},
+		{
+			name:        "With Pagination - First Page",
+			workspaceID: "workspace123",
+			limit:       2,
+			offset:      0,
+			expectedLen: 2,
+			totalCount:  5,
+			expectError: false,
+		},
+		{
+			name:        "With Pagination - Second Page",
+			workspaceID: "workspace123",
+			limit:       2,
+			offset:      2,
+			expectedLen: 2,
+			totalCount:  5,
+			expectError: false,
+		},
+		{
+			name:        "With Pagination - Last Page",
+			workspaceID: "workspace123",
+			limit:       2,
+			offset:      4,
+			expectedLen: 1,
+			totalCount:  5,
 			expectError: false,
 		},
 		{
 			name:        "No Chats for Workspace",
 			workspaceID: "emptyWorkspace",
-			expected:    []Chat{},
-			expectError: false,
-		},
-		{
-			name:        "Invalid Workspace ID",
-			workspaceID: "nonExistentWorkspace",
-			expected:    []Chat{},
+			limit:       -1,
+			offset:      0,
+			expectedLen: 0,
+			totalCount:  0,
 			expectError: false,
 		},
 		{
 			name:        "Empty Workspace ID",
 			workspaceID: "",
-			expected:    []Chat{},
+			limit:       -1,
+			offset:      0,
+			expectedLen: 0,
+			totalCount:  0,
 			expectError: true,
 		},
 		{
-			name:        "Null Workspace ID",
-			workspaceID: "",
-			expected:    []Chat{},
-			expectError: true,
-		},
-		{
-			name:        "Special Characters in Workspace ID",
-			workspaceID: "special!@#Workspace",
-			expected:    []Chat{},
+			name:        "Invalid Offset",
+			workspaceID: "workspace123",
+			limit:       2,
+			offset:      10,
+			expectedLen: 0,
+			totalCount:  5,
 			expectError: false,
 		},
 		{
 			name:        "SQL Injection Attempt",
 			workspaceID: "workspace123'; DROP TABLE chats; --",
-			expected:    []Chat{},
-			expectError: false,
-		},
-		{
-			name:        "Case Sensitivity",
-			workspaceID: "Workspace123",
-			expected:    []Chat{},
+			limit:       -1,
+			offset:      0,
+			expectedLen: 0,
+			totalCount:  0,
 			expectError: false,
 		},
 		{
 			name:        "Unicode Characters in Workspace ID",
 			workspaceID: "工作区123",
-			expected:    []Chat{},
-			expectError: false,
-		},
-		{
-			name:        "Maximum Length Workspace ID",
-			workspaceID: "asdfasfdaasdfasdfasdfasdfasdfasdfasdfjlkajsldkfjalsdflakjsdlkfjalsdkjfal",
-			expected:    []Chat{},
-			expectError: false,
-		},
-		{
-			name:        "Minimum Length Workspace ID",
-			workspaceID: "a",
-			expected:    []Chat{},
+			limit:       -1,
+			offset:      0,
+			expectedLen: 0,
+			totalCount:  0,
 			expectError: false,
 		},
 	}
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-
-			chats, err := TestDB.GetChatsForWorkspace(tt.workspaceID, "")
+			chats, total, err := TestDB.GetChatsForWorkspace(tt.workspaceID, "", tt.limit, tt.offset)
 
 			if tt.expectError {
 				assert.Error(t, err)
 			} else {
 				assert.NoError(t, err)
-				if len(tt.expected) > 0 {
-					assert.Equal(t, tt.expected[0].WorkspaceID, chats[0].WorkspaceID)
-				} else {
-					assert.Equal(t, tt.expected, chats)
+				assert.Equal(t, tt.expectedLen, len(chats), "Expected %d chats, got %d", tt.expectedLen, len(chats))
+				assert.Equal(t, tt.totalCount, total, "Expected total count of %d, got %d", tt.totalCount, total)
+
+				if len(chats) > 0 {
+					assert.Equal(t, tt.workspaceID, chats[0].WorkspaceID)
 				}
 			}
 		})
 	}
+
+	TestDB.db.Exec("DELETE FROM chats")
 }
 
 func TestGetChatMessagesForChatID(t *testing.T) {

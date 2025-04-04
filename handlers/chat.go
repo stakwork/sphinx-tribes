@@ -717,6 +717,20 @@ func (ch *ChatHandler) sendToStakwork(payload StakworkChatPayload, apiKey string
 func (ch *ChatHandler) GetChat(w http.ResponseWriter, r *http.Request) {
 	workspaceID := r.URL.Query().Get("workspace_id")
 	chatStatus := r.URL.Query().Get("status")
+	
+	limit := -1
+	offset := 0
+	
+	if limitStr := r.URL.Query().Get("limit"); limitStr != "" {
+		if l, err := strconv.Atoi(limitStr); err == nil && l > 0 {
+				limit = l
+		}
+	}
+	if offsetStr := r.URL.Query().Get("offset"); offsetStr != "" {
+		if o, err := strconv.Atoi(offsetStr); err == nil && o >= 0 {
+			offset = o
+		}
+	}
 
 	if workspaceID == "" {
 		w.WriteHeader(http.StatusBadRequest)
@@ -727,7 +741,7 @@ func (ch *ChatHandler) GetChat(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	chats, err := ch.db.GetChatsForWorkspace(workspaceID, chatStatus)
+	chats, total, err := ch.db.GetChatsForWorkspace(workspaceID, chatStatus, limit, offset)
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
 		json.NewEncoder(w).Encode(ChatResponse{
@@ -740,7 +754,12 @@ func (ch *ChatHandler) GetChat(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusOK)
 	json.NewEncoder(w).Encode(ChatResponse{
 		Success: true,
-		Data:    chats,
+		Data: map[string]interface{}{
+			"chats":  chats,
+			"total":  total,
+			"limit":  limit,
+			"offset": offset,
+		},
 	})
 }
 

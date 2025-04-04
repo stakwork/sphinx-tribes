@@ -507,15 +507,18 @@ func TestCreateChat(t *testing.T) {
 				ID:          uuid.New().String(),
 				WorkspaceID: "workspace1",
 				Title:       "Chat 1",
+				Status:      "active",
 			},
 			{
 				ID:          uuid.New().String(),
 				WorkspaceID: "workspace1",
 				Title:       "Chat 2",
+				Status:      "active",
 			},
 		}
 		for _, chat := range chats {
-			db.TestDB.AddChat(chat)
+			_, err := db.TestDB.AddChat(chat)
+			assert.NoError(t, err)
 		}
 
 		rr := httptest.NewRecorder()
@@ -532,11 +535,18 @@ func TestCreateChat(t *testing.T) {
 		assert.Equal(t, http.StatusOK, rr.Code)
 		assert.True(t, response.Success)
 
-		responseChats, ok := response.Data.([]interface{})
-		assert.True(t, ok)
-		assert.Equal(t, 2, len(responseChats))
+		responseData, ok := response.Data.(map[string]interface{})
+		assert.True(t, ok, "Response data should be a map")
 
-		firstChat := responseChats[0].(map[string]interface{})
+		chatsData, ok := responseData["chats"].([]interface{})
+		assert.True(t, ok, "Chats should be an array")
+		assert.Equal(t, 2, len(chatsData))
+
+		total, ok := responseData["total"].(float64)
+		assert.True(t, ok, "Total should be a number")
+		assert.Equal(t, float64(2), total)
+
+		firstChat := chatsData[0].(map[string]interface{})
 		assert.NotEmpty(t, firstChat["id"])
 		assert.Equal(t, "workspace1", firstChat["workspaceId"])
 		assert.Contains(t, []string{"Chat 1", "Chat 2"}, firstChat["title"])
@@ -557,9 +567,64 @@ func TestCreateChat(t *testing.T) {
 		assert.Equal(t, http.StatusOK, rr.Code)
 		assert.True(t, response.Success)
 
-		responseChats, ok := response.Data.([]interface{})
-		assert.True(t, ok)
-		assert.Empty(t, responseChats)
+		responseData, ok := response.Data.(map[string]interface{})
+		assert.True(t, ok, "Response data should be a map")
+
+		chatsData, ok := responseData["chats"].([]interface{})
+		assert.True(t, ok, "Chats should be an array")
+		assert.Empty(t, chatsData)
+
+		total, ok := responseData["total"].(float64)
+		assert.True(t, ok, "Total should be a number")
+		assert.Equal(t, float64(0), total)
+	})
+
+	t.Run("should handle pagination parameters", func(t *testing.T) {
+		db.DeleteAllChats()
+
+		for i := 0; i < 5; i++ {
+			chat := &db.Chat{
+				ID:          uuid.New().String(),
+				WorkspaceID: "workspace1",
+				Title:       fmt.Sprintf("Chat %d", i+1),
+				Status:      "active",
+			}
+			_, err := db.TestDB.AddChat(chat)
+			assert.NoError(t, err)
+		}
+
+		rr := httptest.NewRecorder()
+		req, err := http.NewRequest(http.MethodGet, "/hivechat?workspace_id=workspace1&limit=2&offset=1", nil)
+		assert.NoError(t, err)
+
+		handler := http.HandlerFunc(chatHandler.GetChat)
+		handler.ServeHTTP(rr, req)
+
+		var response ChatResponse
+		err = json.NewDecoder(rr.Body).Decode(&response)
+		assert.NoError(t, err)
+
+		assert.Equal(t, http.StatusOK, rr.Code)
+		assert.True(t, response.Success)
+
+		responseData, ok := response.Data.(map[string]interface{})
+		assert.True(t, ok, "Response data should be a map")
+
+		chatsData, ok := responseData["chats"].([]interface{})
+		assert.True(t, ok, "Chats should be an array")
+		assert.Equal(t, 2, len(chatsData))
+
+		total, ok := responseData["total"].(float64)
+		assert.True(t, ok, "Total should be a number")
+		assert.Equal(t, float64(5), total)
+
+		limit, ok := responseData["limit"].(float64)
+		assert.True(t, ok, "Limit should be a number")
+		assert.Equal(t, float64(2), limit)
+
+		offset, ok := responseData["offset"].(float64)
+		assert.True(t, ok, "Offset should be a number")
+		assert.Equal(t, float64(1), offset)
 	})
 
 	t.Run("should return bad request when workspace_id is missing", func(t *testing.T) {
@@ -602,8 +667,10 @@ func TestCreateChat(t *testing.T) {
 			ID:          uuid.New().String(),
 			WorkspaceID: workspaceID,
 			Title:       "Special Chat",
+			Status:      "active",
 		}
-		db.TestDB.AddChat(chat)
+		_, err := db.TestDB.AddChat(chat)
+		assert.NoError(t, err)
 
 		rr := httptest.NewRecorder()
 		req, err := http.NewRequest(http.MethodGet, fmt.Sprintf("/hivechat?workspace_id=%s", url.QueryEscape(workspaceID)), nil)
@@ -619,9 +686,12 @@ func TestCreateChat(t *testing.T) {
 		assert.Equal(t, http.StatusOK, rr.Code)
 		assert.True(t, response.Success)
 
-		responseChats, ok := response.Data.([]interface{})
-		assert.True(t, ok)
-		assert.Equal(t, 1, len(responseChats))
+		responseData, ok := response.Data.(map[string]interface{})
+		assert.True(t, ok, "Response data should be a map")
+
+		chatsData, ok := responseData["chats"].([]interface{})
+		assert.True(t, ok, "Chats should be an array")
+		assert.Equal(t, 1, len(chatsData))
 	})
 
 	t.Run("should handle large number of chats", func(t *testing.T) {
@@ -632,8 +702,10 @@ func TestCreateChat(t *testing.T) {
 				ID:          uuid.New().String(),
 				WorkspaceID: workspaceID,
 				Title:       fmt.Sprintf("Chat %d", i),
+				Status:      "active",
 			}
-			db.TestDB.AddChat(chat)
+			_, err := db.TestDB.AddChat(chat)
+			assert.NoError(t, err)
 		}
 
 		rr := httptest.NewRecorder()
@@ -650,9 +722,12 @@ func TestCreateChat(t *testing.T) {
 		assert.Equal(t, http.StatusOK, rr.Code)
 		assert.True(t, response.Success)
 
-		responseChats, ok := response.Data.([]interface{})
-		assert.True(t, ok)
-		assert.Equal(t, 100, len(responseChats))
+		responseData, ok := response.Data.(map[string]interface{})
+		assert.True(t, ok, "Response data should be a map")
+
+		chatsData, ok := responseData["chats"].([]interface{})
+		assert.True(t, ok, "Chats should be an array")
+		assert.Equal(t, 100, len(chatsData))
 	})
 
 	t.Run("should successfully create chat when valid data is provided", func(t *testing.T) {
@@ -3156,20 +3231,20 @@ func TestSSEMaintenance(t *testing.T) {
 
 	now := time.Now()
 	oldTime := now.Add(-3 * time.Hour)
-	
+
 	oldEvent := map[string]interface{}{
-		"type": "test", 
+		"type": "test",
 		"data": "old-data",
 	}
 	oldLog, err := db.TestDB.CreateSSEMessageLog(oldEvent, "test-chat-1", "test-sse-url", "test-webhook")
 	require.NoError(t, err)
-	
+
 	db.TestDB.UpdateSSEMessageLog(oldLog.ID, map[string]interface{}{
 		"created_at": oldTime,
 	})
-	
+
 	recentEvent := map[string]interface{}{
-		"type": "test", 
+		"type": "test",
 		"data": "recent-data",
 	}
 	_, err = db.TestDB.CreateSSEMessageLog(recentEvent, "test-chat-2", "test-sse-url", "test-webhook")
@@ -3181,7 +3256,7 @@ func TestSSEMaintenance(t *testing.T) {
 	t.Run("should stop all clients and clean up logs with default parameters", func(t *testing.T) {
 		rr := httptest.NewRecorder()
 		req := httptest.NewRequest(http.MethodPost, "/hivechat/sse/maintenance", nil)
-		
+
 		ctx := context.WithValue(req.Context(), auth.ContextKey, "test-pubkey-123")
 		req = req.WithContext(ctx)
 
@@ -3192,7 +3267,7 @@ func TestSSEMaintenance(t *testing.T) {
 		var response SSEMaintenanceResponse
 		err := json.NewDecoder(rr.Body).Decode(&response)
 		require.NoError(t, err)
-		
+
 		assert.True(t, response.Success)
 		assert.True(t, response.LogsRemoved > 0, "Should have removed at least 1 old log")
 		assert.True(t, response.ClientsStopped > 0, "Should have stopped at least 1 client")
@@ -3202,12 +3277,12 @@ func TestSSEMaintenance(t *testing.T) {
 	t.Run("should successfully perform maintenance with custom options", func(t *testing.T) {
 
 		anotherOldEvent := map[string]interface{}{
-			"type": "test", 
+			"type": "test",
 			"data": "another-old-data",
 		}
 		anotherOldLog, err := db.TestDB.CreateSSEMessageLog(anotherOldEvent, "test-chat-3", "test-sse-url", "test-webhook")
 		require.NoError(t, err)
-		
+
 		db.TestDB.UpdateSSEMessageLog(anotherOldLog.ID, map[string]interface{}{
 			"created_at": oldTime,
 		})
@@ -3224,7 +3299,7 @@ func TestSSEMaintenance(t *testing.T) {
 
 		rr := httptest.NewRecorder()
 		req := httptest.NewRequest(http.MethodPost, "/hivechat/sse/maintenance", bytes.NewReader(bodyBytes))
-		
+
 		ctx := context.WithValue(req.Context(), auth.ContextKey, "test-pubkey-123")
 		req = req.WithContext(ctx)
 
@@ -3235,7 +3310,7 @@ func TestSSEMaintenance(t *testing.T) {
 		var response SSEMaintenanceResponse
 		err = json.NewDecoder(rr.Body).Decode(&response)
 		require.NoError(t, err)
-		
+
 		assert.True(t, response.Success)
 		assert.True(t, response.LogsRemoved > 0, "Should have removed at least 1 old log")
 		assert.True(t, response.ClientsStopped > 0, "Should have stopped at least 1 client")
@@ -3245,12 +3320,12 @@ func TestSSEMaintenance(t *testing.T) {
 	t.Run("should handle cleanup logs only", func(t *testing.T) {
 
 		anotherOldEvent := map[string]interface{}{
-			"type": "test", 
+			"type": "test",
 			"data": "another-old-data",
 		}
 		anotherOldLog, err := db.TestDB.CreateSSEMessageLog(anotherOldEvent, "test-chat-4", "test-sse-url", "test-webhook")
 		require.NoError(t, err)
-		
+
 		db.TestDB.UpdateSSEMessageLog(anotherOldLog.ID, map[string]interface{}{
 			"created_at": oldTime,
 		})
@@ -3264,7 +3339,7 @@ func TestSSEMaintenance(t *testing.T) {
 
 		rr := httptest.NewRecorder()
 		req := httptest.NewRequest(http.MethodPost, "/hivechat/sse/maintenance", bytes.NewReader(bodyBytes))
-		
+
 		ctx := context.WithValue(req.Context(), auth.ContextKey, "test-pubkey-123")
 		req = req.WithContext(ctx)
 
@@ -3290,7 +3365,7 @@ func TestSSEMaintenance(t *testing.T) {
 
 		rr := httptest.NewRecorder()
 		req := httptest.NewRequest(http.MethodPost, "/hivechat/sse/maintenance", bytes.NewReader(bodyBytes))
-		
+
 		ctx := context.WithValue(req.Context(), auth.ContextKey, "test-pubkey-123")
 		req = req.WithContext(ctx)
 
@@ -3301,7 +3376,7 @@ func TestSSEMaintenance(t *testing.T) {
 		var response SSEMaintenanceResponse
 		err = json.NewDecoder(rr.Body).Decode(&response)
 		require.NoError(t, err)
-		
+
 		assert.True(t, response.Success)
 		assert.Equal(t, int64(0), response.LogsRemoved, "Should not have removed any logs")
 		assert.True(t, response.ClientsStopped > 0, "Should have stopped at least 1 client")
