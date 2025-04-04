@@ -79,9 +79,8 @@ INSERT INTO workspaces (
     'https://example.com/schematic.pdf',
     'https://placehold.co/600x400'
 ),
-
 (
-    3,
+    4,
     'workspace-uuid-789',
     'owner789 Workspace',
     'owner789',
