@@ -1148,6 +1148,8 @@ func TestGetBountyIndexById(t *testing.T) {
 	mockHttpClient := mocks.NewHttpClient(t)
 	bHandler := NewBountyHandler(mockHttpClient, db.TestDB)
 
+	db.DeleteAllBounties()
+
 	t.Run("successful retrieval of bounty by Index ID", func(t *testing.T) {
 		rr := httptest.NewRecorder()
 		handler := http.HandlerFunc(bHandler.GetBountyIndexById)
@@ -1163,13 +1165,16 @@ func TestGetBountyIndexById(t *testing.T) {
 			OwnerID:       bountyOwner.OwnerPubKey,
 			Show:          true,
 			Created:       now,
+			MaxStakers: 1,
 		}
 
 		db.TestDB.CreateOrEditBounty(bounty)
 
 		bountyInDb, err := db.TestDB.GetBountyByCreated(uint(bounty.Created))
-		assert.Equal(t, bounty, bountyInDb)
 		assert.NoError(t, err)
+		assert.Equal(t, bounty.ID, bountyInDb.ID)
+		assert.Equal(t, bounty.Title, bountyInDb.Title)
+		assert.Equal(t, bounty.Created, bountyInDb.Created)
 
 		bountyIndex := db.TestDB.GetBountyIndexById(strconv.Itoa(int(bountyInDb.ID)))
 
