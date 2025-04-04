@@ -817,6 +817,11 @@ func (h *bountyHandler) GenerateBountyResponse(bounties []db.NewBounty) []db.Bou
 				ProofOfWorkCount:        bounty.ProofOfWorkCount,
 				UnlockCode:              bounty.UnlockCode,
 				AccessRestriction:       bounty.AccessRestriction,
+				IsStakable:              bounty.IsStakable,
+				StakeMin:                bounty.StakeMin,
+				MaxStakers:              bounty.MaxStakers,
+				CurrentStakers:          bounty.CurrentStakers,
+				Stakes:                  bounty.Stakes,
 			},
 			Assignee: db.Person{
 				ID:               assignee.ID,
