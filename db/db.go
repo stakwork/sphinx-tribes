@@ -2367,3 +2367,131 @@ func (db database) DeleteBountyStake(stakeID uuid.UUID) error {
 	
 	return nil
 }
+
+func (db database) CreateBountyStakeProcess(process *BountyStakeProcess) (*BountyStakeProcess, error) {
+	if process.BountyID == 0 {
+		return nil, errors.New("bounty ID is required")
+	}
+	
+	if process.HunterPubKey == "" {
+		return nil, errors.New("hunter public key is required")
+	}
+	
+	if process.Amount <= 0 {
+		return nil, errors.New("stake amount must be greater than zero")
+	}
+	
+	bounty := db.GetBounty(process.BountyID)
+	if bounty.ID == 0 {
+		return nil, errors.New("bounty not found")
+	}
+	
+	if !bounty.IsStakable {
+		return nil, errors.New("bounty is not stakable")
+	}
+	
+	if process.Amount < int64(bounty.StakeMin) {
+		return nil, fmt.Errorf("stake amount must be at least %d", bounty.StakeMin)
+	}
+	
+	if process.Status == "" {
+		process.Status = StakeProcessStatusNew
+	}
+	
+	if process.ID == uuid.Nil {
+		process.ID = uuid.New()
+	}
+	
+	now := time.Now()
+	process.CreatedAt = now
+	process.UpdatedAt = now
+	
+	if err := db.db.Create(process).Error; err != nil {
+		return nil, fmt.Errorf("failed to create stake process: %w", err)
+	}
+	
+	return process, nil
+}
+
+func (db database) GetBountyStakeProcessByID(id uuid.UUID) (*BountyStakeProcess, error) {
+	var process BountyStakeProcess
+	if err := db.db.Where("id = ?", id).First(&process).Error; err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return nil, fmt.Errorf("stake process with ID %s not found", id)
+		}
+		return nil, fmt.Errorf("failed to get stake process: %w", err)
+	}
+	return &process, nil
+}
+
+func (db database) GetBountyStakeProcessesByBountyID(bountyID uint) ([]BountyStakeProcess, error) {
+	var processes []BountyStakeProcess
+	if err := db.db.Where("bounty_id = ?", bountyID).Order("created_at DESC").Find(&processes).Error; err != nil {
+		return nil, fmt.Errorf("failed to get stake processes for bounty %d: %w", bountyID, err)
+	}
+	return processes, nil
+}
+
+func (db database) GetBountyStakeProcessesByHunterPubKey(hunterPubKey string) ([]BountyStakeProcess, error) {
+	var processes []BountyStakeProcess
+	if err := db.db.Where("hunter_pubkey = ?", hunterPubKey).Order("created_at DESC").Find(&processes).Error; err != nil {
+		return nil, fmt.Errorf("failed to get stake processes for hunter %s: %w", hunterPubKey, err)
+	}
+	return processes, nil
+}
+
+func (db database) GetAllBountyStakeProcesses() ([]BountyStakeProcess, error) {
+	var processes []BountyStakeProcess
+	if err := db.db.Order("created_at DESC").Find(&processes).Error; err != nil {
+		return nil, fmt.Errorf("failed to get all stake processes: %w", err)
+	}
+	return processes, nil
+}
+
+func (db database) UpdateBountyStakeProcess(id uuid.UUID, updates map[string]interface{}) (*BountyStakeProcess, error) {
+	process, err := db.GetBountyStakeProcessByID(id)
+	if err != nil {
+		return nil, err
+	}
+	
+	if statusVal, ok := updates["status"]; ok {
+		status, ok := statusVal.(StakeProcessStatus)
+		if !ok {
+			statusStr, ok := statusVal.(string)
+			if ok {
+				status = StakeProcessStatus(statusStr)
+			} else {
+				return nil, errors.New("invalid status type")
+			}
+		}
+		
+		now := time.Now()
+		updates["updated_at"] = now
+		
+		if status == StakeProcessStatusPaid && process.StakedAt == nil {
+			updates["staked_at"] = now
+		}
+		
+		if status == StakeProcessStatusReturned && process.ReturnedAt == nil {
+			updates["returned_at"] = now
+		}
+	}
+	
+	if err := db.db.Model(&BountyStakeProcess{}).Where("id = ?", id).Updates(updates).Error; err != nil {
+		return nil, fmt.Errorf("failed to update stake process with ID %s: %w", id, err)
+	}
+	
+	return db.GetBountyStakeProcessByID(id)
+}
+
+func (db database) DeleteBountyStakeProcess(id uuid.UUID) error {
+	if _, err := db.GetBountyStakeProcessByID(id); err != nil {
+		return err
+	}
+	
+	if err := db.db.Delete(&BountyStakeProcess{}, "id = ?", id).Error; err != nil {
+		return fmt.Errorf("failed to delete stake process with ID %s: %w", id, err)
+	}
+	
+	return nil
+}

@@ -1618,6 +1618,31 @@ type BountyStake struct {
 	UpdatedAt    time.Time  `json:"updated_at" gorm:"autoUpdateTime"`
 }
 
+type BountyStakeProcess struct {
+	ID           uuid.UUID          `json:"id" gorm:"primaryKey;type:uuid;default:gen_random_uuid()"`
+	BountyID     uint               `json:"bounty_id" gorm:"index;not null"`
+	HunterPubKey string             `json:"hunter_pubkey" gorm:"type:varchar(255);not null;index"`
+	Amount       int64              `json:"amount" gorm:"not null"`
+	Status       StakeProcessStatus `json:"status" gorm:"type:varchar(20);default:'NEW'"`
+	Invoice      string             `json:"invoice" gorm:"type:text"` 
+	StakeReceipt string             `json:"stake_receipt" gorm:"type:text"`
+	StakeReturn  string             `json:"stake_return" gorm:"type:text"`
+	StakedAt     *time.Time         `json:"staked_at"`
+	ReturnedAt   *time.Time         `json:"returned_at"`
+	CreatedAt    time.Time          `json:"created_at" gorm:"type:timestamp;default:current_timestamp"`
+	UpdatedAt    time.Time          `json:"updated_at" gorm:"type:timestamp;default:current_timestamp"`
+}
+
+type StakeProcessStatus string
+
+const (
+	StakeProcessStatusNew     StakeProcessStatus = "NEW"
+	StakeProcessStatusPending StakeProcessStatus = "PENDING"
+	StakeProcessStatusPaid    StakeProcessStatus = "PAID"
+	StakeProcessStatusFailed  StakeProcessStatus = "FAILED"
+	StakeProcessStatusReturned StakeProcessStatus = "RETURNED"
+)
+
 func (Person) TableName() string {
 	return "people"
 }

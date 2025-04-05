@@ -93,6 +93,7 @@ func InitTestDB() {
 	db.AutoMigrate(&CodeSpaceMap{})
 	db.AutoMigrate(&BountyStake{})
 	db.AutoMigrate(&ChatWorkflowStatus{})
+	db.AutoMigrate(&BountyStakeProcess{})
 	
 	people := TestDB.GetAllPeople()
 	for _, p := range people {
