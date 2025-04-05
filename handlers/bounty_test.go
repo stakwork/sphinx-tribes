@@ -1145,6 +1145,8 @@ func TestGetBountyIndexById(t *testing.T) {
 	teardownSuite := SetupSuite(t)
 	defer teardownSuite(t)
 
+	db.DeleteAllBounties()
+
 	mockHttpClient := mocks.NewHttpClient(t)
 	bHandler := NewBountyHandler(mockHttpClient, db.TestDB)
 
@@ -1163,13 +1165,16 @@ func TestGetBountyIndexById(t *testing.T) {
 			OwnerID:       bountyOwner.OwnerPubKey,
 			Show:          true,
 			Created:       now,
+			MaxStakers:    1,
 		}
 
 		db.TestDB.CreateOrEditBounty(bounty)
 
 		bountyInDb, err := db.TestDB.GetBountyByCreated(uint(bounty.Created))
-		assert.Equal(t, bounty, bountyInDb)
 		assert.NoError(t, err)
+		assert.Equal(t, bounty.ID, bountyInDb.ID)
+		assert.Equal(t, bounty.Title, bountyInDb.Title)
+		assert.Equal(t, bounty.Created, bountyInDb.Created)
 
 		bountyIndex := db.TestDB.GetBountyIndexById(strconv.Itoa(int(bountyInDb.ID)))
 

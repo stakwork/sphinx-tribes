@@ -419,7 +419,7 @@ type Bounty struct {
 	StakeMin                int64                  `gorm:"default:0" json:"stake_min"`
 	MaxStakers              int                    `gorm:"default:1" json:"max_stakers"`
 	CurrentStakers          int                    `gorm:"default:0" json:"current_stakers"`
-	Stakes                  []BountyStake          `gorm:"foreignKey:BountyID" json:"stakes,omitempty"`
+	Stakes                  []BountyStake          `gorm:"-" json:"stakes,omitempty"`
 }
 
 // Todo: Change back to Bounty
@@ -467,7 +467,7 @@ type NewBounty struct {
 	StakeMin                int64                  `gorm:"default:0" json:"stake_min"`
 	MaxStakers              int                    `gorm:"default:1" json:"max_stakers"`
 	CurrentStakers          int                    `gorm:"default:0" json:"current_stakers"`
-	Stakes                  []BountyStake          `gorm:"foreignKey:BountyID" json:"stakes,omitempty"`
+	Stakes                  []BountyStake          `gorm:"-" json:"stakes,omitempty"`
 }
 
 type BountyOwners struct {

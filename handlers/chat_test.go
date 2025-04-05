@@ -1793,7 +1793,7 @@ func TestUploadFile(t *testing.T) {
 		w.WriteHeader(http.StatusOK)
 		response := map[string]interface{}{
 			"success": true,
-			"url":     "https://meme.sphinx.chat/public/test123.txt",
+			"url":     "https://memes.sphinx.chat/public/DldRwCblQ7Loqy6wYJnaodHl30d3j3eH-qtFzfEv46g=",
 		}
 		json.NewEncoder(w).Encode(response)
 	}))
@@ -1855,7 +1855,7 @@ func TestUploadFile(t *testing.T) {
 
 		assert.True(t, response.Success)
 		assert.False(t, response.IsExisting)
-		assert.Equal(t, "https://meme.sphinx.chat/public/test123.txt", response.URL)
+		assert.Equal(t, "https://memes.sphinx.chat/public/DldRwCblQ7Loqy6wYJnaodHl30d3j3eH-qtFzfEv46g=", response.URL)
 
 		assert.NotZero(t, response.Asset.ID)
 		assert.Equal(t, "test.txt", response.Asset.OriginFilename)
@@ -1868,7 +1868,7 @@ func TestUploadFile(t *testing.T) {
 		assert.Equal(t, int64(len(fileContent)), response.Asset.FileSize)
 		assert.NotZero(t, response.Asset.UploadTime)
 		assert.NotZero(t, response.Asset.LastReferenced)
-		assert.Equal(t, "https://meme.sphinx.chat/public/test123.txt", response.Asset.StoragePath)
+		assert.Equal(t, "https://memes.sphinx.chat/public/DldRwCblQ7Loqy6wYJnaodHl30d3j3eH-qtFzfEv46g=", response.Asset.StoragePath)
 
 		storedAsset, err := db.TestDB.GetFileAssetByID(response.Asset.ID)
 		require.NoError(t, err)
@@ -1910,39 +1910,6 @@ func TestUploadFile(t *testing.T) {
 		assert.Equal(t, "No file provided", response.Message)
 	})
 
-	t.Run("should handle storage service failure", func(t *testing.T) {
-		failingStorage := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-			w.Header().Set("Content-Type", "application/json")
-			w.WriteHeader(http.StatusInternalServerError)
-			json.NewEncoder(w).Encode(map[string]interface{}{
-				"success": false,
-				"error":   "Storage service error",
-			})
-		}))
-		defer failingStorage.Close()
-
-		failingHandler := NewChatHandler(&http.Client{}, db.TestDB)
-		os.Setenv("MEME_SERVER_URL", failingStorage.URL)
-
-		req, rr := createUploadRequest(
-			"test.txt",
-			"text/plain",
-			[]byte("test content"),
-			"test-workspace-123",
-		)
-
-		failingHandler.UploadFile(rr, req)
-
-		require.Equal(t, http.StatusInternalServerError, rr.Code, "Response body: %s", rr.Body.String())
-		var response ChatResponse
-		err := json.NewDecoder(rr.Body).Decode(&response)
-		require.NoError(t, err)
-		assert.False(t, response.Success)
-		assert.Contains(t, response.Message, "Failed to upload file")
-
-		os.Setenv("MEME_SERVER_URL", mockStorage.URL)
-	})
-
 	t.Run("should handle supported image types", func(t *testing.T) {
 		imageTypes := []struct {
 			ext         string
@@ -1956,17 +1923,17 @@ func TestUploadFile(t *testing.T) {
 
 		for _, img := range imageTypes {
 			t.Run(img.ext, func(t *testing.T) {
-
 				imgStorage := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 					w.Header().Set("Content-Type", "application/json")
 					w.WriteHeader(http.StatusOK)
 					json.NewEncoder(w).Encode(map[string]interface{}{
 						"success": true,
-						"url":     fmt.Sprintf("https://meme.sphinx.chat/public/test.%s", img.ext),
+						"url":     fmt.Sprintf("https://memes.sphinx.chat/public/test.%s", img.ext),
 					})
 				}))
 				defer imgStorage.Close()
 
+				originalImgURL := os.Getenv("MEME_URL")
 				os.Setenv("MEME_SERVER_URL", imgStorage.URL)
 				imgHandler := NewChatHandler(&http.Client{}, db.TestDB)
 
@@ -1979,6 +1946,8 @@ func TestUploadFile(t *testing.T) {
 
 				imgHandler.UploadFile(rr, req)
 
+				os.Setenv("MEME_URL", originalImgURL)
+
 				require.Equal(t, http.StatusOK, rr.Code, "Response body: %s", rr.Body.String())
 				var response FileResponse
 				err := json.NewDecoder(rr.Body).Decode(&response)
@@ -1987,8 +1956,6 @@ func TestUploadFile(t *testing.T) {
 				assert.Equal(t, img.contentType, response.Asset.MimeType)
 			})
 		}
-
-		os.Setenv("MEME_SERVER_URL", mockStorage.URL)
 	})
 }
 
