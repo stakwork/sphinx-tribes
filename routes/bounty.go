@@ -38,10 +38,10 @@ func BountyRoutes() chi.Router {
 		r.Get("/stake/bounty/{bountyId}", bountyHandler.GetBountyStakesByBountyID)
 		r.Get("/stake/{id}", bountyHandler.GetBountyStakeByID)
 		r.Get("/stake/hunter/{hunterPubKey}", bountyHandler.GetBountyStakesByHunterPubKey)
+		r.Post("/process_stake/{bountyId}", tribeHandlers.ProcessStake)
 	})
 	r.Group(func(r chi.Router) {
 		r.Use(auth.CombinedAuthContext)
-		r.Post("/process_stake/{bountyId}", tribeHandlers.ProcessStake)
 		r.Post("/featured/create", bountyHandler.CreateFeaturedBounty)
 		r.Put("/featured/update", bountyHandler.UpdateFeaturedBounty)
 		r.Delete("/featured/delete/{bountyId}", bountyHandler.DeleteFeaturedBounty)

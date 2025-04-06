@@ -893,9 +893,9 @@ func (th *tribeHandler) ProcessStake(w http.ResponseWriter, r *http.Request) {
 	}
 
 	r.Body = io.NopCloser(bytes.NewBuffer(modifiedBody))
-	if stakeReq.StakeOperation {
-		th.GenerateBudgetInvoice(w, r)
-	}
+
+	th.GenerateBudgetInvoice(w, r)
+
 }
 
 func (th *tribeHandler) GenerateV1BudgetInvoice(w http.ResponseWriter, r *http.Request) {
