@@ -71,6 +71,12 @@ func BountyRoutes() chi.Router {
 		r.Post("/stake", bountyHandler.CreateBountyStake)
 		r.Put("/stake/{id}", bountyHandler.UpdateBountyStake)
 		r.Delete("/stake/{id}", bountyHandler.DeleteBountyStake)
+
+		r.Post("/stake/stakeprocessing", bountyHandler.CreateBountyStakeProcess)
+		r.Get("/stake/stakeprocessing", bountyHandler.GetAllBountyStakeProcesses)
+		r.Get("/stake/stakeprocessing/{id}", bountyHandler.GetBountyStakeProcessByID)
+		r.Put("/stake/stakeprocessing/{id}", bountyHandler.UpdateBountyStakeProcess)
+		r.Delete("/stake/stakeprocessing/{id}", bountyHandler.DeleteBountyStakeProcess)
 	})
 	return r
 }

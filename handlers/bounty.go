@@ -3047,3 +3047,266 @@ func (h *bountyHandler) DeleteBountyStake(w http.ResponseWriter, r *http.Request
 	w.WriteHeader(http.StatusOK)
 	json.NewEncoder(w).Encode(map[string]string{"message": "Stake deleted successfully"})
 }
+
+// CreateBountyStakeProcess godoc
+//
+//	@Summary		Create a bounty stake process
+//	@Description	Create a new stake process for a bounty
+//	@Tags			Bounties - Stakes
+//	@Accept			json
+//	@Produce		json
+//	@Security		PubKeyContextAuth
+//	@Param			process	body		db.BountyStakeProcess	true	"Stake process object"
+//	@Success		201		{object}	db.BountyStakeProcess
+//	@Failure		400		{string}	string	"Bad request"
+//	@Failure		401		{string}	string	"Unauthorized"
+//	@Failure		500		{string}	string	"Internal server error"
+//	@Router			/gobounties/stake/stakeprocessing [post]
+func (h *bountyHandler) CreateBountyStakeProcess(w http.ResponseWriter, r *http.Request) {
+	ctx := r.Context()
+	pubKeyFromAuth, _ := ctx.Value(auth.ContextKey).(string)
+	
+	if pubKeyFromAuth == "" {
+		logger.Log.Error("[bounty_stake_process] no pubkey from auth")
+		w.WriteHeader(http.StatusUnauthorized)
+		json.NewEncoder(w).Encode(map[string]string{"error": "Unauthorized"})
+		return
+	}
+	
+	var process db.BountyStakeProcess
+	if err := json.NewDecoder(r.Body).Decode(&process); err != nil {
+		logger.Log.Error("[bounty_stake_process] invalid request body: %v", err)
+		w.WriteHeader(http.StatusBadRequest)
+		json.NewEncoder(w).Encode(map[string]string{"error": "Invalid request body"})
+		return
+	}
+	
+	process.HunterPubKey = pubKeyFromAuth
+	
+	process.Status = db.StakeProcessStatusNew
+	
+	createdProcess, err := h.db.CreateBountyStakeProcess(&process)
+	if err != nil {
+		logger.Log.Error("[bounty_stake_process] failed to create stake process: %v", err)
+		w.WriteHeader(http.StatusBadRequest)
+		json.NewEncoder(w).Encode(map[string]string{"error": err.Error()})
+		return
+	}
+	
+	w.WriteHeader(http.StatusCreated)
+	json.NewEncoder(w).Encode(createdProcess)
+}
+
+// GetAllBountyStakeProcesses godoc
+//
+//	@Summary		Get all bounty stake processes
+//	@Description	Get all stake processes sorted by newest first
+//	@Tags			Bounties - Stakes
+//	@Produce		json
+//	@Security		PubKeyContextAuth
+//	@Success		200	{array}		db.BountyStakeProcess
+//	@Failure		401	{string}	string	"Unauthorized"
+//	@Failure		500	{string}	string	"Internal server error"
+//	@Router			/gobounties/stake/stakeprocessing [get]
+func (h *bountyHandler) GetAllBountyStakeProcesses(w http.ResponseWriter, r *http.Request) {
+	ctx := r.Context()
+	pubKeyFromAuth, _ := ctx.Value(auth.ContextKey).(string)
+	
+	if pubKeyFromAuth == "" {
+		logger.Log.Error("[bounty_stake_process] no pubkey from auth")
+		w.WriteHeader(http.StatusUnauthorized)
+		json.NewEncoder(w).Encode(map[string]string{"error": "Unauthorized"})
+		return
+	}
+	
+	processes, err := h.db.GetAllBountyStakeProcesses()
+	if err != nil {
+		logger.Log.Error("[bounty_stake_process] failed to get stake processes: %v", err)
+		w.WriteHeader(http.StatusInternalServerError)
+		json.NewEncoder(w).Encode(map[string]string{"error": "Failed to retrieve stake processes"})
+		return
+	}
+	
+	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode(processes)
+}
+
+// GetBountyStakeProcessByID godoc
+//
+//	@Summary		Get bounty stake process by ID
+//	@Description	Get a specific stake process by its ID
+//	@Tags			Bounties - Stakes
+//	@Produce		json
+//	@Security		PubKeyContextAuth
+//	@Param			id	path		string	true	"Stake Process ID"
+//	@Success		200	{object}	db.BountyStakeProcess
+//	@Failure		400	{string}	string	"Bad request"
+//	@Failure		401	{string}	string	"Unauthorized"
+//	@Failure		404	{string}	string	"Not found"
+//	@Failure		500	{string}	string	"Internal server error"
+//	@Router			/gobounties/stake/stakeprocessing/{id} [get]
+func (h *bountyHandler) GetBountyStakeProcessByID(w http.ResponseWriter, r *http.Request) {
+	ctx := r.Context()
+	pubKeyFromAuth, _ := ctx.Value(auth.ContextKey).(string)
+	
+	if pubKeyFromAuth == "" {
+		logger.Log.Error("[bounty_stake_process] no pubkey from auth")
+		w.WriteHeader(http.StatusUnauthorized)
+		json.NewEncoder(w).Encode(map[string]string{"error": "Unauthorized"})
+		return
+	}
+	
+	idStr := chi.URLParam(r, "id")
+	id, err := uuid.Parse(idStr)
+	if err != nil {
+		logger.Log.Error("[bounty_stake_process] invalid process ID: %v", err)
+		w.WriteHeader(http.StatusBadRequest)
+		json.NewEncoder(w).Encode(map[string]string{"error": "Invalid process ID"})
+		return
+	}
+	
+	process, err := h.db.GetBountyStakeProcessByID(id)
+	if err != nil {
+		logger.Log.Error("[bounty_stake_process] failed to get process by ID: %v", err)
+		w.WriteHeader(http.StatusNotFound)
+		json.NewEncoder(w).Encode(map[string]string{"error": "Stake process not found"})
+		return
+	}
+	
+	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode(process)
+}
+
+// UpdateBountyStakeProcess godoc
+//
+//	@Summary		Update a bounty stake process
+//	@Description	Update a specific stake process by its ID
+//	@Tags			Bounties - Stakes
+//	@Accept			json
+//	@Produce		json
+//	@Security		PubKeyContextAuth
+//	@Param			id		path		string	true	"Stake Process ID"
+//	@Param			updates	body		object	true	"Fields to update"
+//	@Success		200		{object}	db.BountyStakeProcess
+//	@Failure		400		{string}	string	"Bad request"
+//	@Failure		401		{string}	string	"Unauthorized"
+//	@Failure		404		{string}	string	"Not found"
+//	@Failure		500		{string}	string	"Internal server error"
+//	@Router			/gobounties/stake/stakeprocessing/{id} [put]
+func (h *bountyHandler) UpdateBountyStakeProcess(w http.ResponseWriter, r *http.Request) {
+	ctx := r.Context()
+	pubKeyFromAuth, _ := ctx.Value(auth.ContextKey).(string)
+	
+	if pubKeyFromAuth == "" {
+		logger.Log.Error("[bounty_stake_process] no pubkey from auth")
+		w.WriteHeader(http.StatusUnauthorized)
+		json.NewEncoder(w).Encode(map[string]string{"error": "Unauthorized"})
+		return
+	}
+	
+	idStr := chi.URLParam(r, "id")
+	id, err := uuid.Parse(idStr)
+	if err != nil {
+		logger.Log.Error("[bounty_stake_process] invalid process ID: %v", err)
+		w.WriteHeader(http.StatusBadRequest)
+		json.NewEncoder(w).Encode(map[string]string{"error": "Invalid process ID"})
+		return
+	}
+	
+	existingProcess, err := h.db.GetBountyStakeProcessByID(id)
+	if err != nil {
+		logger.Log.Error("[bounty_stake_process] process not found: %v", err)
+		w.WriteHeader(http.StatusNotFound)
+		json.NewEncoder(w).Encode(map[string]string{"error": "Stake process not found"})
+		return
+	}
+	
+	bounty := h.db.GetBounty(existingProcess.BountyID)
+	if existingProcess.HunterPubKey != pubKeyFromAuth && bounty.OwnerID != pubKeyFromAuth {
+		logger.Log.Error("[bounty_stake_process] unauthorized update attempt")
+		w.WriteHeader(http.StatusUnauthorized)
+		json.NewEncoder(w).Encode(map[string]string{"error": "You are not authorized to update this stake process"})
+		return
+	}
+	
+	var updates map[string]interface{}
+	if err := json.NewDecoder(r.Body).Decode(&updates); err != nil {
+		logger.Log.Error("[bounty_stake_process] invalid request body: %v", err)
+		w.WriteHeader(http.StatusBadRequest)
+		json.NewEncoder(w).Encode(map[string]string{"error": "Invalid request body"})
+		return
+	}
+	
+	updatedProcess, err := h.db.UpdateBountyStakeProcess(id, updates)
+	if err != nil {
+		logger.Log.Error("[bounty_stake_process] failed to update process: %v", err)
+		w.WriteHeader(http.StatusInternalServerError)
+		json.NewEncoder(w).Encode(map[string]string{"error": err.Error()})
+		return
+	}
+	
+	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode(updatedProcess)
+}
+
+// DeleteBountyStakeProcess godoc
+//
+//	@Summary		Delete a bounty stake process
+//	@Description	Delete a specific stake process by its ID
+//	@Tags			Bounties - Stakes
+//	@Produce		json
+//	@Security		PubKeyContextAuth
+//	@Param			id	path		string	true	"Stake Process ID"
+//	@Success		200	{object}	map[string]string
+//	@Failure		400	{string}	string	"Bad request"
+//	@Failure		401	{string}	string	"Unauthorized"
+//	@Failure		404	{string}	string	"Not found"
+//	@Failure		500	{string}	string	"Internal server error"
+//	@Router			/gobounties/stake/stakeprocessing/{id} [delete]
+func (h *bountyHandler) DeleteBountyStakeProcess(w http.ResponseWriter, r *http.Request) {
+	ctx := r.Context()
+	pubKeyFromAuth, _ := ctx.Value(auth.ContextKey).(string)
+	
+	if pubKeyFromAuth == "" {
+		logger.Log.Error("[bounty_stake_process] no pubkey from auth")
+		w.WriteHeader(http.StatusUnauthorized)
+		json.NewEncoder(w).Encode(map[string]string{"error": "Unauthorized"})
+		return
+	}
+	
+	idStr := chi.URLParam(r, "id")
+	id, err := uuid.Parse(idStr)
+	if err != nil {
+		logger.Log.Error("[bounty_stake_process] invalid process ID: %v", err)
+		w.WriteHeader(http.StatusBadRequest)
+		json.NewEncoder(w).Encode(map[string]string{"error": "Invalid process ID"})
+		return
+	}
+	
+	existingProcess, err := h.db.GetBountyStakeProcessByID(id)
+	if err != nil {
+		logger.Log.Error("[bounty_stake_process] process not found: %v", err)
+		w.WriteHeader(http.StatusNotFound)
+		json.NewEncoder(w).Encode(map[string]string{"error": "Stake process not found"})
+		return
+	}
+	
+	bounty := h.db.GetBounty(existingProcess.BountyID)
+	if existingProcess.HunterPubKey != pubKeyFromAuth && bounty.OwnerID != pubKeyFromAuth {
+		logger.Log.Error("[bounty_stake_process] unauthorized delete attempt")
+		w.WriteHeader(http.StatusUnauthorized)
+		json.NewEncoder(w).Encode(map[string]string{"error": "You are not authorized to delete this stake process"})
+		return
+	}
+	
+	err = h.db.DeleteBountyStakeProcess(id)
+	if err != nil {
+		logger.Log.Error("[bounty_stake_process] failed to delete process: %v", err)
+		w.WriteHeader(http.StatusInternalServerError)
+		json.NewEncoder(w).Encode(map[string]string{"error": err.Error()})
+		return
+	}
+	
+	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode(map[string]string{"message": "Stake process deleted successfully"})
+}
