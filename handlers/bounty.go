@@ -3315,3 +3315,25 @@ func (h *bountyHandler) DeleteBountyStakeProcess(w http.ResponseWriter, r *http.
 	w.WriteHeader(http.StatusOK)
 	json.NewEncoder(w).Encode(map[string]string{"message": "Stake process deleted successfully"})
 }
+
+func (h *bountyHandler) GetBountyStakeProcessesByBountyID(w http.ResponseWriter, r *http.Request) {
+	bountyIDStr := chi.URLParam(r, "bountyId")
+	bountyID, err := strconv.ParseUint(bountyIDStr, 10, 32)
+	if err != nil {
+		logger.Log.Error("[bounty_stake_process] invalid bounty ID: %v", err)
+		w.WriteHeader(http.StatusBadRequest)
+		json.NewEncoder(w).Encode(map[string]string{"error": "Invalid bounty ID format"})
+		return
+	}
+
+	processes, err := h.db.GetBountyStakeProcessesByBountyID(uint(bountyID))
+	if err != nil {
+		logger.Log.Error("[bounty_stake_process] failed to get stake processes: %v", err)
+		w.WriteHeader(http.StatusInternalServerError)
+		json.NewEncoder(w).Encode(map[string]string{"error": err.Error()})
+		return
+	}
+
+	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode(processes)
+}
