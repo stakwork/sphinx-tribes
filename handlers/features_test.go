@@ -4393,7 +4393,11 @@ func TestGetFeaturesByWorkspaceUuid(t *testing.T) {
 
 				workspace := db.Workspace{
 					Uuid:        uuid.New().String(),
+					Name:        "unique_workspace_name_" + uuid.New().String(),
 					OwnerPubKey: person.OwnerPubKey,
+					Github:      "github",
+					Website:     "website",
+					Description: "description",
 				}
 				db.TestDB.CreateOrEditWorkspace(workspace)
 
@@ -4413,7 +4417,7 @@ func TestGetFeaturesByWorkspaceUuid(t *testing.T) {
 				}
 				db.TestDB.CreateOrEditFeature(archivedFeature)
 
-				return workspace.Uuid, []db.WorkspaceFeatures{activeFeature}
+				return workspace.Uuid, []db.WorkspaceFeatures{activeFeature, archivedFeature}
 			},
 			expectedStatus: http.StatusOK,
 		},
