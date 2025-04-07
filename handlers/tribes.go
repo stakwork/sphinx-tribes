@@ -7,6 +7,7 @@ import (
 	"io"
 	"log"
 	"net/http"
+	"strconv"
 	"strings"
 	"time"
 
@@ -842,6 +843,59 @@ func (th *tribeHandler) GenerateBudgetInvoice(w http.ResponseWriter, r *http.Req
 	} else {
 		th.GenerateV1BudgetInvoice(w, r)
 	}
+}
+
+func (th *tribeHandler) ProcessStake(w http.ResponseWriter, r *http.Request) {
+	var stakeReq db.StakeInvoiceRequest
+
+	body, err := io.ReadAll(r.Body)
+	defer r.Body.Close()
+	if err != nil {
+		logger.Log.Error("Failed reading request body: %v", err)
+		http.Error(w, "Invalid request body", http.StatusBadRequest)
+		return
+	}
+
+	err = json.Unmarshal(body, &stakeReq)
+	if err != nil {
+		logger.Log.Error("Failed unmarshaling request: %v", err)
+		http.Error(w, "Invalid JSON payload", http.StatusBadRequest)
+		return
+	}
+
+	bountyIDStr := chi.URLParam(r, "bountyId")
+	bountyIDUint, err := strconv.ParseUint(bountyIDStr, 10, 64)
+	if err != nil {
+		logger.Log.Error("Invalid bountyID: %v", err)
+		http.Error(w, "Invalid bounty ID", http.StatusBadRequest)
+		return
+	}
+	stakeReq.BountyID = uint(bountyIDUint)
+
+	if !stakeReq.StakeOperation {
+		http.Error(w, "Stake operation flag not set", http.StatusBadRequest)
+		return
+	}
+
+	invoiceReq := db.BudgetInvoiceRequest{
+		Amount:        stakeReq.Amount,
+		SenderPubKey:  stakeReq.SenderPubKey,
+		WorkspaceUuid: stakeReq.WorkspaceUuid,
+		PaymentType:   stakeReq.PaymentType,
+		BountyID:      stakeReq.BountyID,
+	}
+
+	modifiedBody, err := json.Marshal(invoiceReq)
+	if err != nil {
+		logger.Log.Error("Failed to marshal invoice request: %v", err)
+		http.Error(w, "Internal server error", http.StatusInternalServerError)
+		return
+	}
+
+	r.Body = io.NopCloser(bytes.NewBuffer(modifiedBody))
+
+	th.GenerateBudgetInvoice(w, r)
+
 }
 
 func (th *tribeHandler) GenerateV1BudgetInvoice(w http.ResponseWriter, r *http.Request) {

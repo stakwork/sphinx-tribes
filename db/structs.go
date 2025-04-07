@@ -729,8 +729,18 @@ type BudgetInvoiceRequest struct {
 	SenderPubKey    string      `json:"sender_pubkey"`
 	OrgUuid         string      `json:"org_uuid,omitempty"`
 	WorkspaceUuid   string      `json:"workspace_uuid,omitempty"`
+	BountyID        uint        `json:"bounty_id,omitempty"`
 	PaymentType     PaymentType `json:"payment_type,omitempty"`
 	Websocket_token string      `json:"websocket_token,omitempty"`
+}
+
+type StakeInvoiceRequest struct {
+	Amount         uint        `json:"amount"`
+	SenderPubKey   string      `json:"sender_pubkey"`
+	WorkspaceUuid  string      `json:"workspace_uuid"`
+	PaymentType    PaymentType `json:"payment_type"`
+	BountyID       uint        `json:"bounty_id,omitempty"`
+	StakeOperation bool        `json:"is_stake,omitempty"`
 }
 
 type BudgetStoreData struct {
@@ -749,6 +759,7 @@ const (
 	Withdraw PaymentType = "withdraw"
 	Payment  PaymentType = "payment"
 	Reversal PaymentType = "reversal"
+	Stake    PaymentType = "stake"
 )
 
 type BudgetHistory struct {
@@ -1603,19 +1614,19 @@ const (
 )
 
 type BountyStake struct {
-	ID           uuid.UUID  `json:"id" gorm:"primaryKey;type:uuid;default:gen_random_uuid()"`
-	BountyID     uint       `json:"bounty_id" gorm:"index;not null"`
-	HunterPubKey string     `json:"hunter_pubkey" gorm:"type:varchar(255);not null"`
-	Amount       int64      `json:"amount" gorm:"not null"`
+	ID           uuid.UUID   `json:"id" gorm:"primaryKey;type:uuid;default:gen_random_uuid()"`
+	BountyID     uint        `json:"bounty_id" gorm:"index;not null"`
+	HunterPubKey string      `json:"hunter_pubkey" gorm:"type:varchar(255);not null"`
+	Amount       int64       `json:"amount" gorm:"not null"`
 	Status       StakeStatus `json:"status" gorm:"type:varchar(20);default:'NEW'"`
-	Invoice      string     `json:"invoice" gorm:"type:text"`
-	StakeReceipt string     `json:"stake_receipt" gorm:"type:text"`
-	StakeReturn  string     `json:"stake_return" gorm:"type:text"`
-	Note         string     `json:"note" gorm:"type:text"`
-	CreatedAt    time.Time  `json:"created_at" gorm:"autoCreateTime"`
-	StakedAt     *time.Time `json:"staked_at"`
-	ReturnedAt   *time.Time `json:"returned_at"`
-	UpdatedAt    time.Time  `json:"updated_at" gorm:"autoUpdateTime"`
+	Invoice      string      `json:"invoice" gorm:"type:text"`
+	StakeReceipt string      `json:"stake_receipt" gorm:"type:text"`
+	StakeReturn  string      `json:"stake_return" gorm:"type:text"`
+	Note         string      `json:"note" gorm:"type:text"`
+	CreatedAt    time.Time   `json:"created_at" gorm:"autoCreateTime"`
+	StakedAt     *time.Time  `json:"staked_at"`
+	ReturnedAt   *time.Time  `json:"returned_at"`
+	UpdatedAt    time.Time   `json:"updated_at" gorm:"autoUpdateTime"`
 }
 
 type BountyStakeProcess struct {
