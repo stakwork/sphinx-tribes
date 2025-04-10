@@ -21,7 +21,6 @@ var upgrader = websocket.Upgrader{
 				return true
 			}
 		}
-
 		return true
 	}}
 
