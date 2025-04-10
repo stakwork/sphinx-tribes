@@ -331,7 +331,8 @@ func initChi() *chi.Mux {
 	r.Use(middleware.Logger)
 	r.Use(middleware.Recoverer)
 	r.Use(logger.RouteBasedUUIDMiddleware)
-	r.Use(internalServerErrorHandler)
+	// Disabled for now because crashing
+	//r.Use(internalServerErrorHandler)
 	r.Use(customMiddleware.FeatureFlag(db.DB))
 	cors := cors.New(cors.Options{
 		AllowedOrigins:   []string{"*"},
