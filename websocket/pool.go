@@ -41,8 +41,10 @@ func (pool *Pool) Start() {
 				Conn: client.Conn,
 			})
 			if err == nil {
-				pool.Clients[client.Host].Client.Conn.WriteJSON(Message{Type: 1, Msg: "user_connect", Body: client.Host})
-				go client.Read()
+				if pool.Clients[client.Host].Client.Conn != nil {
+					pool.Clients[client.Host].Client.Conn.WriteJSON(Message{Type: 1, Msg: "user_connect", Body: client.Host})
+					go client.Read()
+				}
 			} else {
 				fmt.Println("Websocket pool client save error")
 			}
@@ -89,22 +91,21 @@ func (pool *Pool) SendTicketMessage(message TicketMessage) error {
 	return nil
 }
 
-
 func (pool *Pool) SendTicketPlanMessage(message TicketPlanMessage) error {
-    if pool == nil {
-        return fmt.Errorf("pool is nil")
-    }
+	if pool == nil {
+		return fmt.Errorf("pool is nil")
+	}
 
-    if message.BroadcastType == "direct" {
-        if message.SourceSessionID == "" {
-            return fmt.Errorf("client not found")
-        }
+	if message.BroadcastType == "direct" {
+		if message.SourceSessionID == "" {
+			return fmt.Errorf("client not found")
+		}
 
 		if client, ok := pool.Clients[message.SourceSessionID]; ok {
-            return client.Client.Conn.WriteJSON(message)
-        }
-        return fmt.Errorf("client not found: %s", message.SourceSessionID)
-    }
+			return client.Client.Conn.WriteJSON(message)
+		}
+		return fmt.Errorf("client not found: %s", message.SourceSessionID)
+	}
 
-    return nil
+	return nil
 }
