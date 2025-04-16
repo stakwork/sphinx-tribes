@@ -2390,7 +2390,7 @@ func (db database) CreateBountyStakeProcess(process *BountyStakeProcess) (*Bount
 		return nil, errors.New("bounty is not stakable")
 	}
 	
-	if process.Amount < int64(bounty.StakeMin) {
+	if process.Amount < bounty.StakeMin {
 		return nil, fmt.Errorf("stake amount must be at least %d", bounty.StakeMin)
 	}
 	

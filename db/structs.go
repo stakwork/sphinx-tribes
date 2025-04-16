@@ -416,7 +416,7 @@ type Bounty struct {
 	AccessRestriction       *AccessRestrictionType `gorm:"type:varchar(20);default:null" json:"access_restriction,omitempty"`
 	UnlockCode              *string                `gorm:"type:varchar(6);default:null;index" json:"unlock_code,omitempty"`
 	IsStakable              bool                   `gorm:"default:false" json:"is_stakable"`
-	StakeMin                int64                  `gorm:"default:0" json:"stake_min"`
+	StakeMin                uint                   `gorm:"default:0" json:"stake_min"`
 	MaxStakers              int                    `gorm:"default:1" json:"max_stakers"`
 	CurrentStakers          int                    `gorm:"default:0" json:"current_stakers"`
 	Stakes                  []BountyStake          `gorm:"foreignKey:BountyID" json:"stakes,omitempty"`
@@ -464,7 +464,7 @@ type NewBounty struct {
 	AccessRestriction       *AccessRestrictionType `gorm:"type:varchar(20);default:null" json:"access_restriction,omitempty"`
 	UnlockCode              *string                `gorm:"type:varchar(6);default:null;index" json:"unlock_code,omitempty"`
 	IsStakable              bool                   `gorm:"default:false" json:"is_stakable"`
-	StakeMin                int64                  `gorm:"default:0" json:"stake_min"`
+	StakeMin                uint                   `gorm:"default:0" json:"stake_min"`
 	MaxStakers              int                    `gorm:"default:1" json:"max_stakers"`
 	CurrentStakers          int                    `gorm:"default:0" json:"current_stakers"`
 	Stakes                  []BountyStake          `gorm:"foreignKey:BountyID" json:"stakes,omitempty"`
@@ -1617,7 +1617,7 @@ type BountyStake struct {
 	ID           uuid.UUID   `json:"id" gorm:"primaryKey;type:uuid;default:gen_random_uuid()"`
 	BountyID     uint        `json:"bounty_id" gorm:"index;not null"`
 	HunterPubKey string      `json:"hunter_pubkey" gorm:"type:varchar(255);not null"`
-	Amount       int64       `json:"amount" gorm:"not null"`
+	Amount       uint        `json:"amount" gorm:"not null"`
 	Status       StakeStatus `json:"status" gorm:"type:varchar(20);default:'NEW'"`
 	Invoice      string      `json:"invoice" gorm:"type:text"`
 	StakeReceipt string      `json:"stake_receipt" gorm:"type:text"`
@@ -1633,7 +1633,7 @@ type BountyStakeProcess struct {
 	ID           uuid.UUID          `json:"id" gorm:"primaryKey;type:uuid;default:gen_random_uuid()"`
 	BountyID     uint               `json:"bounty_id" gorm:"index;not null"`
 	HunterPubKey string             `json:"hunter_pubkey" gorm:"type:varchar(255);not null;index"`
-	Amount       int64              `json:"amount" gorm:"not null"`
+	Amount       uint               `json:"amount" gorm:"not null"`
 	Status       StakeProcessStatus `json:"status" gorm:"type:varchar(20);default:'NEW'"`
 	Invoice      string             `json:"invoice" gorm:"type:text"` 
 	StakeReceipt string             `json:"stake_receipt" gorm:"type:text"`
