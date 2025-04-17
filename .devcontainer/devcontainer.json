@@ -24,6 +24,7 @@
       "settings": {
         "git.autofetch": true,
         "editor.formatOnSave": true,
+        "editor.defaultFormatter": "esbenp.prettier-vscode",
         "staklink.port": 15552,
         "staklink.repos": {
           "sphinx-tribes-frontend": {
