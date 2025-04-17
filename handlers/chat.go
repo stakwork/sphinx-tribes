@@ -171,9 +171,9 @@ type ChatStatusRequest struct {
 }
 
 type ChatStatusResponse struct {
-	Success   bool                  `json:"success"`
-	Message   string                `json:"message,omitempty"`
-	Data      *db.ChatWorkflowStatus `json:"data,omitempty"`
+	Success   bool                    `json:"success"`
+	Message   string                  `json:"message,omitempty"`
+	Data      *db.ChatWorkflowStatus  `json:"data,omitempty"`
 	DataArray []db.ChatWorkflowStatus `json:"data_array,omitempty"`
 }
 
@@ -599,7 +599,7 @@ func (ch *ChatHandler) SendMessage(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if mode == "Build" {
-		stakworkPayload.Name = "hive_autogen"
+		stakworkPayload.Name = request.ChatID
 		stakworkPayload.WorkflowID = 43859
 	}
 
@@ -717,13 +717,13 @@ func (ch *ChatHandler) sendToStakwork(payload StakworkChatPayload, apiKey string
 func (ch *ChatHandler) GetChat(w http.ResponseWriter, r *http.Request) {
 	workspaceID := r.URL.Query().Get("workspace_id")
 	chatStatus := r.URL.Query().Get("status")
-	
+
 	limit := -1
 	offset := 0
-	
+
 	if limitStr := r.URL.Query().Get("limit"); limitStr != "" {
 		if l, err := strconv.Atoi(limitStr); err == nil && l > 0 {
-				limit = l
+			limit = l
 		}
 	}
 	if offsetStr := r.URL.Query().Get("offset"); offsetStr != "" {
@@ -2492,7 +2492,7 @@ func (ch *ChatHandler) HandleChatWebhook(w http.ResponseWriter, r *http.Request)
 		return
 	}
 
-	logger.Log.Info("Created chat status for chat %s: %s - %s", 
+	logger.Log.Info("Created chat status for chat %s: %s - %s",
 		chatID, createdStatus.Status, createdStatus.Message)
 
 	w.WriteHeader(http.StatusOK)
