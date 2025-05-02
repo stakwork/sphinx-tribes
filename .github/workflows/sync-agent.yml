@@ -14,4 +14,4 @@ jobs:
         run: |
           curl -G "https://boltwll.swarm38.sphinx.chat/api/git/sync" \
             --data-urlencode "source_link=https://github.com/stakwork/sphinx-tribes,https://github.com/stakwork/sphinx-tribes-frontend" \
-            --data-urlencode "pat=${{ secrets.AGENT_PAT }}"
+            --data-urlencode "pat=${{ secrets.GITHUB_PAT }}"
