@@ -1600,6 +1600,8 @@ type CodeSpaceMap struct {
 	WorkspaceID  string    `json:"workspaceID" gorm:"index"`
 	CodeSpaceURL string    `json:"codeSpaceURL"`
 	UserPubkey   string    `json:"userPubkey" gorm:"index"`
+	// TODO: Encrypt this field
+	GithubPat    string    `json:"githubPat,omitempty" gorm:"column:github_pat"`
 }
 
 type StakeStatus string
