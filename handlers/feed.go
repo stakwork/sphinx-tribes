@@ -7,7 +7,9 @@ import (
 	"errors"
 	"fmt"
 	"io"
+	"log"
 	"net/http"
+	"net/url"
 	"os"
 	"strings"
 
@@ -215,7 +217,15 @@ func GetPodcast(w http.ResponseWriter, r *http.Request) {
 //	@Success		200	{array}	feeds.Feed
 //	@Router			/search_podcasts [get]
 func SearchPodcasts(w http.ResponseWriter, r *http.Request) {
-	q := r.URL.Query().Get("q")
+	rawQuery := r.URL.RawQuery
+	values, err := url.ParseQuery(rawQuery)
+	if err != nil {
+		log.Printf("Error parsing query: %v", err)
+		w.WriteHeader(http.StatusBadRequest)
+		return
+	}
+	q := values.Get("q")
+	
 	podcasts, err := searchPodcastIndex(q)
 	if err != nil {
 		w.WriteHeader(http.StatusNotFound)
