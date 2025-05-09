@@ -1,0 +1,6 @@
+---
+description: 
+globs: 
+alwaysApply: false
+---
+When you add a new method to `(db database)`, make sure to add it the interface definition [interface.go](mdc:db/interface.go)
