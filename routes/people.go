@@ -23,6 +23,7 @@ func PeopleRoutes() chi.Router {
 		r.Get("/short", handlers.GetPeopleShortList)
 		r.Get("/offers", handlers.GetListedOffers)
 		r.Get("/bounty/leaderboard", bountyHandler.GetBountiesLeaderboard)
+	r.Get("/bounty/monthly-earnings", bountyHandler.GetMonthlyEarnings)
 	})
 	return r
 }
