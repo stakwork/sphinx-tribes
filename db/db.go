@@ -1635,6 +1635,36 @@ func (db database) GetLeaderBoardByUuidAndAlias(uuid string, alias string) Leade
 	return m
 }
 
+type MonthlyEarnings struct {
+	Month    string `json:"month"`
+	Year     int    `json:"year"`
+	Earnings uint   `json:"earnings"`
+}
+
+func (db database) GetMonthlyEarnings(uuid string) []MonthlyEarnings {
+	var results []MonthlyEarnings
+	
+	query := `
+		SELECT 
+			TO_CHAR(paid_date, 'Month') as month,
+			EXTRACT(YEAR FROM paid_date) as year,
+			COALESCE(SUM(price), 0) as earnings
+		FROM bounty 
+		WHERE paid_date IS NOT NULL 
+			AND paid = true 
+			AND (tribe = ? OR tribe = '')
+		GROUP BY 
+			EXTRACT(YEAR FROM paid_date), 
+			EXTRACT(MONTH FROM paid_date),
+			TO_CHAR(paid_date, 'Month')
+		ORDER BY year DESC, EXTRACT(MONTH FROM paid_date) DESC
+		LIMIT 12
+	`
+	
+	db.db.Raw(query, uuid).Scan(&results)
+	return results
+}
+
 func (db database) UpdateLeaderBoard(uuid string, alias string, u map[string]interface{}) bool {
 	if uuid == "" {
 		return false

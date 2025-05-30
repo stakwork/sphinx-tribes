@@ -555,6 +555,15 @@ func GetLeaderBoard(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+func GetMonthlyEarnings(w http.ResponseWriter, r *http.Request) {
+	uuid := chi.URLParam(r, "tribe_uuid")
+	
+	monthlyEarnings := db.DB.GetMonthlyEarnings(uuid)
+	
+	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode(monthlyEarnings)
+}
+
 // UpdateLeaderBoard godoc
 //
 //	@Summary		Update a leaderboard

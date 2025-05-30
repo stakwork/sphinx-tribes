@@ -67,6 +67,7 @@ func NewRouter() *http.Server {
 	r.Group(func(r chi.Router) {
 		r.Get("/tribe_by_feed", tribeHandlers.GetFirstTribeByFeed)
 		r.Get("/leaderboard/{tribe_uuid}", handlers.GetLeaderBoard)
+		r.Get("/leaderboard/{tribe_uuid}/earnings", handlers.GetMonthlyEarnings)
 		r.Get("/tribe_by_un/{un}", tribeHandlers.GetTribeByUniqueName)
 		r.Get("/tribes_by_owner/{pubkey}", tribeHandlers.GetTribesByOwner)
 
