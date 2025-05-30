@@ -769,100 +769,31 @@ func GetPaymentByBountyId(w http.ResponseWriter, r *http.Request) {
 }
 
 func (h *bountyHandler) GenerateBountyResponse(bounties []db.NewBounty) []db.BountyResponse {
+	if len(bounties) == 0 {
+		return []db.BountyResponse{}
+	}
+
 	var bountyResponse []db.BountyResponse
-
-	for i := 0; i < len(bounties); i++ {
-		bounty := bounties[i]
-
+	for _, bounty := range bounties {
+		// Fetch owner, assignee, and workspace for the current bounty
 		owner := h.db.GetPersonByPubkey(bounty.OwnerID)
-		assignee := h.db.GetPersonByPubkey(bounty.Assignee)
-		workspace := h.db.GetWorkspaceByUuid(bounty.WorkspaceUuid)
+		assignee := h.db.GetPersonByPubkey(bounty.Assignee) // Assumes GetPersonByPubkey handles empty bounty.Assignee gracefully
+		workspace := h.db.GetWorkspaceByUuid(bounty.WorkspaceUuid) // Assumes GetWorkspaceByUuid handles empty bounty.WorkspaceUuid gracefully
+		
+		// Fetch proofs for the current bounty
+		bountyProofs := h.db.GetProofsByBountyID(bounty.ID) // Assumes GetProofsByBountyID (singular) exists and is correct
 
-		proofs := h.db.GetProofsByBountyID(bounty.ID)
-
+		// Construct the BountyResponse
 		b := db.BountyResponse{
-			Bounty: db.NewBounty{
-				ID:                      bounty.ID,
-				OwnerID:                 bounty.OwnerID,
-				Paid:                    bounty.Paid,
-				Show:                    bounty.Show,
-				Type:                    bounty.Type,
-				Award:                   bounty.Award,
-				AssignedHours:           bounty.AssignedHours,
-				BountyExpires:           bounty.BountyExpires,
-				CommitmentFee:           bounty.CommitmentFee,
-				Price:                   bounty.Price,
-				Title:                   bounty.Title,
-				Tribe:                   bounty.Tribe,
-				Created:                 bounty.Created,
-				Assignee:                bounty.Assignee,
-				TicketUrl:               bounty.TicketUrl,
-				Description:             bounty.Description,
-				WantedType:              bounty.WantedType,
-				Deliverables:            bounty.Deliverables,
-				GithubDescription:       bounty.GithubDescription,
-				OneSentenceSummary:      bounty.OneSentenceSummary,
-				EstimatedSessionLength:  bounty.EstimatedSessionLength,
-				EstimatedCompletionDate: bounty.EstimatedCompletionDate,
-				OrgUuid:                 bounty.WorkspaceUuid,
-				WorkspaceUuid:           bounty.WorkspaceUuid,
-				Updated:                 bounty.Updated,
-				CodingLanguages:         bounty.CodingLanguages,
-				Completed:               bounty.Completed,
-				PaymentPending:          bounty.PaymentPending,
-				PaymentFailed:           bounty.PaymentFailed,
-				PhaseUuid:               bounty.PhaseUuid,
-				FeatureUuid:             bounty.FeatureUuid,
-				PhasePriority:           bounty.PhasePriority,
-				ProofOfWorkCount:        bounty.ProofOfWorkCount,
-				UnlockCode:              bounty.UnlockCode,
-				AccessRestriction:       bounty.AccessRestriction,
-				IsStakable:              bounty.IsStakable,
-				StakeMin:                bounty.StakeMin,
-				MaxStakers:              bounty.MaxStakers,
-				CurrentStakers:          bounty.CurrentStakers,
-				Stakes:                  bounty.Stakes,
-			},
-			Assignee: db.Person{
-				ID:               assignee.ID,
-				Uuid:             assignee.Uuid,
-				OwnerPubKey:      assignee.OwnerPubKey,
-				OwnerAlias:       assignee.OwnerAlias,
-				UniqueName:       assignee.UniqueName,
-				Description:      assignee.Description,
-				Tags:             assignee.Tags,
-				Img:              assignee.Img,
-				Created:          assignee.Created,
-				Updated:          assignee.Updated,
-				LastLogin:        assignee.LastLogin,
-				OwnerRouteHint:   assignee.OwnerRouteHint,
-				OwnerContactKey:  assignee.OwnerContactKey,
-				PriceToMeet:      assignee.PriceToMeet,
-				TwitterConfirmed: assignee.TwitterConfirmed,
-			},
-			Owner: db.Person{
-				ID:               owner.ID,
-				Uuid:             owner.Uuid,
-				OwnerPubKey:      owner.OwnerPubKey,
-				OwnerAlias:       owner.OwnerAlias,
-				UniqueName:       owner.UniqueName,
-				Description:      owner.Description,
-				Tags:             owner.Tags,
-				Img:              owner.Img,
-				Created:          owner.Created,
-				Updated:          owner.Updated,
-				LastLogin:        owner.LastLogin,
-				OwnerRouteHint:   owner.OwnerRouteHint,
-				OwnerContactKey:  owner.OwnerContactKey,
-				PriceToMeet:      owner.PriceToMeet,
-				TwitterConfirmed: owner.TwitterConfirmed,
-			},
+			Bounty:       bounty, // Use the entire bounty struct directly
+			Assignee:     assignee,
+			Owner:        owner,
 			Organization: db.WorkspaceShort{
-				Name: workspace.Name,
+				Name: workspace.Name, // If workspace is a zero-value struct, Name will be its zero value (e.g., "")
 				Uuid: workspace.Uuid,
 				Img:  workspace.Img,
 			},
-			Workspace: db.WorkspaceShort{
+			Workspace: db.WorkspaceShort{ // Assuming WorkspaceShort is intended to be identical to Organization here
 				Name: workspace.Name,
 				Uuid: workspace.Uuid,
 				Img:  workspace.Img,
@@ -870,8 +801,9 @@ func (h *bountyHandler) GenerateBountyResponse(bounties []db.NewBounty) []db.Bou
 			Pow: bounty.ProofOfWorkCount,
 		}
 
-		if len(proofs) > 0 {
-			b.Proofs = proofs
+		// Add proofs if they exist
+		if len(bountyProofs) > 0 {
+			b.Proofs = bountyProofs
 		}
 
 		bountyResponse = append(bountyResponse, b)

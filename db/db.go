@@ -1321,6 +1321,54 @@ func (db database) GetAllBounties(r *http.Request) []NewBounty {
 	return ms
 }
 
+// GetPersonsByPubkeys fetches multiple persons by their public keys in a single query
+func (db database) GetPersonsByPubkeys(pubkeys []string) map[string]Person {
+	if len(pubkeys) == 0 {
+		return make(map[string]Person)
+	}
+
+	var persons []Person
+	db.db.Where("owner_pubkey IN ?", pubkeys).Find(&persons)
+
+	personMap := make(map[string]Person)
+	for _, person := range persons {
+		personMap[person.OwnerPubKey] = person
+	}
+	return personMap
+}
+
+// GetWorkspacesByUuids fetches multiple workspaces by their UUIDs in a single query
+func (db database) GetWorkspacesByUuids(uuids []string) map[string]Workspace {
+	if len(uuids) == 0 {
+		return make(map[string]Workspace)
+	}
+
+	var workspaces []Workspace
+	db.db.Where("uuid IN ?", uuids).Find(&workspaces)
+
+	workspaceMap := make(map[string]Workspace)
+	for _, workspace := range workspaces {
+		workspaceMap[workspace.Uuid] = workspace
+	}
+	return workspaceMap
+}
+
+// GetProofsByBountyIDs fetches proofs for multiple bounty IDs in a single query
+func (db database) GetProofsByBountyIDs(bountyIDs []uint) map[uint][]ProofOfWork {
+	if len(bountyIDs) == 0 {
+		return make(map[uint][]ProofOfWork)
+	}
+
+	var proofs []ProofOfWork
+	db.db.Where("bounty_id IN ?", bountyIDs).Find(&proofs)
+
+	proofsMap := make(map[uint][]ProofOfWork)
+	for _, proof := range proofs {
+		proofsMap[proof.BountyID] = append(proofsMap[proof.BountyID], proof)
+	}
+	return proofsMap
+}
+
 func (db database) CreateOrEditBounty(b NewBounty) (NewBounty, error) {
 	if b.OwnerID == "" {
 		return NewBounty{}, errors.New("no pub key")
