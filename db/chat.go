@@ -3,11 +3,53 @@ package db
 import (
 	"errors"
 	"fmt"
+	"regexp"
+	"strings"
 	"time"
+	"unicode"
+	"unicode/utf8"
 
 	"github.com/google/uuid"
 	"gorm.io/gorm"
 )
+
+// sanitizeText removes or escapes problematic Unicode characters that can cause database issues
+func sanitizeText(text string) string {
+	if text == "" {
+		return text
+	}
+
+	// Remove null bytes which cause Postgres issues
+	text = strings.ReplaceAll(text, "\x00", "")
+
+	// Remove other problematic control characters but preserve common whitespace
+	var result strings.Builder
+	for _, r := range text {
+		// Keep printable characters, spaces, tabs, newlines, and carriage returns
+		if unicode.IsPrint(r) || r == ' ' || r == '\t' || r == '\n' || r == '\r' {
+			result.WriteRune(r)
+		} else if unicode.IsControl(r) {
+			// Replace other control characters with space to maintain readability
+			result.WriteRune(' ')
+		} else {
+			// Keep other valid Unicode characters
+			result.WriteRune(r)
+		}
+	}
+
+	cleaned := result.String()
+
+	// Ensure valid UTF-8 by replacing invalid sequences
+	if !utf8.ValidString(cleaned) {
+		cleaned = strings.ToValidUTF8(cleaned, "�")
+	}
+
+	// Remove excessive whitespace but preserve intentional formatting
+	re := regexp.MustCompile(`\s{3,}`)
+	cleaned = re.ReplaceAllString(cleaned, "  ")
+
+	return strings.TrimSpace(cleaned)
+}
 
 func (db database) AddChat(chat *Chat) (Chat, error) {
 	if chat.ID == "" {
@@ -72,6 +114,9 @@ func (db database) AddChatMessage(chatMessage *ChatMessage) (ChatMessage, error)
 		return ChatMessage{}, errors.New("message ID is required")
 	}
 
+	// Sanitize message text to prevent Unicode-related database issues
+	chatMessage.Message = sanitizeText(chatMessage.Message)
+
 	now := time.Now()
 	chatMessage.Timestamp = now
 
@@ -93,7 +138,8 @@ func (db database) UpdateChatMessage(chatMessage *ChatMessage) (ChatMessage, err
 	}
 
 	if chatMessage.Message != "" {
-		existingMessage.Message = chatMessage.Message
+		// Sanitize message text to prevent Unicode-related database issues
+		existingMessage.Message = sanitizeText(chatMessage.Message)
 	}
 	if chatMessage.Status != "" {
 		existingMessage.Status = chatMessage.Status
@@ -348,6 +394,9 @@ func (db database) AddChatStatus(status *ChatWorkflowStatus) (ChatWorkflowStatus
 		status.Message = status.Status
 	}
 
+	// Sanitize message text to prevent Unicode-related database issues
+	status.Message = sanitizeText(status.Message)
+
 	now := time.Now()
 	status.CreatedAt = now
 	status.UpdatedAt = now
@@ -387,6 +436,9 @@ func (db database) UpdateChatStatus(status *ChatWorkflowStatus) (ChatWorkflowSta
 	if status.Message != "" {
 		existingStatus.Message = status.Message
 	}
+	
+	// Sanitize message text to prevent Unicode-related database issues
+	existingStatus.Message = sanitizeText(existingStatus.Message)
 	
 	existingStatus.UpdatedAt = time.Now()
 
