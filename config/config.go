@@ -49,6 +49,11 @@ var IsV2Payment bool = false
 var FfWebsocket bool = false
 var SWAuth string
 
+var SendGridApiKey string
+var EmailFromAddress string
+var EmailFromName string
+var SupportEmail string
+
 func InitConfig() {
 	Host = os.Getenv("LN_SERVER_BASE_URL")
 	JwtKey = os.Getenv("LN_JWT_KEY")
@@ -146,6 +151,22 @@ func InitConfig() {
 
 	if LogLevel == "" {
 		LogLevel = "DEBUG"
+	}
+
+	// Load email configuration
+	SendGridApiKey = os.Getenv("SENDGRID_API_KEY")
+	EmailFromAddress = os.Getenv("EMAIL_FROM_ADDRESS")
+	EmailFromName = os.Getenv("EMAIL_FROM_NAME")
+	SupportEmail = os.Getenv("SUPPORT_EMAIL")
+	
+	if SupportEmail == "" {
+		SupportEmail = "support@stakwork.com"
+	}
+	if EmailFromAddress == "" {
+		EmailFromAddress = "noreply@stakwork.com"
+	}
+	if EmailFromName == "" {
+		EmailFromName = "Sphinx Tribes"
 	}
 }
 

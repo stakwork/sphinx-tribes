@@ -120,6 +120,18 @@ func (ph *peopleHandler) CreatePerson(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	// Send email notification for new user profile creation
+	// Only send if this is a new user (existing.ID == 0 from earlier check)
+	if existing.ID == 0 {
+		go func() {
+			emailService := utils.NewEmailService()
+			err := emailService.SendNewUserNotification(p.OwnerAlias, p.OwnerPubKey, p.Uuid)
+			if err != nil {
+				logger.Log.Error("Failed to send new user notification email: %v", err)
+			}
+		}()
+	}
+
 	w.WriteHeader(http.StatusOK)
 	json.NewEncoder(w).Encode(p)
 }
