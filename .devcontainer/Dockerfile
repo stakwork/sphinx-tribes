@@ -4,6 +4,9 @@ FROM mcr.microsoft.com/devcontainers/go
 RUN apt-get update && export DEBIAN_FRONTEND=noninteractive \
     && apt-get -y install --no-install-recommends postgresql nodejs npm sed yarn
 
+# Install PM2 globally
+RUN npm install -g pm2
+
 # install gh https://github.com/cli/cli/blob/trunk/docs/install_linux.md
 RUN (type -p wget >/dev/null || (sudo apt update && sudo apt-get install wget -y)) \
 	&& sudo mkdir -p -m 755 /etc/apt/keyrings \
