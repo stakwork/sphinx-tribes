@@ -358,8 +358,9 @@ func (ch *codeSpaceHandler) UpdateCodeSpaceMap(w http.ResponseWriter, r *http.Re
 	if codeSpace.UserPubkey != "" {
 		updates["user_pubkey"] = codeSpace.UserPubkey
 	}
-	// Also allow updating GithubPat, even if empty to clear it
+	// Also allow updating GithubPat and BaseBranch, even if empty to clear them
 	updates["github_pat"] = codeSpace.GithubPat
+	updates["base_branch"] = codeSpace.BaseBranch
 
 
 	updatedCodeSpace, err := ch.db.UpdateCodeSpaceMap(id, updates)
