@@ -19,6 +19,8 @@ func (db database) CreateCodeSpaceMap(codeSpace CodeSpaceMap) (CodeSpaceMap, err
 	if result.RowsAffected > 0 {
 		now := time.Now()
 		existingMap.CodeSpaceURL = codeSpace.CodeSpaceURL
+		existingMap.GithubPat = codeSpace.GithubPat
+		existingMap.BaseBranch = codeSpace.BaseBranch
 		existingMap.UpdatedAt = now
 		
 		db.db.Save(&existingMap)

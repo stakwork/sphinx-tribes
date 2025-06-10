@@ -1602,6 +1602,7 @@ type CodeSpaceMap struct {
 	UserPubkey   string    `json:"userPubkey" gorm:"index"`
 	// TODO: Encrypt this field
 	GithubPat    string    `json:"githubPat,omitempty" gorm:"column:github_pat"`
+	BaseBranch string `json:"baseBranch"`
 }
 
 type StakeStatus string

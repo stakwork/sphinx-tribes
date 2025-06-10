@@ -442,6 +442,10 @@ func buildVarsPayload(request SendMessageRequest, createdMessage *db.ChatMessage
 		vars["codeSpaceURL"] = codeSpace.CodeSpaceURL
 	}
 
+	if codeSpace.BaseBranch != "" {
+		vars["base_branch"] = codeSpace.BaseBranch
+	}
+
 	vars["query"] = request.Message
 
 	return vars
