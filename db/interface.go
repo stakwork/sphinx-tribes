@@ -178,6 +178,7 @@ type Database interface {
 	GetFeaturePhasesBountiesCount(bountyType string, phaseUuid string) int64
 	GetPendingPaymentHistory() []NewPaymentHistory
 	GetPaymentByBountyId(bountyId uint) NewPaymentHistory
+	GetDailyEarnings() []DailyEarning
 	SetPaymentAsComplete(tag string) bool
 	SetPaymentStatusByBountyId(bountyId uint, tagResult V2TagRes) bool
 	GetWorkspacePendingPayments(workspace_uuid string) []NewPaymentHistory

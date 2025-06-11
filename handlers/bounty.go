@@ -2460,6 +2460,13 @@ func (h *bountyHandler) GetBountiesLeaderboard(w http.ResponseWriter, _ *http.Re
 	json.NewEncoder(w).Encode(leaderBoard)
 }
 
+func (h *bountyHandler) GetDailyEarnings(w http.ResponseWriter, _ *http.Request) {
+	dailyEarnings := h.db.GetDailyEarnings()
+
+	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode(dailyEarnings)
+}
+
 // GetAllFeaturedBounties godoc
 //
 //	@Summary		Get all featured bounties
