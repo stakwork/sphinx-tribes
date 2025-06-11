@@ -1817,6 +1817,29 @@ ORDER by total_sats_earned DESC`).Find(&ms)
 	return users
 }
 
+func (db database) GetDailyEarnings() []DailyEarning {
+	var dailyEarnings []DailyEarning
+	
+	// Query to get total sats earned per day in the last 30 days
+	db.db.Raw(`
+		SELECT 
+			TO_CHAR(paid_date::date, 'YYYY-MM-DD') as date,
+			SUM(CAST(price as integer)) as total_sats
+		FROM 
+			bounty
+		WHERE 
+			paid = true 
+			AND paid_date IS NOT NULL
+			AND paid_date >= NOW() - INTERVAL '30 days'
+		GROUP BY 
+			TO_CHAR(paid_date::date, 'YYYY-MM-DD')
+		ORDER BY 
+			date ASC
+	`).Scan(&dailyEarnings)
+	
+	return dailyEarnings
+}
+
 func GetLeaderData(arr []LeaderData, key string) (int, int) {
 	found := -1
 	index := 0
