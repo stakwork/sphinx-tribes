@@ -359,11 +359,6 @@ type BountyLeaderboard struct {
 	Total_sats_earned        uint   `json:"total_sats_earned"`
 }
 
-type DailyEarning struct {
-	Date       string `json:"date"`
-	TotalSats  uint   `json:"total_sats"`
-}
-
 type YoutubeDownload struct {
 	YoutubeUrls []string `json:"youtube_urls"`
 }
