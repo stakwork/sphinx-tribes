@@ -1,18 +1,16 @@
-
-version: '3.8'
+version: "3.8"
 
 volumes:
   postgres-data:
 
 services:
-
   app:
     build:
       context: .
       dockerfile: Dockerfile
     env_file:
-        # Ensure that the variables in .env match the same variables in devcontainer.json
-        - .env
+      # Ensure that the variables in .env match the same variables in devcontainer.json
+      - .env
 
     volumes:
       - ../..:/workspaces:cached
@@ -21,11 +19,13 @@ services:
     command: sleep infinity
 
     # Runs app on the same network as the database container, allows "forwardPorts" in devcontainer.json function.
-    network_mode: service:db
+    # network_mode: service:db
 
   db:
     image: postgres:latest
     restart: unless-stopped
+    ports:
+      - 5432:5432
     volumes:
       - postgres-data:/var/lib/postgresql/data
     env_file:
