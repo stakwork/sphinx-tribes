@@ -3,12 +3,7 @@
   "dockerComposeFile": "docker-compose.yml",
   "service": "app",
   "workspaceFolder": "/workspaces",
-  "forwardPorts": [
-    13008,
-    5432,
-    5002,
-    15552
-  ],
+  "forwardPorts": [13008, 5432, 5002, 15552],
   "postStartCommand": "bash sphinx-tribes/.devcontainer/ports.sh",
   "postAttachCommand": "bash sphinx-tribes/.devcontainer/ports.sh",
   "postCreateCommand": "bash sphinx-tribes/.devcontainer/setup.sh",
@@ -24,30 +19,9 @@
       "settings": {
         "git.autofetch": true,
         "editor.formatOnSave": true,
-        "editor.defaultFormatter": "esbenp.prettier-vscode",
-        "staklink.port": 15552,
-        "staklink.repos": {
-          "sphinx-tribes-frontend": {
-            "start": [
-              "yarn",
-              "yarn start:codespace"
-            ],
-            "port": 13008
-          },
-          "sphinx-tribes": {
-            "restart": [
-              "go build",
-              "./sphinx-tribes"
-            ],
-            "port": 5002
-          }
-        }
+        "editor.defaultFormatter": "esbenp.prettier-vscode"
       },
-      "extensions": [
-        "stakwork.staklink",
-        "golang.go",
-        "esbenp.prettier-vscode"
-      ]
+      "extensions": ["stakwork.staklink", "golang.go", "esbenp.prettier-vscode"]
     }
   },
   "hostRequirements": {
