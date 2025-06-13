@@ -21,11 +21,7 @@
         "editor.formatOnSave": true,
         "editor.defaultFormatter": "esbenp.prettier-vscode"
       },
-      "extensions": [
-        "stakwork.staklink-test",
-        "golang.go",
-        "esbenp.prettier-vscode"
-      ]
+      "extensions": ["stakwork.staklink", "golang.go", "esbenp.prettier-vscode"]
     }
   },
   "hostRequirements": {
