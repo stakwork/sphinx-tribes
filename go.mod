@@ -31,6 +31,7 @@ require (
 	github.com/redis/go-redis/v9 v9.3.0
 	github.com/rs/cors v1.10.1
 	github.com/rs/xid v1.5.0
+	github.com/sendgrid/sendgrid-go v3.14.0+incompatible
 	github.com/stretchr/testify v1.8.4
 	github.com/tuan78/jsonconv v1.0.2
 	golang.org/x/oauth2 v0.15.0
@@ -61,6 +62,7 @@ require (
 	github.com/onsi/gomega v1.26.0 // indirect
 	github.com/posthog/posthog-go v1.2.24
 	github.com/robfig/cron v1.2.0
+	github.com/sendgrid/rest v2.6.9+incompatible // indirect
 	github.com/swaggo/http-swagger v1.3.4
 	github.com/swaggo/swag v1.16.4
 	github.com/urfave/negroni v1.0.0
