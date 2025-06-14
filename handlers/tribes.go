@@ -755,7 +755,7 @@ func GenerateV1Invoice(w http.ResponseWriter, r *http.Request) (db.InvoiceRespon
 	return invoiceRes, db.InvoiceError{Success: true}
 }
 
-// GenerateInvoice godoc
+// GenerateV2Invoice godoc
 //
 //	@Summary		Generate an invoice
 //	@Description	Generate an invoice for a tribe
