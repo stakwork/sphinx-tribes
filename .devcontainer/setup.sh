@@ -4,7 +4,15 @@ cd /workspaces
 
 git clone https://github.com/stakwork/sphinx-tribes-frontend
 
-cd sphinx-tribes
+cd /workspaces/sphinx-tribes-frontend
+
+yarn install
+
+pm2 restart all
+
+cd /workspaces/sphinx-tribes
+
+cp .devcontainer/.env ./.env
 
 DB=postgres://postgres:postgres@localhost:5432/postgres
 
@@ -27,5 +35,7 @@ echo "Inserting dummy data...."
 psql $DB -f docker/dummy-data/people.sql
 psql $DB -f docker/dummy-data/workspaces.sql
 psql $DB -f docker/dummy-data/paid-bounties.sql
+
+pm2 restart all
 
 ./.devcontainer/ports.sh
