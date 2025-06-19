@@ -264,6 +264,22 @@ func (ch *codeSpaceHandler) QueryCodeSpaceMaps(w http.ResponseWriter, r *http.Re
 	json.NewEncoder(w).Encode(codespaces)
 }
 
+func isValidCodeSpaceURL(url string) bool {
+	if url == "" {
+		return false
+	}
+	if len(url) > 200 {
+		return false
+	}
+	for _, c := range url {
+		switch c {
+		case '!', '@', '#', '$', '%', '^', '&', '*', '(', ')', '=', '+', '[', ']', '{', '}', '|', ';', '\'', '"', ',', '<', '>', '\\':
+			return false
+		}
+	}
+	return true
+}
+
 func (ch *codeSpaceHandler) CreateCodeSpaceMap(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 	pubKeyFromAuth, _ := ctx.Value(auth.ContextKey).(string)
@@ -296,6 +312,11 @@ func (ch *codeSpaceHandler) CreateCodeSpaceMap(w http.ResponseWriter, r *http.Re
 	if codeSpace.WorkspaceID == "" || codeSpace.CodeSpaceURL == "" || codeSpace.UserPubkey == "" {
 		w.WriteHeader(http.StatusBadRequest)
 		json.NewEncoder(w).Encode(map[string]string{"error": "WorkspaceID, CodeSpaceURL, and UserPubkey are required"})
+		return
+	}
+	if !isValidCodeSpaceURL(codeSpace.CodeSpaceURL) {
+		w.WriteHeader(http.StatusBadRequest)
+		json.NewEncoder(w).Encode(map[string]string{"error": "Invalid CodeSpace: no special characters allowed and max 200 characters."})
 		return
 	}
 
@@ -353,6 +374,11 @@ func (ch *codeSpaceHandler) UpdateCodeSpaceMap(w http.ResponseWriter, r *http.Re
 		updates["workspace_id"] = codeSpace.WorkspaceID
 	}
 	if codeSpace.CodeSpaceURL != "" {
+		if !isValidCodeSpaceURL(codeSpace.CodeSpaceURL) {
+			w.WriteHeader(http.StatusBadRequest)
+			json.NewEncoder(w).Encode(map[string]string{"error": "Invalid CodeSpace: no special characters allowed and max 200 characters."})
+			return
+		}
 		updates["code_space_url"] = codeSpace.CodeSpaceURL
 	}
 	if codeSpace.UserPubkey != "" {
@@ -360,7 +386,6 @@ func (ch *codeSpaceHandler) UpdateCodeSpaceMap(w http.ResponseWriter, r *http.Re
 	}
 	// Also allow updating GithubPat, even if empty to clear it
 	updates["github_pat"] = codeSpace.GithubPat
-
 
 	updatedCodeSpace, err := ch.db.UpdateCodeSpaceMap(id, updates)
 	if err != nil {
