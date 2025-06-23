@@ -446,6 +446,10 @@ func buildVarsPayload(request SendMessageRequest, createdMessage *db.ChatMessage
 		vars["base_branch"] = codeSpace.BaseBranch
 	}
 
+	if codeSpace.GithubPat != "" {
+		vars["token"] = codeSpace.GithubPat
+	}
+
 	vars["query"] = request.Message
 
 	return vars
