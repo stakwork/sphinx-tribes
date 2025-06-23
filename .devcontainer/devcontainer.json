@@ -2,6 +2,15 @@
   "name": "Sphinx Tribes Dev",
   "dockerComposeFile": "docker-compose.yml",
   "service": "app",
+  "containerEnv": {
+    "POSTGRES_USER":"postgres",
+    "POSTGRES_PASSWORD":"postgres",
+    "POSTGRES_DB":"postgres",
+    "POSTGRES_HOSTNAME":"localhost",
+    "DATABASE_URL":"postgres://postgres:postgres@localhost:5432/postgres",
+    "LN_JWT_KEY":"notasecretstring",
+    "ALT_HOST":"https://app.github.dev"
+  },
   "workspaceFolder": "/workspaces",
   "forwardPorts": [
     13008,
