@@ -11,6 +11,7 @@ module.exports = {
       env: {
         RESTART: "true",
         REBUILD_COMMAND: "go build -o sphinx-tribes",
+        PORT: "5002",
       },
     },
     {
@@ -25,6 +26,7 @@ module.exports = {
       env: {
         NODE_ENV: "development",
         INSTALL_COMMAND: "yarn install",
+        PORT: "13008",
       },
     },
   ],
