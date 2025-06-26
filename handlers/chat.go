@@ -446,6 +446,10 @@ func buildVarsPayload(request SendMessageRequest, createdMessage *db.ChatMessage
 		vars["base_branch"] = codeSpace.BaseBranch
 	}
 
+	if codeSpace.Username != "" {
+		vars["username"] = codeSpace.Username
+	}
+
 	if codeSpace.GithubPat != "" {
 		vars["token"] = codeSpace.GithubPat
 	}
@@ -457,8 +461,8 @@ func buildVarsPayload(request SendMessageRequest, createdMessage *db.ChatMessage
 
 // SendMessage sends a message in a chat
 //
-//	@Summary		Send a message in a chat
-//	@Description	Send a message in a chat with the given details
+//	@Summary			Send a message in a chat
+//	@Description		Send a message in a chat with the given details
 //	@Tags			Hive Chat
 //	@Accept			json
 //	@Produce		json
