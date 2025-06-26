@@ -12,6 +12,7 @@ module.exports = {
         RESTART: "true",
         REBUILD_COMMAND: "go build -o sphinx-tribes",
         PORT: "5002",
+        POST_RUN_COMMAND: "/workspaces/sphinx-tribes/.devcontainer/seed.sh",
       },
     },
     {

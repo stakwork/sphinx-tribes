@@ -6,9 +6,9 @@ git clone https://github.com/stakwork/sphinx-tribes-frontend
 
 cd /workspaces/sphinx-tribes-frontend
 
-yarn install
+# yarn install
 
-pm2 restart all
+# pm2 restart all
 
 cd /workspaces/sphinx-tribes
 
@@ -24,18 +24,18 @@ do
 done
 
 # Wait for backend to be ready
-until [ "$(curl -s -m 1 http://localhost:5002/tribes 2>/dev/null)" = "[]" ]
-do
-  echo "Waiting for backend to become ready..."
-  sleep 5
-done
+# until [ "$(curl -s -m 1 http://localhost:5002/tribes 2>/dev/null)" = "[]" ]
+# do
+#   echo "Waiting for backend to become ready..."
+#   sleep 5
+# done
 
-echo "Inserting dummy data...."
+# echo "Inserting dummy data...."
 
-psql $DB -f docker/dummy-data/people.sql
-psql $DB -f docker/dummy-data/workspaces.sql
-psql $DB -f docker/dummy-data/paid-bounties.sql
+# psql $DB -f docker/dummy-data/people.sql
+# psql $DB -f docker/dummy-data/workspaces.sql
+# psql $DB -f docker/dummy-data/paid-bounties.sql
 
-pm2 restart all
+# pm2 restart all
 
 ./.devcontainer/ports.sh
