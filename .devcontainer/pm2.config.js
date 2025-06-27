@@ -16,7 +16,7 @@ module.exports = {
       },
     },
     {
-      name: "sphinx-tribes-frontend",
+      name: "frontend",
       script: "npm",
       args: "run start:codespace",
       cwd: "/workspaces/sphinx-tribes-frontend",
