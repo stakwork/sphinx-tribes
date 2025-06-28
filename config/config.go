@@ -49,6 +49,14 @@ var IsV2Payment bool = false
 var FfWebsocket bool = false
 var SWAuth string
 
+// Email configuration
+var SMTPHost string
+var SMTPPort string
+var SMTPUsername string
+var SMTPPassword string
+var EmailFrom string
+var SupportEmail string
+
 func InitConfig() {
 	Host = os.Getenv("LN_SERVER_BASE_URL")
 	JwtKey = os.Getenv("LN_JWT_KEY")
@@ -71,6 +79,14 @@ func InitConfig() {
 	FfWebsocket = os.Getenv("FF_WEBSOCKET") == "true"
 	LogLevel = strings.ToUpper(os.Getenv("LOG_LEVEL"))
 	SWAuth = os.Getenv("SWAUTH")
+
+	// Initialize email configuration
+	SMTPHost = os.Getenv("SMTP_HOST")
+	SMTPPort = os.Getenv("SMTP_PORT")
+	SMTPUsername = os.Getenv("SMTP_USERNAME")
+	SMTPPassword = os.Getenv("SMTP_PASSWORD")
+	EmailFrom = os.Getenv("EMAIL_FROM")
+	SupportEmail = os.Getenv("SUPPORT_EMAIL")
 
 	// Add to super admins
 	SuperAdmins = StripSuperAdmins(AdminStrings)
@@ -146,6 +162,18 @@ func InitConfig() {
 
 	if LogLevel == "" {
 		LogLevel = "DEBUG"
+	}
+
+	if SMTPPort == "" {
+		SMTPPort = "587"
+	}
+
+	if SupportEmail == "" {
+		SupportEmail = "support@stakwork.com"
+	}
+
+	if EmailFrom == "" {
+		EmailFrom = "noreply@stakwork.com"
 	}
 }
 
