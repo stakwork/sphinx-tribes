@@ -76,17 +76,18 @@ type FileResponse struct {
 }
 
 type SendMessageRequest struct {
-	ChatID         string `json:"chat_id"`
-	Message        string `json:"message"`
-	PDFURL         string `json:"pdf_url,omitempty"`
-	ModelSelection string `json:"modelSelection,omitempty"`
-	ContextTags    []struct {
+	ChatID              string `json:"chat_id"`
+	Message             string `json:"message"`
+	PDFURL              string `json:"pdf_url,omitempty"`
+	ModelSelection      string `json:"modelSelection,omitempty"`
+	ContextTags         []struct {
 		Type string `json:"type"`
 		ID   string `json:"id"`
 	} `json:"contextTags"`
-	SourceWebsocketID string `json:"sourceWebsocketId"`
-	WorkspaceUUID     string `json:"workspaceUUID"`
-	Mode              string `json:"mode,omitempty"`
+	SourceWebsocketID   string `json:"sourceWebsocketId"`
+	WorkspaceUUID       string `json:"workspaceUUID"`
+	Mode                string `json:"mode,omitempty"`
+	SimultaneousAttempts int   `json:"simultaneous_attempts,omitempty"`
 }
 
 type BuildMessageRequest struct {
@@ -409,17 +410,18 @@ func buildArtifactList(artefacts []db.Artifact) []map[string]string {
 
 func buildVarsPayload(request SendMessageRequest, createdMessage *db.ChatMessage, messageHistory []map[string]string, context interface{}, user *db.Person, codeGraph *db.WorkspaceCodeGraph, codeSpace db.CodeSpaceMap, mode string) map[string]interface{} {
 	vars := map[string]interface{}{
-		"chatId":            request.ChatID,
-		"messageId":         createdMessage.ID,
-		"message":           request.Message,
-		"history":           messageHistory,
-		"contextTags":       context,
-		"sourceWebsocketId": request.SourceWebsocketID,
-		"webhook_url":       fmt.Sprintf("%s/hivechat/response", os.Getenv("HOST")),
-		"alias":             user.OwnerAlias,
-		"pdf_url":           request.PDFURL,
-		"modelSelection":    request.ModelSelection,
-		"workspaceId":       request.WorkspaceUUID,
+		"chatId":                request.ChatID,
+		"messageId":             createdMessage.ID,
+		"message":               request.Message,
+		"history":               messageHistory,
+		"contextTags":           context,
+		"sourceWebsocketId":     request.SourceWebsocketID,
+		"webhook_url":           fmt.Sprintf("%s/hivechat/response", os.Getenv("HOST")),
+		"alias":                 user.OwnerAlias,
+		"pdf_url":               request.PDFURL,
+		"modelSelection":        request.ModelSelection,
+		"workspaceId":           request.WorkspaceUUID,
+		"simultaneous_attempts": request.SimultaneousAttempts,
 	}
 
 	if codeGraph != nil && codeGraph.Url != "" {
