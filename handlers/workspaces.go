@@ -7,6 +7,7 @@ import (
 	"io/ioutil"
 	"log"
 	"net/http"
+	"os"
 	"regexp"
 	"strings"
 	"time"
@@ -1450,6 +1451,133 @@ func (oh *workspaceHandler) GetFeaturesByWorkspaceUuid(w http.ResponseWriter, r 
 
 	w.WriteHeader(http.StatusOK)
 	json.NewEncoder(w).Encode(workspaceFeatures)
+}
+
+// GetWorkspaceEnvVars godoc
+//
+// @Summary      Get Environment Variables for a Workspace
+// @Description  Fetches environment variables for a workspace from the codespace pool API
+// @Tags         Workspaces
+// @Accept       json
+// @Produce      json
+// @Security     PubKeyContextAuth
+// @Param        workspace_uuid path string true "Workspace UUID"
+// @Success      200 {object} map[string]interface{}
+// @Router       /workspaces/{workspace_uuid}/env_vars [get]
+func (oh *workspaceHandler) GetWorkspaceEnvVars(w http.ResponseWriter, r *http.Request) {
+	ctx := r.Context()
+	pubKeyFromAuth, _ := ctx.Value(auth.ContextKey).(string)
+	if pubKeyFromAuth == "" {
+		logger.Log.Info("[workspaces] no pubkey from auth")
+		w.WriteHeader(http.StatusUnauthorized)
+		return
+	}
+
+	workspaceUUID := chi.URLParam(r, "workspace_uuid")
+	if workspaceUUID == "" {
+		w.WriteHeader(http.StatusBadRequest)
+		json.NewEncoder(w).Encode(map[string]string{"error": "Missing workspace_uuid parameter"})
+		return
+	}
+
+	// Find codespace mapping for this workspace
+	codespaces, err := oh.db.GetCodeSpaceMapByWorkspace(workspaceUUID)
+	if err != nil || len(codespaces) == 0 {
+		w.WriteHeader(http.StatusNotFound)
+		json.NewEncoder(w).Encode(map[string]string{"error": "Codespace mapping not found for workspace"})
+		return
+	}
+	codespaceName := codespaces[0].CodeSpaceURL // This is the codespace_name_value
+	if codespaceName == "" {
+		w.WriteHeader(http.StatusNotFound)
+		json.NewEncoder(w).Encode(map[string]string{"error": "Codespace name not found for workspace"})
+		return
+	}
+
+	// Proxy GET to 3rd party API
+	url := "https://workspaces.sphinx.chat/api/pools/" + codespaceName
+	resp, err := http.Get(url)
+	if err != nil {
+		w.WriteHeader(http.StatusBadGateway)
+		json.NewEncoder(w).Encode(map[string]string{"error": "Failed to reach codespace API"})
+		return
+	}
+	defer resp.Body.Close()
+	w.WriteHeader(resp.StatusCode)
+	io.Copy(w, resp.Body)
+}
+
+// UpdateWorkspaceEnvVars godoc
+//
+// @Summary      Update Environment Variables for a Workspace
+// @Description  Updates environment variables for a workspace via the codespace pool API
+// @Tags         Workspaces
+// @Accept       json
+// @Produce      json
+// @Security     PubKeyContextAuth
+// @Param        workspace_uuid path string true "Workspace UUID"
+// @Param        env_vars body map[string]interface{} true "Environment Variables"
+// @Success      200 {object} map[string]interface{}
+// @Router       /workspaces/{workspace_uuid}/env_vars [post]
+func (oh *workspaceHandler) UpdateWorkspaceEnvVars(w http.ResponseWriter, r *http.Request) {
+	ctx := r.Context()
+	pubKeyFromAuth, _ := ctx.Value(auth.ContextKey).(string)
+	if pubKeyFromAuth == "" {
+		logger.Log.Info("[workspaces] no pubkey from auth")
+		w.WriteHeader(http.StatusUnauthorized)
+		return
+	}
+
+	workspaceUUID := chi.URLParam(r, "workspace_uuid")
+	if workspaceUUID == "" {
+		w.WriteHeader(http.StatusBadRequest)
+		json.NewEncoder(w).Encode(map[string]string{"error": "Missing workspace_uuid parameter"})
+		return
+	}
+
+	// Find codespace mapping for this workspace
+	codespaces, err := oh.db.GetCodeSpaceMapByWorkspace(workspaceUUID)
+	if err != nil || len(codespaces) == 0 {
+		w.WriteHeader(http.StatusNotFound)
+		json.NewEncoder(w).Encode(map[string]string{"error": "Codespace mapping not found for workspace"})
+		return
+	}
+	codespaceName := codespaces[0].CodeSpaceURL // This is the codespace_name_value
+	if codespaceName == "" {
+		w.WriteHeader(http.StatusNotFound)
+		json.NewEncoder(w).Encode(map[string]string{"error": "Codespace name not found for workspace"})
+		return
+	}
+
+	// Read body and proxy POST to 3rd party API
+	body, err := io.ReadAll(r.Body)
+	if err != nil {
+		w.WriteHeader(http.StatusBadRequest)
+		json.NewEncoder(w).Encode(map[string]string{"error": "Failed to read request body"})
+		return
+	}
+	url := "https://workspaces.sphinx.chat/api/pools/" + codespaceName
+	req, err := http.NewRequest("POST", url, strings.NewReader(string(body)))
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		json.NewEncoder(w).Encode(map[string]string{"error": "Failed to create request to codespace API"})
+		return
+	}
+	req.Header.Set("Content-Type", "application/json")
+	poolManagerApiKey := os.Getenv("POOL_MANAGER_API_KEY")
+	if poolManagerApiKey != "" {
+		req.Header.Set("Authorization", "Bearer "+poolManagerApiKey)
+	}
+	client := &http.Client{}
+	resp, err := client.Do(req)
+	if err != nil {
+		w.WriteHeader(http.StatusBadGateway)
+		json.NewEncoder(w).Encode(map[string]string{"error": "Failed to reach codespace API"})
+		return
+	}
+	defer resp.Body.Close()
+	w.WriteHeader(resp.StatusCode)
+	io.Copy(w, resp.Body)
 }
 
 // GetLastWithdrawal godoc
