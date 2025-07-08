@@ -56,6 +56,8 @@ func WorkspaceRoutes() chi.Router {
 		r.Post("/codegraph/refresh/{workspace_uuid}", workspaceHandlers.RefreshCodeGraph)
 
 		r.Get("/{workspace_uuid}/lastwithdrawal", workspaceHandlers.GetLastWithdrawal)
+		r.Get("/{workspace_uuid}/env_vars", workspaceHandlers.GetWorkspaceEnvVars)
+		r.Put("/{workspace_uuid}/env_vars", workspaceHandlers.UpdateWorkspaceEnvVars)
 
 		r.Post("/codegraph", workspaceHandlers.CreateOrEditWorkspaceCodeGraph)
 		r.Get("/codegraph/{uuid}", workspaceHandlers.GetWorkspaceCodeGraphByUUID)
