@@ -48,7 +48,8 @@ var V2BotToken string
 var IsV2Payment bool = false
 var FfWebsocket bool = false
 var SWAuth string
-var POOLManagerAPIKey string
+var POOLManagerAPIUsername string
+var POOLManagerAPIPassword string
 
 func InitConfig() {
 	Host = os.Getenv("LN_SERVER_BASE_URL")
@@ -72,7 +73,8 @@ func InitConfig() {
 	FfWebsocket = os.Getenv("FF_WEBSOCKET") == "true"
 	LogLevel = strings.ToUpper(os.Getenv("LOG_LEVEL"))
 	SWAuth = os.Getenv("SWAUTH")
-	POOLManagerAPIKey = os.Getenv("POOL_MANAGER_API_KEY")
+	POOLManagerAPIUsername = os.Getenv("POOL_MANAGER_API_USERNAME")
+	POOLManagerAPIPassword = os.Getenv("POOL_MANAGER_API_PASSWORD")
 
 	// Add to super admins
 	SuperAdmins = StripSuperAdmins(AdminStrings)

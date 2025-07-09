@@ -10,6 +10,7 @@ import (
 	"regexp"
 	"strings"
 	"time"
+	"bytes"
 
 	"github.com/go-chi/chi"
 	"github.com/rs/xid"
@@ -1753,6 +1754,68 @@ func (oh *workspaceHandler) RefreshCodeGraph(w http.ResponseWriter, r *http.Requ
 	w.Write(body)
 }
 
+func GetPoolManagerApiKey() (string, error) {
+    type AuthBody struct {
+        Username string `json:"username"`
+        Password string `json:"password"`
+    }
+
+    type Response struct {
+        Success bool   `json:"success"`
+        Token   string `json:"token"`
+    }
+
+    url := "https://workspaces.sphinx.chat/api/auth/login"
+    
+    // Create request body
+    body := AuthBody{
+        Username: config.POOLManagerAPIUsername,
+        Password: config.POOLManagerAPIPassword,
+    }
+    
+    // Marshal body to JSON
+    jsonBody, err := json.Marshal(body)
+    if err != nil {
+        return "", fmt.Errorf("failed to marshal request body: %w", err)
+    }
+
+    // Create HTTP request
+    req, err := http.NewRequest("POST", url, bytes.NewBuffer(jsonBody))
+    if err != nil {
+        return "", fmt.Errorf("failed to create request: %w", err)
+    }
+    
+    // Set content type for JSON
+    req.Header.Set("Content-Type", "application/json")
+    // Note: Removed Authorization header as it seems unnecessary for login
+    // req.Header.Set("Authorization", "Bearer "+config.POOLManagerAPIKey)
+
+    // Make HTTP request
+    resp, err := http.DefaultClient.Do(req)
+    if err != nil {
+        return "", fmt.Errorf("failed to contact 3rd party service: %w", err)
+    }
+    defer resp.Body.Close()
+
+    // Check status code
+    if resp.StatusCode != http.StatusOK {
+        return "", fmt.Errorf("unexpected status code: %d", resp.StatusCode)
+    }
+
+    // Read and parse response
+    var response Response
+    if err := json.NewDecoder(resp.Body).Decode(&response); err != nil {
+        return "", fmt.Errorf("failed to decode response: %w", err)
+    }
+
+    // Check if request was successful
+    if !response.Success {
+        return "", fmt.Errorf("authentication failed")
+    }
+
+    return response.Token, nil
+}
+
 // GetWorkspaceEnvVars proxies env var fetch to 3rd party
 func (oh *workspaceHandler) GetWorkspaceEnvVars(w http.ResponseWriter, r *http.Request) {
 	workspaceUUID := chi.URLParam(r, "workspace_uuid")
@@ -1771,7 +1834,13 @@ func (oh *workspaceHandler) GetWorkspaceEnvVars(w http.ResponseWriter, r *http.R
 		json.NewEncoder(w).Encode(map[string]string{"error": "failed to create request"})
 		return
 	}
-	req.Header.Set("Authorization", "Bearer "+config.POOLManagerAPIKey)
+	POOLManagerAPIKey, err := GetPoolManagerApiKey()
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		json.NewEncoder(w).Encode(map[string]string{"error": "failed to contact 3rd party service"})
+		return
+	}
+	req.Header.Set("Authorization", "Bearer "+POOLManagerAPIKey)
 	resp, err := http.DefaultClient.Do(req)
 	if err != nil {
 		w.WriteHeader(http.StatusBadGateway)
@@ -1825,7 +1894,13 @@ func (oh *workspaceHandler) UpdateWorkspaceEnvVars(w http.ResponseWriter, r *htt
 		json.NewEncoder(w).Encode(map[string]string{"error": "failed to create request"})
 		return
 	}
-	req.Header.Set("Authorization", "Bearer "+config.POOLManagerAPIKey)
+	POOLManagerAPIKey, err := GetPoolManagerApiKey()
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		json.NewEncoder(w).Encode(map[string]string{"error": "failed to contact 3rd party service"})
+		return
+	}
+	req.Header.Set("Authorization", "Bearer "+POOLManagerAPIKey)
 	req.Header.Set("Content-Type", "application/json")
 	resp, err := http.DefaultClient.Do(req)
 	if err != nil {
