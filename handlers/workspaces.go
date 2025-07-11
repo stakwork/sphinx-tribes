@@ -10,10 +10,12 @@ import (
 	"regexp"
 	"strings"
 	"time"
+	"bytes"
 
 	"github.com/go-chi/chi"
 	"github.com/rs/xid"
 	"github.com/stakwork/sphinx-tribes/auth"
+	"github.com/stakwork/sphinx-tribes/config"
 	"github.com/stakwork/sphinx-tribes/db"
 	"github.com/stakwork/sphinx-tribes/logger"
 	"github.com/stakwork/sphinx-tribes/utils"
@@ -1750,4 +1752,163 @@ func (oh *workspaceHandler) RefreshCodeGraph(w http.ResponseWriter, r *http.Requ
 
 	w.WriteHeader(http.StatusOK)
 	w.Write(body)
+}
+
+func GetPoolManagerApiKey() (string, error) {
+    type AuthBody struct {
+        Username string `json:"username"`
+        Password string `json:"password"`
+    }
+
+    type Response struct {
+        Success bool   `json:"success"`
+        Token   string `json:"token"`
+    }
+
+    url := "https://workspaces.sphinx.chat/api/auth/login"
+    
+    // Create request body
+    body := AuthBody{
+        Username: config.POOLManagerAPIUsername,
+        Password: config.POOLManagerAPIPassword,
+    }
+    
+    // Marshal body to JSON
+    jsonBody, err := json.Marshal(body)
+    if err != nil {
+        return "", fmt.Errorf("failed to marshal request body: %w", err)
+    }
+
+    // Create HTTP request
+    req, err := http.NewRequest("POST", url, bytes.NewBuffer(jsonBody))
+    if err != nil {
+        return "", fmt.Errorf("failed to create request: %w", err)
+    }
+    
+    // Set content type for JSON
+    req.Header.Set("Content-Type", "application/json")
+    // Note: Removed Authorization header as it seems unnecessary for login
+    // req.Header.Set("Authorization", "Bearer "+config.POOLManagerAPIKey)
+
+    // Make HTTP request
+    resp, err := http.DefaultClient.Do(req)
+    if err != nil {
+        return "", fmt.Errorf("failed to contact 3rd party service: %w", err)
+    }
+    defer resp.Body.Close()
+
+    // Check status code
+    if resp.StatusCode != http.StatusOK {
+        return "", fmt.Errorf("unexpected status code: %d", resp.StatusCode)
+    }
+
+    // Read and parse response
+    var response Response
+    if err := json.NewDecoder(resp.Body).Decode(&response); err != nil {
+        return "", fmt.Errorf("failed to decode response: %w", err)
+    }
+
+    // Check if request was successful
+    if !response.Success {
+        return "", fmt.Errorf("authentication failed")
+    }
+
+    return response.Token, nil
+}
+
+// GetWorkspaceEnvVars proxies env var fetch to 3rd party
+func (oh *workspaceHandler) GetWorkspaceEnvVars(w http.ResponseWriter, r *http.Request) {
+	workspaceUUID := chi.URLParam(r, "workspace_uuid")
+	codespaces, err := oh.db.GetCodeSpaceMapByWorkspace(workspaceUUID)
+	if err != nil || len(codespaces) == 0 || codespaces[0].CodeSpaceURL == "" {
+		w.WriteHeader(http.StatusNotFound)
+		json.NewEncoder(w).Encode(map[string]string{"error": "codespaceURL not found for workspace"})
+		return
+	}
+	codespaceURL := codespaces[0].CodeSpaceURL
+	url := "https://workspaces.sphinx.chat/api/pools/" + codespaceURL
+
+	req, err := http.NewRequest("GET", url, nil)
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		json.NewEncoder(w).Encode(map[string]string{"error": "failed to create request"})
+		return
+	}
+	POOLManagerAPIKey, err := GetPoolManagerApiKey()
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		json.NewEncoder(w).Encode(map[string]string{"error": "failed to contact 3rd party service"})
+		return
+	}
+	req.Header.Set("Authorization", "Bearer "+POOLManagerAPIKey)
+	resp, err := http.DefaultClient.Do(req)
+	if err != nil {
+		w.WriteHeader(http.StatusBadGateway)
+		json.NewEncoder(w).Encode(map[string]string{"error": "failed to contact 3rd party service"})
+		return
+	}
+	defer resp.Body.Close()
+	if resp.StatusCode != 200 {
+		w.WriteHeader(resp.StatusCode)
+		io.Copy(w, resp.Body)
+		return
+	}
+	var result struct {
+		Config struct {
+			EnvVars []map[string]interface{} `json:"env_vars"`
+		} `json:"config"`
+	}
+	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		json.NewEncoder(w).Encode(map[string]string{"error": "failed to decode response"})
+		return
+	}
+	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode(result.Config.EnvVars)
+}
+
+// UpdateWorkspaceEnvVars proxies env var update to 3rd party
+func (oh *workspaceHandler) UpdateWorkspaceEnvVars(w http.ResponseWriter, r *http.Request) {
+	workspaceUUID := chi.URLParam(r, "workspace_uuid")
+	codespaces, err := oh.db.GetCodeSpaceMapByWorkspace(workspaceUUID)
+	if err != nil || len(codespaces) == 0 || codespaces[0].CodeSpaceURL == "" {
+		w.WriteHeader(http.StatusNotFound)
+		json.NewEncoder(w).Encode(map[string]string{"error": "codespaceURL not found for workspace"})
+		return
+	}
+	codespaceURL := codespaces[0].CodeSpaceURL
+	url := "https://workspaces.sphinx.chat/api/pools/" + codespaceURL
+
+	var body struct {
+		EnvVars []map[string]string `json:"env_vars"`
+	}
+	if err := json.NewDecoder(r.Body).Decode(&body); err != nil {
+		w.WriteHeader(http.StatusBadRequest)
+		json.NewEncoder(w).Encode(map[string]string{"error": "invalid request body"})
+		return
+	}
+	b, _ := json.Marshal(map[string]interface{}{"env_vars": body.EnvVars})
+	req, err := http.NewRequest("PUT", url, strings.NewReader(string(b)))
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		json.NewEncoder(w).Encode(map[string]string{"error": "failed to create request"})
+		return
+	}
+	POOLManagerAPIKey, err := GetPoolManagerApiKey()
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		json.NewEncoder(w).Encode(map[string]string{"error": "failed to contact 3rd party service"})
+		return
+	}
+	req.Header.Set("Authorization", "Bearer "+POOLManagerAPIKey)
+	req.Header.Set("Content-Type", "application/json")
+	resp, err := http.DefaultClient.Do(req)
+	if err != nil {
+		w.WriteHeader(http.StatusBadGateway)
+		json.NewEncoder(w).Encode(map[string]string{"error": "failed to contact 3rd party service"})
+		return
+	}
+	defer resp.Body.Close()
+	w.WriteHeader(resp.StatusCode)
+	io.Copy(w, resp.Body)
 }
