@@ -1,5 +1,5 @@
 {
-  "name": "sphinx-tribes",
+  "name": "sphinx-tribes-cypress-testing",
   "version": "1.0.0",
   "description": "![Tribes](https://github.com/stakwork/sphinx-tribes/raw/master/img/sphinx-tribes.png)",
   "main": "cypress.config.js",
