@@ -12,7 +12,6 @@ jobs:
     steps:
       - name: Call Swarm Sync Endpoint
         run: |
-          curl -G "https://boltwall.swarm38.sphinx.chat/api/git/sync" \
-            --header "x-api-token: ${{ secrets.SWARM_API_KEY }}" \
-            --data-urlencode "source_link=https://github.com/stakwork/sphinx-tribes,https://github.com/stakwork/sphinx-tribes-frontend" \
-            --data-urlencode "pat=${{ secrets.PAT }}"
+          curl -G "https://stakgraph.swarm38.sphinx.chat/sync" \
+            --header "Authorization: Bearer ${{ secrets.SWARM_API_KEY }}" \
+            -d '{"repo_url":"https://github.com/stakwork/sphinx-tribes"}'
