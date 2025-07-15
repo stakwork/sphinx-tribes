@@ -454,6 +454,10 @@ func buildVarsPayload(request SendMessageRequest, createdMessage *db.ChatMessage
 		vars["token"] = codeSpace.GithubPat
 	}
 
+	if codeSpace.PoolAPIKey != "" {
+		vars["pool_api_key"] = codeSpace.PoolAPIKey
+	}
+
 	vars["query"] = request.Message
 
 	return vars

@@ -22,6 +22,7 @@ func (db database) CreateCodeSpaceMap(codeSpace CodeSpaceMap) (CodeSpaceMap, err
 		existingMap.Username = codeSpace.Username
 		existingMap.GithubPat = codeSpace.GithubPat
 		existingMap.BaseBranch = codeSpace.BaseBranch
+		existingMap.PoolAPIKey = codeSpace.PoolAPIKey
 		existingMap.UpdatedAt = now
 		
 		db.db.Save(&existingMap)
