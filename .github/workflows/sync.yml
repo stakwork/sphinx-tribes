@@ -14,5 +14,4 @@ jobs:
         run: |
           curl -G "https://stakgraph.swarm38.sphinx.chat/sync" \
             --header "Authorization: Bearer ${{ secrets.SWARM_API_KEY }}" \
-            --data-urlencode "source_link=https://github.com/stakwork/sphinx-tribes" \
-            --data-urlencode "pat=${{ secrets.PAT }}"
+            -d '{"repo_url":"https://github.com/stakwork/sphinx-tribes"}'
