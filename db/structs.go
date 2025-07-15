@@ -1604,6 +1604,7 @@ type CodeSpaceMap struct {
 	// TODO: Encrypt this field
 	GithubPat    string    `json:"githubPat,omitempty" gorm:"column:github_pat"`
 	BaseBranch string `json:"baseBranch"`
+	PoolAPIKey string `json:"poolAPIKey,omitempty" gorm:"column:pool_api_key"`
 }
 
 type StakeStatus string

@@ -362,7 +362,7 @@ func (ch *codeSpaceHandler) UpdateCodeSpaceMap(w http.ResponseWriter, r *http.Re
 	updates["username"] = codeSpace.Username
 	updates["github_pat"] = codeSpace.GithubPat
 	updates["base_branch"] = codeSpace.BaseBranch
-
+	updates["pool_api_key"] = codeSpace.PoolAPIKey
 
 	updatedCodeSpace, err := ch.db.UpdateCodeSpaceMap(id, updates)
 	if err != nil {
