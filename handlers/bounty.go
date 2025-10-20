@@ -115,6 +115,28 @@ func (h *bountyHandler) GetBountyById(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+func (h *bountyHandler) GetBountyByCode(w http.ResponseWriter, r *http.Request) {
+	code := chi.URLParam(r, "code")
+	if code == "" {
+		w.WriteHeader(http.StatusBadRequest)
+		json.NewEncoder(w).Encode(map[string]string{"error": "Unlock code required"})
+		return
+	}
+
+	bounty, err := h.db.GetBountyByUnlockCode(code)
+	if err != nil {
+		w.WriteHeader(http.StatusNotFound)
+		json.NewEncoder(w).Encode(map[string]string{"error": "Bounty not found"})
+		return
+	}
+
+	bounties := []db.NewBounty{bounty}
+	bountyResponse := h.GenerateBountyResponse(bounties)
+
+	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode(bountyResponse[0])
+}
+
 // GetNextBountyByCreated godoc
 //
 //	@Summary		Get next bounty
@@ -461,7 +483,7 @@ func (h *bountyHandler) CreateOrEditBounty(w http.ResponseWriter, r *http.Reques
 		}
 	}
 
-	if bounty.UnlockCode == nil {
+	if bounty.UnlockCode == nil || *bounty.UnlockCode == "" {
 		code := generateUnlockCode()
 		bounty.UnlockCode = &code
 	}
