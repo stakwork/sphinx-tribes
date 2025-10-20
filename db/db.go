@@ -1364,6 +1364,12 @@ func (db database) GetBounty(id uint) NewBounty {
 	return b
 }
 
+func (db database) GetBountyByUnlockCode(code string) (NewBounty, error) {
+	b := NewBounty{}
+	err := db.db.Where("unlock_code = ?", code).Where("show = ?", true).First(&b).Error
+	return b, err
+}
+
 func (db database) UpdateBountyPaymentStatuses(bounty NewBounty) (NewBounty, error) {
 
 	bountyUpdates := map[string]interface{}{

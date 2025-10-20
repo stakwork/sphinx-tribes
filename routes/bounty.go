@@ -18,6 +18,7 @@ func BountyRoutes() chi.Router {
 		r.Get("/all", bountyHandler.GetAllBounties)
 		r.Get("/featured/all", bountyHandler.GetAllFeaturedBounties)
 
+		r.Get("/code/{code}", bountyHandler.GetBountyByCode)
 		r.Get("/id/{bountyId}", bountyHandler.GetBountyById)
 		r.Get("/index/{bountyId}", bountyHandler.GetBountyIndexById)
 		r.Get("/next/{created}", bountyHandler.GetNextBountyByCreated)

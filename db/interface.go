@@ -52,6 +52,7 @@ type Database interface {
 	DeleteBounty(pubkey string, created string) (NewBounty, error)
 	GetBountyByCreated(created uint) (NewBounty, error)
 	GetBounty(id uint) NewBounty
+	GetBountyByUnlockCode(code string) (NewBounty, error)
 	UpdateBounty(b NewBounty) (NewBounty, error)
 	UpdateBountyPaymentStatuses(bounty NewBounty) (NewBounty, error)
 	UpdateBountyPayment(b NewBounty) (NewBounty, error)
