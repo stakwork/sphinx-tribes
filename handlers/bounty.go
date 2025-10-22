@@ -629,7 +629,7 @@ func (h *bountyHandler) CreateOrEditBounty(w http.ResponseWriter, r *http.Reques
 const letters = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
 
 func generateUnlockCode() string {
-	length := 36
+	length := 6
 	result := make([]byte, length)
 	for i := range result {
 		result[i] = letters[rand.Intn(len(letters))]
