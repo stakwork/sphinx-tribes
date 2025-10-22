@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"io"
 	"log"
+	"math/rand"
 	"net/http"
 	"net/url"
 	"os"
@@ -625,10 +626,15 @@ func (h *bountyHandler) CreateOrEditBounty(w http.ResponseWriter, r *http.Reques
 	json.NewEncoder(w).Encode(b)
 }
 
+const letters = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
+
 func generateUnlockCode() string {
-	// rand.Seed(time.Now().UnixNano())
-	// return fmt.Sprintf("%06d", rand.Intn(1000000))
-	return xid.New().String()
+	length := 36
+	result := make([]byte, length)
+	for i := range result {
+		result[i] = letters[rand.Intn(len(letters))]
+	}
+	return string(result)
 }
 
 // DeleteBounty godoc
