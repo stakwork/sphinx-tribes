@@ -15,7 +15,6 @@ import (
 	"time"
 
 	"github.com/google/uuid"
-	"github.com/rs/xid"
 
 	"github.com/go-chi/chi"
 	"github.com/stakwork/sphinx-tribes/auth"
