@@ -1,0 +1,17 @@
+name: Sync to Ai Agent
+
+on:
+  push:
+    branches:
+      - master
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Call Swarm Sync Endpoint
+        run: |
+          curl -G "https://boltwall.swarm38.sphinx.chat/api/git/sync" \
+            --data-urlencode "source_link=https://github.com/stakwork/sphinx-tribes,https://github.com/stakwork/sphinx-tribes-frontend" \
+            --data-urlencode "pat=${{ secrets.GITHUB_PAT }}"
