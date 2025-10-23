@@ -120,6 +120,10 @@ func (ph *peopleHandler) CreatePerson(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	// Send email notification for new user profile creation
+	// This is only reached for new users since existing users return early
+	go ph.db.SendNewUserNotification(p)
+
 	w.WriteHeader(http.StatusOK)
 	json.NewEncoder(w).Encode(p)
 }
