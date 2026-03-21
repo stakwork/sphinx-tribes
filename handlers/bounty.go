@@ -81,6 +81,7 @@ func handleTimingError(w http.ResponseWriter, operation string, err error) {
 //	@Summary		Get all bounties
 //	@Description	Get a list of all bounties
 //	@Tags			Bounties
+//	@Param			myAssigned	query		string	false	"Filter bounties assigned to current user"
 //	@Success		200	{array}	db.Bounty
 //	@Router			/gobounties/all [get]
 func (h *bountyHandler) GetAllBounties(w http.ResponseWriter, r *http.Request) {
