@@ -22,8 +22,16 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
+func setupPeopleSuite(_ *testing.T) func(tb testing.TB) {
+	db.InitTestDB()
+
+	return func(_ testing.TB) {
+		db.CloseTestDB()
+	}
+}
+
 func TestGetPersonByPuKey(t *testing.T) {
-	teardownSuite := SetupSuite(t)
+	teardownSuite := setupPeopleSuite(t)
 	defer teardownSuite(t)
 
 	pHandler := NewPeopleHandler(db.TestDB)
@@ -60,7 +68,7 @@ func TestGetPersonByPuKey(t *testing.T) {
 }
 
 func TestCreatePerson(t *testing.T) {
-	teardownSuite := SetupSuite(t)
+	teardownSuite := setupPeopleSuite(t)
 	defer teardownSuite(t)
 	pHandler := NewPeopleHandler(db.TestDB)
 
@@ -178,7 +186,7 @@ func TestCreatePerson(t *testing.T) {
 }
 
 func TestUpdatePerson(t *testing.T) {
-	teardownSuite := SetupSuite(t)
+	teardownSuite := setupPeopleSuite(t)
 	defer teardownSuite(t)
 	pHandler := NewPeopleHandler(db.TestDB)
 
@@ -298,7 +306,7 @@ func TestUpdatePerson(t *testing.T) {
 }
 
 func TestGetPersonById(t *testing.T) {
-	teardownSuite := SetupSuite(t)
+	teardownSuite := setupPeopleSuite(t)
 	defer teardownSuite(t)
 
 	pHandler := NewPeopleHandler(db.TestDB)
@@ -357,7 +365,7 @@ func TestGetPersonById(t *testing.T) {
 }
 
 func TestDeletePerson(t *testing.T) {
-	teardownSuite := SetupSuite(t)
+	teardownSuite := setupPeopleSuite(t)
 	defer teardownSuite(t)
 
 	pHandler := NewPeopleHandler(db.TestDB)
@@ -488,7 +496,7 @@ func TestDeletePerson(t *testing.T) {
 }
 
 func TestGetPeopleBySearch(t *testing.T) {
-	teardownSuite := SetupSuite(t)
+	teardownSuite := setupPeopleSuite(t)
 	defer teardownSuite(t)
 	pHandler := NewPeopleHandler(db.TestDB)
 
@@ -600,7 +608,7 @@ func TestGetPeopleBySearch(t *testing.T) {
 }
 
 func TestGetListedPeople(t *testing.T) {
-	teardownSuite := SetupSuite(t)
+	teardownSuite := setupPeopleSuite(t)
 	defer teardownSuite(t)
 
 	pHandler := NewPeopleHandler(db.TestDB)
@@ -732,7 +740,7 @@ func TestGetListedPeople(t *testing.T) {
 
 }
 func TestGetPersonByUuid(t *testing.T) {
-	teardownSuite := SetupSuite(t)
+	teardownSuite := setupPeopleSuite(t)
 	defer teardownSuite(t)
 
 	pHandler := NewPeopleHandler(db.TestDB)
@@ -790,6 +798,149 @@ func TestGetPersonByUuid(t *testing.T) {
 		assert.NoError(t, err)
 		assert.Empty(t, returnedPerson)
 	})
+}
+
+func TestGetPersonByUuidIncludesBadgeIdsForProfileContexts(t *testing.T) {
+	teardownSuite := setupPeopleSuite(t)
+	defer teardownSuite(t)
+
+	assetServer := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, _ *http.Request) {
+		w.Header().Set("Content-Type", "application/json")
+		_ = json.NewEncoder(w).Encode(db.AssetResponse{
+			Balances: []db.AssetBalanceData{
+				{OwnerPubkey: "profile_owner_pubkey", AssetId: 101, Balance: 1},
+				{OwnerPubkey: "profile_owner_pubkey", AssetId: 202, Balance: 1},
+			},
+		})
+	}))
+	defer assetServer.Close()
+
+	t.Setenv("TEST_MODE", "true")
+	t.Setenv(liquidTestModeUrl, assetServer.URL)
+
+	db.CleanDB()
+
+	pHandler := NewPeopleHandler(db.TestDB)
+	person := db.Person{
+		Uuid:         uuid.New().String(),
+		OwnerAlias:   "badge-owner",
+		UniqueName:   "badge-owner",
+		OwnerPubKey:  "profile_owner_pubkey",
+		Description:  "profile with badges",
+		Tags:         pq.StringArray{},
+		Extras:       db.PropertyMap{},
+		GithubIssues: db.PropertyMap{},
+	}
+	createdPerson, err := db.TestDB.CreateOrEditPerson(person)
+	assert.NoError(t, err)
+
+	tests := []struct {
+		name       string
+		authPubKey string
+	}{
+		{name: "signed in owner", authPubKey: createdPerson.OwnerPubKey},
+		{name: "signed in other user", authPubKey: "other_profile_viewer_pubkey"},
+		{name: "not signed in"},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			rr := httptest.NewRecorder()
+			handler := http.HandlerFunc(pHandler.GetPersonByUuid)
+
+			rctx := chi.NewRouteContext()
+			rctx.URLParams.Add("uuid", createdPerson.Uuid)
+			ctx := context.WithValue(context.Background(), chi.RouteCtxKey, rctx)
+			if tt.authPubKey != "" {
+				ctx = context.WithValue(ctx, auth.ContextKey, tt.authPubKey)
+			}
+			req, err := http.NewRequestWithContext(ctx, http.MethodGet, "/person/uuid/"+createdPerson.Uuid, nil)
+			assert.NoError(t, err)
+
+			handler.ServeHTTP(rr, req)
+
+			var response struct {
+				OwnerPubKey string `json:"owner_pubkey"`
+				Badges      []uint `json:"badges"`
+			}
+			err = json.Unmarshal(rr.Body.Bytes(), &response)
+			assert.NoError(t, err)
+			assert.Equal(t, http.StatusOK, rr.Code)
+			assert.Equal(t, createdPerson.OwnerPubKey, response.OwnerPubKey)
+			assert.Equal(t, []uint{101, 202}, response.Badges)
+		})
+	}
+}
+
+func TestGetPersonAssetsByUuidReturnsBadgeAssetImages(t *testing.T) {
+	teardownSuite := setupPeopleSuite(t)
+	defer teardownSuite(t)
+
+	const ownerPubKey = "badge_asset_owner_pubkey"
+	assetServer := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		assert.Equal(t, ownerPubKey, r.URL.Query().Get("pubkey"))
+		w.Header().Set("Content-Type", "application/json")
+		_ = json.NewEncoder(w).Encode([]db.AssetListData{
+			{
+				ID:      101,
+				Icon:    "https://example.com/badges/builder.png",
+				Name:    "Builder",
+				Asset:   "builder",
+				Token:   "builder-token",
+				Amount:  1,
+				Creator: ownerPubKey,
+				Balance: 1,
+			},
+		})
+	}))
+	defer assetServer.Close()
+
+	t.Setenv("ASSET_LIST_URL", assetServer.URL)
+
+	originalDB := db.DB
+	defer func() {
+		db.DB = originalDB
+	}()
+	db.DB = db.TestDB
+	db.CleanDB()
+
+	person := db.Person{
+		Uuid:         uuid.New().String(),
+		OwnerAlias:   "badge-assets-owner",
+		UniqueName:   "badge-assets-owner",
+		OwnerPubKey:  ownerPubKey,
+		Description:  "profile with badge images",
+		Tags:         pq.StringArray{},
+		Extras:       db.PropertyMap{},
+		GithubIssues: db.PropertyMap{},
+	}
+	createdPerson, err := db.TestDB.CreateOrEditPerson(person)
+	assert.NoError(t, err)
+
+	rr := httptest.NewRecorder()
+	handler := http.HandlerFunc(GetPersonAssetsByUuid)
+
+	rctx := chi.NewRouteContext()
+	rctx.URLParams.Add("uuid", createdPerson.Uuid)
+	req, err := http.NewRequestWithContext(
+		context.WithValue(context.Background(), chi.RouteCtxKey, rctx),
+		http.MethodGet,
+		"/person/assets/"+createdPerson.Uuid,
+		nil,
+	)
+	assert.NoError(t, err)
+
+	handler.ServeHTTP(rr, req)
+
+	var assets []db.AssetListData
+	err = json.Unmarshal(rr.Body.Bytes(), &assets)
+	assert.NoError(t, err)
+	assert.Equal(t, http.StatusOK, rr.Code)
+	assert.Len(t, assets, 1)
+	assert.Equal(t, uint(101), assets[0].ID)
+	assert.Equal(t, "Builder", assets[0].Name)
+	assert.Equal(t, "https://example.com/badges/builder.png", assets[0].Icon)
+	assert.Equal(t, uint(1), assets[0].Balance)
 }
 
 func TestPersonIsAdmin(t *testing.T) {
@@ -939,7 +1090,7 @@ func TestUpsertLogin(t *testing.T) {
 	config.InitConfig()
 	auth.InitJwt()
 
-	teardownSuite := SetupSuite(t)
+	teardownSuite := setupPeopleSuite(t)
 	defer teardownSuite(t)
 
 	pHandler := NewPeopleHandler(db.TestDB)
