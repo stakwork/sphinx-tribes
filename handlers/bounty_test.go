@@ -1165,7 +1165,7 @@ func TestGetBountyIndexById(t *testing.T) {
 			OwnerID:       bountyOwner.OwnerPubKey,
 			Show:          true,
 			Created:       now,
-			MaxStakers: 1,
+			MaxStakers:    1,
 		}
 
 		db.TestDB.CreateOrEditBounty(bounty)
@@ -1247,6 +1247,97 @@ func TestGetAllBounties(t *testing.T) {
 		assert.NoError(t, err)
 		assert.Equal(t, http.StatusOK, rr.Code)
 		assert.NotEmpty(t, returnedBounty)
+	})
+
+	t.Run("Should return only bounties assigned to authenticated user", func(t *testing.T) {
+		db.TestDB.DeleteAllBounties()
+		config.JwtKey = "test-jwt-key"
+		auth.InitJwt()
+
+		now := time.Now().Unix()
+		otherAssignee := db.Person{
+			Uuid:        "other_user_uuid",
+			OwnerAlias:  "other-user",
+			UniqueName:  "other-user",
+			OwnerPubKey: "other_user_pubkey",
+		}
+
+		db.TestDB.CreateOrEditPerson(bountyOwner)
+		db.TestDB.CreateOrEditPerson(bountyAssignee)
+		db.TestDB.CreateOrEditPerson(otherAssignee)
+
+		assignedToMe := db.NewBounty{
+			Type:        "coding",
+			Title:       "Assigned to me",
+			Description: "Assigned bounty description",
+			Assignee:    bountyAssignee.OwnerPubKey,
+			OwnerID:     bountyOwner.OwnerPubKey,
+			Show:        true,
+			Created:     now,
+		}
+		assignedToOther := db.NewBounty{
+			Type:        "coding",
+			Title:       "Assigned to other",
+			Description: "Other assigned bounty description",
+			Assignee:    otherAssignee.OwnerPubKey,
+			OwnerID:     bountyOwner.OwnerPubKey,
+			Show:        true,
+			Created:     now + 1,
+		}
+		openBounty := db.NewBounty{
+			Type:        "coding",
+			Title:       "Open bounty",
+			Description: "Open bounty description",
+			Assignee:    "",
+			OwnerID:     bountyOwner.OwnerPubKey,
+			Show:        true,
+			Created:     now + 2,
+		}
+		db.TestDB.CreateOrEditBounty(assignedToMe)
+		db.TestDB.CreateOrEditBounty(assignedToOther)
+		db.TestDB.CreateOrEditBounty(openBounty)
+
+		token, err := auth.EncodeJwt(bountyAssignee.OwnerPubKey)
+		assert.NoError(t, err)
+
+		rr := httptest.NewRecorder()
+		handler := http.HandlerFunc(bHandler.GetAllBounties)
+
+		rctx := chi.NewRouteContext()
+		req, _ := http.NewRequestWithContext(
+			context.WithValue(context.Background(), chi.RouteCtxKey, rctx),
+			http.MethodGet,
+			"/all?myAssigned=true&sortBy=created&direction=asc",
+			nil,
+		)
+		req.Header.Set("x-jwt", token)
+
+		handler.ServeHTTP(rr, req)
+
+		var returnedBounty []db.BountyResponse
+		err = json.Unmarshal(rr.Body.Bytes(), &returnedBounty)
+		assert.NoError(t, err)
+		assert.Equal(t, http.StatusOK, rr.Code)
+		assert.Len(t, returnedBounty, 1)
+		assert.Equal(t, assignedToMe.Title, returnedBounty[0].Bounty.Title)
+		assert.Equal(t, bountyAssignee.OwnerPubKey, returnedBounty[0].Bounty.Assignee)
+	})
+
+	t.Run("Should require authentication for my assigned filter", func(t *testing.T) {
+		rr := httptest.NewRecorder()
+		handler := http.HandlerFunc(bHandler.GetAllBounties)
+
+		rctx := chi.NewRouteContext()
+		req, _ := http.NewRequestWithContext(
+			context.WithValue(context.Background(), chi.RouteCtxKey, rctx),
+			http.MethodGet,
+			"/all?myAssigned=true",
+			nil,
+		)
+
+		handler.ServeHTTP(rr, req)
+
+		assert.Equal(t, http.StatusUnauthorized, rr.Code)
 	})
 }
 

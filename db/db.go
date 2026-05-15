@@ -804,20 +804,20 @@ func (db database) GetAssignedBounties(r *http.Request) ([]NewBounty, error) {
 
 	ms := []NewBounty{}
 
-    ctx := r.Context()
-    authenticatedPubKey, _ := ctx.Value(auth.ContextKey).(string)
-    isAuthenticated := authenticatedPubKey != "" && authenticatedPubKey == pubkey
+	ctx := r.Context()
+	authenticatedPubKey, _ := ctx.Value(auth.ContextKey).(string)
+	isAuthenticated := authenticatedPubKey != "" && authenticatedPubKey == pubkey
 
-    query := `SELECT * FROM public.bounty WHERE assignee = '` + pubkey + `'`
-    if isAuthenticated {
-        query += ` AND (show = true OR show = false)`
-    } else {
-        query += ` AND show = true`
-    }
+	query := `SELECT * FROM public.bounty WHERE assignee = '` + pubkey + `'`
+	if isAuthenticated {
+		query += ` AND (show = true OR show = false)`
+	} else {
+		query += ` AND show = true`
+	}
 
-    allQuery := query + " " + statusQuery + " " + orderQuery + " " + limitQuery
-    err := db.db.Raw(allQuery).Find(&ms).Error
-    return ms, err
+	allQuery := query + " " + statusQuery + " " + orderQuery + " " + limitQuery
+	err := db.db.Raw(allQuery).Find(&ms).Error
+	return ms, err
 }
 
 func (db database) GetCreatedBounties(r *http.Request) ([]NewBounty, error) {
@@ -1209,6 +1209,7 @@ func (db database) GetAllBounties(r *http.Request) []NewBounty {
 	paid := keys.Get("Paid")
 	pending := keys.Get("Pending")
 	failed := keys.Get("Failed")
+	myAssigned := keys.Get("myAssigned")
 	orgUuid := keys.Get("org_uuid")
 	workspaceUuid := keys.Get("workspace_uuid")
 	languages := keys.Get("languages")
@@ -1232,6 +1233,7 @@ func (db database) GetAllBounties(r *http.Request) []NewBounty {
 	phaseUuidQuery := ""
 	phasePriorityQuery := ""
 	accessRestrictionQuery := ""
+	myAssignedQuery := ""
 
 	if sortBy != "" && direction != "" {
 		orderQuery = "ORDER BY " + sortBy + " " + direction
@@ -1252,9 +1254,18 @@ func (db database) GetAllBounties(r *http.Request) []NewBounty {
 	if PhasePriority != "" {
 		phasePriorityQuery = "AND phase_priority = '" + PhasePriority + "'"
 	}
-	
+
 	if accessRestriction != "" {
 		accessRestrictionQuery = fmt.Sprintf("AND access_restriction = '%s'", accessRestriction)
+	}
+
+	if myAssigned == "true" {
+		if pubKey, ok := r.Context().Value(auth.ContextKey).(string); ok && pubKey != "" {
+			myAssignedQuery = fmt.Sprintf(
+				"AND assignee = '%s'",
+				strings.ReplaceAll(pubKey, "'", "''"),
+			)
+		}
 	}
 
 	var statusConditions []string
@@ -1304,7 +1315,7 @@ func (db database) GetAllBounties(r *http.Request) []NewBounty {
 
 	query := "SELECT * FROM public.bounty WHERE show != false"
 
-	allQuery := query + " " + statusQuery + " " + searchQuery + " " + workspaceQuery + " " + languageQuery + " " + phaseUuidQuery + " " + phasePriorityQuery + " " + accessRestrictionQuery + " " + orderQuery + " " + limitQuery
+	allQuery := query + " " + statusQuery + " " + searchQuery + " " + workspaceQuery + " " + languageQuery + " " + phaseUuidQuery + " " + phasePriorityQuery + " " + accessRestrictionQuery + " " + myAssignedQuery + " " + orderQuery + " " + limitQuery
 
 	theQuery := db.db.Raw(allQuery)
 
@@ -2224,45 +2235,45 @@ func (db database) CreateBountyStake(stake BountyStake) (*BountyStake, error) {
 	if stake.BountyID == 0 {
 		return nil, errors.New("bounty ID is required")
 	}
-	
+
 	if stake.HunterPubKey == "" {
 		return nil, errors.New("hunter public key is required")
 	}
-	
+
 	if stake.Amount <= 0 {
 		return nil, errors.New("stake amount must be greater than zero")
 	}
-	
+
 	bounty := db.GetBounty(stake.BountyID)
 	if bounty.ID == 0 {
 		return nil, errors.New("bounty not found")
 	}
-	
+
 	if !bounty.IsStakable {
 		return nil, errors.New("bounty is not stakable")
 	}
-	
+
 	if stake.Amount < bounty.StakeMin {
 		return nil, fmt.Errorf("stake amount must be at least %d", bounty.StakeMin)
 	}
-	
+
 	if bounty.CurrentStakers >= bounty.MaxStakers {
 		return nil, errors.New("maximum number of stakers reached for this bounty")
 	}
-	
+
 	if stake.Status == "" {
 		stake.Status = StakeStatusNew
 	}
-	
+
 	if err := db.db.Create(&stake).Error; err != nil {
 		return nil, fmt.Errorf("failed to create bounty stake: %w", err)
 	}
-	
+
 	if err := db.db.Model(&NewBounty{}).Where("id = ?", stake.BountyID).
 		Update("current_stakers", gorm.Expr("current_stakers + 1")).Error; err != nil {
 		return nil, fmt.Errorf("failed to update bounty stakers count: %w", err)
 	}
-	
+
 	return &stake, nil
 }
 
@@ -2307,7 +2318,7 @@ func (db database) UpdateBountyStake(stakeID uuid.UUID, updates map[string]inter
 	if err != nil {
 		return nil, err
 	}
-	
+
 	if statusVal, ok := updates["status"]; ok {
 		status, ok := statusVal.(StakeStatus)
 		if !ok {
@@ -2318,27 +2329,27 @@ func (db database) UpdateBountyStake(stakeID uuid.UUID, updates map[string]inter
 				return nil, errors.New("invalid status type")
 			}
 		}
-		
+
 		if status == StakeStatusActive && stake.StakedAt == nil {
 			now := time.Now()
 			updates["staked_at"] = now
 		}
-		
+
 		if status == StakeStatusReturned && stake.ReturnedAt == nil {
 			now := time.Now()
 			updates["returned_at"] = now
-			
+
 			if err := db.db.Model(&NewBounty{}).Where("id = ?", stake.BountyID).
 				Update("current_stakers", gorm.Expr("current_stakers - 1")).Error; err != nil {
 				return nil, fmt.Errorf("failed to update bounty stakers count: %w", err)
 			}
 		}
 	}
-	
+
 	if err := db.db.Model(&BountyStake{}).Where("id = ?", stakeID).Updates(updates).Error; err != nil {
 		return nil, fmt.Errorf("failed to update stake with ID %s: %w", stakeID, err)
 	}
-	
+
 	return db.GetBountyStakeByID(stakeID)
 }
 
@@ -2348,17 +2359,17 @@ func (db database) DeleteBountyStake(stakeID uuid.UUID) error {
 	if err != nil {
 		return err
 	}
-	
+
 	tx := db.db.Begin()
 	if tx.Error != nil {
 		return fmt.Errorf("failed to begin transaction: %w", tx.Error)
 	}
-	
+
 	if err := tx.Delete(&BountyStake{}, "id = ?", stakeID).Error; err != nil {
 		tx.Rollback()
 		return fmt.Errorf("failed to delete stake with ID %s: %w", stakeID, err)
 	}
-	
+
 	if stake.StakedAt != nil && stake.ReturnedAt == nil {
 		if err := tx.Model(&NewBounty{}).Where("id = ?", stake.BountyID).
 			Update("current_stakers", gorm.Expr("current_stakers - 1")).Error; err != nil {
@@ -2366,11 +2377,11 @@ func (db database) DeleteBountyStake(stakeID uuid.UUID) error {
 			return fmt.Errorf("failed to update bounty stakers count: %w", err)
 		}
 	}
-	
+
 	if err := tx.Commit().Error; err != nil {
 		return fmt.Errorf("failed to commit transaction: %w", err)
 	}
-	
+
 	return nil
 }
 
@@ -2378,44 +2389,44 @@ func (db database) CreateBountyStakeProcess(process *BountyStakeProcess) (*Bount
 	if process.BountyID == 0 {
 		return nil, errors.New("bounty ID is required")
 	}
-	
+
 	if process.HunterPubKey == "" {
 		return nil, errors.New("hunter public key is required")
 	}
-	
+
 	if process.Amount <= 0 {
 		return nil, errors.New("stake amount must be greater than zero")
 	}
-	
+
 	bounty := db.GetBounty(process.BountyID)
 	if bounty.ID == 0 {
 		return nil, errors.New("bounty not found")
 	}
-	
+
 	if !bounty.IsStakable {
 		return nil, errors.New("bounty is not stakable")
 	}
-	
+
 	if process.Amount < bounty.StakeMin {
 		return nil, fmt.Errorf("stake amount must be at least %d", bounty.StakeMin)
 	}
-	
+
 	if process.Status == "" {
 		process.Status = StakeProcessStatusNew
 	}
-	
+
 	if process.ID == uuid.Nil {
 		process.ID = uuid.New()
 	}
-	
+
 	now := time.Now()
 	process.CreatedAt = now
 	process.UpdatedAt = now
-	
+
 	if err := db.db.Create(process).Error; err != nil {
 		return nil, fmt.Errorf("failed to create stake process: %w", err)
 	}
-	
+
 	return process, nil
 }
 
@@ -2459,7 +2470,7 @@ func (db database) UpdateBountyStakeProcess(id uuid.UUID, updates map[string]int
 	if err != nil {
 		return nil, err
 	}
-	
+
 	if statusVal, ok := updates["status"]; ok {
 		status, ok := statusVal.(StakeProcessStatus)
 		if !ok {
@@ -2470,23 +2481,23 @@ func (db database) UpdateBountyStakeProcess(id uuid.UUID, updates map[string]int
 				return nil, errors.New("invalid status type")
 			}
 		}
-		
+
 		now := time.Now()
 		updates["updated_at"] = now
-		
+
 		if status == StakeProcessStatusPaid && process.StakedAt == nil {
 			updates["staked_at"] = now
 		}
-		
+
 		if status == StakeProcessStatusReturned && process.ReturnedAt == nil {
 			updates["returned_at"] = now
 		}
 	}
-	
+
 	if err := db.db.Model(&BountyStakeProcess{}).Where("id = ?", id).Updates(updates).Error; err != nil {
 		return nil, fmt.Errorf("failed to update stake process with ID %s: %w", id, err)
 	}
-	
+
 	return db.GetBountyStakeProcessByID(id)
 }
 
@@ -2494,10 +2505,10 @@ func (db database) DeleteBountyStakeProcess(id uuid.UUID) error {
 	if _, err := db.GetBountyStakeProcessByID(id); err != nil {
 		return err
 	}
-	
+
 	if err := db.db.Delete(&BountyStakeProcess{}, "id = ?", id).Error; err != nil {
 		return fmt.Errorf("failed to delete stake process with ID %s: %w", id, err)
 	}
-	
+
 	return nil
 }
