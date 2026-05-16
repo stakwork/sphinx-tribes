@@ -84,9 +84,34 @@ func handleTimingError(w http.ResponseWriter, operation string, err error) {
 //	@Success		200	{array}	db.Bounty
 //	@Router			/gobounties/all [get]
 func (h *bountyHandler) GetAllBounties(w http.ResponseWriter, r *http.Request) {
+	if r.URL.Query().Get("myAssigned") == "true" {
+		token := r.URL.Query().Get("token")
+		if token == "" {
+			token = r.Header.Get("x-jwt")
+		}
+		if token == "" {
+			w.WriteHeader(http.StatusUnauthorized)
+			json.NewEncoder(w).Encode(map[string]string{"error": "authentication required for myAssigned filter"})
+			return
+		}
+		claims, err := auth.DecodeJwt(token)
+		if err != nil {
+			w.WriteHeader(http.StatusUnauthorized)
+			json.NewEncoder(w).Encode(map[string]string{"error": "invalid token"})
+			return
+		}
+		pubkey := fmt.Sprintf("%v", claims["pubkey"])
+		if pubkey == "" || pubkey == "<nil>" {
+			w.WriteHeader(http.StatusUnauthorized)
+			json.NewEncoder(w).Encode(map[string]string{"error": "invalid pubkey in token"})
+			return
+		}
+		q := r.URL.Query()
+		q.Set("assignee", pubkey)
+		r.URL.RawQuery = q.Encode()
+	}
 	bounties := h.db.GetAllBounties(r)
 	var bountyResponse []db.BountyResponse = h.GenerateBountyResponse(bounties)
-
 	w.WriteHeader(http.StatusOK)
 	json.NewEncoder(w).Encode(bountyResponse)
 }
