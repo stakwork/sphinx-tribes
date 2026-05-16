@@ -613,6 +613,13 @@ func (db database) GetWorkspaceBounties(r *http.Request, workspace_uuid string) 
 	if open == "true" {
 		statusConditions = append(statusConditions, "assignee = '' AND paid != true")
 	}
+
+	assignee := keys.Get("assignee")
+
+	var assigneeQuery string
+	if assignee != "" {
+		assigneeQuery = "AND assignee = '" + assignee + "'"
+	}
 	if assingned == "true" {
 		statusConditions = append(statusConditions, "assignee != '' AND paid = false")
 	}
@@ -1304,7 +1311,7 @@ func (db database) GetAllBounties(r *http.Request) []NewBounty {
 
 	query := "SELECT * FROM public.bounty WHERE show != false"
 
-	allQuery := query + " " + statusQuery + " " + searchQuery + " " + workspaceQuery + " " + languageQuery + " " + phaseUuidQuery + " " + phasePriorityQuery + " " + accessRestrictionQuery + " " + orderQuery + " " + limitQuery
+	allQuery := query + " " + statusQuery + " " + searchQuery + " " + workspaceQuery + " " + languageQuery + " " + phaseUuidQuery + " " + phasePriorityQuery + " " + accessRestrictionQuery + " " + assigneeQuery + " " + orderQuery + " " + limitQuery
 
 	theQuery := db.db.Raw(allQuery)
 
