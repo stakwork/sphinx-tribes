@@ -46,14 +46,22 @@ jobs:
         with:
           node-version: 20
 
-      - name: Build Tribes Image
-        run: pwd && ls && docker build -t sphinxlightning/sphinx-tribes:latest .
+      - name: Pull Production Tribes Image
+        run: |
+          docker pull sphinxlightning/sphinx-tribes:latest
+          docker image inspect sphinxlightning/sphinx-tribes:latest --format '{{.Id}} {{.Created}}'
 
 
 # change_v2_ports
       - name: Clone Stack
         run: |
           git clone --single-branch --branch change_v2_ports https://github.com/stakwork/sphinx-stack.git stack
+
+      - name: Use Production Tribes Image
+        run: |
+          grep -q 'sphinxlightning/sphinx-tribes:integrate_v2_payments3' ./stack/alts/v1v2.yml
+          sed -i 's|sphinxlightning/sphinx-tribes:integrate_v2_payments3|sphinxlightning/sphinx-tribes:latest|' ./stack/alts/v1v2.yml
+          grep -n 'sphinxlightning/sphinx-tribes:latest' ./stack/alts/v1v2.yml
 
       - name: Clone Sphinx Tribes Frontend
         run: |
