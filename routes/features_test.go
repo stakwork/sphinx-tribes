@@ -19,6 +19,10 @@ func FeatureMockHandler(t *testing.T, expectedStatus int) http.HandlerFunc {
 			w.WriteHeader(http.StatusOK)
 			return
 		}
+		if r.Method == http.MethodGet && r.URL.Path == "/1234/phase/5678/tickets" {
+			w.WriteHeader(http.StatusOK)
+			return
+		}
 		if r.Method == http.MethodPost && r.URL.Path == "/stories" {
 			w.WriteHeader(http.StatusOK)
 			return
@@ -59,6 +63,7 @@ func TestFeatureRoutes(t *testing.T) {
 	r.Get("/workspace/count/{uuid}", FeatureMockHandler(t, http.StatusOK))
 	r.Post("/phase", FeatureMockHandler(t, http.StatusOK))
 	r.Get("/{feature_uuid}/story", FeatureMockHandler(t, http.StatusOK))
+	r.Get("/{feature_uuid}/phase/{phase_uuid}/tickets", FeatureMockHandler(t, http.StatusOK))
 
 	testCases := []struct {
 		name           string
@@ -112,6 +117,12 @@ func TestFeatureRoutes(t *testing.T) {
 			name:           "Test GET /{feature_uuid}/story Route",
 			method:         http.MethodGet,
 			path:           "/1234/story",
+			expectedStatus: http.StatusOK,
+		},
+		{
+			name:           "Test GET /{feature_uuid}/phase/{phase_uuid}/tickets Route",
+			method:         http.MethodGet,
+			path:           "/1234/phase/5678/tickets",
 			expectedStatus: http.StatusOK,
 		},
 	}

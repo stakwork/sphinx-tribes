@@ -41,6 +41,7 @@ func FeatureRoutes() chi.Router {
 		r.Delete("/{feature_uuid}/story/{story_uuid}", featureHandlers.DeleteStory)
 		r.Get("/{feature_uuid}/phase/{phase_uuid}/bounty", featureHandlers.GetBountiesByFeatureAndPhaseUuid)
 		r.Get("/{feature_uuid}/phase/{phase_uuid}/bounty/count", featureHandlers.GetBountiesCountByFeatureAndPhaseUuid)
+		r.Get("/{feature_uuid}/phase/{phase_uuid}/tickets", featureHandlers.GetTicketsByFeatureAndPhaseUuid)
 		r.Get("/{feature_uuid}/quick-bounties", featureHandlers.GetQuickBounties)
 		r.Get("/{feature_uuid}/quick-tickets", featureHandlers.GetQuickTickets)
 		r.Post("/call", featureHandlers.CreateOrUpdateFeatureCall)

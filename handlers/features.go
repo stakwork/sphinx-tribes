@@ -34,8 +34,8 @@ type PostData struct {
 }
 
 type FeatureCallRequest struct {
-    WorkspaceID string `json:"workspace_id"`
-    URL         string `json:"url"`
+	WorkspaceID string `json:"workspace_id"`
+	URL         string `json:"url"`
 }
 
 type FeatureBriefRequest struct {
@@ -686,6 +686,63 @@ func (oh *featureHandler) GetBountiesByFeatureAndPhaseUuid(w http.ResponseWriter
 
 	w.WriteHeader(http.StatusOK)
 	json.NewEncoder(w).Encode(bountyResponses)
+}
+
+// GetTicketsByFeatureAndPhaseUuid godoc
+//
+//	@Summary		Get Tickets by Feature and Phase UUID
+//	@Description	Get tickets of a feature by its UUID and phase UUID
+//	@Tags			Feature - Phases
+//	@Accept			json
+//	@Produce		json
+//	@Security		PubKeyContextAuth
+//	@Param			feature_uuid	path	string	true	"Feature UUID"
+//	@Param			phase_uuid		path	string	true	"Phase UUID"
+//	@Success		200				{array}	db.Tickets
+//	@Router			/features/{feature_uuid}/phase/{phase_uuid}/tickets [get]
+func (oh *featureHandler) GetTicketsByFeatureAndPhaseUuid(w http.ResponseWriter, r *http.Request) {
+	ctx := r.Context()
+	pubKeyFromAuth, _ := ctx.Value(auth.ContextKey).(string)
+	if pubKeyFromAuth == "" {
+		logger.Log.Info("no pubkey from auth")
+		w.WriteHeader(http.StatusUnauthorized)
+		return
+	}
+
+	featureUuid := chi.URLParam(r, "feature_uuid")
+	phaseUuid := chi.URLParam(r, "phase_uuid")
+	if featureUuid == "" {
+		http.Error(w, "Missing feature uuid", http.StatusBadRequest)
+		return
+	}
+	if phaseUuid == "" {
+		http.Error(w, "Missing phase uuid", http.StatusBadRequest)
+		return
+	}
+
+	feature := oh.db.GetFeatureByUuid(featureUuid)
+	if feature.Uuid == "" {
+		w.WriteHeader(http.StatusNotFound)
+		json.NewEncoder(w).Encode(map[string]string{"error": "feature not found"})
+		return
+	}
+
+	_, err := oh.db.GetFeaturePhaseByUuid(featureUuid, phaseUuid)
+	if err != nil {
+		w.WriteHeader(http.StatusNotFound)
+		json.NewEncoder(w).Encode(map[string]string{"error": "Phase not found"})
+		return
+	}
+
+	tickets, err := oh.db.GetTicketsByPhaseUUID(featureUuid, phaseUuid)
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		json.NewEncoder(w).Encode(map[string]string{"error": err.Error()})
+		return
+	}
+
+	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode(tickets)
 }
 
 // GetBountiesCountByFeatureAndPhaseUuid godoc

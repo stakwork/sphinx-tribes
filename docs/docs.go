@@ -2771,6 +2771,53 @@ const docTemplate = `{
                 }
             }
         },
+        "/features/{feature_uuid}/phase/{phase_uuid}/tickets": {
+            "get": {
+                "security": [
+                    {
+                        "PubKeyContextAuth": []
+                    }
+                ],
+                "description": "Get tickets of a feature by its UUID and phase UUID",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Feature - Phases"
+                ],
+                "summary": "Get Tickets by Feature and Phase UUID",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Feature UUID",
+                        "name": "feature_uuid",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Phase UUID",
+                        "name": "phase_uuid",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/db.Tickets"
+                            }
+                        }
+                    }
+                }
+            }
+        },
         "/features/{feature_uuid}/phase/{phase_uuid}/bounty/count": {
             "get": {
                 "security": [
