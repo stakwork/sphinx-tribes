@@ -2,7 +2,9 @@ package handlers
 
 import (
 	"encoding/json"
+	"errors"
 	"net/http"
+	"strings"
 
 	"github.com/go-chi/chi"
 	"github.com/google/uuid"
@@ -38,6 +40,56 @@ type AddFeatureFlagEndpointRequest struct {
 
 type UpdateFeatureFlagEndpointRequest struct {
 	Path string `json:"new_endpoint_path"`
+}
+
+var errInvalidEndpointPaths = errors.New("invalid endpoint paths")
+
+func decodeEndpointPaths(r *http.Request) ([]string, error) {
+	var raw json.RawMessage
+	if err := json.NewDecoder(r.Body).Decode(&raw); err != nil {
+		return nil, err
+	}
+
+	var endpointPaths []string
+	if err := json.Unmarshal(raw, &endpointPaths); err != nil {
+		var request AddFeatureFlagEndpointRequest
+		if err := json.Unmarshal(raw, &request); err != nil {
+			return nil, err
+		}
+		endpointPaths = request.Endpoints
+	}
+
+	return normalizeEndpointPaths(endpointPaths)
+}
+
+func normalizeEndpointPaths(endpointPaths []string) ([]string, error) {
+	if len(endpointPaths) == 0 {
+		return nil, errInvalidEndpointPaths
+	}
+
+	normalized := make([]string, 0, len(endpointPaths))
+	seen := make(map[string]struct{}, len(endpointPaths))
+	for _, endpointPath := range endpointPaths {
+		path := strings.TrimSpace(endpointPath)
+		if !isValidEndpointPath(path) {
+			return nil, errInvalidEndpointPaths
+		}
+		if _, ok := seen[path]; ok {
+			return nil, errInvalidEndpointPaths
+		}
+		seen[path] = struct{}{}
+		normalized = append(normalized, path)
+	}
+
+	return normalized, nil
+}
+
+func isValidEndpointPath(path string) bool {
+	return strings.HasPrefix(path, "/") && !strings.ContainsAny(path, " \t\r\n")
+}
+
+func isNotFoundError(err error, label string) bool {
+	return err != nil && strings.Contains(err.Error(), label+" not found")
 }
 
 func NewFeatureFlagHandler(database db.Database) *FeatureFlagHandler {
@@ -311,22 +363,61 @@ func (fh *FeatureFlagHandler) AddFeatureFlagEndpoint(w http.ResponseWriter, r *h
 		return
 	}
 
-	var request AddFeatureFlagEndpointRequest
-	if err := json.NewDecoder(r.Body).Decode(&request); err != nil {
+	endpointPaths, err := decodeEndpointPaths(r)
+	if err != nil {
 		w.WriteHeader(http.StatusBadRequest)
 		json.NewEncoder(w).Encode(FeatureFlagResponse{
 			Success: false,
-			Message: "Invalid request body",
+			Message: "Invalid input. Please provide an array of endpoint paths.",
 		})
 		return
 	}
 
-	for _, path := range request.Endpoints {
-		_, err := fh.db.GetEndpointByPath(path)
-		if err == nil {
-			continue
+	if _, err := fh.db.GetFeatureFlagByUUID(flagUUID); err != nil {
+		if isNotFoundError(err, "feature flag") {
+			w.WriteHeader(http.StatusNotFound)
+			json.NewEncoder(w).Encode(FeatureFlagResponse{
+				Success: false,
+				Message: "Feature flag not found",
+			})
+			return
 		}
 
+		w.WriteHeader(http.StatusInternalServerError)
+		json.NewEncoder(w).Encode(FeatureFlagResponse{
+			Success: false,
+			Message: "Failed to fetch feature flag",
+		})
+		return
+	}
+
+	existingEndpoints, err := fh.db.GetEndpointsByFeatureFlag(flagUUID)
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		json.NewEncoder(w).Encode(FeatureFlagResponse{
+			Success: false,
+			Message: "Failed to fetch existing endpoints",
+		})
+		return
+	}
+
+	existingPaths := make(map[string]struct{}, len(existingEndpoints))
+	for _, endpoint := range existingEndpoints {
+		existingPaths[endpoint.Path] = struct{}{}
+	}
+
+	for _, path := range endpointPaths {
+		if _, ok := existingPaths[path]; ok {
+			w.WriteHeader(http.StatusConflict)
+			json.NewEncoder(w).Encode(FeatureFlagResponse{
+				Success: false,
+				Message: "Endpoint path already exists for this feature flag",
+			})
+			return
+		}
+	}
+
+	for _, path := range endpointPaths {
 		endpoint := &db.Endpoint{
 			UUID:            uuid.New(),
 			Path:            path,
@@ -426,18 +517,59 @@ func (fh *FeatureFlagHandler) UpdateFeatureFlagEndpoint(w http.ResponseWriter, r
 		return
 	}
 
-	if request.Path == "" {
+	path := strings.TrimSpace(request.Path)
+	if !isValidEndpointPath(path) {
 		w.WriteHeader(http.StatusBadRequest)
 		json.NewEncoder(w).Encode(FeatureFlagResponse{
 			Success: false,
-			Message: "Path is required",
+			Message: "Invalid input. Please provide a valid new_endpoint_path.",
 		})
 		return
 	}
 
+	existingEndpoint, err := fh.db.GetEndpointByUUID(endpointUUID)
+	if err != nil {
+		w.WriteHeader(http.StatusNotFound)
+		json.NewEncoder(w).Encode(FeatureFlagResponse{
+			Success: false,
+			Message: "Endpoint or Feature Flag not found",
+		})
+		return
+	}
+
+	if existingEndpoint.FeatureFlagUUID != flagUUID {
+		w.WriteHeader(http.StatusBadRequest)
+		json.NewEncoder(w).Encode(FeatureFlagResponse{
+			Success: false,
+			Message: "Endpoint does not belong to this feature flag",
+		})
+		return
+	}
+
+	existingEndpoints, err := fh.db.GetEndpointsByFeatureFlag(flagUUID)
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		json.NewEncoder(w).Encode(FeatureFlagResponse{
+			Success: false,
+			Message: "Failed to fetch existing endpoints",
+		})
+		return
+	}
+
+	for _, endpoint := range existingEndpoints {
+		if endpoint.Path == path && endpoint.UUID != endpointUUID {
+			w.WriteHeader(http.StatusConflict)
+			json.NewEncoder(w).Encode(FeatureFlagResponse{
+				Success: false,
+				Message: "Endpoint path already exists for this feature flag",
+			})
+			return
+		}
+	}
+
 	endpoint := &db.Endpoint{
 		UUID:            endpointUUID,
-		Path:            request.Path,
+		Path:            path,
 		FeatureFlagUUID: flagUUID,
 	}
 
