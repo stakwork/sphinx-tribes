@@ -61,6 +61,15 @@ func BuildSearchQuery(key string, term string) (string, string) {
 	return arg1, arg2
 }
 
+func BuildBountyPaymentMemo(title string) string {
+	title = strings.TrimSpace(title)
+	if title == "" {
+		return "Bounty Payment"
+	}
+
+	return fmt.Sprintf("Bounty Payment: %s", title)
+}
+
 func BuildKeysendBodyData(amount uint, receiver_pubkey string, route_hint string, memo string) string {
 	var bodyData string
 	if route_hint != "" {

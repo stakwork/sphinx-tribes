@@ -1436,11 +1436,11 @@ func TestMakeBountyPayment(t *testing.T) {
 		bHandler2.getSocketConnections = mockGetSocketConnections
 		bHandler2.userHasAccess = mockUserHasAccessTrue
 
-		memoData := fmt.Sprintf("Payment For: %ss", bounty.Title)
+		memoData := utils.BuildBountyPaymentMemo(bounty.Title)
 		memoText := url.QueryEscape(memoData)
 
 		expectedUrl := fmt.Sprintf("%s/payment", config.RelayUrl)
-		expectedBody := fmt.Sprintf(`{"amount": %d, "destination_key": "%s", "text": "memotext added for notification", "data": "%s"}`, bountyAmount, person.OwnerPubKey, memoText)
+		expectedBody := fmt.Sprintf(`{"amount": %d, "destination_key": "%s", "text": "%s", "data": "%s"}`, bountyAmount, person.OwnerPubKey, memoText, memoText)
 
 		expectedV2Url := fmt.Sprintf("%s/pay", botURL)
 		expectedV2Body :=
@@ -1485,11 +1485,11 @@ func TestMakeBountyPayment(t *testing.T) {
 		bHandler.getSocketConnections = mockGetSocketConnections
 		bHandler.userHasAccess = mockUserHasAccessTrue
 
-		memoData := fmt.Sprintf("Payment For: %ss", bounty.Title)
+		memoData := utils.BuildBountyPaymentMemo(bounty.Title)
 		memoText := url.QueryEscape(memoData)
 
 		expectedUrl := fmt.Sprintf("%s/payment", config.RelayUrl)
-		expectedBody := fmt.Sprintf(`{"amount": %d, "destination_key": "%s", "text": "memotext added for notification", "data": "%s"}`, bountyAmount, person.OwnerPubKey, memoText)
+		expectedBody := fmt.Sprintf(`{"amount": %d, "destination_key": "%s", "text": "%s", "data": "%s"}`, bountyAmount, person.OwnerPubKey, memoText, memoText)
 
 		expectedV2Url := fmt.Sprintf("%s/pay", botURL)
 		expectedV2Body :=

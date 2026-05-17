@@ -102,6 +102,37 @@ func TestBuildV2KeysendBodyData(t *testing.T) {
 	}
 }
 
+func TestBuildBountyPaymentMemo(t *testing.T) {
+	tests := []struct {
+		name     string
+		title    string
+		expected string
+	}{
+		{
+			name:     "includes bounty title",
+			title:    "Fix the payout flow",
+			expected: "Bounty Payment: Fix the payout flow",
+		},
+		{
+			name:     "trims surrounding title whitespace",
+			title:    "  Fix the payout flow  ",
+			expected: "Bounty Payment: Fix the payout flow",
+		},
+		{
+			name:     "uses fallback for empty title",
+			title:    "   ",
+			expected: "Bounty Payment",
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			assert.Equal(t, tt.expected, BuildBountyPaymentMemo(tt.title))
+			assert.NotContains(t, BuildBountyPaymentMemo(tt.title), "%ss")
+		})
+	}
+}
+
 func TestGetPaginationParams(t *testing.T) {
 	tests := []struct {
 		name           string

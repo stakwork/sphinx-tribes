@@ -1010,7 +1010,7 @@ func (h *bountyHandler) MakeBountyPayment(w http.ResponseWriter, r *http.Request
 	// Get Bounty Assignee
 	assignee := h.db.GetPersonByPubkey(bounty.Assignee)
 
-	memoData := fmt.Sprintf("Payment For: %ss", bounty.Title)
+	memoData := utils.BuildBountyPaymentMemo(bounty.Title)
 	memoText := url.QueryEscape(memoData)
 	now := time.Now()
 

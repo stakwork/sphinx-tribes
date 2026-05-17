@@ -5696,6 +5696,62 @@ func (_c *Database_GetBountyByCreated_Call) RunAndReturn(run func(uint) (db.NewB
 	return _c
 }
 
+// GetBountyByUnlockCode provides a mock function with given fields: code
+func (_m *Database) GetBountyByUnlockCode(code string) (db.NewBounty, error) {
+	ret := _m.Called(code)
+
+	if len(ret) == 0 {
+		panic("no return value specified for GetBountyByUnlockCode")
+	}
+
+	var r0 db.NewBounty
+	var r1 error
+	if rf, ok := ret.Get(0).(func(string) (db.NewBounty, error)); ok {
+		return rf(code)
+	}
+	if rf, ok := ret.Get(0).(func(string) db.NewBounty); ok {
+		r0 = rf(code)
+	} else {
+		r0 = ret.Get(0).(db.NewBounty)
+	}
+
+	if rf, ok := ret.Get(1).(func(string) error); ok {
+		r1 = rf(code)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
+// Database_GetBountyByUnlockCode_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'GetBountyByUnlockCode'
+type Database_GetBountyByUnlockCode_Call struct {
+	*mock.Call
+}
+
+// GetBountyByUnlockCode is a helper method to define mock.On call
+//   - code string
+func (_e *Database_Expecter) GetBountyByUnlockCode(code interface{}) *Database_GetBountyByUnlockCode_Call {
+	return &Database_GetBountyByUnlockCode_Call{Call: _e.mock.On("GetBountyByUnlockCode", code)}
+}
+
+func (_c *Database_GetBountyByUnlockCode_Call) Run(run func(code string)) *Database_GetBountyByUnlockCode_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(string))
+	})
+	return _c
+}
+
+func (_c *Database_GetBountyByUnlockCode_Call) Return(_a0 db.NewBounty, _a1 error) *Database_GetBountyByUnlockCode_Call {
+	_c.Call.Return(_a0, _a1)
+	return _c
+}
+
+func (_c *Database_GetBountyByUnlockCode_Call) RunAndReturn(run func(string) (db.NewBounty, error)) *Database_GetBountyByUnlockCode_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
 // GetBountyById provides a mock function with given fields: id
 func (_m *Database) GetBountyById(id string) ([]db.NewBounty, error) {
 	ret := _m.Called(id)
@@ -17486,7 +17542,6 @@ func (_c *Database_GetAllBountyStakes_Call) RunAndReturn(run func() ([]db.Bounty
 	return _c
 }
 
-
 func (_m *Database) GetBountyStakesByBountyID(bountyID uint) ([]db.BountyStake, error) {
 	ret := _m.Called(bountyID)
 
@@ -17703,7 +17758,6 @@ func (_c *Database_UpdateBountyStake_Call) RunAndReturn(run func(uuid.UUID, map[
 	return _c
 }
 
-
 func (_m *Database) DeleteBountyStake(stakeID uuid.UUID) error {
 	ret := _m.Called(stakeID)
 
@@ -17746,7 +17800,6 @@ func (_c *Database_DeleteBountyStake_Call) RunAndReturn(run func(uuid.UUID) erro
 	return _c
 }
 
-
 func (_m *Database) AddChatStatus(status *db.ChatWorkflowStatus) (db.ChatWorkflowStatus, error) {
 	ret := _m.Called(status)
 
@@ -17778,7 +17831,6 @@ type Database_AddChatStatus_Call struct {
 	*mock.Call
 }
 
-
 func (_e *Database_Expecter) AddChatStatus(status interface{}) *Database_AddChatStatus_Call {
 	return &Database_AddChatStatus_Call{Call: _e.mock.On("AddChatStatus", status)}
 }
@@ -17799,7 +17851,6 @@ func (_c *Database_AddChatStatus_Call) RunAndReturn(run func(*db.ChatWorkflowSta
 	_c.Call.Return(run)
 	return _c
 }
-
 
 func (_m *Database) UpdateChatStatus(status *db.ChatWorkflowStatus) (db.ChatWorkflowStatus, error) {
 	ret := _m.Called(status)
@@ -17831,7 +17882,6 @@ func (_m *Database) UpdateChatStatus(status *db.ChatWorkflowStatus) (db.ChatWork
 type Database_UpdateChatStatus_Call struct {
 	*mock.Call
 }
-
 
 func (_e *Database_Expecter) UpdateChatStatus(status interface{}) *Database_UpdateChatStatus_Call {
 	return &Database_UpdateChatStatus_Call{Call: _e.mock.On("UpdateChatStatus", status)}
@@ -17908,7 +17958,6 @@ func (_c *Database_GetChatStatusByChatID_Call) RunAndReturn(run func(string) ([]
 	return _c
 }
 
-
 func (_m *Database) GetLatestChatStatusByChatID(chatID string) (db.ChatWorkflowStatus, error) {
 	ret := _m.Called(chatID)
 
@@ -17981,7 +18030,6 @@ func (_m *Database) DeleteChatStatus(_a0 uuid.UUID) error {
 type Database_DeleteChatStatus_Call struct {
 	*mock.Call
 }
-
 
 func (_e *Database_Expecter) DeleteChatStatus(_a0 interface{}) *Database_DeleteChatStatus_Call {
 	return &Database_DeleteChatStatus_Call{Call: _e.mock.On("DeleteChatStatus", _a0)}
@@ -18110,7 +18158,6 @@ func (_c *Database_CreateBountyStakeProcess_Call) RunAndReturn(run func(*db.Boun
 	return _c
 }
 
-
 func (_m *Database) GetBountyStakeProcessByID(id uuid.UUID) (*db.BountyStakeProcess, error) {
 	ret := _m.Called(id)
 
@@ -18219,7 +18266,6 @@ func (_c *Database_GetBountyStakeProcessesByBountyID_Call) RunAndReturn(run func
 	return _c
 }
 
-
 func (_m *Database) GetBountyStakeProcessesByHunterPubKey(hunterPubKey string) ([]db.BountyStakeProcess, error) {
 	ret := _m.Called(hunterPubKey)
 
@@ -18327,7 +18373,6 @@ func (_c *Database_GetAllBountyStakeProcesses_Call) RunAndReturn(run func() ([]d
 	_c.Call.Return(run)
 	return _c
 }
-
 
 func (_m *Database) UpdateBountyStakeProcess(id uuid.UUID, updates map[string]interface{}) (*db.BountyStakeProcess, error) {
 	ret := _m.Called(id, updates)
