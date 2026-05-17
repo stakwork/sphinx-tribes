@@ -1165,7 +1165,7 @@ func TestGetBountyIndexById(t *testing.T) {
 			OwnerID:       bountyOwner.OwnerPubKey,
 			Show:          true,
 			Created:       now,
-			MaxStakers: 1,
+			MaxStakers:    1,
 		}
 
 		db.TestDB.CreateOrEditBounty(bounty)
@@ -1612,6 +1612,13 @@ func TestUpdateBountyPaymentStatus(t *testing.T) {
 			Error:  "",
 		}
 	}
+	mockFailedGetInvoiceStatusByTag := func(tag string) db.V2TagRes {
+		return db.V2TagRes{
+			Status: db.PaymentFailed,
+			Tag:    paymentTag,
+			Error:  "payment failed",
+		}
+	}
 
 	now := time.Now().UnixMilli()
 	bountyOwnerId := "owner_pubkey"
@@ -1647,16 +1654,17 @@ func TestUpdateBountyPaymentStatus(t *testing.T) {
 
 	bountyAmount := uint(3000)
 	bounty := db.NewBounty{
-		OwnerID:       bountyOwnerId,
-		Price:         bountyAmount,
-		Created:       now,
-		Type:          "coding",
-		Title:         "updateBountyTitle",
-		Description:   "updateBountyDescription",
-		Assignee:      person.OwnerPubKey,
-		Show:          true,
-		WorkspaceUuid: workspace.Uuid,
-		Paid:          false,
+		OwnerID:        bountyOwnerId,
+		Price:          bountyAmount,
+		Created:        now,
+		Type:           "coding",
+		Title:          "updateBountyTitle",
+		Description:    "updateBountyDescription",
+		Assignee:       person.OwnerPubKey,
+		Show:           true,
+		WorkspaceUuid:  workspace.Uuid,
+		Paid:           false,
+		PaymentPending: true,
 	}
 	db.TestDB.CreateOrEditBounty(bounty)
 
@@ -1705,7 +1713,7 @@ func TestUpdateBountyPaymentStatus(t *testing.T) {
 		assert.Equal(t, http.StatusUnauthorized, rr.Code, "Expected 401 Unauthorized for unauthorized access")
 	})
 
-	t.Run("Should test that a PENDING payment_status is sent if the payment is not successful", func(t *testing.T) {
+	t.Run("Should test that a PENDING payment_status is sent without updating the bounty if the payment is not complete", func(t *testing.T) {
 		mockHttpClient := &mocks.HttpClient{}
 
 		bHandler := NewBountyHandler(mockHttpClient, db.TestDB)
@@ -1722,8 +1730,96 @@ func TestUpdateBountyPaymentStatus(t *testing.T) {
 		}
 
 		ro.ServeHTTP(rr, req)
-		assert.Equal(t, http.StatusBadRequest, rr.Code)
+		assert.Equal(t, http.StatusOK, rr.Code)
+
+		res := map[string]string{}
+		err = json.Unmarshal(rr.Body.Bytes(), &res)
+		assert.NoError(t, err)
+		assert.Equal(t, db.PaymentPending, res["payment_status"])
+
+		updatedBounty := db.TestDB.GetBounty(bountyId)
+		assert.False(t, updatedBounty.Paid, "Expected pending status retry to leave bounty unpaid")
+		assert.True(t, updatedBounty.PaymentPending, "Expected pending status retry to leave bounty pending")
 		mockHttpClient.AssertExpectations(t)
+	})
+
+	t.Run("Should test that a FAILED payment_status is sent without reversing or updating the bounty", func(t *testing.T) {
+		mockHttpClient := &mocks.HttpClient{}
+
+		bHandler := NewBountyHandler(mockHttpClient, db.TestDB)
+		bHandler.getInvoiceStatusByTag = mockFailedGetInvoiceStatusByTag
+
+		failedRetryCreated := now + 1
+		failedRetryBounty := bounty
+		failedRetryBounty.Created = failedRetryCreated
+		failedRetryBounty.PaymentPending = true
+		failedRetryBounty.PaymentFailed = false
+		failedRetryBounty.Paid = false
+		db.TestDB.CreateOrEditBounty(failedRetryBounty)
+
+		dbFailedRetryBounty, err := db.TestDB.GetBountyDataByCreated(strconv.FormatInt(failedRetryCreated, 10))
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		failedRetryBountyId := dbFailedRetryBounty[0].ID
+		failedRetryBountyIdStr := strconv.FormatInt(int64(failedRetryBountyId), 10)
+		failedRetryTag := "failed_update_tag"
+		failedRetryPaymentTime := time.Now()
+		workspaceBudgetBeforeFailedRetry := db.TestDB.GetWorkspaceBudget(workspace.Uuid)
+
+		depositHistory := db.NewPaymentHistory{
+			Amount:        budgetAmount,
+			WorkspaceUuid: workspace.Uuid,
+			PaymentType:   db.Deposit,
+			Status:        true,
+			Created:       &failedRetryPaymentTime,
+			Updated:       &failedRetryPaymentTime,
+		}
+		pendingPayment := db.NewPaymentHistory{
+			Amount:         bountyAmount,
+			BountyId:       failedRetryBountyId,
+			PaymentStatus:  db.PaymentPending,
+			WorkspaceUuid:  workspace.Uuid,
+			PaymentType:    db.Payment,
+			SenderPubKey:   person.OwnerPubKey,
+			ReceiverPubKey: person.OwnerPubKey,
+			Tag:            failedRetryTag,
+			Status:         true,
+			Created:        &failedRetryPaymentTime,
+			Updated:        &failedRetryPaymentTime,
+		}
+		db.TestDB.AddPaymentHistory(depositHistory)
+		db.TestDB.AddPaymentHistory(pendingPayment)
+
+		ro := chi.NewRouter()
+		ro.Put("/gobounties/payment/status/{id}", bHandler.UpdateBountyPaymentStatus)
+
+		rr := httptest.NewRecorder()
+		requestBody := bytes.NewBuffer([]byte("{}"))
+		req, err := http.NewRequestWithContext(authorizedCtx, http.MethodPut, "/gobounties/payment/status/"+failedRetryBountyIdStr, requestBody)
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		ro.ServeHTTP(rr, req)
+		assert.Equal(t, http.StatusOK, rr.Code)
+
+		res := map[string]string{}
+		err = json.Unmarshal(rr.Body.Bytes(), &res)
+		assert.NoError(t, err)
+		assert.Equal(t, db.PaymentFailed, res["payment_status"])
+
+		updatedBounty := db.TestDB.GetBounty(failedRetryBountyId)
+		assert.False(t, updatedBounty.Paid, "Expected failed status retry to leave bounty unpaid")
+		assert.True(t, updatedBounty.PaymentPending, "Expected failed status retry to leave bounty pending")
+		assert.False(t, updatedBounty.PaymentFailed, "Expected failed status retry not to mark the bounty failed")
+
+		updatedPayment := db.TestDB.GetPaymentByBountyId(failedRetryBountyId)
+		assert.Equal(t, db.PaymentPending, updatedPayment.PaymentStatus, "Expected failed status retry not to mutate the stored payment")
+
+		workspaceBudgetAfterFailedRetry := db.TestDB.GetWorkspaceBudget(workspace.Uuid)
+		assert.Equal(t, workspaceBudgetBeforeFailedRetry.TotalBudget, workspaceBudgetAfterFailedRetry.TotalBudget, "Expected failed status retry not to reverse budget")
 	})
 
 	t.Run("Should test that a COMPLETE payment_status is sent if the payment is successful", func(t *testing.T) {
@@ -1751,6 +1847,7 @@ func TestUpdateBountyPaymentStatus(t *testing.T) {
 
 		updatedBounty := db.TestDB.GetBounty(bountyId)
 		assert.True(t, updatedBounty.Paid, "Expected bounty to be marked as paid")
+		assert.False(t, updatedBounty.PaymentPending, "Expected completed payment retry to clear pending payment state")
 		assert.Equal(t, payment.PaymentStatus, db.PaymentComplete, "Expected Payment Status To be Complete")
 	})
 
