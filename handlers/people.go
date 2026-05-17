@@ -89,7 +89,7 @@ func (ph *peopleHandler) CreatePerson(w http.ResponseWriter, r *http.Request) {
 
 		if referredBy != "" {
 			// get the referral and populate the pubkey
-			referral := db.DB.GetPersonByUuid(referredBy)
+			referral := ph.db.GetPersonByUuid(referredBy)
 			// if referral exists
 			if referral.ID != 0 {
 				person.ReferredBy = referral.ID

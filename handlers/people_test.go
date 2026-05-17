@@ -152,6 +152,47 @@ func TestCreatePerson(t *testing.T) {
 		assert.EqualValues(t, person, fetchedUpdatedPerson)
 	})
 
+	t.Run("should create user with referred_by person id from referral uuid", func(t *testing.T) {
+		rr := httptest.NewRecorder()
+		handler := http.HandlerFunc(pHandler.CreatePerson)
+
+		referrer := db.Person{
+			Uuid:         uuid.New().String(),
+			OwnerAlias:   "referrer",
+			UniqueName:   "referrer",
+			OwnerPubKey:  uuid.New().String(),
+			Tags:         pq.StringArray{},
+			Extras:       db.PropertyMap{},
+			GithubIssues: db.PropertyMap{},
+		}
+
+		createdReferrer, err := db.TestDB.CreateOrEditPerson(referrer)
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		referredPerson := db.Person{
+			OwnerAlias:   "referred-person",
+			OwnerPubKey:  uuid.New().String(),
+			Tags:         pq.StringArray{},
+			Extras:       db.PropertyMap{},
+			GithubIssues: db.PropertyMap{},
+		}
+		requestBody, _ := json.Marshal(referredPerson)
+		ctx := context.WithValue(context.Background(), auth.ContextKey, referredPerson.OwnerPubKey)
+		req, err := http.NewRequestWithContext(ctx, http.MethodPost, "/?referred_by="+createdReferrer.Uuid, bytes.NewReader(requestBody))
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		handler.ServeHTTP(rr, req)
+
+		fetchedCreatedPerson := db.TestDB.GetPersonByPubkey(referredPerson.OwnerPubKey)
+
+		assert.Equal(t, http.StatusOK, rr.Code, "invalid status received")
+		assert.Equal(t, createdReferrer.ID, fetchedCreatedPerson.ReferredBy)
+	})
+
 	t.Run("Should return a 200 status code when existing user hits the endpoint", func(t *testing.T) {
 		rr := httptest.NewRecorder()
 		handler := http.HandlerFunc(pHandler.CreatePerson)
