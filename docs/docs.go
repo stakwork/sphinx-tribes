@@ -5542,43 +5542,6 @@ const docTemplate = `{
                 }
             }
         },
-        "/migrate_bounties": {
-            "post": {
-                "security": [
-                    {
-                        "ApiKeyAuth": []
-                    }
-                ],
-                "description": "Migrate bounties from extras to the new structure",
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "Others"
-                ],
-                "summary": "Migrate bounties",
-                "responses": {
-                    "200": {
-                        "description": "Returns status of migration",
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
-                        }
-                    },
-                    "500": {
-                        "description": "Internal server error",
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
-                        }
-                    }
-                }
-            }
-        },
         "/people": {
             "get": {
                 "description": "Get listed people",

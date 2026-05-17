@@ -85,7 +85,6 @@ func NewRouter() *http.Server {
 		r.Get("/poll/{challenge}", db.Poll)
 		r.Post("/save", db.PostSave)
 		r.Get("/save/{key}", db.PollSave)
-		r.Get("/migrate_bounties", handlers.MigrateBounties)
 		r.Get("/websocket", handlers.HandleWebSocket)
 	})
 

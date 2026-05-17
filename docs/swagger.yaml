@@ -5910,29 +5910,6 @@ paths:
       summary: Get Admin Workspaces
       tags:
       - Metrics
-  /migrate_bounties:
-    post:
-      description: Migrate bounties from extras to the new structure
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: Returns status of migration
-          schema:
-            additionalProperties:
-              type: string
-            type: object
-        "500":
-          description: Internal server error
-          schema:
-            additionalProperties:
-              type: string
-            type: object
-      security:
-      - ApiKeyAuth: []
-      summary: Migrate bounties
-      tags:
-      - Others
   /people:
     get:
       consumes:

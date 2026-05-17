@@ -1256,7 +1256,7 @@ func TestNewRouter(t *testing.T) {
 		server := NewRouter()
 		assert.NotNil(t, server)
 		assert.NotNil(t, server.Handler)
-		
+
 		assert.Equal(t, ":5002", server.Addr)
 	})
 
@@ -1327,7 +1327,6 @@ func TestNewRouter(t *testing.T) {
 			{"GET", "/poll/test-challenge"},
 			{"POST", "/save"},
 			{"GET", "/save/test-key"},
-			{"GET", "/migrate_bounties"},
 			{"GET", "/websocket"},
 		}
 
@@ -1335,7 +1334,7 @@ func TestNewRouter(t *testing.T) {
 			req := httptest.NewRequest(endpoint.method, endpoint.path, nil)
 			rr := httptest.NewRecorder()
 			router.ServeHTTP(rr, req)
-			assert.NotEqual(t, http.StatusNotFound, rr.Code, 
+			assert.NotEqual(t, http.StatusNotFound, rr.Code,
 				"Endpoint %s %s should exist", endpoint.method, endpoint.path)
 		}
 	})
@@ -1487,7 +1486,7 @@ func TestNewRouter(t *testing.T) {
 			req := httptest.NewRequest(endpoint.method, endpoint.path, nil)
 			rr := httptest.NewRecorder()
 			router.ServeHTTP(rr, req)
-			assert.NotEqual(t, http.StatusNotFound, rr.Code, 
+			assert.NotEqual(t, http.StatusNotFound, rr.Code,
 				"Auth endpoint %s %s should exist", endpoint.method, endpoint.path)
 		}
 	})
@@ -1495,11 +1494,11 @@ func TestNewRouter(t *testing.T) {
 	t.Run("Timeout Middleware", func(t *testing.T) {
 		router := chi.NewRouter()
 		router.Use(middleware.Timeout(10 * time.Millisecond))
-	
+
 		router.Get("/slow", func(w http.ResponseWriter, r *http.Request) {
 			timer := time.NewTimer(100 * time.Millisecond)
 			defer timer.Stop()
-	
+
 			select {
 			case <-r.Context().Done():
 				w.WriteHeader(http.StatusServiceUnavailable)
@@ -1508,16 +1507,16 @@ func TestNewRouter(t *testing.T) {
 				w.WriteHeader(http.StatusOK)
 			}
 		})
-	
+
 		req := httptest.NewRequest("GET", "/slow", nil)
 		w := httptest.NewRecorder()
-	
+
 		done := make(chan bool)
 		go func() {
 			router.ServeHTTP(w, req)
 			done <- true
 		}()
-	
+
 		select {
 		case <-done:
 			assert.Equal(t, http.StatusServiceUnavailable, w.Code, "Should timeout and return 503")
@@ -1553,38 +1552,38 @@ func TestNewRouter(t *testing.T) {
 	})
 
 	t.Run("Request ID Generation", func(t *testing.T) {
-    router := chi.NewRouter()
-    router.Use(middleware.RequestID)
+		router := chi.NewRouter()
+		router.Use(middleware.RequestID)
 
-    router.Get("/test-id", func(w http.ResponseWriter, r *http.Request) {
-        reqID := middleware.GetReqID(r.Context())
-        assert.NotEmpty(t, reqID, "Request ID should be present")
-        w.Header().Set("X-Request-ID", reqID)
-        w.WriteHeader(http.StatusOK)
-    })
+		router.Get("/test-id", func(w http.ResponseWriter, r *http.Request) {
+			reqID := middleware.GetReqID(r.Context())
+			assert.NotEmpty(t, reqID, "Request ID should be present")
+			w.Header().Set("X-Request-ID", reqID)
+			w.WriteHeader(http.StatusOK)
+		})
 
-    req := httptest.NewRequest("GET", "/test-id", nil)
-    rr := httptest.NewRecorder()
+		req := httptest.NewRequest("GET", "/test-id", nil)
+		rr := httptest.NewRecorder()
 
-    router.ServeHTTP(rr, req)
-    assert.Equal(t, http.StatusOK, rr.Code, "Handler should execute successfully")
-    assert.NotEmpty(t, rr.Header().Get("X-Request-ID"), "Request ID should be present in response header")
-})
+		router.ServeHTTP(rr, req)
+		assert.Equal(t, http.StatusOK, rr.Code, "Handler should execute successfully")
+		assert.NotEmpty(t, rr.Header().Get("X-Request-ID"), "Request ID should be present in response header")
+	})
 
-t.Run("Logger Middleware", func(t *testing.T) {
-    router := chi.NewRouter()
-    router.Use(middleware.Logger)
+	t.Run("Logger Middleware", func(t *testing.T) {
+		router := chi.NewRouter()
+		router.Use(middleware.Logger)
 
-    router.Get("/test-log", func(w http.ResponseWriter, r *http.Request) {
-        w.WriteHeader(http.StatusOK)
-    })
+		router.Get("/test-log", func(w http.ResponseWriter, r *http.Request) {
+			w.WriteHeader(http.StatusOK)
+		})
 
-    req := httptest.NewRequest("GET", "/test-log", nil)
-    w := httptest.NewRecorder()
+		req := httptest.NewRequest("GET", "/test-log", nil)
+		w := httptest.NewRecorder()
 
-    router.ServeHTTP(w, req)
-    
-    assert.Equal(t, http.StatusOK, w.Code, "Handler should execute successfully")
-})
+		router.ServeHTTP(w, req)
+
+		assert.Equal(t, http.StatusOK, w.Code, "Handler should execute successfully")
+	})
 
 }
