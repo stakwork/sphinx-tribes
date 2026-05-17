@@ -23,13 +23,20 @@ func (db database) CreateNotification(notification *Notification) error {
 	if notification.Content == "" {
 		return errors.New("content is required")
 	}
+	if notification.Status == "" {
+		notification.Status = NotificationStatusPending
+	}
+	if !isValidNotificationStatus(notification.Status) {
+		return fmt.Errorf("invalid notification status: %s", notification.Status)
+	}
 
 	now := time.Now()
-	notification.CreatedAt = &now
+	if notification.CreatedAt == nil {
+		notification.CreatedAt = &now
+	}
 	notification.UpdatedAt = &now
-	notification.Status = NotificationStatusPending
 
-	if err := db.db.Create(&notification).Error; err != nil {
+	if err := db.db.Create(notification).Error; err != nil {
 		return fmt.Errorf("failed to create notification: %w", err)
 	}
 
@@ -56,10 +63,12 @@ func (db database) UpdateNotification(uuid string, updates map[string]interface{
 	now := time.Now()
 	updates["updated_at"] = &now
 
-	if status, ok := updates["status"].(NotificationStatus); ok {
-		if status == "" {
-			return errors.New("status cannot be empty")
+	if status, ok := updates["status"]; ok {
+		notificationStatus, err := parseNotificationStatus(status)
+		if err != nil {
+			return err
 		}
+		updates["status"] = notificationStatus
 	}
 
 	if err := db.db.Model(&existingNotification).Updates(updates).Error; err != nil {
@@ -67,6 +76,36 @@ func (db database) UpdateNotification(uuid string, updates map[string]interface{
 	}
 
 	return nil
+}
+
+func parseNotificationStatus(status interface{}) (NotificationStatus, error) {
+	switch s := status.(type) {
+	case NotificationStatus:
+		if !isValidNotificationStatus(s) {
+			return "", fmt.Errorf("invalid notification status: %s", s)
+		}
+		return s, nil
+	case string:
+		notificationStatus := NotificationStatus(s)
+		if !isValidNotificationStatus(notificationStatus) {
+			return "", fmt.Errorf("invalid notification status: %s", s)
+		}
+		return notificationStatus, nil
+	default:
+		return "", errors.New("invalid notification status type")
+	}
+}
+
+func isValidNotificationStatus(status NotificationStatus) bool {
+	switch status {
+	case NotificationStatusPending,
+		NotificationStatusComplete,
+		NotificationStatusFailed,
+		NotificationStatusWaitingKeyExchange:
+		return true
+	default:
+		return false
+	}
 }
 
 func (db database) GetNotification(uuid string) (*Notification, error) {

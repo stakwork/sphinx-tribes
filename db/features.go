@@ -431,17 +431,15 @@ func (db database) UpdateFeatureStatus(uuid string, status FeatureStatus) (Works
 }
 
 func (db database) SaveNotification(pubkey, event, content, status string) error {
-	notification := Notification{
-		UUID:    uuid.New().String(),
+	notification := &Notification{
 		PubKey:  pubkey,
 		Event:   event,
 		Content: content,
 		Status:  NotificationStatus(status),
 	}
 
-	result := db.db.Create(&notification)
-	if result.Error != nil {
-		return fmt.Errorf("error saving notification: %v", result.Error)
+	if err := db.CreateNotification(notification); err != nil {
+		return fmt.Errorf("error saving notification: %v", err)
 	}
 
 	return nil

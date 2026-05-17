@@ -11,6 +11,7 @@ import (
 	"net/url"
 	"os"
 	"strconv"
+	"strings"
 	"sync"
 	"time"
 
@@ -334,6 +335,10 @@ func getContactKey(pubkey string) (*string, error) {
 	}
 	defer resp.Body.Close()
 
+	if resp.StatusCode < http.StatusOK || resp.StatusCode >= http.StatusMultipleChoices {
+		return nil, fmt.Errorf("contact lookup failed with status %d", resp.StatusCode)
+	}
+
 	var contactResp struct {
 		ContactKey *string `json:"contact_key"`
 	}
@@ -343,6 +348,10 @@ func getContactKey(pubkey string) (*string, error) {
 	}
 
 	return contactResp.ContactKey, nil
+}
+
+func contactKeyAvailable(contactKey *string) bool {
+	return contactKey != nil && strings.TrimSpace(*contactKey) != ""
 }
 
 func ProcessWaitingNotifications() {
@@ -356,7 +365,7 @@ func ProcessWaitingNotifications() {
 			continue
 		}
 
-		if contactKey == nil {
+		if !contactKeyAvailable(contactKey) {
 			db.DB.IncrementNotificationRetry(n.UUID)
 			continue
 		}
@@ -380,7 +389,7 @@ func sendNotification(pubkey, content string) string {
 	req, err := http.NewRequest(http.MethodPost, sendURL, bytes.NewBuffer(msgBody))
 	if err != nil {
 		logger.Log.Error("Error creating send request: %v", err)
-		return "FAILED"
+		return string(db.NotificationStatusFailed)
 	}
 	req.Header.Set("Content-Type", "application/json")
 	req.Header.Set("x-admin-token", config.V2BotToken)
@@ -388,16 +397,25 @@ func sendNotification(pubkey, content string) string {
 	resp, err := http.DefaultClient.Do(req)
 	if err != nil {
 		logger.Log.Error("Error sending notification: %v", err)
-		return "FAILED"
+		return string(db.NotificationStatusFailed)
 	}
 	defer resp.Body.Close()
+
+	if resp.StatusCode < http.StatusOK || resp.StatusCode >= http.StatusMultipleChoices {
+		logger.Log.Error("Notification send failed with status: %d", resp.StatusCode)
+		return string(db.NotificationStatusFailed)
+	}
 
 	var sendResp struct {
 		Status string `json:"status"`
 	}
 	if err := json.NewDecoder(resp.Body).Decode(&sendResp); err != nil {
 		logger.Log.Error("Error decoding send response: %v", err)
-		return "FAILED"
+		return string(db.NotificationStatusFailed)
+	}
+
+	if strings.TrimSpace(sendResp.Status) == "" {
+		return string(db.NotificationStatusFailed)
 	}
 
 	return sendResp.Status
@@ -407,10 +425,10 @@ func processNotification(pubkey, event, content, alias string, route_hint string
 	contactKey, err := getContactKey(pubkey)
 	if err != nil {
 		logger.Log.Error("Error checking contact key: %v", err)
-		return "FAILED"
+		return string(db.NotificationStatusFailed)
 	}
 
-	if contactKey == nil {
+	if !contactKeyAvailable(contactKey) {
 
 		contact_info := fmt.Sprintf("%s_%s", pubkey, route_hint)
 		logger.Log.Info("Sending contact info: %v", contact_info)
@@ -419,12 +437,24 @@ func processNotification(pubkey, event, content, alias string, route_hint string
 		req, _ := http.NewRequest(http.MethodPost, addContactURL, bytes.NewBuffer(body))
 		req.Header.Set("Content-Type", "application/json")
 		req.Header.Set("x-admin-token", config.V2BotToken)
-		http.DefaultClient.Do(req)
+		resp, err := http.DefaultClient.Do(req)
+		if err != nil {
+			logger.Log.Error("Error adding contact: %v", err)
+			db.DB.SaveNotification(pubkey, event, content, string(db.NotificationStatusWaitingKeyExchange))
+			return string(db.NotificationStatusFailed)
+		}
+		defer resp.Body.Close()
+
+		if resp.StatusCode < http.StatusOK || resp.StatusCode >= http.StatusMultipleChoices {
+			logger.Log.Error("Add contact failed with status: %d", resp.StatusCode)
+			db.DB.SaveNotification(pubkey, event, content, string(db.NotificationStatusWaitingKeyExchange))
+			return string(db.NotificationStatusFailed)
+		}
 
 		contactKey, err = getContactKey(pubkey)
-		if err != nil || contactKey == nil {
-			db.DB.SaveNotification(pubkey, event, content, "WAITING_KEY_EXCHANGE")
-			return "FAILED"
+		if err != nil || !contactKeyAvailable(contactKey) {
+			db.DB.SaveNotification(pubkey, event, content, string(db.NotificationStatusWaitingKeyExchange))
+			return string(db.NotificationStatusFailed)
 		}
 	}
 
