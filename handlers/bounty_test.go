@@ -115,6 +115,78 @@ func SetupSuite(_ *testing.T) func(tb testing.TB) {
 	}
 }
 
+func TestTransferBountyOwnership(t *testing.T) {
+	const (
+		workspaceUUID = "workspace-uuid"
+		oldOwner      = "old-owner-pubkey"
+		newOwner      = "new-owner-pubkey"
+	)
+
+	t.Run("transfers unpaid workspace bounties for a manager", func(t *testing.T) {
+		mockDb := dbMocks.NewDatabase(t)
+		mockHttpClient := mocks.NewHttpClient(t)
+		bHandler := NewBountyHandler(mockHttpClient, mockDb)
+		bHandler.userHasManageBountyRoles = func(pubKeyFromAuth string, uuid string) bool {
+			return pubKeyFromAuth == newOwner && uuid == workspaceUUID
+		}
+
+		mockDb.EXPECT().GetPersonByPubkey(newOwner).Return(db.Person{OwnerPubKey: newOwner}).Once()
+		mockDb.EXPECT().GetWorkspaceByUuid(workspaceUUID).Return(db.Workspace{
+			Uuid:        workspaceUUID,
+			OwnerPubKey: oldOwner,
+		}).Once()
+		mockDb.EXPECT().GetPersonByPubkey(oldOwner).Return(db.Person{OwnerPubKey: oldOwner}).Once()
+		mockDb.EXPECT().GetPersonByPubkey(newOwner).Return(db.Person{OwnerPubKey: newOwner}).Once()
+		mockDb.EXPECT().GetWorkspaceUser(newOwner, workspaceUUID).Return(db.WorkspaceUsers{
+			OwnerPubKey:   newOwner,
+			WorkspaceUuid: workspaceUUID,
+		}).Once()
+		mockDb.EXPECT().TransferWorkspaceBountyOwnership(workspaceUUID, oldOwner, newOwner).Return(int64(6), nil).Once()
+
+		body := fmt.Sprintf(`{"workspace_uuid":%q,"from_owner_id":%q,"to_owner_id":%q}`, workspaceUUID, oldOwner, newOwner)
+		req := httptest.NewRequest(http.MethodPatch, "/gobounties/owner/transfer", strings.NewReader(body))
+		req = req.WithContext(context.WithValue(req.Context(), auth.ContextKey, newOwner))
+		rr := httptest.NewRecorder()
+
+		http.HandlerFunc(bHandler.TransferBountyOwnership).ServeHTTP(rr, req)
+
+		assert.Equal(t, http.StatusOK, rr.Code)
+		var response TransferBountyOwnershipResponse
+		assert.NoError(t, json.NewDecoder(rr.Body).Decode(&response))
+		assert.Equal(t, int64(6), response.UpdatedCount)
+		assert.Equal(t, oldOwner, response.FromOwnerID)
+		assert.Equal(t, newOwner, response.ToOwnerID)
+	})
+
+	t.Run("rejects requester without source ownership or workspace bounty role", func(t *testing.T) {
+		const requester = "other-pubkey"
+
+		mockDb := dbMocks.NewDatabase(t)
+		mockHttpClient := mocks.NewHttpClient(t)
+		bHandler := NewBountyHandler(mockHttpClient, mockDb)
+		bHandler.userHasManageBountyRoles = func(pubKeyFromAuth string, uuid string) bool {
+			return false
+		}
+
+		mockDb.EXPECT().GetPersonByPubkey(requester).Return(db.Person{OwnerPubKey: requester}).Once()
+		mockDb.EXPECT().GetWorkspaceByUuid(workspaceUUID).Return(db.Workspace{
+			Uuid:        workspaceUUID,
+			OwnerPubKey: oldOwner,
+		}).Once()
+		mockDb.EXPECT().GetPersonByPubkey(oldOwner).Return(db.Person{OwnerPubKey: oldOwner}).Once()
+		mockDb.EXPECT().GetPersonByPubkey(newOwner).Return(db.Person{OwnerPubKey: newOwner}).Once()
+
+		body := fmt.Sprintf(`{"workspace_uuid":%q,"from_owner_id":%q,"to_owner_id":%q}`, workspaceUUID, oldOwner, newOwner)
+		req := httptest.NewRequest(http.MethodPatch, "/gobounties/owner/transfer", strings.NewReader(body))
+		req = req.WithContext(context.WithValue(req.Context(), auth.ContextKey, requester))
+		rr := httptest.NewRecorder()
+
+		http.HandlerFunc(bHandler.TransferBountyOwnership).ServeHTTP(rr, req)
+
+		assert.Equal(t, http.StatusForbidden, rr.Code)
+	})
+}
+
 func AddExisitingDB(existingBounty db.NewBounty) {
 	bounty := db.TestDB.GetBounty(1)
 	if bounty.ID == 0 {
@@ -1165,7 +1237,7 @@ func TestGetBountyIndexById(t *testing.T) {
 			OwnerID:       bountyOwner.OwnerPubKey,
 			Show:          true,
 			Created:       now,
-			MaxStakers: 1,
+			MaxStakers:    1,
 		}
 
 		db.TestDB.CreateOrEditBounty(bounty)
