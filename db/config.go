@@ -111,6 +111,7 @@ func InitDB() {
 	db.AutoMigrate(&BountyStakeProcess{})
 
 	DB.MigrateTablesWithOrgUuid()
+	DB.DropLegacyBountySummaryColumn()
 	DB.MigrateOrganizationToWorkspace()
 
 	people := DB.GetAllPeople()
@@ -269,6 +270,12 @@ func (db database) MigrateTablesWithOrgUuid() {
 		db.db.AutoMigrate(&OrganizationUsers{})
 	} else {
 		db.db.AutoMigrate(&WorkspaceUsers{})
+	}
+}
+
+func (db database) DropLegacyBountySummaryColumn() {
+	if db.db.Migrator().HasTable(&Bounty{}) && db.db.Migrator().HasColumn(&Bounty{}, "one_sentence_summary") {
+		db.db.Migrator().DropColumn(&Bounty{}, "one_sentence_summary")
 	}
 }
 

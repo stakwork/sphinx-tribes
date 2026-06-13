@@ -95,6 +95,8 @@ func InitTestDB() {
 	db.AutoMigrate(&ChatWorkflowStatus{})
 	db.AutoMigrate(&BountyStakeProcess{})
 	
+	TestDB.DropLegacyBountySummaryColumn()
+
 	people := TestDB.GetAllPeople()
 	for _, p := range people {
 		if p.Uuid == "" {

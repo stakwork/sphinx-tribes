@@ -399,7 +399,7 @@ type Bounty struct {
 	WantedType              string                 `json:"wanted_type"`
 	Deliverables            string                 `json:"deliverables"`
 	GithubDescription       bool                   `json:"github_description"`
-	OneSentenceSummary      string                 `json:"one_sentence_summary"`
+	OneSentenceSummary      string                 `gorm:"-" json:"one_sentence_summary"`
 	EstimatedSessionLength  string                 `json:"estimated_session_length"`
 	EstimatedCompletionDate string                 `json:"estimated_completion_date"`
 	Created                 int64                  `json:"created"`
@@ -446,7 +446,7 @@ type NewBounty struct {
 	WantedType              string                 `json:"wanted_type"`
 	Deliverables            string                 `json:"deliverables"`
 	GithubDescription       bool                   `json:"github_description"`
-	OneSentenceSummary      string                 `json:"one_sentence_summary"`
+	OneSentenceSummary      string                 `gorm:"-" json:"one_sentence_summary"`
 	EstimatedSessionLength  string                 `json:"estimated_session_length"`
 	EstimatedCompletionDate string                 `json:"estimated_completion_date"`
 	Created                 int64                  `json:"created"`

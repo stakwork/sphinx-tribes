@@ -829,7 +829,7 @@ func (h *bountyHandler) GenerateBountyResponse(bounties []db.NewBounty) []db.Bou
 				WantedType:              bounty.WantedType,
 				Deliverables:            bounty.Deliverables,
 				GithubDescription:       bounty.GithubDescription,
-				OneSentenceSummary:      bounty.OneSentenceSummary,
+				OneSentenceSummary:      bounty.Title,
 				EstimatedSessionLength:  bounty.EstimatedSessionLength,
 				EstimatedCompletionDate: bounty.EstimatedCompletionDate,
 				OrgUuid:                 bounty.WorkspaceUuid,
