@@ -14,6 +14,12 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
+const testWorkflowResponseToken = "test-swwf-token"
+
+func authorizeWorkflowResponse(req *http.Request) {
+	req.Header.Set("x-api-token", testWorkflowResponseToken)
+}
+
 func TestHandleWorkflowRequest(t *testing.T) {
 
 	teardownSuite := SetupSuite(t)
@@ -78,6 +84,7 @@ func TestHandleWorkflowResponse(t *testing.T) {
 
 	teardownSuite := SetupSuite(t)
 	defer teardownSuite(t)
+	t.Setenv("SWWF_RESKEY", testWorkflowResponseToken)
 
 	wh := NewWorkFlowHandler(db.TestDB)
 	t.Run("should process workflow response successfully", func(t *testing.T) {
@@ -120,6 +127,7 @@ func TestHandleWorkflowResponse(t *testing.T) {
 
 		req := httptest.NewRequest(http.MethodPost, "/workflows/response", bytes.NewBuffer(payload))
 		req.Header.Set("Content-Type", "application/json")
+		authorizeWorkflowResponse(req)
 		w := httptest.NewRecorder()
 
 		wh.HandleWorkflowResponse(w, req)
@@ -180,6 +188,7 @@ func TestHandleWorkflowResponse(t *testing.T) {
 
 		req := httptest.NewRequest(http.MethodPost, "/workflows/response", bytes.NewBuffer(payload))
 		req.Header.Set("Content-Type", "application/json")
+		authorizeWorkflowResponse(req)
 		w := httptest.NewRecorder()
 
 		wh.HandleWorkflowResponse(w, req)
@@ -201,6 +210,7 @@ func TestHandleWorkflowResponse(t *testing.T) {
 		payload, _ := json.Marshal(response)
 
 		req := httptest.NewRequest(http.MethodPost, "/workflows/response", bytes.NewBuffer(payload))
+		authorizeWorkflowResponse(req)
 		w := httptest.NewRecorder()
 
 		wh.HandleWorkflowResponse(w, req)
@@ -212,6 +222,7 @@ func TestHandleWorkflowResponse(t *testing.T) {
 		invalidJSON := []byte(`{"request_id": "123", status: invalid}`)
 
 		req := httptest.NewRequest(http.MethodPost, "/workflows/response", bytes.NewBuffer(invalidJSON))
+		authorizeWorkflowResponse(req)
 		w := httptest.NewRecorder()
 
 		wh.HandleWorkflowResponse(w, req)
@@ -228,6 +239,7 @@ func TestHandleWorkflowResponse(t *testing.T) {
 		payload, _ := json.Marshal(response)
 
 		req := httptest.NewRequest(http.MethodPost, "/workflows/response", bytes.NewBuffer(payload))
+		authorizeWorkflowResponse(req)
 		w := httptest.NewRecorder()
 
 		wh.HandleWorkflowResponse(w, req)
@@ -259,6 +271,7 @@ func TestHandleWorkflowResponse(t *testing.T) {
 		payload, _ := json.Marshal(response)
 
 		req := httptest.NewRequest(http.MethodPost, "/workflows/response", bytes.NewBuffer(payload))
+		authorizeWorkflowResponse(req)
 		w := httptest.NewRecorder()
 
 		wh.HandleWorkflowResponse(w, req)
@@ -301,6 +314,7 @@ func TestHandleWorkflowResponse(t *testing.T) {
 		payload, _ := json.Marshal(response)
 
 		req := httptest.NewRequest(http.MethodPost, "/workflows/response", bytes.NewBuffer(payload))
+		authorizeWorkflowResponse(req)
 		w := httptest.NewRecorder()
 
 		wh.HandleWorkflowResponse(w, req)
@@ -312,5 +326,72 @@ func TestHandleWorkflowResponse(t *testing.T) {
 		assert.NoError(t, err)
 		assert.Equal(t, db.StatusPending, updatedReq.Status)
 		assert.Equal(t, response.ResponseData, updatedReq.ResponseData)
+	})
+}
+
+func TestHandleWorkflowResponseTokenValidation(t *testing.T) {
+	wh := NewWorkFlowHandler(db.TestDB)
+	payload := []byte(`{"request_id":"test-request","response_data":{}}`)
+
+	t.Run("returns 401 when token is missing", func(t *testing.T) {
+		t.Setenv("SWWF_RESKEY", testWorkflowResponseToken)
+
+		req := httptest.NewRequest(http.MethodPost, "/workflows/response", bytes.NewBuffer(payload))
+		w := httptest.NewRecorder()
+
+		wh.HandleWorkflowResponse(w, req)
+
+		assert.Equal(t, http.StatusUnauthorized, w.Code)
+		assert.Contains(t, w.Body.String(), "Missing token")
+	})
+
+	t.Run("returns 500 when server token is not configured", func(t *testing.T) {
+		t.Setenv("SWWF_RESKEY", "")
+
+		req := httptest.NewRequest(http.MethodPost, "/workflows/response", bytes.NewBuffer(payload))
+		req.Header.Set("x-api-token", testWorkflowResponseToken)
+		w := httptest.NewRecorder()
+
+		wh.HandleWorkflowResponse(w, req)
+
+		assert.Equal(t, http.StatusInternalServerError, w.Code)
+		assert.Contains(t, w.Body.String(), "Server not configured")
+	})
+
+	t.Run("returns 401 when token is invalid", func(t *testing.T) {
+		t.Setenv("SWWF_RESKEY", testWorkflowResponseToken)
+
+		req := httptest.NewRequest(http.MethodPost, "/workflows/response", bytes.NewBuffer(payload))
+		req.Header.Set("x-api-token", "wrong-token")
+		w := httptest.NewRecorder()
+
+		wh.HandleWorkflowResponse(w, req)
+
+		assert.Equal(t, http.StatusUnauthorized, w.Code)
+		assert.Contains(t, w.Body.String(), "Invalid token")
+	})
+
+	t.Run("accepts bearer token", func(t *testing.T) {
+		t.Setenv("SWWF_RESKEY", testWorkflowResponseToken)
+
+		req := httptest.NewRequest(http.MethodPost, "/workflows/response", bytes.NewBuffer(payload))
+		req.Header.Set("Authorization", "Bearer "+testWorkflowResponseToken)
+
+		status, msg := validateStakworkResponseToken(req)
+
+		assert.Equal(t, http.StatusOK, status)
+		assert.Empty(t, msg)
+	})
+
+	t.Run("accepts swwf token header", func(t *testing.T) {
+		t.Setenv("SWWF_RESKEY", testWorkflowResponseToken)
+
+		req := httptest.NewRequest(http.MethodPost, "/workflows/response", bytes.NewBuffer(payload))
+		req.Header.Set("x-swwf-reskey", testWorkflowResponseToken)
+
+		status, msg := validateStakworkResponseToken(req)
+
+		assert.Equal(t, http.StatusOK, status)
+		assert.Empty(t, msg)
 	})
 }
