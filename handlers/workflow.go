@@ -1,6 +1,7 @@
 package handlers
 
 import (
+	"crypto/subtle"
 	"encoding/json"
 
 	"github.com/stakwork/sphinx-tribes/db"
@@ -8,6 +9,8 @@ import (
 
 	"io"
 	"net/http"
+	"os"
+	"strings"
 )
 
 type workflowHandler struct {
@@ -19,10 +22,39 @@ type CreateWorkflowRequestRequest struct {
 	ResponseData db.PropertyMap `json:"response_data"`
 }
 
+const workflowResponseTokenHeader = "x-api-token"
+
 func NewWorkFlowHandler(database db.Database) *workflowHandler {
 	return &workflowHandler{
 		db: database,
 	}
+}
+
+func validateStakworkResponseToken(r *http.Request) (int, string) {
+	expectedToken := strings.TrimSpace(os.Getenv("SWWF_RESKEY"))
+	if expectedToken == "" {
+		return http.StatusInternalServerError, "Server not configured"
+	}
+
+	token := strings.TrimSpace(r.Header.Get(workflowResponseTokenHeader))
+	if token == "" {
+		token = strings.TrimSpace(r.Header.Get("x-swwf-reskey"))
+	}
+	if token == "" {
+		authHeader := strings.TrimSpace(r.Header.Get("Authorization"))
+		if strings.HasPrefix(strings.ToLower(authHeader), "bearer ") {
+			token = strings.TrimSpace(authHeader[len("bearer "):])
+		}
+	}
+	if token == "" {
+		return http.StatusUnauthorized, "Missing token"
+	}
+
+	if subtle.ConstantTimeCompare([]byte(token), []byte(expectedToken)) != 1 {
+		return http.StatusUnauthorized, "Invalid token"
+	}
+
+	return http.StatusOK, ""
 }
 
 // HandleWorkflowRequest godoc
@@ -86,6 +118,11 @@ func (wh *workflowHandler) HandleWorkflowRequest(w http.ResponseWriter, r *http.
 // @Success		200			{object}	map[string]string
 // @Router			/workflows/response [post]
 func (wh *workflowHandler) HandleWorkflowResponse(w http.ResponseWriter, r *http.Request) {
+	if status, msg := validateStakworkResponseToken(r); status != http.StatusOK {
+		http.Error(w, msg, status)
+		return
+	}
+
 	body, err := io.ReadAll(r.Body)
 	if err != nil {
 		http.Error(w, "Error reading response body", http.StatusBadRequest)
