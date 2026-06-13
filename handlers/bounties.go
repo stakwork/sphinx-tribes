@@ -191,13 +191,6 @@ func MigrateBounties(w http.ResponseWriter, r *http.Request) {
 				migrateBountyFinal.GithubDescription = GithuDescription
 			}
 
-			OneSentenceSummary, ok15 := migrateBounty["one_sentence_summary"].(string)
-			if !ok15 {
-				migrateBountyFinal.OneSentenceSummary = ""
-			} else {
-				migrateBountyFinal.OneSentenceSummary = OneSentenceSummary
-			}
-
 			EstimatedSessionLength, ok16 := migrateBounty["estimated_session_length"].(string)
 			if !ok16 {
 				migrateBountyFinal.EstimatedSessionLength = ""

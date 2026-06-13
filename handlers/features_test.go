@@ -2800,7 +2800,7 @@ func TestGetBountiesByFeatureAndPhaseUuid(t *testing.T) {
 				WantedType:              "",
 				Deliverables:            "",
 				GithubDescription:       false,
-				OneSentenceSummary:      "",
+				OneSentenceSummary:      "test-bounty",
 				EstimatedSessionLength:  "",
 				EstimatedCompletionDate: "",
 				Created:                 0,
