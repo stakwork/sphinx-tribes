@@ -56,6 +56,7 @@ type Database interface {
 	UpdateBounty(b NewBounty) (NewBounty, error)
 	UpdateBountyPaymentStatuses(bounty NewBounty) (NewBounty, error)
 	UpdateBountyPayment(b NewBounty) (NewBounty, error)
+	TransferWorkspaceBountyOwnership(workspaceUUID string, fromOwnerID string, toOwnerID string) (int64, error)
 	GetListedOffers(r *http.Request) ([]PeopleExtra, error)
 	UpdateBot(uuid string, u map[string]interface{}) bool
 	GetAllTribes() []Tribe
