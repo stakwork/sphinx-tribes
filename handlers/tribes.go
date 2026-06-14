@@ -7,6 +7,7 @@ import (
 	"io"
 	"log"
 	"net/http"
+	"os"
 	"strconv"
 	"strings"
 	"time"
@@ -24,6 +25,8 @@ type tribeHandler struct {
 	verifyTribeUUID         func(uuid string, checkTimestamp bool) (string, error)
 	tribeUniqueNameFromName func(name string) (string, error)
 }
+
+const defaultTribeArchiveAfterDays = 30
 
 func NewTribeHandler(db db.Database) *tribeHandler {
 	return &tribeHandler{
@@ -375,6 +378,31 @@ func (th *tribeHandler) CreateOrEditTribe(w http.ResponseWriter, r *http.Request
 
 	w.WriteHeader(http.StatusOK)
 	json.NewEncoder(w).Encode(tribe)
+}
+
+func ArchiveInactiveTribes() {
+	days := defaultTribeArchiveAfterDays
+	if envDays := os.Getenv("TRIBE_ARCHIVE_AFTER_DAYS"); envDays != "" {
+		parsedDays, err := strconv.Atoi(envDays)
+		if err != nil {
+			logger.Log.Error("invalid TRIBE_ARCHIVE_AFTER_DAYS: %v", err)
+			return
+		}
+		if parsedDays <= 0 {
+			return
+		}
+		days = parsedDays
+	}
+
+	cutoff := time.Now().AddDate(0, 0, -days).Unix()
+	count, err := db.DB.ArchiveInactiveTribes(cutoff)
+	if err != nil {
+		logger.Log.Error("failed to archive inactive tribes: %v", err)
+		return
+	}
+	if count > 0 {
+		logger.Log.Info("archived %d inactive tribes", count)
+	}
 }
 
 // PutTribeActivity godoc

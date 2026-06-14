@@ -144,6 +144,86 @@ func TestGetFilterStatusCount(t *testing.T) {
 	}
 }
 
+func TestArchiveInactiveTribes(t *testing.T) {
+	InitTestDB()
+	defer CloseTestDB()
+
+	now := time.Now()
+	cutoff := now.AddDate(0, 0, -30).Unix()
+	oldActive := now.AddDate(0, 0, -45).Unix()
+	recentActive := now.AddDate(0, 0, -5).Unix()
+
+	tribes := []Tribe{
+		{
+			UUID:        "stale-listed-tribe",
+			OwnerPubKey: "owner-1",
+			Name:        "stale listed tribe",
+			LastActive:  oldActive,
+			Unlisted:    false,
+			Deleted:     false,
+		},
+		{
+			UUID:        "recent-listed-tribe",
+			OwnerPubKey: "owner-2",
+			Name:        "recent listed tribe",
+			LastActive:  recentActive,
+			Unlisted:    false,
+			Deleted:     false,
+		},
+		{
+			UUID:        "legacy-listed-tribe",
+			OwnerPubKey: "owner-3",
+			Name:        "legacy listed tribe",
+			LastActive:  0,
+			Unlisted:    false,
+			Deleted:     false,
+		},
+		{
+			UUID:        "stale-unlisted-tribe",
+			OwnerPubKey: "owner-4",
+			Name:        "stale unlisted tribe",
+			LastActive:  oldActive,
+			Unlisted:    true,
+			Deleted:     false,
+		},
+		{
+			UUID:        "stale-deleted-tribe",
+			OwnerPubKey: "owner-5",
+			Name:        "stale deleted tribe",
+			LastActive:  oldActive,
+			Unlisted:    false,
+			Deleted:     true,
+		},
+	}
+	for _, tribe := range tribes {
+		assert.NoError(t, TestDB.db.Create(&tribe).Error)
+	}
+
+	archived, err := TestDB.ArchiveInactiveTribes(cutoff)
+	assert.NoError(t, err)
+	assert.Equal(t, int64(1), archived)
+
+	var got []Tribe
+	assert.NoError(t, TestDB.db.Where("uuid IN ?", []string{
+		"stale-listed-tribe",
+		"recent-listed-tribe",
+		"legacy-listed-tribe",
+		"stale-unlisted-tribe",
+		"stale-deleted-tribe",
+	}).Find(&got).Error)
+
+	byUUID := make(map[string]Tribe, len(got))
+	for _, tribe := range got {
+		byUUID[tribe.UUID] = tribe
+	}
+
+	assert.True(t, byUUID["stale-listed-tribe"].Unlisted)
+	assert.False(t, byUUID["recent-listed-tribe"].Unlisted)
+	assert.False(t, byUUID["legacy-listed-tribe"].Unlisted)
+	assert.True(t, byUUID["stale-unlisted-tribe"].Unlisted)
+	assert.False(t, byUUID["stale-deleted-tribe"].Unlisted)
+}
+
 func TestCreateConnectionCode(t *testing.T) {
 
 	InitTestDB()
