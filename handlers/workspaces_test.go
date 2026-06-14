@@ -1435,6 +1435,125 @@ func TestCreateWorkspaceUser(t *testing.T) {
 	})
 }
 
+func TestUpdateWorkspaceUser(t *testing.T) {
+	teardownSuite := SetupSuite(t)
+	defer teardownSuite(t)
+
+	oHandler := NewWorkspaceHandler(db.TestDB)
+
+	admin := db.Person{
+		Uuid:        "update-admin-uuid",
+		OwnerAlias:  "update-admin",
+		UniqueName:  "update_admin",
+		OwnerPubKey: "update-admin-pubkey",
+		PriceToMeet: 0,
+		Description: "update admin",
+	}
+	oldUser := db.Person{
+		Uuid:        "update-old-user-uuid",
+		OwnerAlias:  "update-old-user",
+		UniqueName:  "update_old_user",
+		OwnerPubKey: "update-old-user-pubkey",
+		PriceToMeet: 0,
+		Description: "update old user",
+	}
+	newUser := db.Person{
+		Uuid:        "update-new-user-uuid",
+		OwnerAlias:  "update-new-user",
+		UniqueName:  "update_new_user",
+		OwnerPubKey: "update-new-user-pubkey",
+		PriceToMeet: 0,
+		Description: "update new user",
+	}
+
+	db.TestDB.CreateOrEditPerson(admin)
+	db.TestDB.CreateOrEditPerson(oldUser)
+	db.TestDB.CreateOrEditPerson(newUser)
+
+	workspace := db.Workspace{
+		Uuid:        "update-workspace-uuid",
+		Name:        "update_workspace",
+		OwnerPubKey: admin.OwnerPubKey,
+		Github:      "github",
+		Website:     "website",
+		Description: "description",
+	}
+	db.TestDB.CreateOrEditWorkspace(workspace)
+
+	db.TestDB.DeleteWorkspaceUser(db.WorkspaceUsersData{
+		WorkspaceUuid: workspace.Uuid,
+		Person:        oldUser,
+	}, workspace.Uuid)
+	db.TestDB.DeleteWorkspaceUser(db.WorkspaceUsersData{
+		WorkspaceUuid: workspace.Uuid,
+		Person:        newUser,
+	}, workspace.Uuid)
+
+	oldWorkspaceUser := db.WorkspaceUsers{
+		OwnerPubKey:   oldUser.OwnerPubKey,
+		WorkspaceUuid: workspace.Uuid,
+	}
+	db.TestDB.CreateWorkspaceUser(oldWorkspaceUser)
+
+	role := db.WorkspaceUserRoles{
+		WorkspaceUuid: workspace.Uuid,
+		OwnerPubKey:   oldUser.OwnerPubKey,
+		Role:          db.UpdateUser,
+	}
+	db.TestDB.CreateUserRoles([]db.WorkspaceUserRoles{role}, workspace.Uuid, oldUser.OwnerPubKey)
+
+	oHandler.userHasAccess = func(pubKeyFromAuth string, uuid string, role string) bool {
+		return pubKeyFromAuth == admin.OwnerPubKey && uuid == workspace.Uuid && role == db.UpdateUser
+	}
+
+	t.Run("Should test that when an unauthorized user hits the endpoint it returns a 401 error", func(t *testing.T) {
+		requestBody, _ := json.Marshal(WorkspaceUserUpdateRequest{
+			OwnerPubKey: newUser.OwnerPubKey,
+		})
+		rctx := chi.NewRouteContext()
+		rctx.URLParams.Add("uuid", workspace.Uuid)
+		rctx.URLParams.Add("user", oldUser.OwnerPubKey)
+		req, err := http.NewRequestWithContext(context.WithValue(context.Background(), chi.RouteCtxKey, rctx), http.MethodPut, "/users/"+workspace.Uuid+"/"+oldUser.OwnerPubKey, bytes.NewReader(requestBody))
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		rr := httptest.NewRecorder()
+		http.HandlerFunc(oHandler.UpdateWorkspaceUser).ServeHTTP(rr, req)
+
+		assert.Equal(t, http.StatusUnauthorized, rr.Code)
+	})
+
+	t.Run("Should test that when the right conditions are met a workspace user can be updated", func(t *testing.T) {
+		requestBody, _ := json.Marshal(WorkspaceUserUpdateRequest{
+			OwnerPubKey: newUser.OwnerPubKey,
+		})
+		ctx := context.WithValue(context.Background(), auth.ContextKey, admin.OwnerPubKey)
+		rctx := chi.NewRouteContext()
+		rctx.URLParams.Add("uuid", workspace.Uuid)
+		rctx.URLParams.Add("user", oldUser.OwnerPubKey)
+		req, err := http.NewRequestWithContext(context.WithValue(ctx, chi.RouteCtxKey, rctx), http.MethodPut, "/users/"+workspace.Uuid+"/"+oldUser.OwnerPubKey, bytes.NewReader(requestBody))
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		rr := httptest.NewRecorder()
+		http.HandlerFunc(oHandler.UpdateWorkspaceUser).ServeHTTP(rr, req)
+
+		updatedWorkspaceUser := db.TestDB.GetWorkspaceUser(newUser.OwnerPubKey, workspace.Uuid)
+		deletedWorkspaceUser := db.TestDB.GetWorkspaceUser(oldUser.OwnerPubKey, workspace.Uuid)
+		updatedRoles := db.TestDB.GetUserRoles(workspace.Uuid, newUser.OwnerPubKey)
+		deletedRoles := db.TestDB.GetUserRoles(workspace.Uuid, oldUser.OwnerPubKey)
+
+		assert.Equal(t, http.StatusOK, rr.Code)
+		assert.Equal(t, newUser.OwnerPubKey, updatedWorkspaceUser.OwnerPubKey)
+		assert.Equal(t, uint(0), deletedWorkspaceUser.ID)
+		assert.Equal(t, 1, len(updatedRoles))
+		assert.Equal(t, db.UpdateUser, updatedRoles[0].Role)
+		assert.Equal(t, 0, len(deletedRoles))
+	})
+}
+
 func TestGetWorkspaceUsers(t *testing.T) {
 
 }

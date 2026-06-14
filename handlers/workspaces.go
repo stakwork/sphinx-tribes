@@ -306,6 +306,157 @@ func (oh *workspaceHandler) CreateWorkspaceUser(w http.ResponseWriter, r *http.R
 	json.NewEncoder(w).Encode(user)
 }
 
+type WorkspaceUserUpdateRequest struct {
+	OwnerPubKey    string `json:"owner_pubkey"`
+	NewOwnerPubKey string `json:"new_owner_pubkey,omitempty"`
+	OrgUuid        string `json:"org_uuid"`
+	WorkspaceUuid  string `json:"workspace_uuid,omitempty"`
+}
+
+// UpdateWorkspaceUser godoc
+//
+//	@Summary		Update Workspace User
+//	@Description	Update a user in a workspace
+//	@Tags			Workspace -  Users
+//	@Accept			json
+//	@Produce		json
+//	@Security		PubKeyContextAuth
+//	@Param			uuid			path		string							true	"Workspace UUID"
+//	@Param			user			path		string							true	"Current User PubKey"
+//	@Param			workspaceUser	body		WorkspaceUserUpdateRequest	true	"Workspace User Update Data"
+//	@Success		200				{object}	db.WorkspaceUsers
+//	@Router			/workspaces/users/{uuid}/{user} [put]
+func (oh *workspaceHandler) UpdateWorkspaceUser(w http.ResponseWriter, r *http.Request) {
+	ctx := r.Context()
+	pubKeyFromAuth, _ := ctx.Value(auth.ContextKey).(string)
+	workspaceUUID := chi.URLParam(r, "uuid")
+	currentOwnerPubKey := chi.URLParam(r, "user")
+	now := time.Now()
+
+	workspaceUserUpdate := WorkspaceUserUpdateRequest{}
+	body, err := io.ReadAll(r.Body)
+	r.Body.Close()
+
+	if err != nil {
+		logger.Log.Error("[body] %v", err)
+		w.WriteHeader(http.StatusNotAcceptable)
+		return
+	}
+
+	err = json.Unmarshal(body, &workspaceUserUpdate)
+	if err != nil {
+		logger.Log.Error("[workspaces] %v", err)
+		w.WriteHeader(http.StatusNotAcceptable)
+		return
+	}
+
+	if workspaceUserUpdate.WorkspaceUuid == "" && workspaceUserUpdate.OrgUuid != "" {
+		workspaceUserUpdate.WorkspaceUuid = workspaceUserUpdate.OrgUuid
+	}
+
+	if workspaceUUID == "" {
+		workspaceUUID = workspaceUserUpdate.WorkspaceUuid
+	} else if workspaceUserUpdate.WorkspaceUuid != "" && workspaceUserUpdate.WorkspaceUuid != workspaceUUID {
+		w.WriteHeader(http.StatusUnauthorized)
+		json.NewEncoder(w).Encode("workspace uuid does not match route")
+		return
+	}
+
+	newOwnerPubKey := workspaceUserUpdate.NewOwnerPubKey
+	if newOwnerPubKey == "" {
+		newOwnerPubKey = workspaceUserUpdate.OwnerPubKey
+	}
+
+	if workspaceUUID == "" || currentOwnerPubKey == "" || newOwnerPubKey == "" {
+		w.WriteHeader(http.StatusUnauthorized)
+		json.NewEncoder(w).Encode("no uuid, current user pubkey, or new user pubkey")
+		return
+	}
+
+	if pubKeyFromAuth == "" {
+		logger.Log.Info("[workspaces] no pubkey from auth")
+		w.WriteHeader(http.StatusUnauthorized)
+		return
+	}
+
+	if currentOwnerPubKey == newOwnerPubKey {
+		w.WriteHeader(http.StatusUnauthorized)
+		json.NewEncoder(w).Encode("new user pubkey must be different from current user pubkey")
+		return
+	}
+
+	workspace := oh.db.GetWorkspaceByUuid(workspaceUUID)
+
+	if currentOwnerPubKey == workspace.OwnerPubKey || newOwnerPubKey == workspace.OwnerPubKey {
+		w.WriteHeader(http.StatusUnauthorized)
+		json.NewEncoder(w).Encode("Cannot update workspace admin as a user")
+		return
+	}
+
+	if pubKeyFromAuth == currentOwnerPubKey || pubKeyFromAuth == newOwnerPubKey {
+		w.WriteHeader(http.StatusUnauthorized)
+		json.NewEncoder(w).Encode("Cannot update userself as a user")
+		return
+	}
+
+	hasRole := oh.userHasAccess(pubKeyFromAuth, workspaceUUID, db.UpdateUser)
+	if !hasRole {
+		w.WriteHeader(http.StatusUnauthorized)
+		json.NewEncoder(w).Encode("Don't have access to update user")
+		return
+	}
+
+	existingWorkspaceUser := oh.db.GetWorkspaceUser(currentOwnerPubKey, workspaceUUID)
+	if existingWorkspaceUser.ID == 0 {
+		w.WriteHeader(http.StatusUnauthorized)
+		json.NewEncoder(w).Encode("User does not exists in the workspace")
+		return
+	}
+
+	newUser := oh.db.GetPersonByPubkey(newOwnerPubKey)
+	if newUser.OwnerPubKey != newOwnerPubKey {
+		w.WriteHeader(http.StatusUnauthorized)
+		json.NewEncoder(w).Encode("User doesn't exists in people")
+		return
+	}
+
+	existingNewWorkspaceUser := oh.db.GetWorkspaceUser(newOwnerPubKey, workspaceUUID)
+	if existingNewWorkspaceUser.ID != 0 {
+		w.WriteHeader(http.StatusUnauthorized)
+		json.NewEncoder(w).Encode("User already exists")
+		return
+	}
+
+	roles := oh.db.GetUserRoles(workspaceUUID, currentOwnerPubKey)
+	oh.db.DeleteWorkspaceUser(db.WorkspaceUsersData{
+		WorkspaceUuid: workspaceUUID,
+		Person: db.Person{
+			OwnerPubKey: currentOwnerPubKey,
+		},
+	}, workspaceUUID)
+
+	updatedWorkspaceUser := db.WorkspaceUsers{
+		OwnerPubKey:   newOwnerPubKey,
+		WorkspaceUuid: workspaceUUID,
+		Created:       existingWorkspaceUser.Created,
+		Updated:       &now,
+	}
+
+	user := oh.db.CreateWorkspaceUser(updatedWorkspaceUser)
+
+	if len(roles) > 0 {
+		for i := range roles {
+			roles[i].OwnerPubKey = newOwnerPubKey
+			roles[i].WorkspaceUuid = workspaceUUID
+			roles[i].OrgUuid = ""
+		}
+		oh.db.CreateUserRoles(roles, workspaceUUID, newOwnerPubKey)
+	}
+
+	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode(user)
+}
+
 // GetWorkspaceUsers godoc
 //
 //	@Summary		Get Workspace Users

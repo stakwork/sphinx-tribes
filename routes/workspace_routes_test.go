@@ -75,6 +75,7 @@ func TestWorkspaceRoutes(t *testing.T) {
 
 	workspaceRouter.Get("/users/{uuid}", MockHandler(t, http.StatusOK, nil))
 	workspaceRouter.Get("/users/{uuid}/count", MockHandler(t, http.StatusOK, nil))
+	workspaceRouter.Put("/users/{uuid}/{user}", MockHandler(t, http.StatusOK, nil))
 	workspaceRouter.Post("/users/role/{uuid}/{user}", MockHandler(t, http.StatusOK, nil))
 
 	workspaceRouter.Get("/bounties/{uuid}", MockHandler(t, http.StatusOK, nil))
@@ -218,6 +219,13 @@ func TestWorkspaceRoutes(t *testing.T) {
 			name:           "Get Workspace Users Count",
 			method:         "GET",
 			path:           "/workspaces/users/123e4567-e89b-12d3-a456-426614174000/count",
+			expectedStatus: http.StatusOK,
+		},
+		{
+			name:           "Update Workspace User",
+			method:         "PUT",
+			path:           "/workspaces/users/123e4567-e89b-12d3-a456-426614174000/user123",
+			body:           map[string]interface{}{"owner_pubkey": "user456"},
 			expectedStatus: http.StatusOK,
 		},
 		{
