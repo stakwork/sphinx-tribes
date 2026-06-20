@@ -3387,6 +3387,177 @@ func TestSSEMaintenance(t *testing.T) {
 	})
 }
 
+func TestHandleChatWebhook(t *testing.T) {
+	teardownSuite := SetupSuite(t)
+	defer teardownSuite(t)
+
+	chatHandler := NewChatHandler(&http.Client{}, db.TestDB)
+
+	t.Run("should return bad request when chat_id is missing", func(t *testing.T) {
+		rr := httptest.NewRecorder()
+		req := httptest.NewRequest(http.MethodPost, "/hivechat//update", nil)
+
+		rctx := chi.NewRouteContext()
+		req = req.WithContext(context.WithValue(req.Context(), chi.RouteCtxKey, rctx))
+
+		chatHandler.HandleChatWebhook(rr, req)
+
+		assert.Equal(t, http.StatusBadRequest, rr.Code)
+
+		var response ChatStatusWebhookResponse
+		err := json.NewDecoder(rr.Body).Decode(&response)
+		require.NoError(t, err)
+		assert.Equal(t, "error", response.Status)
+		assert.Equal(t, "Chat ID is required", response.Message)
+	})
+
+	t.Run("should return not found when chat does not exist", func(t *testing.T) {
+		rr := httptest.NewRecorder()
+		req := httptest.NewRequest(http.MethodPost, "/hivechat/nonexistent/update", nil)
+
+		rctx := chi.NewRouteContext()
+		rctx.URLParams.Add("chat_id", "nonexistent")
+		req = req.WithContext(context.WithValue(req.Context(), chi.RouteCtxKey, rctx))
+
+		chatHandler.HandleChatWebhook(rr, req)
+
+		assert.Equal(t, http.StatusNotFound, rr.Code)
+
+		var response ChatStatusWebhookResponse
+		err := json.NewDecoder(rr.Body).Decode(&response)
+		require.NoError(t, err)
+		assert.Equal(t, "error", response.Status)
+	})
+
+	t.Run("should return bad request for invalid payload", func(t *testing.T) {
+		chat := &db.Chat{
+			ID:          uuid.New().String(),
+			WorkspaceID: uuid.New().String(),
+			Title:       "Test Chat",
+		}
+		db.TestDB.AddChat(chat)
+
+		rr := httptest.NewRecorder()
+		req := httptest.NewRequest(http.MethodPost, "/hivechat/"+chat.ID+"/update", strings.NewReader("invalid json"))
+
+		rctx := chi.NewRouteContext()
+		rctx.URLParams.Add("chat_id", chat.ID)
+		req = req.WithContext(context.WithValue(req.Context(), chi.RouteCtxKey, rctx))
+
+		chatHandler.HandleChatWebhook(rr, req)
+
+		assert.Equal(t, http.StatusBadRequest, rr.Code)
+
+		var response ChatStatusWebhookResponse
+		err := json.NewDecoder(rr.Body).Decode(&response)
+		require.NoError(t, err)
+		assert.Equal(t, "error", response.Status)
+	})
+
+	t.Run("should process completed webhook successfully", func(t *testing.T) {
+		chat := &db.Chat{
+			ID:          uuid.New().String(),
+			WorkspaceID: uuid.New().String(),
+			Title:       "Test Chat Completed",
+		}
+		db.TestDB.AddChat(chat)
+
+		payload := WebhookPayload{
+			ProjectStatus:     "completed",
+			WorkflowID:        1358,
+			WorkflowVersionID: 6155,
+			WorkflowVersion:   6155,
+		}
+		bodyBytes, _ := json.Marshal(payload)
+
+		rr := httptest.NewRecorder()
+		req := httptest.NewRequest(http.MethodPost, "/hivechat/"+chat.ID+"/update", bytes.NewReader(bodyBytes))
+
+		rctx := chi.NewRouteContext()
+		rctx.URLParams.Add("chat_id", chat.ID)
+		req = req.WithContext(context.WithValue(req.Context(), chi.RouteCtxKey, rctx))
+
+		chatHandler.HandleChatWebhook(rr, req)
+
+		assert.Equal(t, http.StatusOK, rr.Code)
+
+		var response ChatStatusWebhookResponse
+		err := json.NewDecoder(rr.Body).Decode(&response)
+		require.NoError(t, err)
+		assert.Equal(t, "success", response.Status)
+	})
+
+	t.Run("should process error webhook successfully", func(t *testing.T) {
+		chat := &db.Chat{
+			ID:          uuid.New().String(),
+			WorkspaceID: uuid.New().String(),
+			Title:       "Test Chat Error",
+		}
+		db.TestDB.AddChat(chat)
+
+		payload := WebhookPayload{
+			ProjectStatus:     "error",
+			WorkflowID:        1358,
+			WorkflowVersionID: 6161,
+			WorkflowVersion:   6161,
+			Error: &WebhookError{
+				Message:           "Error: couldn't connect to the website",
+				WorkflowID:        1357,
+				WorkflowVersionID: 1357,
+				StepName:          "req",
+				SkillName:         "request",
+			},
+		}
+		bodyBytes, _ := json.Marshal(payload)
+
+		rr := httptest.NewRecorder()
+		req := httptest.NewRequest(http.MethodPost, "/hivechat/"+chat.ID+"/update", bytes.NewReader(bodyBytes))
+
+		rctx := chi.NewRouteContext()
+		rctx.URLParams.Add("chat_id", chat.ID)
+		req = req.WithContext(context.WithValue(req.Context(), chi.RouteCtxKey, rctx))
+
+		chatHandler.HandleChatWebhook(rr, req)
+
+		assert.Equal(t, http.StatusOK, rr.Code)
+
+		var response ChatStatusWebhookResponse
+		err := json.NewDecoder(rr.Body).Decode(&response)
+		require.NoError(t, err)
+		assert.Equal(t, "success", response.Status)
+	})
+
+	t.Run("should process error webhook without error details", func(t *testing.T) {
+		chat := &db.Chat{
+			ID:          uuid.New().String(),
+			WorkspaceID: uuid.New().String(),
+			Title:       "Test Chat Error No Details",
+		}
+		db.TestDB.AddChat(chat)
+
+		payload := WebhookPayload{
+			ProjectStatus: "error",
+		}
+		bodyBytes, _ := json.Marshal(payload)
+
+		rr := httptest.NewRecorder()
+		req := httptest.NewRequest(http.MethodPost, "/hivechat/"+chat.ID+"/update", bytes.NewReader(bodyBytes))
+
+		rctx := chi.NewRouteContext()
+		rctx.URLParams.Add("chat_id", chat.ID)
+		req = req.WithContext(context.WithValue(req.Context(), chi.RouteCtxKey, rctx))
+
+		chatHandler.HandleChatWebhook(rr, req)
+
+		assert.Equal(t, http.StatusOK, rr.Code)
+
+		var response ChatStatusWebhookResponse
+		err := json.NewDecoder(rr.Body).Decode(&response)
+		require.NoError(t, err)
+		assert.Equal(t, "success", response.Status)
+	})
+}
+
 type RoundTripFunc func(req *http.Request) (*http.Response, error)
 
 func (f RoundTripFunc) RoundTrip(req *http.Request) (*http.Response, error) {
