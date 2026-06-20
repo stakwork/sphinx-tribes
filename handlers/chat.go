@@ -191,10 +191,20 @@ type SSEMaintenanceResponse struct {
 }
 
 type WebhookPayload struct {
-	ProjectStatus string `json:"project_status"`
-	Error         *struct {
-		Message string `json:"message"`
-	} `json:"error,omitempty"`
+	ProjectStatus      string                 `json:"project_status"`
+	ProjectOutput      map[string]interface{} `json:"project_output,omitempty"`
+	WorkflowID         int                    `json:"workflow_id,omitempty"`
+	WorkflowVersionID  int                    `json:"workflow_version_id,omitempty"`
+	WorkflowVersion    int                    `json:"workflow_version,omitempty"`
+	Error              *WebhookError          `json:"error,omitempty"`
+}
+
+type WebhookError struct {
+	Message           string `json:"message"`
+	WorkflowID        int    `json:"workflow_id,omitempty"`
+	WorkflowVersionID int    `json:"workflow_version_id,omitempty"`
+	StepName          string `json:"step_name,omitempty"`
+	SkillName         string `json:"skill_name,omitempty"`
 }
 
 type ChatStatusWebhookResponse struct {
@@ -2480,6 +2490,7 @@ func (ch *ChatHandler) HandleChatWebhook(w http.ResponseWriter, r *http.Request)
 
 	if payload.ProjectStatus == "completed" {
 		status = "success"
+		message = "Workflow completed successfully"
 	} else if payload.ProjectStatus == "error" {
 		status = "error"
 		if payload.Error != nil {
@@ -2510,6 +2521,22 @@ func (ch *ChatHandler) HandleChatWebhook(w http.ResponseWriter, r *http.Request)
 
 	logger.Log.Info("Created chat status for chat %s: %s - %s",
 		chatID, createdStatus.Status, createdStatus.Message)
+
+	wsMessage := websocket.TicketMessage{
+		BroadcastType: "chat",
+		Message:       fmt.Sprintf("Workflow %s for chat %s", status, chatID),
+		Action:        "webhook_status",
+		ChatMessage: db.ChatMessage{
+			ID:     chatID,
+			ChatID: chatID,
+			Message: fmt.Sprintf("Project status: %s", message),
+			Status: status,
+		},
+	}
+
+	if err := websocket.WebsocketPool.SendTicketMessage(wsMessage); err != nil {
+		logger.Log.Error("Failed to send websocket message for webhook: %v", err)
+	}
 
 	w.WriteHeader(http.StatusOK)
 	json.NewEncoder(w).Encode(ChatStatusWebhookResponse{
