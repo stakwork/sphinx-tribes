@@ -1840,3 +1840,127 @@ func TestTicketsToBounties(t *testing.T) {
 		})
 	}
 }
+
+func TestUpdateTicketAssignmentNotification(t *testing.T) {
+	teardownSuite := SetupSuite(t)
+	defer teardownSuite(t)
+
+	tHandler := NewTicketHandler(&http.Client{}, db.TestDB)
+
+	person := db.Person{
+		Uuid:          uuid.New().String(),
+		OwnerAlias:    "assignee-alias",
+		UniqueName:    "assignee-unique",
+		OwnerPubKey:   "assignee-pubkey",
+		PriceToMeet:   0,
+		Description:   "assignee description",
+		OwnerRouteHint: "route_hint",
+	}
+	db.TestDB.CreateOrEditPerson(person)
+
+	workspace := db.Workspace{
+		Uuid:        uuid.New().String(),
+		Name:        "test-workspace-" + uuid.New().String(),
+		OwnerPubKey: "owner-pubkey",
+	}
+	db.TestDB.CreateOrEditWorkspace(workspace)
+
+	feature := db.WorkspaceFeatures{
+		Uuid:          uuid.New().String(),
+		WorkspaceUuid: workspace.Uuid,
+		Name:          "test-feature",
+	}
+	db.TestDB.CreateOrEditFeature(feature)
+
+	featurePhase := db.FeaturePhase{
+		Uuid:        uuid.New().String(),
+		FeatureUuid: feature.Uuid,
+		WorkspaceId: workspace.Uuid,
+		Name:        "test-phase",
+	}
+	db.TestDB.CreateOrEditFeaturePhase(featurePhase)
+
+	t.Run("should trigger notification when ticket is assigned", func(t *testing.T) {
+		ticketUUID := uuid.New()
+		ticket := &db.Tickets{
+			UUID:        ticketUUID,
+			FeatureUUID: feature.Uuid,
+			PhaseUUID:   featurePhase.Uuid,
+			Name:        "test ticket",
+			Status:      db.DraftTicket,
+			Assignee:    "",
+		}
+		db.TestDB.CreateOrEditTicket(ticket)
+
+		updateRequest := UpdateTicketRequest{
+			Ticket: &db.Tickets{
+				UUID:        ticketUUID,
+				FeatureUUID: feature.Uuid,
+				PhaseUUID:   featurePhase.Uuid,
+				Name:        "test ticket",
+				Status:      db.ActiveTicket,
+				Assignee:    "assignee-pubkey",
+			},
+		}
+		bodyBytes, _ := json.Marshal(updateRequest)
+
+		rr := httptest.NewRecorder()
+		req := httptest.NewRequest(http.MethodPut, "/bounties/ticket/"+ticketUUID.String(), bytes.NewReader(bodyBytes))
+		req = req.WithContext(context.WithValue(req.Context(), auth.ContextKey, "owner-pubkey"))
+
+		rctx := chi.NewRouteContext()
+		rctx.URLParams.Add("uuid", ticketUUID.String())
+		req = req.WithContext(context.WithValue(req.Context(), chi.RouteCtxKey, rctx))
+
+		tHandler.UpdateTicket(rr, req)
+
+		assert.Equal(t, http.StatusOK, rr.Code)
+
+		var response db.Tickets
+		err := json.NewDecoder(rr.Body).Decode(&response)
+		require.NoError(t, err)
+		assert.Equal(t, "assignee-pubkey", response.Assignee)
+	})
+
+	t.Run("should not trigger notification when assignee is unchanged", func(t *testing.T) {
+		ticketUUID := uuid.New()
+		ticket := &db.Tickets{
+			UUID:        ticketUUID,
+			FeatureUUID: feature.Uuid,
+			PhaseUUID:   featurePhase.Uuid,
+			Name:        "test ticket unchanged",
+			Status:      db.DraftTicket,
+			Assignee:    "assignee-pubkey",
+		}
+		db.TestDB.CreateOrEditTicket(ticket)
+
+		updateRequest := UpdateTicketRequest{
+			Ticket: &db.Tickets{
+				UUID:        ticketUUID,
+				FeatureUUID: feature.Uuid,
+				PhaseUUID:   featurePhase.Uuid,
+				Name:        "test ticket unchanged",
+				Status:      db.ActiveTicket,
+				Assignee:    "assignee-pubkey",
+			},
+		}
+		bodyBytes, _ := json.Marshal(updateRequest)
+
+		rr := httptest.NewRecorder()
+		req := httptest.NewRequest(http.MethodPut, "/bounties/ticket/"+ticketUUID.String(), bytes.NewReader(bodyBytes))
+		req = req.WithContext(context.WithValue(req.Context(), auth.ContextKey, "owner-pubkey"))
+
+		rctx := chi.NewRouteContext()
+		rctx.URLParams.Add("uuid", ticketUUID.String())
+		req = req.WithContext(context.WithValue(req.Context(), chi.RouteCtxKey, rctx))
+
+		tHandler.UpdateTicket(rr, req)
+
+		assert.Equal(t, http.StatusOK, rr.Code)
+
+		var response db.Tickets
+		err := json.NewDecoder(rr.Body).Decode(&response)
+		require.NoError(t, err)
+		assert.Equal(t, "assignee-pubkey", response.Assignee)
+	})
+}
