@@ -1217,6 +1217,8 @@ func (db database) GetAllBounties(r *http.Request) []NewBounty {
 	PhaseUuid := keys.Get("phase_uuid")
 	PhasePriority := keys.Get("phase_priority")
 	accessRestriction := keys.Get("access_restriction")
+	myAssigned := keys.Get("myAssigned")
+	myAssigned := keys.Get("myAssigned")
 
 	if workspaceUuid == "" && orgUuid != "" {
 		workspaceUuid = orgUuid
@@ -1255,6 +1257,14 @@ func (db database) GetAllBounties(r *http.Request) []NewBounty {
 	
 	if accessRestriction != "" {
 		accessRestrictionQuery = fmt.Sprintf("AND access_restriction = '%s'", accessRestriction)
+	}
+
+	myAssignedQuery := ""
+	if myAssigned == "true" {
+		pubKeyFromAuth, _ := r.Context().Value(auth.ContextKey).(string)
+		if pubKeyFromAuth != "" {
+			myAssignedQuery = fmt.Sprintf("AND assignee = '%s'", pubKeyFromAuth)
+		}
 	}
 
 	var statusConditions []string
@@ -1304,7 +1314,7 @@ func (db database) GetAllBounties(r *http.Request) []NewBounty {
 
 	query := "SELECT * FROM public.bounty WHERE show != false"
 
-	allQuery := query + " " + statusQuery + " " + searchQuery + " " + workspaceQuery + " " + languageQuery + " " + phaseUuidQuery + " " + phasePriorityQuery + " " + accessRestrictionQuery + " " + orderQuery + " " + limitQuery
+	allQuery := query + " " + statusQuery + " " + searchQuery + " " + workspaceQuery + " " + languageQuery + " " + phaseUuidQuery + " " + phasePriorityQuery + " " + accessRestrictionQuery + " " + myAssignedQuery + " " + orderQuery + " " + limitQuery
 
 	theQuery := db.db.Raw(allQuery)
 

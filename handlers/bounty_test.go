@@ -1250,6 +1250,128 @@ func TestGetAllBounties(t *testing.T) {
 	})
 }
 
+func TestGetAllBountiesMyAssigned(t *testing.T) {
+	teardownSuite := SetupSuite(t)
+	defer teardownSuite(t)
+
+	mockHttpClient := mocks.NewHttpClient(t)
+	bHandler := NewBountyHandler(mockHttpClient, db.TestDB)
+
+	t.Run("should return only bounties assigned to authenticated user", func(t *testing.T) {
+		now := time.Now().Unix()
+		assignedBounty := db.NewBounty{
+			Type:          "coding",
+			Title:         "Assigned Bounty",
+			Description:   "Bounty assigned to me",
+			Assignee:      "test-user-pubkey",
+			OwnerID:       "test-owner",
+			Show:          true,
+			Created:       now,
+		}
+		db.TestDB.CreateOrEditBounty(assignedBounty)
+
+		unassignedBounty := db.NewBounty{
+			Type:          "coding",
+			Title:         "Unassigned Bounty",
+			Description:   "Bounty not assigned to me",
+			Assignee:      "other-user-pubkey",
+			OwnerID:       "test-owner",
+			Show:          true,
+			Created:       now + 1,
+		}
+		db.TestDB.CreateOrEditBounty(unassignedBounty)
+
+		rr := httptest.NewRecorder()
+		handler := http.HandlerFunc(bHandler.GetAllBounties)
+
+		rctx := chi.NewRouteContext()
+		req, _ := http.NewRequestWithContext(
+			context.WithValue(context.Background(), auth.ContextKey, "test-user-pubkey"),
+			http.MethodGet,
+			"/all?myAssigned=true",
+			nil,
+		)
+		req = req.WithContext(context.WithValue(req.Context(), chi.RouteCtxKey, rctx))
+
+		handler.ServeHTTP(rr, req)
+
+		var returnedBounty []db.BountyResponse
+		err := json.Unmarshal(rr.Body.Bytes(), &returnedBounty)
+		assert.NoError(t, err)
+		assert.Equal(t, http.StatusOK, rr.Code)
+		assert.NotEmpty(t, returnedBounty)
+
+		for _, b := range returnedBounty {
+			assert.Equal(t, "test-user-pubkey", b.Assignee)
+		}
+	})
+
+	t.Run("should return all bounties when myAssigned is not set", func(t *testing.T) {
+		rr := httptest.NewRecorder()
+		handler := http.HandlerFunc(bHandler.GetAllBounties)
+
+		rctx := chi.NewRouteContext()
+		req, _ := http.NewRequestWithContext(
+			context.WithValue(context.Background(), auth.ContextKey, "test-user-pubkey"),
+			http.MethodGet,
+			"/all",
+			nil,
+		)
+		req = req.WithContext(context.WithValue(req.Context(), chi.RouteCtxKey, rctx))
+
+		handler.ServeHTTP(rr, req)
+
+		var returnedBounty []db.BountyResponse
+		err := json.Unmarshal(rr.Body.Bytes(), &returnedBounty)
+		assert.NoError(t, err)
+		assert.Equal(t, http.StatusOK, rr.Code)
+		assert.NotEmpty(t, returnedBounty)
+	})
+
+	t.Run("should return empty when no bounties assigned to user", func(t *testing.T) {
+		rr := httptest.NewRecorder()
+		handler := http.HandlerFunc(bHandler.GetAllBounties)
+
+		rctx := chi.NewRouteContext()
+		req, _ := http.NewRequestWithContext(
+			context.WithValue(context.Background(), auth.ContextKey, "nonexistent-user"),
+			http.MethodGet,
+			"/all?myAssigned=true",
+			nil,
+		)
+		req = req.WithContext(context.WithValue(req.Context(), chi.RouteCtxKey, rctx))
+
+		handler.ServeHTTP(rr, req)
+
+		var returnedBounty []db.BountyResponse
+		err := json.Unmarshal(rr.Body.Bytes(), &returnedBounty)
+		assert.NoError(t, err)
+		assert.Equal(t, http.StatusOK, rr.Code)
+		assert.Empty(t, returnedBounty)
+	})
+
+	t.Run("should handle myAssigned with other filters", func(t *testing.T) {
+		rr := httptest.NewRecorder()
+		handler := http.HandlerFunc(bHandler.GetAllBounties)
+
+		rctx := chi.NewRouteContext()
+		req, _ := http.NewRequestWithContext(
+			context.WithValue(context.Background(), auth.ContextKey, "test-user-pubkey"),
+			http.MethodGet,
+			"/all?myAssigned=true&Open=true",
+			nil,
+		)
+		req = req.WithContext(context.WithValue(req.Context(), chi.RouteCtxKey, rctx))
+
+		handler.ServeHTTP(rr, req)
+
+		var returnedBounty []db.BountyResponse
+		err := json.Unmarshal(rr.Body.Bytes(), &returnedBounty)
+		assert.NoError(t, err)
+		assert.Equal(t, http.StatusOK, rr.Code)
+	})
+}
+
 func MockNewWSServer(t *testing.T) (*httptest.Server, *websocket.Conn) {
 
 	s := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
