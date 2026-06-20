@@ -197,6 +197,7 @@ func (th *ticketHandler) UpdateTicket(w http.ResponseWriter, r *http.Request) {
 			Status:      updateRequest.Ticket.Status,
 			Amount:      updateRequest.Ticket.Amount,
 			Category:    updateRequest.Ticket.Category,
+			Assignee:    updateRequest.Ticket.Assignee,
 			Version:     1,
 			CreatedAt:   time.Now(),
 			UpdatedAt:   time.Now(),
@@ -215,6 +216,7 @@ func (th *ticketHandler) UpdateTicket(w http.ResponseWriter, r *http.Request) {
 			Status:      updateRequest.Ticket.Status,
 			Amount:      updateRequest.Ticket.Amount,
 			Category:    updateRequest.Ticket.Category,
+			Assignee:    updateRequest.Ticket.Assignee,
 			Version:     existingTicket.Version + 1,
 			Author:      updateRequest.Ticket.Author,
 			AuthorID:    updateRequest.Ticket.AuthorID,
@@ -233,6 +235,21 @@ func (th *ticketHandler) UpdateTicket(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusInternalServerError)
 		json.NewEncoder(w).Encode(map[string]string{"error": fmt.Sprintf("Failed to update ticket: %v", err)})
 		return
+	}
+
+	if newTicket.Assignee != "" {
+		var previousAssignee string
+		if existingTicket.UUID != uuid.Nil {
+			previousAssignee = existingTicket.Assignee
+		}
+
+		if newTicket.Assignee != previousAssignee {
+			person := th.db.GetPersonByPubkey(newTicket.Assignee)
+			if person.OwnerPubKey != "" {
+				msg := fmt.Sprintf("You have been assigned a new ticket: %s. %s/bounty/%s", newTicket.Name, os.Getenv("HOST"), newTicket.UUID.String())
+				processNotification(newTicket.Assignee, "ticket_assigned", msg, person.OwnerAlias, person.OwnerRouteHint)
+			}
+		}
 	}
 
 	if updateRequest.Metadata.Source == "websocket" && updateRequest.Metadata.ID != "" {
