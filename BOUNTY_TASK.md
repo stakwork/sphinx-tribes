@@ -1,74 +1,43 @@
-# Bounty Objective: Notification Lifecycle Functionality and Key Exchange Handling  
-Target: stakwork/sphinx-tribes Issue #2391
-URL: https://github.com/stakwork/sphinx-tribes/issues/2391
+# Bounty Objective: Create route /features/uuid/phase/uuid/tickets
+Target: stakwork/sphinx-tribes Issue #1982
+URL: https://github.com/stakwork/sphinx-tribes/issues/1982
 
 ## Issue Description
-**Description:**  
-This task involves implementing a function to process notifications and setting up a cron job to handle cases where the `contact_key` is unavailable. The function will manage the end-to-end notification lifecycle, including user verification, notification sending, and status logging. The cron job will ensure notifications with the `WAITING_KEY_EXCHANGE` status are periodically rechecked and processed when the `contact_key` becomes available.  
+This endpoint will be used to return the full list of ticket UUIDS for a given feature and phase uuid. 
 
-**Acceptance Criteria:**  
+Add a route to features.go at /features/uuid/phase/uuid/tickets
 
-### 1. **Notification Processing Function**  
-Create a function named `sendNotification` to handle the following:  
-- **Input Parameters:**  
-  - `pubkey`: User's public key.  
-  - `event`: The event type (e.g., `bounty_assigned`).  
-  - `content`: Notification content.  
-  - `alias`: Alias of the user
+		r.Get("/{uuid}/phase/{uuid}/tickets", featureHandlers.GetTickets)
 
-- **Steps to Implement:**  
-  1. **Verify User on v2 Bot:**  
-     - Call the `/contact/{pubkey}` endpoint to check if the user exists.  
-     - If `contact_key` is empty:  
-       - Add the user to the bot's contact list using the `/add_contact` endpoint.  
-       - Re-call `/contact/{pubkey}` to verify the `contact_key`.  
+## Context
+We need to create a new endpoint that returns all ticket UUIDs associated with a specific feature and phase. This endpoint will be used to fetch the complete list of tickets for a given phase within a feature.
 
-     - If the `contact_key` is still empty, log the notification in the database with the status `WAITING_KEY_EXCHANGE` and exit the function
+## Task
+Add a new route to features.go that handles GET requests for retrieving all tickets associated with a feature and phase UUID combination.
 
-  2. **Send the Notification:**  
-     - If the `contact_key` is available, call the `/send` endpoint with the appropriate payload:  
-       ```typescript
-       {
-         dest: string;       // User's pubkey
-         amt_msat: 0;        // For text messages
-         content: string;    // Notification content
-         is_tribe: false;    // For direct messages
-         wait: true;         // Synchronous behavior
-       }
-       ```  
+## Outcome
+A functioning route that accepts feature UUID and phase UUID parameters and returns the associated ticket UUIDs.
 
-  3. **Log the Result:**  
-     - Update the database with the response from the `/send` endpoint.  
-     - Store the final status (`COMPLETE`, `FAILED`, or `PENDING`) along with relevant metadata.  
+## Design
+### Route Definition
+In features.go:
+```go
+func RegisterFeatureRoutes(r chi.Router) {
+    // Existing routes...
+    
+    // New route for getting phase tickets
+    r.Get("/{featureUUID}/phase/{phaseUUID}/tickets", featureHandlers.GetTickets)
+}
+```
 
-### 2. **Cron Job for Key Exchange Handling**  
-Implement a cron job to periodically process notifications with the status `WAITING_KEY_EXCHANGE`:  
-
-- **Behavior:**  
-  1. Query the database for all notifications with the status `WAITING_KEY_EXCHANGE`.  
-  2. For each record:  
-     - Re-call the `/contact/{pubkey}` endpoint to check if the `contact_key` is now available.  
-     - If the `contact_key` is available:  
-       - Call the function in charge of sending notifications to send the notification.  
-       - Update the database with the response from the `/send` endpoint.  
-     - If the `contact_key` is still unavailable increment retry by 1 and leave the record for the next cron job iteration.  
-
-**Database Schema:**  
-Ensure the database table `notifications` supports the following:  
-- `id` (Primary Key)  
-- `event` (Event type, e.g., `bounty_assigned`)  
-- `pubkey`  
-- `content`  
-- `retries`  
-- `status` (`PENDING`, `COMPLETE`, `FAILED`, `WAITING_KEY_EXCHANGE`)  
-- `uuid` (Unique identifier for the notification)  
-- `created_at` (Timestamp for record creation)  
-
-**Additional Notes:**  
-- The `sendNotification` function and cron job should be modular and reusable for future enhancements.  
-- Ensure robust error handling for API calls and database interactions.  
-
-This Ticket depends on [this](https://github.com/stakwork/sphinx-tribes/issues/2390)
+## Acceptance Criteria
+- [ ] Route `/features/{featureUUID}/phase/{phaseUUID}/tickets` is registered
+- [ ] Route is accessible via GET method
+- [ ] Route parameters are properly defined:
+  - `featureUUID`: Feature identifier
+  - `phaseUUID`: Phase identifier
+- [ ] Route is mapped to the correct handler function
+- [ ] Route follows existing project patterns for URL structure
 
 ## Instructions for Kuro (Autonomous Solver):
 1. Use skills: `systematic-debugging` and `code-review-and-quality`.
