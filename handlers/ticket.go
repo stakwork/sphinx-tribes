@@ -577,9 +577,9 @@ func (th *ticketHandler) PostTicketDataToStakwork(w http.ResponseWriter, r *http
 	}
 
 	mode := "thinking"
-   if ticketRequest.Ticket.Mode != "" {
-      mode = ticketRequest.Ticket.Mode
-   }
+	if ticketRequest.Ticket.Mode != "" {
+		mode = ticketRequest.Ticket.Mode
+	}
 
 	stakworkPayload := map[string]interface{}{
 		"name":        "Hive Ticket Builder",
@@ -864,10 +864,12 @@ func (th *ticketHandler) ProcessTicketReview(w http.ResponseWriter, r *http.Requ
 //	@Success		200				{array}	db.Tickets
 //	@Router			/bounties/ticket/feature/{feature_uuid}/phase/{phase_uuid} [get]
 func (th *ticketHandler) GetTicketsByPhaseUUID(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json")
+
 	ctx := r.Context()
 	pubKeyFromAuth, _ := ctx.Value(auth.ContextKey).(string)
 	if pubKeyFromAuth == "" {
-		logger.Log.Info("no pubkey from auth")
+		logger.Log.Info("[ticket] no pubkey from auth")
 		w.WriteHeader(http.StatusUnauthorized)
 		return
 	}
@@ -875,15 +877,15 @@ func (th *ticketHandler) GetTicketsByPhaseUUID(w http.ResponseWriter, r *http.Re
 	featureUUID := chi.URLParam(r, "feature_uuid")
 	phaseUUID := chi.URLParam(r, "phase_uuid")
 
-	if featureUUID == "" {
-		log.Println("feature uuid is missing")
-		http.Error(w, "Missing feature uuid", http.StatusBadRequest)
+	if _, err := uuid.Parse(featureUUID); err != nil {
+		w.WriteHeader(http.StatusBadRequest)
+		json.NewEncoder(w).Encode(map[string]string{"error": "invalid feature UUID format"})
 		return
 	}
 
-	if phaseUUID == "" {
-		log.Println("phase uuid is missing")
-		http.Error(w, "Missing phase uuid", http.StatusBadRequest)
+	if _, err := uuid.Parse(phaseUUID); err != nil {
+		w.WriteHeader(http.StatusBadRequest)
+		json.NewEncoder(w).Encode(map[string]string{"error": "invalid phase UUID format"})
 		return
 	}
 
