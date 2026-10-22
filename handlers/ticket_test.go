@@ -1139,6 +1139,159 @@ func TestGetTicketsByGroup(t *testing.T) {
 	}
 }
 
+func TestGetTicketsByPhaseUUID(t *testing.T) {
+	teardownSuite := SetupSuite(t)
+	defer teardownSuite(t)
+
+	tHandler := NewTicketHandler(&http.Client{}, db.TestDB)
+
+	person := db.Person{
+		Uuid:        uuid.New().String(),
+		OwnerAlias:  "test-alias",
+		UniqueName:  "test-unique-name",
+		OwnerPubKey: "test-pubkey",
+	}
+	db.TestDB.CreateOrEditPerson(person)
+
+	workspace := db.Workspace{
+		Uuid:        uuid.New().String(),
+		Name:        "test-workspace" + uuid.New().String(),
+		OwnerPubKey: person.OwnerPubKey,
+	}
+	db.TestDB.CreateOrEditWorkspace(workspace)
+
+	feature := db.WorkspaceFeatures{
+		Uuid:          uuid.New().String(),
+		WorkspaceUuid: workspace.Uuid,
+		Name:          "test-feature",
+		Url:           "https://github.com/test-feature",
+	}
+	createdFeature, err := db.TestDB.CreateOrEditFeature(feature)
+	require.NoError(t, err)
+
+	phase := db.FeaturePhase{
+		Uuid:        uuid.New().String(),
+		FeatureUuid: createdFeature.Uuid,
+		Name:        "test-phase",
+	}
+	createdPhase, err := db.TestDB.CreateOrEditFeaturePhase(phase)
+	require.NoError(t, err)
+
+	ticket := db.Tickets{
+		UUID:        uuid.New(),
+		FeatureUUID: createdFeature.Uuid,
+		PhaseUUID:   createdPhase.Uuid,
+		Name:        "Test Ticket",
+		Sequence:    1,
+		Description: "Test Description",
+		Status:      db.DraftTicket,
+	}
+	_, err = db.TestDB.CreateOrEditTicket(&ticket)
+	require.NoError(t, err)
+
+	tests := []struct {
+		name        string
+		featureUUID string
+		phaseUUID   string
+		auth        string
+		wantCode    int
+		wantTickets bool
+	}{
+		{
+			name:        "success",
+			featureUUID: createdFeature.Uuid,
+			phaseUUID:   createdPhase.Uuid,
+			auth:        person.OwnerPubKey,
+			wantCode:    http.StatusOK,
+			wantTickets: true,
+		},
+		{
+			name:        "unauthorized - no auth token",
+			featureUUID: createdFeature.Uuid,
+			phaseUUID:   createdPhase.Uuid,
+			wantCode:    http.StatusUnauthorized,
+		},
+		{
+			name:        "bad request - invalid feature UUID",
+			featureUUID: "invalid-uuid",
+			phaseUUID:   createdPhase.Uuid,
+			auth:        person.OwnerPubKey,
+			wantCode:    http.StatusBadRequest,
+		},
+		{
+			name:        "bad request - invalid phase UUID",
+			featureUUID: createdFeature.Uuid,
+			phaseUUID:   "invalid-uuid",
+			auth:        person.OwnerPubKey,
+			wantCode:    http.StatusBadRequest,
+		},
+		{
+			name:        "not found - feature does not exist",
+			featureUUID: uuid.New().String(),
+			phaseUUID:   createdPhase.Uuid,
+			auth:        person.OwnerPubKey,
+			wantCode:    http.StatusNotFound,
+		},
+		{
+			name:        "not found - phase does not exist",
+			featureUUID: createdFeature.Uuid,
+			phaseUUID:   uuid.New().String(),
+			auth:        person.OwnerPubKey,
+			wantCode:    http.StatusNotFound,
+		},
+		{
+			name:        "success - empty phase returns empty array",
+			featureUUID: createdFeature.Uuid,
+			phaseUUID: func() string {
+				emptyPhase := db.FeaturePhase{
+					Uuid:        uuid.New().String(),
+					FeatureUuid: createdFeature.Uuid,
+					Name:        "empty-phase",
+				}
+				created, err := db.TestDB.CreateOrEditFeaturePhase(emptyPhase)
+				require.NoError(t, err)
+				return created.Uuid
+			}(),
+			auth:        person.OwnerPubKey,
+			wantCode:    http.StatusOK,
+			wantTickets: false,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			rr := httptest.NewRecorder()
+			req := httptest.NewRequest(http.MethodGet, "/tickets/feature/"+tt.featureUUID+"/phase/"+tt.phaseUUID, nil)
+
+			rctx := chi.NewRouteContext()
+			rctx.URLParams.Add("feature_uuid", tt.featureUUID)
+			rctx.URLParams.Add("phase_uuid", tt.phaseUUID)
+			req = req.WithContext(context.WithValue(req.Context(), chi.RouteCtxKey, rctx))
+
+			if tt.auth != "" {
+				req = req.WithContext(context.WithValue(req.Context(), auth.ContextKey, tt.auth))
+			}
+
+			tHandler.GetTicketsByPhaseUUID(rr, req)
+
+			assert.Equal(t, tt.wantCode, rr.Code)
+			assert.Equal(t, "application/json", rr.Header().Get("Content-Type"))
+
+			if tt.wantCode == http.StatusOK {
+				var tickets []db.Tickets
+				err := json.NewDecoder(rr.Body).Decode(&tickets)
+				require.NoError(t, err)
+				if tt.wantTickets {
+					require.Len(t, tickets, 1)
+					assert.Equal(t, ticket.UUID, tickets[0].UUID)
+				} else {
+					assert.Empty(t, tickets)
+				}
+			}
+		})
+	}
+}
+
 func TestCreateWorkspaceDraftTicket(t *testing.T) {
 	teardownSuite := SetupSuite(t)
 	defer teardownSuite(t)
