@@ -47,6 +47,18 @@ func FeatureMockHandler(t *testing.T, expectedStatus int) http.HandlerFunc {
 	}
 }
 
+func TestFeatureRoutesPhaseTicketsRegistered(t *testing.T) {
+	r := FeatureRoutes()
+
+	req := httptest.NewRequest(http.MethodGet, "/1234/phase/5678/tickets", nil)
+	rr := httptest.NewRecorder()
+	r.ServeHTTP(rr, req)
+
+	// The route is registered but protected by the feature auth middleware.
+	assert.NotEqual(t, http.StatusNotFound, rr.Code, "phase tickets route should be registered")
+	assert.Equal(t, http.StatusUnauthorized, rr.Code)
+}
+
 func TestFeatureRoutes(t *testing.T) {
 	r := chi.NewRouter()
 
