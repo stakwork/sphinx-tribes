@@ -1090,6 +1090,7 @@ type Tickets struct {
 	Dependency    []int             `gorm:"type:integer[]" json:"dependency"`
 	Description   string            `gorm:"type:text" json:"description"`
 	Status        TicketStatus      `gorm:"type:varchar(50);default:'DRAFT'" json:"status"`
+	Assignee      string            `gorm:"type:varchar(255);default:''" json:"assignee"`
 	Version       int               `gorm:"type:integer;default:0" json:"version"`
 	Author        *Author           `gorm:"type:varchar(50)" json:"author,omitempty"`
 	AuthorID      *string           `gorm:"type:varchar(255)" json:"author_id,omitempty"`
